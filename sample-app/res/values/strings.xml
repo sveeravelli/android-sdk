@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, OoyalaAndroidSDKActivity!</string>
-    <string name="app_name">Ooyala Android SDK</string>
+    <string name="hello">Hello World, Ooyala Android Sample App!</string>
+    <string name="app_name">Ooyala Android Sample App</string>
 
 </resources>

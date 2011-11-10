@@ -1,9 +1,9 @@
-package com.ooyala.android;
+package com.ooyala.android.sampleapp;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-public class OoyalaAndroidSDKActivity extends Activity {
+public class OoyalaAndroidSampleAppActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
