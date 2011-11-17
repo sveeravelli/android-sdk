@@ -2,6 +2,6 @@ package com.ooyala.android;
 
 import java.util.List;
 
-public interface ChannelSet extends Movie {
+public interface ChannelSet extends ContentItem {
   public List<Channel> getChannels();
 }
