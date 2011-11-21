@@ -63,7 +63,7 @@ public class OoyalaPlayer {
    * @param embedCode
    * @return accepted
    */
-  public boolean changeCurrentItem(String embedCode)
+  public boolean setCurrentItem(String embedCode)
   {
     Movie requestedItem = null; // look up based on embed code
     // TODO: actually change what's playing
@@ -93,7 +93,7 @@ public class OoyalaPlayer {
   /**
    * Pause the current video
    */
-  public void pauseMovie()
+  public void pause()
   {
 
   }
@@ -101,7 +101,7 @@ public class OoyalaPlayer {
   /**
    * Play the current video
    */
-  public void playMovie()
+  public void play()
   {
 
   }
@@ -124,16 +124,16 @@ public class OoyalaPlayer {
     return 0;
   }
 
-  /**
-   * Move the playhead to a new location in seconds with millisecond accuracy
-   * @param time in seconds
-   */
-  public void setPlayheadTime(int time)
+  public void setPlayheadTime(int timeInMillis)
   {
-    seek(time);
+    seek(timeInMillis);
   }
 
-  public void seek(int time)
+  /**
+   * Move the playhead to a new location in seconds with millisecond accuracy
+   * @param time in milliseconds
+   */
+  public void seek(int timeInMillis)
   {
   }
 
