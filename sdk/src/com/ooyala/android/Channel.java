@@ -1,7 +1,18 @@
 package com.ooyala.android;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public interface Channel extends ContentItem {
-  public List<Movie> getMovies();
+public class Channel extends ContentItem
+{
+  protected ArrayList<Movie>_movies = new ArrayList<Movie>();
+
+  protected void addMovie(Movie movie)
+  {
+    _movies.add(movie);
+  }
+
+  public ArrayList<Movie> getMovies()
+  {
+    return _movies;
+  }
 }
