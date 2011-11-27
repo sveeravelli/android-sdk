@@ -1,6 +1,9 @@
 package com.ooyala.android;
 
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.util.AttributeSet;
+import android.widget.RelativeLayout;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -9,17 +12,91 @@ import android.media.MediaPlayer;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-public class OoyalaPlayer {
-
+public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPreparedListener,
+                                                            MediaPlayer.OnErrorListener,
+                                                            MediaPlayer.OnCompletionListener//,
+//                                     MediaPlayer.OnBufferingUpdateListener,
+//                                     MediaPlayer.OnInfoListener,
+//                                     MediaPlayer.OnSeekCompleteListener,
+//                                     MediaPlayer.OnVideoSizeChangedListener
+{
   private MediaPlayer _mediaPlayer = null;
 
   private ContentItem _item = null;
   private Movie _currentItem = null;
   private OoyalaError _currentError = null;
 
-  public OoyalaPlayer(String embedCode)
+  public OoyalaPlayer(Context context)
   {
-    _mediaPlayer = new MediaPlayer();
+    super(context);
+  }
+
+  public OoyalaPlayer(Context context, AttributeSet attrs)
+  {
+    super(context, attrs);
+  }
+
+  public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle)
+  {
+    super(context, attrs, defStyle);
+  }
+
+  public OoyalaPlayer(Context context, String embedCode)
+  {
+    super(context);
+    createMediaPlayer();
+    setEmbedCode(embedCode);
+  }
+
+  public OoyalaPlayer(Context context, AttributeSet attrs, String embedCode)
+  {
+    super(context, attrs);
+    createMediaPlayer();
+    setEmbedCode(embedCode);
+  }
+
+  public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle, String embedCode)
+  {
+    super(context, attrs, defStyle);
+    createMediaPlayer();
+    setEmbedCode(embedCode);
+  }
+
+  private void createMediaPlayer()
+  {
+    _mediaPlayer = new MediaPlayer(); // Player Idle
+    _mediaPlayer.setOnPreparedListener(this);
+    _mediaPlayer.setOnErrorListener(this);
+    _mediaPlayer.setOnCompletionListener(this);
+// TODO: Implement all of these listeners:
+//    _mediaPlayer.setOnBufferingUpdateListener(this);
+//    _mediaPlayer.setOnInfoListener(this);
+//    _mediaPlayer.setOnSeekCompleteListener(this);
+//    _mediaPlayer.setOnVideoSizeChangedListener(this);
+  }
+
+  /** Called when MediaPlayer is ready */
+  @Override
+  public void onPrepared(MediaPlayer player)
+  {
+    if (true)
+    {
+      _mediaPlayer.start();
+    }
+  }
+
+  @Override
+  public boolean onError(MediaPlayer player, int what, int extra)
+  {
+      // ... react appropriately ...
+      // The MediaPlayer has moved to the Error state, must be reset!
+    System.out.println("Player Error");
+    return true;
+  }
+
+  @Override
+  public void onCompletion(MediaPlayer player)
+  {
   }
 
   /**
@@ -41,7 +118,7 @@ public class OoyalaPlayer {
   }
 
   /**
-   * Get the embedCode for the current player
+   * Get the embedCode for the current player.
    * @return embedCode
    */
   public String getEmbedCode()
@@ -51,11 +128,26 @@ public class OoyalaPlayer {
 
   /**
    * Reinitializes the player with a new embedCode.
+   * If embedCode is null, this method has no effect and just returns.
    * @param embedCode
    */
   public void setEmbedCode(String embedCode)
   {
-    // TODO
+    if (embedCode == null) return;
+
+    // Look up playback URL
+    String url = "http://www.daily3gp.com/vids/3.3gp";
+
+    // Play URL in MediaPlayer
+    try
+    {
+      _mediaPlayer.setDataSource(url); // Player Initialized
+    }
+    catch (Exception exception)
+    {
+      // TODO: handle error
+    }
+    _mediaPlayer.prepareAsync(); // Player Preparing
   }
 
   /**
@@ -124,6 +216,10 @@ public class OoyalaPlayer {
     return 0;
   }
 
+  /**
+   * Synonym for seek.
+   * @param time in milliseconds
+   */
   public void setPlayheadTime(int timeInMillis)
   {
     seek(timeInMillis);
