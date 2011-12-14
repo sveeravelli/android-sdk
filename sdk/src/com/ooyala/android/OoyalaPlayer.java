@@ -1,6 +1,7 @@
 package com.ooyala.android;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
@@ -22,23 +23,26 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
 {
   private MediaPlayer _mediaPlayer = null;
 
-  private ContentItem _item = null;
-  private Movie _currentItem = null;
+  private ContentItem _rootItem = null;
+  private Video _currentItem = null;
   private OoyalaError _currentError = null;
 
   public OoyalaPlayer(Context context)
   {
     super(context);
+    createMediaPlayer();
   }
 
   public OoyalaPlayer(Context context, AttributeSet attrs)
   {
     super(context, attrs);
+    createMediaPlayer();
   }
 
   public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle)
   {
     super(context, attrs, defStyle);
+    createMediaPlayer();
   }
 
   public OoyalaPlayer(Context context, String embedCode)
@@ -73,6 +77,8 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
 //    _mediaPlayer.setOnInfoListener(this);
 //    _mediaPlayer.setOnSeekCompleteListener(this);
 //    _mediaPlayer.setOnVideoSizeChangedListener(this);
+//    _mediaPlayer.setDisplay(holder);
+    _mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
   }
 
   /** Called when MediaPlayer is ready */
@@ -103,7 +109,7 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * The current movie.
    * @return movie
    */
-  public Movie getCurrentItem()
+  public Video getCurrentItem()
   {
 	  return _currentItem;
   }
@@ -112,9 +118,9 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * The embedded item (movie, channel, or channel set).
    * @return movie
    */
-  public ContentItem getItem()
+  public ContentItem getRootItem()
   {
-	  return _item;
+	  return _rootItem;
   }
 
   /**
@@ -123,7 +129,7 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    */
   public String getEmbedCode()
   {
-	  return _item == null ? null : _item.getEmbedCode();
+	  return _rootItem == null ? null : _rootItem.getEmbedCode();
   }
 
   /**
@@ -136,16 +142,19 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
     if (embedCode == null) return;
 
     // Look up playback URL
-    String url = "http://www.daily3gp.com/vids/3.3gp";
+    String url = "http://ak.c.ooyala.com/81MTVjMjq2PJ4s41-o_iNxP5uYAHQjPy/DOcJ-FxaFrRg4gtGEwOjkzOjBrO_9K4g";
+    //String url = "http://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3";
+    //String url = "http://www.tools4movies.com/dvd_catalyst_profile_samples/Harold%20Kumar%203%20Christmas%20bionic.mp4";
 
     // Play URL in MediaPlayer
+    System.out.println("Callig setDataSource");
     try
     {
       _mediaPlayer.setDataSource(url); // Player Initialized
     }
     catch (Exception exception)
     {
-      // TODO: handle error
+      System.out.println("Unable to setDataSource: "+exception);
     }
     _mediaPlayer.prepareAsync(); // Player Preparing
   }
@@ -157,7 +166,7 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    */
   public boolean setCurrentItem(String embedCode)
   {
-    Movie requestedItem = null; // look up based on embed code
+    Video requestedItem = null; // look up based on embed code
     // TODO: actually change what's playing
     _currentItem = requestedItem;
     return true;
