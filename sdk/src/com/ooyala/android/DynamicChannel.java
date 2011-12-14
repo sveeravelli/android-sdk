@@ -1,19 +1,11 @@
 package com.ooyala.android;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ooyala.android.Constants.ReturnState;
-import com.ooyala.android.OoyalaError.OoyalaErrorCode;
 
 public class DynamicChannel extends Channel
 {
@@ -59,7 +51,8 @@ public class DynamicChannel extends Channel
       {
         if (data.isNull(videoEmbedCode))
         {
-          // do nothing?
+          // Remove from _embedCodes
+          _embedCodes.remove(videoEmbedCode);
         }
         else
         {
