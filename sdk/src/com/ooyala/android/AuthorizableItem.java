@@ -1,6 +1,9 @@
 package com.ooyala.android;
 
 import java.util.List;
+import java.util.Map;
+
+import com.ooyala.android.Constants.ReturnState;
 
 /**
  * Stores the info and metatdata for the specified movie.
@@ -13,7 +16,7 @@ public interface AuthorizableItem
    * @param data the data to use to update this ContentItem
    * @returns a ReturnState based on if the data matched or not (or parsing failed)
    */
-  - (ReturnState)update(Map<String,String> data);
+  public ReturnState update(Map<String,String> data);
 
   /**
    * The embed code for the AuthorizableItem
