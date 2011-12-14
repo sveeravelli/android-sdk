@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, Ooyala Android Sample App!</string>
+    <string name="start">The player is below.</string>
+    <string name="end">The player is above.</string>
     <string name="app_name">Ooyala Android Sample App</string>
 
 </resources>
