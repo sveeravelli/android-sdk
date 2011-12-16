@@ -15,7 +15,7 @@ import com.ooyala.android.Constants.ReturnState;
  */
 public class Video extends ContentItem
 {
-  protected Set<Ad> _ads = new HashSet<Ad>();
+  protected Set<AdSpot> _ads = new HashSet<AdSpot>();
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected Channel _parent = null;
   protected int _duration = 0;
@@ -92,7 +92,7 @@ public class Video extends ContentItem
           _ads.clear();
           for (int i = 0; i < ads.length(); i++)
           {
-            Ad ad = new Ad(ads.getJSONObject(i));
+            AdSpot ad = AdSpot.create(ads.getJSONObject(i), _api);
             if (ad != null)
             {
               _ads.add(ad);
@@ -114,7 +114,7 @@ public class Video extends ContentItem
     return ReturnState.STATE_MATCHED;
   }
 
-  public Set<Ad> getAds()
+  public Set<AdSpot> getAds()
   {
     return _ads;
   }
@@ -157,9 +157,9 @@ public class Video extends ContentItem
   public ReturnState fetchAdsPlaybackInfo(PlayerAPIClient api)
   {
     if (!hasAds()) { return ReturnState.STATE_UNMATCHED; }
-    for (Ad ad : ads)
+    for (AdSpot ad : _ads)
     {
-      if (ad.fetchPlaybackInfo(api) != ReturnState.STATE_MATCHED)
+      if (ad.fetchPlaybackInfo() != ReturnState.STATE_MATCHED)
       {
         return ReturnState.STATE_FAIL;
       }
