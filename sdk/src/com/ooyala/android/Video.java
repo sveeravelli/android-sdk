@@ -1,8 +1,6 @@
 package com.ooyala.android;
 
-import java.net.URL;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.json.*;
@@ -74,10 +72,6 @@ public class Video extends ContentItem
             if (stream != null)
             {
               _streams.add(stream);
-            }
-            else
-            {
-              System.out.println("Unable to create stream.");
             }
           }
         }
