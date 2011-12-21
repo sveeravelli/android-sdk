@@ -89,7 +89,7 @@ public class DynamicChannel extends Channel
     return ReturnState.STATE_MATCHED;
   }
 
-  List<String> embedCodesToAuthorize()
+  public List<String> embedCodesToAuthorize()
   {
     return _embedCodes;
   }

@@ -10,20 +10,20 @@ class Constants
   public static final String API_METADATA             = "metadata";
 
   public static final String AUTHORIZE_HOST           = "http://dev.corp.ooyala.com:4567";
-  public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/authorization/content_id/%@/%@";
-  public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/authorization/embed_code/%@/%@";
+  public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/authorization/content_id/%s/%s";
+  public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/authorization/embed_code/%s/%s";
   public static final String AUTHORIZE_PUBLIC_KEY_B64 = "MCgCIQD1PX86jvLr5bB3b5IFEze7TiWGEaRSHl5Ls7/3AKO5IwIDAQAB";
   public static final String AUTHORIZE_PUBLIC_KEY_NAME = "sas_public_key";
   public static final int    AUTHORIZE_SIGNATURE_DIGEST_LENGTH  = 20;
 
   public static final String CONTENT_TREE_HOST        = "http://dev.corp.ooyala.com:3000";
-  public static final String CONTENT_TREE_URI         = "/player_api/content_tree/embed_code/%@/%@";
-  public static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/content_tree/external_id/%@/%@";
-  public static final String CONTENT_TREE_NEXT_URI    = "/player_api/content_tree/next/%@/%@";
+  public static final String CONTENT_TREE_URI         = "/player_api/content_tree/embed_code/%s/%s";
+  public static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/content_tree/external_id/%s/%s";
+  public static final String CONTENT_TREE_NEXT_URI    = "/player_api/content_tree/next/%s/%s";
 
   public static final String METADATA_HOST            = "http://dev.corp.ooyala.com:3000";
-  public static final String METADATA_CONTENT_ID_URI  = "/player_api/metadata/content_id/%@/%@/ios";
-  public static final String METADATA_EMBED_CODE_URI  = "/player_api/metadata/embed_code/%@/%@/ios";
+  public static final String METADATA_CONTENT_ID_URI  = "/player_api/metadata/content_id/%s/%s/android";
+  public static final String METADATA_EMBED_CODE_URI  = "/player_api/metadata/embed_code/%s/%s/android";
 
   public static final String KEY_EMBED_CODE           = "embed_code";
   public static final String KEY_EXTERNAL_ID          = "external_id";

@@ -4,15 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ooyala.android.Constants.ReturnState;
-import com.ooyala.android.OoyalaError.OoyalaErrorCode;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class Channel extends ContentItem implements PaginatedParentItem
 {
@@ -238,31 +236,30 @@ public class Channel extends ContentItem implements PaginatedParentItem
 
     public void run()
     {
-      Object responseObject = _api.contentTreeNext(_nextChildren, this);
-      if (responseObject instanceof OoyalaError)
+      PaginatedItemResponse response = _api.contentTreeNext(_nextChildren, Channel.this);
+      if (response == null)
       {
-        _listener.onItemsFetched(-1, 0, (OoyalaError)responseObject);
+        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Null response"));
         _isFetchingMoreChildren = false;
         return;
       }
 
-      PaginatedItemResponse response = (PaginatedItemResponse) responseObject;
       if (response.firstIndex < 0)
       {
-        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaError(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
+        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
         _isFetchingMoreChildren = false;
         return;
       }
 
-      Set<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(Utils.getSubset(_videos, response.firstIndex, response.count));
-      boolean authorized = _api.authorizeEmbedCodes(childEmbedCodesToAuthorize, this);
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(Utils.getSubset(_videos, response.firstIndex, response.count));
+      boolean authorized = _api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this);
       if (authorized)
       {
         _listener.onItemsFetched(response.firstIndex, response.count, null);
       }
       else
       {
-        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaError(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
       }
       _isFetchingMoreChildren = false;
       return;

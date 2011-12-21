@@ -25,7 +25,7 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
 
   private ContentItem _rootItem = null;
   private Video _currentItem = null;
-  private OoyalaError _currentError = null;
+  private OoyalaException _currentError = null;
 
   public OoyalaPlayer(Context context)
   {
@@ -177,7 +177,7 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * Get the current error code, if one exists
    * @return error code
    */
-  public OoyalaError getError()
+  public OoyalaException getError()
   {
     return _currentError;
   }

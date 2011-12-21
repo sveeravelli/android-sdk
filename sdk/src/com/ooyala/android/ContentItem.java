@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import com.ooyala.android.Constants.ReturnState;
  * Stores the info and metadata for the specified content item.
  *
  */
-public abstract class ContentItem
+public abstract class ContentItem implements AuthorizableItem
 {
   protected String _embedCode = null;
   protected String _externalId = null;
@@ -178,6 +179,14 @@ public abstract class ContentItem
     }
   }
 
+  public List<String> embedCodesToAuthorize()
+  {
+    List<String> embedCodes = new ArrayList<String>();
+    embedCodes.add(_embedCode);
+    return embedCodes;
+  }
+
+
   /**
    * Returns a promo image URL for this content item that will be at least the specified dimensions
    * @param width
@@ -209,10 +218,10 @@ public abstract class ContentItem
     return url;
   }
 
-  public static <T> Set<String> getEmbedCodes(Set<T> items)
+  public static <T> List<String> getEmbedCodes(Set<T> items)
   {
     if (items == null) { return null; }
-    Set<String> result = new HashSet<String>();
+    List<String> result = new ArrayList<String>();
     for (ContentItem item : (Set<ContentItem>)items)
     {
       result.add(item.getEmbedCode());
