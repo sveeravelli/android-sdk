@@ -11,7 +11,7 @@ import com.ooyala.android.Constants.ReturnState;
  * Stores the info and metatdata for the specified movie.
  *
  */
-public class Video extends ContentItem
+public class Video extends ContentItem implements PlayableItem
 {
   protected Set<AdSpot> _ads = new HashSet<AdSpot>();
   protected Set<Stream> _streams = new HashSet<Stream>();
@@ -148,17 +148,22 @@ public class Video extends ContentItem
     return Stream.bestStream(_streams);
   }
 
-  public ReturnState fetchAdsPlaybackInfo(PlayerAPIClient api)
+  public boolean fetchPlaybackInfo()
   {
-    if (!hasAds()) { return ReturnState.STATE_UNMATCHED; }
-    for (AdSpot ad : _ads)
+    if (hasAds())
     {
-      if (ad.fetchPlaybackInfo() != ReturnState.STATE_MATCHED)
+      for (AdSpot ad : _ads)
       {
-        return ReturnState.STATE_FAIL;
+        if (!ad.fetchPlaybackInfo())
+        {
+          return false;
+        }
       }
     }
-    return ReturnState.STATE_MATCHED;
+
+    // TODO: closed captions
+
+    return true;
   }
 
   /**

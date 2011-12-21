@@ -84,7 +84,7 @@ public abstract class AdSpot
     return ReturnState.STATE_MATCHED;
   }
 
-  public abstract ReturnState fetchPlaybackInfo();
+  public abstract boolean fetchPlaybackInfo();
 
   public static AdSpot create(JSONObject data, PlayerAPIClient api)
   {

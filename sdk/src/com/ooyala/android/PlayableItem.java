@@ -6,5 +6,5 @@ package com.ooyala.android;
  */
 public interface PlayableItem
 {
-  public String getStreamURL();
+  public Stream getStream();
 }
