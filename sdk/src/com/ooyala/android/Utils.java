@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 public class Utils
 {
   public static URL makeURL(String host, String uri, Map<String,String> params)
@@ -78,6 +82,37 @@ public class Utils
     }
     return result;
   }
+
+  public static String join(List<String> list, String separator)
+  {
+    if (list == null) { return null; }
+    StringBuffer result = new StringBuffer();
+    if (!list.isEmpty())
+    {
+      result.append(list.get(0));
+      for (int i = 1; i < list.size(); i++)
+      {
+        if (separator != null) { result.append(separator); }
+        result.append(list.get(i));
+      }
+    }
+    return result.toString();
+  }
+
+  public static JSONObject objectFromJSON(String json)
+  {
+    try
+    {
+      return (JSONObject) new JSONTokener(json).nextValue();
+    }
+    catch (JSONException exception)
+    {
+      System.out.println("JSONException: " + exception);
+      return null;
+    }
+  }
+
+
 }
 
 
