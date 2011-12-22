@@ -98,4 +98,26 @@ class Constants
   public static final int DEFAULT_AD_TIME_SECONDS     = 0;
 
   public enum ReturnState { STATE_MATCHED, STATE_UNMATCHED, STATE_FAIL };
+
+  public static final int AUTH_CODE_UNKNOWN = -2;                       /**< The authorization code was invalid */
+  public static final int AUTH_CODE_NOT_REQUESTED = -1;                 /**< The authorization has not been requested for this item */
+  public static final int AUTH_CODE_MIN_AUTH_CODE = 0;                  /**< The minimum value for auth codes from the server */
+  public static final int AUTH_CODE_AUTHORIZED = 0;                     /**< The item is authorized */
+  public static final int AUTH_CODE_UNAUTHORIZED_PARENT = 1;            /**< The item's parent is unauthorized */
+  public static final int AUTH_CODE_UNAUTHORIZED_DOMAIN = 2;            /**< The item is not authorized for this domain */
+  public static final int AUTH_CODE_UNAUTHORIZED_LOCATION = 3;          /**< The item is not authorized for this location */
+  public static final int AUTH_CODE_BEFORE_FLIGHT_TIME = 4;             /**< The item has been requested before its flight time */
+  public static final int AUTH_CODE_AFTER_FLIGHT_TIME = 5;              /**< The item has been requested after its flight time */
+  public static final int AUTH_CODE_OUTSIDE_RECURRING_FLIGHT_TIMES = 6; /**< The item has been requested outside of its recurring flight time */
+  public static final int AUTH_CODE_BAD_EMBED_CODE = 7;                 /**< The item's embed code is invalid */
+  public static final int AUTH_CODE_INVALID_SIGNATURE = 8;              /**< The signature of the request is invalid */
+  public static final int AUTH_CODE_MISSING_PARAMS = 9;                 /**< The request had missing params */
+  public static final int AUTH_CODE_MISSING_RULE_SET = 10;              /**< The server is missing its rule set */
+  public static final int AUTH_CODE_UNAUTHORIZED = 11;                  /**< The item is unauthorized */
+  public static final int AUTH_CODE_MISSING_PCODE = 12;                 /**< The request was missing the pcode */
+  public static final int AUTH_CODE_UNAUTHORIZED_DEVICE = 13;           /**< The item is not authorized for this device */
+  public static final int AUTH_CODE_INVALID_TOKEN = 14;                 /**< The request's token was invalid */
+  public static final int AUTH_CODE_TOKEN_EXPIRED = 15;                 /**< The request's token was expired */
+  public static final int AUTH_CODE_MAX_AUTH_CODE = 16;                 /**< The maximum value for auth codes from the server */
+
 }
