@@ -99,6 +99,11 @@ public class Utils
     return result.toString();
   }
 
+  public static boolean isNullOrEmpty(String string)
+  {
+    return string == null || string.equals(Constants.SEPARATOR_EMPTY);
+  }
+
   public static JSONObject objectFromJSON(String json)
   {
     try
@@ -112,7 +117,18 @@ public class Utils
     }
   }
 
-
+  public static double secondsFromTimeString(String time)
+  {
+    String[] hms = time.split(Constants.SEPARATOR_COLON);
+    double multiplier = 1.0;
+    double milliseconds = 0.0;
+    for (int i = hms.length - 1; i >= 0; i--)
+    {
+      milliseconds += (Double.parseDouble(hms[i]) * multiplier);
+      multiplier *= 60.0;
+    }
+    return milliseconds;
+  }
 }
 
 

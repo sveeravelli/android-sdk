@@ -64,6 +64,9 @@ class Constants
   public static final String KEY_ASPECT_RATIO         = "aspect_ratio";
   public static final String KEY_NEXT_CHILDREN        = "next_children";
   public static final String KEY_DURATION             = "duration";
+  public static final String KEY_CLOSED_CAPTIONS      = "closed_captions";
+  public static final String KEY_LANGUAGES            = "languages";
+  public static final String KEY_DEFAULT_LANGUAGE     = "default_language";
   public static final String KEY_NEXT_TOKEN           = "next_token";
   public static final String KEY_PARENT               = "parent";
   public static final String KEY_API                  = "api";
@@ -90,12 +93,71 @@ class Constants
   public static final String SEPARATOR_AMPERSAND      = "&";
   public static final String SEPARATOR_COMMA          = ",";
   public static final String SEPARATOR_EMPTY          = "";
+  public static final String SEPARATOR_NEWLINE        = "\n";
+  public static final String SEPARATOR_COLON          = ":";
 
   public static final String DELIVERY_TYPE_HLS        = "hls";
   public static final String DELIVERY_TYPE_MP4        = "mp4";
   public static final String DELIVERY_TYPE_REMOTE_ASSET = "remote_asset";
 
-  public static final int DEFAULT_AD_TIME_SECONDS     = 0;
+  public static final int    DEFAULT_AD_TIME_SECONDS  = 0;
+
+  public static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
+  public static final String ELEMENT_VAST             = "VAST";
+  public static final String ELEMENT_AD               = "Ad";
+  public static final String ELEMENT_IN_LINE          = "InLine";
+  public static final String ELEMENT_WRAPPER          = "Wrapper";
+  public static final String ELEMENT_AD_SYSTEM        = "AdSystem";
+  public static final String ELEMENT_AD_TITLE         = "AdTitle";
+  public static final String ELEMENT_DESCRIPTION      = "Description";
+  public static final String ELEMENT_SURVEY           = "Survey";
+  public static final String ELEMENT_ERROR            = "Error";
+  public static final String ELEMENT_IMPRESSION       = "Impression";
+  public static final String ELEMENT_CREATIVES        = "Creatives";
+  public static final String ELEMENT_CREATIVE         = "Creative";
+  public static final String ELEMENT_LINEAR           = "Linear";
+  public static final String ELEMENT_NON_LINEAR_ADS   = "NonLinearAds";
+  public static final String ELEMENT_COMPANION_ADS    = "CompanionAds";
+  public static final String ELEMENT_EXTENSTIONS      = "Extensions";
+  public static final String ELEMENT_DURATION         = "Duration";
+  public static final String ELEMENT_TRACKING_EVENTS  = "TrackingEvents";
+  public static final String ELEMENT_TRACKING         = "Tracking";
+  public static final String ELEMENT_AD_PARAMETERS    = "AdParameters";
+  public static final String ELEMENT_VIDEO_CLICKS     = "VideoClicks";
+  public static final String ELEMENT_CLICK_THROUGH    = "ClickThrough";
+  public static final String ELEMENT_CLICK_TRACKING   = "ClickTracking";
+  public static final String ELEMENT_CUSTOM_CLICK     = "CustomClick";
+  public static final String ELEMENT_MEDIA_FILES      = "MediaFiles";
+  public static final String ELEMENT_MEDIA_FILE       = "MediaFile";
+  public static final String ELEMENT_VAST_AD_TAG_URI  = "VASTAdTagURI";
+  public static final String ELEMENT_TT               = "tt";
+  public static final String ELEMENT_HEAD             = "head";
+  public static final String ELEMENT_BODY             = "body";
+  public static final String ELEMENT_STYLING          = "styling";
+  public static final String ELEMENT_STYLE            = "style";
+  public static final String ELEMENT_DIV              = "div";
+  public static final String ELEMENT_P                = "p";
+  public static final String ELEMENT_SPAN             = "span";
+  public static final String ELEMENT_BR               = "br";
+  public static final String ATTRIBUTE_VERSION        = "version";
+  public static final String ATTRIBUTE_ID             = "id";
+  public static final String ATTRIBUTE_SEQUENCE       = "sequence";
+  public static final String ATTRIBUTE_EVENT          = "event";
+  public static final String ATTRIBUTE_DELIVERY       = "delivery";
+  public static final String ATTRIBUTE_TYPE           = "type";
+  public static final String ATTRIBUTE_BITRATE        = "bitrate";
+  public static final String ATTRIBUTE_WIDTH          = "width";
+  public static final String ATTRIBUTE_HEIGHT         = "height";
+  public static final String ATTRIBUTE_SCALABLE       = "scalable";
+  public static final String ATTRIBUTE_MAINTAIN_ASPECT_RATIO = "maintainAspectRatio";
+  public static final String ATTRIBUTE_API_FRAMEWORK  = "apiFramework";
+  public static final String ATTRIBUTE_BEGIN          = "begin";
+  public static final String ATTRIBUTE_END            = "end";
+  public static final String ATTRIBUTE_DUR            = "dur";
+  public static final String ATTRIBUTE_XML_LANG       = "xml:lang";
+
+  public static final String MIME_TYPE_MP4            = "video/mp4";
+  public static final String MIME_TYPE_M3U8           = "application/x-mpegURL";
 
   public enum ReturnState { STATE_MATCHED, STATE_UNMATCHED, STATE_FAIL };
 
