@@ -325,4 +325,8 @@ class PlayerAPIClient
     // TODO
     return false;
   }
+
+  public String getPcode() {
+    return _pcode;
+  }
 }

@@ -1,5 +1,149 @@
 package com.ooyala.android;
 
-public class Analytics {
+import java.util.ArrayList;
+import java.util.List;
 
+import android.content.Context;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+public class Analytics {
+  private boolean _ready = false;
+  private boolean _failed = false;
+  private WebView _jsAnalytics;
+  private List<String> _queue = new ArrayList<String>();
+
+  private static final String EMBED_HTML = "<html><head><script src=\"{HOST}{URI}\"></script></head><body onload=\"reporter = new Ooyala.Reporter(\'{PCODE}\');\"></body></html>";
+
+  /** @internal
+   * Initialize an Analytics using the specified api
+   * @param[in] context the context the initialize the internal WebView with
+   * @param[in] api the API to initialize this Analytics with
+   * @returns the initialized Analytics
+   */
+  public Analytics(Context context, PlayerAPIClient api) {
+    this(context, EMBED_HTML.replaceAll("{HOST}", Constants.JS_ANALYTICS_HOST).replaceAll("{URI}", Constants.JS_ANALYTICS_URI).replaceAll("{PCODE}", api.getPcode()));
+  }
+
+  /** @internal
+   * Initialize an Analytics using the specified api and HTML
+   * @note [jigish]: this is here purely to be able to test this class
+   * @param[in] context the context the initialize the internal WebView with
+   * @param[in] theAPI the API to initialize this Analytics with
+   * @param[in] embedHTML the HTML to use when initializing this Analytics
+   * @returns the initialized Analytics
+   */
+  public Analytics(Context context, String embedHTML) {
+    _jsAnalytics = new WebView(context);
+    _jsAnalytics.getSettings().setJavaScriptEnabled(true);
+    _jsAnalytics.setWebViewClient(new WebViewClient() {
+      public void onPageFinished(WebView view, String url) {
+        if (!_ready && !_failed) {
+          _ready = true;
+          performQueuedActions();
+        }
+      }
+
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        if (!_failed) {
+          _ready = false;
+          _failed = true;
+          System.err.println("ERROR: Failed to load js Analytics!");
+        }
+      }
+    });
+    _jsAnalytics.loadData(embedHTML, "text/html", null);
+    reportPlayerLoad();
+  }
+
+  /**
+   * Report a new video being initialized with the given embed code and duration
+   * @param[in] embedCode the embed code of the new video
+   * @param[in] duration the duration (in seconds) of the new video
+   */
+  public void initializeVideo(String embedCode, double duration) {
+    if (_failed) { return; }
+    String action = "javascript:reporter.initializeVideo('"+embedCode+"',"+duration+");";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  /**
+   * Report a player load
+   */
+  public void reportPlayerLoad() {
+    if (_failed) { return; }
+    String action = "javascript:reporter.reportPlayerLoad();";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  /**
+   * Report a player display
+   */
+  public void reportDisplay() {
+    if (_failed) { return; }
+    String action = "javascript:reporter.reportDisplay();";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  /**
+   * Report a playhead update to the specified time
+   * @param[in] time the new playhead time (in seconds)
+   */
+  public void reportPlayheadUpdate(double time) {
+    if (_failed) { return; }
+    String action = "javascript:reporter.reportPlayheadUpdate("+time*1000+");";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  /**
+   * Report that the player has started playing
+   */
+  public void reportPlayStarted() {
+    if (_failed) { return; }
+    String action = "javascript:reporter.reportPlayStarted();";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  /**
+   * Report that the player was asked to replay
+   */
+  public void reportReplay() {
+    if (_failed) { return; }
+    String action = "javascript:reporter.reportReplay();";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
+  private void queue(String action) {
+    _queue.add(action);
+  }
+
+  private void performQueuedActions() {
+    for (String action : _queue) {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
 }
