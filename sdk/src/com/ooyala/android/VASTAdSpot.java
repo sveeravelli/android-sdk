@@ -48,15 +48,15 @@ public class VASTAdSpot extends AdSpot {
       break;
   }
   if (data.isNull(Constants.KEY_SIGNATURE)) {
-    System.out.println("ERROR: Fail to update VASTAd with dictionary because no signature exists!");
+    System.err.println("ERROR: Fail to update VASTAd with dictionary because no signature exists!");
     return ReturnState.STATE_FAIL;
   }
   if (data.isNull(Constants.KEY_EXPIRES)) {
-    System.out.println("ERROR: Fail to update VASTAd with dictionary because no expires exists!");
+    System.err.println("ERROR: Fail to update VASTAd with dictionary because no expires exists!");
     return ReturnState.STATE_FAIL;
   }
   if (data.isNull(Constants.KEY_URL)) {
-    System.out.println("ERROR: Fail to update VASTAd with dictionary because no url exists!");
+    System.err.println("ERROR: Fail to update VASTAd with dictionary because no url exists!");
     return ReturnState.STATE_FAIL;
   }
   try {
