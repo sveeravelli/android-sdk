@@ -40,7 +40,7 @@ public abstract class AdSpot
       {
         _time = data.getInt(Constants.KEY_TIME);
       }
-      else
+      else if (_time < 0)
       {
         _time = Constants.DEFAULT_AD_TIME_SECONDS;
       }

@@ -12,17 +12,17 @@ import com.ooyala.android.Constants.ReturnState;
 
 public class Stream
 {
-  private String _deliveryType = null;
-  private String _videoCodec = null;
-  private String _urlFormat = null;
-  private String _framerate = null;
-  private int _videoBitrate = -1;
-  private int _audioBitrate = -1;
-  private int _height = -1;
-  private int _width = -1;
-  private String _url = null;
-  private String _aspectRatio = null;
-  private boolean _isLiveStream = false;
+  protected String _deliveryType = null;
+  protected String _videoCodec = null;
+  protected String _urlFormat = null;
+  protected String _framerate = null;
+  protected int _videoBitrate = -1;
+  protected int _audioBitrate = -1;
+  protected int _height = -1;
+  protected int _width = -1;
+  protected String _url = null;
+  protected String _aspectRatio = null;
+  protected boolean _isLiveStream = false;
 
   public Stream()
   {

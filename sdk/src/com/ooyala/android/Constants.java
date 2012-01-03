@@ -118,7 +118,7 @@ class Constants
   public static final String ELEMENT_LINEAR           = "Linear";
   public static final String ELEMENT_NON_LINEAR_ADS   = "NonLinearAds";
   public static final String ELEMENT_COMPANION_ADS    = "CompanionAds";
-  public static final String ELEMENT_EXTENSTIONS      = "Extensions";
+  public static final String ELEMENT_EXTENSIONS       = "Extensions";
   public static final String ELEMENT_DURATION         = "Duration";
   public static final String ELEMENT_TRACKING_EVENTS  = "TrackingEvents";
   public static final String ELEMENT_TRACKING         = "Tracking";
