@@ -41,31 +41,15 @@ public class VASTStream extends Stream {
     return _scalable;
   }
 
-  public void setScalable(boolean scalable) {
-    this._scalable = scalable;
-  }
-
   public boolean isMaintainAspectRatio() {
     return _maintainAspectRatio;
-  }
-
-  public void setMaintainAspectRatio(boolean maintainAspectRatio) {
-    this._maintainAspectRatio = maintainAspectRatio;
   }
 
   public String getVastDeliveryType() {
     return _vastDeliveryType;
   }
 
-  public void setVastDeliveryType(String vastDeliveryType) {
-    this._vastDeliveryType = vastDeliveryType;
-  }
-
   public String getApiFramework() {
     return _apiFramework;
-  }
-
-  public void set_apiFramework(String apiFramework) {
-    this._apiFramework = apiFramework;
   }
 }

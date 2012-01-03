@@ -84,57 +84,27 @@ public class VASTLinearAd implements PlayableItem {
     return _duration;
   }
 
-  public void setDuration(double duration) {
-    this._duration = duration;
-  }
-
   public HashMap<String, Set<String>> getTrackingEvents() {
     return _trackingEvents;
-  }
-
-  public void setTrackingEvents(
-      HashMap<String, Set<String>> trackingEvents) {
-    this._trackingEvents = trackingEvents;
   }
 
   public String getParameters() {
     return _parameters;
   }
 
-  public void setParameters(String parameters) {
-    this._parameters = parameters;
-  }
-
   public String getClickThroughURL() {
     return _clickThroughURL;
-  }
-
-  public void setClickThroughURL(String clickThroughURL) {
-    this._clickThroughURL = clickThroughURL;
   }
 
   public Set<String> getClickTrackingURLs() {
     return _clickTrackingURLs;
   }
 
-  public void setClickTrackingURLs(Set<String> clickTrackingURLs) {
-    this._clickTrackingURLs = clickTrackingURLs;
-  }
-
   public Set<String> getCustomClickURLs() {
     return _customClickURLs;
-  }
-
-  public void setCustomClickURLs(Set<String> customClickURLs) {
-    this._customClickURLs = customClickURLs;
   }
 
   public Set<Stream> getStreams() {
     return _streams;
   }
-
-  public void setStreams(Set<Stream> streams) {
-    this._streams = streams;
-  }
-
 }

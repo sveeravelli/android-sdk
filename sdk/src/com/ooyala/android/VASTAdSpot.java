@@ -104,4 +104,8 @@ public class VASTAdSpot extends AdSpot {
     return true;
   }
 
+  public List<VASTAd> getAds() {
+    return _ads;
+  }
+
 }

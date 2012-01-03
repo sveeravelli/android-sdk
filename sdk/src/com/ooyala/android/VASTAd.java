@@ -16,16 +16,16 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 public class VASTAd {
-  public String _adID;                                                         /**< the ID of the Ad */
-  public String _system;                                                       /**< the System */
-  public String _systemVersion;                                                /**< the System Version */
-  public String _title;                                                        /**< the title of the Ad */
-  public String _description;                                                  /**< the description of the Ad */
-  public Set<String> _surveyURLs = new HashSet<String>();                      /**< the survey URLs of the Ad */
-  public Set<String> _errorURLs = new HashSet<String>();                       /**< the error URLs of the Ad */
-  public Set<String> _impressionURLs = new HashSet<String>();                  /**< the impression URLs of the Ad */
-  public List<VASTSequenceItem> _sequence = new ArrayList<VASTSequenceItem>(); /**< the ordered sequence of the Ad (List of VASTSequenceItem) */
-  public Element _extensions;                                                  /**< the extensions of the Ad */
+  private String _adID;                                                         /**< the ID of the Ad */
+  private String _system;                                                       /**< the System */
+  private String _systemVersion;                                                /**< the System Version */
+  private String _title;                                                        /**< the title of the Ad */
+  private String _description;                                                  /**< the description of the Ad */
+  private Set<String> _surveyURLs = new HashSet<String>();                      /**< the survey URLs of the Ad */
+  private Set<String> _errorURLs = new HashSet<String>();                       /**< the error URLs of the Ad */
+  private Set<String> _impressionURLs = new HashSet<String>();                  /**< the impression URLs of the Ad */
+  private List<VASTSequenceItem> _sequence = new ArrayList<VASTSequenceItem>(); /**< the ordered sequence of the Ad (List of VASTSequenceItem) */
+  private Element _extensions;                                                  /**< the extensions of the Ad */
 
   /** @internal
    * Initialize a VASTAd using the specified xml (subclasses should override this)
@@ -172,5 +172,45 @@ public class VASTAd {
       }
       _sequence.add(item);
     }
+  }
+
+  public String getAdID() {
+    return _adID;
+  }
+
+  public String getSystem() {
+    return _system;
+  }
+
+  public String getSystemVersion() {
+    return _systemVersion;
+  }
+
+  public String getTitle() {
+    return _title;
+  }
+
+  public String getDescription() {
+    return _description;
+  }
+
+  public Set<String> getSurveyURLs() {
+    return _surveyURLs;
+  }
+
+  public Set<String> getErrorURLs() {
+    return _errorURLs;
+  }
+
+  public Set<String> getImpressionURLs() {
+    return _impressionURLs;
+  }
+
+  public List<VASTSequenceItem> getSequence() {
+    return _sequence;
+  }
+
+  public Element getExtensions() {
+    return _extensions;
   }
 }
