@@ -1,0 +1,139 @@
+<Ad id="129381">
+  <InLine>
+    <AdSystem version="2.0">VINDICO</AdSystem>
+    <AdTitle>
+      <![CDATA[
+        93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4
+      ]]>
+    </AdTitle>
+    <Description>
+      <![CDATA[ ]]>
+    </Description>
+    <Survey>
+      <![CDATA[ ]]>
+    </Survey>
+    <Error/>
+    <Impression id="PIRANHA">
+      <![CDATA[
+        http://afe2.specificclick.net/dserve/t=d;l=20517;c=173705;b=1554660;ta=2596220;cr=3961100210
+      ]]>
+    </Impression>
+    <Impression id="VINDICO">
+      <![CDATA[
+        http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?0|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&ximpid=20517&cb=%timestamp%&internalRedirect=false
+      ]]>
+    </Impression>
+    <Impression id="COMSCORE">
+      <![CDATA[
+        http://b.scorecardresearch.com/p?c1=1&c2=3000027&c3=&c4=&c5=01&cA1=3&cA2=2101&cA3=173705&cA4=1554660&cA5=&cA6=1&rn=%timestamp%
+      ]]>
+    </Impression>
+    <Impression>
+      <![CDATA[
+        http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?adimp|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&cb=%timestamp%&internalRedirect=false
+      ]]>
+    </Impression>
+    <Creatives>
+      <Creative AdID="129381" id="66796" sequence="1">
+        <Linear>
+          <Duration>00:00:10</Duration>
+          <TrackingEvents>
+            <Tracking event="start">
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?start|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&ximpid=20517&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </Tracking>
+            <Tracking event="start">
+              <![CDATA[
+                http://afe2.specificclick.net/event/e=12;l=20517;b=1554660;c=173705;ta=2596220;tk=97156;cr=1482257995;href=
+              ]]>
+            </Tracking>
+            <Tracking event="firstQuartile">
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?25|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </Tracking>
+            <Tracking event="firstQuartile">
+              <![CDATA[
+                http://afe2.specificclick.net/event/e=13;l=20517;b=1554660;c=173705;ta=2596220;tk=86303;cr=2954573086;href=
+              ]]>
+            </Tracking>
+            <Tracking event="midpoint">
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?50|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </Tracking>
+            <Tracking event="midpoint">
+              <![CDATA[
+                http://afe2.specificclick.net/event/e=14;l=20517;b=1554660;c=173705;ta=2596220;tk=7295;cr=354491315;href=
+              ]]>
+            </Tracking>
+            <Tracking event="thirdQuartile">
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?75|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </Tracking>
+            <Tracking event="thirdQuartile">
+              <![CDATA[
+                http://afe2.specificclick.net/event/e=15;l=20517;b=1554660;c=173705;ta=2596220;tk=51554;cr=2745369819;href=
+              ]]>
+            </Tracking>
+            <Tracking event="complete">
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V3/Instream/Impression/?100|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&ximpid=20517&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </Tracking>
+            <Tracking event="complete">
+              <![CDATA[
+                http://afe2.specificclick.net/event/e=16;l=20517;b=1554660;c=173705;ta=2596220;tk=5058;cr=1841549021;href=
+              ]]>
+            </Tracking>
+          </TrackingEvents>
+          <VideoClicks>
+            <ClickThrough>
+              <![CDATA[
+                http://ads.adviva.net/click/v=4;m=3;l=20517;c=173705;b=1554660;ts=20111208222012;dct=http://trk.vindicosuite.com/Tracking/V3/Instream/Clickthrough/?2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&ximpid=20517&cb=%timestamp%
+              ]]>
+            </ClickThrough>
+            <ClickTracking>
+              <![CDATA[
+                http://trk.vindicosuite.com/Tracking/V5/Instream/Impression/?vct|2213|69973|66796|8759|18959|undefined|1297|3281|546|BBEEND|&iari=129381&cb=%timestamp%&internalRedirect=false
+              ]]>
+            </ClickTracking>
+          </VideoClicks>
+          <MediaFiles>
+            <MediaFile delivery="progressive" bitrate="400" width="400" height="300" type="video/mp4">
+              <![CDATA[
+                http://vindicoasset.edgesuite.net/Repository/CampaignCreative/Campaign_8759/INSTREAMAD/93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4
+              ]]>
+            </MediaFile>
+          </MediaFiles>
+        </Linear>
+      </Creative>
+      <Creative AdID="129381" id="33527" sequence="1">
+        <CompanionAds>
+          <Companion id="33527" width="1" height="1" title="0. Default">
+            <IFrameResource>
+              <![CDATA[
+                http://cache.vindicosuite.com/Feeds/Generator/2.0/GetAdDirector_BannerCreative.asp?bannerCreativeAdModuleId=33527&siteId=2213&syndicationOutletId=69973&campaignId=8759&adRotationId=18959&campaignAccountId=546&campaignBrandId=3281&campaignClientId=1297
+              ]]>
+            </IFrameResource>
+          </Companion>
+          <Companion id="33527" width="1" height="1" title="0. Default">
+            <HTMLResource creativeType="text/html">
+              <![CDATA[
+                <iframe src = 'http://trk.vindicosuite.com/Tracking/V2/BannerCreative/Impression/?siteId=2213&syndicationOutletId=69973&campaignId=8759&adRotationId=18959&bannerCreativeAdModuleId=33527' style = 'width:0px;height:0px;'></iframe>
+              ]]>
+            </HTMLResource>
+          </Companion>
+          <Companion id="33527" width="1" height="1" title="0. Default">
+            <StaticResource creativeType="image/jpeg">
+              <![CDATA[ ]]>
+            </StaticResource>
+          </Companion>
+        </CompanionAds>
+      </Creative>
+    </Creatives>
+    <Extensions/>
+  </InLine>
+</Ad>

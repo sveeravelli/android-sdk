@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.ooyala.android.test;
+package com.ooyala.android.sampleapp.test;
 
 public final class R {
     public static final class attr {

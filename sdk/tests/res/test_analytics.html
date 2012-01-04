@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <scipt type=javascript>
+      Ooyala.Reporter = function(pcode) {
+      }
+      Ooyala.Reporter.prototype = {
+        initializeVideoWithEmbedCode: function(embedCode, duration) {
+          return "called initializeVideoWithEmbedCode:"+embedCode+" duration:"+duration;
+        },
+        reportPlayerLoad: function() {
+          return "called reportPlayerLoad";
+        },
+        reportDisplay: function() {
+          return "called reportDisplay";
+        },
+        reportPlayheadUpdateToTime: function(time) {
+          return "called reportPlayheadUpdateToTime:"+time;
+        },
+        reportPlayStarted: function() {
+          return "called reportPlayStarted";
+        },
+        reportReplay: function() {
+          return "called reportReplay";
+        }
+      };
+    </script>
+  </head>
+  <body onload="reporter = new Ooyala.Reporter('pcode');">
+  </body>
+</html>

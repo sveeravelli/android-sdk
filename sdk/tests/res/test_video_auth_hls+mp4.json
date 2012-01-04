@@ -1,0 +1,112 @@
+{
+  "UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM": {
+    "streams": [{
+                "video_bitrate": 1200,
+                "height": 720,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjEzYzowODE7Z_",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 1280
+                }, {
+                "video_bitrate": 900,
+                "height": 720,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOnI5OjA4MTtA06",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 1280
+                }, {
+                "video_bitrate": 1200,
+                "height": 360,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjEzYzowazvfui",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 640
+                }, {
+                "video_bitrate": 600,
+                "height": 360,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 640
+                }, {
+                "video_bitrate": 2000,
+                "height": 720,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjFyazowODE7_c",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 1280
+                }, {
+                "video_bitrate": 900,
+                "height": 360,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOnI5OjBrO21dO7",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 640
+                }, {
+                "video_bitrate": 2000,
+                "height": 360,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjFyazowazsvY7",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 640
+                }, {
+                "video_bitrate": 600,
+                "height": 720,
+                "delivery_type": "mp4",
+                "framerate": "30.0",
+                "url": {
+                "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
+                "format": "text"
+                },
+                "video_codec": "h264",
+                "audio_bitrate": 128,
+                "width": 1280
+                }, {
+                "delivery_type": "hls",
+                "url": {
+                "data": "http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8",
+                "format": "text"
+                },
+                }],
+    "message": "authorized",
+    "request_timestamp": "1322517767",
+    "authorized": true,
+    "retry": null,
+    "code": "0"
+  }
+}

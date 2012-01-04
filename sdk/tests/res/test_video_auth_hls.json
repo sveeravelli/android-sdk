@@ -1,0 +1,16 @@
+{
+  "UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM": {
+    "streams": [{
+                  "delivery_type": "hls",
+                  "url": {
+                    "data": "http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8",
+                    "format": "text"
+                  },
+                }],
+    "message": "authorized",
+    "request_timestamp": "1322517767",
+    "authorized": true,
+    "retry": null,
+    "code": "0"
+  }
+}

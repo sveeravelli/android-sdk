@@ -3,7 +3,7 @@
 	<name>ooyala-android-sdk-test</name>
 	<comment></comment>
 	<projects>
-		<project>ooyala-android-sdk</project>
+		<project>ooyala-android-sample-app</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
