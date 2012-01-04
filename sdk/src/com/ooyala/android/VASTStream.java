@@ -18,7 +18,7 @@ public class VASTStream extends Stream {
     this._vastDeliveryType = data.getAttribute(Constants.ATTRIBUTE_DELIVERY);
     this._apiFramework = data.getAttribute(Constants.ATTRIBUTE_API_FRAMEWORK);
     String scalableStr = data.getAttribute(Constants.ATTRIBUTE_SCALABLE);
-    if (scalableStr != null) { this._scalable = Boolean.getBoolean(scalableStr); }
+    if (!Utils.isNullOrEmpty(scalableStr)) { this._scalable = Boolean.getBoolean(scalableStr); }
     String maintainAspectRatioStr = data.getAttribute(Constants.ATTRIBUTE_MAINTAIN_ASPECT_RATIO);
     if (maintainAspectRatioStr != null) { this._maintainAspectRatio = Boolean.getBoolean(maintainAspectRatioStr); }
     String type = data.getAttribute(Constants.ATTRIBUTE_TYPE);
@@ -28,11 +28,11 @@ public class VASTStream extends Stream {
       else { this._deliveryType = type; }
     }
     String bitrate = data.getAttribute(Constants.ATTRIBUTE_BITRATE);
-    if (bitrate != null) { this._videoBitrate = Integer.parseInt(bitrate); }
+    if (!Utils.isNullOrEmpty(bitrate)) { this._videoBitrate = Integer.parseInt(bitrate); }
     String theWidth = data.getAttribute(Constants.ATTRIBUTE_WIDTH);
-    if (theWidth != null) { this._width = Integer.parseInt(Constants.ATTRIBUTE_WIDTH); }
+    if (!Utils.isNullOrEmpty(theWidth)) { this._width = Integer.parseInt(theWidth); }
     String theHeight = data.getAttribute(Constants.ATTRIBUTE_HEIGHT);
-    if (theHeight != null) {this._height = Integer.parseInt(Constants.ATTRIBUTE_HEIGHT); }
+    if (!Utils.isNullOrEmpty(theHeight)) {this._height = Integer.parseInt(theHeight); }
     this._urlFormat = "text";
     this._url = data.getTextContent();
   }
