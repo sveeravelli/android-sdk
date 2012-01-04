@@ -1,3 +1,6 @@
 *.class
 */javadoc
 */bin
+*/tests/bin
+*/gen
+*/tests/gen
