@@ -19,23 +19,23 @@ public class TestConstants
   public static final String TEST_DOMAIN                           = "www.ooyala.com";
   public static final String TEST_AD_OOYALA                        = "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B";
 
-  public static final String TEST_DICTIONARY_VIDEO                 = "test_video.json";
-  public static final String TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA  = "test_video_ooyala_ad.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS        = "test_video_auth_hls.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_MP4        = "test_video_auth_mp4.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS_MP4    = "test_video_auth_hls+mp4.json";
-  public static final String TEST_DICTIONARY_CHANNEL               = "test_channel.json";
-  public static final String TEST_DICTIONARY_CHANNEL_SET           = "test_channel_set.json";
-  public static final String TEST_DICTIONARY_DYNAMIC_CHANNEL       = "test_dynamic_channel.json";
-  public static final String TEST_DICTIONARY_AD_OOYALA             = "test_ooyala_ad.json";
-  public static final String TEST_DICTIONARY_AD_VAST               = "test_vast_ad.json";
-  public static final String TEST_DICTIONARY_STREAM_HLS            = "test_stream_hls.json";
-  public static final String TEST_DICTIONARY_STREAM_MP4            = "test_stream_mp4.json";
-  public static final String TEST_DICTIONARY_STREAMS_MP4           = "test_streams_mp4.json";
-  public static final String TEST_DICTIONARY_CLOSED_CAPTIONS       = "test_closed_captions.json";
+  public static final String TEST_DICTIONARY_VIDEO                 = "resources/test_video.json";
+  public static final String TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA  = "resources/test_video_ooyala_ad.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS        = "resources/test_video_auth_hls.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_MP4        = "resources/test_video_auth_mp4.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS_MP4    = "resources/test_video_auth_hls+mp4.json";
+  public static final String TEST_DICTIONARY_CHANNEL               = "resources/test_channel.json";
+  public static final String TEST_DICTIONARY_CHANNEL_SET           = "resources/test_channel_set.json";
+  public static final String TEST_DICTIONARY_DYNAMIC_CHANNEL       = "resources/test_dynamic_channel.json";
+  public static final String TEST_DICTIONARY_AD_OOYALA             = "resources/test_ooyala_ad.json";
+  public static final String TEST_DICTIONARY_AD_VAST               = "resources/test_vast_ad.json";
+  public static final String TEST_DICTIONARY_STREAM_HLS            = "resources/test_stream_hls.json";
+  public static final String TEST_DICTIONARY_STREAM_MP4            = "resources/test_stream_mp4.json";
+  public static final String TEST_DICTIONARY_STREAMS_MP4           = "resources/test_streams_mp4.json";
+  public static final String TEST_DICTIONARY_CLOSED_CAPTIONS       = "resources/test_closed_captions.json";
 
-  public static final String TEST_ANALYTICS_HTML                   = "test_analytics.html";
-  public static final String TEST_ANALYTICS_HTML_FAIL              = "test_analytics_fail.html";
+  public static final String TEST_ANALYTICS_HTML                   = "resources/test_analytics.html";
+  public static final String TEST_ANALYTICS_HTML_FAIL              = "resources/test_analytics_fail.html";
 
-  public static final String TEST_XML_VAST_AD                      = "test_vast_ad.xml";
+  public static final String TEST_XML_VAST_AD                      = "resources/test_vast_ad.xml";
 }
