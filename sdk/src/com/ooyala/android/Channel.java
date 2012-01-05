@@ -1,6 +1,5 @@
 package com.ooyala.android;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -14,7 +13,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class Channel extends ContentItem implements PaginatedParentItem
 {
-  protected LinkedHashMap<String,Video>_videos = new LinkedHashMap<String,Video>();
+  protected LinkedHashMap<String,Video> _videos = new LinkedHashMap<String,Video>();
   protected ChannelSet _parent = null;
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
@@ -193,9 +192,9 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return _videos.size();
   }
 
-  public Collection<Video> getVideos()
+  public LinkedHashMap<String,Video> getVideos()
   {
-    return _videos.values();
+    return _videos;
   }
 
   public int getDuration()
