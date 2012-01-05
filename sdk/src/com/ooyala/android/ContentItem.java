@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -65,6 +64,15 @@ public abstract class ContentItem implements AuthorizableItem
   public String getExternalId()
   {
     return _externalId;
+  }
+
+  /**
+   * Get the contentToken for this content item.
+   * @return contentToken of this content item
+   */
+  public String getContentToken()
+  {
+    return _contentToken;
   }
 
   /**
