@@ -21,6 +21,16 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
 //                                     MediaPlayer.OnSeekCompleteListener,
 //                                     MediaPlayer.OnVideoSizeChangedListener
 {
+  public static enum PlayerState {
+    PlayerStateInit,
+    PlayerStateLoading,
+    PlayerStateReadyToPlay,
+    PlayerStatePlaying,
+    PlayerStatePaused,
+    PlayerStateCompleted,
+    PlayerStateError
+  }
+
   private MediaPlayer _mediaPlayer = null;
 
   private ContentItem _rootItem = null;

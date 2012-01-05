@@ -114,4 +114,16 @@ public abstract class AdSpot
       return null;
     }
   }
+
+  public int getTime() {
+    return _time;
+  }
+
+  public URL getClickURL() {
+    return _clickURL;
+  }
+
+  public List<URL> getTrackingURLs() {
+    return _trackingURLs;
+  }
 }
