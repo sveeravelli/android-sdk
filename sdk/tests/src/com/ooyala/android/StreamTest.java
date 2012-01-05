@@ -25,6 +25,9 @@ public class StreamTest extends AndroidTestCase
 
   }
 
+  /**
+   * Tests Stream constructor, update, and combinedBitrate
+   */
   public void testInitializers()
   {
     Stream stream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
@@ -47,6 +50,9 @@ public class StreamTest extends AndroidTestCase
     assertEquals(1280, stream.getWidth());
   }
 
+  /**
+   * Tests bestStream and decodeURL, as well as the constructor as a side effect.
+   */
   public void testBestStreamFromArray()
   {
     JSONArray streamsData = ContentItemTest.getTestJSONArray(TestConstants.TEST_DICTIONARY_STREAMS_MP4);
