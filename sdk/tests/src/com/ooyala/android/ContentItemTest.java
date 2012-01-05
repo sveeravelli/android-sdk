@@ -38,4 +38,19 @@ public class ContentItemTest extends AndroidTestCase
       return null;
     }
   }
+
+  public static JSONArray getTestJSONArray(String file)
+  {
+    InputStream inputStream = ContentItemTest.class.getResourceAsStream(file);
+    String json = new Scanner(inputStream).useDelimiter("\\A").next();
+    try
+    {
+      return (JSONArray) new JSONArray(json);
+    }
+    catch (JSONException exception)
+    {
+      System.out.println("JSONException: " + exception);
+      return null;
+    }
+  }
 }
