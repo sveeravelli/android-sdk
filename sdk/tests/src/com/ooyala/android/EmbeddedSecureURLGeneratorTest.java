@@ -21,9 +21,9 @@ public class EmbeddedSecureURLGeneratorTest extends AndroidTestCase {
   }
 
   public void testSecureURL() {
-    String expecedSecureURL = "http://hello.com/uhh.../hi?api_key=l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_&device=android&expires=1234567890&signature=LvOmpUl3GMO2cqos6fdrwKkXmD/KEg3NWG7j5iz6UlU";
+    String expecedSecureURL = "http://hello.com/uhh.../hi?api_key=l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_&device=android_sdk&expires=1234567890&signature=LvOmpUl3GMO2cqos6fdrwKkXmD/KEg3NWG7j5iz6UlU";
     Map<String,String> params = new HashMap<String,String>();
-    params.put(Constants.KEY_DEVICE, Constants.DEVICE_ANDROID);
+    params.put(Constants.KEY_DEVICE, Constants.DEVICE_ANDROID_SDK);
     params.put(Constants.KEY_EXPIRES, "1234567890");
     URL secureURL = urlGen.secureURL("http://hello.com", "/uhh.../hi", params);
     assertEquals(secureURL.toString(), expecedSecureURL);

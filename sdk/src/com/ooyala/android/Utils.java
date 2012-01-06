@@ -17,7 +17,7 @@ import org.json.JSONTokener;
 public class Utils
 {
   public static String device() {
-    return Constants.DEVICE_ANDROID;
+    return Constants.DEVICE_ANDROID_SDK;
   }
 
   public static URL makeURL(String host, String uri, Map<String,String> params)

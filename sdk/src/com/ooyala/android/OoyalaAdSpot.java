@@ -17,8 +17,8 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
 {
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected String _embedCode = null;
-  protected boolean _isAuthorized = false;
-  protected int _authCode = Constants.AUTH_CODE_NOT_REQUESTED;
+  protected boolean _authorized = false;
+  protected int _authCode = AuthCode.NOT_REQUESTED;
 
   public OoyalaAdSpot()
   {
@@ -63,20 +63,20 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
         JSONObject myData = data.getJSONObject(_embedCode);
         if (!myData.isNull(Constants.KEY_AUTHORIZED))
         {
-          _isAuthorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
+          _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
           if (!myData.isNull(Constants.KEY_CODE))
           {
             int theAuthCode = myData.getInt(Constants.KEY_CODE);
-            if (theAuthCode < Constants.AUTH_CODE_MIN_AUTH_CODE || theAuthCode > Constants.AUTH_CODE_MAX_AUTH_CODE)
+            if (theAuthCode < AuthCode.MIN_AUTH_CODE || theAuthCode > AuthCode.MAX_AUTH_CODE)
             {
-              _authCode = Constants.AUTH_CODE_UNKNOWN;
+              _authCode = AuthCode.UNKNOWN;
             }
             else
             {
               _authCode = theAuthCode;
             }
           }
-          if (_isAuthorized && !myData.isNull(Constants.KEY_STREAMS))
+          if (_authorized && !myData.isNull(Constants.KEY_STREAMS))
           {
             JSONArray streams = myData.getJSONArray(Constants.KEY_STREAMS);
             if (streams.length() > 0)
@@ -127,4 +127,11 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
     return embedCodes;
   }
 
+  public boolean isAuthorized() {
+    return _authorized;
+  }
+
+  public int getAuthCode() {
+    return _authCode;
+  }
 }

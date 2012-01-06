@@ -1,6 +1,8 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.json.*;
@@ -13,11 +15,11 @@ import com.ooyala.android.Constants.ReturnState;
  */
 public class Video extends ContentItem implements PlayableItem
 {
-  protected Set<AdSpot> _ads = new HashSet<AdSpot>();
+  protected List<AdSpot> _ads = new ArrayList<AdSpot>();
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected Channel _parent = null;
   protected int _duration = 0;
-  protected boolean _isLive = false;
+  protected boolean _live = false;
 
   public Video()
   {
@@ -57,7 +59,7 @@ public class Video extends ContentItem implements PlayableItem
       }
       if (!myData.isNull(Constants.KEY_CONTENT_TYPE))
       {
-        _isLive = myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_LIVE_STREAM);
+        _live = myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_LIVE_STREAM);
       }
       if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED) &&
           !myData.isNull(Constants.KEY_STREAMS))
@@ -108,7 +110,7 @@ public class Video extends ContentItem implements PlayableItem
     return ReturnState.STATE_MATCHED;
   }
 
-  public Set<AdSpot> getAds()
+  public List<AdSpot> getAds()
   {
     return _ads;
   }
@@ -121,11 +123,6 @@ public class Video extends ContentItem implements PlayableItem
   public int getDuration()
   {
     return _duration;
-  }
-
-  public boolean isLive()
-  {
-    return _isLive;
   }
 
   public Video firstVideo()
@@ -173,5 +170,9 @@ public class Video extends ContentItem implements PlayableItem
   public boolean hasAds()
   {
     return (_ads != null && _ads.size() > 0);
+  }
+
+  public boolean isLive() {
+    return _live;
   }
 }

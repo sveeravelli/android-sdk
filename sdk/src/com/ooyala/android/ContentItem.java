@@ -23,6 +23,8 @@ public abstract class ContentItem implements AuthorizableItem
   protected String _description = null;
   protected PlayerAPIClient _api;
   protected static Map<String,String> _promoImageURLCache = new HashMap<String,String>();
+  protected boolean _authorized = false;
+  protected int _authCode = AuthCode.NOT_REQUESTED;
 
   public ContentItem()
   {
@@ -113,8 +115,17 @@ public abstract class ContentItem implements AuthorizableItem
     try
     {
       JSONObject myData = data.getJSONObject(_embedCode);
-      if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED))
+      if (!myData.isNull(Constants.KEY_AUTHORIZED))
       {
+        _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
+        if (!myData.isNull(Constants.KEY_CODE)) {
+          int authCode = myData.getInt(Constants.KEY_CODE);
+          if (authCode < AuthCode.MIN_AUTH_CODE || authCode > AuthCode.MAX_AUTH_CODE) {
+            _authCode = AuthCode.UNKNOWN;
+          } else {
+            _authCode = authCode;
+          }
+        }
         return ReturnState.STATE_MATCHED;
       }
 
@@ -168,7 +179,7 @@ public abstract class ContentItem implements AuthorizableItem
     {
       return null;
     }
-    else if (contentType.equals(Constants.CONTENT_TYPE_VIDEO))
+    else if (contentType.equals(Constants.CONTENT_TYPE_VIDEO) || contentType.equals(Constants.CONTENT_TYPE_LIVE_STREAM))
     {
       return new Video(data, embedCode, api);
     }
@@ -226,14 +237,22 @@ public abstract class ContentItem implements AuthorizableItem
     return url;
   }
 
-  public static <T> List<String> getEmbedCodes(Set<T> items)
+  public static List<String> getEmbedCodes(Set<? extends ContentItem> items)
   {
     if (items == null) { return null; }
     List<String> result = new ArrayList<String>();
-    for (ContentItem item : (Set<ContentItem>)items)
+    for (ContentItem item : items)
     {
       result.add(item.getEmbedCode());
     }
     return result;
+  }
+
+  public boolean isAuthorized() {
+    return _authorized;
+  }
+
+  public int getAuthCode() {
+    return _authCode;
   }
 }

@@ -58,7 +58,7 @@ class PlayerAPIClient
         JSONObject authData = authResult.getJSONObject(Constants.KEY_AUTHORIZATION_DATA);
         for (String embedCode : embedCodes)
         {
-          if (authData.isNull(embedCode) || authResult.getJSONObject(embedCode).isNull(Constants.KEY_AUTHORIZED))
+          if (authData.isNull(embedCode) || authData.getJSONObject(embedCode).isNull(Constants.KEY_AUTHORIZED))
           {
             throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
                                       "Authorization invalid for embed code: " + embedCode);
