@@ -82,10 +82,12 @@ public class VASTAdSpot extends AdSpot {
    */
   @Override
   public boolean fetchPlaybackInfo() {
+    if (_vastURL == null) { return false; }
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      Document doc = db.parse(new InputSource(_vastURL.openStream()));
+      Document doc = db.parse(_vastURL.toString());
+      //Document doc = db.parse(new InputSource(_vastURL.openStream()));
       Element vast = doc.getDocumentElement();
       if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) { return false; }
       String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
@@ -106,6 +108,10 @@ public class VASTAdSpot extends AdSpot {
 
   public List<VASTAd> getAds() {
     return _ads;
+  }
+
+  public URL getVASTURL() {
+    return _vastURL;
   }
 
 }

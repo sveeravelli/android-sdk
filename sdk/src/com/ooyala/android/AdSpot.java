@@ -50,7 +50,7 @@ public abstract class AdSpot
         catch (MalformedURLException exception)
         {
           System.out.println("Malformed Ad URL: " + data.getString(Constants.KEY_CLICK_URL));
-          return ReturnState.STATE_FAIL;
+          _clickURL = null;
         }
       }
 
@@ -66,8 +66,7 @@ public abstract class AdSpot
           }
           catch (MalformedURLException exception)
           {
-            System.out.println("Malformed Ad Tracking URL: " + data.getString(Constants.KEY_CLICK_URL));
-            return ReturnState.STATE_FAIL;
+            System.out.println("Malformed Ad Tracking URL: " + data.getString(Constants.KEY_TRACKING_URL));
           }
         }
       }
