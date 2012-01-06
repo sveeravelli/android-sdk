@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import java.io.InputStream;
-import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 

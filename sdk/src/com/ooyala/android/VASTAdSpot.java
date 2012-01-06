@@ -12,7 +12,6 @@ import org.json.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 import com.ooyala.android.Constants.ReturnState;
 
@@ -87,7 +86,6 @@ public class VASTAdSpot extends AdSpot {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(_vastURL.toString());
-      //Document doc = db.parse(new InputSource(_vastURL.openStream()));
       Element vast = doc.getDocumentElement();
       if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) { return false; }
       String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
