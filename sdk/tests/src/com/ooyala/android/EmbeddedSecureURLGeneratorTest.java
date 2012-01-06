@@ -11,10 +11,10 @@ public class EmbeddedSecureURLGeneratorTest extends AndroidTestCase {
 
   public EmbeddedSecureURLGeneratorTest() {
     super();
-    urlGen = new EmbeddedSecureURLGenerator(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET);
   }
 
   protected void setUp() {
+    urlGen = new EmbeddedSecureURLGenerator(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET);
   }
 
   protected void tearDown() {

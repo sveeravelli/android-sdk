@@ -12,10 +12,10 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
 
   public OoyalaAPIHelperTest() {
     super();
-    apiHelper = new OoyalaAPIHelper(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET);
   }
 
   protected void setUp() {
+    apiHelper = new OoyalaAPIHelper(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET);
   }
 
   protected void tearDown() {

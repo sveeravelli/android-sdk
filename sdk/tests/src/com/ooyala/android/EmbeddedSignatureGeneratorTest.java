@@ -7,10 +7,10 @@ public class EmbeddedSignatureGeneratorTest extends AndroidTestCase {
 
   public EmbeddedSignatureGeneratorTest() {
     super();
-    sigGen = new EmbeddedSignatureGenerator(TestConstants.TEST_SECRET);
   }
 
   protected void setUp() {
+    sigGen = new EmbeddedSignatureGenerator(TestConstants.TEST_SECRET);
   }
 
   protected void tearDown() {
