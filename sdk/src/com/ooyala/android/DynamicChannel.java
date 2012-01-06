@@ -22,7 +22,8 @@ public class DynamicChannel extends Channel
 
   public DynamicChannel(JSONObject data, List<String> embedCodes, ChannelSet parent, PlayerAPIClient api)
   {
-    super(data, null, parent, api);
+    _authorized = true;
+    _authCode = AuthCode.AUTHORIZED;
     _parent = parent;
     _embedCode = null;
     _embedCodes = embedCodes;
