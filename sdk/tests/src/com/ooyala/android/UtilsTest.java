@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +48,14 @@ public class UtilsTest extends AndroidTestCase {
     String expectedParamString = "api_key="+TestConstants.TEST_API_KEY+"&device=android&domain="+TestConstants.TEST_DOMAIN+"&expires=1322007460";
     String paramString = Utils.getParamsString(paramDictionary, "&");
     assertEquals(paramString, expectedParamString);
+  }
+
+  public void testMakeURL() {
+    Map<String,String> params = new HashMap<String,String>();
+    params.put("paramName", "paramVal");
+    params.put("otherParamName", "otherParamVal");
+    URL url = Utils.makeURL("http://hello.com", "/omggggggg/omg", params);
+    String expected = "http://hello.com/omggggggg/omg?otherParamName=otherParamVal&paramName=paramVal";
+    assertEquals(url.toString(), expected);
   }
 }
