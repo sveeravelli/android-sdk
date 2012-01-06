@@ -179,7 +179,7 @@ class PlayerAPIClient
   private Map<String,String> authorizeParams()
   {
     Map<String,String> params = new HashMap<String,String>();
-    params.put(Constants.KEY_DEVICE, "DEVICE_ANDROID");
+    params.put(Constants.KEY_DEVICE, Utils.device());
     params.put(Constants.KEY_DOMAIN, _domain);
     return params;
   }
@@ -187,7 +187,7 @@ class PlayerAPIClient
   private Map<String,String> contentTreeParams()
   {
     Map<String,String> params = new HashMap<String,String>();
-    params.put(Constants.KEY_DEVICE, "DEVICE_ANDROID");
+    params.put(Constants.KEY_DEVICE, Utils.device());
     if (_height > 0 && _width > 0)
     {
       params.put(Constants.KEY_WIDTH, Integer.toString(_width));

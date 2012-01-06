@@ -75,8 +75,7 @@ class Constants
   public static final String KEY_API                  = "api";
   public static final String KEY_CALLBACK             = "callback";
 
-  public static final String DEVICE_IPHONE            = "iphone";
-  public static final String DEVICE_IPAD              = "ipad";
+  public static final String DEVICE_ANDROID           = "android";
 
   public static final String CONTENT_TYPE_CHANNEL_SET = "ChannelSet";
   public static final String CONTENT_TYPE_CHANNEL     = "Channel";

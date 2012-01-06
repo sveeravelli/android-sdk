@@ -16,6 +16,10 @@ import org.json.JSONTokener;
 
 public class Utils
 {
+  public static String device() {
+    return Constants.DEVICE_ANDROID;
+  }
+
   public static URL makeURL(String host, String uri, Map<String,String> params)
   {
     return makeURL(host, uri, getParamsString(params, Constants.SEPARATOR_AMPERSAND));
@@ -25,7 +29,7 @@ public class Utils
   {
     try
     {
-      return new URL("http://" + host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
+      return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     }
     catch (MalformedURLException e)
     {
