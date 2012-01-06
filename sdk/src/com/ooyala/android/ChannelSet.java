@@ -85,7 +85,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
         for (int i = 0; i < children.length(); i++)
         {
           JSONObject child = children.getJSONObject(i);
-          if (!child.isNull(Constants.KEY_CONTENT_TYPE) && !child.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL))
+          if (!child.isNull(Constants.KEY_CONTENT_TYPE) && child.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL))
           {
             HashMap<String, JSONObject> childMap = new HashMap<String, JSONObject>();
             String childEmbedCode = child.getString(Constants.KEY_EMBED_CODE);

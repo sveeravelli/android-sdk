@@ -77,7 +77,7 @@ class Constants
 
   public static final String DEVICE_ANDROID_SDK       = "android_sdk";
 
-  public static final String CONTENT_TYPE_CHANNEL_SET = "ChannelSet";
+  public static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   public static final String CONTENT_TYPE_CHANNEL     = "Channel";
   public static final String CONTENT_TYPE_VIDEO       = "Video";
   public static final String CONTENT_TYPE_LIVE_STREAM = "LiveStream";
