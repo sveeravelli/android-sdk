@@ -136,7 +136,7 @@ public abstract class ContentItem implements AuthorizableItem
       }
 
       if (!myData.isNull(Constants.KEY_EMBED_CODE)) { _embedCode = myData.getString(Constants.KEY_EMBED_CODE); }
-      if (!myData.isNull(Constants.KEY_EXTERNAL_ID)) { _embedCode = myData.getString(Constants.KEY_EXTERNAL_ID); }
+      if (!myData.isNull(Constants.KEY_EXTERNAL_ID)) { _externalId = myData.getString(Constants.KEY_EXTERNAL_ID); }
       if (!myData.isNull(Constants.KEY_CONTENT_TOKEN)) { _contentToken = myData.getString(Constants.KEY_CONTENT_TOKEN); }
       if (!myData.isNull(Constants.KEY_TITLE)) { _title = myData.getString(Constants.KEY_TITLE); }
       if (!myData.isNull(Constants.KEY_DESCRIPTION)) { _description = myData.getString(Constants.KEY_DESCRIPTION); }
