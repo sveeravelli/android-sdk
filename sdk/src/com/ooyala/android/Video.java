@@ -132,12 +132,12 @@ public class Video extends ContentItem implements PlayableItem
 
   public Video nextVideo()
   {
-    return _parent == null ? _parent.nextVideo(this) : null;
+    return _parent == null ? null : _parent.nextVideo(this);
   }
 
   public Video previousVideo()
   {
-    return _parent == null ? _parent.previousVideo(this) : null;
+    return _parent == null ? null : _parent.previousVideo(this);
   }
 
   public Stream getStream()
