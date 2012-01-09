@@ -108,7 +108,7 @@ public class ChannelTest extends AndroidTestCase
   }
 
   /**
-   * Test previousVideo.o
+   * Test previousVideo.
    */
   public void testPreviousVideo()
   {
