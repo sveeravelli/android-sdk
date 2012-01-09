@@ -238,7 +238,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
       PaginatedItemResponse response = _api.contentTreeNext(_nextChildren, Channel.this);
       if (response == null)
       {
-        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Null response"));
+        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "Null response"));
         _isFetchingMoreChildren = false;
         return;
       }

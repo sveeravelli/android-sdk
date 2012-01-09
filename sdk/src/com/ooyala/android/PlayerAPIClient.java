@@ -305,7 +305,7 @@ class PlayerAPIClient
 
       int startIdx = parent.childrenCount();
       parent.update(parentDict);
-      return new PaginatedItemResponse(startIdx, tokenDict.isNull(Constants.KEY_CHILDREN) ? 0 : tokenDict.getJSONObject(Constants.KEY_CHILDREN).length());
+      return new PaginatedItemResponse(startIdx, tokenDict.isNull(Constants.KEY_CHILDREN) ? 0 : tokenDict.getJSONArray(Constants.KEY_CHILDREN).length());
     }
     catch (JSONException e)
     {
