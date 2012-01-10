@@ -175,4 +175,12 @@ public class Video extends ContentItem implements PlayableItem
   public boolean isLive() {
     return _live;
   }
+
+  @Override
+  public Video videoFromEmbedCode(String embedCode, Video currentItem) {
+    if (_embedCode.equals(embedCode)) {
+      return this;
+    }
+    return null;
+  }
 }

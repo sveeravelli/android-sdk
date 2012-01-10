@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 
 import org.json.*;
 
@@ -14,7 +13,7 @@ import com.ooyala.android.Constants.ReturnState;
  * Stores the info and metadata for the specified content item.
  *
  */
-public abstract class ContentItem implements AuthorizableItem
+public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<String>
 {
   protected String _embedCode = null;
   protected String _externalId = null;
@@ -205,6 +204,7 @@ public abstract class ContentItem implements AuthorizableItem
     return embedCodes;
   }
 
+  public abstract Video videoFromEmbedCode(String embedCode, Video currentItem);
 
   /**
    * Returns a promo image URL for this content item that will be at least the specified dimensions
@@ -237,7 +237,7 @@ public abstract class ContentItem implements AuthorizableItem
     return url;
   }
 
-  public static List<String> getEmbedCodes(Set<? extends ContentItem> items)
+  public static List<String> getEmbedCodes(List<? extends ContentItem> items)
   {
     if (items == null) { return null; }
     List<String> result = new ArrayList<String>();
@@ -254,5 +254,9 @@ public abstract class ContentItem implements AuthorizableItem
 
   public int getAuthCode() {
     return _authCode;
+  }
+
+  public String getKey() {
+    return _embedCode;
   }
 }

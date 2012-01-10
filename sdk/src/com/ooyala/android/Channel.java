@@ -1,8 +1,6 @@
 package com.ooyala.android;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +11,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class Channel extends ContentItem implements PaginatedParentItem
 {
-  protected LinkedHashMap<String,Video> _videos = new LinkedHashMap<String,Video>();
+  protected OrderedMap<String,Video> _videos = new OrderedMap<String,Video>();
   protected ChannelSet _parent = null;
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
@@ -42,7 +40,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;
       case STATE_UNMATCHED:
-        for (Video video : _videos.values())
+        for (Video video : _videos)
         {
           video.update(data);
         }
@@ -56,7 +54,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
       JSONObject myData = data.getJSONObject(_embedCode);
       if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED))
       {
-        for (Video video : _videos.values())
+        for (Video video : _videos)
         {
           video.update(data);
         }
@@ -122,64 +120,27 @@ public class Channel extends ContentItem implements PaginatedParentItem
   public Video firstVideo()
   {
     if (_videos == null || _videos.size() == 0) { return null; }
-    return _videos.values().iterator().next();
+    return _videos.get(0);
   }
 
   public Video lastVideo()
   {
     if (_videos == null || _videos.size() == 0) { return null; }
-    Video video = null;
-    Iterator<Video> iterator = _videos.values().iterator();
-    while (iterator.hasNext())
-    {
-      video = iterator.next();
-    }
-    return video;
+    return _videos.get(_videos.size()-1);
   }
 
   public Video nextVideo(Video currentItem)
   {
-    if (_videos != null && _videos.size() > 0)
-    {
-      Iterator<Video> iterator = _videos.values().iterator();
-      while (iterator.hasNext())
-      {
-        Video video = iterator.next();
-        if (video.getEmbedCode().equals(currentItem.getEmbedCode()))
-        {
-          if (iterator.hasNext())
-          {
-            return iterator.next();
-          }
-          break;
-        }
-      }
-    }
-    return _parent == null ? null : _parent.nextVideo(this);
+    int index = _videos.indexForValue(currentItem);
+    if (index < 0 || ++index >= _videos.size()) { return _parent == null ? null : _parent.nextVideo(this); }
+    return _videos.get(index);
   }
 
   public Video previousVideo(Video currentItem)
   {
-    if (_videos != null && _videos.size() > 0)
-    {
-      Video prevVideo = null;
-      Video video = null;
-      Iterator<Video> iterator = _videos.values().iterator();
-      while (iterator.hasNext())
-      {
-        prevVideo = video;
-        video = iterator.next();
-        if (video.getEmbedCode().equals(currentItem.getEmbedCode()))
-        {
-          if (prevVideo != null)
-          {
-            return prevVideo;
-          }
-          break;
-        }
-      }
-    }
-    return _parent == null ? null : _parent.previousVideo(this);
+    int index = _videos.indexForValue(currentItem);
+    if (index < 0 || --index < 0) { return _parent == null ? null : _parent.previousVideo(this); }
+    return _videos.get(index);
   }
 
   protected void addVideo(Video video)
@@ -192,7 +153,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return _videos.size();
   }
 
-  public LinkedHashMap<String,Video> getVideos()
+  public OrderedMap<String,Video> getVideos()
   {
     return _videos;
   }
@@ -200,7 +161,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
   public int getDuration()
   {
     int totalDuration = 0;
-    for (Video video : _videos.values()) { totalDuration += video.getDuration(); }
+    for (Video video : _videos) { totalDuration += video.getDuration(); }
     return totalDuration;
   }
 
@@ -250,18 +211,26 @@ public class Channel extends ContentItem implements PaginatedParentItem
         return;
       }
 
-      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(Utils.getSubset(_videos, response.firstIndex, response.count));
-      boolean authorized = _api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this);
-      if (authorized)
-      {
-        _listener.onItemsFetched(response.firstIndex, response.count, null);
-      }
-      else
-      {
-        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_videos.subList(response.firstIndex, response.firstIndex+response.count));
+      try {
+        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this))
+        {
+          _listener.onItemsFetched(response.firstIndex, response.count, null);
+        }
+        else
+        {
+          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        }
+      } catch (OoyalaException e) {
+        _listener.onItemsFetched(response.firstIndex, response.count, e);
       }
       _isFetchingMoreChildren = false;
       return;
     }
+  }
+
+  @Override
+  public Video videoFromEmbedCode(String embedCode, Video currentItem) {
+    return _videos.get(embedCode);
   }
 }

@@ -1,7 +1,5 @@
 package com.ooyala.android;
 
-import java.util.Iterator;
-
 import android.test.AndroidTestCase;
 
 public class VideoTest extends AndroidTestCase
@@ -135,16 +133,12 @@ public class VideoTest extends AndroidTestCase
   {
     ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
     Video video = channelSet.firstVideo();
-    Iterator<Video> iter = channelSet.getChannels().values().iterator().next().getVideos().values().iterator();
-    iter.next(); // skip 1st video
-    Video expectedNext = iter.next();
+    Video expectedNext = channelSet.getChannels().get(0).getVideos().get(1);
     Video next = video.nextVideo();
     assertEquals(expectedNext, next);
 
-    video = channelSet.getChannels().values().iterator().next().lastVideo();
-    Iterator<Channel> channelIter = channelSet.getChannels().values().iterator();
-    channelIter.next(); // skip 1st channel
-    expectedNext = channelIter.next().getVideos().values().iterator().next();
+    video = channelSet.getChannels().get(0).lastVideo();
+    expectedNext = channelSet.getChannels().get(1).getVideos().get(0);
     next = video.nextVideo();
     assertEquals(expectedNext, next);
     video = next;
@@ -160,19 +154,15 @@ public class VideoTest extends AndroidTestCase
   public void testPreviousVideo()
   {
     ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
-    Iterator<Video> iter = channelSet.getChannels().values().iterator().next().getVideos().values().iterator();
-    iter.next(); // skip 1st video
-    Video video = iter.next();
-    Video expectedPrevious = channelSet.firstVideo();
+    Video video = channelSet.getChannels().get(0).getVideos().get(1);
+    Video expectedPrevious = channelSet.getChannels().get(0).getVideos().get(0);
     Video previous = video.previousVideo();
     assertEquals(expectedPrevious, previous);
     video = previous;
     previous = video.previousVideo();
     assertNull(previous);
-    Iterator<Channel> channelIter = channelSet.getChannels().values().iterator();
-    channelIter.next(); // skip 1st channel
-    video = channelIter.next().getVideos().values().iterator().next();
-    expectedPrevious = channelSet.getChannels().values().iterator().next().lastVideo();
+    video = channelSet.getChannels().get(1).getVideos().get(0);
+    expectedPrevious = channelSet.getChannels().get(0).getVideos().get(channelSet.getChannels().get(0).getVideos().size()-1);
     previous = video.previousVideo();
     assertEquals(expectedPrevious, previous);
   }

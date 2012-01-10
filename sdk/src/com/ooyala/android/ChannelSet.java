@@ -1,8 +1,6 @@
 package com.ooyala.android;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +11,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class ChannelSet extends ContentItem implements PaginatedParentItem
 {
-  protected LinkedHashMap<String,Channel> _channels = new LinkedHashMap<String,Channel>();
+  protected OrderedMap<String,Channel> _channels = new OrderedMap<String,Channel>();
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
 
@@ -40,7 +38,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;
       case STATE_UNMATCHED:
-        for (Channel channel : _channels.values())
+        for (Channel channel : _channels)
         {
           channel.update(data);
         }
@@ -54,7 +52,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
       JSONObject myData = data.getJSONObject(_embedCode);
       if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED))
       {
-        for (Channel channel : _channels.values())
+        for (Channel channel : _channels)
         {
           channel.update(data);
         }
@@ -120,60 +118,21 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
   public Video firstVideo()
   {
     if (_channels == null || _channels.size() == 0) { return null; }
-    return _channels.values().iterator().next().firstVideo();
-  }
-
-  public Video lastVideo()
-  {
-    if (_channels == null || _channels.size() == 0) { return null; }
-    Channel channel = null;
-    Iterator<Channel> iterator = _channels.values().iterator();
-    while (iterator.hasNext())
-    {
-      channel = iterator.next();
-    }
-    return channel.firstVideo();
+    return _channels.get(0).firstVideo();
   }
 
   public Video nextVideo(Channel currentItem)
   {
-    if (_channels == null || _channels.size() == 0) { return null; }
-    Iterator<Channel> iterator = _channels.values().iterator();
-    while (iterator.hasNext())
-    {
-      Channel channel = iterator.next();
-      if (channel.getEmbedCode().equals(currentItem.getEmbedCode()))
-      {
-        if (iterator.hasNext())
-        {
-          return iterator.next().firstVideo();
-        }
-        break;
-      }
-    }
-    return null;
+    int idx = _channels.indexForValue(currentItem);
+    if (idx < 0 || ++idx >= _channels.size()) { return null; }
+    return _channels.get(idx).firstVideo();
   }
 
   public Video previousVideo(Channel currentItem)
   {
-    if (_channels == null || _channels.size() == 0) { return null; }
-    Channel prevChannel = null;
-    Channel channel = null;
-    Iterator<Channel> iterator = _channels.values().iterator();
-    while (iterator.hasNext())
-    {
-      prevChannel = channel;
-      channel = iterator.next();
-      if (channel.getEmbedCode().equals(currentItem.getEmbedCode()))
-      {
-        if (prevChannel != null)
-        {
-          return prevChannel.lastVideo();
-        }
-        break;
-      }
-    }
-    return null;
+    int idx = _channels.indexForValue(currentItem);
+    if (idx < 0 || --idx < 0) { return null; }
+    return _channels.get(idx).lastVideo();
   }
 
   protected void addChannel(Channel channel)
@@ -186,7 +145,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     return _channels.size();
   }
 
-  public LinkedHashMap<String,Channel> getChannels()
+  public OrderedMap<String,Channel> getChannels()
   {
     return _channels;
   }
@@ -194,7 +153,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
   public int getDuration()
   {
     int totalDuration = 0;
-    for (Channel channel : _channels.values()) { totalDuration += channel.getDuration(); }
+    for (Channel channel : _channels) { totalDuration += channel.getDuration(); }
     return totalDuration;
   }
 
@@ -245,19 +204,38 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
         return;
       }
 
-      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(Utils.getSubset(_channels, response.firstIndex, response.count));
-      boolean authorized = _api.authorizeEmbedCodes(childEmbedCodesToAuthorize, ChannelSet.this);
-      if (authorized)
-      {
-        _listener.onItemsFetched(response.firstIndex, response.count, null);
-      }
-      else
-      {
-        _listener.onItemsFetched(response.firstIndex, response.count,
-                                 new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_channels.subList(response.firstIndex, response.firstIndex + response.count));
+      try {
+        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, ChannelSet.this))
+        {
+          _listener.onItemsFetched(response.firstIndex, response.count, null);
+        }
+        else
+        {
+          _listener.onItemsFetched(response.firstIndex, response.count,
+                                   new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        }
+      } catch (OoyalaException e) {
+        _listener.onItemsFetched(response.firstIndex, response.count, e);
       }
       _isFetchingMoreChildren = false;
       return;
     }
+  }
+
+  @Override
+  public Video videoFromEmbedCode(String embedCode, Video currentItem) {
+    //search through channelset starting with currentItem's channel
+    //get first channels index
+    int start = (currentItem == null) ? 0 : _channels.indexForValue(currentItem.getParent());
+    int i = start;
+    do {
+      Video v = _channels.get(i).videoFromEmbedCode(embedCode, currentItem);
+      if (v != null) {
+        return v;
+      }
+      i = i >= _channels.size() ? 0 : i+1;
+    } while (i != start);
+    return null;
   }
 }

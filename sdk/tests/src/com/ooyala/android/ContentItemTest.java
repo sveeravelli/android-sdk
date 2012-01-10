@@ -2,8 +2,6 @@ package com.ooyala.android;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -61,7 +59,7 @@ public class ContentItemTest extends AndroidTestCase
     assertEquals("best. team. ever.", channel.getDescription());
     assertEquals(Channel.class, channel.getClass());
 
-    LinkedHashMap<String,Video> videos = ((Channel)channel).getVideos();
+    OrderedMap<String,Video> videos = ((Channel)channel).getVideos();
     assertEquals(5, videos.size());
     assertNotNull(videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
     assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B").getEmbedCode());
@@ -87,14 +85,14 @@ public class ContentItemTest extends AndroidTestCase
     assertEquals("Bhangra Empire\nFunny", channelSet.getDescription());
     assertEquals(ChannelSet.class, channelSet.getClass());
 
-    LinkedHashMap<String,Channel> channels = ((ChannelSet)channelSet).getChannels();
+    OrderedMap<String,Channel> channels = ((ChannelSet)channelSet).getChannels();
     assertEquals(2, channels.size());
 
     Channel channel = channels.get(TestConstants.TEST_CHANNEL);
     assertNotNull(channel);
     assertEquals(TestConstants.TEST_CHANNEL, channel.getEmbedCode());
 
-    LinkedHashMap<String,Video> videos = channel.getVideos();
+    OrderedMap<String,Video> videos = channel.getVideos();
     assertEquals(5, videos.size());
     assertNotNull(videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
     assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B").getEmbedCode());
@@ -126,9 +124,8 @@ public class ContentItemTest extends AndroidTestCase
     assertEquals(DynamicChannel.class, dynamicChannel.getClass());
 
     assertEquals(2, ((DynamicChannel)dynamicChannel).getVideos().size());
-    Iterator<Video> iter = ((DynamicChannel)dynamicChannel).getVideos().values().iterator();
-    assertEquals(TestConstants.TEST_VIDEO, iter.next().getEmbedCode());
-    assertEquals(TestConstants.TEST_VIDEO_WITH_AD_OOYALA, iter.next().getEmbedCode());
+    assertEquals(TestConstants.TEST_VIDEO, ((DynamicChannel)dynamicChannel).getVideos().get(0).getEmbedCode());
+    assertEquals(TestConstants.TEST_VIDEO_WITH_AD_OOYALA, ((DynamicChannel)dynamicChannel).getVideos().get(1).getEmbedCode());
   }
 
   public static JSONObject getTestJSON(String file)

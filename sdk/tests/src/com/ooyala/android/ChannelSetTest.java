@@ -1,8 +1,5 @@
 package com.ooyala.android;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
 import android.test.AndroidTestCase;
 
 public class ChannelSetTest extends AndroidTestCase
@@ -35,13 +32,13 @@ public class ChannelSetTest extends AndroidTestCase
     assertEquals("Bhangra Empire\nFunny", channelSet.getDescription());
     assertEquals(ChannelSet.class, channelSet.getClass());
 
-    LinkedHashMap<String,Channel> channels = channelSet.getChannels();
+    OrderedMap<String,Channel> channels = channelSet.getChannels();
     assertEquals(2, channels.size());
     Channel channel = channels.get(TestConstants.TEST_CHANNEL);
     assertNotNull(channel);
     assertEquals(TestConstants.TEST_CHANNEL, channel.getEmbedCode());
 
-    LinkedHashMap<String,Video> videos = channel.getVideos();
+    OrderedMap<String,Video> videos = channel.getVideos();
     assertEquals(5, videos.size());
     assertNotNull(videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
     assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B").getEmbedCode());
@@ -70,7 +67,7 @@ public class ChannelSetTest extends AndroidTestCase
   public void testFirstVideo()
   {
     ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
-    Video video = channelSet.getChannels().values().iterator().next().getVideos().values().iterator().next();
+    Video video = channelSet.getChannels().get(0).getVideos().get(0);
     assertEquals(video, channelSet.firstVideo());
   }
 
@@ -80,10 +77,9 @@ public class ChannelSetTest extends AndroidTestCase
   public void testNextVideo()
   {
     ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
-    Iterator<Channel> iter = channelSet.getChannels().values().iterator();
-    Channel channel = iter.next();
-    Channel channel2 = iter.next();
-    Video expectedNext = channel2.getVideos().values().iterator().next();
+    Channel channel = channelSet.getChannels().get(0);
+    Channel channel2 = channelSet.getChannels().get(1);
+    Video expectedNext = channel2.getVideos().get(0);
     Video next = channelSet.nextVideo(channel);
     assertEquals(expectedNext, next);
     next = channelSet.nextVideo(channel2);
@@ -96,15 +92,9 @@ public class ChannelSetTest extends AndroidTestCase
   public void testPreviousVideo()
   {
     ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
-    Iterator<Channel> iter = channelSet.getChannels().values().iterator();
-    Channel channel = iter.next();
-    Channel channel2 = iter.next();
-    Iterator<Video> videoIter = channel.getVideos().values().iterator();
-    videoIter.next(); // 0
-    videoIter.next(); // 1
-    videoIter.next(); // 2
-    videoIter.next(); // 3
-    Video expectedPrevious = videoIter.next();
+    Channel channel = channelSet.getChannels().get(0);
+    Channel channel2 = channelSet.getChannels().get(1);
+    Video expectedPrevious = channel.getVideos().get(channel.getVideos().size()-1);
     Video previous = channelSet.previousVideo(channel2);
     assertEquals(expectedPrevious, previous);
     previous = channelSet.previousVideo(channel);
