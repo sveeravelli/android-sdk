@@ -2,17 +2,29 @@ package com.ooyala.android.player;
 
 import java.net.URL;
 
-import com.ooyala.android.OoyalaPlayer.PlayerState;
+import android.content.Context;
+import android.view.View;
+
+import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
 public abstract class Player {
-  protected PlayerState _state; /**< the current state of the player */
+  protected OoyalaPlayerState _state; /**< the current state of the player */
   protected int _playheadTime; /**< KVO compatible playhead time */
   protected String _error; /**< The Player's current error if it exists */
 
   /**
    * Init the player
    */
-  protected Player(URL url) {
+  protected Player() {
+  }
+
+  /**
+   * Init the player
+   */
+  protected Player(Context c, URL url) {
+  }
+
+  public void init(Context c, Object param) {
   }
 
   /**
@@ -72,11 +84,11 @@ public abstract class Player {
   public void seekToTime(int timeInMillis) {
   }
 
-  public PlayerState getState() {
+  public OoyalaPlayerState getState() {
     return _state;
   }
 
-  public void setState(PlayerState state) {
+  public void setState(OoyalaPlayerState state) {
     this._state = state;
   }
 
@@ -91,4 +103,6 @@ public abstract class Player {
   public String getError() {
     return _error;
   }
+
+  public abstract View getView();
 }

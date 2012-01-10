@@ -1,118 +1,167 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
-/**
- * A wrapper around android.media.MediaPlayer
- * http://developer.android.com/reference/android/media/MediaPlayer.html
- *
- * For a list of Android supported media formats, see:
- * http://developer.android.com/guide/appendix/media-formats.html
- */
-public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPreparedListener,
-                                                            MediaPlayer.OnErrorListener,
-                                                            MediaPlayer.OnCompletionListener//,
-//                                     MediaPlayer.OnBufferingUpdateListener,
-//                                     MediaPlayer.OnInfoListener,
-//                                     MediaPlayer.OnSeekCompleteListener,
-//                                     MediaPlayer.OnVideoSizeChangedListener
-{
-  public static enum PlayerState {
-    PlayerStateInit,
-    PlayerStateLoading,
-    PlayerStateReadyToPlay,
-    PlayerStatePlaying,
-    PlayerStatePaused,
-    PlayerStateCompleted,
-    PlayerStateError
-  }
+import com.ooyala.android.AuthorizableItem.AuthCode;
+import com.ooyala.android.player.MoviePlayer;
+import com.ooyala.android.player.Player;
 
-  private MediaPlayer _mediaPlayer = null;
+public class OoyalaPlayer extends RelativeLayout
+{
+  public static enum OoyalaPlayerActionAtEnd {
+    OoyalaPlayerActionAtEndContinue,
+    OoyalaPlayerActionAtEndPause,
+    OoyalaPlayerActionAtEndStop
+  };
+
+  public static enum OoyalaPlayerState {
+    OoyalaPlayerStateInit,
+    OoyalaPlayerStateLoading,
+    OoyalaPlayerStateReadyToPlay,
+    OoyalaPlayerStatePlaying,
+    OoyalaPlayerStatePaused,
+    OoyalaPlayerStateCompleted,
+    OoyalaPlayerStateError
+  }
 
   private ContentItem _rootItem = null;
   private Video _currentItem = null;
   private OoyalaException _currentError = null;
+  private Player _player = null;
+  private Player _adPlayer = null;
+  private PlayerAPIClient _playerAPIClient = null;
+  private OoyalaPlayerState _state = OoyalaPlayerState.OoyalaPlayerStateInit;
+  private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
+
+  public OoyalaPlayer(Context context, String pcode, String apiKey, String secret, String domain) {
+    super(context);
+    if (pcode != null && apiKey != null && secret != null && domain != null) {
+      _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
+    } else {
+      throw new IllegalStateException("pcode, apiKey, secret, and domain must be non-null");
+    }
+  }
 
   public OoyalaPlayer(Context context)
   {
     super(context);
-    createMediaPlayer();
+    createAPI(context);
   }
 
   public OoyalaPlayer(Context context, AttributeSet attrs)
   {
     super(context, attrs);
-    createMediaPlayer();
+    createAPI(context);
   }
 
   public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle)
   {
     super(context, attrs, defStyle);
-    createMediaPlayer();
+    createAPI(context);
   }
 
-  public OoyalaPlayer(Context context, String embedCode)
-  {
-    super(context);
-    createMediaPlayer();
-    setEmbedCode(embedCode);
-  }
-
-  public OoyalaPlayer(Context context, AttributeSet attrs, String embedCode)
-  {
-    super(context, attrs);
-    createMediaPlayer();
-    setEmbedCode(embedCode);
-  }
-
-  public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle, String embedCode)
-  {
-    super(context, attrs, defStyle);
-    createMediaPlayer();
-    setEmbedCode(embedCode);
-  }
-
-  private void createMediaPlayer()
-  {
-    _mediaPlayer = new MediaPlayer(); // Player Idle
-    _mediaPlayer.setOnPreparedListener(this);
-    _mediaPlayer.setOnErrorListener(this);
-    _mediaPlayer.setOnCompletionListener(this);
-// TODO: Implement all of these listeners:
-//    _mediaPlayer.setOnBufferingUpdateListener(this);
-//    _mediaPlayer.setOnInfoListener(this);
-//    _mediaPlayer.setOnSeekCompleteListener(this);
-//    _mediaPlayer.setOnVideoSizeChangedListener(this);
-//    _mediaPlayer.setDisplay(holder);
-    _mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-  }
-
-  /** Called when MediaPlayer is ready */
-  @Override
-  public void onPrepared(MediaPlayer player)
-  {
-    if (true)
-    {
-      _mediaPlayer.start();
+  private void createAPI(Context context) {
+    TypedArray a = getContext().obtainStyledAttributes(R.styleable.OoyalaPlayer);
+    String apiKey = a.getString(R.styleable.OoyalaPlayer_apiKey);
+    String secret = a.getString(R.styleable.OoyalaPlayer_secret);
+    String pcode = a.getString(R.styleable.OoyalaPlayer_pcode);
+    String domain = a.getString(R.styleable.OoyalaPlayer_domain);
+    if (pcode != null && apiKey != null && secret != null && domain != null) {
+      _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
+    } else {
+      throw new IllegalStateException("pcode, apiKey, secret, and domain must be non-null");
     }
   }
 
-  @Override
-  public boolean onError(MediaPlayer player, int what, int extra)
-  {
-      // ... react appropriately ...
-      // The MediaPlayer has moved to the Error state, must be reset!
-    System.out.println("Player Error");
+  private boolean reinitialize(ContentItem contentTree) {
+    _rootItem = contentTree;
+    try {
+      if (!_playerAPIClient.authorize(contentTree)) {
+        _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+        return false;
+      }
+    } catch (OoyalaException e) {
+     _currentError = e;
+     return false;
+    }
+    return changeCurrentVideo(_rootItem.firstVideo());
+  }
+
+  private boolean changeCurrentVideo(Video v) {
+    if (v == null) {
+      cleanupPlayers();
+      return false;
+    }
+    _state = OoyalaPlayerState.OoyalaPlayerStateLoading;
+    cleanupPlayers();
+    _playedAds = new ArrayList<AdSpot>();
+    _currentItem = v;
+    if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
+      try {
+        if (!_playerAPIClient.authorize(_currentItem)) {
+          _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+          return false;
+        }
+      } catch (OoyalaException e) {
+        _currentError = e;
+        return false;
+      }
+    }
+
+    if (!_currentItem.isAuthorized()) {
+      _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+      return false;
+    }
+
+    _player = initializePlayer(MoviePlayer.class, _currentItem.getStream().decodedURL());
+    if (_player == null) {
+      return false;
+    }
+
+    /**
+     * TODO closed captions
+     */
+
     return true;
   }
 
-  @Override
-  public void onCompletion(MediaPlayer player)
-  {
+  private Player initializePlayer(Class<? extends Player> playerClass, Object param) {
+    Player p;
+    try {
+      p = playerClass.newInstance();
+    } catch (Exception e) {
+      e.printStackTrace();
+      _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_INTERNAL_ANDROID, e);
+      return null;
+    }
+    p.init(this.getContext(), param);
+
+    this.addView(p.getView(), this.getWidth(), this.getHeight());
+
+    /**
+     * TODO add observers and views and shit
+     */
+
+    return p;
+  }
+
+  private void cleanupPlayers() {
+    cleanupPlayer(_adPlayer);
+    _adPlayer = null;
+    cleanupPlayer(_player);
+    _player = null;
+  }
+
+  private void cleanupPlayer(Player player) {
+    /**
+     * TODO actually clean up shit.
+     */
   }
 
   /**
@@ -147,26 +196,36 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * If embedCode is null, this method has no effect and just returns.
    * @param embedCode
    */
-  public void setEmbedCode(String embedCode)
-  {
-    if (embedCode == null) return;
+  public boolean setEmbedCode(String embedCode) {
+    List<String> embedCodes = new ArrayList<String>();
+    embedCodes.add(embedCode);
+    return setEmbedCodes(embedCodes);
+  }
 
-    // Look up playback URL
-    String url = "http://ak.c.ooyala.com/81MTVjMjq2PJ4s41-o_iNxP5uYAHQjPy/DOcJ-FxaFrRg4gtGEwOjkzOjBrO_9K4g";
-    //String url = "http://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3";
-    //String url = "http://www.tools4movies.com/dvd_catalyst_profile_samples/Harold%20Kumar%203%20Christmas%20bionic.mp4";
+  public boolean setEmbedCodes(List<String> embedCodes) {
+    try {
+      ContentItem contentTree = _playerAPIClient.contentTree(embedCodes);
+      return reinitialize(contentTree);
+    } catch (OoyalaException e) {
+      _currentError = e;
+      return false;
+    }
+  }
 
-    // Play URL in MediaPlayer
-    System.out.println("Callig setDataSource");
-    try
-    {
-      _mediaPlayer.setDataSource(url); // Player Initialized
+  public boolean setExternalId(String externalId) {
+    List<String> externalIds = new ArrayList<String>();
+    externalIds.add(externalId);
+    return setExternalIds(externalIds);
+  }
+
+  public boolean setExternalIds(List<String> externalIds) {
+    try {
+      ContentItem contentTree = _playerAPIClient.contentTreeByExternalIds(externalIds);
+      return reinitialize(contentTree);
+    } catch (OoyalaException e) {
+      _currentError = e;
+      return false;
     }
-    catch (Exception exception)
-    {
-      System.out.println("Unable to setDataSource: "+exception);
-    }
-    _mediaPlayer.prepareAsync(); // Player Preparing
   }
 
   /**
@@ -174,12 +233,9 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * @param embedCode
    * @return accepted
    */
-  public boolean setCurrentItem(String embedCode)
+  public boolean changeCurrentItem(String embedCode)
   {
-    Video requestedItem = null; // look up based on embed code
-    // TODO: actually change what's playing
-    _currentItem = requestedItem;
-    return true;
+    return changeCurrentVideo(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
   }
 
 
@@ -196,9 +252,9 @@ public class OoyalaPlayer extends RelativeLayout implements MediaPlayer.OnPrepar
    * Get current player state. One of playing, paused, buffering, channel, or error
    * @return state
    */
-  public String getState()
+  public OoyalaPlayerState getState()
   {
-    return "TODO";
+    return _state;
   }
 
   /**
