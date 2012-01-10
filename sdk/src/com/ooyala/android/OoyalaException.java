@@ -9,7 +9,8 @@ public class OoyalaException extends Exception
     ERROR_CONTENT_TREE_INVALID, /**< Content Tree Response invalid */
     ERROR_AUTHORIZATION_FAILED, /**< Authorization failed */
     ERROR_AUTHORIZATION_SIGNATURE_INVALID, /**< The signature of the Authorization Response is invalid */
-    ERROR_CONTENT_TREE_NEXT_FAILED /**< Content Tree Next failed */
+    ERROR_CONTENT_TREE_NEXT_FAILED, /**< Content Tree Next failed */
+    ERROR_INTERNAL_ANDROID /**< An Internal Android Error. Check the Throwable properties. */
   };
 
 	private OoyalaErrorCode _code;

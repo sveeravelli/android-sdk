@@ -196,7 +196,7 @@ class PlayerAPIClient
     return params;
   }
 
-  public boolean authorize(AuthorizableItem item)
+  public boolean authorize(AuthorizableItem item) throws OoyalaException
   {
     List<String> embedCodes = item.embedCodesToAuthorize();
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
@@ -206,16 +206,16 @@ class PlayerAPIClient
     {
       authData = verifyAuthorizeJSON(json, embedCodes);
     }
-    catch (Exception e)
+    catch (OoyalaException e)
     {
       System.out.println("Unable to authorize: " + e);
-      return false;
+      throw e;
     }
     item.update(authData);
     return true;
   }
 
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException
   {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());
@@ -224,16 +224,16 @@ class PlayerAPIClient
     {
       authData = verifyAuthorizeJSON(json, embedCodes);
     }
-    catch (Exception e)
+    catch (OoyalaException e)
     {
       System.out.println("Unable to authorize: " + e);
-      return false;
+      throw e;
     }
     if (parent != null) { parent.update(authData); }
     return true;
   }
 
-  public ContentItem contentTree(List<String> embedCodes)
+  public ContentItem contentTree(List<String> embedCodes) throws OoyalaException
   {
     String uri = String.format(Constants.CONTENT_TREE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
@@ -243,15 +243,15 @@ class PlayerAPIClient
     {
       contentTree = verifyContentTreeObject(obj, embedCodes);
     }
-    catch (Exception e)
+    catch (OoyalaException e)
     {
       System.out.println("Unable to create objects: " + e);
-      return null;
+      throw e;
     }
     return ContentItem.create(contentTree, embedCodes, this);
   }
 
-  public ContentItem contentTreeByExternalIds(List<String> externalIds)
+  public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException
   {
     String uri = String.format(Constants.CONTENT_TREE_BY_EXTERNAL_ID_URI, _pcode, Utils.join(externalIds, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
@@ -262,10 +262,10 @@ class PlayerAPIClient
     {
       contentTree = verifyContentTreeObject(obj, externalIds, embedCodes);
     }
-    catch (Exception e)
+    catch (OoyalaException e)
     {
       System.out.println("Unable to create externalId objects: " + e);
-      return null;
+      throw e;
     }
     return ContentItem.create(contentTree, embedCodes, this);
   }

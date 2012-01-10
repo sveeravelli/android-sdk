@@ -23,7 +23,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   protected void tearDown() {
   }
 
-  public void testAuthorizeVideo() {
+  public void testAuthorizeVideo() throws OoyalaException {
     ContentItem video = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO), TestConstants.TEST_VIDEO, api);
     assertTrue(api.authorize(video));
     assertTrue(video.isAuthorized());
@@ -62,7 +62,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertTrue(((Video)video).isLive());
   }
 
-  public void testAuthorizeChannel() {
+  public void testAuthorizeChannel() throws OoyalaException {
     ContentItem channel = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, api);
     assertTrue(api.authorize(channel));
     assertTrue(channel.isAuthorized());
@@ -72,7 +72,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
                ((Channel)channel).firstVideo().getStream().decodedURL().toString().equals("http://ak.c.ooyala.com/JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B/DOcJ-FxaFrRg4gtGIwOjRpOmc3OxgEkc"));
   }
 
-  public void testAuthorizeChannelSet() {
+  public void testAuthorizeChannelSet() throws OoyalaException {
     ContentItem channelSet = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, api);
     assertTrue(api.authorize(channelSet));
     assertTrue(channelSet.isAuthorized());
@@ -82,7 +82,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
                ((ChannelSet)channelSet).firstVideo().getStream().decodedURL().toString().equals("http://ak.c.ooyala.com/JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B/DOcJ-FxaFrRg4gtGIwOjRpOmc3OxgEkc"));
   }
 
-  public void testAuthorizeDynamicChannel() {
+  public void testAuthorizeDynamicChannel() throws OoyalaException {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
@@ -100,7 +100,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
                secondVideo.getStream().decodedURL().toString().equals("http://ak.c.ooyala.com/g3N2wxMzqxoB84c3dan5xyXTxdrhX1km/DOcJ-FxaFrRg4gtGIwOjRpOmc3OxgEkc"));
   }
 
-  public void testContentTreeVideo() {
+  public void testContentTreeVideo() throws OoyalaException {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_VIDEO);
     ContentItem rootItem = api.contentTree(embeds);
@@ -121,7 +121,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertTrue(((Video)rootItem).isLive());
   }
 
-  public void testContentTreeDynamicChannel() {
+  public void testContentTreeDynamicChannel() throws OoyalaException {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
@@ -136,7 +136,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertEquals(secondVideo.getEmbedCode(), TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
   }
 
-  public void testContentTreeByExternalIdsVideo() {
+  public void testContentTreeByExternalIdsVideo() throws OoyalaException {
     List<String> externals = new ArrayList<String>();
     externals.add(TestConstants.TEST_VIDEO_EXTERNAL_ID);
     ContentItem rootItem = api.contentTreeByExternalIds(externals);
@@ -144,7 +144,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertEquals(rootItem.getEmbedCode(), TestConstants.TEST_VIDEO);
   }
 
-  public void testContentTreeByExternalIdsDynamicChannel() {
+  public void testContentTreeByExternalIdsDynamicChannel() throws OoyalaException {
     List<String> externals = new ArrayList<String>();
     externals.add(TestConstants.TEST_VIDEO_EXTERNAL_ID);
     externals.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA_EXTERNAL_ID);
@@ -159,7 +159,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertEquals(secondVideo.getEmbedCode(), TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
   }
 
-  public void testContentTreeNext() {
+  public void testContentTreeNext() throws OoyalaException {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_CHANNEL_SET);
     ContentItem rootItem = api.contentTree(embeds);

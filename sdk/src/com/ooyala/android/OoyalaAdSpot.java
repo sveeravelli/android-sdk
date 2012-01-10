@@ -112,7 +112,12 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
 
   public boolean fetchPlaybackInfo()
   {
-    return _api.authorize(this);
+    try {
+      return _api.authorize(this);
+    } catch (OoyalaException e) {
+      System.out.println("Unable to fetch playback info: "+e.getMessage());
+      return false;
+    }
   }
 
   public Stream getStream()
