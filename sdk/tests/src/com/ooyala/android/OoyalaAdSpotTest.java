@@ -52,6 +52,9 @@ public class OoyalaAdSpotTest extends AndroidTestCase
     PlayerAPIClient api = new PlayerAPIClient(new OoyalaAPIHelper(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET), TestConstants.TEST_PCODE, "www.ooyala.com");
     OoyalaAdSpot adSpot = new OoyalaAdSpot(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), api);
     assertTrue(adSpot.fetchPlaybackInfo());
-    assertEquals("http://player.ooyala.com/player/iphone/JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B.m3u8", adSpot.getStream().decodedURL().toString());
+    // FIXME: This test asset has multiple streams with the same resolution and bitrate...
+    String url = adSpot.getStream().decodedURL().toString();
+    assertTrue(url.equals("http://ak.c.ooyala.com/JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B/DOcJ-FxaFrRg4gtGIwOjRpOmc3OxgEkc") ||
+               url.equals("http://ak.c.ooyala.com/JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B/DOcJ-FxaFrRg4gtGMwOjRpOmc3OzS3Gm"));
   }
 }
