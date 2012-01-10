@@ -88,6 +88,30 @@ public class ClosedCaptions
     return ReturnState.STATE_MATCHED;
   }
 
+  /**
+   * @return the Set of supported languages
+   */
+  public Set<String> getLanguages()
+  {
+    return _languages;
+  }
+
+  /**
+   * @return the default language
+   */
+  public String getDefaultLanguage()
+  {
+    return _defaultLanguage;
+  }
+
+  /**
+   * @return the URL
+   */
+  public URL getURL()
+  {
+    return _url;
+  }
+
   private boolean parseHeadXML(Element head)
   {
     if (!head.getTagName().equals(Constants.ELEMENT_HEAD)) { return false; }
@@ -111,12 +135,12 @@ public class ClosedCaptions
       String lang = div.getAttribute(Constants.ATTRIBUTE_XML_LANG);
       List<Caption> captionsForLang = Utils.isNullOrEmpty(lang) ? null : _captions.get(lang);
       String begin = div.getAttribute(Constants.ATTRIBUTE_BEGIN);
-      if (Utils.isNullOrEmpty(begin) || captionsForLang == null)
+      if (!Utils.isNullOrEmpty(begin) || captionsForLang == null)
       {
         continue;
       }
 
-      NodeList ps = body.getElementsByTagName(Constants.ELEMENT_P);
+      NodeList ps = div.getElementsByTagName(Constants.ELEMENT_P);
       for (int j = 0; j < ps.getLength(); j++)
       {
         Element p = (Element)ps.item(j);

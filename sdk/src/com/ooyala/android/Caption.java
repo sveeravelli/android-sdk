@@ -27,7 +27,7 @@ public class Caption
     {
       _end = Utils.secondsFromTimeString(endStr);
     }
-    else if (!Utils.isNullOrEmpty(endStr))
+    else if (!Utils.isNullOrEmpty(durationStr))
     {
       _end = _begin + Utils.secondsFromTimeString(durationStr);
     }
@@ -36,7 +36,7 @@ public class Caption
       return;
     }
 
-    _text = element.getTextContent(); // TODO: May need to clean up the text
+    _text = element.getTextContent().trim(); // TODO: May need to clean up the text
   }
 
   public double getBegin()
