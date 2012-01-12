@@ -13,19 +13,21 @@ import android.util.Log;
 
 public class OoyalaPlayer implements Observer {
   public static enum OoyalaPlayerActionAtEnd {
-    OoyalaPlayerActionAtEndContinue,
-    OoyalaPlayerActionAtEndPause,
-    OoyalaPlayerActionAtEndStop
+    CONTINUE,
+    PAUSE,
+    STOP
   };
 
   public static enum OoyalaPlayerState {
-    OoyalaPlayerStateInit,
-    OoyalaPlayerStateLoading,
-    OoyalaPlayerStateReadyToPlay,
-    OoyalaPlayerStatePlaying,
-    OoyalaPlayerStatePaused,
-    OoyalaPlayerStateCompleted,
-    OoyalaPlayerStateError
+    INIT,
+    LOADING,
+    READY,
+    PLAYING,
+    PAUSED,
+    COMPLETED,
+    ERROR,
+    SUSPENDED,
+    RESUMED // This is used by setState in Player to reset the state to the old state
   }
 
   private Video _currentItem = null;
@@ -35,7 +37,7 @@ public class OoyalaPlayer implements Observer {
   private Player _player = null;
   private Player _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
-  private OoyalaPlayerState _state = OoyalaPlayerState.OoyalaPlayerStateInit;
+  private OoyalaPlayerState _state = OoyalaPlayerState.INIT;
   private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
   private boolean _playQueued = false;
@@ -120,7 +122,7 @@ public class OoyalaPlayer implements Observer {
       cleanupPlayers();
       return false;
     }
-    _state = OoyalaPlayerState.OoyalaPlayerStateLoading;
+    _state = OoyalaPlayerState.LOADING;
     cleanupPlayers();
     _playedAds.clear();
     _lastPlayedTime = 0;
@@ -224,7 +226,7 @@ public class OoyalaPlayer implements Observer {
    */
   public void pause() {
     switch (_state) {
-      case OoyalaPlayerStatePlaying:
+      case PLAYING:
         currentPlayer().pause();
       default:
         break;
@@ -237,13 +239,13 @@ public class OoyalaPlayer implements Observer {
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
     switch (_state) {
-      case OoyalaPlayerStateInit:
-      case OoyalaPlayerStateLoading:
+      case INIT:
+      case LOADING:
         queuePlay();
         break;
-      case OoyalaPlayerStatePaused:
-      case OoyalaPlayerStateReadyToPlay:
-      case OoyalaPlayerStateCompleted:
+      case PAUSED:
+      case READY:
+      case COMPLETED:
         currentPlayer().play();
       default:
         break;
@@ -301,9 +303,9 @@ public class OoyalaPlayer implements Observer {
     Log.d(this.getClass().getName(), "TEST - dequeuePlay");
     if (_playQueued) {
       switch (_state) {
-        case OoyalaPlayerStatePaused:
-        case OoyalaPlayerStateReadyToPlay:
-        case OoyalaPlayerStateCompleted:
+        case PAUSED:
+        case READY:
+        case COMPLETED:
           _playQueued = false;
           currentPlayer().play();
         default:

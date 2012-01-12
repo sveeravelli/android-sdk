@@ -10,7 +10,8 @@ import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
 public abstract class Player extends Observable {
   protected OoyalaPlayerLayout _parent = null;
-  protected OoyalaPlayerState _state = OoyalaPlayerState.OoyalaPlayerStateInit; /**< the current state of the player */
+  protected OoyalaPlayerState _state = OoyalaPlayerState.INIT; /**< the current state of the player */
+  protected OoyalaPlayerState _stateBeforeSuspended;
   protected int _playheadTime = 0; /**< KVO compatible playhead time */
   protected String _error = null; /**< The Player's current error if it exists */
   protected SurfaceView _view = null;

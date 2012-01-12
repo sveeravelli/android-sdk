@@ -51,15 +51,15 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     Log.d(this.getClass().getName(), "TEST - init");
     if (url == null) {
       this._error = "Invalid URL";
-      setState(OoyalaPlayerState.OoyalaPlayerStateError);
+      setState(OoyalaPlayerState.ERROR);
       return;
     }
     if (parent == null) {
       this._error = "Invalid Parent";
-      setState(OoyalaPlayerState.OoyalaPlayerStateError);
+      setState(OoyalaPlayerState.ERROR);
       return;
     }
-    setState(OoyalaPlayerState.OoyalaPlayerStateLoading);
+    setState(OoyalaPlayerState.LOADING);
     _url = url.toString();
     setParent(parent);
   }
@@ -67,14 +67,14 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void pause() {
     _player.pause();
-    setState(OoyalaPlayerState.OoyalaPlayerStatePaused);
+    setState(OoyalaPlayerState.PAUSED);
   }
 
   @Override
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
     _player.start();
-    setState(OoyalaPlayerState.OoyalaPlayerStatePlaying);
+    setState(OoyalaPlayerState.PLAYING);
   }
 
   @Override
@@ -140,7 +140,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   public boolean onError(MediaPlayer mp, int what, int extra) {
     Log.d(this.getClass().getName(), "TEST - onError");
     this._error = "MediaPlayer Error: "+what+" "+extra;
-    setState(OoyalaPlayerState.OoyalaPlayerStateError);
+    setState(OoyalaPlayerState.ERROR);
     return false;
   }
 
@@ -155,7 +155,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     } else {
       Log.d(this.getClass().getName(), "TEST - onPrepared - start else");
     }
-    setState(OoyalaPlayerState.OoyalaPlayerStateReadyToPlay);
+    setState(OoyalaPlayerState.READY);
   }
 
   @Override
@@ -167,7 +167,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void onCompletion(MediaPlayer mp) {
     Log.d(this.getClass().getName(), "TEST - onCompletion");
-    setState(OoyalaPlayerState.OoyalaPlayerStateCompleted);
+    setState(OoyalaPlayerState.COMPLETED);
   }
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
@@ -184,7 +184,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   public void surfaceCreated(SurfaceHolder arg0) {
     // TODO Auto-generated method stub
     Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
-    if (_state == OoyalaPlayerState.OoyalaPlayerStateLoading) {
+    if (_state == OoyalaPlayerState.LOADING) {
       createMediaPlayer(_url);
     }
   }

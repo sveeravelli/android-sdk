@@ -18,7 +18,7 @@ public class OoyalaAdPlayer extends MoviePlayer {
   public void init(OoyalaPlayerLayout parent, Object ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = "Invalid Ad";
-      this._state = OoyalaPlayerState.OoyalaPlayerStateError;
+      this._state = OoyalaPlayerState.ERROR;
       return;
     }
     _ad = (OoyalaAdSpot)ad;
