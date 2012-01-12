@@ -10,12 +10,12 @@
         android:layout_height="wrap_content"
         android:text="@string/start" />
 
-  <com.ooyala.android.OoyalaPlayer
+    <com.ooyala.android.OoyalaPlayerLayout
     android:id="@+id/player"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center">
-  </com.ooyala.android.OoyalaPlayer>
+  </com.ooyala.android.OoyalaPlayerLayout>
 
     <TextView
         android:id="@+id/end"

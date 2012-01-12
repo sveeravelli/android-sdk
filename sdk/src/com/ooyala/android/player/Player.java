@@ -1,16 +1,19 @@
 package com.ooyala.android.player;
 
-import java.net.URL;
+import java.util.Observable;
 
-import android.content.Context;
+import android.view.SurfaceView;
 import android.view.View;
 
+import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
-public abstract class Player {
-  protected OoyalaPlayerState _state; /**< the current state of the player */
-  protected int _playheadTime; /**< KVO compatible playhead time */
-  protected String _error; /**< The Player's current error if it exists */
+public abstract class Player extends Observable {
+  protected OoyalaPlayerLayout _parent = null;
+  protected OoyalaPlayerState _state = OoyalaPlayerState.OoyalaPlayerStateInit; /**< the current state of the player */
+  protected int _playheadTime = 0; /**< KVO compatible playhead time */
+  protected String _error = null; /**< The Player's current error if it exists */
+  protected SurfaceView _view = null;
 
   /**
    * Init the player
@@ -18,13 +21,7 @@ public abstract class Player {
   protected Player() {
   }
 
-  /**
-   * Init the player
-   */
-  protected Player(Context c, URL url) {
-  }
-
-  public void init(Context c, Object param) {
+  public void init(OoyalaPlayerLayout parent, Object param) {
   }
 
   /**
@@ -90,6 +87,8 @@ public abstract class Player {
 
   public void setState(OoyalaPlayerState state) {
     this._state = state;
+    setChanged();
+    notifyObservers();
   }
 
   public float getPlayheadTime() {
@@ -104,5 +103,15 @@ public abstract class Player {
     return _error;
   }
 
-  public abstract View getView();
+  public View getView() {
+    return _view;
+  }
+
+  public void setParent(OoyalaPlayerLayout parent) {
+    _parent = parent;
+  }
+
+  public abstract boolean suspend();
+
+  public abstract boolean resume();
 }

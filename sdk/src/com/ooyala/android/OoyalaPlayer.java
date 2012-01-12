@@ -2,18 +2,16 @@ package com.ooyala.android;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.widget.RelativeLayout;
+import java.util.Observable;
+import java.util.Observer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 
-public class OoyalaPlayer extends RelativeLayout
-{
+import android.util.Log;
+
+public class OoyalaPlayer implements Observer {
   public static enum OoyalaPlayerActionAtEnd {
     OoyalaPlayerActionAtEndContinue,
     OoyalaPlayerActionAtEndPause,
@@ -30,99 +28,120 @@ public class OoyalaPlayer extends RelativeLayout
     OoyalaPlayerStateError
   }
 
-  private ContentItem _rootItem = null;
   private Video _currentItem = null;
-  private OoyalaException _currentError = null;
+  private ContentItem _rootItem = null;
+  private OoyalaException _error = null;
+  private OoyalaPlayerActionAtEnd _actionAtEnd;
   private Player _player = null;
   private Player _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
   private OoyalaPlayerState _state = OoyalaPlayerState.OoyalaPlayerStateInit;
   private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
+  private int _lastPlayedTime = 0;
+  private boolean _playQueued = false;
+  private OoyalaPlayerLayout _layout = null;
 
-  public OoyalaPlayer(Context context, String pcode, String apiKey, String secret, String domain) {
-    super(context);
-    if (pcode != null && apiKey != null && secret != null && domain != null) {
-      _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
-    } else {
-      throw new IllegalStateException("pcode, apiKey, secret, and domain must be non-null");
+  public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
+    _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
+  }
+
+  public void setLayout(OoyalaPlayerLayout layout) {
+    _layout = layout;
+    if (_adPlayer != null) {
+      _adPlayer.setParent(_layout);
+    }
+    if (_player != null) {
+      _player.setParent(_layout);
     }
   }
 
-  public OoyalaPlayer(Context context)
-  {
-    super(context);
-    createAPI(context);
+  /**
+   * Reinitializes the player with a new embedCode.
+   * If embedCode is null, this method has no effect and just returns.
+   * @param embedCode
+   */
+  public boolean setEmbedCode(String embedCode) {
+    List<String> embeds = new ArrayList<String>();
+    embeds.add(embedCode);
+    return setEmbedCodes(embeds);
   }
 
-  public OoyalaPlayer(Context context, AttributeSet attrs)
-  {
-    super(context, attrs);
-    createAPI(context);
-  }
-
-  public OoyalaPlayer(Context context, AttributeSet attrs, int defStyle)
-  {
-    super(context, attrs, defStyle);
-    createAPI(context);
-  }
-
-  private void createAPI(Context context) {
-    TypedArray a = getContext().obtainStyledAttributes(R.styleable.OoyalaPlayer);
-    String apiKey = a.getString(R.styleable.OoyalaPlayer_apiKey);
-    String secret = a.getString(R.styleable.OoyalaPlayer_secret);
-    String pcode = a.getString(R.styleable.OoyalaPlayer_pcode);
-    String domain = a.getString(R.styleable.OoyalaPlayer_domain);
-    if (pcode != null && apiKey != null && secret != null && domain != null) {
-      _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
-    } else {
-      throw new IllegalStateException("pcode, apiKey, secret, and domain must be non-null");
-    }
-  }
-
-  private boolean reinitialize(ContentItem contentTree) {
-    _rootItem = contentTree;
+  public boolean setEmbedCodes(List<String> embedCodes) {
     try {
-      if (!_playerAPIClient.authorize(contentTree)) {
-        _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
-        return false;
-      }
+      ContentItem contentTree = _playerAPIClient.contentTree(embedCodes);
+      return reinitialize(contentTree);
     } catch (OoyalaException e) {
-     _currentError = e;
-     return false;
+      Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", e);
+      this._error = e;
+      return false;
+    }
+  }
+
+  public boolean setExternalId(String externalId) {
+    List<String> ids = new ArrayList<String>();
+    ids.add(externalId);
+    return setExternalIds(ids);
+  }
+
+  public boolean setExternalIds(List<String> externalIds) {
+    try {
+      ContentItem contentTree = _playerAPIClient.contentTreeByExternalIds(externalIds);
+      return reinitialize(contentTree);
+    } catch (OoyalaException e) {
+      Log.d(this.getClass().getName(), "Exception in setExternalIds!", e);
+      this._error = e;
+      return false;
+    }
+  }
+
+  /**
+   * Set the current video in a channel if the video is present. Returns true if accepted, false if not.
+   * @param embedCode
+   * @return accepted
+   */
+  public boolean changeCurrentItem(String embedCode) {
+    return changeCurrentVideo(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
+  }
+
+  private boolean reinitialize(ContentItem tree) {
+    _rootItem = tree;
+    try {
+      _playerAPIClient.authorize(_rootItem);
+    } catch (OoyalaException e) {
+      Log.d(this.getClass().getName(), "Exception in reinitialize!", e);
+      this._error = e;
+      return false;
     }
     return changeCurrentVideo(_rootItem.firstVideo());
   }
 
-  private boolean changeCurrentVideo(Video v) {
-    if (v == null) {
+  public boolean changeCurrentVideo(Video video) {
+    if (video == null) {
       cleanupPlayers();
       return false;
     }
     _state = OoyalaPlayerState.OoyalaPlayerStateLoading;
     cleanupPlayers();
-    _playedAds = new ArrayList<AdSpot>();
-    _currentItem = v;
+    _playedAds.clear();
+    _lastPlayedTime = 0;
+    _currentItem = video;
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       try {
-        if (!_playerAPIClient.authorize(_currentItem)) {
-          _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
-          return false;
-        }
+        _playerAPIClient.authorize(_currentItem);
       } catch (OoyalaException e) {
-        _currentError = e;
+        Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", e);
+        this._error = e;
         return false;
       }
     }
 
     if (!_currentItem.isAuthorized()) {
-      _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
       return false;
     }
 
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream().decodedURL());
-    if (_player == null) {
-      return false;
-    }
+    if (_player == null) { return false; }
 
     /**
      * TODO closed captions
@@ -132,22 +151,15 @@ public class OoyalaPlayer extends RelativeLayout
   }
 
   private Player initializePlayer(Class<? extends Player> playerClass, Object param) {
-    Player p;
+    Player p = null;
     try {
       p = playerClass.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      _currentError = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_INTERNAL_ANDROID, e);
+      _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_INTERNAL_ANDROID, e);
       return null;
     }
-    p.init(this.getContext(), param);
-
-    this.addView(p.getView(), this.getWidth(), this.getHeight());
-
-    /**
-     * TODO add observers and views and shit
-     */
-
+    p.addObserver(this);
+    p.init(_layout, param);
     return p;
   }
 
@@ -158,127 +170,91 @@ public class OoyalaPlayer extends RelativeLayout
     _player = null;
   }
 
-  private void cleanupPlayer(Player player) {
-    /**
-     * TODO actually clean up shit.
-     */
+  private void cleanupPlayer(Player p) {
+    if (p != null) {
+      p.stop();
+      /**
+       * TODO remove view!
+       */
+    }
   }
 
   /**
    * The current movie.
    * @return movie
    */
-  public Video getCurrentItem()
-  {
-	  return _currentItem;
+  public Video getCurrentItem() {
+    return _currentItem;
   }
 
   /**
    * The embedded item (movie, channel, or channel set).
    * @return movie
    */
-  public ContentItem getRootItem()
-  {
-	  return _rootItem;
+  public ContentItem getRootItem() {
+    return _rootItem;
+  }
+
+  /**
+   * Get the current error code, if one exists
+   * @return error code
+   */
+  public OoyalaException getError() {
+    return _error;
   }
 
   /**
    * Get the embedCode for the current player.
    * @return embedCode
    */
-  public String getEmbedCode()
-  {
-	  return _rootItem == null ? null : _rootItem.getEmbedCode();
-  }
-
-  /**
-   * Reinitializes the player with a new embedCode.
-   * If embedCode is null, this method has no effect and just returns.
-   * @param embedCode
-   */
-  public boolean setEmbedCode(String embedCode) {
-    List<String> embedCodes = new ArrayList<String>();
-    embedCodes.add(embedCode);
-    return setEmbedCodes(embedCodes);
-  }
-
-  public boolean setEmbedCodes(List<String> embedCodes) {
-    try {
-      ContentItem contentTree = _playerAPIClient.contentTree(embedCodes);
-      return reinitialize(contentTree);
-    } catch (OoyalaException e) {
-      _currentError = e;
-      return false;
-    }
-  }
-
-  public boolean setExternalId(String externalId) {
-    List<String> externalIds = new ArrayList<String>();
-    externalIds.add(externalId);
-    return setExternalIds(externalIds);
-  }
-
-  public boolean setExternalIds(List<String> externalIds) {
-    try {
-      ContentItem contentTree = _playerAPIClient.contentTreeByExternalIds(externalIds);
-      return reinitialize(contentTree);
-    } catch (OoyalaException e) {
-      _currentError = e;
-      return false;
-    }
-  }
-
-  /**
-   * Set the current video in a channel if the video is present. Returns true if accepted, false if not.
-   * @param embedCode
-   * @return accepted
-   */
-  public boolean changeCurrentItem(String embedCode)
-  {
-    return changeCurrentVideo(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
-  }
-
-
-  /**
-   * Get the current error code, if one exists
-   * @return error code
-   */
-  public OoyalaException getError()
-  {
-    return _currentError;
+  public String getEmbedCode() {
+    return _rootItem == null ? null : _rootItem.getEmbedCode();
   }
 
   /**
    * Get current player state. One of playing, paused, buffering, channel, or error
    * @return state
    */
-  public OoyalaPlayerState getState()
-  {
+  public OoyalaPlayerState getState() {
     return _state;
   }
 
   /**
    * Pause the current video
    */
-  public void pause()
-  {
-
+  public void pause() {
+    switch (_state) {
+      case OoyalaPlayerStatePlaying:
+        currentPlayer().pause();
+      default:
+        break;
+    }
   }
 
   /**
    * Play the current video
    */
-  public void play()
-  {
-
+  public void play() {
+    Log.d(this.getClass().getName(), "TEST - play");
+    switch (_state) {
+      case OoyalaPlayerStateInit:
+      case OoyalaPlayerStateLoading:
+        queuePlay();
+        break;
+      case OoyalaPlayerStatePaused:
+      case OoyalaPlayerStateReadyToPlay:
+      case OoyalaPlayerStateCompleted:
+        currentPlayer().play();
+      default:
+        break;
+    }
   }
 
   /**
    * Returns true if in fullscreen mode, false if not
    * @return fullscreen mode
    */
-  public boolean getFullscreen()
-  {
+  public boolean getFullscreen() {
     return false;
   }
 
@@ -286,26 +262,61 @@ public class OoyalaPlayer extends RelativeLayout
    * Find where the playhead is with millisecond accuracy
    * @return time in seconds
    */
-  public int getPlayheadTime()
-  {
-    return 0;
+  public int getPlayheadTime() {
+    return currentPlayer().currentTime();
   }
 
   /**
    * Synonym for seek.
    * @param time in milliseconds
    */
-  public void setPlayheadTime(int timeInMillis)
-  {
+  public void setPlayheadTime(int timeInMillis) {
     seek(timeInMillis);
+  }
+
+  public boolean seekable() {
+    return currentPlayer().seekable();
   }
 
   /**
    * Move the playhead to a new location in seconds with millisecond accuracy
    * @param time in milliseconds
    */
-  public void seek(int timeInMillis)
-  {
+  public void seek(int timeInMillis) {
+    if (currentPlayer().seekable()) {
+      currentPlayer().seekToTime(timeInMillis);
+    }
+  }
+
+  private Player currentPlayer() {
+    return _player;
+  }
+
+  private void queuePlay() {
+    Log.d(this.getClass().getName(), "TEST - queuePlay");
+    _playQueued = true;
+  }
+
+  private void dequeuePlay() {
+    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
+    if (_playQueued) {
+      switch (_state) {
+        case OoyalaPlayerStatePaused:
+        case OoyalaPlayerStateReadyToPlay:
+        case OoyalaPlayerStateCompleted:
+          _playQueued = false;
+          currentPlayer().play();
+        default:
+          break;
+      }
+    }
+  }
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    this._state = ((Player)arg0).getState();
+    Log.d(this.getClass().getName(), "TEST - update: "+_state);
+    dequeuePlay();
   }
 
   //Closed Captions

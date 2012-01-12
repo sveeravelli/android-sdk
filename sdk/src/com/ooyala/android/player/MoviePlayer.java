@@ -1,17 +1,19 @@
 package com.ooyala.android.player;
 
-import java.net.URL;
-
-import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
+import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
+import android.view.ViewGroup;
 
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 // TODO support these:
 //    _mediaPlayer.setOnInfoListener(this);
@@ -29,58 +31,55 @@ import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 public class MoviePlayer extends Player implements OnBufferingUpdateListener,
                                                    OnCompletionListener,
                                                    OnErrorListener,
-                                                   OnPreparedListener {
+                                                   OnPreparedListener,
+                                                   OnVideoSizeChangedListener,
+                                                   SurfaceHolder.Callback {
 
-  protected MediaPlayer _player;
-  protected OoyalaPlayerState _previousState;
-  protected int _buffer;
-  protected SurfaceView _view;
+  protected MediaPlayer _player = null;
+  protected int _buffer = 0;
+  protected SurfaceHolder _holder = null;
+  protected int _width = 0;
+  protected int _height = 0;
+  protected String _url = null;
 
   public MoviePlayer() {
     super();
   }
 
-  public MoviePlayer(Context c, URL url) {
-    super(c, url);
-    init(c, url);
-  }
-
-  public void init(Context c, Object url) {
+  @Override
+  public void init(OoyalaPlayerLayout parent, Object url) {
+    Log.d(this.getClass().getName(), "TEST - init");
     if (url == null) {
       this._error = "Invalid URL";
-      this._state = OoyalaPlayerState.OoyalaPlayerStateError;
+      setState(OoyalaPlayerState.OoyalaPlayerStateError);
       return;
     }
-    this._state = OoyalaPlayerState.OoyalaPlayerStateLoading;
-    _player = new MediaPlayer();
-    _player.setOnPreparedListener(this);
-    _player.setOnErrorListener(this);
-    _view = new SurfaceView(c);
-    _player.setDisplay(_view.getHolder());
-    try {
-      _player.setDataSource(url.toString());
-      _player.prepareAsync();
-    } catch (Exception e) {
-      e.printStackTrace();
-      this._error = "Exception: "+e.getMessage();
-      this._state = OoyalaPlayerState.OoyalaPlayerStateError;
+    if (parent == null) {
+      this._error = "Invalid Parent";
+      setState(OoyalaPlayerState.OoyalaPlayerStateError);
+      return;
     }
+    setState(OoyalaPlayerState.OoyalaPlayerStateLoading);
+    _url = url.toString();
+    setParent(parent);
   }
 
   @Override
   public void pause() {
     _player.pause();
-    _state = OoyalaPlayerState.OoyalaPlayerStatePaused;
+    setState(OoyalaPlayerState.OoyalaPlayerStatePaused);
   }
 
   @Override
   public void play() {
+    Log.d(this.getClass().getName(), "TEST - play");
     _player.start();
-    _state = OoyalaPlayerState.OoyalaPlayerStatePlaying;
+    setState(OoyalaPlayerState.OoyalaPlayerStatePlaying);
   }
 
   @Override
   public void stop() {
+    Log.d(this.getClass().getName(), "TEST - stop");
     _player.stop();
     _player.release();
   }
@@ -110,30 +109,119 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _player.seekTo(timeInMillis);
   }
 
+  private void createMediaPlayer(String url) {
+    Log.d(this.getClass().getName(), "TEST - createMediaPlayer");
+    try {
+      if (_player==null) {
+        Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create");
+        _player=new MediaPlayer();
+        _player.setScreenOnWhilePlaying(true);
+      }
+      else {
+        Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create else");
+        _player.stop();
+        _player.reset();
+      }
+
+      _player.setDataSource(url);
+      Log.d(this.getClass().getName(), "TEST - FRAME SIZE: "+_holder.getSurfaceFrame().right+"x"+_holder.getSurfaceFrame().bottom);
+      _player.setDisplay(_holder);
+      _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+      _player.setOnPreparedListener(this);
+      _player.prepareAsync();
+      _player.setOnCompletionListener(this);
+    }
+    catch (Throwable t) {
+      Log.e(this.getClass().getName(), "TEST - Exception in media prep", t);
+    }
+  }
+
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
+    Log.d(this.getClass().getName(), "TEST - onError");
     this._error = "MediaPlayer Error: "+what+" "+extra;
-    this._state = OoyalaPlayerState.OoyalaPlayerStateError;
+    setState(OoyalaPlayerState.OoyalaPlayerStateError);
     return false;
   }
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    this._state = OoyalaPlayerState.OoyalaPlayerStateReadyToPlay;
+    Log.d(this.getClass().getName(), "TEST - onPrepared");
+    _width = _player.getVideoWidth();
+    _height = _player.getVideoHeight();
+    if (_width != 0 && _height != 0) {
+      Log.d(this.getClass().getName(), "TEST - onPrepared - start");
+      _holder.setFixedSize(_width, _height);
+    } else {
+      Log.d(this.getClass().getName(), "TEST - onPrepared - start else");
+    }
+    setState(OoyalaPlayerState.OoyalaPlayerStateReadyToPlay);
   }
 
   @Override
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
+    Log.d(this.getClass().getName(), "TEST - onBufferingUpdate");
     this._buffer = percent;
   }
 
   @Override
   public void onCompletion(MediaPlayer mp) {
-    this._state = OoyalaPlayerState.OoyalaPlayerStateCompleted;
+    Log.d(this.getClass().getName(), "TEST - onCompletion");
+    setState(OoyalaPlayerState.OoyalaPlayerStateCompleted);
   }
 
-  public View getView() {
-    return _view;
+  public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+    Log.d(this.getClass().getName(), "TEST - onVideoSizeChanged "+width+"x"+height);
   }
 
+  @Override
+  public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+    // TODO Auto-generated method stub
+    Log.d(this.getClass().getName(), "TEST - surfaceChanged: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
+  }
+
+  @Override
+  public void surfaceCreated(SurfaceHolder arg0) {
+    // TODO Auto-generated method stub
+    Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
+    if (_state == OoyalaPlayerState.OoyalaPlayerStateLoading) {
+      createMediaPlayer(_url);
+    }
+  }
+
+  @Override
+  public void surfaceDestroyed(SurfaceHolder arg0) {
+    // TODO Auto-generated method stub
+    Log.d(this.getClass().getName(), "TEST - surfaceDestroyed");
+    switch (_state) {
+    case OoyalaPlayerStatePlaying:
+      _player.pause();
+
+    default:
+      break;
+    }
+  }
+
+  @Override
+  public void setParent(OoyalaPlayerLayout parent) {
+    super.setParent(parent);
+    _view = new SurfaceView(parent.getContext());
+    _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    _parent.addView(_view,300,300);
+    _holder = _view.getHolder();
+    _holder.addCallback(this);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+  }
+
+  @Override
+  public boolean suspend() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean resume() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }

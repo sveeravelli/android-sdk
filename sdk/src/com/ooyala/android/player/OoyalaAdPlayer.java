@@ -2,10 +2,9 @@ package com.ooyala.android.player;
 
 import java.net.URL;
 
-import android.content.Context;
-
 import com.ooyala.android.NetUtils;
 import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
 public class OoyalaAdPlayer extends MoviePlayer {
@@ -15,18 +14,15 @@ public class OoyalaAdPlayer extends MoviePlayer {
     super();
   }
 
-  public OoyalaAdPlayer(Context c, OoyalaAdSpot ad) {
-    init(c, ad);
-  }
-
-  public void init(Context c, Object ad) {
+  @Override
+  public void init(OoyalaPlayerLayout parent, Object ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = "Invalid Ad";
       this._state = OoyalaPlayerState.OoyalaPlayerStateError;
       return;
     }
     _ad = (OoyalaAdSpot)ad;
-    super.init(c, _ad.getStream().decodedURL());
+    super.init(parent, _ad.getStream().decodedURL());
 
     // TODO[jigish] setup clickthrough
 

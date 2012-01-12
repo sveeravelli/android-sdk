@@ -4,42 +4,35 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public class OoyalaAndroidSampleAppActivity extends Activity
 {
   private static final String TAG = "OoyalaSampleApp";
 
-  private OoyalaPlayer player;
-
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
-      super.onCreate(savedInstanceState);
-      Thread.setDefaultUncaughtExceptionHandler(onUncaughtException);
+    Log.d(TAG, "TEST - onCreate");
+    super.onCreate(savedInstanceState);
+    Thread.setDefaultUncaughtExceptionHandler(onUncaughtException);
+    try {
       setContentView(R.layout.main);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-//      ((TextView)findViewById(R.id.start)).setText(Ad.FOO);
-//
-      player = (OoyalaPlayer)findViewById(R.id.player);
-      player.setEmbedCode("someEmbedCode");
-
-//      surface = (TappableSurfaceView)findViewById(R.id.surface);
-//      surface.addTapListener(onTap);
-//      holder=surface.getHolder();
-//      holder.addCallback(this);
-//      holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-//
-//      topPanel=findViewById(R.id.top_panel);
-//      bottomPanel=findViewById(R.id.bottom_panel);
-//
-//      timeline = (ProgressBar)findViewById(R.id.timeline);
-//
-//      media = (ImageButton)findViewById(R.id.media);
-//      media.setOnClickListener(onMedia);
-//
-//      go = (Button)findViewById(R.id.go);
-//      go.setOnClickListener(onGo);
+    OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
+    OoyalaPlayer p = new OoyalaPlayer("l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    p.setLayout(layout);
+    if (p.setEmbedCode("UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
+      Log.d(TAG, "TEST - yay!");
+      p.play();
+    } else {
+      Log.d(TAG, "TEST - lame :(");
+    }
   }
 
   private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler()
@@ -60,5 +53,4 @@ public class OoyalaAndroidSampleAppActivity extends Activity
     builder.setPositiveButton("OK", null);
     builder.show();
   }
-
 }
