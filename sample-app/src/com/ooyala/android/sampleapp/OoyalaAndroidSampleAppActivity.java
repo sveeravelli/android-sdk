@@ -29,7 +29,12 @@ public class OoyalaAndroidSampleAppActivity extends Activity
     OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
     createPlayer();
     player.setLayout(layout);
-    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {//"JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")) {//"UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
+    // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
+    // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
+    // ooyala postroll:           1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
+    // ooyala ad as normal video: JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B
+    // no ads:                    UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
+    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {

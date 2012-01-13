@@ -151,7 +151,7 @@ public class OoyalaPlayer implements Observer {
       return false;
     }
 
-    _player = initializePlayer(MoviePlayer.class, _currentItem.getStream().decodedURL());
+    _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
 
     /**
@@ -183,8 +183,8 @@ public class OoyalaPlayer implements Observer {
 
   private void cleanupPlayer(Player p) {
     if (p != null) {
-      p.stop();
-      this._layout.removeView(p.getView());
+      p.deleteObserver(this);
+      p.destroy();
     }
   }
 
@@ -243,7 +243,7 @@ public class OoyalaPlayer implements Observer {
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
     if (currentPlayer() != null) {
-      if(playAdsBeforeTime(0)) {
+      if(playAdsBeforeTime(_lastPlayedTime)) {
         return;
       }
       currentPlayer().play();
@@ -346,6 +346,12 @@ public class OoyalaPlayer implements Observer {
     if (arg0 == this._player) {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
         this._state = ((Player)arg0).getState();
+        switch(((Player)arg0).getState()) {
+          case COMPLETED:
+            playAdsBeforeTime(Integer.MAX_VALUE);
+          default:
+            break;
+        }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
         this._lastPlayedTime = this._player.currentTime();
         playAdsBeforeTime(this._lastPlayedTime);

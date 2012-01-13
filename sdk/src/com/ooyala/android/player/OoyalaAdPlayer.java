@@ -29,7 +29,7 @@ public class OoyalaAdPlayer extends MoviePlayer {
       return;
     }
 
-    super.init(parent, _ad.getStream().decodedURL());
+    super.init(parent, _ad.getStream());
 
     // TODO[jigish] setup clickthrough
 

@@ -29,7 +29,7 @@ public class OoyalaPlayerLayout extends RelativeLayout {
     _observers.add(o);
   }
 
-  public void removeObserver(Observer o) {
+  public void deleteObserver(Observer o) {
     _observers.remove(o);
   }
 

@@ -106,4 +106,6 @@ public abstract class Player extends Observable {
   public abstract void suspend();
 
   public abstract void resume();
+
+  public abstract void destroy();
 }

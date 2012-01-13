@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
+import com.ooyala.android.Stream;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -40,7 +41,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   protected MediaPlayer _player = null;
   protected int _buffer = 0;
   protected SurfaceHolder _holder = null;
-  protected String _url = null;
+  protected Stream _stream = null;
   protected int _width = 0;
   protected int _height = 0;
   private boolean _playQueued = false;
@@ -52,10 +53,10 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   @Override
-  public void init(OoyalaPlayer parent, Object url) {
+  public void init(OoyalaPlayer parent, Object stream) {
     Log.d(this.getClass().getName(), "TEST - init");
-    if (url == null) {
-      this._error = "Invalid URL";
+    if (stream == null) {
+      this._error = "Invalid Stream";
       setState(OoyalaPlayerState.ERROR);
       return;
     }
@@ -65,7 +66,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       return;
     }
     setState(OoyalaPlayerState.LOADING);
-    _url = url.toString();
+    _stream = (Stream)stream;
     setParent(parent);
   }
 
@@ -130,7 +131,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _player.seekTo(timeInMillis);
   }
 
-  private void createMediaPlayer(String url) {
+  private void createMediaPlayer() {
     Log.d(this.getClass().getName(), "TEST - createMediaPlayer");
     try {
       if (_player==null) {
@@ -144,7 +145,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
         _player.reset();
       }
 
-      _player.setDataSource(url);
+      _player.setDataSource(_stream.decodedURL().toString());
       Log.d(this.getClass().getName(), "TEST - FRAME SIZE: "+_holder.getSurfaceFrame().right+"x"+_holder.getSurfaceFrame().bottom);
       _player.setDisplay(_holder);
       _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -210,8 +211,11 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
+    if (_width == 0 && _height == 0) {
+      resize(_stream.getWidth(), _stream.getHeight());
+    }
     if (_state == OoyalaPlayerState.LOADING) {
-      createMediaPlayer(_url);
+      createMediaPlayer();
     }
   }
 
@@ -225,12 +229,23 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     Log.d(this.getClass().getName(), "TEST - setParent");
     super.setParent(parent);
     _parent.getLayout().addObserver(this);
-    _view = new SurfaceView(parent.getLayout().getContext());
+    setupView();
+  }
+
+  private void setupView() {
+    _view = new SurfaceView(_parent.getLayout().getContext());
     _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+  }
+
+  private void removeView() {
+    _parent.getLayout().removeView(_view);
+    _holder.removeCallback(this);
+    _view = null;
+    _holder = null;
   }
 
   @Override
@@ -250,10 +265,13 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     if (_player != null) {
       _timeBeforeSuspend = _player.getCurrentPosition();
       stop();
+      _player = null;
     }
-    _parent.getLayout().removeView(_view);
-    _view = null;
-    _holder = null;
+    removeView();
+    _width = 0;
+    _height = 0;
+    _buffer = 0;
+    _playQueued = false;
     _state = OoyalaPlayerState.SUSPENDED;
   }
 
@@ -261,13 +279,19 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   public void resume() {
     if (_state != OoyalaPlayerState.SUSPENDED) { return; }
     _state = OoyalaPlayerState.LOADING;
-    _view = new SurfaceView(_parent.getLayout().getContext());
-    _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-    _parent.getLayout().addView(_view);
-    _holder = _view.getHolder();
-    _holder.addCallback(this);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    setupView();
     queuePlay();
+  }
+
+  @Override
+  public void destroy() {
+    if (_player != null) {
+      stop();
+      _player = null;
+    }
+    removeView();
+    _parent.getLayout().deleteObserver(this);
+    _parent = null;
   }
 
   // Must queue play and wait for ready
