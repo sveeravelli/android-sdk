@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Observer;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
 public class OoyalaPlayerLayout extends RelativeLayout {
   private List<Observer> _observers = new ArrayList<Observer>();
-  public Configuration configuration = null;
 
   public OoyalaPlayerLayout(Context context) {
     super(context);

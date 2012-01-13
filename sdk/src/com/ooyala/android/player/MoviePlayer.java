@@ -43,9 +43,12 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   protected String _url = null;
   protected int _width = 0;
   protected int _height = 0;
+  private boolean _playQueued = false;
+  private int _timeBeforeSuspend = -1;
 
   public MoviePlayer() {
     super();
+    Log.d(this.getClass().getName(), "TEST - INSTANTIATING MOVIE PLAYER");
   }
 
   @Override
@@ -68,15 +71,31 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void pause() {
-    _player.pause();
-    setState(OoyalaPlayerState.PAUSED);
+    switch (_state) {
+      case PLAYING:
+        _player.pause();
+        setState(OoyalaPlayerState.PAUSED);
+      default:
+        break;
+    }
   }
 
   @Override
   public void play() {
-    Log.d(this.getClass().getName(), "TEST - play - w:"+_player.getVideoWidth()+" h:"+_player.getVideoHeight());
-    _player.start();
-    setState(OoyalaPlayerState.PLAYING);
+    Log.d(this.getClass().getName(), "TEST - play");
+    switch (_state) {
+      case INIT:
+      case LOADING:
+        queuePlay();
+        break;
+      case PAUSED:
+      case READY:
+      case COMPLETED:
+        _player.start();
+        setState(OoyalaPlayerState.PLAYING);
+      default:
+        break;
+    }
   }
 
   @Override
@@ -145,7 +164,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
-    Log.d(this.getClass().getName(), "TEST - onError");
+    Log.d(this.getClass().getName(), "TEST - onError: "+what+" "+extra);
     this._error = "MediaPlayer Error: "+what+" "+extra;
     setState(OoyalaPlayerState.ERROR);
     return false;
@@ -153,14 +172,21 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    Log.d(this.getClass().getName(), "TEST - onPrepared");
+    Log.d(this.getClass().getName(), "TEST - onPrepared "+mp.getVideoWidth()+"x"+mp.getVideoHeight());
     setState(OoyalaPlayerState.READY);
+    if (_width == 0 && _height == 0) {
+      Log.d(this.getClass().getName(), "TEST - onPrepared2 "+mp.getVideoWidth()+"x"+mp.getVideoHeight());
+      if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0)
+        resize(mp.getVideoWidth(), mp.getVideoHeight());
+    }
   }
 
   @Override
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
     Log.d(this.getClass().getName(), "TEST - onBufferingUpdate");
     this._buffer = percent;
+    setChanged();
+    notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
   }
 
   @Override
@@ -178,13 +204,11 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-    // TODO Auto-generated method stub
     Log.d(this.getClass().getName(), "TEST - surfaceChanged: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
   }
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    // TODO Auto-generated method stub
     Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
     if (_state == OoyalaPlayerState.LOADING) {
       createMediaPlayer(_url);
@@ -193,7 +217,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    // TODO Auto-generated method stub
     Log.d(this.getClass().getName(), "TEST - surfaceDestroyed");
   }
 
@@ -203,12 +226,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     super.setParent(parent);
     _parent.getLayout().addObserver(this);
     _view = new SurfaceView(parent.getLayout().getContext());
-    Log.d(this.getClass().getName(), "TEST - setParent setSize");
     _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-    // TODO set height/width based on aspect ratio!
-    Log.d(this.getClass().getName(), "TEST - setParent addView");
     _parent.getLayout().addView(_view);
-    Log.d(this.getClass().getName(), "TEST - setParent after addView");
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -217,12 +236,64 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
     Log.d(this.getClass().getName(), "TEST - onSeekComplete");
+    dequeuePlay();
   }
 
   @Override
   public boolean onInfo(MediaPlayer arg0, int arg1, int arg2) {
     Log.d(this.getClass().getName(), "TEST - onInfo");
     return true;
+  }
+
+  @Override
+  public void suspend() {
+    if (_player != null) {
+      _timeBeforeSuspend = _player.getCurrentPosition();
+      stop();
+    }
+    _parent.getLayout().removeView(_view);
+    _view = null;
+    _holder = null;
+    _state = OoyalaPlayerState.SUSPENDED;
+  }
+
+  @Override
+  public void resume() {
+    if (_state != OoyalaPlayerState.SUSPENDED) { return; }
+    _state = OoyalaPlayerState.LOADING;
+    _view = new SurfaceView(_parent.getLayout().getContext());
+    _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+    _parent.getLayout().addView(_view);
+    _holder = _view.getHolder();
+    _holder.addCallback(this);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    queuePlay();
+  }
+
+  // Must queue play and wait for ready
+  private void queuePlay() {
+    Log.d(this.getClass().getName(), "TEST - queuePlay");
+    _playQueued = true;
+  }
+
+  private void dequeuePlay() {
+    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
+    if (_playQueued) {
+      switch (_state) {
+        case PAUSED:
+        case READY:
+        case COMPLETED:
+          if (_timeBeforeSuspend > 0) {
+            _player.seekTo(_timeBeforeSuspend);
+            _timeBeforeSuspend = -1;
+          } else {
+            _playQueued = false;
+            play();
+          }
+        default:
+          break;
+      }
+    }
   }
 
   // Resizing related crap. damn android for making me do this.
@@ -298,6 +369,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       dequeueResize();
     }
     super.setState(state);
+    dequeuePlay();
   }
 
   @Override

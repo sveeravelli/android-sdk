@@ -11,7 +11,6 @@ import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 public abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
   protected OoyalaPlayerState _state = OoyalaPlayerState.INIT; /**< the current state of the player */
-  protected int _playheadTime = 0; /**< KVO compatible playhead time */
   protected String _error = null; /**< The Player's current error if it exists */
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
@@ -89,15 +88,7 @@ public abstract class Player extends Observable {
   protected void setState(OoyalaPlayerState state) {
     this._state = state;
     setChanged();
-    notifyObservers();
-  }
-
-  public float getPlayheadTime() {
-    return _playheadTime;
-  }
-
-  public void setPlayheadTime(int playheadTime) {
-    this._playheadTime = playheadTime;
+    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
   public String getError() {
@@ -111,4 +102,8 @@ public abstract class Player extends Observable {
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
   }
+
+  public abstract void suspend();
+
+  public abstract void resume();
 }

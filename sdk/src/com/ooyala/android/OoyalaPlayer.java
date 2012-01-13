@@ -7,6 +7,7 @@ import java.util.Observer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.player.MoviePlayer;
+import com.ooyala.android.player.OoyalaAdPlayer;
 import com.ooyala.android.player.Player;
 
 import android.util.Log;
@@ -25,8 +26,12 @@ public class OoyalaPlayer implements Observer {
     PLAYING,
     PAUSED,
     COMPLETED,
+    SUSPENDED,
     ERROR
   }
+
+  public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
+  public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
 
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
@@ -38,7 +43,6 @@ public class OoyalaPlayer implements Observer {
   private OoyalaPlayerState _state = OoyalaPlayerState.INIT;
   private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
-  private boolean _playQueued = false;
   private OoyalaPlayerLayout _layout = null;
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
@@ -180,9 +184,7 @@ public class OoyalaPlayer implements Observer {
   private void cleanupPlayer(Player p) {
     if (p != null) {
       p.stop();
-      /**
-       * TODO remove view!
-       */
+      this._layout.removeView(p.getView());
     }
   }
 
@@ -230,11 +232,8 @@ public class OoyalaPlayer implements Observer {
    * Pause the current video
    */
   public void pause() {
-    switch (_state) {
-      case PLAYING:
-        currentPlayer().pause();
-      default:
-        break;
+    if (currentPlayer() != null) {
+      currentPlayer().pause();
     }
   }
 
@@ -243,17 +242,11 @@ public class OoyalaPlayer implements Observer {
    */
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
-    switch (_state) {
-      case INIT:
-      case LOADING:
-        queuePlay();
-        break;
-      case PAUSED:
-      case READY:
-      case COMPLETED:
-        currentPlayer().play();
-      default:
-        break;
+    if (currentPlayer() != null) {
+      if(playAdsBeforeTime(0)) {
+        return;
+      }
+      currentPlayer().play();
     }
   }
 
@@ -270,6 +263,9 @@ public class OoyalaPlayer implements Observer {
    * @return time in seconds
    */
   public int getPlayheadTime() {
+    if (currentPlayer() == null) {
+      return -1;
+    }
     return currentPlayer().currentTime();
   }
 
@@ -282,6 +278,9 @@ public class OoyalaPlayer implements Observer {
   }
 
   public boolean seekable() {
+    if (currentPlayer() == null) {
+      return false;
+    }
     return currentPlayer().seekable();
   }
 
@@ -295,35 +294,74 @@ public class OoyalaPlayer implements Observer {
     }
   }
 
-  private Player currentPlayer() {
-    return _player;
-  }
-
-  private void queuePlay() {
-    Log.d(this.getClass().getName(), "TEST - queuePlay");
-    _playQueued = true;
-  }
-
-  private void dequeuePlay() {
-    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
-    if (_playQueued) {
-      switch (_state) {
-        case PAUSED:
-        case READY:
-        case COMPLETED:
-          _playQueued = false;
-          currentPlayer().play();
-        default:
-          break;
+  private boolean playAdsBeforeTime(int time) {
+    Log.d(this.getClass().getName(), "TEST - playAdsBeforeTime: "+time);
+    this._lastPlayedTime = time;
+    for (AdSpot ad : _currentItem.getAds()) {
+      if (ad.getTime() <= time && !this._playedAds.contains(ad)) {
+        _playedAds.add(ad);
+        if (playAd(ad)) {
+          return true;
+        }
       }
     }
+    return false;
+  }
+
+  private boolean playAd(AdSpot ad) {
+    Log.d(this.getClass().getName(), "TEST - playAd: "+ad.getTime());
+
+    Class<? extends Player> adPlayerClass = null;
+    if (ad instanceof OoyalaAdSpot) {
+      adPlayerClass = OoyalaAdPlayer.class;
+    } else if (ad instanceof VASTAdSpot) {
+      // TODO do vast here
+    }
+
+    if (adPlayerClass == null) {
+      Log.d(this.getClass().getName(), "TEST - playAd fail class null");
+      return false;
+    }
+
+    _adPlayer = initializePlayer(adPlayerClass, ad);
+
+    if (_adPlayer == null) {
+      Log.d(this.getClass().getName(), "TEST - playAd fail player null");
+      return false;
+    }
+
+    // TODO ad started notification
+    _player.suspend();
+    _adPlayer.play();
+    return true;
+  }
+
+  private Player currentPlayer() {
+    return _adPlayer != null ? _adPlayer : _player;
   }
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    this._state = ((Player)arg0).getState();
-    Log.d(this.getClass().getName(), "TEST - update: "+_state);
-    dequeuePlay();
+    Log.d(this.getClass().getName(), "TEST - Notification: "+arg1.toString());
+    if (arg0 == this._player) {
+      if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
+        this._state = ((Player)arg0).getState();
+      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
+        this._lastPlayedTime = this._player.currentTime();
+        playAdsBeforeTime(this._lastPlayedTime);
+      }
+    } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
+      switch(((Player)arg0).getState()) {
+        case COMPLETED:
+        case ERROR:
+          cleanupPlayer(_adPlayer);
+          _adPlayer = null;
+          // TODO ad completed notification
+          if (!playAdsBeforeTime(this._lastPlayedTime)) {
+            _player.resume();
+          }
+      }
+    }
   }
 
   //Closed Captions

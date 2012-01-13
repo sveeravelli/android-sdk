@@ -22,14 +22,21 @@ public class OoyalaAdPlayer extends MoviePlayer {
       return;
     }
     _ad = (OoyalaAdSpot)ad;
+
+    if (!_ad.fetchPlaybackInfo()) {
+      this._error = "Invalid Ad";
+      this._state = OoyalaPlayerState.ERROR;
+      return;
+    }
+
     super.init(parent, _ad.getStream().decodedURL());
 
     // TODO[jigish] setup clickthrough
 
-    NetUtils pinger = new NetUtils();
+    /*NetUtils pinger = new NetUtils();
     for (URL url : _ad.getTrackingURLs()) {
       pinger.ping(url);
-    }
+    }*/
   }
 
   @Override
