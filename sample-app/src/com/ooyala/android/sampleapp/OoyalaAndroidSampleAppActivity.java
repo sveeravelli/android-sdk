@@ -29,7 +29,7 @@ public class OoyalaAndroidSampleAppActivity extends Activity
     OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
     createPlayer();
     player.setLayout(layout);
-    if (player.setEmbedCode("UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
+    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {//"JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")) {//"UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {
