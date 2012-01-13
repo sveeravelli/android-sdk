@@ -5,16 +5,16 @@ import java.util.Observable;
 import android.view.SurfaceView;
 import android.view.View;
 
-import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
 public abstract class Player extends Observable {
-  protected OoyalaPlayerLayout _parent = null;
+  protected OoyalaPlayer _parent = null;
   protected OoyalaPlayerState _state = OoyalaPlayerState.INIT; /**< the current state of the player */
-  protected OoyalaPlayerState _stateBeforeSuspended;
   protected int _playheadTime = 0; /**< KVO compatible playhead time */
   protected String _error = null; /**< The Player's current error if it exists */
   protected SurfaceView _view = null;
+  protected boolean _resizeQueued = false;
 
   /**
    * Init the player
@@ -22,7 +22,7 @@ public abstract class Player extends Observable {
   protected Player() {
   }
 
-  public void init(OoyalaPlayerLayout parent, Object param) {
+  public void init(OoyalaPlayer parent, Object param) {
   }
 
   /**
@@ -86,7 +86,7 @@ public abstract class Player extends Observable {
     return _state;
   }
 
-  public void setState(OoyalaPlayerState state) {
+  protected void setState(OoyalaPlayerState state) {
     this._state = state;
     setChanged();
     notifyObservers();
@@ -108,11 +108,7 @@ public abstract class Player extends Observable {
     return _view;
   }
 
-  public void setParent(OoyalaPlayerLayout parent) {
+  public void setParent(OoyalaPlayer parent) {
     _parent = parent;
   }
-
-  public abstract boolean suspend();
-
-  public abstract boolean resume();
 }

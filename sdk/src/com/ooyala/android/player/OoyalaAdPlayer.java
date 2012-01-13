@@ -4,7 +4,7 @@ import java.net.URL;
 
 import com.ooyala.android.NetUtils;
 import com.ooyala.android.OoyalaAdSpot;
-import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 
 public class OoyalaAdPlayer extends MoviePlayer {
@@ -15,7 +15,7 @@ public class OoyalaAdPlayer extends MoviePlayer {
   }
 
   @Override
-  public void init(OoyalaPlayerLayout parent, Object ad) {
+  public void init(OoyalaPlayer parent, Object ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = "Invalid Ad";
       this._state = OoyalaPlayerState.ERROR;

@@ -25,9 +25,7 @@ public class OoyalaPlayer implements Observer {
     PLAYING,
     PAUSED,
     COMPLETED,
-    ERROR,
-    SUSPENDED,
-    RESUMED // This is used by setState in Player to reset the state to the old state
+    ERROR
   }
 
   private Video _currentItem = null;
@@ -49,12 +47,19 @@ public class OoyalaPlayer implements Observer {
 
   public void setLayout(OoyalaPlayerLayout layout) {
     _layout = layout;
+    if (_layout == null) {
+      return;
+    }
     if (_adPlayer != null) {
-      _adPlayer.setParent(_layout);
+      _adPlayer.setParent(this);
     }
     if (_player != null) {
-      _player.setParent(_layout);
+      _player.setParent(this);
     }
+  }
+
+  public OoyalaPlayerLayout getLayout() {
+    return _layout;
   }
 
   /**
@@ -161,7 +166,7 @@ public class OoyalaPlayer implements Observer {
       return null;
     }
     p.addObserver(this);
-    p.init(_layout, param);
+    p.init(this, param);
     return p;
   }
 
