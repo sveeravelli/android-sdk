@@ -52,12 +52,6 @@ public class OoyalaPlayerLayout extends FrameLayout {
   }
 
   @Override
-  protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
-    Log.d(this.getClass().getName(), "TEST - onSizeChanged - "+xNew+","+yNew+" "+xOld+","+yOld);
-    super.onSizeChanged(xNew, yNew, xOld, yOld);
-  }
-
-  @Override
   public boolean onTouchEvent(MotionEvent event) {
     //the MediaController will hide after 3 seconds - tap the screen to make it appear again
     switch(_player.getState()) {
