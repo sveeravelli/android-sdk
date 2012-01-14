@@ -10,7 +10,8 @@ public class OoyalaException extends Exception
     ERROR_AUTHORIZATION_FAILED, /**< Authorization failed */
     ERROR_AUTHORIZATION_SIGNATURE_INVALID, /**< The signature of the Authorization Response is invalid */
     ERROR_CONTENT_TREE_NEXT_FAILED, /**< Content Tree Next failed */
-    ERROR_INTERNAL_ANDROID /**< An Internal Android Error. Check the Throwable properties. */
+    ERROR_INTERNAL_ANDROID, /**< An Internal Android Error. Check the Throwable properties. */
+    ERROR_PLAYBACK_FAILED /**< Playback failed */
   };
 
 	private OoyalaErrorCode _code;

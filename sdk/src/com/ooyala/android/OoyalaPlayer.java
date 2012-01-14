@@ -15,7 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-public class OoyalaPlayer implements Observer {
+public class OoyalaPlayer extends Observable implements Observer {
   public static enum OoyalaPlayerActionAtEnd {
     CONTINUE,
     PAUSE,
@@ -36,6 +36,13 @@ public class OoyalaPlayer implements Observer {
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
   public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
+  public static final String ERROR_NOTIFICATION = "error";
+  public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
+  public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
+  public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
+  public static final String AD_STARTED_NOTIFICATION = "adStarted";
+  public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
+  public static final String AD_ERROR_NOTIFICATION = "adError";
 
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
@@ -136,11 +143,12 @@ public class OoyalaPlayer implements Observer {
       cleanupPlayers();
       return false;
     }
-    _state = OoyalaPlayerState.LOADING;
+    setState(OoyalaPlayerState.LOADING);
     cleanupPlayers();
     _playedAds.clear();
     _lastPlayedTime = 0;
     _currentItem = video;
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       try {
         _playerAPIClient.authorize(_currentItem);
@@ -335,8 +343,8 @@ public class OoyalaPlayer implements Observer {
       return false;
     }
 
-    // TODO ad started notification
     _player.suspend();
+    sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();
     return true;
   }
@@ -409,18 +417,29 @@ public class OoyalaPlayer implements Observer {
                   }
                 case STOP:
                   cleanupPlayers();
-                  this._state = OoyalaPlayerState.COMPLETED;
-                  // TODO complete notification
+                  setState(OoyalaPlayerState.COMPLETED);
+                  sendNotification(PLAY_COMPLETED_NOTIFICATION);
                   break;
               }
             }
             break;
+          case ERROR:
+            cleanupPlayers();
+            _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+            setState(OoyalaPlayerState.ERROR);
+            sendNotification(ERROR_NOTIFICATION);
+            break;
+          case PLAYING:
+            if (_lastPlayedTime == 0) {
+              sendNotification(PLAY_STARTED_NOTIFICATION);
+            }
           default:
-            this._state = ((Player)arg0).getState();
+            setState(((Player)arg0).getState());
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
         if (this._player.getState() == OoyalaPlayerState.PLAYING) {
+          sendNotification(TIME_CHANGED_NOTIFICATION);
           this._lastPlayedTime = this._player.currentTime();
           playAdsBeforeTime(this._lastPlayedTime);
         }
@@ -428,10 +447,11 @@ public class OoyalaPlayer implements Observer {
     } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
       switch(((Player)arg0).getState()) {
         case COMPLETED:
+          sendNotification(AD_COMPLETED_NOTIFICATION);
         case ERROR:
+          sendNotification(AD_ERROR_NOTIFICATION);
           cleanupPlayer(_adPlayer);
           _adPlayer = null;
-          // TODO ad completed notification
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
             _player.resume();
           }
@@ -445,6 +465,16 @@ public class OoyalaPlayer implements Observer {
 
   public void setActionAtEnd(OoyalaPlayerActionAtEnd actionAtEnd) {
     this._actionAtEnd = actionAtEnd;
+  }
+
+  private void setState(OoyalaPlayerState state) {
+    this._state = state;
+    sendNotification(STATE_CHANGED_NOTIFICATION);
+  }
+
+  private void sendNotification(String obj) {
+    setChanged();
+    notifyObservers(obj);
   }
 
   //Closed Captions

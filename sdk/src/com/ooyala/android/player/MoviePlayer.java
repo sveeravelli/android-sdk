@@ -118,8 +118,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       case READY:
       case COMPLETED:
         _player.start();
-        startPlayheadTimer();
         setState(OoyalaPlayerState.PLAYING);
+        startPlayheadTimer();
       default:
         break;
     }
