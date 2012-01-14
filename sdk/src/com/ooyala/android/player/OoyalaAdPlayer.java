@@ -33,10 +33,10 @@ public class OoyalaAdPlayer extends MoviePlayer {
 
     // TODO[jigish] setup clickthrough
 
-    /*NetUtils pinger = new NetUtils();
+    NetUtils pinger = new NetUtils();
     for (URL url : _ad.getTrackingURLs()) {
       pinger.ping(url);
-    }*/
+    }
   }
 
   @Override
@@ -47,9 +47,4 @@ public class OoyalaAdPlayer extends MoviePlayer {
   public OoyalaAdSpot getAd() {
     return _ad;
   }
-
-  public void setAd(OoyalaAdSpot ad) {
-    this._ad = ad;
-  }
-
 }

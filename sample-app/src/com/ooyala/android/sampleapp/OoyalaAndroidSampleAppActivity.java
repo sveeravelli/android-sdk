@@ -29,12 +29,17 @@ public class OoyalaAndroidSampleAppActivity extends Activity
     OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
     createPlayer();
     player.setLayout(layout);
+    // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
     // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
     // ooyala postroll:           1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
     // ooyala ad as normal video: JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B
     // no ads:                    UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
-    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
+    // VAST preroll:              w2cXAxMzqpwY5HwqSbHMzYgu92Lj6Fer
+    // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
+    // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
+    // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
+    if (player.setEmbedCode("NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {

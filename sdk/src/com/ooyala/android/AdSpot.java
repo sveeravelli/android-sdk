@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.json.*;
 
+import android.util.Log;
+
 import com.ooyala.android.Constants.ReturnState;
 
 public abstract class AdSpot
@@ -49,7 +51,7 @@ public abstract class AdSpot
         }
         catch (MalformedURLException exception)
         {
-          System.out.println("Malformed Ad URL: " + data.getString(Constants.KEY_CLICK_URL));
+          Log.d(this.getClass().getName(), "Malformed Ad Click URL: " + data.getString(Constants.KEY_CLICK_URL));
           _clickURL = null;
         }
       }
@@ -66,14 +68,14 @@ public abstract class AdSpot
           }
           catch (MalformedURLException exception)
           {
-            System.out.println("Malformed Ad Tracking URL: " + data.getString(Constants.KEY_TRACKING_URL));
+            Log.d(this.getClass().getName(), "Malformed Ad Tracking URL: " + data.getString(Constants.KEY_TRACKING_URL));
           }
         }
       }
     }
     catch (JSONException exception)
     {
-      System.out.println("JSONException: " + exception);
+      Log.d(this.getClass().getName(), "JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
     return ReturnState.STATE_MATCHED;
@@ -91,7 +93,7 @@ public abstract class AdSpot
     }
     catch (JSONException exception)
     {
-      System.out.println("Ad create failed due to JSONException: " + exception);
+      Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
       return null;
     }
 
@@ -109,7 +111,7 @@ public abstract class AdSpot
     }
     else
     {
-      System.out.println("Unknown ad type: " + type);
+      Log.d(AdSpot.class.getName(), "Unknown ad type: " + type);
       return null;
     }
   }

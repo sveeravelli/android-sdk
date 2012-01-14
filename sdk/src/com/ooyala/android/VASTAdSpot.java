@@ -13,6 +13,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import android.util.Log;
+
 import com.ooyala.android.Constants.ReturnState;
 
 public class VASTAdSpot extends AdSpot {
@@ -39,39 +41,41 @@ public class VASTAdSpot extends AdSpot {
    */
   public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
-    case STATE_FAIL:
-      return ReturnState.STATE_FAIL;
-    case STATE_UNMATCHED:
-      return ReturnState.STATE_UNMATCHED;
-    default:
-      break;
-  }
-  if (data.isNull(Constants.KEY_SIGNATURE)) {
-    System.err.println("ERROR: Fail to update VASTAd with dictionary because no signature exists!");
-    return ReturnState.STATE_FAIL;
-  }
-  if (data.isNull(Constants.KEY_EXPIRES)) {
-    System.err.println("ERROR: Fail to update VASTAd with dictionary because no expires exists!");
-    return ReturnState.STATE_FAIL;
-  }
-  if (data.isNull(Constants.KEY_URL)) {
-    System.err.println("ERROR: Fail to update VASTAd with dictionary because no url exists!");
-    return ReturnState.STATE_FAIL;
-  }
-  try {
-    _signature = data.getString(Constants.KEY_SIGNATURE);
-    _expires = data.getInt(Constants.KEY_EXPIRES);
-    try {
-      _vastURL = new URL(data.getString(Constants.KEY_URL));
-    } catch (MalformedURLException exception) {
-      System.out.println("Malformed VAST URL: " + data.getString(Constants.KEY_URL));
+      case STATE_FAIL:
+        return ReturnState.STATE_FAIL;
+      case STATE_UNMATCHED:
+        return ReturnState.STATE_UNMATCHED;
+      default:
+        break;
+    }
+    if (data.isNull(Constants.KEY_SIGNATURE)) {
+      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
     }
-  } catch (JSONException exception) {
-    System.out.println("JSONException: " + exception);
-    return ReturnState.STATE_FAIL;
-  }
-  return ReturnState.STATE_MATCHED;
+    if (data.isNull(Constants.KEY_EXPIRES)) {
+      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
+      return ReturnState.STATE_FAIL;
+    }
+    if (data.isNull(Constants.KEY_URL)) {
+      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no url exists!");
+      return ReturnState.STATE_FAIL;
+    }
+    try {
+      _signature = data.getString(Constants.KEY_SIGNATURE);
+      _expires = data.getInt(Constants.KEY_EXPIRES);
+      try {
+        _vastURL = new URL(data.getString(Constants.KEY_URL));
+      } catch (MalformedURLException exception) {
+        Log.d(this.getClass().getName(), "Malformed VAST URL: " + data.getString(Constants.KEY_URL));
+        return ReturnState.STATE_FAIL;
+      }
+    } catch (JSONException exception) {
+      Log.d(this.getClass().getName(), "JSONException: " + exception);
+      return ReturnState.STATE_FAIL;
+    }
+
+    Log.d(this.getClass().getName(), "TEST - init ad with time: "+_time);
+    return ReturnState.STATE_MATCHED;
   }
 
   /** @internal

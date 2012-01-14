@@ -9,6 +9,7 @@ import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.OoyalaAdPlayer;
 import com.ooyala.android.player.Player;
+import com.ooyala.android.player.VASTAdPlayer;
 
 import android.util.Log;
 
@@ -32,6 +33,7 @@ public class OoyalaPlayer implements Observer {
 
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
+  public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
 
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
@@ -47,6 +49,7 @@ public class OoyalaPlayer implements Observer {
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
+    _actionAtEnd = OoyalaPlayerActionAtEnd.CONTINUE;
   }
 
   public void setLayout(OoyalaPlayerLayout layout) {
@@ -315,7 +318,7 @@ public class OoyalaPlayer implements Observer {
     if (ad instanceof OoyalaAdSpot) {
       adPlayerClass = OoyalaAdPlayer.class;
     } else if (ad instanceof VASTAdSpot) {
-      // TODO do vast here
+      adPlayerClass = VASTAdPlayer.class;
     }
 
     if (adPlayerClass == null) {
@@ -345,16 +348,39 @@ public class OoyalaPlayer implements Observer {
     Log.d(this.getClass().getName(), "TEST - Notification: "+arg1.toString());
     if (arg0 == this._player) {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
-        this._state = ((Player)arg0).getState();
         switch(((Player)arg0).getState()) {
           case COMPLETED:
-            playAdsBeforeTime(Integer.MAX_VALUE);
+            if (!playAdsBeforeTime(Integer.MAX_VALUE)) {
+              switch (_actionAtEnd) {
+                case CONTINUE:
+                  if (_currentItem.nextVideo() != null) {
+                    changeCurrentVideo(_currentItem.nextVideo());
+                    play();
+                    break;
+                  }
+                case PAUSE:
+                  if (_currentItem.nextVideo() != null) {
+                    changeCurrentVideo(_currentItem.nextVideo());
+                    pause();
+                    break;
+                  }
+                case STOP:
+                  cleanupPlayers();
+                  this._state = OoyalaPlayerState.COMPLETED;
+                  // TODO complete notification
+                  break;
+              }
+            }
+            break;
           default:
+            this._state = ((Player)arg0).getState();
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
-        this._lastPlayedTime = this._player.currentTime();
-        playAdsBeforeTime(this._lastPlayedTime);
+        if (this._player.getState() == OoyalaPlayerState.PLAYING) {
+          this._lastPlayedTime = this._player.currentTime();
+          playAdsBeforeTime(this._lastPlayedTime);
+        }
       }
     } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
       switch(((Player)arg0).getState()) {
@@ -368,6 +394,14 @@ public class OoyalaPlayer implements Observer {
           }
       }
     }
+  }
+
+  public OoyalaPlayerActionAtEnd getActionAtEnd() {
+    return _actionAtEnd;
+  }
+
+  public void setActionAtEnd(OoyalaPlayerActionAtEnd actionAtEnd) {
+    this._actionAtEnd = actionAtEnd;
   }
 
   //Closed Captions

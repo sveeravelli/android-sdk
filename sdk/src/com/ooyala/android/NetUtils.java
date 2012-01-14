@@ -5,6 +5,7 @@ import java.net.URL;
 
 public class NetUtils {
   public void ping(URL url) {
+    if (url == null) { return; }
     try {
       url.openConnection();
     } catch (IOException e) {
