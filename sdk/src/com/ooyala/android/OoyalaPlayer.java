@@ -34,7 +34,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     COMPLETED,
     SUSPENDED,
     ERROR
-  }
+  };
 
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
@@ -448,8 +448,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    Log.d(this.getClass().getName(), "TEST - Notification: "+arg1.toString());
+    Log.d(this.getClass().getName(), "TEST - Notificationn: "+arg1.toString()+" "+_player+" "+_adPlayer+" "+arg0);
     if (arg0 == this._player) {
+      Log.d(this.getClass().getName(), "TEST - Note from player");
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
         switch(((Player)arg0).getState()) {
           case COMPLETED:
@@ -491,7 +492,6 @@ public class OoyalaPlayer extends Observable implements Observer,
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
-
         if (this._player.getState() == OoyalaPlayerState.PLAYING) {
           sendNotification(TIME_CHANGED_NOTIFICATION);
           this._lastPlayedTime = this._player.currentTime();
@@ -499,16 +499,18 @@ public class OoyalaPlayer extends Observable implements Observer,
           //closed captions
           if (_currentItem.hasClosedCaptions()) {
             if (_closedCaptionsView.getCaption() != null && currentPlayer().currentTime() > _closedCaptionsView.getCaption().getEnd()) {
-          	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getCountry(), currentPlayer().currentTime());
-          	if (caption.getBegin() <= currentPlayer().currentTime() && caption.getEnd() > currentPlayer().currentTime()) {
-          	  _closedCaptionsView.setCaption(caption);
-          	} else {
-          	  _closedCaptionsView.setCaption(null);
-          	}
+            	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getCountry(), currentPlayer().currentTime());
+            	if (caption.getBegin() <= currentPlayer().currentTime() && caption.getEnd() > currentPlayer().currentTime()) {
+            	  _closedCaptionsView.setCaption(caption);
+            	} else {
+            	  _closedCaptionsView.setCaption(null);
+            	}
+            }
           }
         }
       }
     } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
+      Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
       switch(((Player)arg0).getState()) {
         case COMPLETED:
           sendNotification(AD_COMPLETED_NOTIFICATION);
@@ -517,13 +519,19 @@ public class OoyalaPlayer extends Observable implements Observer,
           cleanupPlayer(_adPlayer);
           _adPlayer = null;
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
+            Log.d(this.getClass().getName(), "TEST - attempting to resume");
             _player.resume();
+            Log.d(this.getClass().getName(), "TEST - resumed");
             if (_closedCaptionsView != null) {
               _closedCaptionsView.setVisibility(ClosedCaptionsView.VISIBLE);
               _closedCaptionsView.bringToFront();
             }
+            Log.d(this.getClass().getName(), "TEST - after captions");
+          } else {
+            Log.d(this.getClass().getName(), "TEST - BULLSHIT");
           }
-        }
+        default:
+          break;
       }
     }
   }

@@ -373,6 +373,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   private void dequeuePlay() {
     Log.d(this.getClass().getName(), "TEST - dequeuePlay");
     if (_playQueued) {
+      Log.d(this.getClass().getName(), "TEST - dequeuePlay queued");
       switch (_state) {
         case PAUSED:
         case READY:
@@ -381,6 +382,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
             _player.seekTo(_timeBeforeSuspend);
             _timeBeforeSuspend = -1;
           } else {
+            Log.d(this.getClass().getName(), "TEST - should play");
             _playQueued = false;
             play();
           }
