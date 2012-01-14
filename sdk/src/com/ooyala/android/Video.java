@@ -20,6 +20,7 @@ public class Video extends ContentItem implements PlayableItem
   protected Channel _parent = null;
   protected int _duration = 0;
   protected boolean _live = false;
+  protected ClosedCaptions _closedCaptions = null;
 
   public Video()
   {
@@ -158,7 +159,9 @@ public class Video extends ContentItem implements PlayableItem
       }
     }
 
-    // TODO: closed captions
+    if (_closedCaptions != null)
+      if (!_closedCaptions.fetchClosedCaptionsInfo())
+    	  return false;
 
     return true;
   }
@@ -174,6 +177,19 @@ public class Video extends ContentItem implements PlayableItem
 
   public boolean isLive() {
     return _live;
+  }
+
+  public ClosedCaptions getClosedCaptions() {
+	return _closedCaptions;
+  }
+
+  public void setClosedCaptions(ClosedCaptions closedCaptions) {
+	this._closedCaptions = closedCaptions;
+  }
+
+  public boolean hasClosedCaptions()
+  {
+	return _closedCaptions != null && _closedCaptions.getLanguages().size() > 0;
   }
 
   @Override

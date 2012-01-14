@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -55,6 +56,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
   private OoyalaPlayerLayout _layout = null;
+  private ClosedCaptionsView _closedCaptionsView = null;
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
@@ -167,9 +169,11 @@ public class OoyalaPlayer extends Observable implements Observer {
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
 
-    /**
-     * TODO closed captions
-     */
+    //closed captions
+    if (_currentItem.hasClosedCaptions()) {
+      _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
+      _layout.addView(_closedCaptionsView);
+    }
 
     return true;
   }
@@ -192,6 +196,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     _adPlayer = null;
     cleanupPlayer(_player);
     _player = null;
+    if (_closedCaptionsView != null)
+      _layout.removeView(_closedCaptionsView);
+    _closedCaptionsView = null;
   }
 
   private void cleanupPlayer(Player p) {
@@ -344,6 +351,8 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
 
     _player.suspend();
+    if (_closedCaptionsView != null)
+        _closedCaptionsView.setVisibility(ClosedCaptionsView.GONE);
     sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();
     return true;
@@ -438,10 +447,21 @@ public class OoyalaPlayer extends Observable implements Observer {
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
+
         if (this._player.getState() == OoyalaPlayerState.PLAYING) {
           sendNotification(TIME_CHANGED_NOTIFICATION);
           this._lastPlayedTime = this._player.currentTime();
           playAdsBeforeTime(this._lastPlayedTime);
+          //closed captions
+          if (_currentItem.hasClosedCaptions()) {
+            if (_closedCaptionsView.getCaption() != null && currentPlayer().currentTime() > _closedCaptionsView.getCaption().getEnd()) {
+          	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getCountry(), currentPlayer().currentTime());
+          	if (caption.getBegin() <= currentPlayer().currentTime() && caption.getEnd() > currentPlayer().currentTime()) {
+          	  _closedCaptionsView.setCaption(caption);
+          	} else {
+          	  _closedCaptionsView.setCaption(null);
+          	}
+          }
         }
       }
     } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
@@ -454,6 +474,10 @@ public class OoyalaPlayer extends Observable implements Observer {
           _adPlayer = null;
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
             _player.resume();
+            if (_closedCaptionsView != null) {
+              _closedCaptionsView.setVisibility(ClosedCaptionsView.VISIBLE);
+              _closedCaptionsView.bringToFront();
+            }
           }
       }
     }

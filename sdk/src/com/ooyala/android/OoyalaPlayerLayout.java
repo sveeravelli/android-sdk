@@ -7,9 +7,9 @@ import java.util.Observer;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
-public class OoyalaPlayerLayout extends RelativeLayout {
+public class OoyalaPlayerLayout extends FrameLayout {
   private List<Observer> _observers = new ArrayList<Observer>();
 
   public OoyalaPlayerLayout(Context context) {
