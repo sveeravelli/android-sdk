@@ -479,6 +479,7 @@ public class OoyalaPlayer extends Observable implements Observer {
               _closedCaptionsView.bringToFront();
             }
           }
+        }
       }
     }
   }
