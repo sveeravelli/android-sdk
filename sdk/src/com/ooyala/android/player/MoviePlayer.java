@@ -15,8 +15,10 @@ import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.ooyala.android.MovieView;
 import com.ooyala.android.OoyalaPlayer;
@@ -277,7 +279,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   private void setupView() {
     _view = new MovieView(_parent.getLayout().getContext());
-    _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
