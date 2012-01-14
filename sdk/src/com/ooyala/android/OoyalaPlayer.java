@@ -15,8 +15,10 @@ import com.ooyala.android.player.VASTAdPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.MediaController;
 
-public class OoyalaPlayer extends Observable implements Observer {
+public class OoyalaPlayer extends Observable implements Observer,
+                                                        MediaController.MediaPlayerControl {
   public static enum OoyalaPlayerActionAtEnd {
     CONTINUE,
     PAUSE,
@@ -57,6 +59,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private int _lastPlayedTime = 0;
   private OoyalaPlayerLayout _layout = null;
   private ClosedCaptionsView _closedCaptionsView = null;
+  private Analytics _analytics = null;
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
@@ -73,6 +76,18 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
     if (_player != null) {
       _player.setParent(this);
+    }
+    /**
+     *  NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of our customers
+     *  should actually call setLayout right after initializing the player so this is ok.
+     */
+    _analytics = new Analytics(_layout.getContext(), _playerAPIClient);
+  }
+
+  public void setLayout(OoyalaPlayerLayout layout, boolean useDefaultControls) {
+    setLayout(layout);
+    if (_layout != null && useDefaultControls) {
+      _layout.useDefaultControls(this);
     }
   }
 
@@ -175,6 +190,8 @@ public class OoyalaPlayer extends Observable implements Observer {
       _layout.addView(_closedCaptionsView);
     }
 
+    _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
+    _analytics.reportPlayerLoad();
     return true;
   }
 
@@ -311,6 +328,9 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void seek(int timeInMillis) {
     if (currentPlayer().seekable()) {
       currentPlayer().seekToTime(timeInMillis);
+      if (currentPlayer() == _player) {
+        _analytics.reportPlayheadUpdate(((double)timeInMillis)/1000);
+      }
     }
   }
 
@@ -375,15 +395,52 @@ public class OoyalaPlayer extends Observable implements Observer {
     return false;
   }
 
+  public static final int DO_PLAY = 0;
+  public static final int DO_PAUSE = 1;
+  public boolean previousVideo(int what) {
+    if (_currentItem.previousVideo() != null) {
+      changeCurrentVideo(_currentItem.previousVideo());
+      if (what == DO_PLAY) {
+        play();
+      } else if(what == DO_PAUSE) {
+        pause();
+      }
+      return true;
+    }
+    seek(0);
+    return false;
+  }
+
   //This is required because android enjoys making things difficult. talk to jigish if you got issues.
-  private static final int FETCH_MORE_CHILDREN_PLAY = 0;
-  private static final int FETCH_MORE_CHILDREN_PAUSE = 1;
+
+  public boolean nextVideo(int what) {
+    if (_currentItem.nextVideo() != null) {
+      _fetchMoreChildrenHandler.sendEmptyMessage(what);
+      return true;
+    } else if (what == DO_PLAY && fetchMoreChildren(new PaginatedItemListener() {
+            @Override
+            public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+              _fetchMoreChildrenHandler.sendEmptyMessage(DO_PLAY);
+            }
+          })) {
+      return true;
+    } else if (what == DO_PAUSE && fetchMoreChildren(new PaginatedItemListener() {
+            @Override
+            public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+              _fetchMoreChildrenHandler.sendEmptyMessage(DO_PAUSE);
+            }
+          })) {
+      return true;
+    }
+    return false;
+  }
+
   private final Handler _fetchMoreChildrenHandler = new Handler() {
     public void handleMessage(Message msg) {
       changeCurrentVideo(_currentItem.nextVideo());
-      if (msg.what == FETCH_MORE_CHILDREN_PLAY) {
+      if (msg.what == DO_PLAY) {
         play();
-      } else if(msg.what == FETCH_MORE_CHILDREN_PAUSE) {
+      } else if(msg.what == DO_PAUSE) {
         pause();
       }
     }
@@ -399,29 +456,11 @@ public class OoyalaPlayer extends Observable implements Observer {
             if (!playAdsBeforeTime(Integer.MAX_VALUE)) {
               switch (_actionAtEnd) {
                 case CONTINUE:
-                  if (_currentItem.nextVideo() != null) {
-                    changeCurrentVideo(_currentItem.nextVideo());
-                    play();
-                    break;
-                  } else if (fetchMoreChildren(new PaginatedItemListener() {
-                          @Override
-                          public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-                            _fetchMoreChildrenHandler.sendEmptyMessage(FETCH_MORE_CHILDREN_PLAY);
-                          }
-                        })) {
+                  if(nextVideo(DO_PLAY)) {
                     break;
                   }
                 case PAUSE:
-                  if (_currentItem.nextVideo() != null) {
-                    changeCurrentVideo(_currentItem.nextVideo());
-                    pause();
-                    break;
-                  } else if (fetchMoreChildren(new PaginatedItemListener() {
-                          @Override
-                          public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-                            _fetchMoreChildrenHandler.sendEmptyMessage(FETCH_MORE_CHILDREN_PAUSE);
-                          }
-                        })) {
+                  if(nextVideo(DO_PAUSE)) {
                     break;
                   }
                 case STOP:
@@ -440,8 +479,13 @@ public class OoyalaPlayer extends Observable implements Observer {
             break;
           case PLAYING:
             if (_lastPlayedTime == 0) {
+              _analytics.reportPlayStarted();
               sendNotification(PLAY_STARTED_NOTIFICATION);
             }
+            setState(OoyalaPlayerState.PLAYING);
+            break;
+          case READY:
+            _analytics.reportDisplay();
           default:
             setState(((Player)arg0).getState());
             break;
@@ -502,10 +546,49 @@ public class OoyalaPlayer extends Observable implements Observer {
     notifyObservers(obj);
   }
 
-  //Closed Captions
-  //@todo
-//  public List<String> getCurrentItemClosedCaptionsLanguages();
-//  public void setClosedCaptionsLanguage(String language);
-//  public void getTimedText(float startTime, float endTime);
+  // The following methods are required for MediaPlayerControl
+  @Override
+  public boolean canPause() {
+    return currentPlayer() != null && currentPlayer().pauseable();
+  }
 
+  @Override
+  public boolean canSeekBackward() {
+    return currentPlayer() != null && currentPlayer().seekable();
+  }
+
+  @Override
+  public boolean canSeekForward() {
+    return currentPlayer() != null && currentPlayer().seekable();
+  }
+
+  @Override
+  public int getBufferPercentage() {
+    return currentPlayer() == null ? 0 : currentPlayer().getBufferPercentage();
+  }
+
+  @Override
+  public int getCurrentPosition() {
+    return currentPlayer() == null ? 0 : currentPlayer().currentTime();
+  }
+
+  @Override
+  public int getDuration() {
+    return currentPlayer() == null ? 0 : currentPlayer().duration();
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return _state == OoyalaPlayerState.PLAYING;
+  }
+
+  @Override
+  public void seekTo(int arg0) {
+    seek(arg0);
+  }
+
+  @Override
+  public void start() {
+    play();
+  }
 }

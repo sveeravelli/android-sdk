@@ -13,7 +13,7 @@ public class Analytics {
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
 
-  private static final String EMBED_HTML = "<html><head><script src=\"{HOST}{URI}\"></script></head><body onload=\"reporter = new Ooyala.Reporter(\'{PCODE}\');\"></body></html>";
+  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onload=\"reporter = new Ooyala.Reporter(\'_PCODE_\');\"></body></html>";
 
   /** @internal
    * Initialize an Analytics using the specified api
@@ -22,7 +22,7 @@ public class Analytics {
    * @returns the initialized Analytics
    */
   public Analytics(Context context, PlayerAPIClient api) {
-    this(context, EMBED_HTML.replaceAll("{HOST}", Constants.JS_ANALYTICS_HOST).replaceAll("{URI}", Constants.JS_ANALYTICS_URI).replaceAll("{PCODE}", api.getPcode()));
+    this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST).replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
   }
 
   /** @internal

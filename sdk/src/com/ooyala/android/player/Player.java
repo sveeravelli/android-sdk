@@ -14,6 +14,7 @@ public abstract class Player extends Observable {
   protected String _error = null; /**< The Player's current error if it exists */
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
+  protected int _buffer = 0;
 
   /**
    * Init the player
@@ -67,6 +68,14 @@ public abstract class Player extends Observable {
   }
 
   /**
+   * Returns whether this player is pauseable
+   * @returns A boolean value specifiying whether the player is pauseable
+   */
+  public boolean pauseable() {
+    return true;
+  }
+
+  /**
    * Returns whether this player is seekable
    * @returns A boolean value specifiying whether the player is seekable
    */
@@ -101,6 +110,10 @@ public abstract class Player extends Observable {
 
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
+  }
+
+  public int getBufferPercentage() {
+    return _buffer;
   }
 
   public abstract void suspend();

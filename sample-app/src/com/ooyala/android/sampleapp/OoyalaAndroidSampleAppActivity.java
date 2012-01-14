@@ -28,7 +28,7 @@ public class OoyalaAndroidSampleAppActivity extends Activity
 
     OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
     createPlayer();
-    player.setLayout(layout);
+    player.setLayout(layout, true);
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
     // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
@@ -39,7 +39,7 @@ public class OoyalaAndroidSampleAppActivity extends Activity
     // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
     // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
     // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    if (player.setEmbedCode("NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) {
+    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {

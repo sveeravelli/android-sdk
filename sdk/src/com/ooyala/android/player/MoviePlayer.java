@@ -18,9 +18,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.ViewGroup;
 
+import com.ooyala.android.MovieView;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
 import com.ooyala.android.Stream;
@@ -43,7 +43,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
                                                    Observer {
 
   protected MediaPlayer _player = null;
-  protected int _buffer = 0;
   protected SurfaceHolder _holder = null;
   protected Stream _stream = null;
   protected int _width = 0;
@@ -136,11 +135,29 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public int currentTime() {
+    if (_player == null) { return 0; }
+    switch(_state) {
+    case INIT:
+    case LOADING:
+    case SUSPENDED:
+      return 0;
+    default:
+      break;
+  }
     return _player.getCurrentPosition();
   }
 
   @Override
   public int duration() {
+    if (_player == null) { return 0; }
+    switch(_state) {
+      case INIT:
+      case LOADING:
+      case SUSPENDED:
+        return 0;
+      default:
+        break;
+    }
     return _player.getDuration();
   }
 
@@ -156,6 +173,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void seekToTime(int timeInMillis) {
+    if (_player == null) { return; }
     _player.seekTo(timeInMillis);
   }
 
@@ -206,8 +224,9 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     setState(OoyalaPlayerState.READY);
     if (_width == 0 && _height == 0) {
       Log.d(this.getClass().getName(), "TEST - onPrepared2 "+mp.getVideoWidth()+"x"+mp.getVideoHeight());
-      if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0)
-        resize(mp.getVideoWidth(), mp.getVideoHeight());
+      if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
+        setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
+      }
     }
   }
 
@@ -221,14 +240,13 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void onCompletion(MediaPlayer mp) {
-    Log.d(this.getClass().getName(), "TEST - onCompletion");
     currentItemCompleted();
   }
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
     Log.d(this.getClass().getName(), "TEST - onVideoSizeChangedd "+width+"x"+height);
-    if (_width == 0 && _height == 0) {
-      resize(width, height);
+    if (_width == 0 && _height == 0 && height > 0) {
+      setVideoSize(width, height);
     }
   }
 
@@ -240,8 +258,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
-    if (_width == 0 && _height == 0) {
-      resize(_stream.getWidth(), _stream.getHeight());
+    if (_width == 0 && _height == 0 && _stream.getHeight() > 0) {
+      setVideoSize(_stream.getWidth(), _stream.getHeight());
     }
     if (_state == OoyalaPlayerState.LOADING) {
       createMediaPlayer();
@@ -262,7 +280,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   private void setupView() {
-    _view = new SurfaceView(_parent.getLayout().getContext());
+    _view = new MovieView(_parent.getLayout().getContext());
     _view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
@@ -335,6 +353,12 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _state = OoyalaPlayerState.INIT;
   }
 
+  private void setVideoSize(int width, int height) {
+    _width = width;
+    _height = height;
+    ((MovieView)_view).setAspectRatio(((float)_width) / ((float)_height));
+  }
+
   protected void currentItemCompleted() {
     stopPlayheadTimer();
     setState(OoyalaPlayerState.COMPLETED);
@@ -366,81 +390,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     }
   }
 
-  // Resizing related crap. damn android for making me do this.
-  public void resize(int width, int height) {
-    Log.d(this.getClass().getName(), "TEST - resize: "+width+","+height);
-    _width = width;
-    _height = height;
-    switch(_state) {
-      case INIT:
-      case LOADING:
-        queueResize();
-        return;
-      default:
-        break;
-    }
-    Log.d(this.getClass().getName(), "TEST - resizing: "+width+","+height);
-    ViewGroup.LayoutParams parentLP = _parent.getLayout().getLayoutParams();
-    if (parentLP.width == ViewGroup.LayoutParams.WRAP_CONTENT || parentLP.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
-      // Wrap Content -> just use video's height and width.
-      ViewGroup.LayoutParams lp = _view.getLayoutParams();
-      lp.width = _width;
-      lp.height = _height;
-      _view.setLayoutParams(lp);
-    } else {
-      // Fill Parent or explicit width/height -> maintain aspect ratio
-      ViewGroup.LayoutParams lp = _view.getLayoutParams();
-      int pWidth = _parent.getLayout().getWidth();
-      int pHeight = _parent.getLayout().getHeight();
-      Log.d(this.getClass().getName(), "TEST - resizing else lp: "+parentLP.width+","+parentLP.height);
-      Log.d(this.getClass().getName(), "TEST - resizing else pl: "+pWidth+","+pHeight);
-      if (_width == 0 || _height == 0 || pWidth == 0 || pHeight == 0) {
-        Log.e(this.getClass().getName(), "ERROR: cannot set video size");
-        return;
-      }
-      float availableAspectRatio = ((float)pWidth)/((float)pHeight);
-      float videoAspectRatio = ((float)_width)/((float)_height);
-      if (availableAspectRatio > videoAspectRatio) {
-        // bounded by the available height
-        lp.width = (int)(((float)_width)*((float)pHeight)/((float)_height));
-        lp.height = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by height: "+lp.width+","+lp.height);
-      } else if (availableAspectRatio < videoAspectRatio) {
-        // bounded by the available width
-        lp.width = pWidth;
-        lp.height = (int)(((float)_height)*((float)pWidth)/((float)_width));;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by width: "+lp.width+","+lp.height);
-      } else {
-        // no bound, aspect ratios are the same.
-        lp.width = pWidth;
-        lp.height = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by nothing: "+lp.width+","+lp.height);
-      }
-      _view.setLayoutParams(lp);
-      _view.getHolder().setFixedSize(lp.width, lp.height);
-      _view.invalidate();
-      _view.requestLayout();
-    }
-  }
-
-  protected void queueResize() {
-    Log.d(this.getClass().getName(), "TEST - queueResize");
-    _resizeQueued = true;
-  }
-
-  protected void dequeueResize() {
-    Log.d(this.getClass().getName(), "TEST - dequeueResize");
-    if (_resizeQueued) {
-      _resizeQueued = false;
-      resize(_width, _height);
-    }
-  }
-
   @Override
   protected void setState(OoyalaPlayerState state) {
-    if (state != OoyalaPlayerState.INIT && state != OoyalaPlayerState.LOADING) {
-      dequeueResize();
-    }
     super.setState(state);
     dequeuePlay();
   }
@@ -448,9 +399,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void update(Observable o, Object arg) {
     Log.d(this.getClass().getName(), "TEST - update");
-    if (_width > 0 && _height > 0) {
-      resize(_width,_height);
-    }
   }
 
   // Timer tasks for playhead updates
