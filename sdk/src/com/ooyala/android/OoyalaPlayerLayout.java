@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.MediaController;
 
 public class OoyalaPlayerLayout extends FrameLayout {
-  private List<Observer> _observers = new ArrayList<Observer>();
   MediaController _controller = null;
   OoyalaPlayer _player = null;
 
@@ -52,26 +51,10 @@ public class OoyalaPlayerLayout extends FrameLayout {
     return _controller;
   }
 
-  public void addObserver(Observer o) {
-    if (_observers.contains(o)) { return; }
-    _observers.add(o);
-  }
-
-  public void deleteObserver(Observer o) {
-    _observers.remove(o);
-  }
-
-  private void notifyObservers() {
-    for (Observer o : _observers) {
-      o.update(null, this);
-    }
-  }
-
   @Override
   protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
     Log.d(this.getClass().getName(), "TEST - onSizeChanged - "+xNew+","+yNew+" "+xOld+","+yOld);
     super.onSizeChanged(xNew, yNew, xOld, yOld);
-    //notifyObservers();
   }
 
   @Override
@@ -84,8 +67,7 @@ public class OoyalaPlayerLayout extends FrameLayout {
         return false;
       default:
         _controller.show();
-        break;
+        return false;
     }
-    return false;
   }
 }

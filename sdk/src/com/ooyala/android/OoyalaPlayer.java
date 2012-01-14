@@ -448,7 +448,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    Log.d(this.getClass().getName(), "TEST - Notificationn: "+arg1.toString()+" "+_player+" "+_adPlayer+" "+arg0);
+    Log.d(this.getClass().getName(), "TEST - Notificationn: "+arg1.toString()+" "+_state);
     if (arg0 == this._player) {
       Log.d(this.getClass().getName(), "TEST - Note from player");
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
@@ -485,6 +485,8 @@ public class OoyalaPlayer extends Observable implements Observer,
             }
             setState(OoyalaPlayerState.PLAYING);
             break;
+          case SUSPENDED: // suspended is an internal state. we don't want to pass it through
+            break;
           case READY:
             _analytics.reportDisplay();
           default:
@@ -512,28 +514,34 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
       Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
       switch(((Player)arg0).getState()) {
-        case COMPLETED:
-          sendNotification(AD_COMPLETED_NOTIFICATION);
         case ERROR:
           sendNotification(AD_ERROR_NOTIFICATION);
+        case COMPLETED:
+          sendNotification(AD_COMPLETED_NOTIFICATION);
           cleanupPlayer(_adPlayer);
           _adPlayer = null;
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
-            Log.d(this.getClass().getName(), "TEST - attempting to resume");
             _player.resume();
-            Log.d(this.getClass().getName(), "TEST - resumed");
             if (_closedCaptionsView != null) {
               _closedCaptionsView.setVisibility(ClosedCaptionsView.VISIBLE);
               _closedCaptionsView.bringToFront();
             }
-            Log.d(this.getClass().getName(), "TEST - after captions");
-          } else {
-            Log.d(this.getClass().getName(), "TEST - BULLSHIT");
+          }
+          break;
+        case PLAYING:
+          if (_state != OoyalaPlayerState.PLAYING) {
+            setState(OoyalaPlayerState.PLAYING);
+          }
+          break;
+        case PAUSED:
+          if (_state != OoyalaPlayerState.PAUSED) {
+            setState(OoyalaPlayerState.PAUSED);
           }
         default:
           break;
       }
     }
+    Log.d(this.getClass().getName(), "TEST - Notificationn END: "+arg1.toString()+" "+_state);
   }
 
   public OoyalaPlayerActionAtEnd getActionAtEnd() {

@@ -1,7 +1,5 @@
 package com.ooyala.android.player;
 
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,8 +37,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
                                                    OnVideoSizeChangedListener,
                                                    OnInfoListener,
                                                    OnSeekCompleteListener,
-                                                   SurfaceHolder.Callback,
-                                                   Observer {
+                                                   SurfaceHolder.Callback {
 
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
@@ -275,7 +272,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   public void setParent(OoyalaPlayer parent) {
     Log.d(this.getClass().getName(), "TEST - setParent");
     super.setParent(parent);
-    _parent.getLayout().addObserver(this);
     setupView();
   }
 
@@ -341,9 +337,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       _player = null;
     }
     removeView();
-    if (_parent != null) {
-      _parent.getLayout().deleteObserver(this);
-    }
     _parent = null;
     _width = 0;
     _height = 0;
@@ -396,11 +389,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   protected void setState(OoyalaPlayerState state) {
     super.setState(state);
     dequeuePlay();
-  }
-
-  @Override
-  public void update(Observable o, Object arg) {
-    Log.d(this.getClass().getName(), "TEST - update");
   }
 
   // Timer tasks for playhead updates
