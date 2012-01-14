@@ -233,4 +233,8 @@ public class Channel extends ContentItem implements PaginatedParentItem
   public Video videoFromEmbedCode(String embedCode, Video currentItem) {
     return _videos.get(embedCode);
   }
+
+  public ChannelSet getParent() {
+    return _parent;
+  }
 }

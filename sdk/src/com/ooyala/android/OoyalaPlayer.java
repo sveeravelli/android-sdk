@@ -11,6 +11,8 @@ import com.ooyala.android.player.OoyalaAdPlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.VASTAdPlayer;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class OoyalaPlayer implements Observer {
@@ -343,6 +345,33 @@ public class OoyalaPlayer implements Observer {
     return _adPlayer != null ? _adPlayer : _player;
   }
 
+  private boolean fetchMoreChildren(PaginatedItemListener listener) {
+    Channel parent = _currentItem.getParent();
+    if (parent != null) {
+      ChannelSet parentOfParent = parent.getParent();
+      if (parent.hasMoreChildren()) {
+        return parent.fetchMoreChildren(listener);
+      } else if (parentOfParent != null && parentOfParent.hasMoreChildren()) {
+        return parentOfParent.fetchMoreChildren(listener);
+      }
+    }
+    return false;
+  }
+
+  //This is required because android enjoys making things difficult. talk to jigish if you got issues.
+  private static final int FETCH_MORE_CHILDREN_PLAY = 0;
+  private static final int FETCH_MORE_CHILDREN_PAUSE = 1;
+  private final Handler _fetchMoreChildrenHandler = new Handler() {
+    public void handleMessage(Message msg) {
+      changeCurrentVideo(_currentItem.nextVideo());
+      if (msg.what == FETCH_MORE_CHILDREN_PLAY) {
+        play();
+      } else if(msg.what == FETCH_MORE_CHILDREN_PAUSE) {
+        pause();
+      }
+    }
+  };
+
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(this.getClass().getName(), "TEST - Notification: "+arg1.toString());
@@ -357,11 +386,25 @@ public class OoyalaPlayer implements Observer {
                     changeCurrentVideo(_currentItem.nextVideo());
                     play();
                     break;
+                  } else if (fetchMoreChildren(new PaginatedItemListener() {
+                          @Override
+                          public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+                            _fetchMoreChildrenHandler.sendEmptyMessage(FETCH_MORE_CHILDREN_PLAY);
+                          }
+                        })) {
+                    break;
                   }
                 case PAUSE:
                   if (_currentItem.nextVideo() != null) {
                     changeCurrentVideo(_currentItem.nextVideo());
                     pause();
+                    break;
+                  } else if (fetchMoreChildren(new PaginatedItemListener() {
+                          @Override
+                          public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+                            _fetchMoreChildrenHandler.sendEmptyMessage(FETCH_MORE_CHILDREN_PAUSE);
+                          }
+                        })) {
                     break;
                   }
                 case STOP:
