@@ -101,6 +101,22 @@ public class Video extends ContentItem implements PlayableItem
           }
         }
       }
+
+      if (!myData.isNull(Constants.KEY_CLOSED_CAPTIONS)) {
+        _closedCaptions = null;
+        JSONArray array = myData.getJSONArray(Constants.KEY_CLOSED_CAPTIONS);
+        if (array.length() > 0) {
+          /*
+           * NOTE [jigish]: here we only select the first closed caption returned. according to rui it is guaranteed
+           * by the ingestion API that only one closed caption file will exist per movie. we are not doing this
+           * restriction server side in the content tree api because the DB does not have this restriction in case we
+           * want to support having multiple closed caption files per movie. if that ever happens, we will have to
+           * change this to support multiple closed captions.
+           */
+          JSONObject o = (JSONObject)array.get(0);
+          _closedCaptions = new ClosedCaptions(o);
+        }
+      }
     }
     catch (JSONException exception)
     {

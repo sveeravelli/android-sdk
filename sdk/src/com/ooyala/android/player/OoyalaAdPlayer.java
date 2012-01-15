@@ -23,12 +23,6 @@ public class OoyalaAdPlayer extends MoviePlayer {
     }
     _ad = (OoyalaAdSpot)ad;
 
-    if (!_ad.fetchPlaybackInfo()) {
-      this._error = "Invalid Ad";
-      this._state = OoyalaPlayerState.ERROR;
-      return;
-    }
-
     super.init(parent, _ad.getStream());
 
     // TODO[jigish] setup clickthrough

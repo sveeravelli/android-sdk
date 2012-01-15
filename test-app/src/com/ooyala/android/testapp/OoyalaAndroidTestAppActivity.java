@@ -39,7 +39,7 @@ public class OoyalaAndroidTestAppActivity extends Activity
     // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
     // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
     // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
+    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {

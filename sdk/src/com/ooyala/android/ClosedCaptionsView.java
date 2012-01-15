@@ -41,7 +41,7 @@ public class ClosedCaptionsView extends TextView {
 
 	public void initStyle() {
 		setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
-		setMaxLines(3);
+		setMaxLines(5);
 		setTextColor(Color.WHITE);
 		setTextSize(16);
 		setBackgroundColor(Color.BLACK);

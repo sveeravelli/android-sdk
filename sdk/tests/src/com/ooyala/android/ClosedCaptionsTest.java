@@ -74,5 +74,6 @@ public class ClosedCaptionsTest extends AndroidTestCase
     assertNull(caption);
     caption = cc.getCaption("en", 42.00);
     assertNull(caption);
+    caption = cc.getCaption("en", 15.084);
   }
 }

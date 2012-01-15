@@ -65,12 +65,6 @@ public class VASTAdPlayer extends MoviePlayer {
     }
     _ad = (VASTAdSpot)ad;
 
-    if (!_ad.fetchPlaybackInfo()) {
-      this._error = "Invalid Ad";
-      this._state = OoyalaPlayerState.ERROR;
-      return;
-    }
-
     for (VASTAd vastAd : _ad.getAds()) {
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear()) {

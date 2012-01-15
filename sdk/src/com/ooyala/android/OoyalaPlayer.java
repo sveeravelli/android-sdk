@@ -215,6 +215,12 @@ public class OoyalaPlayer extends Observable implements Observer,
       return false;
     }
 
+    if (!_currentItem.fetchPlaybackInfo()) {
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+      setState(OoyalaPlayerState.ERROR);
+      return false;
+    }
+
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
 
@@ -563,9 +569,10 @@ public class OoyalaPlayer extends Observable implements Observer,
           playAdsBeforeTime(this._lastPlayedTime);
           //closed captions
           if (_currentItem.hasClosedCaptions()) {
-            if (_closedCaptionsView.getCaption() != null && currentPlayer().currentTime() > _closedCaptionsView.getCaption().getEnd()) {
-            	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getCountry(), currentPlayer().currentTime());
-            	if (caption.getBegin() <= currentPlayer().currentTime() && caption.getEnd() > currentPlayer().currentTime()) {
+            double currT = ((double)currentPlayer().currentTime())/1000d;
+            if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
+            	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getLanguage(), currT);
+            	if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
             	  _closedCaptionsView.setCaption(caption);
             	} else {
             	  _closedCaptionsView.setCaption(null);

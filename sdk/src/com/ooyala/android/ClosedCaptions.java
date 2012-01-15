@@ -19,6 +19,8 @@ import org.xml.sax.InputSource;
 
 import org.json.*;
 
+import android.util.Log;
+
 import com.ooyala.android.Constants.ReturnState;
 
 public class ClosedCaptions
@@ -183,14 +185,14 @@ public class ClosedCaptions
     }
     catch (Exception e)
     {
-      System.out.println("ERROR: Unable to fetch closed captions info: " + e);
+      Log.e(this.getClass().getName(),"ERROR: Unable to fetch closed captions info: " + e);
       return false;
     }
   }
 
   public List<Caption> closedCaptionsForLanguage(String language)
   {
-    return _captions.get(language);
+    return _captions.get(language.toLowerCase());
   }
 
   public Caption getCaption(String language, double time)
@@ -202,6 +204,7 @@ public class ClosedCaptions
     }
 
     // Binary Search!
+    int prevCurrIdx = -1;
     int currIdx = captionsForLanguage.size() / 2;
     int topIdx = captionsForLanguage.size() - 1;
     int botIdx = 0;
@@ -215,12 +218,16 @@ public class ClosedCaptions
         break;
       }
       // adjust indicies
+      if (prevCurrIdx == currIdx) { break; }
       if (topIdx == botIdx) { break; }
       if (time < curr.getBegin()) { topIdx = currIdx - 1; }
       else { botIdx = currIdx + 1; }
+      prevCurrIdx = currIdx;
       currIdx = botIdx + ((topIdx - botIdx) / 2);
     }
-    if (found) { return captionsForLanguage.get(currIdx); }
+    if (found) {
+      return captionsForLanguage.get(currIdx);
+    }
     return null;
   }
 
