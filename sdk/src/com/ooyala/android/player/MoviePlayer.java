@@ -219,10 +219,9 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    Log.d(this.getClass().getName(), "TEST - onPrepared "+mp.getVideoWidth()+"x"+mp.getVideoHeight());
+    Log.d(this.getClass().getName(), "TEST - onPrepared");
     setState(OoyalaPlayerState.READY);
     if (_width == 0 && _height == 0) {
-      Log.d(this.getClass().getName(), "TEST - onPrepared2 "+mp.getVideoWidth()+"x"+mp.getVideoHeight());
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
       }

@@ -9,7 +9,11 @@ Ooyala SDK Android Libaray
   <property name="build.classes" location="${build}/classes" />
   <property name="build.dist" location="${build}/dist" />
 	<property name="build.dist.javadoc" location="${build.dist}/javadoc" />
-	<property name="lib.jar" location="${build.dist}/OoyalaSDK.jar" />
+	<property name="build.dist.sample-app" location="${build.dist}/sample-app" />
+	<property name="jar.name" value="OoyalaSDK.jar" />
+	<property name="jar.location" location="${build.dist}/${jar.name}" />
+	<property name="sampleapp.dir" location="../sample-app" />
+	<property name="sampleapp.lib.dir" location="${sampleapp.dir}/lib" />
 	<property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
 	<property name="release.zip" location="${build.dist}/OoyalaSDK.zip" />
 	<property name="doc" location="Documentation" />
@@ -23,7 +27,6 @@ Ooyala SDK Android Libaray
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.classes}"/>
 		<mkdir dir="${build.dist}"/>
-		<mkdir dir="${build.dist.javadoc}"/>
 	</target>
 	
 	<target name="compile" depends="init">
@@ -31,12 +34,16 @@ Ooyala SDK Android Libaray
 	</target>
 
   <target name="jar" depends="compile">
-    <jar destfile="${lib.jar}" basedir="${build.classes}">
+    <jar destfile="${jar.location}" basedir="${build.classes}">
       <include name="com/ooyala/android/**" />
     </jar>
+  	<copy todir="${sampleapp.lib.dir}">
+  		<fileset dir="${build.dist}"/>
+  	</copy>
   </target>
 	
 	<target name="docs" depends="init">
+		<mkdir dir="${build.dist.javadoc}"/>
 		<exec executable="./gen_docs.sh">
 		</exec>
 	</target>
@@ -45,6 +52,9 @@ Ooyala SDK Android Libaray
 		<copy todir="${build.dist.javadoc}">
 			<fileset dir="${doc.public}"/>
 		</copy>
+		<copy todir="${build.dist.sample-app}">
+      <fileset dir="${sampleapp.dir}"/>
+    </copy>
 		<zip destfile="${release.zip}" basedir="${build.dist}"/>
 	</target>
 </project>

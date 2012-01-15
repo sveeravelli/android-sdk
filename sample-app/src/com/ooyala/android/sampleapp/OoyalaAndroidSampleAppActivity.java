@@ -1,82 +1,110 @@
 package com.ooyala.android.sampleapp;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.util.Log;
-
+import com.ooyala.android.Channel;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.Video;
 
-public class OoyalaAndroidSampleAppActivity extends Activity
-{
-  private static final String TAG = "OoyalaSampleApp";
-  private OoyalaPlayer player;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-  @Override
-  public void onCreate(Bundle savedInstanceState)
-  {
-    Log.d(TAG, "TEST - onCreate");
-    super.onCreate(savedInstanceState);
-    Thread.setDefaultUncaughtExceptionHandler(onUncaughtException);
-    try {
-      setContentView(R.layout.main);
-    } catch (Exception e) {
-      e.printStackTrace();
+public class OoyalaAndroidSampleAppActivity extends Activity implements OnClickListener {
+  private static final String TAG = "OoyalaAndroidSampleAppActivity";
+
+  private OoyalaPlayer player = null;
+
+  private class ChannelBrowserItemView extends TextView {
+    private Video video = null;
+
+    public ChannelBrowserItemView(Context context) {
+      super(context);
     }
 
-    OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
-    createPlayer();
+    public ChannelBrowserItemView(Context context, AttributeSet attrs) {
+      super(context, attrs);
+    }
+
+    public ChannelBrowserItemView(Context context, AttributeSet attrs, int defStyle) {
+      super(context, attrs, defStyle);
+    }
+
+    public void setVideo(Video v, float weight) {
+      video = v;
+      this.setText(video.getTitle());
+      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                   ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                   weight);
+      this.setLayoutParams(lp);
+      this.setGravity(Gravity.CENTER);
+      this.requestLayout();
+      this.setTextSize(18);
+    }
+
+    public Video getVideo() {
+      return video;
+    }
+  }
+
+  /** Called when the activity is first created. */
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.main);
+
+    LinearLayout channelBrowser = (LinearLayout)findViewById(R.id.channelBrowser);
+    OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.ooyalaPlayer);
+    // Initializer Params: (api key, secret, pcode, domain)
+    player = new OoyalaPlayer("l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    // Must setLayout before doing anything else so the player has a surface to draw on
+    // Params:
+    //   First:  the OoyalaPlayerLayout
+    //   Second: true if the OoyalaPlayer should use the default android media player controls. false if no controls should be shown.
     player.setLayout(layout, true);
-    // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
-    // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
-    // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
-    // ooyala postroll:           1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
-    // ooyala ad as normal video: JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B
-    // no ads:                    UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
-    // VAST preroll:              w2cXAxMzqpwY5HwqSbHMzYgu92Lj6Fer
-    // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
-    // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
-    // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
-      Log.d(TAG, "TEST - yay!");
+    if (player.setEmbedCode("NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) { // this is a channel's embed code
+      // The embed code was set properly, we can play the video and/or access the rootItem now.
+      if (player.getRootItem() instanceof Channel) {
+        // Here we set up a list of the embed codes in the channel, then set up an OnClickListener to change
+        // to that embed code
+        Channel rootItem = ((Channel)player.getRootItem());
+        for(Video v : rootItem.getVideos()) {
+          ChannelBrowserItemView browserItemView = new ChannelBrowserItemView(channelBrowser.getContext());
+          browserItemView.setClickable(true);
+          browserItemView.setOnClickListener(this); // see onClick for what happens when we click on this
+          browserItemView.setVideo(v, 1f/((float)rootItem.getVideos().size()));
+          channelBrowser.addView(browserItemView);
+        }
+      } else {
+        // This will never happen. better safe than sorry though.
+        Log.e(TAG,"This will never happen. But it did. Freaky.");
+      }
+      // and after we set up the list, lets play the first video
       player.play();
     } else {
-      Log.d(TAG, "TEST - lame :(");
-    }
-  }
-
-  private void createPlayer() {
-    Log.d(TAG, "TEST - createPlayer");
-    if (player == null) {
-      Log.d(TAG, "TEST - fetchOrCreatePlayer - null");
-      player = new OoyalaPlayer("l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+      // Something wrong happened. check player.getError() for details
+      Log.e(TAG,"Unable to set embed code: "+player.getError().getCode());
     }
   }
 
   @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    Log.d(TAG, "TEST - onConfigurationChangedd");
-    super.onConfigurationChanged(newConfig);
-  }
-
-  private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler()
-  {
-    public void uncaughtException(Thread thread, Throwable ex)
-    {
-      Log.e(TAG, "Uncaught exception", ex);
-      showErrorDialog(ex);
+  public void onClick(View arg0) {
+    if (arg0 instanceof ChannelBrowserItemView) {
+      if (player.changeCurrentVideo(((ChannelBrowserItemView)arg0).getVideo())) {
+        // success
+      } else {
+        // something bad happened, check player.getError() for details
+        Log.e(TAG,"Unable to change video.");
+      }
+    } else {
+      // ignore. we didn't click on a ChannelBrowserItemView we set up
     }
-  };
-
-  private void showErrorDialog(Throwable t)
-  {
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-    builder.setTitle("Exception!");
-    builder.setMessage(t.toString());
-    builder.setPositiveButton("OK", null);
-    builder.show();
   }
 }

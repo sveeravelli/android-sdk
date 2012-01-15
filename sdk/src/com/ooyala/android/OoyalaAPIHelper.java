@@ -7,6 +7,8 @@ import java.net.URLConnection;
 import java.util.Map;
 import org.json.*;
 
+import android.util.Log;
+
 public class OoyalaAPIHelper
 {
   private SecureURLGenerator _secureURLGenerator = null;
@@ -43,6 +45,7 @@ public class OoyalaAPIHelper
 
   private static String jsonForAPI(URL url)
   {
+    Log.d(OoyalaAPIHelper.class.getName(), "Sending Request: "+url.toString());
     StringBuffer sb = new StringBuffer();
     try
     {
