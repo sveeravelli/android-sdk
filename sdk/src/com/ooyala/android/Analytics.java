@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -13,7 +14,7 @@ public class Analytics {
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
 
-  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onload=\"reporter = new Ooyala.Reporter(\'_PCODE_\');\"></body></html>";
+  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script><script>var reporter; function init() { reporter = new Ooyala.Reporter(\'_PCODE_\'); }</script></head><body onLoad=\"init()\"></body></html>";
 
   /**
    * Initialize an Analytics using the specified api
@@ -44,11 +45,12 @@ public class Analytics {
         if (!_failed) {
           _ready = false;
           _failed = true;
-          System.err.println("ERROR: Failed to load js Analytics!");
+          Log.e(this.getClass().getName(),"ERROR: Failed to load js Analytics!");
         }
       }
     });
-    _jsAnalytics.loadData(embedHTML, "text/html", null);
+    String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+    _jsAnalytics.loadData(header+embedHTML, "text/html", "UTF-8");
     reportPlayerLoad();
   }
 

@@ -50,14 +50,17 @@ public class OoyalaPlayerLayout extends FrameLayout {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     //the MediaController will hide after 3 seconds - tap the screen to make it appear again
-    switch(_player.getState()) {
-      case INIT:
-      case LOADING:
-      case ERROR:
-        return false;
-      default:
-        _controller.show();
-        return false;
+    if (_player != null) {
+      switch(_player.getState()) {
+        case INIT:
+        case LOADING:
+        case ERROR:
+          return false;
+        default:
+          _controller.show();
+          return false;
+      }
     }
+    return false;
   }
 }
