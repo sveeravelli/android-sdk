@@ -552,8 +552,6 @@ public class OoyalaPlayer extends Observable implements Observer,
             break;
           case SUSPENDED: // suspended is an internal state. we don't want to pass it through
             break;
-          case READY:
-            _analytics.reportDisplay();
           default:
             setState(((Player)arg0).getState());
             break;

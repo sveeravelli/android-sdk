@@ -14,7 +14,7 @@ public class Analytics {
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
 
-  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script><script>var reporter; function init() { reporter = new Ooyala.Reporter(\'_PCODE_\'); }</script></head><body onLoad=\"init()\"></body></html>";
+  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad=\"reporter = new Ooyala.Reporter('_PCODE_');\"></body></html>";
 
   /**
    * Initialize an Analytics using the specified api
@@ -75,19 +75,6 @@ public class Analytics {
   public void reportPlayerLoad() {
     if (_failed) { return; }
     String action = "javascript:reporter.reportPlayerLoad();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
-  }
-
-  /**
-   * Report a player display
-   */
-  public void reportDisplay() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportDisplay();";
     if (!_ready) {
       queue(action);
     } else {
