@@ -6,23 +6,10 @@ echo "Removing Old Docs..."
 rm -rf Documentation/complete Documentation/public
 
 echo "Generating Public Docs..."
-javadoc -sourcepath src \
-        -d Documentation/public -use -windowtitle 'Ooyala Android SDK API Documentation' \
-        -doctitle 'Ooyala Android SDK API Documentation' \
-        -header '<b>Ooyala Android SDK' \
-        -bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>' \
-        -link http://docs.oracle.com/javase/6/docs/api/ \
-        -public \
-        com.ooyala.android com.ooyala.android.player
+javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public
 
 echo "Generating Complete Docs..."
-javadoc -sourcepath src \
-        -d Documentation/complete -use -windowtitle 'Ooyala Android SDK API Documentation' \
-        -doctitle 'Ooyala Android SDK API Documentation' \
-        -header '<b>Ooyala Android SDK' \
-        -bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>' \
-        -link http://docs.oracle.com/javase/6/docs/api/ \
-        com.ooyala.android com.ooyala.android.player
+javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete
 
 echo
 echo "Document Generation Complete!"

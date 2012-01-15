@@ -1,0 +1,38 @@
+-d Documentation/public
+-use
+-windowtitle 'Ooyala Android SDK API Documentation'
+-doctitle 'Ooyala Android SDK API Documentation'
+-header '<b>Ooyala Android SDK</b>'
+-bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>'
+-link http://docs.oracle.com/javase/6/docs/api/
+-public
+-sourcepath src
+src/com/ooyala/android/AdSpot.java
+src/com/ooyala/android/Analytics.java
+src/com/ooyala/android/AuthorizableItem.java
+src/com/ooyala/android/Caption.java
+src/com/ooyala/android/Channel.java
+src/com/ooyala/android/ChannelSet.java
+src/com/ooyala/android/ClosedCaptions.java
+src/com/ooyala/android/ContentItem.java
+src/com/ooyala/android/DynamicChannel.java
+src/com/ooyala/android/EmbeddedSecureURLGenerator.java
+src/com/ooyala/android/EmbeddedSignatureGenerator.java
+src/com/ooyala/android/OoyalaAdSpot.java
+src/com/ooyala/android/OoyalaAPIHelper.java
+src/com/ooyala/android/OoyalaException.java
+src/com/ooyala/android/OoyalaPlayer.java
+src/com/ooyala/android/OoyalaPlayerLayout.java
+src/com/ooyala/android/OrderedMap.java
+src/com/ooyala/android/PaginatedParentItem.java
+src/com/ooyala/android/PaginatedItemListener.java
+src/com/ooyala/android/PlayableItem.java
+src/com/ooyala/android/SecureURLGenerator.java
+src/com/ooyala/android/SignatureGenerator.java
+src/com/ooyala/android/Stream.java
+src/com/ooyala/android/VASTAd.java
+src/com/ooyala/android/VASTAdSpot.java
+src/com/ooyala/android/VASTLinearAd.java
+src/com/ooyala/android/VASTSequenceItem.java
+src/com/ooyala/android/VASTStream.java
+src/com/ooyala/android/Video.java

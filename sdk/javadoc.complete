@@ -1,0 +1,11 @@
+-d Documentation/complete
+-use
+-windowtitle 'Ooyala Android SDK API Documentation'
+-doctitle 'Ooyala Android SDK API Documentation'
+-header '<b>Ooyala Android SDK</b>'
+-bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>'
+-link http://docs.oracle.com/javase/6/docs/api/
+-public
+-sourcepath src
+com.ooyala.android
+com.ooyala.android.player
