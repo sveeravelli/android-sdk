@@ -8,10 +8,9 @@ public class VASTStream extends Stream {
   private String _vastDeliveryType;     /**< the vast delivery type of this stream */
   private String _apiFramework;         /**< the apiFramework of this stream */
 
-  /** @internal
+  /**
    * Initialize a Stream using the specified VAST MediaFile XML (subclasses should override this)
-   * @param[in] data the Element containing the xml to use to initialize this Stream
-   * @returns the initialized Stream
+   * @param data the Element containing the xml to use to initialize this Stream
    */
   public VASTStream(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_MEDIA_FILE)) { return; }

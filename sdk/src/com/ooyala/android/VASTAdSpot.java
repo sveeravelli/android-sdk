@@ -23,21 +23,20 @@ public class VASTAdSpot extends AdSpot {
   protected URL _vastURL;                                /**< The url for the vast request */
   protected List<VASTAd> _ads = new ArrayList<VASTAd>(); /**< The actual ads (List of VASTAd) */
 
-  /** @internal
+  /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
-   * @param[in] data the NSDictionary containing the data to use to initialize this VASTAdSpot
-   * @param[in] theAPI the PlayerAPIClient that was used to fetch this VASTAd
-   * @returns the initialized VASTAdSpot
+   * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
+   * @param api the PlayerAPIClient that was used to fetch this VASTAd
    */
   public VASTAdSpot(JSONObject data, PlayerAPIClient api) {
     _api = api;
     update(data);
   }
 
-  /** @internal
+  /**
    * Update the VASTAdSpot using the specified data (subclasses should override and call this)
-   * @param[in] data the NSDictionary containing the data to use to update this VASTAdSpot
-   * @returns ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
+   * @param data the NSDictionary containing the data to use to update this VASTAdSpot
+   * @return ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
    */
   public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
@@ -78,10 +77,10 @@ public class VASTAdSpot extends AdSpot {
     return ReturnState.STATE_MATCHED;
   }
 
-  /** @internal
+  /**
    * Fetch the additional required info for the ad
-   * @note As of right now, we only support VAST 2.0 Linear Ads. Information about Non-Linear and Companion Ads are stored in the dictionaries nonLinear and companion respectively.
-   * @returns NO if errors occurred, YES if successful
+   * NOTE: As of right now, we only support VAST 2.0 Linear Ads. Information about Non-Linear and Companion Ads are stored in the dictionaries nonLinear and companion respectively.
+   * @return false if errors occurred, true if successful
    */
   @Override
   public boolean fetchPlaybackInfo() {

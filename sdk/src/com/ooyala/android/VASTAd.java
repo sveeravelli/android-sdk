@@ -25,10 +25,9 @@ public class VASTAd {
   private List<VASTSequenceItem> _sequence = new ArrayList<VASTSequenceItem>(); /**< the ordered sequence of the Ad (List of VASTSequenceItem) */
   private Element _extensions;                                                  /**< the extensions of the Ad */
 
-  /** @internal
+  /**
    * Initialize a VASTAd using the specified xml (subclasses should override this)
-   * @param[in] data the Element containing the xml to use to initialize this VASTAd
-   * @returns the initialized VASTAd
+   * @param data the Element containing the xml to use to initialize this VASTAd
    */
   public VASTAd(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_AD)) { return; }
@@ -36,10 +35,10 @@ public class VASTAd {
     update(data);
   }
 
-  /** @internal
+  /**
    * Update the VASTAd using the specified xml (subclasses should override this)
-   * @param[in] xml the TBXMLElement containing the xml to use to update this VASTAd
-   * @returns YES if the XML was properly formatter, NO if not
+   * @param xml the TBXMLElement containing the xml to use to update this VASTAd
+   * @return YES if the XML was properly formatter, NO if not
    */
   public boolean update(Element xml) {
     Node type = xml.getFirstChild();
@@ -111,11 +110,11 @@ public class VASTAd {
     }
     return found;
   }
-  
-  /** @internal
+
+  /**
    * Add a Creative TBXMLElement
-   * @note [jigish]: this assumes that the element is in fact a creative.
-   * @param[in] creative the creative to add
+   * NOTE: this assumes that the element is in fact a creative.
+   * @param creative the creative to add
    */
   private void addCreative(Element creative) {
     Node type = creative.getFirstChild();

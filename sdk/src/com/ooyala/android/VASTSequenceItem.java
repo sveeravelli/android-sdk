@@ -10,7 +10,7 @@ public class VASTSequenceItem implements Comparable<VASTSequenceItem> {
 
   /**
    * Whether or not this VASTSequenceItem has a linear ad
-   * @returns true if there exists a linear ad, false if there does not;
+   * @return true if there exists a linear ad, false if there does not;
    */
   public boolean hasLinear() {
     return _linear != null;

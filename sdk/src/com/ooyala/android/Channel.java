@@ -117,18 +117,31 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return ReturnState.STATE_MATCHED;
   }
 
+  /**
+   * Get the first Video for this Channel
+   * @return the first Video this Channel represents
+   */
   public Video firstVideo()
   {
     if (_videos == null || _videos.size() == 0) { return null; }
     return _videos.get(0);
   }
 
+  /**
+   * Get the last Video for this Channel
+   * @return the last Video this Channel represents
+   */
   public Video lastVideo()
   {
     if (_videos == null || _videos.size() == 0) { return null; }
     return _videos.get(_videos.size()-1);
   }
 
+  /**
+   * Get the next Video for this Channel
+   * @param currentItem the current Video
+   * @return the next Video from Channel
+   */
   public Video nextVideo(Video currentItem)
   {
     int index = _videos.indexForValue(currentItem);
@@ -136,6 +149,11 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return _videos.get(index);
   }
 
+  /**
+   * Get the previous Video for this Channel
+   * @param currentItem the current Video
+   * @return the previous Video from Channel
+   */
   public Video previousVideo(Video currentItem)
   {
     int index = _videos.indexForValue(currentItem);
@@ -148,6 +166,10 @@ public class Channel extends ContentItem implements PaginatedParentItem
     _videos.put(video.getEmbedCode(), video);
   }
 
+  /**
+   * The number of videos this Channel has. Same as getVideos().size().
+   * @return an int with the number of videos
+   */
   public int childrenCount()
   {
     return _videos.size();
@@ -158,6 +180,10 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return _videos;
   }
 
+  /**
+   * The total duration (not including Ads) of this Channel
+   * @return an int with the total duration in seconds
+   */
   public int getDuration()
   {
     int totalDuration = 0;
@@ -165,11 +191,20 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return totalDuration;
   }
 
+  /**
+   * Find out it this Channel has more children
+   * @return true if it does, false if it doesn't
+   */
   public boolean hasMoreChildren()
   {
     return _nextChildren != null;
   }
 
+  /**
+   * Fetch the additional children if they exist. This will happen in the background and callback will be called when the fetch is complete.
+   * @param listener the listener to execute when the children are fetched
+   * @return true if more children exist, false if they don't or they are already in the process of being fetched
+   */
   public boolean fetchMoreChildren(PaginatedItemListener listener)
   {
     // The two lines below aren't within a synchronized block because we assume single thread

@@ -41,25 +41,25 @@ public interface AuthorizableItem
   /**
    * Update the ContentItem using the specified data (subclasses should override and call this)
    * @param data the data to use to update this ContentItem
-   * @returns a ReturnState based on if the data matched or not (or parsing failed)
+   * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
   public ReturnState update(JSONObject data);
 
   /**
    * The embed code for the AuthorizableItem
-   * @returns the embed codes to authorize as a List
+   * @return the embed codes to authorize as a List
    */
   public List<String> embedCodesToAuthorize();
 
   /**
    * Whether or not this AuthorizableItem is authorized
-   * @returns true if authorized, false if not
+   * @return true if authorized, false if not
    */
   public boolean isAuthorized();
 
   /**
    * The Auth Code from the authorization request
-   * @returns an int with the status of the authorization request
+   * @return an int with the status of the authorization request
    */
   public int getAuthCode();
 }

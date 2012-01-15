@@ -25,7 +25,7 @@ class EmbeddedSignatureGenerator implements SignatureGenerator
    * @li Strip any '=' characters from the end of the truncated String
    * @li Return the resulting String
    * @param data the String to create the signature from (not prepended with the secret key)
-   * @returns String containing the signature
+   * @return String containing the signature
    */
   public String sign(String data)
   {

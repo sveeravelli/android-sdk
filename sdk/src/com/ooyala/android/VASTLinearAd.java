@@ -14,12 +14,11 @@ public class VASTLinearAd implements PlayableItem {
   private String _clickThroughURL;                                                         /**< The click through url */
   private Set<String> _clickTrackingURLs = new HashSet<String>();                          /**< The click tracking urls in an Set of String */
   private Set<String> _customClickURLs = new HashSet<String>();                            /**< The custom click urls in an Set of String */
-  private Set<Stream> _streams = new HashSet<Stream>();                                    /**< The streams in an HashSet of Stream */          
+  private Set<Stream> _streams = new HashSet<Stream>();                                    /**< The streams in an HashSet of Stream */
 
-  /** @internal
+  /**
    * Initialize a VASTLinearAd using the specified xml (subclasses should override this)
-   * @param[in] data the Element containing the xml to use to initialize this VASTLinearAd
-   * @returns the initialized VASTLinearAd
+   * @param data the Element containing the xml to use to initialize this VASTLinearAd
    */
   public VASTLinearAd(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
@@ -71,9 +70,9 @@ public class VASTLinearAd implements PlayableItem {
     }
   }
 
-  /** @internal
+  /**
    * Return the stream to play
-   * @returns The hls stream if it exists, otherwise the lowest bitrate mp4 stream
+   * @return he lowest bitrate mp4 stream
    */
   @Override
   public Stream getStream() {

@@ -115,12 +115,21 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     return ReturnState.STATE_MATCHED;
   }
 
+  /**
+   * Get the first Video for this ChannelSet
+   * @return the first Video this ChannelSet represents
+   */
   public Video firstVideo()
   {
     if (_channels == null || _channels.size() == 0) { return null; }
     return _channels.get(0).firstVideo();
   }
 
+  /**
+   * Get the next Video for this ChannelSet (this method should only be called at the end of a channel)
+   * @param currentItem the current Channel
+   * @return the next Video from ChannelSet
+   */
   public Video nextVideo(Channel currentItem)
   {
     int idx = _channels.indexForValue(currentItem);
@@ -128,6 +137,11 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     return _channels.get(idx).firstVideo();
   }
 
+  /**
+   * Get the previous Video for this ChannelSet (this method should only be called at the end of a channel)
+   * @param currentItem the current Channel
+   * @return the previous Video from ChannelSet
+   */
   public Video previousVideo(Channel currentItem)
   {
     int idx = _channels.indexForValue(currentItem);
@@ -140,6 +154,10 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     _channels.put(channel.getEmbedCode(), channel);
   }
 
+  /**
+   * The number of channels this ChannelSet has. Same as getChannels().size().
+   * @return an int with the number of channels
+   */
   public int childrenCount()
   {
     return _channels.size();
@@ -150,6 +168,10 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     return _channels;
   }
 
+  /**
+   * The total duration (not including Ads) of this ChannelSet
+   * @return an int with the total duration in seconds
+   */
   public int getDuration()
   {
     int totalDuration = 0;
@@ -157,11 +179,20 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
     return totalDuration;
   }
 
+  /**
+   * Find out it this ChannelSet has more children
+   * @return true if it does, false if it doesn't
+   */
   public boolean hasMoreChildren()
   {
     return _nextChildren != null;
   }
 
+  /**
+   * Fetch the additional children if they exist
+   * @param listener the listener to execute when the children are fetched
+   * @return true if more children exist, false if they don't or they are already in the process of being fetched
+   */
   public boolean fetchMoreChildren(PaginatedItemListener listener)
   {
     // The two lines below aren't within a synchronized block because we assume single thread
@@ -224,6 +255,12 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
   }
 
   @Override
+  /**
+   * Get the Video in this ChannelSet with the specified embed code
+   * @param embedCode the embed code to look up
+   * @param currentItem the current Video
+   * @return the video in this ChannelSet with the specified embed code
+   */
   public Video videoFromEmbedCode(String embedCode, Video currentItem) {
     //search through channelset starting with currentItem's channel
     //get first channels index

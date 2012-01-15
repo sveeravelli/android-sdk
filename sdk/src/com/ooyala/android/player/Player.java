@@ -45,7 +45,7 @@ public abstract class Player extends Observable {
 
   /**
    * Get the current playhead time
-   * @returns the current playhead time in milliseconds as an int
+   * @return the current playhead time in milliseconds as an int
    */
   public int currentTime() {
     return 0;
@@ -53,7 +53,7 @@ public abstract class Player extends Observable {
 
   /**
    * Get the current item's duration
-   * @returns duration in milliseconds as an int
+   * @return duration in milliseconds as an int
    */
   public int duration() {
     return 0;
@@ -61,7 +61,7 @@ public abstract class Player extends Observable {
 
   /**
    * Get the current item's buffer
-   * @returns buffer+played percentage as an int
+   * @return buffer+played percentage as an int
    */
   public int buffer() {
     return 0;
@@ -69,7 +69,7 @@ public abstract class Player extends Observable {
 
   /**
    * Returns whether this player is pauseable
-   * @returns A boolean value specifiying whether the player is pauseable
+   * @return A boolean value specifiying whether the player is pauseable
    */
   public boolean pauseable() {
     return true;
@@ -77,7 +77,7 @@ public abstract class Player extends Observable {
 
   /**
    * Returns whether this player is seekable
-   * @returns A boolean value specifiying whether the player is seekable
+   * @return A boolean value specifiying whether the player is seekable
    */
   public boolean seekable() {
     return true;
@@ -85,7 +85,7 @@ public abstract class Player extends Observable {
 
   /**
    * Set the current playhead time of the player
-   * @param[time] int millis to set the playhead time to
+   * @param timeInMillis int millis to set the playhead time to
    */
   public void seekToTime(int timeInMillis) {
   }

@@ -66,6 +66,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     _actionAtEnd = OoyalaPlayerActionAtEnd.CONTINUE;
   }
 
+  /**
+   * Set the layout that the OoyalaPlayer should display to
+   * @param layout the OoyalaPlayerLayout to use
+   */
   public void setLayout(OoyalaPlayerLayout layout) {
     _layout = layout;
     if (_layout == null) {
@@ -77,13 +81,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_player != null) {
       _player.setParent(this);
     }
-    /**
-     *  NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of our customers
-     *  should actually call setLayout right after initializing the player so this is ok.
+    /*
+     * NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of our customers
+     * should actually call setLayout right after initializing the player so this is ok.
      */
     _analytics = new Analytics(_layout.getContext(), _playerAPIClient);
   }
 
+  /**
+   * Set the layout that the OoyalaPlayer should display to
+   * @param layout the OoyalaPlayerLayout to use
+   * @param useDefaultControls true if the default Android media controls should be used. false if no controls are needed.
+   */
   public void setLayout(OoyalaPlayerLayout layout, boolean useDefaultControls) {
     setLayout(layout);
     if (_layout != null && useDefaultControls) {
@@ -91,22 +100,39 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * Get the current OoyalaPlayerLayout
+   * @return the current OoyalaPlayerLayout
+   */
   public OoyalaPlayerLayout getLayout() {
     return _layout;
   }
 
   /**
-   * Reinitializes the player with a new embedCode.
-   * If embedCode is null, this method has no effect and just returns.
+   * Reinitializes the player with a new embed code.
+   * If embedCode is null, this method has no effect and just returns false.
    * @param embedCode
+   * @return true if the embed code was successfully set, false if not.
    */
   public boolean setEmbedCode(String embedCode) {
+    if (embedCode == null) {
+      return false;
+    }
     List<String> embeds = new ArrayList<String>();
     embeds.add(embedCode);
     return setEmbedCodes(embeds);
   }
 
+  /**
+   * Reinitializes the player with a new set of embed codes.
+   * If embedCodes is null, this method has no effect and just returns false.
+   * @param embedCodes
+   * @return true if the embed codes were successfully set, false if not.
+   */
   public boolean setEmbedCodes(List<String> embedCodes) {
+    if (embedCodes == null || embedCodes.isEmpty()) {
+      return false;
+    }
     try {
       ContentItem contentTree = _playerAPIClient.contentTree(embedCodes);
       return reinitialize(contentTree);
@@ -117,12 +143,27 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * Reinitializes the player with a new external ID.
+   * If externalId is null, this method has no effect and just returns false.
+   * @param externalId
+   * @return true if the external ID was successfully set, false if not.
+   */
   public boolean setExternalId(String externalId) {
+    if (externalId == null) {
+      return false;
+    }
     List<String> ids = new ArrayList<String>();
     ids.add(externalId);
     return setExternalIds(ids);
   }
 
+  /**
+   * Reinitializes the player with a new set of external IDs.
+   * If externalIds is null, this method has no effect and just returns false.
+   * @param externalIds
+   * @return true if the external IDs were successfully set, false if not.
+   */
   public boolean setExternalIds(List<String> externalIds) {
     try {
       ContentItem contentTree = _playerAPIClient.contentTreeByExternalIds(externalIds);
@@ -135,26 +176,19 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * Set the current video in a channel if the video is present. Returns true if accepted, false if not.
+   * Set the current video in a channel if the video is present.
    * @param embedCode
-   * @return accepted
+   * @return true if the change was successful, false if not
    */
   public boolean changeCurrentItem(String embedCode) {
     return changeCurrentVideo(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
   }
 
-  private boolean reinitialize(ContentItem tree) {
-    _rootItem = tree;
-    try {
-      _playerAPIClient.authorize(_rootItem);
-    } catch (OoyalaException e) {
-      Log.d(this.getClass().getName(), "Exception in reinitialize!", e);
-      this._error = e;
-      return false;
-    }
-    return changeCurrentVideo(_rootItem.firstVideo());
-  }
-
+  /**
+   * Set the current video in a channel if the video is present.
+   * @param video
+   * @return true if the change was successful, false if not
+   */
   public boolean changeCurrentVideo(Video video) {
     if (video == null) {
       cleanupPlayers();
@@ -193,6 +227,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
     return true;
+  }
+
+  private boolean reinitialize(ContentItem tree) {
+    _rootItem = tree;
+    try {
+      _playerAPIClient.authorize(_rootItem);
+    } catch (OoyalaException e) {
+      Log.d(this.getClass().getName(), "Exception in reinitialize!", e);
+      this._error = e;
+      return false;
+    }
+    return changeCurrentVideo(_rootItem.firstVideo());
   }
 
   private Player initializePlayer(Class<? extends Player> playerClass, Object param) {
@@ -308,7 +354,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Synonym for seek.
-   * @param time in milliseconds
+   * @param timeInMillis in milliseconds
    */
   public void setPlayheadTime(int timeInMillis) {
     seek(timeInMillis);
@@ -323,7 +369,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Move the playhead to a new location in seconds with millisecond accuracy
-   * @param time in milliseconds
+   * @param timeInMillis in milliseconds
    */
   public void seek(int timeInMillis) {
     if (currentPlayer().seekable()) {
@@ -395,8 +441,21 @@ public class OoyalaPlayer extends Observable implements Observer,
     return false;
   }
 
+  /**
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it is set.
+   */
   public static final int DO_PLAY = 0;
+  /**
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be paused after it is set.
+   */
   public static final int DO_PAUSE = 1;
+
+  /**
+   * Change the current video to the previous video in the Channel or ChannelSet. If there is no previous video,
+   * this will seek to the beginning of the video.
+   * @param what OoyalaPlayer.DO_PLAY or OoyalaPlayer.DO_PAUSE depending on what to do after the video is set.
+   * @return true if there was a previous video, false if not.
+   */
   public boolean previousVideo(int what) {
     if (_currentItem.previousVideo() != null) {
       changeCurrentVideo(_currentItem.previousVideo());
@@ -411,9 +470,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     return false;
   }
 
-  //This is required because android enjoys making things difficult. talk to jigish if you got issues.
-
+  /**
+   * Change the current video to the next video in the Channel or ChannelSet. If there is no next video,
+   * nothing will happen. Note that this will trigger a fetch of additional children if the Channel or ChannelSet
+   * is paginated. If so, it may take some time before the video is actually set.
+   * @param what OoyalaPlayer.DO_PLAY or OoyalaPlayer.DO_PAUSE depending on what to do after the video is set.
+   * @return true if there was a next video, false if not.
+   */
   public boolean nextVideo(int what) {
+    //This is required because android enjoys making things difficult. talk to jigish if you got issues.
     if (_currentItem.nextVideo() != null) {
       _fetchMoreChildrenHandler.sendEmptyMessage(what);
       return true;
@@ -544,10 +609,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     Log.d(this.getClass().getName(), "TEST - Notificationn END: "+arg1.toString()+" "+_state);
   }
 
+  /**
+   * Get what the player will do at the end of playback.
+   * @return the OoyalaPlayer.OoyalaPlayerActionAtEnd to use
+   */
   public OoyalaPlayerActionAtEnd getActionAtEnd() {
     return _actionAtEnd;
   }
 
+  /**
+   * Set what the player should do at the end of playback.
+   * @param actionAtEnd
+   */
   public void setActionAtEnd(OoyalaPlayerActionAtEnd actionAtEnd) {
     this._actionAtEnd = actionAtEnd;
   }

@@ -15,23 +15,19 @@ public class Analytics {
 
   private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onload=\"reporter = new Ooyala.Reporter(\'_PCODE_\');\"></body></html>";
 
-  /** @internal
+  /**
    * Initialize an Analytics using the specified api
-   * @param[in] context the context the initialize the internal WebView with
-   * @param[in] api the API to initialize this Analytics with
-   * @returns the initialized Analytics
+   * @param context the context the initialize the internal WebView with
+   * @param api the API to initialize this Analytics with
    */
   public Analytics(Context context, PlayerAPIClient api) {
     this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST).replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
   }
 
-  /** @internal
-   * Initialize an Analytics using the specified api and HTML
-   * @note [jigish]: this is here purely to be able to test this class
-   * @param[in] context the context the initialize the internal WebView with
-   * @param[in] theAPI the API to initialize this Analytics with
-   * @param[in] embedHTML the HTML to use when initializing this Analytics
-   * @returns the initialized Analytics
+  /**
+   * Initialize an Analytics using the specified api and HTML (used for testing only)
+   * @param context the context the initialize the internal WebView with
+   * @param embedHTML the HTML to use when initializing this Analytics
    */
   public Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
@@ -58,8 +54,8 @@ public class Analytics {
 
   /**
    * Report a new video being initialized with the given embed code and duration
-   * @param[in] embedCode the embed code of the new video
-   * @param[in] duration the duration (in seconds) of the new video
+   * @param embedCode the embed code of the new video
+   * @param duration the duration (in seconds) of the new video
    */
   public void initializeVideo(String embedCode, double duration) {
     if (_failed) { return; }
@@ -99,7 +95,7 @@ public class Analytics {
 
   /**
    * Report a playhead update to the specified time
-   * @param[in] time the new playhead time (in seconds)
+   * @param time the new playhead time (in seconds)
    */
   public void reportPlayheadUpdate(double time) {
     if (_failed) { return; }
