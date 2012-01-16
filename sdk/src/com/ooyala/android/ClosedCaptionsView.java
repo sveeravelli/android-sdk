@@ -33,10 +33,14 @@ public class ClosedCaptionsView extends TextView {
 
 	public void setCaption(Caption caption) {
 		_caption = caption;
-		if (_caption != null)
+		if (_caption != null) {
+		  setBackgroundColor(Color.BLACK);
 			setText(caption.getText());
-		else
-			setText("");
+		}
+		else {
+		  setBackgroundColor(Color.TRANSPARENT);
+		  setText("");
+		}
 	}
 
 	public void initStyle() {
@@ -44,7 +48,7 @@ public class ClosedCaptionsView extends TextView {
 		setMaxLines(5);
 		setTextColor(Color.WHITE);
 		setTextSize(16);
-		setBackgroundColor(Color.BLACK);
+		setBackgroundColor(Color.TRANSPARENT);
 		setGravity(Gravity.CENTER);
 		setPadding(20, 0, 20, 20);
 	}
