@@ -60,6 +60,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private OoyalaPlayerLayout _layout = null;
   private ClosedCaptionsView _closedCaptionsView = null;
   private Analytics _analytics = null;
+  private String _language = Locale.getDefault().getLanguage();
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
@@ -568,10 +569,10 @@ public class OoyalaPlayer extends Observable implements Observer,
           this._lastPlayedTime = this._player.currentTime();
           playAdsBeforeTime(this._lastPlayedTime);
           //closed captions
-          if (_currentItem.hasClosedCaptions()) {
+          if (_language != null && _currentItem.hasClosedCaptions()) {
             double currT = ((double)currentPlayer().currentTime())/1000d;
             if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
-            	Caption caption = _currentItem.getClosedCaptions().getCaption(Locale.getDefault().getLanguage(), currT);
+            	Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
             	if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
             	  _closedCaptionsView.setCaption(caption);
             	} else {
@@ -638,6 +639,14 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void sendNotification(String obj) {
     setChanged();
     notifyObservers(obj);
+  }
+  
+  /**
+   * Set the displayed closed captions language
+   * @param language 2 letter country code of the language to display or nil to hide closed captions
+   */
+  public void setClosedCaptionsLanguage(String language) {
+    _language = language;
   }
 
   // The following methods are required for MediaPlayerControl
