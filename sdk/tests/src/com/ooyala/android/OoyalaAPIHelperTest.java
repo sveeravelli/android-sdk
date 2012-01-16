@@ -26,7 +26,7 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
     params.put("device", "android");
     params.put("domain", "www.ooyala.com");
     // TODO once we push SAS, go to player.ooyala.com
-    String json = apiHelper.jsonForSecureAPI("http://eng-dynamic-238.v101.mtv:4567", "/sas/player_api/authorization/embed_code/"+TestConstants.TEST_PCODE+"/"+TestConstants.TEST_VIDEO, params);
+    String json = apiHelper.jsonForSecureAPI("http://player.ooyala.com", "/sas/player_api/authorization/embed_code/"+TestConstants.TEST_PCODE+"/"+TestConstants.TEST_VIDEO, params);
     assertTrue(json.contains("\"authorized\":true"));
   }
 
@@ -35,7 +35,7 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
     params.put("device", "android");
     params.put("domain", "www.ooyala.com");
     // TODO once we push SAS, go to player.ooyala.com
-    JSONObject json = apiHelper.objectForSecureAPI("http://eng-dynamic-238.v101.mtv:4567", "/sas/player_api/authorization/embed_code/"+TestConstants.TEST_PCODE+"/"+TestConstants.TEST_VIDEO, params);
+    JSONObject json = apiHelper.objectForSecureAPI("http://player.ooyala.com", "/sas/player_api/authorization/embed_code/"+TestConstants.TEST_PCODE+"/"+TestConstants.TEST_VIDEO, params);
     assertFalse(json.isNull("authorization_data"));
     try {
       assertFalse(json.getJSONObject("authorization_data").isNull(TestConstants.TEST_VIDEO));

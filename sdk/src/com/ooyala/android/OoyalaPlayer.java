@@ -341,10 +341,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * Returns true if in fullscreen mode, false if not
+   * Returns true if in fullscreen mode, false if not.
+   * Fullscreen currently does not work due to limitations in Android.
    * @return fullscreen mode
    */
-  public boolean getFullscreen() {
+  public boolean isFullscreen() {
     return false;
   }
 
