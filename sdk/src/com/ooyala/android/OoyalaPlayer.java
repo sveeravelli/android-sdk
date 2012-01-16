@@ -22,7 +22,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static enum OoyalaPlayerActionAtEnd {
     CONTINUE,
     PAUSE,
-    STOP
+    STOP,
+    RESET
   };
 
   public static enum OoyalaPlayerState {
@@ -540,6 +541,11 @@ public class OoyalaPlayer extends Observable implements Observer,
                 case STOP:
                   cleanupPlayers();
                   setState(OoyalaPlayerState.COMPLETED);
+                  sendNotification(PLAY_COMPLETED_NOTIFICATION);
+                  break;
+                case RESET:
+                  seek(0);
+                  pause();
                   sendNotification(PLAY_COMPLETED_NOTIFICATION);
                   break;
               }
