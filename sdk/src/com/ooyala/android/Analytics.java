@@ -49,9 +49,8 @@ public class Analytics {
         }
       }
     });
-    String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-    _jsAnalytics.loadData(header+embedHTML, "text/html", "UTF-8");
-    reportPlayerLoad();
+    //give dummy url to allow for cookie setting
+    _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8", "");
   }
 
   /**
