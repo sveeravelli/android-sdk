@@ -13,7 +13,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.VASTAd;
 import com.ooyala.android.VASTAdSpot;
 import com.ooyala.android.VASTLinearAd;
-import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.VASTSequenceItem;
 
 public class VASTAdPlayer extends MoviePlayer {
@@ -60,7 +60,7 @@ public class VASTAdPlayer extends MoviePlayer {
   public void init(OoyalaPlayer parent, Object ad) {
     if (!(ad instanceof VASTAdSpot)) {
       this._error = "Invalid Ad";
-      this._state = OoyalaPlayerState.ERROR;
+      this._state = State.ERROR;
       return;
     }
     _ad = (VASTAdSpot)ad;
@@ -90,7 +90,7 @@ public class VASTAdPlayer extends MoviePlayer {
   @Override
   public void play() {
     if (_linearAdQueue.isEmpty()) {
-      setState(OoyalaPlayerState.COMPLETED);
+      setState(State.COMPLETED);
       return;
     }
     if (_player == null) { super.play(); return; } // while state is loading, player will be null, so just call super to queue
@@ -105,10 +105,10 @@ public class VASTAdPlayer extends MoviePlayer {
   @Override
   public void pause() {
     if (_linearAdQueue.isEmpty()) {
-      setState(OoyalaPlayerState.COMPLETED);
+      setState(State.COMPLETED);
       return;
     }
-    if (_state == OoyalaPlayerState.PLAYING) {
+    if (_state == State.PLAYING) {
       sendTrackingEvent(TrackingEvent.PAUSE);
     }
     super.pause();

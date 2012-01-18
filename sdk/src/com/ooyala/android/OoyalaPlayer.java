@@ -15,18 +15,18 @@ import com.ooyala.android.player.VASTAdPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.MediaController;
+import android.widget.MediaController.MediaPlayerControl;
 
 public class OoyalaPlayer extends Observable implements Observer,
-                                                        MediaController.MediaPlayerControl {
-  public static enum OoyalaPlayerActionAtEnd {
+                                                        MediaPlayerControl {
+  public static enum ActionAtEnd {
     CONTINUE,
     PAUSE,
     STOP,
     RESET
   };
 
-  public static enum OoyalaPlayerState {
+  public static enum State {
     INIT,
     LOADING,
     READY,
@@ -36,6 +36,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     SUSPENDED,
     ERROR
   };
+
+  /**
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it is set.
+   */
+  public static final int DO_PLAY = 0;
+  /**
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be paused after it is set.
+   */
+  public static final int DO_PAUSE = 1;
 
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
@@ -51,30 +60,36 @@ public class OoyalaPlayer extends Observable implements Observer,
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
   private OoyalaException _error = null;
-  private OoyalaPlayerActionAtEnd _actionAtEnd;
+  private ActionAtEnd _actionAtEnd;
   private Player _player = null;
   private Player _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
-  private OoyalaPlayerState _state = OoyalaPlayerState.INIT;
+  private State _state = State.INIT;
   private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
-  private OoyalaPlayerLayout _layout = null;
+  private LayoutController _layoutController = null;
   private ClosedCaptionsView _closedCaptionsView = null;
   private Analytics _analytics = null;
   private String _language = Locale.getDefault().getLanguage();
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
-    _actionAtEnd = OoyalaPlayerActionAtEnd.CONTINUE;
+    _actionAtEnd = ActionAtEnd.CONTINUE;
+  }
+
+  public OoyalaPlayer(LayoutController lc, String apiKey, String secret, String pcode, String domain) {
+    _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
+    _actionAtEnd = ActionAtEnd.CONTINUE;
+    setLayoutController(lc);
   }
 
   /**
-   * Set the layout that the OoyalaPlayer should display to
-   * @param layout the OoyalaPlayerLayout to use
+   * Set the layout controller from which the OoyalaPlayer should fetch the layout to display to.
+   * @param lc the LayoutController to use.
    */
-  public void setLayout(OoyalaPlayerLayout layout) {
-    _layout = layout;
-    if (_layout == null) {
+  public void setLayoutController(LayoutController lc) {
+    _layoutController = lc;
+    if (getLayout() == null) {
       return;
     }
     if (_adPlayer != null) {
@@ -87,19 +102,7 @@ public class OoyalaPlayer extends Observable implements Observer,
      * NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of our customers
      * should actually call setLayout right after initializing the player so this is ok.
      */
-    _analytics = new Analytics(_layout.getContext(), _playerAPIClient);
-  }
-
-  /**
-   * Set the layout that the OoyalaPlayer should display to
-   * @param layout the OoyalaPlayerLayout to use
-   * @param useDefaultControls true if the default Android media controls should be used. false if no controls are needed.
-   */
-  public void setLayout(OoyalaPlayerLayout layout, boolean useDefaultControls) {
-    setLayout(layout);
-    if (_layout != null && useDefaultControls) {
-      _layout.useDefaultControls(this);
-    }
+    _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
   }
 
   /**
@@ -107,7 +110,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the current OoyalaPlayerLayout
    */
   public OoyalaPlayerLayout getLayout() {
-    return _layout;
+    return _layoutController.getLayout();
   }
 
   /**
@@ -196,7 +199,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       cleanupPlayers();
       return false;
     }
-    setState(OoyalaPlayerState.LOADING);
+    setState(State.LOADING);
     cleanupPlayers();
     _playedAds.clear();
     _lastPlayedTime = 0;
@@ -219,7 +222,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (!_currentItem.fetchPlaybackInfo()) {
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
-      setState(OoyalaPlayerState.ERROR);
+      setState(State.ERROR);
       return false;
     }
 
@@ -228,8 +231,8 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     //closed captions
     if (_currentItem.hasClosedCaptions()) {
-      _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
-      _layout.addView(_closedCaptionsView);
+      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+      getLayout().addView(_closedCaptionsView);
     }
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
@@ -268,7 +271,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayer(_player);
     _player = null;
     if (_closedCaptionsView != null)
-      _layout.removeView(_closedCaptionsView);
+      getLayout().removeView(_closedCaptionsView);
     _closedCaptionsView = null;
   }
 
@@ -315,7 +318,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Get current player state. One of playing, paused, buffering, channel, or error
    * @return state
    */
-  public OoyalaPlayerState getState() {
+  public State getState() {
     return _state;
   }
 
@@ -342,12 +345,39 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
+   * Suspend the current video (can be resumed later by calling resume).
+   * This differs from pause in that it completely deconstructs the view so the layout can be changed.
+   */
+  public void suspend() {
+    currentPlayer().suspend();
+  }
+
+  /**
+   * Resume the current video from a suspended state
+   */
+  public void resume() {
+    currentPlayer().resume();
+  }
+
+  /**
    * Returns true if in fullscreen mode, false if not.
    * Fullscreen currently does not work due to limitations in Android.
    * @return fullscreen mode
    */
   public boolean isFullscreen() {
-    return false;
+    return _layoutController.isFullscreen();
+  }
+
+  /**
+   * Set fullscreen mode (will only work if fullscreenLayout is set)
+   * @param fullscreen true to switch to fullscreen, false to switch out of fullscreen
+   */
+  public void setFullscreen(boolean fullscreen) {
+    if (isFullscreen() == !fullscreen) { // this is so we don't suspend/resume if we are not actually changing state.
+      currentPlayer().suspend();
+      _layoutController.setFullscreen(fullscreen);
+      currentPlayer().resume();
+    }
   }
 
   /**
@@ -451,18 +481,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it is set.
-   */
-  public static final int DO_PLAY = 0;
-  /**
-   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be paused after it is set.
-   */
-  public static final int DO_PAUSE = 1;
-
-  /**
    * Change the current video to the previous video in the Channel or ChannelSet. If there is no previous video,
    * this will seek to the beginning of the video.
-   * @param what OoyalaPlayer.DO_PLAY or OoyalaPlayer.DO_PAUSE depending on what to do after the video is set.
+   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the video is set.
    * @return true if there was a previous video, false if not.
    */
   public boolean previousVideo(int what) {
@@ -483,7 +504,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Change the current video to the next video in the Channel or ChannelSet. If there is no next video,
    * nothing will happen. Note that this will trigger a fetch of additional children if the Channel or ChannelSet
    * is paginated. If so, it may take some time before the video is actually set.
-   * @param what OoyalaPlayer.DO_PLAY or OoyalaPlayer.DO_PAUSE depending on what to do after the video is set.
+   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the video is set.
    * @return true if there was a next video, false if not.
    */
   public boolean nextVideo(int what) {
@@ -540,7 +561,7 @@ public class OoyalaPlayer extends Observable implements Observer,
                   }
                 case STOP:
                   cleanupPlayers();
-                  setState(OoyalaPlayerState.COMPLETED);
+                  setState(State.COMPLETED);
                   sendNotification(PLAY_COMPLETED_NOTIFICATION);
                   break;
                 case RESET:
@@ -554,7 +575,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           case ERROR:
             cleanupPlayers();
             _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
-            setState(OoyalaPlayerState.ERROR);
+            setState(State.ERROR);
             sendNotification(ERROR_NOTIFICATION);
             break;
           case PLAYING:
@@ -562,7 +583,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               _analytics.reportPlayStarted();
               sendNotification(PLAY_STARTED_NOTIFICATION);
             }
-            setState(OoyalaPlayerState.PLAYING);
+            setState(State.PLAYING);
             break;
           case SUSPENDED: // suspended is an internal state. we don't want to pass it through
             break;
@@ -571,7 +592,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
-        if (this._player.getState() == OoyalaPlayerState.PLAYING) {
+        if (this._player.getState() == State.PLAYING) {
           sendNotification(TIME_CHANGED_NOTIFICATION);
           this._lastPlayedTime = this._player.currentTime();
           playAdsBeforeTime(this._lastPlayedTime);
@@ -607,13 +628,13 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
           break;
         case PLAYING:
-          if (_state != OoyalaPlayerState.PLAYING) {
-            setState(OoyalaPlayerState.PLAYING);
+          if (_state != State.PLAYING) {
+            setState(State.PLAYING);
           }
           break;
         case PAUSED:
-          if (_state != OoyalaPlayerState.PAUSED) {
-            setState(OoyalaPlayerState.PAUSED);
+          if (_state != State.PAUSED) {
+            setState(State.PAUSED);
           }
         default:
           break;
@@ -626,7 +647,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Get what the player will do at the end of playback.
    * @return the OoyalaPlayer.OoyalaPlayerActionAtEnd to use
    */
-  public OoyalaPlayerActionAtEnd getActionAtEnd() {
+  public ActionAtEnd getActionAtEnd() {
     return _actionAtEnd;
   }
 
@@ -634,11 +655,11 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Set what the player should do at the end of playback.
    * @param actionAtEnd
    */
-  public void setActionAtEnd(OoyalaPlayerActionAtEnd actionAtEnd) {
+  public void setActionAtEnd(ActionAtEnd actionAtEnd) {
     this._actionAtEnd = actionAtEnd;
   }
 
-  private void setState(OoyalaPlayerState state) {
+  private void setState(State state) {
     this._state = state;
     sendNotification(STATE_CHANGED_NOTIFICATION);
   }
@@ -647,7 +668,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     setChanged();
     notifyObservers(obj);
   }
-  
+
   /**
    * Set the displayed closed captions language
    * @param language 2 letter country code of the language to display or nil to hide closed captions
@@ -689,7 +710,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public boolean isPlaying() {
-    return _state == OoyalaPlayerState.PLAYING;
+    return _state == State.PLAYING;
   }
 
   @Override

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.OoyalaPlayerLayoutController;
 
 public class OoyalaAndroidTestAppActivity extends Activity
 {
@@ -26,9 +27,8 @@ public class OoyalaAndroidTestAppActivity extends Activity
       e.printStackTrace();
     }
 
-    OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.player);
-    createPlayer();
-    player.setLayout(layout, true);
+    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    player = layoutController.getPlayer();
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
     // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
@@ -44,14 +44,6 @@ public class OoyalaAndroidTestAppActivity extends Activity
       player.play();
     } else {
       Log.d(TAG, "TEST - lame :(");
-    }
-  }
-
-  private void createPlayer() {
-    Log.d(TAG, "TEST - createPlayer");
-    if (player == null) {
-      Log.d(TAG, "TEST - fetchOrCreatePlayer - null");
-      player = new OoyalaPlayer("l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     }
   }
 

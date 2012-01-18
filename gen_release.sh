@@ -1,3 +1,4 @@
+#!/bin/bash
 CURRDIR=`pwd`
 cd sdk
 ant release

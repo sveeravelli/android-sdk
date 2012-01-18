@@ -3,6 +3,7 @@ package com.ooyala.android.player;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -22,7 +23,7 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.MovieView;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.Stream;
 
 /**
@@ -78,15 +79,15 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     Log.d(this.getClass().getName(), "TEST - init");
     if (stream == null) {
       this._error = "Invalid Stream";
-      setState(OoyalaPlayerState.ERROR);
+      setState(State.ERROR);
       return;
     }
     if (parent == null) {
       this._error = "Invalid Parent";
-      setState(OoyalaPlayerState.ERROR);
+      setState(State.ERROR);
       return;
     }
-    setState(OoyalaPlayerState.LOADING);
+    setState(State.LOADING);
     _stream = (Stream)stream;
     setParent(parent);
   }
@@ -98,7 +99,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       case PLAYING:
         stopPlayheadTimer();
         _player.pause();
-        setState(OoyalaPlayerState.PAUSED);
+        setState(State.PAUSED);
       default:
         break;
     }
@@ -116,7 +117,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
       case READY:
       case COMPLETED:
         _player.start();
-        setState(OoyalaPlayerState.PLAYING);
+        setState(State.PLAYING);
         startPlayheadTimer();
       default:
         break;
@@ -213,14 +214,14 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   public boolean onError(MediaPlayer mp, int what, int extra) {
     Log.d(this.getClass().getName(), "TEST - onError: "+what+" "+extra);
     this._error = "MediaPlayer Error: "+what+" "+extra;
-    setState(OoyalaPlayerState.ERROR);
+    setState(State.ERROR);
     return false;
   }
 
   @Override
   public void onPrepared(MediaPlayer mp) {
     Log.d(this.getClass().getName(), "TEST - onPrepared");
-    setState(OoyalaPlayerState.READY);
+    setState(State.READY);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
@@ -259,7 +260,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     if (_width == 0 && _height == 0 && _stream.getHeight() > 0) {
       setVideoSize(_stream.getWidth(), _stream.getHeight());
     }
-    if (_state == OoyalaPlayerState.LOADING) {
+    if (_state == State.LOADING) {
       createMediaPlayer();
     }
   }
@@ -277,15 +278,21 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   private void setupView() {
-    _view = new MovieView(_parent.getLayout().getContext());
-    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+    Log.d(this.getClass().getName(), "TEST - setupView");
+    createView(_parent.getLayout().getContext());
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
+  private void createView(Context c) {
+    _view = new MovieView(c);
+    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+  }
+
   private void removeView() {
+    Log.d(this.getClass().getName(), "TEST - removeView");
     if (_parent != null) {
       _parent.getLayout().removeView(_view);
     }
@@ -310,6 +317,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void suspend() {
+    Log.d(this.getClass().getName(), "TEST - suspend");
+    if (_state == State.SUSPENDED) { return; }
     if (_player != null) {
       _timeBeforeSuspend = _player.getCurrentPosition();
       stop();
@@ -320,13 +329,14 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _height = 0;
     _buffer = 0;
     _playQueued = false;
-    _state = OoyalaPlayerState.SUSPENDED;
+    _state = State.SUSPENDED;
   }
 
   @Override
   public void resume() {
-    if (_state != OoyalaPlayerState.SUSPENDED) { return; }
-    _state = OoyalaPlayerState.LOADING;
+    Log.d(this.getClass().getName(), "TEST - resume");
+    if (_state != State.SUSPENDED) { return; }
+    _state = State.LOADING;
     setupView();
     queuePlay();
   }
@@ -344,7 +354,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
-    _state = OoyalaPlayerState.INIT;
+    _state = State.INIT;
   }
 
   private void setVideoSize(int width, int height) {
@@ -355,7 +365,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   protected void currentItemCompleted() {
     stopPlayheadTimer();
-    setState(OoyalaPlayerState.COMPLETED);
+    setState(State.COMPLETED);
   }
 
   // Must queue play and wait for ready
@@ -387,7 +397,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   @Override
-  protected void setState(OoyalaPlayerState state) {
+  protected void setState(State state) {
     super.setState(state);
     dequeuePlay();
   }

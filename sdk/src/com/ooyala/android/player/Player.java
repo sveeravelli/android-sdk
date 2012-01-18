@@ -6,15 +6,16 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.OoyalaPlayerState;
+import com.ooyala.android.OoyalaPlayer.State;
 
 public abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
-  protected OoyalaPlayerState _state = OoyalaPlayerState.INIT; /**< the current state of the player */
+  protected State _state = State.INIT; /**< the current state of the player */
   protected String _error = null; /**< The Player's current error if it exists */
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
+  protected boolean _fullscreen = false;
 
   /**
    * Init the player
@@ -90,11 +91,11 @@ public abstract class Player extends Observable {
   public void seekToTime(int timeInMillis) {
   }
 
-  public OoyalaPlayerState getState() {
+  public State getState() {
     return _state;
   }
 
-  protected void setState(OoyalaPlayerState state) {
+  protected void setState(State state) {
     this._state = state;
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
