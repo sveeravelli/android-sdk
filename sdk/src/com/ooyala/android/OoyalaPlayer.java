@@ -337,9 +337,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
     if (currentPlayer() != null) {
-      if(playAdsBeforeTime(_lastPlayedTime)) {
-        return;
-      }
       currentPlayer().play();
     }
   }
@@ -581,6 +578,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           case PLAYING:
             if (_lastPlayedTime == 0) {
               _analytics.reportPlayStarted();
+              playAdsBeforeTime(250);
               sendNotification(PLAY_STARTED_NOTIFICATION);
             }
             setState(State.PLAYING);
