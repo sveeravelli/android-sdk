@@ -659,6 +659,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     this._actionAtEnd = actionAtEnd;
   }
 
+  public OoyalaAPIClient getOoyalaAPIClient() {
+    return new OoyalaAPIClient(_playerAPIClient);
+  }
+
   private void setState(State state) {
     this._state = state;
     sendNotification(STATE_CHANGED_NOTIFICATION);

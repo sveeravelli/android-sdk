@@ -329,4 +329,12 @@ class PlayerAPIClient
   public String getPcode() {
     return _pcode;
   }
+
+  public String getDomain() {
+    return _domain;
+  }
+
+  public OoyalaAPIHelper getAPIHelper() {
+    return _apiHelper;
+  }
 }
