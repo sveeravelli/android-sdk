@@ -17,8 +17,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.MediaController.MediaPlayerControl;
 
-public class OoyalaPlayer extends Observable implements Observer,
-                                                        MediaPlayerControl {
+public class OoyalaPlayer extends Observable implements Observer {
   public static enum ActionAtEnd {
     CONTINUE,
     PAUSE,
@@ -679,49 +678,58 @@ public class OoyalaPlayer extends Observable implements Observer,
     _language = language;
   }
 
-  // The following methods are required for MediaPlayerControl
-  @Override
-  public boolean canPause() {
-    return currentPlayer() != null && currentPlayer().pauseable();
-  }
-
-  @Override
-  public boolean canSeekBackward() {
-    return currentPlayer() != null && currentPlayer().seekable();
-  }
-
-  @Override
-  public boolean canSeekForward() {
-    return currentPlayer() != null && currentPlayer().seekable();
-  }
-
-  @Override
-  public int getBufferPercentage() {
-    return currentPlayer() == null ? 0 : currentPlayer().getBufferPercentage();
-  }
-
-  @Override
-  public int getCurrentPosition() {
-    return currentPlayer() == null ? 0 : currentPlayer().currentTime();
-  }
-
-  @Override
-  public int getDuration() {
-    return currentPlayer() == null ? 0 : currentPlayer().duration();
-  }
-
-  @Override
+  /**
+   * @return true if the current state is State.Playing, false otherwise
+   */
   public boolean isPlaying() {
     return _state == State.PLAYING;
   }
 
-  @Override
-  public void seekTo(int arg0) {
-    seek(arg0);
+  /**
+   * Seek to the given percentage
+   * @param percent percent (between 0 and 100) to seek to
+   */
+  public void seekToPercent(int percent) {
+    if (percent < 0 || percent > 100) { return; }
+    if (seekable()) {
+      seek(percentToMillis(percent));
+    }
   }
 
-  @Override
-  public void start() {
-    play();
+  /**
+   * Get the current item's duration
+   * @return the duration in milliseconds
+   */
+  public int getDuration() {
+    if (currentPlayer() == null) { return 0; }
+    return currentPlayer().duration();
+  }
+
+  /**
+   * Get the current item's buffer percentage
+   * @return the buffer percentage (between 0 and 100 inclusive)
+   */
+  public int getBufferPercentage() {
+    if (currentPlayer() == null) { return 0; }
+    return currentPlayer().buffer();
+  }
+
+  /**
+   * Get the current item's playhead time as a percentage
+   * @return the playhead time percentage (between 0 and 100 inclusive)
+   */
+  public int getPlayheadPercentage() {
+    if (currentPlayer() == null) { return 0; }
+    return millisToPercent(currentPlayer().currentTime());
+  }
+
+  private int percentToMillis(int percent) {
+    float fMillis = (((float)percent)/(100f)) * ((float)getDuration());
+    return (int)fMillis;
+  }
+
+  private int millisToPercent(int millis) {
+    float fPercent = (((float)millis)/((float)getDuration()))*(100f);
+    return (int)fPercent;
   }
 }

@@ -23,4 +23,9 @@ public interface OoyalaPlayerControls {
    * Hide these controls (make all controls invisible/transparent)
    */
   public void hide();
+
+  /**
+   * @return true if the controls are currently showing, false otherwise
+   */
+  public boolean isShowing();
 }

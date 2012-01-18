@@ -2,14 +2,11 @@ package com.ooyala.android;
 
 import android.R;
 import android.app.Dialog;
-import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.MediaController;
 
 public class OoyalaPlayerLayoutController implements LayoutController {
   public static enum DefaultControlStyle {
@@ -25,23 +22,6 @@ public class OoyalaPlayerLayoutController implements LayoutController {
   private OoyalaPlayerControls _inlineOverlay = null;
   private OoyalaPlayerControls _fullscreenOverlay = null;
   private OoyalaPlayer _player = null;
-  private int _touchCount = 0;
-
-  private class DefaultOoyalaPlayerControls extends MediaController implements OoyalaPlayerControls {
-    public DefaultOoyalaPlayerControls(Context c, boolean showFFandRW) {
-      super(c, showFFandRW);
-    }
-
-    @Override
-    public void setOoyalaPlayer(OoyalaPlayer player) {
-      super.setMediaPlayer(player);
-    }
-
-    @Override
-    public void setParentLayout(OoyalaPlayerLayout layout) {
-      super.setAnchorView(layout);
-    }
-  }
 
   /**
    * Instantiate an OoyalaPlayerLayoutController
@@ -93,22 +73,8 @@ public class OoyalaPlayerLayoutController implements LayoutController {
     _layout.setLayoutController(this);
   }
 
-  private OoyalaPlayerControls createDefaultControls(View v) {
-    DefaultOoyalaPlayerControls controls = new DefaultOoyalaPlayerControls(v.getContext(), false);
-    controls.setOoyalaPlayer(_player);
-    controls.setAnchorView(v);
-    Log.d(this.getClass().getName(), "TEST - TOUCH CONTROLS PARENT: "+controls.getParent().getClass().getName());
-    controls.setPrevNextListeners(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) { // next
-        _player.nextVideo(OoyalaPlayer.DO_PLAY);
-      }
-    }, new View.OnClickListener() {
-      @Override
-      public void onClick(View v) { // previous
-        _player.previousVideo(OoyalaPlayer.DO_PLAY);
-      }
-    });
+  private OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout) {
+    DefaultOoyalaPlayerControls controls = new DefaultOoyalaPlayerControls(_player, layout);
     return controls;
   }
 
@@ -205,13 +171,23 @@ public class OoyalaPlayerLayoutController implements LayoutController {
         case ERROR:
           return false;
         default:
-          _touchCount++;
-          if (_touchCount % 2 == 0) {
-            _touchCount = 0;
-            setFullscreen(!isFullscreen());
-          } else {
-            if (getControls() != null) { Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING CONTROLS"); getControls().show(); }
-            if (getOverlay() != null) { Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING OVERLAY"); getOverlay().show(); }
+          if (getControls() != null) {
+            if (getControls().isShowing()) {
+              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - HIDING CONTROLS");
+              getControls().hide();
+            } else {
+              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING CONTROLS");
+              getControls().show();
+            }
+          }
+          if (getOverlay() != null) {
+            if (getOverlay().isShowing()) {
+              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - HIDING OVERLAY");
+              getOverlay().hide();
+            } else {
+              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING OVERLAY");
+              getOverlay().show();
+            }
           }
           return false;
       }

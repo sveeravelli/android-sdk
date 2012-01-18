@@ -2,7 +2,9 @@ package com.ooyala.android;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -132,6 +134,13 @@ public class Utils
       multiplier *= 60.0;
     }
     return milliseconds;
+  }
+
+  public static String timeStringFromMillis(int millis) {
+    Calendar c = Calendar.getInstance();
+    c.setTimeInMillis(millis+(8*60*60*1000));
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    return sdf.format(c.getTime());
   }
 }
 
