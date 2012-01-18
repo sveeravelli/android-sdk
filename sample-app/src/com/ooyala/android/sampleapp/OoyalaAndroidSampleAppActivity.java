@@ -3,6 +3,7 @@ package com.ooyala.android.sampleapp;
 import com.ooyala.android.Channel;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.Video;
 
 import android.app.Activity;
@@ -63,12 +64,8 @@ public class OoyalaAndroidSampleAppActivity extends Activity implements OnClickL
     LinearLayout channelBrowser = (LinearLayout)findViewById(R.id.channelBrowser);
     OoyalaPlayerLayout layout = (OoyalaPlayerLayout)findViewById(R.id.ooyalaPlayer);
     // Initializer Params: (api key, secret, pcode, domain)
-    player = new OoyalaPlayer("l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
-    // Must setLayout before doing anything else so the player has a surface to draw on
-    // Params:
-    //   First:  the OoyalaPlayerLayout
-    //   Second: true if the OoyalaPlayer should use the default android media player controls. false if no controls should be shown.
-    player.setLayout(layout, true);
+    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController(layout, "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    player = layoutController.getPlayer();
     if (player.setEmbedCode("NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) { // this is a channel's embed code
       // The embed code was set properly, we can play the video and/or access the rootItem now.
       if (player.getRootItem() instanceof Channel) {
