@@ -21,7 +21,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected String _title = null;
   protected String _description = null;
   protected PlayerAPIClient _api;
-  protected static Map<String,String> _promoImageURLCache = new HashMap<String,String>();
+  protected String _promoImageURL = null;
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
 
@@ -139,6 +139,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
       if (!myData.isNull(Constants.KEY_CONTENT_TOKEN)) { _contentToken = myData.getString(Constants.KEY_CONTENT_TOKEN); }
       if (!myData.isNull(Constants.KEY_TITLE)) { _title = myData.getString(Constants.KEY_TITLE); }
       if (!myData.isNull(Constants.KEY_DESCRIPTION)) { _description = myData.getString(Constants.KEY_DESCRIPTION); }
+      if (!myData.isNull(Constants.KEY_PROMO_IMAGE)) { _promoImageURL = myData.getString(Constants.KEY_PROMO_IMAGE); }
     }
     catch (JSONException exception)
     {
@@ -214,27 +215,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    */
   public String getPromoImageURL(int width, int height)
   {
-    return _embedCode == null? null : getPromoImageURL(_embedCode, width, height);
-  }
-
-  /**
-   * Returns a promo image URL for the given embed code in a channel that will be at least the specified dimensions,
-   * or null for an embed code not present in the channel.
-   * @param width
-   * @param height
-   * @return the image url
-   */
-  public static String getPromoImageURL(String embedCode, int width, int height)
-  {
-    String key = embedCode + "|" + width + "x" + height;
-    String url = _promoImageURLCache.get(key);
-    if (url == null)
-    {
-      // TODO: Look up URL
-      url = "figurethisout";
-      _promoImageURLCache.put(key, url);
-    }
-    return url;
+    return _promoImageURL;
   }
 
   public static List<String> getEmbedCodes(List<? extends ContentItem> items)

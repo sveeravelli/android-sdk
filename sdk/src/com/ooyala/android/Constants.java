@@ -43,6 +43,8 @@ class Constants
   public static final String KEY_CONTENT_TOKEN        = "content_token";
   public static final String KEY_TITLE                = "title";
   public static final String KEY_DESCRIPTION          = "description";
+  public static final String KEY_PROMO_IMAGE          = "promo_image";
+  public static final String KEY_THUMBNAIL_IMAGE      = "thumbnail_image";
   public static final String KEY_CONTENT_TYPE         = "content_type";
   public static final String KEY_CHILDREN             = "children";
   public static final String KEY_VIDEO_BITRATE        = "video_bitrate";

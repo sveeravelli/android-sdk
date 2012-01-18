@@ -40,6 +40,7 @@ public class ContentItemTest extends AndroidTestCase
     assertEquals("Bhangra Empire - Boston Bhangra 2011 [Top View]", video.getTitle());
     assertEquals(TestConstants.TEST_CONTENT_ID, video.getContentToken());
     assertEquals("dancing", video.getDescription());
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/64AGzoRZwH8F99WH5hMDoxOmFkO7UOTK", video.getPromoImageURL(100, 100));
     assertEquals(Video.class, video.getClass());
   }
 
