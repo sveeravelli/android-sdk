@@ -23,16 +23,18 @@ class EmbeddedSecureURLGenerator implements SecureURLGenerator {
       long secondsSince1970 = (new Date()).getTime() / 1000;
       allParams.put(Constants.KEY_EXPIRES, Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
       allParams.put(Constants.KEY_SIGNATURE, _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
-    } else if (!params.containsKey(Constants.KEY_SIGNATURE)) {
+    } else {
       allParams = new HashMap<String,String>(params);
-      if (!params.containsKey(Constants.KEY_API_KEY)) {
-        allParams.put(Constants.KEY_API_KEY, _apiKey);
+      if (!params.containsKey(Constants.KEY_SIGNATURE)) {
+        if (!params.containsKey(Constants.KEY_API_KEY)) {
+          allParams.put(Constants.KEY_API_KEY, _apiKey);
+        }
+        if (!params.containsKey(Constants.KEY_EXPIRES)) {
+          long secondsSince1970 = (new Date()).getTime() / 1000;
+          allParams.put(Constants.KEY_EXPIRES, Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
+        }
+        allParams.put(Constants.KEY_SIGNATURE, _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
       }
-      if (!params.containsKey(Constants.KEY_EXPIRES)) {
-        long secondsSince1970 = (new Date()).getTime() / 1000;
-        allParams.put(Constants.KEY_EXPIRES, Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
-      }
-      allParams.put(Constants.KEY_SIGNATURE, _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
     }
     return Utils.makeURL(host, uri, allParams);
   }
