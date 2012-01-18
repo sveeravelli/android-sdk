@@ -15,7 +15,6 @@ import com.ooyala.android.player.VASTAdPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.MediaController.MediaPlayerControl;
 
 public class OoyalaPlayer extends Observable implements Observer {
   public static enum ActionAtEnd {

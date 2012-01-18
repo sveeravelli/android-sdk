@@ -66,7 +66,7 @@ public class OoyalaAndroidSampleAppActivity extends Activity implements OnClickL
     // Initializer Params: (api key, secret, pcode, domain)
     OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController(layout, "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     player = layoutController.getPlayer();
-    if (player.setEmbedCode("NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) { // this is a channel's embed code
+    if (player.setEmbedCode("B0eHAxMzqsbVRm0ZJROXw1Yaj73roQu6")){//"NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt")) { // this is a channel's embed code
       // The embed code was set properly, we can play the video and/or access the rootItem now.
       if (player.getRootItem() instanceof Channel) {
         // Here we set up a list of the embed codes in the channel, then set up an OnClickListener to change
