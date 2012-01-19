@@ -15,7 +15,7 @@ public class PlayerDetailActivity extends Activity
 {
   private static final String TAG = "PlayerDetailActivity";
   
-  private OoyalaPlayer player;
+  private OoyalaPlayer player = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -30,14 +30,18 @@ public class PlayerDetailActivity extends Activity
     } catch (Exception e) {
       e.printStackTrace();
     }
-    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController(
+    		(OoyalaPlayerLayout)findViewById(R.id.player), 
+    		OoyalaAndroidSampleAppActivity.APIKEY, OoyalaAndroidSampleAppActivity.SECRETKEY, 
+    		OoyalaAndroidSampleAppActivity.PCODE, OoyalaAndroidSampleAppActivity.PLAYERDOMAIN);
     player = layoutController.getPlayer();
     if (player.setEmbedCode(embedCode)) {
         Log.d(TAG, "TEST - yay!");
         player.play();
       } else {
         Log.d(TAG, "TEST - lame :(" + embedCode);
-      }    
+    }    
+
   }
 
   @Override

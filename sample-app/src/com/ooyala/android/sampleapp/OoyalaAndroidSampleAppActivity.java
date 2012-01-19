@@ -24,10 +24,17 @@ import android.widget.SimpleAdapter;
 
 public class OoyalaAndroidSampleAppActivity extends ListActivity {
   private static final String TAG = "OoyalaAndroidSampleAppActivity";
-  
-  public static OoyalaAPIClient api = new OoyalaAPIClient( "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
 
-  private String[]embedCodes = { "B0eHAxMzqsbVRm0ZJROXw1Yaj73roQu6" };
+  public static final String PCODE = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
+  public static final String APIKEY = "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd";
+  public static final String SECRETKEY = "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN";
+  public static final String PLAYERDOMAIN = "www.ooyala.com";
+  
+  public static final String CHANNEL_CODE = "txaGRiMzqQZSmFpMML92QczdIYUrcYVe";
+  
+  public static OoyalaAPIClient api = new OoyalaAPIClient(APIKEY, SECRETKEY, PCODE, PLAYERDOMAIN);
+
+  private String[]embedCodes = { CHANNEL_CODE };
   private Channel rootItem = null;
 
   /** Called when the activity is first created. */
