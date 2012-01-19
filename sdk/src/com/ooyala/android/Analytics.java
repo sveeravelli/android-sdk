@@ -32,6 +32,7 @@ public class Analytics {
    */
   public Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
+    _jsAnalytics.getSettings().setUserAgentString("Ooyala Android SDK");
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     _jsAnalytics.setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
