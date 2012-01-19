@@ -20,7 +20,7 @@ public class OoyalaAPIClientTest extends AndroidTestCase {
   }
 
   public void testObjectFromBacklotAPI() throws JSONException {
-    JSONObject o = api.objectFromBacklotAPI("/assets/Y3bDg0MzoD70RBbsIbOu6TP_awu9g8Cu");
+    JSONObject o = api.objectFromBacklotAPI("/assets/Y3bDg0MzoD70RBbsIbOu6TP_awu9g8Cu", null);
     assertTrue(o != null);
     assertTrue(!o.isNull("name"));
     assertTrue(o.getString("name").equals("E*Trade Dancing Monkey"));
