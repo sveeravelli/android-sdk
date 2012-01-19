@@ -1,6 +1,7 @@
 package com.ooyala.android;
 
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -54,10 +55,11 @@ public class OoyalaAPIClient {
   /**
    * Fetch a raw JSONObject from any backlot API (GET requests only)
    * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request https://api.ooyala.com/v2/assets, uri should be "/assets"
+   * @param params Optional parameters to pass to the API
    * @return the raw JSONObject representing the response
    */
-  public JSONObject objectFromBacklotAPI(String uri) {
-    return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX+uri, null);
+  public JSONObject objectFromBacklotAPI(String uri, Map<String,String> params) {
+    return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX+uri, params);
   }
 
   public String getAPIKey() {
