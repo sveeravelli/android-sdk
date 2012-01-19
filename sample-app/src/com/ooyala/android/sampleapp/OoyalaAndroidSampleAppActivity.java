@@ -10,6 +10,7 @@ import com.ooyala.android.Channel;
 import com.ooyala.android.ContentItem;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaException;
+import com.ooyala.android.Utils;
 
 import com.ooyala.android.Video;
 
@@ -41,9 +42,9 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
     }
     if (item != null && item instanceof Channel) {
     	rootItem = (Channel)item;
-        setListAdapter(new SimpleAdapter(this, getData(),
-                R.layout.embed_list_item, new String[] { "title" },
-                new int[] { R.id.asset_title }));
+        setListAdapter(new OoyalaVideoListAdapter(this, getData(),
+                R.layout.embed_list_item, new String[] { "title", "thumbnail", "duration" },
+                new int[] { R.id.asset_title, R.id.asset_thumbnail, R.id.asset_duration }));
         getListView().setTextFilterEnabled(false);
 
     } else {
@@ -57,7 +58,7 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
       List<Map<String, Object>> myData = new ArrayList<Map<String, Object>>();
 
   	  for(Video v : rootItem.getVideos()) {
-  		addItem(myData, v.getTitle(), browseIntent(v.getEmbedCode()));
+  		addItem(myData, v.getTitle(), v.getDuration(), v.getPromoImageURL(50, 50), browseIntent(v.getEmbedCode()));
 	  }
       return myData;
   }  
@@ -69,9 +70,11 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
       return result;
   }
 
-  protected void addItem(List<Map<String, Object>> data, String name, Intent intent) {
+  protected void addItem(List<Map<String, Object>> data, String name, int duration, String thumbnail, Intent intent) {
       Map<String, Object> temp = new HashMap<String, Object>();
       temp.put("title", name);
+      temp.put("duration", Utils.timeStringFromMillis(duration));
+      temp.put("thumbnail", thumbnail);
       temp.put("intent", intent);
       data.add(temp);
   }
