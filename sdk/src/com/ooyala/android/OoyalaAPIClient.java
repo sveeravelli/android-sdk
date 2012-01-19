@@ -5,8 +5,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 public class OoyalaAPIClient {
-  private PlayerAPIClient _playerAPI;
-  private OoyalaAPIHelper _apiHelper;
+  private PlayerAPIClient _playerAPI = null;
+  private OoyalaAPIHelper _apiHelper = null;
+  private String _apiKey = null;
+  private String _secret = null;
 
   /**
    * Instantiate an OoyalaAPIClient
@@ -18,6 +20,8 @@ public class OoyalaAPIClient {
   public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(apiKey, secret);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
+    _apiKey = apiKey;
+    _secret = secret;
   }
 
   public OoyalaAPIClient(PlayerAPIClient apiClient) {
@@ -54,5 +58,21 @@ public class OoyalaAPIClient {
    */
   public JSONObject objectFromBacklotAPI(String uri) {
     return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX+uri, null);
+  }
+
+  public String getAPIKey() {
+    return _apiKey;
+  }
+
+  public String getSecret() {
+    return _secret;
+  }
+
+  public String getPcode() {
+    return _playerAPI.getPcode();
+  }
+
+  public String getDomain() {
+    return _playerAPI.getDomain();
   }
 }

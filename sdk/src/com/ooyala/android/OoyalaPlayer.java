@@ -76,9 +76,16 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   public OoyalaPlayer(LayoutController lc, String apiKey, String secret, String pcode, String domain) {
-    _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
-    _actionAtEnd = ActionAtEnd.CONTINUE;
+    this(apiKey, secret, pcode, domain);
     setLayoutController(lc);
+  }
+
+  public OoyalaPlayer(OoyalaAPIClient apiClient) {
+    this(apiClient.getAPIKey(), apiClient.getSecret(), apiClient.getPcode(), apiClient.getDomain());
+  }
+
+  public OoyalaPlayer(LayoutController lc, OoyalaAPIClient apiClient) {
+    this(lc, apiClient.getAPIKey(), apiClient.getSecret(), apiClient.getPcode(), apiClient.getDomain());
   }
 
   /**
