@@ -351,14 +351,18 @@ public class OoyalaPlayer extends Observable implements Observer {
    * This differs from pause in that it completely deconstructs the view so the layout can be changed.
    */
   public void suspend() {
-    currentPlayer().suspend();
+    if (currentPlayer() != null) {
+      currentPlayer().suspend();
+    }
   }
 
   /**
    * Resume the current video from a suspended state
    */
   public void resume() {
-    currentPlayer().resume();
+    if (currentPlayer() != null) {
+      currentPlayer().resume();
+    }
   }
 
   /**
@@ -367,7 +371,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return fullscreen mode
    */
   public boolean isFullscreen() {
-    return _layoutController.isFullscreen();
+    return _layoutController != null && _layoutController.isFullscreen();
   }
 
   /**
