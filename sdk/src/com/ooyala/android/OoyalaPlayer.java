@@ -12,6 +12,7 @@ import com.ooyala.android.player.OoyalaAdPlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.VASTAdPlayer;
 
+import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -686,6 +687,17 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setClosedCaptionsLanguage(String language) {
     _language = language;
+  }
+
+  public double getBitrate() {
+    if (android.os.Build.VERSION.SDK_INT >= 10) {
+      //Query for bitrate
+      MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
+      metadataRetreiver.setDataSource(getCurrentItem().getStream().getUrl());
+      return Double.parseDouble(metadataRetreiver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+    } else {
+      return (double)(getCurrentItem().getStream().getVideoBitrate() * 1000);
+    }
   }
 
   /**
