@@ -67,15 +67,18 @@ public class OoyalaPlayerLayoutController implements LayoutController {
     _player = p;
     _layout = l;
     if (dcs == DefaultControlStyle.AUTO) {
-      setInlineControls(createDefaultControls(_layout));
+      setInlineControls(createDefaultControls(_layout, false));
     }
     _player.setLayoutController(this);
     _layout.setLayoutController(this);
   }
 
-  private OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout) {
-    DefaultOoyalaPlayerControls controls = new DefaultOoyalaPlayerControls(_player, layout);
-    return controls;
+  private OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout, boolean fullscreen) {
+    if (fullscreen) {
+      return new DefaultOoyalaPlayerFullscreenControls(_player, layout);
+    } else {
+      return new DefaultOoyalaPlayerInlineControls(_player, layout);
+    }
   }
 
   public void setInlineOverlay(OoyalaPlayerControls controlsOverlay) {
@@ -121,11 +124,18 @@ public class OoyalaPlayerLayoutController implements LayoutController {
    */
   public void setFullscreen(boolean fullscreen) {
     _player.suspend();
+    OoyalaPlayerControls controlsToShow = null;
+    OoyalaPlayerControls overlayToShow = null;
     if (isFullscreen() && !fullscreen) { // Fullscreen -> Not Fullscreen
       _fullscreenDialog.dismiss();
       _fullscreenDialog = null;
       _fullscreenControls = null;
       _fullscreenLayout = null;
+      controlsToShow = _inlineControls;
+      if (_inlineOverlay != null) {
+        _inlineOverlay.setParentLayout(_layout);
+        overlayToShow = _inlineOverlay;
+      }
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
       _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen);
       _fullscreenLayout = new OoyalaPlayerLayout(_fullscreenDialog.getContext());
@@ -133,15 +143,16 @@ public class OoyalaPlayerLayoutController implements LayoutController {
       _fullscreenLayout.setLayoutController(this);
       _fullscreenDialog.setContentView(_fullscreenLayout);
       _fullscreenDialog.show();
-      setFullscreenControls(createDefaultControls(_fullscreenLayout));
-    }
-    if (_inlineOverlay != null && _layout != null) {
-      _inlineOverlay.setParentLayout(_layout);
-    }
-    if (_fullscreenOverlay != null && _fullscreenLayout != null) {
-      _fullscreenOverlay.setParentLayout(_fullscreenLayout);
+      setFullscreenControls(createDefaultControls(_fullscreenLayout, true));
+      controlsToShow = _fullscreenControls;
+      if (_fullscreenOverlay != null) {
+        _fullscreenOverlay.setParentLayout(_fullscreenLayout);
+        overlayToShow = _fullscreenOverlay;
+      }
     }
     _player.resume();
+    if (controlsToShow != null) { controlsToShow.show(); }
+    if (overlayToShow != null) { overlayToShow.show(); }
   }
 
   public void setInlineControls(OoyalaPlayerControls controls) {

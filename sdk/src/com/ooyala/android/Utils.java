@@ -136,10 +136,10 @@ public class Utils
     return milliseconds;
   }
 
-  public static String timeStringFromMillis(int millis) {
+  public static String timeStringFromMillis(int millis, boolean includeHours) {
     Calendar c = Calendar.getInstance();
     c.setTimeInMillis(millis+(8*60*60*1000));
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
     return sdf.format(c.getTime());
   }
 }

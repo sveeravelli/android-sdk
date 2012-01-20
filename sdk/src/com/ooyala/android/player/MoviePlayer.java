@@ -49,6 +49,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   protected int _height = 0;
   private boolean _playQueued = false;
   private int _timeBeforeSuspend = -1;
+  private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
 
   protected static final long TIMER_DELAY  = 0;
@@ -108,6 +109,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
+    _playQueued = false;
     switch (_state) {
       case INIT:
       case LOADING:
@@ -221,12 +223,16 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public void onPrepared(MediaPlayer mp) {
     Log.d(this.getClass().getName(), "TEST - onPrepared");
-    setState(State.READY);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
       }
     }
+    if (_timeBeforeSuspend > 0) {
+      _player.seekTo(_timeBeforeSuspend);
+      _timeBeforeSuspend = -1;
+    }
+    setState(State.READY);
   }
 
   @Override
@@ -321,6 +327,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     if (_state == State.SUSPENDED) { return; }
     if (_player != null) {
       _timeBeforeSuspend = _player.getCurrentPosition();
+      _stateBeforeSuspend = _state;
       stop();
       _player = null;
     }
@@ -338,7 +345,9 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     if (_state != State.SUSPENDED) { return; }
     _state = State.LOADING;
     setupView();
-    queuePlay();
+    if (_stateBeforeSuspend == State.PLAYING) {
+      queuePlay();
+    }
   }
 
   @Override
@@ -382,14 +391,9 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
         case PAUSED:
         case READY:
         case COMPLETED:
-          if (_timeBeforeSuspend > 0) {
-            _player.seekTo(_timeBeforeSuspend);
-            _timeBeforeSuspend = -1;
-          } else {
-            Log.d(this.getClass().getName(), "TEST - should play");
-            _playQueued = false;
-            play();
-          }
+          Log.d(this.getClass().getName(), "TEST - should play");
+          _playQueued = false;
+          play();
         default:
           break;
       }
