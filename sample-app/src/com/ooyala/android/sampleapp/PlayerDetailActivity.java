@@ -66,6 +66,7 @@ public class PlayerDetailActivity extends Activity
   @Override
   protected void onDestroy() {
       super.onDestroy();
+      player = null;
   }  
   
   @Override
