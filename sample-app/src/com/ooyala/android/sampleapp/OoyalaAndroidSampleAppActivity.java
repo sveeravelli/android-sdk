@@ -29,9 +29,9 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
   public static final String APIKEY = "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd";
   public static final String SECRETKEY = "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN";
   public static final String PLAYERDOMAIN = "www.ooyala.com";
-  
+
   public static final String CHANNEL_CODE = "txaGRiMzqQZSmFpMML92QczdIYUrcYVe";
-  
+
   public static OoyalaAPIClient api = new OoyalaAPIClient(APIKEY, SECRETKEY, PCODE, PLAYERDOMAIN);
 
   private String[]embedCodes = { CHANNEL_CODE };
@@ -57,7 +57,7 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
     } else {
     	Log.e(TAG, "Should not be here!");
     }
-    
+
   }
 
   protected List<Map<String, Object>> getData() {
@@ -68,8 +68,8 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
   		addItem(myData, v.getTitle(), v.getDuration(), v.getPromoImageURL(50, 50), browseIntent(v.getEmbedCode()));
 	  }
       return myData;
-  }  
- 
+  }
+
   protected Intent browseIntent(String embedCode) {
       Intent result = new Intent();
       result.setClass(this, PlayerDetailActivity.class);
@@ -80,7 +80,7 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
   protected void addItem(List<Map<String, Object>> data, String name, int duration, String thumbnail, Intent intent) {
       Map<String, Object> temp = new HashMap<String, Object>();
       temp.put("title", name);
-      temp.put("duration", Utils.timeStringFromMillis(duration));
+      temp.put("duration", Utils.timeStringFromMillis(duration, true));
       temp.put("thumbnail", thumbnail);
       temp.put("intent", intent);
       data.add(temp);
@@ -92,6 +92,6 @@ public class OoyalaAndroidSampleAppActivity extends ListActivity {
       Map<String, Object> map = (Map<String, Object>)l.getItemAtPosition(position);
       Intent intent = (Intent) map.get("intent");
       startActivity(intent);
-  }  
+  }
 
 }
