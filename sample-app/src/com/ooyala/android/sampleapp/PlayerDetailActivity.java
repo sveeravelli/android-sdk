@@ -44,10 +44,28 @@ public class PlayerDetailActivity extends Activity
 
   }
 
+
+  @Override
+  protected void onStop() {
+      super.onStop();
+      Log.d(TAG, "---------------- Stop -----------");
+      if (player != null) {
+    	  player.suspend();
+      }
+  }    
+
+  @Override
+  protected void onRestart() {
+      super.onRestart();
+      Log.d(TAG, "---------------- Restart -----------");
+      if (player != null) {
+    	  player.resume();
+      }
+  }     
+  
   @Override
   protected void onDestroy() {
       super.onDestroy();
-      player.pause();
   }  
   
   @Override
