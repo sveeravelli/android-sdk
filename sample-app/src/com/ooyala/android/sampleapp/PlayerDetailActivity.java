@@ -16,6 +16,7 @@ public class PlayerDetailActivity extends Activity
   private static final String TAG = "PlayerDetailActivity";
   
   private OoyalaPlayer player = null;
+  private Boolean isSuspended = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -49,8 +50,9 @@ public class PlayerDetailActivity extends Activity
   protected void onStop() {
       super.onStop();
       Log.d(TAG, "---------------- Stop -----------");
-      if (player != null) {
+      if (player != null && !isSuspended) {
     	  player.suspend();
+    	  isSuspended = true;
       }
   }    
 
@@ -60,6 +62,7 @@ public class PlayerDetailActivity extends Activity
       Log.d(TAG, "---------------- Restart -----------");
       if (player != null) {
     	  player.resume();
+    	  isSuspended = false;
       }
   }     
   
