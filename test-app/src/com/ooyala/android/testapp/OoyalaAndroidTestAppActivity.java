@@ -48,6 +48,30 @@ public class OoyalaAndroidTestAppActivity extends Activity
   }
 
   @Override
+  protected void onStop() {
+      super.onStop();
+      Log.d(TAG, "---------------- Stop -----------");
+      if (player != null) {
+    	  player.suspend();
+      }
+  }    
+
+  @Override
+  protected void onRestart() {
+      super.onRestart();
+      Log.d(TAG, "---------------- Restart -----------");
+      if (player != null) {
+    	  player.resume();
+      }
+  }     
+  
+  @Override
+  protected void onDestroy() {
+      super.onDestroy();
+      player = null;
+  }    
+  
+  @Override
   public void onConfigurationChanged(Configuration newConfig) {
     Log.d(TAG, "TEST - onConfigurationChangedd");
     super.onConfigurationChanged(newConfig);
