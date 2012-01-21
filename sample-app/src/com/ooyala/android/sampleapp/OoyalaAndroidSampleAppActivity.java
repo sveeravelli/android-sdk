@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 public class OoyalaAndroidSampleAppActivity extends ListActivity {
   private static final String TAG = "OoyalaAndroidSampleAppActivity";
