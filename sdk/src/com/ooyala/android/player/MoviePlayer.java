@@ -48,6 +48,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   protected int _width = 0;
   protected int _height = 0;
   private boolean _playQueued = false;
+  private boolean _completedQueued = false;
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
@@ -133,6 +134,13 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     _playQueued = false;
     _player.stop();
     _player.release();
+    Log.d(this.getClass().getName(), "TEST - stop end");
+  }
+
+  @Override
+  public void reset() {
+    suspend(0, State.PAUSED);
+    resume();
   }
 
   @Override
@@ -323,15 +331,22 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void suspend() {
+    suspend(_player.getCurrentPosition(), _state);
+  }
+
+  @Override
+  public void suspend(int millisToResume, State stateToResume) {
     Log.d(this.getClass().getName(), "TEST - suspend");
     if (_state == State.SUSPENDED) { return; }
     if (_player != null) {
-      _timeBeforeSuspend = _player.getCurrentPosition();
-      _stateBeforeSuspend = _state;
+      _timeBeforeSuspend = millisToResume;
+      _stateBeforeSuspend = stateToResume;
       stop();
       _player = null;
     }
+    Log.d(this.getClass().getName(), "TEST - suspend - before remove");
     removeView();
+    Log.d(this.getClass().getName(), "TEST - suspend - after remove");
     _width = 0;
     _height = 0;
     _buffer = 0;
@@ -347,6 +362,8 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     setupView();
     if (_stateBeforeSuspend == State.PLAYING) {
       queuePlay();
+    } else if (_stateBeforeSuspend == State.COMPLETED) {
+      queueCompleted();
     }
   }
 
@@ -377,6 +394,18 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     setState(State.COMPLETED);
   }
 
+  private void queueCompleted() {
+    _completedQueued = true;
+  }
+
+  private void dequeueCompleted() {
+    if (_completedQueued) {
+      _playQueued = false;
+      _completedQueued = false;
+      setState(State.COMPLETED);
+    }
+  }
+
   // Must queue play and wait for ready
   private void queuePlay() {
     Log.d(this.getClass().getName(), "TEST - queuePlayy");
@@ -400,10 +429,15 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
     }
   }
 
+  private void dequeueAll() {
+    dequeueCompleted();
+    dequeuePlay();
+  }
+
   @Override
   protected void setState(State state) {
     super.setState(state);
-    dequeuePlay();
+    dequeueAll();
   }
 
   // Timer tasks for playhead updates

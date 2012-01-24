@@ -117,7 +117,11 @@ public abstract class Player extends Observable {
     return _buffer;
   }
 
+  public abstract void reset();
+
   public abstract void suspend();
+
+  public abstract void suspend(int millisToResume, State stateToResume);
 
   public abstract void resume();
 

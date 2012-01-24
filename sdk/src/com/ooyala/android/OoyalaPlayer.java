@@ -558,6 +558,35 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   };
 
+  private void onComplete() {
+    Log.d(this.getClass().getName(), "TEST - COMPLETED - onComplete");
+    switch (_actionAtEnd) {
+      case CONTINUE:
+        if(nextVideo(DO_PLAY)) {
+        } else {
+          _player.reset();
+          sendNotification(PLAY_COMPLETED_NOTIFICATION);
+        }
+        break;
+      case PAUSE:
+        if(nextVideo(DO_PAUSE)) {
+        } else {
+          _player.reset();
+          sendNotification(PLAY_COMPLETED_NOTIFICATION);
+        }
+        break;
+      case STOP:
+        cleanupPlayers();
+        setState(State.COMPLETED);
+        sendNotification(PLAY_COMPLETED_NOTIFICATION);
+        break;
+      case RESET:
+        _player.reset();
+        sendNotification(PLAY_COMPLETED_NOTIFICATION);
+        break;
+    }
+  }
+
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(this.getClass().getName(), "TEST - Notificationn: "+arg1.toString()+" "+_state);
@@ -567,26 +596,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         switch(((Player)arg0).getState()) {
           case COMPLETED:
             if (!playAdsBeforeTime(Integer.MAX_VALUE)) {
-              switch (_actionAtEnd) {
-                case CONTINUE:
-                  if(nextVideo(DO_PLAY)) {
-                    break;
-                  }
-                case PAUSE:
-                  if(nextVideo(DO_PAUSE)) {
-                    break;
-                  }
-                case STOP:
-                  cleanupPlayers();
-                  setState(State.COMPLETED);
-                  sendNotification(PLAY_COMPLETED_NOTIFICATION);
-                  break;
-                case RESET:
-                  seek(0);
-                  pause();
-                  sendNotification(PLAY_COMPLETED_NOTIFICATION);
-                  break;
-              }
+              onComplete();
             }
             break;
           case ERROR:
@@ -638,8 +648,12 @@ public class OoyalaPlayer extends Observable implements Observer {
           cleanupPlayer(_adPlayer);
           _adPlayer = null;
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
-            _player.resume();
-            addClosedCaptionsView();
+            if (_player.getState() == State.COMPLETED) {
+              onComplete();
+            } else {
+              _player.resume();
+              addClosedCaptionsView();
+            }
           }
           break;
         case PLAYING:
@@ -686,6 +700,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void sendNotification(String obj) {
     setChanged();
     notifyObservers(obj);
+    Log.d(this.getClass().getName(), "TEST - SENT NOTIFICATION "+obj);
   }
 
   /**
