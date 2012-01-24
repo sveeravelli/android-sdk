@@ -84,5 +84,13 @@ public class StreamTest extends AndroidTestCase
     Set<Stream> hls = new HashSet<Stream>();
     hls.add(hlsStream);
     assertNull(Stream.bestStream(hls));
+
+    Stream.setStreamSelector(new StreamSelector() {
+      @Override
+      public Stream bestStream(Set<Stream> streams) {
+        return null;
+      }
+    });
+    assertNull(Stream.bestStream(mp4s));
   }
 }
