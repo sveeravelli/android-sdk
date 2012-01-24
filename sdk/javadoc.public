@@ -34,6 +34,7 @@ src/com/ooyala/android/PlayableItem.java
 src/com/ooyala/android/SecureURLGenerator.java
 src/com/ooyala/android/SignatureGenerator.java
 src/com/ooyala/android/Stream.java
+src/com/ooyala/android/StreamSelector.java
 src/com/ooyala/android/VASTAd.java
 src/com/ooyala/android/VASTAdSpot.java
 src/com/ooyala/android/VASTLinearAd.java

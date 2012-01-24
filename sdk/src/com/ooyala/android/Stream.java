@@ -24,12 +24,47 @@ public class Stream
   protected String _aspectRatio = null;
   protected boolean _isLiveStream = false;
 
-  public Stream()
-  {
+  private static class DefaultStreamSelector implements StreamSelector {
+    public DefaultStreamSelector() {}
+    @Override
+    public Stream bestStream(Set<Stream> streams) {
+      if (streams == null || streams.size() == 0) { return null; }
+
+      Stream lowestBitrateStream = null;
+      for (Stream stream : streams)
+      {
+        // for remote assets, just pick the first stream
+        if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))
+        {
+          return stream;
+        }
+        if (Stream.isDeliveryTypePlayable(stream) &&
+            (lowestBitrateStream == null ||
+             stream.getCombinedBitrate() < lowestBitrateStream.getCombinedBitrate() ||
+             (stream.getCombinedBitrate() == lowestBitrateStream.getCombinedBitrate() &&
+              stream.getHeight() < lowestBitrateStream.getHeight())))
+        {
+          lowestBitrateStream = stream;
+        }
+      }
+
+      return lowestBitrateStream;
+    }
   }
 
-  public Stream(JSONObject data)
-  {
+  private static StreamSelector _selector = new DefaultStreamSelector();
+
+  /**
+   * This method will set the StreamSelector used to select the Stream to play.
+   * @param selector an implemented StreamSelector
+   */
+  public static void setStreamSelector(StreamSelector selector) {
+    _selector = selector;
+  }
+
+  public Stream() {}
+
+  public Stream(JSONObject data) {
     update(data);
   }
 
@@ -228,29 +263,8 @@ public class Stream
     return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET);
   }
 
-  public static Stream bestStream(Set<Stream> streams)
-  {
-    if (streams == null || streams.size() == 0) { return null; }
-
-    Stream lowestBitrateStream = null;
-    for (Stream stream : streams)
-    {
-      // for remote assets, just pick the first stream
-      if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))
-      {
-        return stream;
-      }
-      if (Stream.isDeliveryTypePlayable(stream) &&
-          (lowestBitrateStream == null ||
-           stream.getCombinedBitrate() < lowestBitrateStream.getCombinedBitrate() ||
-           (stream.getCombinedBitrate() == lowestBitrateStream.getCombinedBitrate() &&
-            stream.getHeight() < lowestBitrateStream.getHeight())))
-      {
-        lowestBitrateStream = stream;
-      }
-    }
-
-    return lowestBitrateStream;
+  public static Stream bestStream(Set<Stream> streams) {
+    return _selector.bestStream(streams);
   }
 
 }
