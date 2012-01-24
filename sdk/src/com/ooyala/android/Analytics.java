@@ -32,7 +32,7 @@ public class Analytics {
    */
   public Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
-    _jsAnalytics.getSettings().setUserAgentString(Constants.JS_ANALYTICS_USER_AGENT);
+    _jsAnalytics.getSettings().setUserAgentString(Constants.JS_ANALYTICS_USER_AGENT_PREFIX+Constants.SDK_VERSION);
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     _jsAnalytics.setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
