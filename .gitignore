@@ -7,3 +7,7 @@
 */tests/gen
 */build
 sdk/Documentation
+sdk/*/bin
+sdk/*/gen
+sample-apps/*/bin
+sample-apps/*/gen
