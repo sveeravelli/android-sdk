@@ -235,11 +235,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
 
-    //closed captions
-    if (_currentItem.hasClosedCaptions()) {
-      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
-      getLayout().addView(_closedCaptionsView);
-    }
+    addClosedCaptionsView();
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
@@ -276,9 +272,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     _adPlayer = null;
     cleanupPlayer(_player);
     _player = null;
-    if (_closedCaptionsView != null)
-      getLayout().removeView(_closedCaptionsView);
-    _closedCaptionsView = null;
+    removeClosedCaptionsView();
   }
 
   private void cleanupPlayer(Player p) {
@@ -354,6 +348,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void suspend() {
     if (currentPlayer() != null) {
       currentPlayer().suspend();
+      removeClosedCaptionsView();
     }
   }
 
@@ -363,6 +358,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void resume() {
     if (currentPlayer() != null) {
       currentPlayer().resume();
+      addClosedCaptionsView();
     }
   }
 
@@ -381,9 +377,9 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setFullscreen(boolean fullscreen) {
     if (isFullscreen() == !fullscreen) { // this is so we don't suspend/resume if we are not actually changing state.
-      currentPlayer().suspend();
+      suspend();
       _layoutController.setFullscreen(fullscreen);
-      currentPlayer().resume();
+      resume();
     }
   }
 
@@ -426,6 +422,21 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   }
 
+  private void addClosedCaptionsView() {
+    removeClosedCaptionsView();
+    if (_currentItem != null && _currentItem.hasClosedCaptions()) {
+      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+      getLayout().addView(_closedCaptionsView);
+    }
+  }
+
+  private void removeClosedCaptionsView() {
+    if (_closedCaptionsView != null) {
+      getLayout().removeView(_closedCaptionsView);
+      _closedCaptionsView = null;
+    }
+  }
+
   private boolean playAdsBeforeTime(int time) {
     Log.d(this.getClass().getName(), "TEST - playAdsBeforeTime: "+time);
     this._lastPlayedTime = time;
@@ -463,8 +474,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
 
     _player.suspend();
-    if (_closedCaptionsView != null)
-        _closedCaptionsView.setVisibility(ClosedCaptionsView.GONE);
+    removeClosedCaptionsView();
     sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();
     return true;
@@ -629,10 +639,7 @@ public class OoyalaPlayer extends Observable implements Observer {
           _adPlayer = null;
           if (!playAdsBeforeTime(this._lastPlayedTime)) {
             _player.resume();
-            if (_closedCaptionsView != null) {
-              _closedCaptionsView.setVisibility(ClosedCaptionsView.VISIBLE);
-              _closedCaptionsView.bringToFront();
-            }
+            addClosedCaptionsView();
           }
           break;
         case PLAYING:
