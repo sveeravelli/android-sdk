@@ -15,6 +15,7 @@ Ooyala SDK Android Libaray
   <property name="sampleapp.dir" location="../sample-apps" />
   <property name="sampleapp.channelbrowser.lib.dir" location="${sampleapp.dir}/ChannelBrowserSampleApp/lib" />
 	<property name="sampleapp.gettingstarted.lib.dir" location="${sampleapp.dir}/GettingStartedSampleApp/lib" />
+	<property name="guide.pdf" location="../getting_started.pdf" />
   <property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
   <property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
   <property name="doc" location="Documentation" />
@@ -56,10 +57,14 @@ Ooyala SDK Android Libaray
   <target name="release" depends="jar,docs">
     <copy todir="${build.dist.javadoc}">
       <fileset dir="${doc.public}"/>
+    	
     </copy>
     <copy todir="${build.dist.sampleapps}">
       <fileset dir="${sampleapp.dir}"/>
     </copy>
+  	<copy todir="${build.dist}">
+  		<fileset file="${guide.pdf}"/>
+  	</copy>
     <zip destfile="${release.zip}" basedir="${build.dist}"/>
   </target>
 </project>
