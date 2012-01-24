@@ -13,8 +13,8 @@ Ooyala SDK Android Libaray
   <property name="jar.name" value="OoyalaSDK.jar" />
   <property name="jar.location" location="${build.dist}/${jar.name}" />
   <property name="sampleapp.dir" location="../sample-apps" />
-  <property name="sampleapp.channelbrowser.dir" location="${sampleapp.dir}/ChannelBrowserSampleApp" />
-  <property name="sampleapp.channelbrowser.lib.dir" location="${sampleapp.channelbrowser.dir}/lib" />
+  <property name="sampleapp.channelbrowser.lib.dir" location="${sampleapp.dir}/ChannelBrowserSampleApp/lib" />
+	<property name="sampleapp.gettingstarted.lib.dir" location="${sampleapp.dir}/GettingStartedSampleApp/lib" />
   <property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
   <property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
   <property name="doc" location="Documentation" />
@@ -40,6 +40,9 @@ Ooyala SDK Android Libaray
     </jar>
   	<!-- Copy jar to all sample apps -->
     <copy todir="${sampleapp.channelbrowser.lib.dir}">
+      <fileset dir="${build.dist}"/>
+    </copy>
+  	<copy todir="${sampleapp.gettingstarted.lib.dir}">
       <fileset dir="${build.dist}"/>
     </copy>
   </target>
