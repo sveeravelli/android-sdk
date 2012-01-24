@@ -3,59 +3,59 @@
 Ooyala SDK Android Libaray
   </description>
 
-	<property environment="env" />
+  <property environment="env" />
   <property name="src" location="src" />
   <property name="build" location="build" />
   <property name="build.classes" location="${build}/classes" />
   <property name="build.dist" location="${build}/dist" />
-	<property name="build.dist.javadoc" location="${build.dist}/javadoc" />
-	<property name="build.dist.sample-app" location="${build.dist}/sample-app" />
-	<property name="jar.name" value="OoyalaSDK.jar" />
-	<property name="jar.location" location="${build.dist}/${jar.name}" />
-	<property name="sampleapp.dir" location="../sample-app" />
-	<property name="sampleapp.lib.dir" location="${sampleapp.dir}/lib" />
-	<property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
-	<property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
-	<property name="doc" location="Documentation" />
-	<property name="doc.public" location="${doc}/public" />
+  <property name="build.dist.javadoc" location="${build.dist}/javadoc" />
+  <property name="build.dist.sample-app" location="${build.dist}/sample-app" />
+  <property name="jar.name" value="OoyalaSDK.jar" />
+  <property name="jar.location" location="${build.dist}/${jar.name}" />
+  <property name="sampleapp.dir" location="../sample-app" />
+  <property name="sampleapp.lib.dir" location="${sampleapp.dir}/lib" />
+  <property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
+  <property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
+  <property name="doc" location="Documentation" />
+  <property name="doc.public" location="${doc}/public" />
 
-	<target name="clean">
+  <target name="clean">
     <delete dir="${build}"/>
   </target>
 
-	<target name="init" depends="clean">
-		<mkdir dir="${build}"/>
-		<mkdir dir="${build.classes}"/>
-		<mkdir dir="${build.dist}"/>
-	</target>
-	
-	<target name="compile" depends="init">
-	  <javac srcdir="src" destdir="${build.classes}" classpath="${android.jar}"/>
-	</target>
+  <target name="init" depends="clean">
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.dist}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src" destdir="${build.classes}" classpath="${android.jar}"/>
+  </target>
 
   <target name="jar" depends="compile">
     <jar destfile="${jar.location}" basedir="${build.classes}">
       <include name="com/ooyala/android/**" />
     </jar>
-  	<copy todir="${sampleapp.lib.dir}">
-  		<fileset dir="${build.dist}"/>
-  	</copy>
+    <copy todir="${sampleapp.lib.dir}">
+      <fileset dir="${build.dist}"/>
+    </copy>
   </target>
-	
-	<target name="docs" depends="init">
-		<mkdir dir="${build.dist.javadoc}"/>
-		<exec executable="./gen_docs.sh">
-		</exec>
-	</target>
-	
-	<target name="release" depends="jar,docs">
-		<copy todir="${build.dist.javadoc}">
-			<fileset dir="${doc.public}"/>
-		</copy>
-		<copy todir="${build.dist.sample-app}">
+
+  <target name="docs" depends="init">
+    <mkdir dir="${build.dist.javadoc}"/>
+    <exec executable="./gen_docs.sh">
+    </exec>
+  </target>
+
+  <target name="release" depends="jar,docs">
+    <copy todir="${build.dist.javadoc}">
+      <fileset dir="${doc.public}"/>
+    </copy>
+    <copy todir="${build.dist.sample-app}">
       <fileset dir="${sampleapp.dir}"/>
     </copy>
-		<zip destfile="${release.zip}" basedir="${build.dist}"/>
-	</target>
+    <zip destfile="${release.zip}" basedir="${build.dist}"/>
+  </target>
 </project>
 
