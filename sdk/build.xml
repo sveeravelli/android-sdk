@@ -9,11 +9,12 @@ Ooyala SDK Android Libaray
   <property name="build.classes" location="${build}/classes" />
   <property name="build.dist" location="${build}/dist" />
   <property name="build.dist.javadoc" location="${build.dist}/javadoc" />
-  <property name="build.dist.sample-app" location="${build.dist}/sample-app" />
+  <property name="build.dist.sampleapps" location="${build.dist}/SampleApps" />
   <property name="jar.name" value="OoyalaSDK.jar" />
   <property name="jar.location" location="${build.dist}/${jar.name}" />
-  <property name="sampleapp.dir" location="../sample-app" />
-  <property name="sampleapp.lib.dir" location="${sampleapp.dir}/lib" />
+  <property name="sampleapp.dir" location="../sample-apps" />
+  <property name="sampleapp.channelbrowser.dir" location="${sampleapp.dir}/ChannelBrowserSampleApp" />
+  <property name="sampleapp.channelbrowser.lib.dir" location="${sampleapp.channelbrowser.dir}/lib" />
   <property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
   <property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
   <property name="doc" location="Documentation" />
@@ -37,7 +38,8 @@ Ooyala SDK Android Libaray
     <jar destfile="${jar.location}" basedir="${build.classes}">
       <include name="com/ooyala/android/**" />
     </jar>
-    <copy todir="${sampleapp.lib.dir}">
+  	<!-- Copy jar to all sample apps -->
+    <copy todir="${sampleapp.channelbrowser.lib.dir}">
       <fileset dir="${build.dist}"/>
     </copy>
   </target>
@@ -52,7 +54,7 @@ Ooyala SDK Android Libaray
     <copy todir="${build.dist.javadoc}">
       <fileset dir="${doc.public}"/>
     </copy>
-    <copy todir="${build.dist.sample-app}">
+    <copy todir="${build.dist.sampleapps}">
       <fileset dir="${sampleapp.dir}"/>
     </copy>
     <zip destfile="${release.zip}" basedir="${build.dist}"/>
