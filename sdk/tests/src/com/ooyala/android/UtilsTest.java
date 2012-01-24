@@ -46,7 +46,7 @@ public class UtilsTest extends AndroidTestCase {
     paramDictionary.put("domain", TestConstants.TEST_DOMAIN);
     paramDictionary.put("expires", "1322007460");
     String expectedParamString = "api_key="+TestConstants.TEST_API_KEY+"&device=android&domain="+TestConstants.TEST_DOMAIN+"&expires=1322007460";
-    String paramString = Utils.getParamsString(paramDictionary, "&");
+    String paramString = Utils.getParamsString(paramDictionary, "&", true);
     assertEquals(paramString, expectedParamString);
   }
 

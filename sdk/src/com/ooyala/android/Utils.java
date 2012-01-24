@@ -1,7 +1,9 @@
 package com.ooyala.android;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import android.util.Log;
+
 public class Utils
 {
   public static String device() {
@@ -24,7 +28,7 @@ public class Utils
 
   public static URL makeURL(String host, String uri, Map<String,String> params)
   {
-    return makeURL(host, uri, getParamsString(params, Constants.SEPARATOR_AMPERSAND));
+    return makeURL(host, uri, getParamsString(params, Constants.SEPARATOR_AMPERSAND, true));
   }
 
   public static URL makeURL(String host, String uri, String params)
@@ -47,8 +51,7 @@ public class Utils
     return list;
   }
 
-  public static String getParamsString(Map<String,String> params, String separator)
-  {
+  public static String getParamsString(Map<String,String> params, String separator, boolean urlEncode) {
     if (params == null || params.isEmpty()) { return ""; }
 
     StringBuffer result = new StringBuffer();
@@ -66,7 +69,16 @@ public class Utils
 
       result.append(key);
       result.append("=");
-      result.append(params.get(key));
+      if (urlEncode) {
+        try {
+          result.append(URLEncoder.encode(params.get(key), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+          Log.e(Utils.class.getName(), "ERROR while trying to encode parameter", e);
+          result.append(params.get(key));
+        }
+      } else {
+        result.append(params.get(key));
+      }
     }
     return result.toString();
   }

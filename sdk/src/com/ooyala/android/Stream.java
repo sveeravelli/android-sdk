@@ -62,6 +62,13 @@ public class Stream
     _selector = selector;
   }
 
+  /**
+   * This method will reset the StreamSelector to the default
+   */
+  public static void resetStreamSelector() {
+    _selector = new DefaultStreamSelector();
+  }
+
   public Stream() {}
 
   public Stream(JSONObject data) {

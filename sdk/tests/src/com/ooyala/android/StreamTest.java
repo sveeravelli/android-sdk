@@ -92,5 +92,6 @@ public class StreamTest extends AndroidTestCase
       }
     });
     assertNull(Stream.bestStream(mp4s));
+    Stream.resetStreamSelector();
   }
 }

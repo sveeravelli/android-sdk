@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ooyala-android-sdk-test</name>
+	<name>ooyala-android-sdk-tests</name>
 	<comment></comment>
 	<projects>
-		<project>ooyala-android-sample-app</project>
+		<project>ooyala-android-test-app</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -40,7 +40,7 @@ class EmbeddedSecureURLGenerator implements SecureURLGenerator {
   }
 
   private String genStringToSign(String uri, Map<String,String> params, String method) {
-    String paramsString = Utils.getParamsString(params, Constants.SEPARATOR_EMPTY);
+    String paramsString = Utils.getParamsString(params, Constants.SEPARATOR_EMPTY, false);
     return method + uri + paramsString;
   }
 

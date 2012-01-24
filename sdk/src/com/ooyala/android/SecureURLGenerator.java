@@ -9,6 +9,7 @@ public interface SecureURLGenerator {
    * <p>
    * This method should use one of the following security method to create a complete NSURL:
    * <li>Create a signature from the parameters (including API Key and Domain, which are not guarenteed to be in params) and a secret
+   * <li>Create a URL by appending the params (making sure to URL encode the signature)
    * @param host the hostname for the URL
    * @param uri the URI for the URL
    * @param params the URI params for the URL (not including any security params that the security method would use)
