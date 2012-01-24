@@ -33,8 +33,8 @@ public class PlayerDetailActivity extends Activity
     }
     OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController(
     		(OoyalaPlayerLayout)findViewById(R.id.player), 
-    		OoyalaAndroidSampleAppActivity.APIKEY, OoyalaAndroidSampleAppActivity.SECRETKEY, 
-    		OoyalaAndroidSampleAppActivity.PCODE, OoyalaAndroidSampleAppActivity.PLAYERDOMAIN);
+    		ChannelBrowserSampleAppActivity.APIKEY, ChannelBrowserSampleAppActivity.SECRETKEY, 
+    		ChannelBrowserSampleAppActivity.PCODE, ChannelBrowserSampleAppActivity.PLAYERDOMAIN);
     player = layoutController.getPlayer();
     if (player.setEmbedCode(embedCode)) {
         Log.d(TAG, "TEST - yay!");

@@ -21,7 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-public class OoyalaAndroidSampleAppActivity extends ListActivity {
+public class ChannelBrowserSampleAppActivity extends ListActivity {
   private static final String TAG = "OoyalaAndroidSampleAppActivity";
 
   public static final String PCODE = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
