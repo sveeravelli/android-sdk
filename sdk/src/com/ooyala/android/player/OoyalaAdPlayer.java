@@ -21,6 +21,7 @@ public class OoyalaAdPlayer extends MoviePlayer {
       this._state = State.ERROR;
       return;
     }
+    _seekable = false;
     _ad = (OoyalaAdSpot)ad;
 
     super.init(parent, _ad.getStream());
@@ -31,11 +32,6 @@ public class OoyalaAdPlayer extends MoviePlayer {
     for (URL url : _ad.getTrackingURLs()) {
       pinger.ping(url);
     }
-  }
-
-  @Override
-  public boolean seekable() {
-    return false;
   }
 
   public OoyalaAdSpot getAd() {

@@ -177,11 +177,6 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   @Override
-  public boolean seekable() {
-    return true;
-  }
-
-  @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) { return; }
     _player.seekTo(timeInMillis);

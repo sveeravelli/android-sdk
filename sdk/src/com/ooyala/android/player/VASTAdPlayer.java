@@ -63,6 +63,7 @@ public class VASTAdPlayer extends MoviePlayer {
       this._state = State.ERROR;
       return;
     }
+    _seekable = false;
     _ad = (VASTAdSpot)ad;
 
     for (VASTAd vastAd : _ad.getAds()) {
@@ -112,11 +113,6 @@ public class VASTAdPlayer extends MoviePlayer {
       sendTrackingEvent(TrackingEvent.PAUSE);
     }
     super.pause();
-  }
-
-  @Override
-  public boolean seekable() {
-    return false;
   }
 
   public void sendTrackingEvent(String event) {

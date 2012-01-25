@@ -29,6 +29,7 @@ public class OoyalaAndroidTestAppActivity extends Activity
 
     OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     player = layoutController.getPlayer();
+    player.setAdsSeekable(true); // this will help us skip ads if need be.
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
     // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
@@ -54,7 +55,7 @@ public class OoyalaAndroidTestAppActivity extends Activity
       if (player != null) {
     	  player.suspend();
       }
-  }    
+  }
 
   @Override
   protected void onRestart() {
@@ -63,14 +64,14 @@ public class OoyalaAndroidTestAppActivity extends Activity
       if (player != null) {
     	  player.resume();
       }
-  }     
-  
+  }
+
   @Override
   protected void onDestroy() {
       super.onDestroy();
       player = null;
-  }    
-  
+  }
+
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     Log.d(TAG, "TEST - onConfigurationChangedd");

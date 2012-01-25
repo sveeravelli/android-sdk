@@ -52,6 +52,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
   public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
+  public static final String AD_TIME_CHANGED_NOTIFICATION = "adTimeChanged";
   public static final String AD_STARTED_NOTIFICATION = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
   public static final String AD_ERROR_NOTIFICATION = "adError";
@@ -70,6 +71,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   private ClosedCaptionsView _closedCaptionsView = null;
   private Analytics _analytics = null;
   private String _language = Locale.getDefault().getLanguage();
+  private boolean _adsSeekable = false;
+  private boolean _seekable = true;
 
   public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(apiKey, secret), pcode, domain);
@@ -234,6 +237,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
+    _player.setSeekable(_seekable);
 
     addClosedCaptionsView();
 
@@ -472,6 +476,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       Log.d(this.getClass().getName(), "TEST - playAd fail player null");
       return false;
     }
+    _adPlayer.setSeekable(_adsSeekable);
 
     _player.suspend();
     removeClosedCaptionsView();
@@ -558,20 +563,26 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   };
 
+  private void reset() {
+    removeClosedCaptionsView();
+    _player.reset();
+    addClosedCaptionsView();
+  }
+
   private void onComplete() {
     Log.d(this.getClass().getName(), "TEST - COMPLETED - onComplete");
     switch (_actionAtEnd) {
       case CONTINUE:
         if(nextVideo(DO_PLAY)) {
         } else {
-          _player.reset();
+          reset();
           sendNotification(PLAY_COMPLETED_NOTIFICATION);
         }
         break;
       case PAUSE:
         if(nextVideo(DO_PAUSE)) {
         } else {
-          _player.reset();
+          reset();
           sendNotification(PLAY_COMPLETED_NOTIFICATION);
         }
         break;
@@ -581,7 +592,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         sendNotification(PLAY_COMPLETED_NOTIFICATION);
         break;
       case RESET:
-        _player.reset();
+        reset();
         sendNotification(PLAY_COMPLETED_NOTIFICATION);
         break;
     }
@@ -619,54 +630,56 @@ public class OoyalaPlayer extends Observable implements Observer {
             setState(((Player)arg0).getState());
             break;
         }
-      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION)) {
-        if (this._player.getState() == State.PLAYING) {
-          sendNotification(TIME_CHANGED_NOTIFICATION);
-          this._lastPlayedTime = this._player.currentTime();
-          playAdsBeforeTime(this._lastPlayedTime);
-          //closed captions
-          if (_language != null && _currentItem.hasClosedCaptions()) {
-            double currT = ((double)currentPlayer().currentTime())/1000d;
-            if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
-            	Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
-            	if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
-            	  _closedCaptionsView.setCaption(caption);
-            	} else {
-            	  _closedCaptionsView.setCaption(null);
-            	}
-            }
+      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _player.getState() == State.PLAYING) {
+        sendNotification(TIME_CHANGED_NOTIFICATION);
+        this._lastPlayedTime = this._player.currentTime();
+        playAdsBeforeTime(this._lastPlayedTime);
+        //closed captions
+        if (_language != null && _currentItem.hasClosedCaptions()) {
+          double currT = ((double)currentPlayer().currentTime())/1000d;
+          if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
+          	Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
+          	if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
+          	  _closedCaptionsView.setCaption(caption);
+          	} else {
+          	  _closedCaptionsView.setCaption(null);
+          	}
           }
         }
       }
-    } else if (arg0 == this._adPlayer && arg1.equals(STATE_CHANGED_NOTIFICATION)) {
-      Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
-      switch(((Player)arg0).getState()) {
-        case ERROR:
-          sendNotification(AD_ERROR_NOTIFICATION);
-        case COMPLETED:
-          sendNotification(AD_COMPLETED_NOTIFICATION);
-          cleanupPlayer(_adPlayer);
-          _adPlayer = null;
-          if (!playAdsBeforeTime(this._lastPlayedTime)) {
-            if (_player.getState() == State.COMPLETED) {
-              onComplete();
-            } else {
-              _player.resume();
-              addClosedCaptionsView();
+    } else if (arg0 == this._adPlayer) {
+      if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
+        Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
+        switch(((Player)arg0).getState()) {
+          case ERROR:
+            sendNotification(AD_ERROR_NOTIFICATION);
+          case COMPLETED:
+            sendNotification(AD_COMPLETED_NOTIFICATION);
+            cleanupPlayer(_adPlayer);
+            _adPlayer = null;
+            if (!playAdsBeforeTime(this._lastPlayedTime)) {
+              if (_player.getState() == State.COMPLETED) {
+                onComplete();
+              } else {
+                _player.resume();
+                addClosedCaptionsView();
+              }
             }
-          }
-          break;
-        case PLAYING:
-          if (_state != State.PLAYING) {
-            setState(State.PLAYING);
-          }
-          break;
-        case PAUSED:
-          if (_state != State.PAUSED) {
-            setState(State.PAUSED);
-          }
-        default:
-          break;
+            break;
+          case PLAYING:
+            if (_state != State.PLAYING) {
+              setState(State.PLAYING);
+            }
+            break;
+          case PAUSED:
+            if (_state != State.PAUSED) {
+              setState(State.PAUSED);
+            }
+          default:
+            break;
+        }
+      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _adPlayer.getState() == State.PLAYING) {
+        sendNotification(AD_TIME_CHANGED_NOTIFICATION);
       }
     }
     Log.d(this.getClass().getName(), "TEST - Notificationn END: "+arg1.toString()+" "+_state);
@@ -765,6 +778,35 @@ public class OoyalaPlayer extends Observable implements Observer {
   public int getPlayheadPercentage() {
     if (currentPlayer() == null) { return 0; }
     return millisToPercent(currentPlayer().currentTime());
+  }
+
+  /**
+   * Set whether ads played by this OoyalaPlayer are seekable (default is false)
+   * @param seekable true if seekable, false if not.
+   */
+  public void setAdsSeekable(boolean seekable) {
+    _adsSeekable = seekable;
+    if (_adPlayer != null) {
+      _adPlayer.setSeekable(_adsSeekable);
+    }
+  }
+
+  /**
+   * Set whether videos played by this OoyalaPlayer are seekable (default is true)
+   * @param seekable true if seekable, false if not.
+   */
+  public void setSeekable(boolean seekable) {
+    _seekable = seekable;
+    if (_player != null) {
+      _player.setSeekable(_seekable);
+    }
+  }
+
+  /**
+   * This will reset the state of all the ads to "unplayed" causing any ad that has already played to play again.
+   */
+  public void resetAds() {
+    _playedAds.clear();
   }
 
   private int percentToMillis(int percent) {
