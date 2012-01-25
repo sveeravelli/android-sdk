@@ -2,7 +2,7 @@
 <resources>
 
     <string name="start">The player is below.</string>
-    <string name="end">The player is above.</string>
+    <string name="end">Skip Ad</string>
     <string name="app_name">Ooyala Android Test App</string>
 
 </resources>

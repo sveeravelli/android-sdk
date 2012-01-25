@@ -5,12 +5,15 @@ import android.app.AlertDialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
-public class OoyalaAndroidTestAppActivity extends Activity
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
 {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
@@ -26,6 +29,9 @@ public class OoyalaAndroidTestAppActivity extends Activity
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    Button end = (Button)findViewById(R.id.end);
+    end.setOnClickListener(this);
 
     OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     player = layoutController.getPlayer();
@@ -95,5 +101,10 @@ public class OoyalaAndroidTestAppActivity extends Activity
     builder.setMessage(t.toString());
     builder.setPositiveButton("OK", null);
     builder.show();
+  }
+
+  @Override
+  public void onClick(View arg0) {
+    if (player != null) { player.skipAd(); }
   }
 }

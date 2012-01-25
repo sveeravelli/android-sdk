@@ -18,7 +18,7 @@
     android:layout_weight="1">
   </com.ooyala.android.OoyalaPlayerLayout>
 
-    <TextView
+    <Button
         android:id="@+id/end"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
