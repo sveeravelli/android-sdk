@@ -52,9 +52,9 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
   public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
-  public static final String AD_TIME_CHANGED_NOTIFICATION = "adTimeChanged";
   public static final String AD_STARTED_NOTIFICATION = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
+  public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
 
   private Video _currentItem = null;
@@ -654,9 +654,9 @@ public class OoyalaPlayer extends Observable implements Observer {
           case ERROR:
             sendNotification(AD_ERROR_NOTIFICATION);
           case COMPLETED:
-            sendNotification(AD_COMPLETED_NOTIFICATION);
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
+            sendNotification(AD_COMPLETED_NOTIFICATION);
             if (!playAdsBeforeTime(this._lastPlayedTime)) {
               if (_player.getState() == State.COMPLETED) {
                 onComplete();
@@ -679,7 +679,7 @@ public class OoyalaPlayer extends Observable implements Observer {
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _adPlayer.getState() == State.PLAYING) {
-        sendNotification(AD_TIME_CHANGED_NOTIFICATION);
+        sendNotification(TIME_CHANGED_NOTIFICATION);
       }
     }
     Log.d(this.getClass().getName(), "TEST - Notificationn END: "+arg1.toString()+" "+_state);
@@ -807,6 +807,29 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void resetAds() {
     _playedAds.clear();
+  }
+
+  /**
+   * Skip the currently playing ad. Do nothing if no ad is playing
+   */
+  public void skipAd() {
+    if (isShowingAd()) {
+      cleanupPlayer(_adPlayer);
+      _adPlayer = null;
+      sendNotification(AD_SKIPPED_NOTIFICATION);
+      if (!playAdsBeforeTime(this._lastPlayedTime)) {
+        if (_player.getState() == State.COMPLETED) {
+          onComplete();
+        } else {
+          _player.resume();
+          addClosedCaptionsView();
+        }
+      }
+    }
+  }
+
+  public boolean isShowingAd() {
+    return _adPlayer != null;
   }
 
   private int percentToMillis(int percent) {
