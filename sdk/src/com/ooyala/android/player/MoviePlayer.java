@@ -326,7 +326,7 @@ public class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void suspend() {
-    suspend(_player.getCurrentPosition(), _state);
+    suspend(_player != null ? _player.getCurrentPosition() : 0, _state);
   }
 
   @Override
