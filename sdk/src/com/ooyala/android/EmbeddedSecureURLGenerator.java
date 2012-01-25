@@ -14,6 +14,11 @@ class EmbeddedSecureURLGenerator implements SecureURLGenerator {
     _signatureGenerator = new EmbeddedSignatureGenerator(secretKey);
   }
 
+  public EmbeddedSecureURLGenerator(String apiKey, SignatureGenerator signatureGenerator) {
+    _apiKey = apiKey;
+    _signatureGenerator = signatureGenerator;
+  }
+
   public URL secureURL(String host, String uri, Map<String,String> params)
   {
     Map<String,String> allParams = null;
