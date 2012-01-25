@@ -453,7 +453,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param fullscreen true to switch to fullscreen, false to switch out of fullscreen
    */
   public void setFullscreen(boolean fullscreen) {
-    if (isFullscreen() == !fullscreen) { // this is so we don't suspend/resume if we are not actually changing state.
+    if (isFullscreen() == !fullscreen) { // this is so we don't add/remove cc view if we are not actually changing state.
       removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
       addClosedCaptionsView();
