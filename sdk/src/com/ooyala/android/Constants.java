@@ -84,6 +84,7 @@ class Constants
   public static final String KEY_CALLBACK             = "callback";
 
   public static final String DEVICE_ANDROID_SDK       = "android_sdk";
+  public static final String DEVICE_ANDROID_3PLUS_SDK = "android_3plus_sdk";
 
   public static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   public static final String CONTENT_TYPE_CHANNEL     = "Channel";

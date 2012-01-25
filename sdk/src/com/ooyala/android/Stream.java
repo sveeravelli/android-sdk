@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.json.*;
 
+import android.os.Build;
 import android.util.Base64;
 
 import com.ooyala.android.Constants.ReturnState;
@@ -267,7 +268,8 @@ public class Stream
   public static boolean isDeliveryTypePlayable(Stream stream)
   {
     String type = stream.getDeliveryType();
-    return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET);
+    return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
+        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && type.equals(Constants.DELIVERY_TYPE_HLS));   // Android v3+ supports HLS
   }
 
   public static Stream bestStream(Set<Stream> streams) {

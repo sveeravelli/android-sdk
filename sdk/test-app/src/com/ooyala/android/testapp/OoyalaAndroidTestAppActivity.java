@@ -33,7 +33,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     Button end = (Button)findViewById(R.id.end);
     end.setOnClickListener(this);
 
-    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
@@ -46,7 +46,10 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
     // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
     // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
+    // Greg's account: "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com"
+    // HLS:    	"9ydnRhMzq-roTTbvwmG20FIwMEB08xom"
+
+    if (player.setEmbedCode("9ydnRhMzq-roTTbvwmG20FIwMEB08xom")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {

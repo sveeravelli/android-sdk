@@ -18,12 +18,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import android.os.Build;
 import android.util.Log;
 
 public class Utils
 {
   public static String device() {
-    return Constants.DEVICE_ANDROID_SDK;
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+      return Constants.DEVICE_ANDROID_3PLUS_SDK;
+    else
+      return Constants.DEVICE_ANDROID_SDK;
   }
 
   public static URL makeURL(String host, String uri, Map<String,String> params)
