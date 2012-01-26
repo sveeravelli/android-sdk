@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 class Constants
 {
-  public static final String SDK_VERSION              = "1";
+  public static final String SDK_VERSION              = "0.1.0";
 
   public static final int    RESPONSE_LIFE_SECONDS    = 5*60;
 
