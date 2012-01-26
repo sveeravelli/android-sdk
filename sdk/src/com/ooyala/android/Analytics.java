@@ -38,6 +38,7 @@ public class Analytics {
       public void onPageFinished(WebView view, String url) {
         if (!_ready && !_failed) {
           _ready = true;
+          Log.d(this.getClass().getName(), "Initialized Analytics.");
           performQueuedActions();
         }
       }
@@ -52,7 +53,7 @@ public class Analytics {
     });
     //give dummy url to allow for cookie setting
     _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8", "");
-    Log.d(this.getClass().getName(), "Initialized Analytics with user agent: "+_jsAnalytics.getSettings().getUserAgentString());
+    Log.d(this.getClass().getName(), "Initializing Analytics with user agent: "+_jsAnalytics.getSettings().getUserAgentString());
   }
 
   /**
