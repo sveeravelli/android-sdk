@@ -9,7 +9,7 @@ class Constants
 
   public static final String JS_ANALYTICS_HOST        = "http://player.ooyala.com";
   public static final String JS_ANALYTICS_URI         = "/reporter.js";
-  public static final String JS_ANALYTICS_USER_AGENT_PREFIX  = "Ooyala Android SDK v";
+  public static final String JS_ANALYTICS_USER_AGENT  = "Ooyala Android SDK v%s [%s]";
 
   public static final String API_CONTENT_TREE         = "content_tree";
   public static final String API_CONTENT_TREE_NEXT    = "content_tree_next";

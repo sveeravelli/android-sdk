@@ -32,7 +32,7 @@ public class Analytics {
    */
   public Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
-    _jsAnalytics.getSettings().setUserAgentString(Constants.JS_ANALYTICS_USER_AGENT_PREFIX+Constants.SDK_VERSION);
+    _jsAnalytics.getSettings().setUserAgentString(String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION, _jsAnalytics.getSettings().getUserAgentString()));
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     _jsAnalytics.setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
@@ -52,6 +52,7 @@ public class Analytics {
     });
     //give dummy url to allow for cookie setting
     _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8", "");
+    Log.d(this.getClass().getName(), "Initialized Analytics with user agent: "+_jsAnalytics.getSettings().getUserAgentString());
   }
 
   /**
