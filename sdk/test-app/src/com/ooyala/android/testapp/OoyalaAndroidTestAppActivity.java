@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.FastOoyalaPlayerLayoutController;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
 {

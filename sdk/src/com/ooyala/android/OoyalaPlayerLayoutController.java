@@ -2,26 +2,19 @@ package com.ooyala.android;
 
 import android.R;
 import android.app.Dialog;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-public class OoyalaPlayerLayoutController implements LayoutController {
-  public static enum DefaultControlStyle {
-    NONE,
-    AUTO
-  };
-
-  private OoyalaPlayerLayout _layout = null;
-  private Dialog _fullscreenDialog = null;
-  private OoyalaPlayerLayout _fullscreenLayout = null;
-  private OoyalaPlayerControls _inlineControls = null;
-  private OoyalaPlayerControls _fullscreenControls = null;
-  private OoyalaPlayerControls _inlineOverlay = null;
-  private OoyalaPlayerControls _fullscreenOverlay = null;
-  private OoyalaPlayer _player = null;
+/**
+ * This LayoutController is a generic LayoutController that will work in most cases (regardless of the containing Layout type).
+ * It uses basic controls and allows additional overlays to be added. Fullscreening is done by opening a full screen Dialog
+ * and filling it with a dynamically created OoyalaPlayerLayout. Because of this, playback will be suspended and subsequently
+ * resumed during this process. As a result, fullscreening is slower than if the OoyalaPlayerLayout is embeded directly in the
+ * Activity's base layout, that base layout is a FrameLayout, and the LayoutController used is FastOoyalaPlayerLayoutController.
+ * @author jigish
+ */
+public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
 
   /**
    * Instantiate an OoyalaPlayerLayoutController
@@ -64,56 +57,13 @@ public class OoyalaPlayerLayoutController implements LayoutController {
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
-    _player = p;
-    _layout = l;
-    if (dcs == DefaultControlStyle.AUTO) {
-      setInlineControls(createDefaultControls(_layout, false));
-    }
-    _player.setLayoutController(this);
-    _layout.setLayoutController(this);
-  }
-
-  private OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout, boolean fullscreen) {
-    if (fullscreen) {
-      return new DefaultOoyalaPlayerFullscreenControls(_player, layout);
-    } else {
-      return new DefaultOoyalaPlayerInlineControls(_player, layout);
-    }
-  }
-
-  public void setInlineOverlay(OoyalaPlayerControls controlsOverlay) {
-    _inlineOverlay = controlsOverlay;
-    if (_layout != null)
-      _inlineOverlay.setParentLayout(_layout);
-    _inlineOverlay.setOoyalaPlayer(_player);
-  }
-
-  public void setFullscreenOverlay(OoyalaPlayerControls controlsOverlay) {
-    _fullscreenOverlay = controlsOverlay;
-    if (_fullscreenLayout != null)
-      _fullscreenOverlay.setParentLayout(_fullscreenLayout);
-    _fullscreenOverlay.setOoyalaPlayer(_player);
-  }
-
-  /**
-   * Get the OoyalaPlayer associated with this Controller
-   * @return the OoyalaPlayer
-   */
-  public OoyalaPlayer getPlayer() {
-    return _player;
-  }
-
-  /**
-   * Get the current active layout
-   * @return the current active layout
-   */
-  public OoyalaPlayerLayout getLayout() {
-    return isFullscreen() ? _fullscreenLayout : _layout;
+    super(l, p, dcs);
   }
 
   /**
    * @return true if currently in fullscreen, false if not
    */
+  @Override
   public boolean isFullscreen() {
     return _fullscreenLayout != null;
   }
@@ -122,6 +72,7 @@ public class OoyalaPlayerLayoutController implements LayoutController {
    * Sets the fullscreen state to this layout controller.
    * @param fullscreen
    */
+  @Override
   public void setFullscreen(boolean fullscreen) {
     _player.suspend();
     OoyalaPlayerControls controlsToShow = null;
@@ -153,56 +104,5 @@ public class OoyalaPlayerLayoutController implements LayoutController {
     _player.resume();
     if (controlsToShow != null) { controlsToShow.show(); }
     if (overlayToShow != null) { overlayToShow.show(); }
-  }
-
-  public void setInlineControls(OoyalaPlayerControls controls) {
-    _inlineControls = controls;
-  }
-
-  public void setFullscreenControls(OoyalaPlayerControls controls) {
-    _fullscreenControls = controls;
-  }
-
-  public OoyalaPlayerControls getControls() {
-    return isFullscreen() ? _fullscreenControls : _inlineControls;
-  }
-
-  public OoyalaPlayerControls getOverlay() {
-    return isFullscreen() ? _fullscreenOverlay : _inlineOverlay;
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event, OoyalaPlayerLayout source) {
-    Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+")");
-    //the MediaController will hide after 3 seconds - tap the screen to make it appear again
-    if (_player != null) {
-      switch(_player.getState()) {
-        case INIT:
-        case LOADING:
-        case ERROR:
-          return false;
-        default:
-          if (getControls() != null) {
-            if (getControls().isShowing()) {
-              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - HIDING CONTROLS");
-              getControls().hide();
-            } else {
-              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING CONTROLS");
-              getControls().show();
-            }
-          }
-          if (getOverlay() != null) {
-            if (getOverlay().isShowing()) {
-              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - HIDING OVERLAY");
-              getOverlay().hide();
-            } else {
-              Log.d(this.getClass().getName(), "TEST - TOUCH("+(source == _fullscreenLayout)+") - SHOWING OVERLAY");
-              getOverlay().show();
-            }
-          }
-          return false;
-      }
-    }
-    return false;
   }
 }

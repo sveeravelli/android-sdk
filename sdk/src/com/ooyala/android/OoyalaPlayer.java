@@ -445,13 +445,18 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   /**
    * Set fullscreen mode (will only work if fullscreenLayout is set)
+   * This will call the setFullscreen method on the associated LayoutController. If you are implementing your own
+   * LayoutController here are some things to keep in mind:
+   * <li>If the setFullscreen method of your LayoutController creates a new OoyalaPlayerLayout or switches to a different one,
+   * you *must* call OoyalaPlayer.suspend() before doing so and call OoyalaPlayer.resume() after doing so.
+   * <li>If the setFullscreen method of your LayoutController uses the same OoyalaPlayerLayout, you do not need to do any special handling.
    * @param fullscreen true to switch to fullscreen, false to switch out of fullscreen
    */
   public void setFullscreen(boolean fullscreen) {
-    if (isFullscreen() == !fullscreen) { // this is so we don't suspend/resume if we are not actually changing state.
-      suspend();
+    if (isFullscreen() == !fullscreen) { // this is so we don't add/remove cc view if we are not actually changing state.
+      removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
-      resume();
+      addClosedCaptionsView();
     }
   }
 
