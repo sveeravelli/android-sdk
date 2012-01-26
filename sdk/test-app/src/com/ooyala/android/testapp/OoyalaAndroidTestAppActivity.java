@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.FastOoyalaPlayerLayoutController;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
 {
@@ -33,7 +33,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     Button end = (Button)findViewById(R.id.end);
     end.setOnClickListener(this);
 
-    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com");
+    FastOoyalaPlayerLayoutController layoutController = new FastOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
