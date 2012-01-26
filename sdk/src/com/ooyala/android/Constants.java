@@ -15,7 +15,7 @@ class Constants
   public static final String API_AUTHORIZE            = "authorize";
   public static final String API_METADATA             = "metadata";
 
-  public static final String AUTHORIZE_HOST           = "http://player.ooyala.com"; // TODO fix when sas goes live
+  public static final String AUTHORIZE_HOST           = "http://player.ooyala.com";
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/authorization/embed_code/%s/%s";
   public static final String AUTHORIZE_PUBLIC_KEY_B64 = "MCgCIQD1PX86jvLr5bB3b5IFEze7TiWGEaRSHl5Ls7/3AKO5IwIDAQAB";
