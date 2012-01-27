@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.FastOoyalaPlayerLayoutController;
@@ -32,6 +33,9 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
     Button end = (Button)findViewById(R.id.end);
     end.setOnClickListener(this);
+
+    // optional localization
+    LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
     FastOoyalaPlayerLayoutController layoutController = new FastOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com");
     player = layoutController.getPlayer();
