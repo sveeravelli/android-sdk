@@ -49,8 +49,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // Greg's account: "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com"
     // HLS:    	"9ydnRhMzq-roTTbvwmG20FIwMEB08xom"
     // Live Streaming: "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
-    // Live: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
-
+    // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
     if (player.setEmbedCode("RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh")) {
       Log.d(TAG, "TEST - yay!");

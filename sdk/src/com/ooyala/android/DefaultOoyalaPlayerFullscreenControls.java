@@ -44,6 +44,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   protected void updateButtonStates() {
     _playPause.setPlaying(_player.isPlaying());
     _fullscreen.setFullscreen(_player.isFullscreen());
+    int visibility = _player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE;
+    if(_seekWrapper!=null) _seekWrapper.setVisibility(visibility);
   }
 
   @Override
