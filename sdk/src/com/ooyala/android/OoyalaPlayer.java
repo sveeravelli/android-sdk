@@ -462,7 +462,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   /**
    * Find where the playhead is with millisecond accuracy
-   * @return time in seconds
+   * @return time in milliseconds
    */
   public int getPlayheadTime() {
     if (currentPlayer() == null) {
