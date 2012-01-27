@@ -15,7 +15,7 @@ public class Images {
   public static final int PREVIOUS = 5;
 
   public static GradientDrawable gradientBackground(GradientDrawable.Orientation orientation) {
-    GradientDrawable gradient = new GradientDrawable(orientation, new int[] {0xFF000000, 0xE0151515});
+    GradientDrawable gradient = new GradientDrawable(orientation, new int[] {0xFF000000, 0x80151515});
     gradient.setCornerRadius(0f);
     return gradient;
   }

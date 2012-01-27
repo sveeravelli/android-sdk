@@ -156,7 +156,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     } else if (v == _fullscreen) {
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
-      hide();
     }
   }
 

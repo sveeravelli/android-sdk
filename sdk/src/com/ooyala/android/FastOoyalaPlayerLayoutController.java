@@ -58,8 +58,8 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
   public FastOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
     super(l, p, dcs);
     if (dcs == DefaultControlStyle.AUTO) {
-      setFullscreenControls(createDefaultControls(_layout, true));
-      _fullscreenControls.hide();
+      _fullscreenControls = _inlineControls;
+      _fullscreenOverlay = _inlineOverlay;
     }
     _inlineLP = (FrameLayout.LayoutParams)_layout.getLayoutParams();
     _fullscreenLayout = _layout;
@@ -81,19 +81,11 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
   public void setFullscreen(boolean fullscreen) {
     if (isFullscreen() && !fullscreen) { // Fullscreen -> Not Fullscreen
       _fullscreen = fullscreen;
-      _fullscreenControls.hide();
-      if (_fullscreenOverlay != null) { _fullscreenOverlay.hide(); }
       _layout.setLayoutParams(_inlineLP);
-      _inlineControls.show();
-      if (_inlineOverlay != null) { _inlineOverlay.show(); }
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
       _fullscreen = fullscreen;
-      _inlineControls.hide();
-      if (_inlineOverlay != null) { _inlineOverlay.hide(); }
       _layout.setLayoutParams(_fullscreenLP);
       _layout.bringToFront();
-      _fullscreenControls.show();
-      if (_fullscreenOverlay != null) { _fullscreenOverlay.show(); }
     }
   }
 }
