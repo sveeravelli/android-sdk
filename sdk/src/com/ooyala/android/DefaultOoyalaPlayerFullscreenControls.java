@@ -20,6 +20,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private LinearLayout _bottomOverlay = null;
   private LinearLayout _topBar = null;
   private LinearLayout _seekWrapper = null;
+  private LinearLayout _liveWrapper = null;
   private PlayPauseButton _playPause = null;
   private NextButton _next = null;
   private PreviousButton _previous = null;
@@ -27,6 +28,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private SeekBar _seek = null;
   private TextView _currTime = null;
   private TextView _duration = null;
+  private TextView _liveIndicator = null;
 
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int)((float)PREFERRED_BUTTON_WIDTH_DP*OVERLAY_SCALE);
@@ -44,8 +46,12 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   protected void updateButtonStates() {
     _playPause.setPlaying(_player.isPlaying());
     _fullscreen.setFullscreen(_player.isFullscreen());
-    int visibility = _player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE;
-    if(_seekWrapper!=null) _seekWrapper.setVisibility(visibility);
+
+    if(_seekWrapper!=null) _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
+    if(_liveWrapper!=null) {
+      _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE: View.GONE);
+      _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f);
+    }
   }
 
   @Override
@@ -125,6 +131,22 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     seekWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     _seekWrapper.setLayoutParams(seekWrapperLP);
 
+    _liveWrapper = new LinearLayout(_topBar.getContext());
+    _liveWrapper.setVisibility(View.GONE);
+    _liveWrapper.setOrientation(LinearLayout.HORIZONTAL);
+    _liveIndicator = new TextView(_liveWrapper.getContext());
+    _liveIndicator.setText("LIVE");
+    _liveIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
+    LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    liveIndicatorLP.gravity = Gravity.CENTER;
+    _liveIndicator.setLayoutParams(liveIndicatorLP);
+    _liveWrapper.addView(_liveIndicator);
+    LinearLayout.LayoutParams liveWrapperLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+    liveWrapperLP.gravity = Gravity.CENTER;
+    liveWrapperLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP + PREFERRED_BUTTON_WIDTH_DP);
+    liveWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
+    _liveWrapper.setLayoutParams(liveWrapperLP);
+
     _fullscreen = new FullscreenButton(_topBar.getContext());
     _fullscreen.setFullscreen(_player.isFullscreen());
     LinearLayout.LayoutParams fsLP = new LinearLayout.LayoutParams(Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
@@ -134,6 +156,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     _fullscreen.setOnClickListener(this);
 
     _topBar.addView(_seekWrapper);
+    _topBar.addView(_liveWrapper);
     _topBar.addView(_fullscreen);
     FrameLayout.LayoutParams topBarLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
     _baseLayout.addView(_topBar, topBarLP);

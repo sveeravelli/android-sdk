@@ -62,6 +62,7 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
       _fullscreenControls.hide();
     }
     _inlineLP = (FrameLayout.LayoutParams)_layout.getLayoutParams();
+    _fullscreenLayout = _layout;
   }
 
   /**
