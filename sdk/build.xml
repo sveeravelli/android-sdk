@@ -1,6 +1,6 @@
 <project name="OoyalaSDK" default="release" basedir=".">
   <description>
-Ooyala SDK Android Libaray
+Ooyala Android SDK Library
   </description>
 
   <property environment="env" />
@@ -8,14 +8,15 @@ Ooyala SDK Android Libaray
   <property name="build" location="build" />
   <property name="build.classes" location="${build}/classes" />
   <property name="build.dist" location="${build}/dist" />
-  <property name="build.dist.javadoc" location="${build.dist}/javadoc" />
-  <property name="build.dist.sampleapps" location="${build.dist}/SampleApps" />
+  <property name="build.dist.container" location="${build.dist}/OoyalaSDK-Android" />
+  <property name="build.dist.javadoc" location="${build.dist.container}/Documentation" />
+  <property name="build.dist.sampleapps" location="${build.dist.container}/SampleApps" />
   <property name="jar.name" value="OoyalaSDK.jar" />
-  <property name="jar.location" location="${build.dist}/${jar.name}" />
+  <property name="jar.location" location="${build.dist.container}/${jar.name}" />
   <property name="sampleapp.dir" location="../sample-apps" />
   <property name="sampleapp.channelbrowser.lib.dir" location="${sampleapp.dir}/ChannelBrowserSampleApp/lib" />
-	<property name="sampleapp.gettingstarted.lib.dir" location="${sampleapp.dir}/GettingStartedSampleApp/lib" />
-	<property name="guide.pdf" location="../getting_started.pdf" />
+  <property name="sampleapp.gettingstarted.lib.dir" location="${sampleapp.dir}/GettingStartedSampleApp/lib" />
+  <property name="guide.pdf" location="../getting_started.pdf" />
   <property name="android.jar" location="${env.ANDROID_SDK_DIR}/android.jar" />
   <property name="release.zip" location="${build.dist}/OoyalaSDK-Android.zip" />
   <property name="doc" location="Documentation" />
@@ -39,17 +40,16 @@ Ooyala SDK Android Libaray
     <jar destfile="${jar.location}" basedir="${build.classes}">
       <include name="com/ooyala/android/**" />
     </jar>
-  	<!-- Copy jar to all sample apps -->
+    <!-- Copy jar to all sample apps -->
     <copy todir="${sampleapp.channelbrowser.lib.dir}">
       <fileset dir="${build.dist}"/>
     </copy>
-  	<copy todir="${sampleapp.gettingstarted.lib.dir}">
+    <copy todir="${sampleapp.gettingstarted.lib.dir}">
       <fileset dir="${build.dist}"/>
     </copy>
   </target>
 
   <target name="docs" depends="init">
-    <mkdir dir="${build.dist.javadoc}"/>
     <exec executable="./gen_docs.sh">
     </exec>
   </target>
@@ -57,14 +57,13 @@ Ooyala SDK Android Libaray
   <target name="release" depends="jar,docs">
     <copy todir="${build.dist.javadoc}">
       <fileset dir="${doc.public}"/>
-    	
     </copy>
     <copy todir="${build.dist.sampleapps}">
       <fileset dir="${sampleapp.dir}"/>
     </copy>
-  	<copy todir="${build.dist}">
-  		<fileset file="${guide.pdf}"/>
-  	</copy>
+    <copy todir="${build.dist.container}">
+      <fileset file="${guide.pdf}"/>
+    </copy>
     <zip destfile="${release.zip}" basedir="${build.dist}"/>
   </target>
 </project>
