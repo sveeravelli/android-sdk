@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,9 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     if(_seekWrapper!=null) _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
     if(_liveWrapper!=null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE: View.GONE);
-      _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f);
+      if(Build.VERSION.SDK_INT >= 11) {
+        _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f);  // supported only 11+
+      }
     }
   }
 
