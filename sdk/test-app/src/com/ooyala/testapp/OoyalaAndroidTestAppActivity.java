@@ -1,4 +1,4 @@
-package com.ooyala.android.testapp;
+package com.ooyala.testapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,6 +13,7 @@ import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.FastOoyalaPlayerLayoutController;
+import com.ooyala.android.testapp.R;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
 {
