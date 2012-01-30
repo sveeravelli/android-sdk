@@ -20,7 +20,7 @@ public class VASTLinearAd implements PlayableItem {
    * Initialize a VASTLinearAd using the specified xml (subclasses should override this)
    * @param data the Element containing the xml to use to initialize this VASTLinearAd
    */
-  public VASTLinearAd(Element data) {
+  VASTLinearAd(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
     Node child = data.getFirstChild();
     while (child != null) {

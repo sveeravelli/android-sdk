@@ -20,16 +20,16 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
 
-  public OoyalaAdSpot()
+  OoyalaAdSpot()
   {
   }
 
-  public OoyalaAdSpot(String embedCode)
+  OoyalaAdSpot(String embedCode)
   {
     _embedCode = embedCode;
   }
 
-  public OoyalaAdSpot(JSONObject data, PlayerAPIClient api)
+  OoyalaAdSpot(JSONObject data, PlayerAPIClient api)
   {
     _api = api;
     update(data);

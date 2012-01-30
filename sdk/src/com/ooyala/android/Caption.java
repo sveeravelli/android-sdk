@@ -8,11 +8,11 @@ public class Caption
   protected double _end = 0;
   protected String _text = null;
 
-  public Caption()
+  Caption()
   {
   }
 
-  public Caption(Element element)
+  Caption(Element element)
   {
     if (!element.getTagName().equals(Constants.ELEMENT_P)) { return; }
 

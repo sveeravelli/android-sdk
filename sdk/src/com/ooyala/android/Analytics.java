@@ -21,7 +21,7 @@ public class Analytics {
    * @param context the context the initialize the internal WebView with
    * @param api the API to initialize this Analytics with
    */
-  public Analytics(Context context, PlayerAPIClient api) {
+  Analytics(Context context, PlayerAPIClient api) {
     this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST).replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
   }
 
@@ -30,7 +30,7 @@ public class Analytics {
    * @param context the context the initialize the internal WebView with
    * @param embedHTML the HTML to use when initializing this Analytics
    */
-  public Analytics(Context context, String embedHTML) {
+  Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
     _jsAnalytics.getSettings().setUserAgentString(String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION, _jsAnalytics.getSettings().getUserAgentString()));
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
@@ -61,7 +61,7 @@ public class Analytics {
    * @param embedCode the embed code of the new video
    * @param duration the duration (in seconds) of the new video
    */
-  public void initializeVideo(String embedCode, double duration) {
+  void initializeVideo(String embedCode, double duration) {
     if (_failed) { return; }
     String action = "javascript:reporter.initializeVideo('"+embedCode+"',"+duration+");";
     if (!_ready) {
@@ -74,7 +74,7 @@ public class Analytics {
   /**
    * Report a player load
    */
-  public void reportPlayerLoad() {
+  void reportPlayerLoad() {
     if (_failed) { return; }
     String action = "javascript:reporter.reportPlayerLoad();";
     if (!_ready) {
@@ -88,7 +88,7 @@ public class Analytics {
    * Report a playhead update to the specified time
    * @param time the new playhead time (in seconds)
    */
-  public void reportPlayheadUpdate(double time) {
+  void reportPlayheadUpdate(double time) {
     if (_failed) { return; }
     String action = "javascript:reporter.reportPlayheadUpdate("+time*1000+");";
     if (!_ready) {
@@ -101,7 +101,7 @@ public class Analytics {
   /**
    * Report that the player has started playing
    */
-  public void reportPlayStarted() {
+  void reportPlayStarted() {
     if (_failed) { return; }
     String action = "javascript:reporter.reportPlayStarted();";
     if (!_ready) {
@@ -114,7 +114,7 @@ public class Analytics {
   /**
    * Report that the player was asked to replay
    */
-  public void reportReplay() {
+  void reportReplay() {
     if (_failed) { return; }
     String action = "javascript:reporter.reportReplay();";
     if (!_ready) {

@@ -12,7 +12,7 @@ public class VASTStream extends Stream {
    * Initialize a Stream using the specified VAST MediaFile XML (subclasses should override this)
    * @param data the Element containing the xml to use to initialize this Stream
    */
-  public VASTStream(Element data) {
+  VASTStream(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_MEDIA_FILE)) { return; }
     this._vastDeliveryType = data.getAttribute(Constants.ATTRIBUTE_DELIVERY);
     this._apiFramework = data.getAttribute(Constants.ATTRIBUTE_API_FRAMEWORK);

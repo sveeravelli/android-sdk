@@ -15,22 +15,23 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
 
-  public ChannelSet()
+  ChannelSet()
   {
   }
 
-  public ChannelSet(JSONObject data, String embedCode, PlayerAPIClient api)
+  ChannelSet(JSONObject data, String embedCode, PlayerAPIClient api)
   {
     this(data, embedCode, null, api);
   }
 
-  public ChannelSet(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api)
+  ChannelSet(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api)
   {
     _embedCode = embedCode;
     _api = api;
     update(data);
   }
 
+  @Override
   public synchronized ReturnState update(JSONObject data)
   {
     switch (super.update(data))

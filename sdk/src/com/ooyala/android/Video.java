@@ -22,16 +22,16 @@ public class Video extends ContentItem implements PlayableItem
   protected boolean _live = false;
   protected ClosedCaptions _closedCaptions = null;
 
-  public Video()
+  Video()
   {
   }
 
-  public Video(JSONObject data, String embedCode, PlayerAPIClient api)
+  Video(JSONObject data, String embedCode, PlayerAPIClient api)
   {
     this(data, embedCode, null, api);
   }
 
-  public Video(JSONObject data, String embedCode, Channel parent, PlayerAPIClient api)
+  Video(JSONObject data, String embedCode, Channel parent, PlayerAPIClient api)
   {
     _embedCode = embedCode;
     _api = api;
@@ -196,16 +196,15 @@ public class Video extends ContentItem implements PlayableItem
   }
 
   public ClosedCaptions getClosedCaptions() {
-	return _closedCaptions;
+    return _closedCaptions;
   }
 
   public void setClosedCaptions(ClosedCaptions closedCaptions) {
-	this._closedCaptions = closedCaptions;
+    this._closedCaptions = closedCaptions;
   }
 
-  public boolean hasClosedCaptions()
-  {
-	return _closedCaptions != null && _closedCaptions.getLanguages().size() > 0;
+  public boolean hasClosedCaptions() {
+    return _closedCaptions != null && _closedCaptions.getLanguages().size() > 0;
   }
 
   @Override

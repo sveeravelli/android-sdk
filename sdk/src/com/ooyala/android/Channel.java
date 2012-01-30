@@ -16,16 +16,16 @@ public class Channel extends ContentItem implements PaginatedParentItem
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
 
-  public Channel()
+  Channel()
   {
   }
 
-  public Channel(JSONObject data, String embedCode, PlayerAPIClient api)
+  Channel(JSONObject data, String embedCode, PlayerAPIClient api)
   {
     this(data, embedCode, null, api);
   }
 
-  public Channel(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api)
+  Channel(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api)
   {
     _embedCode = embedCode;
     _api = api;
@@ -33,6 +33,7 @@ public class Channel extends ContentItem implements PaginatedParentItem
     update(data);
   }
 
+  @Override
   public synchronized ReturnState update(JSONObject data)
   {
     switch (super.update(data))

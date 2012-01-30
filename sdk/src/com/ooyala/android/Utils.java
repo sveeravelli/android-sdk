@@ -21,7 +21,7 @@ import org.json.JSONTokener;
 import android.os.Build;
 import android.util.Log;
 
-public class Utils
+class Utils
 {
   public static String device() {
     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)

@@ -11,16 +11,16 @@ public class DynamicChannel extends Channel
 {
   protected List<String> _embedCodes = null;
 
-  public DynamicChannel()
+  DynamicChannel()
   {
   }
 
-  public DynamicChannel(JSONObject data, List<String> embedCodes, PlayerAPIClient api)
+  DynamicChannel(JSONObject data, List<String> embedCodes, PlayerAPIClient api)
   {
     this(data, embedCodes, null, api);
   }
 
-  public DynamicChannel(JSONObject data, List<String> embedCodes, ChannelSet parent, PlayerAPIClient api)
+  DynamicChannel(JSONObject data, List<String> embedCodes, ChannelSet parent, PlayerAPIClient api)
   {
     _authorized = true;
     _authCode = AuthCode.AUTHORIZED;

@@ -18,17 +18,17 @@ public abstract class AdSpot
   protected List<URL> _trackingURLs = null;
   protected PlayerAPIClient _api;
 
-  public AdSpot()
+  AdSpot()
   {
   }
 
-  public AdSpot(JSONObject data, PlayerAPIClient api)
+  AdSpot(JSONObject data, PlayerAPIClient api)
   {
     _api = api;
     update(data);
   }
 
-  public ReturnState update(JSONObject data)
+  ReturnState update(JSONObject data)
   {
     if (data == null) { return ReturnState.STATE_FAIL; }
 
@@ -83,7 +83,7 @@ public abstract class AdSpot
 
   public abstract boolean fetchPlaybackInfo();
 
-  public static AdSpot create(JSONObject data, PlayerAPIClient api)
+  static AdSpot create(JSONObject data, PlayerAPIClient api)
   {
     if (data == null || data.isNull(Constants.KEY_TYPE)) { return null; }
     String type = null;

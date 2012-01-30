@@ -8,7 +8,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class ClosedCaptionsView extends TextView {
+class ClosedCaptionsView extends TextView {
 
 	private Caption _caption;
 

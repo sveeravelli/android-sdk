@@ -28,7 +28,7 @@ public class VASTAdSpot extends AdSpot {
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
    * @param api the PlayerAPIClient that was used to fetch this VASTAd
    */
-  public VASTAdSpot(JSONObject data, PlayerAPIClient api) {
+  VASTAdSpot(JSONObject data, PlayerAPIClient api) {
     _api = api;
     update(data);
   }
@@ -38,7 +38,7 @@ public class VASTAdSpot extends AdSpot {
    * @param data the NSDictionary containing the data to use to update this VASTAdSpot
    * @return ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
    */
-  public ReturnState update(JSONObject data) {
+  ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;

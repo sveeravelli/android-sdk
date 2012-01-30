@@ -23,16 +23,16 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
 
-  public ContentItem()
+  ContentItem()
   {
   }
 
-  public ContentItem(String embedCode, String title, String description)
+  ContentItem(String embedCode, String title, String description)
   {
     this(embedCode, null, title, description);
   }
 
-  public ContentItem(String embedCode, String contentToken, String title, String description)
+  ContentItem(String embedCode, String contentToken, String title, String description)
   {
     _embedCode = embedCode;
     _contentToken = contentToken;
@@ -40,7 +40,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
     _description = description;
   }
 
-  public ContentItem(JSONObject data, String embedCode, PlayerAPIClient api)
+  ContentItem(JSONObject data, String embedCode, PlayerAPIClient api)
   {
     _embedCode = embedCode;
     _api = api;
@@ -69,7 +69,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    * Get the contentToken for this content item.
    * @return contentToken of this content item
    */
-  public String getContentToken()
+  String getContentToken()
   {
     return _contentToken;
   }
@@ -103,6 +103,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    */
   public abstract int getDuration();
 
+  @Override
   public ReturnState update(JSONObject data)
   {
     if (data == null) { return ReturnState.STATE_FAIL; }
@@ -147,14 +148,14 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
     return ReturnState.STATE_MATCHED;
   }
 
-  public static ContentItem create(JSONObject data, List<String> embedCodes, PlayerAPIClient api)
+  static ContentItem create(JSONObject data, List<String> embedCodes, PlayerAPIClient api)
   {
     if (data == null || embedCodes == null || embedCodes.size() == 0) { return null; }
     if (embedCodes.size() == 1) { return create(data, embedCodes.get(0), api); }
     return new DynamicChannel(data, embedCodes, api);
   }
 
-  public static ContentItem create(JSONObject data, String embedCode, PlayerAPIClient api)
+  static ContentItem create(JSONObject data, String embedCode, PlayerAPIClient api)
   {
     if (data == null || embedCode == null || data.isNull(embedCode)) { return null; }
     String contentType = null;
@@ -196,6 +197,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
     }
   }
 
+  @Override
   public List<String> embedCodesToAuthorize()
   {
     List<String> embedCodes = new ArrayList<String>();
@@ -227,10 +229,12 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
     return result;
   }
 
+  @Override
   public boolean isAuthorized() {
     return _authorized;
   }
 
+  @Override
   public int getAuthCode() {
     return _authCode;
   }

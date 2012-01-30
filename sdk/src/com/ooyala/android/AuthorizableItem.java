@@ -38,14 +38,14 @@ public interface AuthorizableItem
     public static int MAX_AUTH_CODE = 16;                 /**< The maximum value for auth codes from the server */
   }
 
-  /**
+  /** For internal use only.
    * Update the ContentItem using the specified data (subclasses should override and call this)
    * @param data the data to use to update this ContentItem
    * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
   public ReturnState update(JSONObject data);
 
-  /**
+  /** For internal use only.
    * The embed code for the AuthorizableItem
    * @return the embed codes to authorize as a List
    */

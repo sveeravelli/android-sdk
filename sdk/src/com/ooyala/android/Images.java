@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.GradientDrawable;
 
-public class Images {
+class Images {
   public static final int PLAY = 0;
   public static final int PAUSE = 1;
   public static final int FULLSCREEN = 2;

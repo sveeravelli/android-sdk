@@ -70,13 +70,13 @@ public class Stream
     _selector = new DefaultStreamSelector();
   }
 
-  public Stream() {}
+  Stream() {}
 
-  public Stream(JSONObject data) {
+  Stream(JSONObject data) {
     update(data);
   }
 
-  public ReturnState update(JSONObject data)
+  ReturnState update(JSONObject data)
   {
     if (data.isNull(Constants.KEY_DELIVERY_TYPE))
     {

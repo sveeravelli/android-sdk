@@ -5,20 +5,20 @@ import java.util.*;
 public final class LocalizationSupport {
   private static Map<String, Map<String,String>> defaultLocales = null;
   private static Map<String, String> currentLocalizedStrings = null;
-  
+
   private static void createDefaultLocales() {
     final Map<String, String> en_US = new HashMap<String, String>();
     en_US.put("LIVE", "LIVE");
 
-    final Map<String, String> ja_JP = new HashMap<String, String>(); 
+    final Map<String, String> ja_JP = new HashMap<String, String>();
     ja_JP.put("LIVE", "ライブビデオ");
-    
+
     defaultLocales = new HashMap<String, Map<String,String>>();
     defaultLocales.put("en_US", en_US);
     defaultLocales.put("ja_JP", ja_JP);
     currentLocalizedStrings = loadLocalizedStrings("en_US");
   }
-  
+
   /**
    * Loads a map of localized strings for specified locale
    * @param localeId The ID of locale (such as en_US)
@@ -27,7 +27,7 @@ public final class LocalizationSupport {
     if(defaultLocales==null) createDefaultLocales();
     return defaultLocales.get(localeId);
   }
-  
+
   /**
    * Instructs the player to use localized strings
    */

@@ -9,7 +9,7 @@ import org.json.*;
 
 import android.util.Log;
 
-public class OoyalaAPIHelper {
+class OoyalaAPIHelper {
   private SecureURLGenerator _secureURLGenerator = null;
 
   public OoyalaAPIHelper(String apiKey, String secretKey) {

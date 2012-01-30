@@ -72,11 +72,11 @@ public class OoyalaAPIClient {
     return _apiHelper.getSecureURLGenerator();
   }
 
-  public String getPcode() {
+  String getPcode() {
     return _playerAPI.getPcode();
   }
 
-  public String getDomain() {
+  String getDomain() {
     return _playerAPI.getDomain();
   }
 }

@@ -29,7 +29,7 @@ public class VASTAd {
    * Initialize a VASTAd using the specified xml (subclasses should override this)
    * @param data the Element containing the xml to use to initialize this VASTAd
    */
-  public VASTAd(Element data) {
+  VASTAd(Element data) {
     if (!data.getTagName().equals(Constants.ELEMENT_AD)) { return; }
     _adID = data.getAttribute(Constants.ATTRIBUTE_ID);
     update(data);
@@ -40,7 +40,7 @@ public class VASTAd {
    * @param xml the TBXMLElement containing the xml to use to update this VASTAd
    * @return YES if the XML was properly formatter, NO if not
    */
-  public boolean update(Element xml) {
+  boolean update(Element xml) {
     Node type = xml.getFirstChild();
     boolean found = false;
     while (type != null) {

@@ -31,16 +31,16 @@ public class ClosedCaptions
   protected Map<String,String> _styles = new HashMap<String,String>();
   protected Map<String,List<Caption>> _captions = new HashMap<String,List<Caption>>();
 
-  public ClosedCaptions()
+  ClosedCaptions()
   {
   }
 
-  public ClosedCaptions(JSONObject data)
+  ClosedCaptions(JSONObject data)
   {
     update(data);
   }
 
-  public ReturnState update(JSONObject data)
+  ReturnState update(JSONObject data)
   {
     if (data == null) { return ReturnState.STATE_FAIL; }
 
