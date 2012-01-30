@@ -18,10 +18,10 @@ import android.util.Log;
 import com.ooyala.android.Constants.ReturnState;
 
 public class VASTAdSpot extends AdSpot {
-  protected String _signature;                           /**< The signature for the vast request */
-  protected long _expires;                               /**< The expires for the vast request */
-  protected URL _vastURL;                                /**< The url for the vast request */
-  protected List<VASTAd> _ads = new ArrayList<VASTAd>(); /**< The actual ads (List of VASTAd) */
+  protected String _signature;                           /** The signature for the vast request */
+  protected long _expires;                               /** The expires for the vast request */
+  protected URL _vastURL;                                /** The url for the vast request */
+  protected List<VASTAd> _ads = new ArrayList<VASTAd>(); /** The actual ads (List of VASTAd) */
 
   /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)

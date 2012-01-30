@@ -3,10 +3,10 @@ package com.ooyala.android;
 import org.w3c.dom.Element;
 
 public class VASTStream extends Stream {
-  private boolean _scalable;            /**< if this stream is scalable */
-  private boolean _maintainAspectRatio; /**< if this stream must maintain the aspect ratio */
-  private String _vastDeliveryType;     /**< the vast delivery type of this stream */
-  private String _apiFramework;         /**< the apiFramework of this stream */
+  private boolean _scalable;            /** if this stream is scalable */
+  private boolean _maintainAspectRatio; /** if this stream must maintain the aspect ratio */
+  private String _vastDeliveryType;     /** the vast delivery type of this stream */
+  private String _apiFramework;         /** the apiFramework of this stream */
 
   /**
    * Initialize a Stream using the specified VAST MediaFile XML (subclasses should override this)

@@ -10,8 +10,8 @@ import android.view.View;
 
 abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
-  protected State _state = State.INIT; /**< the current state of the player */
-  protected String _error = null; /**< The Player's current error if it exists */
+  protected State _state = State.INIT; /** the current state of the player */
+  protected String _error = null; /** The Player's current error if it exists */
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;

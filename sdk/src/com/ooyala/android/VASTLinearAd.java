@@ -8,13 +8,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class VASTLinearAd implements PlayableItem {
-  private double _duration;                                                                /**< The duration of the ad in seconds */
-  private HashMap<String,Set<String>> _trackingEvents = new HashMap<String,Set<String>>(); /**< The tracking events in a HashMap of event name to Set of String */
-  private String _parameters;                                                              /**< The additional ad parameters */
-  private String _clickThroughURL;                                                         /**< The click through url */
-  private Set<String> _clickTrackingURLs = new HashSet<String>();                          /**< The click tracking urls in an Set of String */
-  private Set<String> _customClickURLs = new HashSet<String>();                            /**< The custom click urls in an Set of String */
-  private Set<Stream> _streams = new HashSet<Stream>();                                    /**< The streams in an HashSet of Stream */
+  private double _duration;                                                                /** The duration of the ad in seconds */
+  private HashMap<String,Set<String>> _trackingEvents = new HashMap<String,Set<String>>(); /** The tracking events in a HashMap of event name to Set of String */
+  private String _parameters;                                                              /** The additional ad parameters */
+  private String _clickThroughURL;                                                         /** The click through url */
+  private Set<String> _clickTrackingURLs = new HashSet<String>();                          /** The click tracking urls in an Set of String */
+  private Set<String> _customClickURLs = new HashSet<String>();                            /** The custom click urls in an Set of String */
+  private Set<Stream> _streams = new HashSet<Stream>();                                    /** The streams in an HashSet of Stream */
 
   /**
    * Initialize a VASTLinearAd using the specified xml (subclasses should override this)

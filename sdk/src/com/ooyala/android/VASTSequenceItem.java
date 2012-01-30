@@ -3,10 +3,10 @@ package com.ooyala.android;
 import org.w3c.dom.Element;
 
 public class VASTSequenceItem implements Comparable<VASTSequenceItem> {
-  private int _number = -1;            /**< The sequence number associated with this item in the sequence */
-  private VASTLinearAd _linear = null; /**< The Linear Ad associated with this item in the sequence */
-  private Element _nonLinears = null;  /**< The Non-Linear Ads associated with this item in the sequence (XML Element) */
-  private Element _companions = null;  /**< The Companion Ads associated with this item in the sequence (XML Element) */
+  private int _number = -1;            /** The sequence number associated with this item in the sequence */
+  private VASTLinearAd _linear = null; /** The Linear Ad associated with this item in the sequence */
+  private Element _nonLinears = null;  /** The Non-Linear Ads associated with this item in the sequence (XML Element) */
+  private Element _companions = null;  /** The Companion Ads associated with this item in the sequence (XML Element) */
 
   /**
    * Whether or not this VASTSequenceItem has a linear ad
