@@ -24,7 +24,7 @@ import android.util.Log;
 class Utils
 {
   public static String device() {
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+    if(Build.VERSION.SDK_INT >= 11) // HONEYCOMB
       return Constants.DEVICE_ANDROID_3PLUS_SDK;
     else
       return Constants.DEVICE_ANDROID_SDK;

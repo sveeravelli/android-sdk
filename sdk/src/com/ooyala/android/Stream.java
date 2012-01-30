@@ -269,7 +269,7 @@ public class Stream
   {
     String type = stream.getDeliveryType();
     return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
-        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && type.equals(Constants.DELIVERY_TYPE_HLS));   // Android v3+ supports HLS
+        || (Build.VERSION.SDK_INT >= 11 && type.equals(Constants.DELIVERY_TYPE_HLS));   // Android v3+ (HONEYCOMB) supports HLS
   }
 
   public static Stream bestStream(Set<Stream> streams) {
