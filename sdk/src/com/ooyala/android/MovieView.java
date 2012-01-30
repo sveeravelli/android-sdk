@@ -1,4 +1,4 @@
-package com.ooyala.android.player;
+package com.ooyala.android;
 
 import android.content.Context;
 import android.util.AttributeSet;

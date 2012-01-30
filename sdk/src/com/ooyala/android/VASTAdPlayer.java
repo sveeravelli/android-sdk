@@ -1,4 +1,4 @@
-package com.ooyala.android.player;
+package com.ooyala.android;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,15 +8,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ooyala.android.NetUtils;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.VASTAd;
-import com.ooyala.android.VASTAdSpot;
-import com.ooyala.android.VASTLinearAd;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.VASTSequenceItem;
 
-public class VASTAdPlayer extends MoviePlayer {
+
+class VASTAdPlayer extends MoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private NetUtils _pinger;

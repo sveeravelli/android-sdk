@@ -3,7 +3,7 @@ package com.ooyala.android;
 import java.io.IOException;
 import java.net.URL;
 
-public class NetUtils {
+class NetUtils {
   public void ping(URL url) {
     if (url == null) { return; }
     try {

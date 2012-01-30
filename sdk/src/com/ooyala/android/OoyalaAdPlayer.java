@@ -1,13 +1,11 @@
-package com.ooyala.android.player;
+package com.ooyala.android;
 
 import java.net.URL;
 
-import com.ooyala.android.NetUtils;
-import com.ooyala.android.OoyalaAdSpot;
-import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
-public class OoyalaAdPlayer extends MoviePlayer {
+
+class OoyalaAdPlayer extends MoviePlayer {
   private OoyalaAdSpot _ad;
 
   public OoyalaAdPlayer() {

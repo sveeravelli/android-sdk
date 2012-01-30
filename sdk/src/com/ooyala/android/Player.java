@@ -1,14 +1,14 @@
-package com.ooyala.android.player;
+package com.ooyala.android;
 
 import java.util.Observable;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 import android.view.SurfaceView;
 import android.view.View;
 
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
 
-public abstract class Player extends Observable {
+abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
   protected State _state = State.INIT; /**< the current state of the player */
   protected String _error = null; /**< The Player's current error if it exists */

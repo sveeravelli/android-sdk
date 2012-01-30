@@ -1,7 +1,9 @@
-package com.ooyala.android.player;
+package com.ooyala.android;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -21,9 +23,6 @@ import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.Stream;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -32,7 +31,7 @@ import com.ooyala.android.Stream;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-public class MoviePlayer extends Player implements OnBufferingUpdateListener,
+class MoviePlayer extends Player implements OnBufferingUpdateListener,
                                                    OnCompletionListener,
                                                    OnErrorListener,
                                                    OnPreparedListener,

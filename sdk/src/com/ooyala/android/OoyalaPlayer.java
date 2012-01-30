@@ -7,10 +7,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
-import com.ooyala.android.player.MoviePlayer;
-import com.ooyala.android.player.OoyalaAdPlayer;
-import com.ooyala.android.player.Player;
-import com.ooyala.android.player.VASTAdPlayer;
 
 import android.media.MediaMetadataRetriever;
 import android.os.Handler;
