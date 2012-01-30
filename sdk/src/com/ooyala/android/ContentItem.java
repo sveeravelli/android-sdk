@@ -11,7 +11,7 @@ import com.ooyala.android.Constants.ReturnState;
  * Stores the info and metadata for the specified content item.
  *
  */
-public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<String>
+public abstract class ContentItem implements AuthorizableItemInternal, OrderedMapValue<String>
 {
   protected String _embedCode = null;
   protected String _externalId = null;
@@ -104,6 +104,11 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   public abstract int getDuration();
 
   @Override
+  /** For internal use only.
+   * Update the AuthorizableItem using the specified data (subclasses should override and call this)
+   * @param data the data to use to update this AuthorizableItem
+   * @return a ReturnState based on if the data matched or not (or parsing failed)
+   */
   public ReturnState update(JSONObject data)
   {
     if (data == null) { return ReturnState.STATE_FAIL; }
@@ -198,6 +203,10 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   }
 
   @Override
+  /** For internal use only.
+   * The embed codes to authorize for the AuthorizableItem
+   * @return the embed codes to authorize as a List
+   */
   public List<String> embedCodesToAuthorize()
   {
     List<String> embedCodes = new ArrayList<String>();

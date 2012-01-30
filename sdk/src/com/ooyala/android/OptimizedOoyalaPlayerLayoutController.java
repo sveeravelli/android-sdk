@@ -10,7 +10,7 @@ import android.widget.FrameLayout;
  * a player reload thus causing this to be much faster at Fullscreening than OoyalaPlayerLayoutController.
  * @author jigish
  */
-public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
+public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
   private boolean _fullscreen = false;
   private FrameLayout.LayoutParams _inlineLP = null;
   private FrameLayout.LayoutParams _fullscreenLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.FILL);
@@ -23,7 +23,7 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public FastOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain) {
     this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO);
   }
 
@@ -32,7 +32,7 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
    * @param l the layout to use
    * @param p the instantiated player to use
    */
-  public FastOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p) {
     this(l, p, DefaultControlStyle.AUTO);
   }
 
@@ -45,7 +45,7 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public FastOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain, DefaultControlStyle dcs) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain, DefaultControlStyle dcs) {
     this(l, new OoyalaPlayer(apiKey, secret, pcode, domain), dcs);
   }
 
@@ -55,7 +55,7 @@ public class FastOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayout
    * @param p the instantiated player to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public FastOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
     super(l, p, dcs);
     if (dcs == DefaultControlStyle.AUTO) {
       _fullscreenControls = _inlineControls;

@@ -12,7 +12,7 @@ import android.widget.Button;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.FastOoyalaPlayerLayoutController;
+import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
@@ -38,7 +38,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // optional localization
     LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
-    FastOoyalaPlayerLayoutController layoutController = new FastOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com");
+    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"

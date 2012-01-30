@@ -19,6 +19,7 @@ src/com/ooyala/android/DynamicChannel.java
 src/com/ooyala/android/EmbeddedSecureURLGenerator.java
 src/com/ooyala/android/EmbeddedSignatureGenerator.java
 src/com/ooyala/android/LayoutController.java
+src/com/ooyala/android/LocalizationSupport.java
 src/com/ooyala/android/OoyalaAdSpot.java
 src/com/ooyala/android/OoyalaAPIClient.java
 src/com/ooyala/android/OoyalaException.java
@@ -26,6 +27,7 @@ src/com/ooyala/android/OoyalaPlayer.java
 src/com/ooyala/android/OoyalaPlayerControls.java
 src/com/ooyala/android/OoyalaPlayerLayout.java
 src/com/ooyala/android/OoyalaPlayerLayoutController.java
+src/com/ooyala/android/OptimizedOoyalaPlayerLayoutController.java
 src/com/ooyala/android/OrderedMap.java
 src/com/ooyala/android/PaginatedItemListener.java
 src/com/ooyala/android/PaginatedItemResponse.java

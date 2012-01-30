@@ -13,7 +13,7 @@ import com.ooyala.android.Constants.ReturnState;
  * Stores the info and metadata for the specified content item.
  *
  */
-public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableItem
+public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, PlayableItem
 {
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected String _embedCode = null;
@@ -44,6 +44,11 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
     return _embedCode;
   }
 
+  /** For internal use only.
+   * Update the AuthorizableItem using the specified data (subclasses should override and call this)
+   * @param data the data to use to update this AuthorizableItem
+   * @return a ReturnState based on if the data matched or not (or parsing failed)
+   */
   public ReturnState update(JSONObject data)
   {
     switch (super.update(data))
@@ -125,6 +130,10 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableIt
     return Stream.bestStream(_streams);
   }
 
+  /** For internal use only.
+   * The embed codes to authorize for the AuthorizableItem
+   * @return the embed codes to authorize as a List
+   */
   public List<String> embedCodesToAuthorize()
   {
     List<String> embedCodes = new ArrayList<String>();

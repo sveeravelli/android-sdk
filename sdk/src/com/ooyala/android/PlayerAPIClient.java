@@ -196,7 +196,7 @@ class PlayerAPIClient
     return params;
   }
 
-  public boolean authorize(AuthorizableItem item) throws OoyalaException
+  public boolean authorize(AuthorizableItemInternal item) throws OoyalaException
   {
     List<String> embedCodes = item.embedCodesToAuthorize();
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
@@ -215,7 +215,7 @@ class PlayerAPIClient
     return true;
   }
 
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent) throws OoyalaException
   {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());

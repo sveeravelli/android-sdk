@@ -34,6 +34,11 @@ public class Channel extends ContentItem implements PaginatedParentItem
   }
 
   @Override
+  /** For internal use only.
+   * Update the AuthorizableItem using the specified data (subclasses should override and call this)
+   * @param data the data to use to update this AuthorizableItem
+   * @return a ReturnState based on if the data matched or not (or parsing failed)
+   */
   public synchronized ReturnState update(JSONObject data)
   {
     switch (super.update(data))
