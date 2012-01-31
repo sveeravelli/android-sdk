@@ -1,7 +1,9 @@
 package com.ooyala.android.sampleapp;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,6 @@ import com.ooyala.android.Channel;
 import com.ooyala.android.ContentItem;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaException;
-import com.ooyala.android.Utils;
 
 import com.ooyala.android.Video;
 
@@ -79,7 +80,7 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   protected void addItem(List<Map<String, Object>> data, String name, int duration, String thumbnail, Intent intent) {
       Map<String, Object> temp = new HashMap<String, Object>();
       temp.put("title", name);
-      temp.put("duration", Utils.timeStringFromMillis(duration, true));
+      temp.put("duration", timeStringFromMillis(duration, true));
       temp.put("thumbnail", thumbnail);
       temp.put("intent", intent);
       data.add(temp);
@@ -93,4 +94,10 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
       startActivity(intent);
   }
 
+  private String timeStringFromMillis(int millis, boolean includeHours) {
+    Calendar c = Calendar.getInstance();
+    c.setTimeInMillis(millis+(8*60*60*1000));
+    SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
+    return sdf.format(c.getTime());
+  }
 }
