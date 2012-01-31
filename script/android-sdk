@@ -1,0 +1,88 @@
+#!/bin/bash
+
+BEGINDIR=`pwd`
+BINDIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASEDIR=$BINDIR/../
+SDKDIR=$BASEDIR/sdk
+SAMPLEDIR=$BASEDIR/sample-apps
+
+# Generate the docs
+function doc {
+  CURRDIR=`pwd`
+  cd $SDKDIR
+  echo
+  echo "Removing Old Docs..."
+  rm -rf Documentation/complete Documentation/public
+  echo "Generating Public Docs..."
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public
+  echo "Generating Complete Docs..."
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete
+  echo
+  echo "Document Generation Complete!"
+  echo
+  cd $CURRDIR
+}
+
+# Generate the release
+function gen {
+  cd $SDKDIR
+  VERSION=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
+  DATE=`date`
+  echo "v$VERSION" >> VERSION
+  echo "Created On: $DATE" >> VERSION
+  ant release
+  cd $BASEDIR
+  cp sdk/build/dist/OoyalaSDK-Android.zip .
+}
+
+function pub {
+  if [[ "$1" = "-gen" || "$1" = "-g" || "$2" = "-gen" || "$2" = "-g" ]]; then
+    gen
+  fi
+
+  cd $BASEDIR
+
+  if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
+    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/OoyalaSDK-Android-Nightly.zip
+  else
+    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/ |grep OoyalaSDK-Android`" != "" ]]; then
+      rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android*
+    fi
+
+    VERSION=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
+    DATE=`date +%Y%m%d%H%M%S`
+    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android-${VERSION}-${DATE}.zip
+    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/OoyalaSDK-Android-${VERSION}-${DATE}.zip
+    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android.zip
+  fi
+}
+
+function tests {
+  CURRDIR=`pwd`
+  cd $SDKDIR
+  cd tests
+  adb shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner
+  cd $CURRDIR
+}
+
+function usage {
+  echo "$0 <task> <options>"
+  echo "  tasks:"
+  echo "    gen_docs|docs|doc|d       : generate the documentation"
+  echo "    gen_release|gen|g         : generate the release"
+  echo "    pub_release|publish|pub|p : publish the release"
+  echo "      options:"
+  echo "        -[gen|g]     : generate the release prior to publishing"
+  echo "        -[nightly|n] : publish the nightly version of the release"
+  echo "    run_tests|tests|test|t    : run the unit tests"
+}
+
+case "$1" in
+  gen_release|gen|g) gen;;
+  gen_docs|docs|doc|d) doc;;
+  pub_release|publish|pub|p) pub $2 $3;;
+  run_tests|tests|test|t) tests;;
+  *) usage;;
+esac
+
+cd $BEGINDIR

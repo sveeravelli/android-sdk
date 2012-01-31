@@ -50,7 +50,8 @@ Ooyala Android SDK Library
   </target>
 
   <target name="docs" depends="init">
-    <exec executable="./gen_docs.sh">
+    <exec executable="../script/android-sdk">
+      <arg value="doc"/>
     </exec>
   </target>
 
@@ -61,6 +62,7 @@ Ooyala Android SDK Library
     <copy todir="${build.dist.sampleapps}">
       <fileset dir="${sampleapp.dir}"/>
     </copy>
+    <move file="VERSION" tofile="${build.dist.container}/VERSION"/>
     <copy todir="${build.dist.container}">
       <fileset file="${guide.pdf}"/>
     </copy>
