@@ -119,7 +119,7 @@ function tests {
   adb install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
   adb install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk 
   adb shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
-  if [[ "`cat $BASEDIR/test_results.txt |grep error`" != "" || "`cat $BASEDIR/test_results.txt |grep FAIL`" != "" ]]; then
+  if [[ "`cat $BASEDIR/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
     echo "Tests Failed!"
     cd $CURRDIR
     exit
