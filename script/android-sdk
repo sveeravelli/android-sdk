@@ -132,6 +132,7 @@ function tests {
 function setup {
   if [[ "${ANDROID_SDKS}" = "" ]]; then
     echo "Please set the environment variable ANDROID_SDKS to point to your Android platform SDK directory and try again."
+    exit
   fi
   echo "sdk.dir=${ANDROID_SDKS}" > $BASEDIR/sdk/local.properties
   cp $BASEDIR/sdk/local.properties $BASEDIR/sdk/test-app/local.properties
