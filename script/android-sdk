@@ -45,7 +45,7 @@ function pub {
   if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
     cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/OoyalaSDK-Android-Nightly.zip
   else
-    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/ |grep OoyalaSDK-Android`" != "" ]]; then
+    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep OoyalaSDK-Android`" != "" ]]; then
       rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android*
     fi
 
