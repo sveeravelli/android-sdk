@@ -118,16 +118,28 @@ function tests {
   cd tests
   ant clean
   ant debug
+  echo "  Uninstalling apps..."
+  echo "    TestApp:   `${ADB} uninstall com.ooyala.android.testapp`"
+  echo "    UnitTests: `${ADB} uninstall com.ooyala.android.testapp.test`"
+  echo "  Installing apps..."
+  echo "    TestApp:"
   ${ADB} install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
+  echo "    UnitTests:"
   ${ADB} install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk
   ${ADB} shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
   if [[ "`cat $BASEDIR/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
     echo "Tests Failed!"
+    echo "  Uninstalling apps..."
+    echo "    TestApp:   `${ADB} uninstall com.ooyala.android.testapp`"
+    echo "    UnitTests: `${ADB} uninstall com.ooyala.android.testapp.test`"
     cd $CURRDIR
     exit
   fi
   echo "Tests Passed!"
   rm $BASEDIR/test_results.txt
+  echo "  Uninstalling apps..."
+  echo "    TestApp:   `${ADB} uninstall com.ooyala.android.testapp`"
+  echo "    UnitTests: `${ADB} uninstall com.ooyala.android.testapp.test`"
   cd $CURRDIR
 }
 
