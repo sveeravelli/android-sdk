@@ -36,6 +36,19 @@ function gen {
 }
 
 function pub {
+  if [[ "$1" != "" ]]; then
+    if [[ "$1" != "-gen" && "$1" != "-g" && "$1" != "-nightly" && "$1" != "-n" ]]; then
+      echo "ERROR: invalid option: $1"
+      usage
+    fi
+  fi
+  if [[ "$2" != "" ]]; then
+    if [[ "$2" != "-gen" && "$2" != "-g" && "$2" != "-nightly" && "$2" != "-n" ]]; then
+      echo "ERROR: invalid option: $2"
+      usage
+    fi
+  fi
+
   if [[ "$1" = "-gen" || "$1" = "-g" || "$2" = "-gen" || "$2" = "-g" ]]; then
     gen
   fi
@@ -75,6 +88,7 @@ function usage {
   echo "        -[gen|g]     : generate the release prior to publishing"
   echo "        -[nightly|n] : publish the nightly version of the release"
   echo "    run_tests|tests|test|t    : run the unit tests"
+  exit
 }
 
 case "$1" in
