@@ -5,6 +5,10 @@ BINDIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=$BINDIR/../
 SDKDIR=$BASEDIR/sdk
 SAMPLEDIR=$BASEDIR/sample-apps
+JAR_BASE="OoyalaSDK"
+JAR_NAME="${JAR_BASE}.jar"
+ZIP_BASE="${JAR_BASE}-Android"
+ZIP_NAME="${ZIP_BASE}.zip"
 
 # Generate the docs
 function doc {
@@ -25,14 +29,45 @@ function doc {
 
 # Generate the release
 function gen {
+  # Run tests before doing anything to make sure we are passing.
+  tests
+
+  cd $BASEDIR
+  rm -rf $ZIP_BASE
+  mkdir $ZIP_BASE
+
+  #create jar
   cd $SDKDIR
+  ant clean
+  ant release
+  cp bin/classes.jar $BASEDIR/$ZIP_BASE/$JAR_NAME
+
+  #update sample apps
+  cp $BASEDIR/$ZIP_BASE/$JAR_NAME $SAMPLEDIR/GettingStartedSampleApp/lib/
+  cp $BASEDIR/$ZIP_BASE/$JAR_NAME $SAMPLEDIR/ChannelBrowserSampleApp/lib/
+
+  #copy sample apps
+  cd $BASEDIR
+  cp -R $SAMPLEDIR $ZIP_BASE/SampleApps
+
+  #getting started guide
+  cp getting_started.pdf $ZIP_BASE/
+
+  #version file
   VERSION=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
   DATE=`date`
-  echo "v$VERSION" >> VERSION
-  echo "Created On: $DATE" >> VERSION
-  ant release
+  echo "v$VERSION" >> $ZIP_BASE/VERSION
+  echo "Created On: $DATE" >> $ZIP_BASE/VERSION
+
+  #docs
+  doc
+  cp -R sdk/Documentation/public $BASEDIR/$ZIP_BASE/Documentation
+
+  #zip
   cd $BASEDIR
-  cp sdk/build/dist/OoyalaSDK-Android.zip .
+  rm $ZIP_NAME
+  zip -r $ZIP_BASE $ZIP_BASE/*
+  rm -rf $ZIP_BASE
 }
 
 function pub {
@@ -56,25 +91,41 @@ function pub {
   cd $BASEDIR
 
   if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
-    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/OoyalaSDK-Android-Nightly.zip
+    cp $ZIP_NAME ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/$ZIP_BASE-Nightly.zip
   else
-    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep OoyalaSDK-Android`" != "" ]]; then
-      rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android*
+    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep $ZIP_BASE`" != "" ]]; then
+      rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/$ZIP_BASE*
     fi
 
     VERSION=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
     DATE=`date +%Y%m%d%H%M%S`
-    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android-${VERSION}-${DATE}.zip
-    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/OoyalaSDK-Android-${VERSION}-${DATE}.zip
-    cp OoyalaSDK-Android.zip ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/OoyalaSDK-Android.zip
+    cp $ZIP_NAME ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/$ZIP_BASE-${VERSION}-${DATE}.zip
+    cp $ZIP_NAME ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/$ZIP_BASE-${VERSION}-${DATE}.zip
+    cp $ZIP_NAME ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/$ZIP_NAME
   fi
 }
 
 function tests {
+  echo "Running Unit Tests..."
   CURRDIR=`pwd`
   cd $SDKDIR
+  ant clean
+  cd test-app
+  ant clean
+  cd ..
   cd tests
-  adb shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner
+  ant clean
+  ant debug
+  adb install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
+  adb install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk 
+  adb shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
+  if [[ "`cat $BASEDIR/test_results.txt |grep error`" != "" || "`cat $BASEDIR/test_results.txt |grep FAIL`" != "" ]]; then
+    echo "Tests Failed!"
+    cd $CURRDIR
+    exit
+  fi
+  echo "Tests Passed!"
+  rm $BASEDIR/test_results.txt
   cd $CURRDIR
 }
 

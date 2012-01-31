@@ -5,9 +5,10 @@
 */tests/bin
 */gen
 */tests/gen
-*/build
+*/local.properties
 sdk/Documentation
 sdk/*/bin
 sdk/*/gen
+sdk/*/local.properties
 sample-apps/*/bin
 sample-apps/*/gen
