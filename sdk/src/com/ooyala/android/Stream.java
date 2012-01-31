@@ -35,7 +35,7 @@ public class Stream
       for (Stream stream : streams)
       {
         // for remote assets, just pick the first stream
-        if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))
+        if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET) || stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS))
         {
           return stream;
         }
