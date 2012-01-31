@@ -10,6 +10,8 @@ JAR_NAME="${JAR_BASE}.jar"
 ZIP_BASE="${JAR_BASE}-Android"
 ZIP_NAME="${ZIP_BASE}.zip"
 
+ADB=${ANDROID_SDKS}/platform-tools/adb
+
 # Generate the docs
 function doc {
   CURRDIR=`pwd`
@@ -116,9 +118,9 @@ function tests {
   cd tests
   ant clean
   ant debug
-  adb install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
-  adb install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk 
-  adb shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
+  ${ADB} install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
+  ${ADB} install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk
+  ${ADB} shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
   if [[ "`cat $BASEDIR/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
     echo "Tests Failed!"
     cd $CURRDIR
