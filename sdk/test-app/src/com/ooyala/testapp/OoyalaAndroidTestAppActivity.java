@@ -1,5 +1,8 @@
 package com.ooyala.testapp;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.res.Configuration;
@@ -15,7 +18,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
 
-public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer
 {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
@@ -41,6 +44,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
+    player.addObserver(this);
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
     // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
@@ -116,5 +120,10 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   @Override
   public void onClick(View arg0) {
     if (player != null) { player.skipAd(); }
+  }
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    Log.d(TAG, "Recieved Notification: "+arg1);
   }
 }
