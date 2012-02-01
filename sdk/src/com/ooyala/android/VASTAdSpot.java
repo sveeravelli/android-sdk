@@ -24,6 +24,18 @@ public class VASTAdSpot extends AdSpot {
   protected List<VASTAd> _ads = new ArrayList<VASTAd>(); /** The actual ads (List of VASTAd) */
 
   /**
+   * Initialize a VASTAdSpot using the specified data
+   * @param time the time at which the VASTAdSpot should play
+   * @param clickURL the clickthrough URL
+   * @param trackingURLs the tracking URLs that should be pinged when this ad plays
+   * @param vastURL the VAST URL containing the VAST compliant XML for this ad spot
+   */
+  public VASTAdSpot(int time, URL clickURL, List<URL> trackingURLs, URL vastURL) {
+    super(time, clickURL, trackingURLs);
+    _vastURL = vastURL;
+  }
+
+  /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
    * @param api the PlayerAPIClient that was used to fetch this VASTAd

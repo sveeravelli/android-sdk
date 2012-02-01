@@ -134,6 +134,20 @@ public class Video extends ContentItem implements PlayableItem
     return _ads;
   }
 
+  /**
+   * Insert an AdSpot to play during this video
+   * @param ad the AdSpot to play during this video
+   */
+  public void insertAd(AdSpot ad) {
+    ad.setAPI(_api);
+    for (int i = 0; i < _ads.size(); i++) {
+      if (ad.getTime() < _ads.get(i).getTime()) {
+        _ads.add(i, ad);
+        break;
+      }
+    }
+  }
+
   public Channel getParent()
   {
     return _parent;
