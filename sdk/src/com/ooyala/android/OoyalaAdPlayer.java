@@ -4,7 +4,6 @@ import java.net.URL;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-
 class OoyalaAdPlayer extends MoviePlayer {
   private OoyalaAdSpot _ad;
 
@@ -20,8 +19,17 @@ class OoyalaAdPlayer extends MoviePlayer {
       return;
     }
     _seekable = false;
-    _ad = (OoyalaAdSpot)ad;
+    _ad = (OoyalaAdSpot) ad;
 
+    if (_ad.getStream() == null) {
+      // TODO async call to fetch playback info!
+      initAfterFetch(parent);
+      return;
+    }
+    initAfterFetch(parent);
+  }
+
+  private void initAfterFetch(OoyalaPlayer parent) {
     super.init(parent, _ad.getStream());
 
     // TODO[jigish] setup clickthrough

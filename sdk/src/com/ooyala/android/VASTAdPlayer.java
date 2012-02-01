@@ -10,7 +10,6 @@ import java.util.TimerTask;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-
 class VASTAdPlayer extends MoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
@@ -30,19 +29,21 @@ class VASTAdPlayer extends MoviePlayer {
     public static final String RESUME = "resume";
   }
 
-  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D", "[Place_Random_Number_Here]",
+  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList(
+      "%5BPlace_Random_Number_Here%5D", "[Place_Random_Number_Here]",
       "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
 
   private class VASTPlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if (!_firstQSent && currentTime() > (currentAd().getDuration()/4)) {
+      if (!_firstQSent && currentTime() > (currentAd().getDuration() / 4)) {
         sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
         _firstQSent = true;
-      } else if (!_midSent && currentTime() > (currentAd().getDuration()/2)) {
+      } else if (!_midSent && currentTime() > (currentAd().getDuration() / 2)) {
         sendTrackingEvent(TrackingEvent.MIDPOINT);
         _midSent = true;
-      } else if (!_thirdQSent && currentTime() > (3*currentAd().getDuration()/4)) {
+      } else if (!_thirdQSent
+          && currentTime() > (3 * currentAd().getDuration() / 4)) {
         sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         _thirdQSent = true;
       }
@@ -59,8 +60,16 @@ class VASTAdPlayer extends MoviePlayer {
       return;
     }
     _seekable = false;
-    _ad = (VASTAdSpot)ad;
+    _ad = (VASTAdSpot) ad;
+    if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
+      // TODO async call to fetch playback info!
+      initAfterFetch(parent);
+      return;
+    }
+    initAfterFetch(parent);
+  }
 
+  private void initAfterFetch(OoyalaPlayer parent) {
     for (VASTAd vastAd : _ad.getAds()) {
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear()) {
@@ -89,7 +98,11 @@ class VASTAdPlayer extends MoviePlayer {
       setState(State.COMPLETED);
       return;
     }
-    if (_player == null) { super.play(); return; } // while state is loading, player will be null, so just call super to queue
+    if (_player == null) {
+      super.play();
+      return;
+    } // while state is loading, player will be null, so just call super to
+      // queue
     if (currentTime() != 0) {
       sendTrackingEvent(TrackingEvent.RESUME);
     } else {
@@ -111,7 +124,9 @@ class VASTAdPlayer extends MoviePlayer {
   }
 
   public void sendTrackingEvent(String event) {
-    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
+    if (currentAd() == null || currentAd().getTrackingEvents() == null) {
+      return;
+    }
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
@@ -142,7 +157,7 @@ class VASTAdPlayer extends MoviePlayer {
   }
 
   private URL urlFromAdUrlString(String url) {
-    String timestamp = ""+(System.currentTimeMillis()/1000);
+    String timestamp = "" + (System.currentTimeMillis() / 1000);
     String newURL = url;
     for (String replace : URL_STRINGS_TO_REPLACE) {
       newURL.replaceAll(replace, timestamp);
@@ -154,10 +169,11 @@ class VASTAdPlayer extends MoviePlayer {
     }
   }
 
-  //Timer tasks for playhead updates
+  // Timer tasks for playhead updates
   @Override
   protected void startPlayheadTimer() {
     _playheadUpdateTimer = new Timer();
-    _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(), TIMER_DELAY, TIMER_PERIOD);
+    _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(),
+        TIMER_DELAY, TIMER_PERIOD);
   }
 }
