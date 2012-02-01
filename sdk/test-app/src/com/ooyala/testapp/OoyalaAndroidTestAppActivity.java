@@ -14,6 +14,7 @@ import android.widget.Button;
 
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
@@ -39,9 +40,9 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     end.setOnClickListener(this);
 
     // optional localization
-    LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
+    //LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
-    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com");
+    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
@@ -60,7 +61,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // Live Streaming: "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh")) {
+    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {
@@ -125,5 +126,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(TAG, "Recieved Notification: "+arg1);
+    //if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState() == State.READY) {
+    //  player.play();
+    //}
   }
 }
