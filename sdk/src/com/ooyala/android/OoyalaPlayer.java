@@ -69,6 +69,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private String _language = Locale.getDefault().getLanguage();
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
+  private boolean _playQueued = false;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -211,14 +212,21 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
-    try {
-      ContentItem contentTree = _playerAPIClient.contentTree(embedCodes);
-      return reinitialize(contentTree);
-    } catch (OoyalaException e) {
-      Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", e);
-      this._error = e;
-      return false;
-    }
+    _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
+      @Override
+      public void callback(ContentItem item, OoyalaException error) {
+        Log.d(this.getClass().getName(), "TEST - CALLBACK");
+        if (error != null) {
+          _error = error;
+          Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+          return;
+        }
+        reinitialize(item);
+      }
+    });
+    return true;
   }
 
   /**
@@ -243,14 +251,24 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return true if the external IDs were successfully set, false if not.
    */
   public boolean setExternalIds(List<String> externalIds) {
-    try {
-      ContentItem contentTree = _playerAPIClient.contentTreeByExternalIds(externalIds);
-      return reinitialize(contentTree);
-    } catch (OoyalaException e) {
-      Log.d(this.getClass().getName(), "Exception in setExternalIds!", e);
-      this._error = e;
+    if (externalIds == null || externalIds.isEmpty()) {
       return false;
     }
+    _playerAPIClient.contentTreeByExternalIds(externalIds, new ContentTreeCallback() {
+      @Override
+      public void callback(ContentItem item, OoyalaException error) {
+        Log.d(this.getClass().getName(), "TEST - CALLBACK");
+        if (error != null) {
+          _error = error;
+          Log.d(this.getClass().getName(), "Exception in setExternalIds!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+          return;
+        }
+        reinitialize(item);
+      }
+    });
+    return true;
   }
 
   /**
@@ -279,26 +297,55 @@ public class OoyalaPlayer extends Observable implements Observer {
     _currentItem = video;
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
-      try {
-        _playerAPIClient.authorize(_currentItem);
-      } catch (OoyalaException e) {
-        Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", e);
-        this._error = e;
-        return false;
-      }
+      // Async authorize;
+      _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
+        @Override
+        public void callback(boolean result, OoyalaException error) {
+          if (error != null) {
+            _error = error;
+            Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", error);
+            setState(State.ERROR);
+            sendNotification(ERROR_NOTIFICATION);
+            return;
+          }
+          changeCurrentVideoAfterAuth();
+        }
+      });
+      return true;
     }
 
+    return changeCurrentVideoAfterAuth();
+  }
+
+  /**
+   * This is a helper function ONLY to be used with changeCurrentVideo.
+   * @return
+   */
+  private boolean changeCurrentVideoAfterAuth() {
     if (!_currentItem.isAuthorized()) {
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
       return false;
     }
 
-    if (!_currentItem.fetchPlaybackInfo()) {
-      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
-      setState(State.ERROR);
-      return false;
-    }
+    _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+      @Override
+      public void callback(boolean result) {
+        if (!result) {
+          _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+          setState(State.ERROR);
+          return;
+        }
+        changeCurrentVideoAfterFetch();
+      }
+    });
+    return true;
+  }
 
+  /**
+   * This is a helper function ONLY to be used with changeCurrentVideo (in changeCurrentVideoAfterAuth).
+   * @return
+   */
+  private boolean changeCurrentVideoAfterFetch() {
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
     _player.setSeekable(_seekable);
@@ -307,19 +354,28 @@ public class OoyalaPlayer extends Observable implements Observer {
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
+
+    dequeuePlay();
     return true;
   }
 
   private boolean reinitialize(ContentItem tree) {
     _rootItem = tree;
-    try {
-      _playerAPIClient.authorize(_rootItem);
-    } catch (OoyalaException e) {
-      Log.d(this.getClass().getName(), "Exception in reinitialize!", e);
-      this._error = e;
-      return false;
-    }
-    return changeCurrentVideo(_rootItem.firstVideo());
+    // Async Authorize
+    _playerAPIClient.authorize(tree, new AuthorizeCallback() {
+      @Override
+      public void callback(boolean result, OoyalaException error) {
+        if (error != null) {
+          _error = error;
+          Log.d(this.getClass().getName(), "Exception in reinitialize!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+          return;
+        }
+        changeCurrentVideo(_rootItem.firstVideo());
+      }
+    });
+    return true;
   }
 
   private Player initializePlayer(Class<? extends Player> playerClass, Object param) {
@@ -394,6 +450,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * Pause the current video
    */
   public void pause() {
+    _playQueued = false;
     if (currentPlayer() != null) {
       currentPlayer().pause();
     }
@@ -406,6 +463,8 @@ public class OoyalaPlayer extends Observable implements Observer {
     Log.d(this.getClass().getName(), "TEST - play");
     if (currentPlayer() != null) {
       currentPlayer().play();
+    } else {
+      queuePlay();
     }
   }
 
@@ -414,6 +473,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * This differs from pause in that it completely deconstructs the view so the layout can be changed.
    */
   public void suspend() {
+    _playQueued = false;
     if (currentPlayer() != null) {
       currentPlayer().suspend();
       removeClosedCaptionsView();
@@ -634,6 +694,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private void reset() {
     removeClosedCaptionsView();
+    _playQueued = false;
     _player.reset();
     addClosedCaptionsView();
   }
@@ -909,5 +970,19 @@ public class OoyalaPlayer extends Observable implements Observer {
   private int millisToPercent(int millis) {
     float fPercent = (((float)millis)/((float)getDuration()))*(100f);
     return (int)fPercent;
+  }
+
+  private void queuePlay() {
+    Log.d(this.getClass().getName(), "TEST - queuePlayy");
+    _playQueued = true;
+  }
+
+  private void dequeuePlay() {
+    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
+    if (_playQueued && currentPlayer() != null) {
+      Log.d(this.getClass().getName(), "TEST - dequeuePlay queued");
+      _playQueued = false;
+      play();
+    }
   }
 }

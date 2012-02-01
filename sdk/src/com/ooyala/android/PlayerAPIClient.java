@@ -8,22 +8,22 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.os.AsyncTask;
+
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
-class PlayerAPIClient
-{
+class PlayerAPIClient {
   protected String _pcode = null;
   protected String _domain = null;
   protected OoyalaAPIHelper _apiHelper = null;
   protected int _width = -1;
   protected int _height = -1;
 
-  public PlayerAPIClient()
-  {
+  public PlayerAPIClient() {
   }
 
-  public PlayerAPIClient(OoyalaAPIHelper apiHelper, String pcode, String domain)
-  {
+  public PlayerAPIClient(OoyalaAPIHelper apiHelper, String pcode, String domain) {
     _apiHelper = apiHelper;
     _pcode = pcode;
     _domain = domain;
@@ -199,33 +199,16 @@ class PlayerAPIClient
   public boolean authorize(AuthorizableItemInternal item) throws OoyalaException
   {
     List<String> embedCodes = item.embedCodesToAuthorize();
-    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());
-    JSONObject authData = null;
-    try
-    {
-      authData = verifyAuthorizeJSON(json, embedCodes);
-    }
-    catch (OoyalaException e)
-    {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    }
-    item.update(authData);
-    return true;
+    return authorizeEmbedCodes(embedCodes, item);
   }
 
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent) throws OoyalaException
-  {
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent) throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());
     JSONObject authData = null;
-    try
-    {
+    try {
       authData = verifyAuthorizeJSON(json, embedCodes);
-    }
-    catch (OoyalaException e)
-    {
+    } catch (OoyalaException e) {
       System.out.println("Unable to authorize: " + e);
       throw e;
     }
@@ -233,8 +216,42 @@ class PlayerAPIClient
     return true;
   }
 
-  public ContentItem contentTree(List<String> embedCodes) throws OoyalaException
-  {
+  private class AuthorizeTask extends AsyncTask<Object, Integer, Boolean> {
+    protected OoyalaException _error = null;
+    protected AuthorizeCallback _callback = null;
+    public AuthorizeTask(AuthorizeCallback callback) {
+      super();
+      _callback = callback;
+    }
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Boolean doInBackground(Object... params) { // first param is List<String> of embed codes to authorize, second param is AuthorizableItemInternal parent
+      if (params.length == 0 || params[0] == null || !(params[0] instanceof List<?>)) { return new Boolean(false); }
+      List<String> embedCodeList = ((List<String>)(params[0]));
+      try {
+        return authorizeEmbedCodes(embedCodeList, params.length >= 2 && params[1] != null && params[1] instanceof AuthorizableItemInternal ? (AuthorizableItemInternal)params[1] : null);
+      } catch (OoyalaException e) {
+        _error = e;
+        return new Boolean(false);
+      }
+    }
+    @Override
+    protected void onPostExecute(Boolean result) {
+      _callback.callback(result.booleanValue(), _error);
+    }
+  }
+
+  public Object authorize(AuthorizableItemInternal item, AuthorizeCallback callback) {
+    return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, callback);
+  }
+
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent, AuthorizeCallback callback) {
+    AuthorizeTask task = new AuthorizeTask(callback);
+    task.execute(embedCodes, parent);
+    return task;
+  }
+
+  public ContentItem contentTree(List<String> embedCodes) throws OoyalaException {
     String uri = String.format(Constants.CONTENT_TREE_URI, _pcode, Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
@@ -249,6 +266,36 @@ class PlayerAPIClient
       throw e;
     }
     return ContentItem.create(contentTree, embedCodes, this);
+  }
+
+  private class ContentTreeTask extends AsyncTask<List<String>, Integer, ContentItem> {
+    protected OoyalaException _error = null;
+    protected ContentTreeCallback _callback = null;
+    public ContentTreeTask(ContentTreeCallback callback) {
+      super();
+      _callback = callback;
+    }
+    @Override
+    protected ContentItem doInBackground(List<String>... embedCodeLists) {
+      if (embedCodeLists.length == 0 || embedCodeLists[0] == null || embedCodeLists[0].isEmpty()) { return null; }
+      try {
+        return contentTree(embedCodeLists[0]);
+      } catch (OoyalaException e) {
+        _error = e;
+        return null;
+      }
+    }
+    @Override
+    protected void onPostExecute(ContentItem result) {
+      _callback.callback(result, _error);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Object contentTree(List<String> embedCodes, ContentTreeCallback callback) {
+    ContentTreeTask task = new ContentTreeTask(callback);
+    task.execute(embedCodes);
+    return task;
   }
 
   public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException
@@ -270,20 +317,39 @@ class PlayerAPIClient
     return ContentItem.create(contentTree, embedCodes, this);
   }
 
-  public PaginatedItemResponse contentTreeNext(String nextToken, PaginatedParentItem parent)
-  {
+  private class ContentTreeByExternalIdsTask extends ContentTreeTask {
+    public ContentTreeByExternalIdsTask(ContentTreeCallback callback) {
+      super(callback);
+    }
+    @Override
+    protected ContentItem doInBackground(List<String>... externalIdLists) {
+      if (externalIdLists.length == 0 || externalIdLists[0] == null || externalIdLists[0].isEmpty()) { return null; }
+      try {
+        return contentTreeByExternalIds(externalIdLists[0]);
+      } catch (OoyalaException e) {
+        _error = e;
+        return null;
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Object contentTreeByExternalIds(List<String> externalIds, ContentTreeCallback callback) {
+    ContentTreeByExternalIdsTask task = new ContentTreeByExternalIdsTask(callback);
+    task.execute(externalIds);
+    return task;
+  }
+
+  public PaginatedItemResponse contentTreeNext(String nextToken, PaginatedParentItem parent) {
     String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, _pcode, nextToken);
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
     JSONObject contentTree = null;
     List<String> keys = new ArrayList<String>();
     keys.add(nextToken);
-    try
-    {
+    try {
       contentTree = verifyContentTreeObject(obj, keys);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       System.out.println("Unable to create next objects: " + e);
       return null;
     }
@@ -292,13 +358,11 @@ class PlayerAPIClient
      * NOTE: We have to convert the content token keyed dictionary to one that is embed code keyed in order for it to work with update.
      * We could just create a new update in each class, but this seemed better because that would have a lot of duplicate code.
      */
-    if (contentTree.isNull(nextToken))
-    {
+    if (contentTree.isNull(nextToken)) {
       System.out.println("Could not find token in content_tree_next response.");
       return null;
     }
-    try
-    {
+    try {
       JSONObject tokenDict = contentTree.getJSONObject(nextToken);
       JSONObject parentDict = new JSONObject();
       parentDict.put(parent.getEmbedCode(), tokenDict);
@@ -306,24 +370,34 @@ class PlayerAPIClient
       int startIdx = parent.childrenCount();
       parent.update(parentDict);
       return new PaginatedItemResponse(startIdx, tokenDict.isNull(Constants.KEY_CHILDREN) ? 0 : tokenDict.getJSONArray(Constants.KEY_CHILDREN).length());
-    }
-    catch (JSONException e)
-    {
+    } catch (JSONException e) {
       System.out.println("Unable to create next objects due to JSON Exception: " + e);
       return null;
     }
   }
 
-  public boolean metadataForContentIDs(List<String> contentIDs)
-  {
-    // TODO
-    return false;
+  private class ContentTreeNextTask extends AsyncTask<Object, Integer, PaginatedItemResponse> {
+    protected OoyalaException _error = null;
+    protected ContentTreeNextCallback _callback = null;
+    public ContentTreeNextTask(ContentTreeNextCallback callback) {
+      super();
+      _callback = callback;
+    }
+    @Override
+    protected PaginatedItemResponse doInBackground(Object... params) {
+      if (params.length < 2 || params[0] == null || !(params[0] instanceof String) || params[1] == null || !(params[1] instanceof PaginatedParentItem)) { return null; }
+      return contentTreeNext((String)(params[0]), (PaginatedParentItem)(params[1]));
+    }
+    @Override
+    protected void onPostExecute(PaginatedItemResponse result) {
+      _callback.callback(result, _error);
+    }
   }
 
-  public boolean metadataForEmbedCodes(List<String> embedCodes)
-  {
-    // TODO
-    return false;
+  public Object contentTreeNext(String nextToken, PaginatedParentItem parent, ContentTreeNextCallback callback) {
+    ContentTreeNextTask task = new ContentTreeNextTask(callback);
+    task.execute(nextToken, parent);
+    return task;
   }
 
   public String getPcode() {

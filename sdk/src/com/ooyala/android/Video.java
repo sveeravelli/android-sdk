@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.json.*;
 
+import android.os.AsyncTask;
+
 import com.ooyala.android.Constants.ReturnState;
 
 /**
@@ -180,6 +182,28 @@ public class Video extends ContentItem implements PlayableItem
     	  return false;
 
     return true;
+  }
+
+  private class FetchPlaybackInfoTask extends AsyncTask<Void, Integer, Boolean> {
+    protected FetchPlaybackInfoCallback _callback = null;
+    public FetchPlaybackInfoTask(FetchPlaybackInfoCallback callback) {
+      super();
+      _callback = callback;
+    }
+    @Override
+    protected Boolean doInBackground(Void... params) {
+      return fetchPlaybackInfo();
+    }
+    @Override
+    protected void onPostExecute(Boolean result) {
+      _callback.callback(result.booleanValue());
+    }
+  }
+
+  public Object fetchPlaybackInfo(FetchPlaybackInfoCallback callback) {
+    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(callback);
+    task.execute();
+    return task;
   }
 
   /**
