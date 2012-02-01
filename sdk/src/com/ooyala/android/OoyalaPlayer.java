@@ -8,6 +8,8 @@ import java.util.Observer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
+import android.R.color;
+import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.os.Message;
@@ -70,6 +72,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
+  private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black, Typeface.DEFAULT);
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -559,6 +562,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     removeClosedCaptionsView();
     if (_currentItem != null && _currentItem.hasClosedCaptions()) {
       _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
     }
   }
@@ -984,5 +988,15 @@ public class OoyalaPlayer extends Observable implements Observer {
       _playQueued = false;
       play();
     }
+  }
+
+  public ClosedCaptionsStyle getClosedCaptionsStyle() {
+    return _closedCaptionsStyle;
+  }
+
+  public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
+    this._closedCaptionsStyle = closedCaptionsStyle;
+    if (_closedCaptionsView != null)
+      _closedCaptionsView.setStyle(closedCaptionsStyle);
   }
 }

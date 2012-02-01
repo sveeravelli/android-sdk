@@ -8,7 +8,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-class ClosedCaptionsView extends TextView {
+public class ClosedCaptionsView extends TextView {
 
 	private Caption _caption;
 
@@ -41,6 +41,12 @@ class ClosedCaptionsView extends TextView {
 		  setBackgroundColor(Color.TRANSPARENT);
 		  setText("");
 		}
+	}
+	
+	public void setStyle(ClosedCaptionsStyle style) {
+	  setTextColor(style.getColor());
+	  setBackgroundColor(style.getBackgroundColor());
+    setTypeface(style.getFont());
 	}
 
 	public void initStyle() {
