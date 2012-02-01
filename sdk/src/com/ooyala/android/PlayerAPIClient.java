@@ -411,4 +411,9 @@ class PlayerAPIClient {
   public OoyalaAPIHelper getAPIHelper() {
     return _apiHelper;
   }
+
+  @SuppressWarnings("rawtypes")
+  public void cancel(Object task) {
+    ((AsyncTask)task).cancel(true);
+  }
 }

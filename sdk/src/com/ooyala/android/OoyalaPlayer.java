@@ -1,8 +1,10 @@
 package com.ooyala.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -73,6 +75,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean _seekable = true;
   private boolean _playQueued = false;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black, Typeface.DEFAULT);
+  private Map<String, Object> _openTasks = new HashMap<String, Object>();
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -215,9 +218,12 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
-    _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
+    cancelOpenTasks();
+    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    taskStarted(taskKey, _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
+        taskCompleted(taskKey);
         Log.d(this.getClass().getName(), "TEST - CALLBACK");
         if (error != null) {
           _error = error;
@@ -228,7 +234,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         }
         reinitialize(item);
       }
-    });
+    }));
     return true;
   }
 
@@ -257,9 +263,12 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (externalIds == null || externalIds.isEmpty()) {
       return false;
     }
-    _playerAPIClient.contentTreeByExternalIds(externalIds, new ContentTreeCallback() {
+    cancelOpenTasks();
+    final String taskKey = "setExternalIds"+System.currentTimeMillis();
+    taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds, new ContentTreeCallback() {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
+        taskCompleted(taskKey);
         Log.d(this.getClass().getName(), "TEST - CALLBACK");
         if (error != null) {
           _error = error;
@@ -270,7 +279,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         }
         reinitialize(item);
       }
-    });
+    }));
     return true;
   }
 
@@ -301,9 +310,12 @@ public class OoyalaPlayer extends Observable implements Observer {
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       // Async authorize;
-      _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
+      cancelOpenTasks();
+      final String taskKey = "changeCurrentVideo"+System.currentTimeMillis();
+      taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
         @Override
         public void callback(boolean result, OoyalaException error) {
+          taskCompleted(taskKey);
           if (error != null) {
             _error = error;
             Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", error);
@@ -313,7 +325,7 @@ public class OoyalaPlayer extends Observable implements Observer {
           }
           changeCurrentVideoAfterAuth();
         }
-      });
+      }));
       return true;
     }
 
@@ -330,9 +342,11 @@ public class OoyalaPlayer extends Observable implements Observer {
       return false;
     }
 
-    _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    taskStarted(taskKey, _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
       @Override
       public void callback(boolean result) {
+        taskCompleted(taskKey);
         if (!result) {
           _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
           setState(State.ERROR);
@@ -340,7 +354,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         }
         changeCurrentVideoAfterFetch();
       }
-    });
+    }));
     return true;
   }
 
@@ -365,9 +379,11 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean reinitialize(ContentItem tree) {
     _rootItem = tree;
     // Async Authorize
-    _playerAPIClient.authorize(tree, new AuthorizeCallback() {
+    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    taskStarted(taskKey, _playerAPIClient.authorize(tree, new AuthorizeCallback() {
       @Override
       public void callback(boolean result, OoyalaException error) {
+        taskCompleted(taskKey);
         if (error != null) {
           _error = error;
           Log.d(this.getClass().getName(), "Exception in reinitialize!", error);
@@ -377,7 +393,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         }
         changeCurrentVideo(_rootItem.firstVideo());
       }
-    });
+    }));
     return true;
   }
 
@@ -988,6 +1004,22 @@ public class OoyalaPlayer extends Observable implements Observer {
       _playQueued = false;
       play();
     }
+  }
+
+  private void taskStarted(String key, Object task) {
+    if (task != null)
+      _openTasks.put(key, task);
+  }
+
+  private void taskCompleted(String key) {
+    _openTasks.remove(key);
+  }
+
+  private void cancelOpenTasks() {
+    for (String key : _openTasks.keySet()) {
+      this._playerAPIClient.cancel(_openTasks.get(key));
+    }
+    _openTasks.clear();
   }
 
   public ClosedCaptionsStyle getClosedCaptionsStyle() {
