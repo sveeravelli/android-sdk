@@ -32,7 +32,14 @@ function doc {
 # Generate the release
 function gen {
   # Run tests before doing anything to make sure we are passing.
-  tests
+  if [[ "$1" != "" ]]; then
+    if [[ "$1" != "-notests" && "$1" != "-notest" && "$1" != "-nt" ]]; then
+      echo "ERROR: invalid option: $1"
+      usage
+    fi
+  else
+    tests
+  fi
 
   cd $BASEDIR
   rm -rf ${ZIP_BASE}
@@ -158,17 +165,19 @@ function usage {
   echo "  tasks:"
   echo "    gen_docs|docs|doc|d       : generate the documentation"
   echo "    gen_release|gen|g         : generate the release"
+  echo "      options:"
+  echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
-  echo "        -[gen|g]     : generate the release prior to publishing"
-  echo "        -[nightly|n] : publish the nightly version of the release"
+  echo "        -[gen|g]              : generate the release prior to publishing"
+  echo "        -[nightly|n]          : publish the nightly version of the release"
   echo "    run_tests|tests|test|t    : run the unit tests"
   echo "    setup|s                   : setup this repo for use by this script"
   exit
 }
 
 case "$1" in
-  gen_release|gen|g) gen;;
+  gen_release|gen|g) gen $2;;
   gen_docs|docs|doc|d) doc;;
   pub_release|publish|pub|p) pub $2 $3;;
   run_tests|tests|test|t) tests;;
