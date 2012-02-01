@@ -83,7 +83,7 @@ public class StreamTest extends AndroidTestCase
     Stream hlsStream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
     Set<Stream> hls = new HashSet<Stream>();
     hls.add(hlsStream);
-    assertNull(Stream.bestStream(hls));
+    assertEquals(Stream.bestStream(hls), hlsStream);
 
     Stream.setStreamSelector(new StreamSelector() {
       @Override
