@@ -12,7 +12,7 @@ import com.ooyala.android.Constants.ReturnState;
 
 /**
  * Stores the info and metadata for the specified content item.
- *
+ * 
  */
 public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, PlayableItem {
   protected Set<Stream> _streams = new HashSet<Stream>();
@@ -45,8 +45,9 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     return _embedCode;
   }
 
-  /** For internal use only.
-   * Update the AuthorizableItem using the specified data (subclasses should override and call this)
+  /**
+   * For internal use only. Update the AuthorizableItem using the specified data (subclasses should override
+   * and call this)
    * @param data the data to use to update this AuthorizableItem
    * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
@@ -69,8 +70,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
             int theAuthCode = myData.getInt(Constants.KEY_CODE);
             if (theAuthCode < AuthCode.MIN_AUTH_CODE || theAuthCode > AuthCode.MAX_AUTH_CODE) {
               _authCode = AuthCode.UNKNOWN;
-            }
-            else {
+            } else {
               _authCode = theAuthCode;
             }
           }
@@ -90,7 +90,8 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
         return ReturnState.STATE_MATCHED;
       }
       if (data.isNull(Constants.KEY_AD_EMBED_CODE)) {
-        System.out.println("ERROR: Fail to update OoyalaAdSpot with dictionary because no ad embed code exists!");
+        System.out
+            .println("ERROR: Fail to update OoyalaAdSpot with dictionary because no ad embed code exists!");
         return ReturnState.STATE_FAIL;
       }
       _embedCode = data.getString(Constants.KEY_AD_EMBED_CODE);
@@ -105,7 +106,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     try {
       return _api.authorize(this);
     } catch (OoyalaException e) {
-      System.out.println("Unable to fetch playback info: "+e.getMessage());
+      System.out.println("Unable to fetch playback info: " + e.getMessage());
       return false;
     }
   }
@@ -114,8 +115,8 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     return Stream.bestStream(_streams);
   }
 
-  /** For internal use only.
-   * The embed codes to authorize for the AuthorizableItem
+  /**
+   * For internal use only. The embed codes to authorize for the AuthorizableItem
    * @return the embed codes to authorize as a List
    */
   public List<String> embedCodesToAuthorize() {

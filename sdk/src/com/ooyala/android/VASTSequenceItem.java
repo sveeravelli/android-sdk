@@ -3,10 +3,14 @@ package com.ooyala.android;
 import org.w3c.dom.Element;
 
 public class VASTSequenceItem implements Comparable<VASTSequenceItem> {
-  private int _number = -1;            /** The sequence number associated with this item in the sequence */
-  private VASTLinearAd _linear = null; /** The Linear Ad associated with this item in the sequence */
-  private Element _nonLinears = null;  /** The Non-Linear Ads associated with this item in the sequence (XML Element) */
-  private Element _companions = null;  /** The Companion Ads associated with this item in the sequence (XML Element) */
+  /** The sequence number associated with this item in the sequence */
+  private int _number = -1;
+  /** The Linear Ad associated with this item in the sequence */
+  private VASTLinearAd _linear = null;
+  /** The Non-Linear Ads associated with this item in the sequence (XML Element) */
+  private Element _nonLinears = null;
+  /** The Companion Ads associated with this item in the sequence (XML Element) */
+  private Element _companions = null;
 
   /**
    * Whether or not this VASTSequenceItem has a linear ad
@@ -18,10 +22,8 @@ public class VASTSequenceItem implements Comparable<VASTSequenceItem> {
 
   @Override
   public int compareTo(VASTSequenceItem arg0) {
-    if (_number < arg0.getNumber())
-      return -1;
-    if (_number > arg0.getNumber())
-      return 1;
+    if (_number < arg0.getNumber()) return -1;
+    if (_number > arg0.getNumber()) return 1;
     return 0;
   }
 

@@ -5,8 +5,7 @@ import android.view.MotionEvent;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   public static enum DefaultControlStyle {
-    NONE,
-    AUTO
+    NONE, AUTO
   };
 
   protected OoyalaPlayerLayout _layout = null;
@@ -20,18 +19,21 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
+   * 
    * @param l the layout to use
    * @param apiKey the API Key to use
    * @param secret the secret to use
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain) {
+  public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret,
+      String pcode, String domain) {
     this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO);
   }
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
+   * 
    * @param l the layout to use
    * @param p the instantiated player to use
    */
@@ -41,6 +43,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
+   * 
    * @param l the layout to use
    * @param apiKey the API Key to use
    * @param secret the secret to use
@@ -48,12 +51,14 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain, DefaultControlStyle dcs) {
+  public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret,
+      String pcode, String domain, DefaultControlStyle dcs) {
     this(l, new OoyalaPlayer(apiKey, secret, pcode, domain), dcs);
   }
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
+   * 
    * @param l the layout to use
    * @param p the instantiated player to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
@@ -81,6 +86,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Get the OoyalaPlayer associated with this Controller
+   * 
    * @return the OoyalaPlayer
    */
   public OoyalaPlayer getPlayer() {
@@ -89,6 +95,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Get the current active layout
+   * 
    * @return the current active layout
    */
   public OoyalaPlayerLayout getLayout() {
@@ -113,9 +120,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   @Override
   public boolean onTouchEvent(MotionEvent event, OoyalaPlayerLayout source) {
-    //the MediaController will hide after 3 seconds - tap the screen to make it appear again
+    // the MediaController will hide after 3 seconds - tap the screen to make it appear again
     if (_player != null) {
-      switch(_player.getState()) {
+      switch (_player.getState()) {
         case INIT:
         case LOADING:
         case ERROR:
@@ -142,8 +149,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   }
 
   @Override
-  public void setFullscreen(boolean fullscreen) {
-  }
+  public void setFullscreen(boolean fullscreen) {}
 
   @Override
   public boolean isFullscreen() {

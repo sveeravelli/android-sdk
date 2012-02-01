@@ -15,11 +15,9 @@ public class VASTSequenceItemTest extends AndroidTestCase {
     super();
   }
 
-  protected void setUp() {
-  }
+  protected void setUp() {}
 
-  protected void tearDown() {
-  }
+  protected void tearDown() {}
 
   public void testHasLinear() {
     VASTSequenceItem item = new VASTSequenceItem();
@@ -30,13 +28,13 @@ public class VASTSequenceItemTest extends AndroidTestCase {
       InputStream is = this.getClass().getResourceAsStream(TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
-      Element il = (Element)adXML.getElementsByTagName("InLine").item(0);
-      Element creatives = (Element)il.getElementsByTagName("Creatives").item(0);
-      Element lcreative = (Element)creatives.getElementsByTagName("Creative").item(0);
-      Element linearXML = (Element)lcreative.getElementsByTagName("Linear").item(0);
+      Element il = (Element) adXML.getElementsByTagName("InLine").item(0);
+      Element creatives = (Element) il.getElementsByTagName("Creatives").item(0);
+      Element lcreative = (Element) creatives.getElementsByTagName("Creative").item(0);
+      Element linearXML = (Element) lcreative.getElementsByTagName("Linear").item(0);
       item.setLinear(new VASTLinearAd(linearXML));
     } catch (Exception e) {
-      System.err.println("Exception: "+e.getMessage());
+      System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
       fail();
     }

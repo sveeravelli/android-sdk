@@ -8,13 +8,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class VASTLinearAd implements PlayableItem {
-  private double _duration;                                                                /** The duration of the ad in seconds */
-  private HashMap<String,Set<String>> _trackingEvents = new HashMap<String,Set<String>>(); /** The tracking events in a HashMap of event name to Set of String */
-  private String _parameters;                                                              /** The additional ad parameters */
-  private String _clickThroughURL;                                                         /** The click through url */
-  private Set<String> _clickTrackingURLs = new HashSet<String>();                          /** The click tracking urls in an Set of String */
-  private Set<String> _customClickURLs = new HashSet<String>();                            /** The custom click urls in an Set of String */
-  private Set<Stream> _streams = new HashSet<Stream>();                                    /** The streams in an HashSet of Stream */
+  /** The duration of the ad in seconds */
+  private double _duration;
+  /** The tracking events in a HashMap of event name to Set of String */
+  private HashMap<String, Set<String>> _trackingEvents = new HashMap<String, Set<String>>();
+  /** The additional ad parameters */
+  private String _parameters;
+  /** The click through url */
+  private String _clickThroughURL;
+  /** The click tracking urls in an Set of String */
+  private Set<String> _clickTrackingURLs = new HashSet<String>();
+  /** The custom click urls in an Set of String */
+  private Set<String> _customClickURLs = new HashSet<String>();
+  /** The streams in an HashSet of Stream */
+  private Set<Stream> _streams = new HashSet<Stream>();
 
   /**
    * Initialize a VASTLinearAd using the specified xml (subclasses should override this)
@@ -24,16 +31,24 @@ public class VASTLinearAd implements PlayableItem {
     if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
     Node child = data.getFirstChild();
     while (child != null) {
-      if (!(child instanceof Element)) { child = child.getNextSibling(); continue; }
-      if (!Utils.isNullOrEmpty(child.getTextContent()) && ((Element)child).getTagName().equals(Constants.ELEMENT_DURATION)) {
+      if (!(child instanceof Element)) {
+        child = child.getNextSibling();
+        continue;
+      }
+      if (!Utils.isNullOrEmpty(child.getTextContent())
+          && ((Element) child).getTagName().equals(Constants.ELEMENT_DURATION)) {
         _duration = Utils.secondsFromTimeString(child.getTextContent());
-      } else if (!Utils.isNullOrEmpty(child.getTextContent()) && ((Element)child).getTagName().equals(Constants.ELEMENT_AD_PARAMETERS)) {
+      } else if (!Utils.isNullOrEmpty(child.getTextContent())
+          && ((Element) child).getTagName().equals(Constants.ELEMENT_AD_PARAMETERS)) {
         _parameters = child.getTextContent();
-      } else if (((Element)child).getTagName().equals(Constants.ELEMENT_TRACKING_EVENTS)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_TRACKING_EVENTS)) {
         Node trackingChild = child.getFirstChild();
         while (trackingChild != null) {
-          if (!(trackingChild instanceof Element) || Utils.isNullOrEmpty(trackingChild.getTextContent())) { trackingChild = trackingChild.getNextSibling(); continue; }
-          String event = ((Element)trackingChild).getAttribute(Constants.ATTRIBUTE_EVENT);
+          if (!(trackingChild instanceof Element) || Utils.isNullOrEmpty(trackingChild.getTextContent())) {
+            trackingChild = trackingChild.getNextSibling();
+            continue;
+          }
+          String event = ((Element) trackingChild).getAttribute(Constants.ATTRIBUTE_EVENT);
           Set<String> urls = _trackingEvents.get(event);
           if (urls != null) {
             urls.add(trackingChild.getTextContent());
@@ -44,24 +59,30 @@ public class VASTLinearAd implements PlayableItem {
           }
           trackingChild = trackingChild.getNextSibling();
         }
-      } else if (((Element)child).getTagName().equals(Constants.ELEMENT_VIDEO_CLICKS)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_VIDEO_CLICKS)) {
         Node clickChild = child.getFirstChild();
         while (clickChild != null) {
-          if (!(clickChild instanceof Element) || Utils.isNullOrEmpty(clickChild.getTextContent())) { clickChild = clickChild.getNextSibling(); continue; }
-          if (((Element)clickChild).getTagName().equals(Constants.ELEMENT_CLICK_THROUGH)) {
+          if (!(clickChild instanceof Element) || Utils.isNullOrEmpty(clickChild.getTextContent())) {
+            clickChild = clickChild.getNextSibling();
+            continue;
+          }
+          if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CLICK_THROUGH)) {
             _clickThroughURL = clickChild.getTextContent();
-          } else if (((Element)clickChild).getTagName().equals(Constants.ELEMENT_CLICK_TRACKING)) {
+          } else if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CLICK_TRACKING)) {
             _clickTrackingURLs.add(clickChild.getTextContent());
-          } else if (((Element)clickChild).getTagName().equals(Constants.ELEMENT_CUSTOM_CLICK)) {
+          } else if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CUSTOM_CLICK)) {
             _customClickURLs.add(clickChild.getTextContent());
           }
           clickChild = clickChild.getNextSibling();
         }
-      } else if (((Element)child).getTagName().equals(Constants.ELEMENT_MEDIA_FILES)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_MEDIA_FILES)) {
         Node fileChild = child.getFirstChild();
         while (fileChild != null) {
-          if (!(fileChild instanceof Element)) { fileChild = fileChild.getNextSibling(); continue; }
-          VASTStream stream = new VASTStream((Element)fileChild);
+          if (!(fileChild instanceof Element)) {
+            fileChild = fileChild.getNextSibling();
+            continue;
+          }
+          VASTStream stream = new VASTStream((Element) fileChild);
           _streams.add(stream);
           fileChild = fileChild.getNextSibling();
         }

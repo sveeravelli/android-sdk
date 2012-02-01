@@ -37,8 +37,8 @@ public class OoyalaAPIClient {
   }
 
   /**
-   * Fetch the root ContentItem associated with the given embed codes. If multiple embed codes are given, the root item is
-   * assumed to be a Dynamic Channel and the embed codes are assumed to all be videos.
+   * Fetch the root ContentItem associated with the given embed codes. If multiple embed codes are given, the
+   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos.
    * @param embedCodes the embed codes to fetch
    * @return the root ContentItem representing embedCodes
    * @throws OoyalaException
@@ -48,8 +48,8 @@ public class OoyalaAPIClient {
   }
 
   /**
-   * Fetch the root ContentItem associated with the given external ids. If multiple external ids are given, the root item is
-   * assumed to be a Dynamic Channel and the external ids are assumed to all be videos.
+   * Fetch the root ContentItem associated with the given external ids. If multiple external ids are given,
+   * the root item is assumed to be a Dynamic Channel and the external ids are assumed to all be videos.
    * @param externalIds the external ids to fetch
    * @return the root ContentItem representing externalIds
    * @throws OoyalaException
@@ -60,12 +60,13 @@ public class OoyalaAPIClient {
 
   /**
    * Fetch a raw JSONObject from any backlot API (GET requests only)
-   * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request https://api.ooyala.com/v2/assets, uri should be "/assets"
+   * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request
+   *          https://api.ooyala.com/v2/assets, uri should be "/assets"
    * @param params Optional parameters to pass to the API
    * @return the raw JSONObject representing the response
    */
-  public JSONObject objectFromBacklotAPI(String uri, Map<String,String> params) {
-    return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX+uri, params);
+  public JSONObject objectFromBacklotAPI(String uri, Map<String, String> params) {
+    return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
   }
 
   public SecureURLGenerator getSecureURLGenerator() {

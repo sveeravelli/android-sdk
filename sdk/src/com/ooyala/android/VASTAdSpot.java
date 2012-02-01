@@ -18,10 +18,14 @@ import android.util.Log;
 import com.ooyala.android.Constants.ReturnState;
 
 public class VASTAdSpot extends AdSpot {
-  protected String _signature;                           /** The signature for the vast request */
-  protected long _expires;                               /** The expires for the vast request */
-  protected URL _vastURL;                                /** The url for the vast request */
-  protected List<VASTAd> _ads = new ArrayList<VASTAd>(); /** The actual ads (List of VASTAd) */
+  /** The signature for the vast request */
+  protected String _signature;
+  /** The expires for the vast request */
+  protected long _expires;
+  /** The url for the vast request */
+  protected URL _vastURL;
+  /** The actual ads (List of VASTAd) */
+  protected List<VASTAd> _ads = new ArrayList<VASTAd>();
 
   /**
    * Initialize a VASTAdSpot using the specified data
@@ -60,11 +64,13 @@ public class VASTAdSpot extends AdSpot {
         break;
     }
     if (data.isNull(Constants.KEY_SIGNATURE)) {
-      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
+      Log.e(this.getClass().getName(),
+          "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(Constants.KEY_EXPIRES)) {
-      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
+      Log.e(this.getClass().getName(),
+          "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(Constants.KEY_URL)) {
@@ -85,13 +91,14 @@ public class VASTAdSpot extends AdSpot {
       return ReturnState.STATE_FAIL;
     }
 
-    Log.d(this.getClass().getName(), "TEST - init ad with time: "+_time);
+    Log.d(this.getClass().getName(), "TEST - init ad with time: " + _time);
     return ReturnState.STATE_MATCHED;
   }
 
   /**
-   * Fetch the additional required info for the ad
-   * NOTE: As of right now, we only support VAST 2.0 Linear Ads. Information about Non-Linear and Companion Ads are stored in the dictionaries nonLinear and companion respectively.
+   * Fetch the additional required info for the ad NOTE: As of right now, we only support VAST 2.0 Linear Ads.
+   * Information about Non-Linear and Companion Ads are stored in the dictionaries nonLinear and companion
+   * respectively.
    * @return false if errors occurred, true if successful
    */
   @Override
@@ -107,9 +114,14 @@ public class VASTAdSpot extends AdSpot {
       if (Double.parseDouble(vastVersion) < Constants.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
       Node ad = vast.getFirstChild();
       while (ad != null) {
-        if (!(ad instanceof Element) || !((Element)ad).getTagName().equals(Constants.ELEMENT_AD)) { ad = ad.getNextSibling(); continue; }
-        VASTAd vastAd = new VASTAd((Element)ad);
-        if (vastAd != null) { _ads.add(vastAd); }
+        if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(Constants.ELEMENT_AD)) {
+          ad = ad.getNextSibling();
+          continue;
+        }
+        VASTAd vastAd = new VASTAd((Element) ad);
+        if (vastAd != null) {
+          _ads.add(vastAd);
+        }
         ad = ad.getNextSibling();
       }
     } catch (Exception e) {

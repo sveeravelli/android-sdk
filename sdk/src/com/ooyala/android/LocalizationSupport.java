@@ -3,7 +3,7 @@ package com.ooyala.android;
 import java.util.*;
 
 public final class LocalizationSupport {
-  private static Map<String, Map<String,String>> defaultLocales = null;
+  private static Map<String, Map<String, String>> defaultLocales = null;
   private static Map<String, String> currentLocalizedStrings = null;
 
   private static void createDefaultLocales() {
@@ -13,7 +13,7 @@ public final class LocalizationSupport {
     final Map<String, String> ja_JP = new HashMap<String, String>();
     ja_JP.put("LIVE", "ライブビデオ");
 
-    defaultLocales = new HashMap<String, Map<String,String>>();
+    defaultLocales = new HashMap<String, Map<String, String>>();
     defaultLocales.put("en_US", en_US);
     defaultLocales.put("ja_JP", ja_JP);
     currentLocalizedStrings = loadLocalizedStrings("en_US");
@@ -24,7 +24,7 @@ public final class LocalizationSupport {
    * @param localeId The ID of locale (such as en_US)
    */
   synchronized public static Map<String, String> loadLocalizedStrings(String localeId) {
-    if(defaultLocales==null) createDefaultLocales();
+    if (defaultLocales == null) createDefaultLocales();
     return defaultLocales.get(localeId);
   }
 
@@ -32,7 +32,7 @@ public final class LocalizationSupport {
    * Instructs the player to use localized strings
    */
   synchronized public static void useLocalizedStrings(Map<String, String> localizedStrings) {
-    if(currentLocalizedStrings==null) createDefaultLocales();
+    if (currentLocalizedStrings == null) createDefaultLocales();
     currentLocalizedStrings = localizedStrings;
   }
 
@@ -40,7 +40,7 @@ public final class LocalizationSupport {
    * Returns current localized strings
    */
   synchronized public static String localizedStringFor(String string) {
-    if(currentLocalizedStrings==null) createDefaultLocales();
+    if (currentLocalizedStrings == null) createDefaultLocales();
     return currentLocalizedStrings.get(string);
   }
 }

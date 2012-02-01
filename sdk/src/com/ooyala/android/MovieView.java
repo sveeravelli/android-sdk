@@ -7,6 +7,7 @@ import android.view.SurfaceView;
 
 class MovieView extends SurfaceView {
   private float _aspectRatio = -1;
+
   public MovieView(Context context) {
     super(context);
   }
@@ -38,22 +39,22 @@ class MovieView extends SurfaceView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         return;
       }
-      float availableAspectRatio = ((float)pWidth)/((float)pHeight);
+      float availableAspectRatio = ((float) pWidth) / ((float) pHeight);
       if (availableAspectRatio > _aspectRatio) {
         // bounded by the available height
-        newWidth = (int)(_aspectRatio*((float)pHeight));
+        newWidth = (int) (_aspectRatio * ((float) pHeight));
         newHeight = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by height: "+newWidth+","+newHeight);
+        Log.d(this.getClass().getName(), "TEST - resizing bounded by height: " + newWidth + "," + newHeight);
       } else if (availableAspectRatio < _aspectRatio) {
         // bounded by the available width
         newWidth = pWidth;
-        newHeight = (int)(((float)pWidth)/_aspectRatio);
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by width: "+newWidth+","+newHeight);
+        newHeight = (int) (((float) pWidth) / _aspectRatio);
+        Log.d(this.getClass().getName(), "TEST - resizing bounded by width: " + newWidth + "," + newHeight);
       } else {
         // no bound, aspect ratios are the same.
         newWidth = pWidth;
         newHeight = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by nothing: "+newWidth+","+newHeight);
+        Log.d(this.getClass().getName(), "TEST - resizing bounded by nothing: " + newWidth + "," + newHeight);
       }
       setMeasuredDimension(newWidth, newHeight);
     }

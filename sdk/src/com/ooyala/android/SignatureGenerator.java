@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
-public interface SignatureGenerator
-{
+public interface SignatureGenerator {
   /**
    * Generate the APIv2/SAS style signature.
    * <p>

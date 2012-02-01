@@ -19,32 +19,34 @@ class EmbeddedSecureURLGenerator implements SecureURLGenerator {
     _signatureGenerator = signatureGenerator;
   }
 
-  public URL secureURL(String host, String uri, Map<String,String> params)
-  {
-    Map<String,String> allParams = null;
+  public URL secureURL(String host, String uri, Map<String, String> params) {
+    Map<String, String> allParams = null;
     if (params == null) {
-      allParams = new HashMap<String,String>();
+      allParams = new HashMap<String, String>();
       allParams.put(Constants.KEY_API_KEY, _apiKey);
       long secondsSince1970 = (new Date()).getTime() / 1000;
       allParams.put(Constants.KEY_EXPIRES, Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
-      allParams.put(Constants.KEY_SIGNATURE, _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
+      allParams.put(Constants.KEY_SIGNATURE,
+          _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
     } else {
-      allParams = new HashMap<String,String>(params);
+      allParams = new HashMap<String, String>(params);
       if (!params.containsKey(Constants.KEY_SIGNATURE)) {
         if (!params.containsKey(Constants.KEY_API_KEY)) {
           allParams.put(Constants.KEY_API_KEY, _apiKey);
         }
         if (!params.containsKey(Constants.KEY_EXPIRES)) {
           long secondsSince1970 = (new Date()).getTime() / 1000;
-          allParams.put(Constants.KEY_EXPIRES, Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
+          allParams.put(Constants.KEY_EXPIRES,
+              Long.toString(secondsSince1970 + Constants.RESPONSE_LIFE_SECONDS));
         }
-        allParams.put(Constants.KEY_SIGNATURE, _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
+        allParams.put(Constants.KEY_SIGNATURE,
+            _signatureGenerator.sign(genStringToSign(uri, allParams, Constants.METHOD_GET)));
       }
     }
     return Utils.makeURL(host, uri, allParams);
   }
 
-  private String genStringToSign(String uri, Map<String,String> params, String method) {
+  private String genStringToSign(String uri, Map<String, String> params, String method) {
     String paramsString = Utils.getParamsString(params, Constants.SEPARATOR_EMPTY, false);
     return method + uri + paramsString;
   }

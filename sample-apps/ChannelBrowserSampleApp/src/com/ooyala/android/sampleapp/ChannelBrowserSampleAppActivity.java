@@ -34,7 +34,7 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
 
   public static OoyalaAPIClient api = new OoyalaAPIClient(APIKEY, SECRETKEY, PCODE, PLAYERDOMAIN);
 
-  private String[]embedCodes = { CHANNEL_CODE };
+  private String[] embedCodes = { CHANNEL_CODE };
   private Channel rootItem = null;
 
   /** Called when the activity is first created. */
@@ -43,60 +43,62 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
     super.onCreate(savedInstanceState);
     ContentItem item = null;
     try {
-        item = api.contentTree(Arrays.asList(embedCodes));
+      item = api.contentTree(Arrays.asList(embedCodes));
     } catch (OoyalaException e) {
-    	Log.e(TAG, "can not find content tree from api");
+      Log.e(TAG, "can not find content tree from api");
     }
     if (item != null && item instanceof Channel) {
-    	rootItem = (Channel)item;
-        setListAdapter(new OoyalaVideoListAdapter(this, getData(),
-                R.layout.embed_list_item, new String[] { "title", "thumbnail", "duration" },
-                new int[] { R.id.asset_title, R.id.asset_thumbnail, R.id.asset_duration }));
-        getListView().setTextFilterEnabled(false);
+      rootItem = (Channel) item;
+      setListAdapter(new OoyalaVideoListAdapter(this, getData(), R.layout.embed_list_item, new String[] {
+          "title", "thumbnail", "duration" }, new int[] { R.id.asset_title, R.id.asset_thumbnail,
+          R.id.asset_duration }));
+      getListView().setTextFilterEnabled(false);
 
     } else {
-    	Log.e(TAG, "Should not be here!");
+      Log.e(TAG, "Should not be here!");
     }
 
   }
 
   protected List<Map<String, Object>> getData() {
-	  if (rootItem == null) return null;
-      List<Map<String, Object>> myData = new ArrayList<Map<String, Object>>();
+    if (rootItem == null) return null;
+    List<Map<String, Object>> myData = new ArrayList<Map<String, Object>>();
 
-  	  for(Video v : rootItem.getVideos()) {
-  		addItem(myData, v.getTitle(), v.getDuration(), v.getPromoImageURL(50, 50), browseIntent(v.getEmbedCode()));
-	  }
-      return myData;
+    for (Video v : rootItem.getVideos()) {
+      addItem(myData, v.getTitle(), v.getDuration(), v.getPromoImageURL(50, 50),
+          browseIntent(v.getEmbedCode()));
+    }
+    return myData;
   }
 
   protected Intent browseIntent(String embedCode) {
-      Intent result = new Intent();
-      result.setClass(this, PlayerDetailActivity.class);
-      result.putExtra("com.ooyala.embedcode", embedCode);
-      return result;
+    Intent result = new Intent();
+    result.setClass(this, PlayerDetailActivity.class);
+    result.putExtra("com.ooyala.embedcode", embedCode);
+    return result;
   }
 
-  protected void addItem(List<Map<String, Object>> data, String name, int duration, String thumbnail, Intent intent) {
-      Map<String, Object> temp = new HashMap<String, Object>();
-      temp.put("title", name);
-      temp.put("duration", timeStringFromMillis(duration, true));
-      temp.put("thumbnail", thumbnail);
-      temp.put("intent", intent);
-      data.add(temp);
+  protected void addItem(List<Map<String, Object>> data, String name, int duration, String thumbnail,
+      Intent intent) {
+    Map<String, Object> temp = new HashMap<String, Object>();
+    temp.put("title", name);
+    temp.put("duration", timeStringFromMillis(duration, true));
+    temp.put("thumbnail", thumbnail);
+    temp.put("intent", intent);
+    data.add(temp);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   protected void onListItemClick(ListView l, View v, int position, long id) {
-      Map<String, Object> map = (Map<String, Object>)l.getItemAtPosition(position);
-      Intent intent = (Intent) map.get("intent");
-      startActivity(intent);
+    Map<String, Object> map = (Map<String, Object>) l.getItemAtPosition(position);
+    Intent intent = (Intent) map.get("intent");
+    startActivity(intent);
   }
 
   private String timeStringFromMillis(int millis, boolean includeHours) {
     Calendar c = Calendar.getInstance();
-    c.setTimeInMillis(millis+(8*60*60*1000));
+    c.setTimeInMillis(millis + (8 * 60 * 60 * 1000));
     SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
     return sdf.format(c.getTime());
   }

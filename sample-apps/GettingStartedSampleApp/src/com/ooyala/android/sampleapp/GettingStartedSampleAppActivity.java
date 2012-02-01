@@ -14,13 +14,10 @@ public class GettingStartedSampleAppActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-
-    OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout)findViewById(R.id.ooyalaPlayer);
+    OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-                                                                                           "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd",
-                                                                                           "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-                                                                                           "R2d3I6s06RyB712DN0_2GsQS-R-Y",
-                                                                                           "www.ooyala.com");
+        "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
+        "R2d3I6s06RyB712DN0_2GsQS-R-Y", "www.ooyala.com");
     OoyalaPlayer player = playerLayoutController.getPlayer();
     if (player.setEmbedCode("lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe")) {
       // The Embed Code works

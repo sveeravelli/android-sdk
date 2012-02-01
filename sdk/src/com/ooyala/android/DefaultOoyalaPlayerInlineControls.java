@@ -15,9 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements SeekBar.OnSeekBarChangeListener,
-                                                                                                      Button.OnClickListener,
-                                                                                                      Observer {
+public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements
+    SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private LinearLayout _bottomBar = null;
   private LinearLayout _seekWrapper = null;
   private LinearLayout _liveWrapper = null;
@@ -43,11 +42,12 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _fullscreen.setFullscreen(_player.isFullscreen());
     }
 
-    if(_seekWrapper!=null) _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
-    if(_liveWrapper!=null) {
-      _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE: View.GONE);
-      if(Build.VERSION.SDK_INT >= 11) {
-        _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f);  // supported only 11+
+    if (_seekWrapper != null)
+      _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
+    if (_liveWrapper != null) {
+      _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
+      if (Build.VERSION.SDK_INT >= 11) {
+        _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
     }
   }
@@ -64,7 +64,8 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
     _playPause = new PlayPauseButton(_bottomBar.getContext());
     _playPause.setPlaying(_player.isPlaying());
-    ViewGroup.LayoutParams ppLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
+    ViewGroup.LayoutParams ppLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(),
+        PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
     _playPause.setLayoutParams(ppLP);
     _playPause.setOnClickListener(this);
 
@@ -72,11 +73,13 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _seekWrapper.setOrientation(LinearLayout.HORIZONTAL);
     _currTime = new TextView(_seekWrapper.getContext());
     _currTime.setText("00:00:00");
-    LinearLayout.LayoutParams currTimeLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    LinearLayout.LayoutParams currTimeLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
     currTimeLP.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
     _currTime.setLayoutParams(currTimeLP);
     _seek = new SeekBar(_seekWrapper.getContext());
-    LinearLayout.LayoutParams seekLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+    LinearLayout.LayoutParams seekLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT,
+        1f);
     seekLP.gravity = Gravity.CENTER;
     seekLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     seekLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
@@ -84,13 +87,15 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _seek.setOnSeekBarChangeListener(this);
     _duration = new TextView(_seekWrapper.getContext());
     _duration.setText("00:00:00");
-    LinearLayout.LayoutParams durationLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    LinearLayout.LayoutParams durationLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
     durationLP.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
     _duration.setLayoutParams(durationLP);
     _seekWrapper.addView(_currTime);
     _seekWrapper.addView(_seek);
     _seekWrapper.addView(_duration);
-    LinearLayout.LayoutParams seekWrapperLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+    LinearLayout.LayoutParams seekWrapperLP = new LinearLayout.LayoutParams(0,
+        ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
     seekWrapperLP.gravity = Gravity.CENTER;
     seekWrapperLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     seekWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
@@ -102,11 +107,13 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _liveIndicator = new TextView(_liveWrapper.getContext());
     _liveIndicator.setText(LocalizationSupport.localizedStringFor("LIVE"));
     _liveIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
-    LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     liveIndicatorLP.gravity = Gravity.CENTER;
     _liveIndicator.setLayoutParams(liveIndicatorLP);
     _liveWrapper.addView(_liveIndicator);
-    LinearLayout.LayoutParams liveWrapperLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+    LinearLayout.LayoutParams liveWrapperLP = new LinearLayout.LayoutParams(0,
+        ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
     liveWrapperLP.gravity = Gravity.CENTER;
     liveWrapperLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     liveWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
@@ -114,9 +121,11 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
     _fullscreen = new FullscreenButton(_bottomBar.getContext());
     _fullscreen.setFullscreen(_player.isFullscreen());
-    LinearLayout.LayoutParams fsLP = new LinearLayout.LayoutParams(Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
-    fsLP.leftMargin = (PREFERRED_BUTTON_WIDTH_DP-PREFERRED_BUTTON_HEIGHT_DP)/2;
-    fsLP.rightMargin = (PREFERRED_BUTTON_WIDTH_DP-PREFERRED_BUTTON_HEIGHT_DP)/2;
+    LinearLayout.LayoutParams fsLP = new LinearLayout.LayoutParams(Images.dpToPixels(
+        _baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP), Images.dpToPixels(_baseLayout.getContext(),
+        PREFERRED_BUTTON_HEIGHT_DP));
+    fsLP.leftMargin = (PREFERRED_BUTTON_WIDTH_DP - PREFERRED_BUTTON_HEIGHT_DP) / 2;
+    fsLP.rightMargin = (PREFERRED_BUTTON_WIDTH_DP - PREFERRED_BUTTON_HEIGHT_DP) / 2;
     _fullscreen.setLayoutParams(fsLP);
     _fullscreen.setOnClickListener(this);
 
@@ -124,10 +133,13 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _bottomBar.addView(_seekWrapper);
     _bottomBar.addView(_liveWrapper);
     _bottomBar.addView(_fullscreen);
-    FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+    FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+            | Gravity.CENTER_HORIZONTAL);
     _baseLayout.addView(_bottomBar, bottomBarLP);
 
-    FrameLayout.LayoutParams baseLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    FrameLayout.LayoutParams baseLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT);
     _layout.addView(_baseLayout, baseLP);
     hide();
     _player.addObserver(this);
@@ -153,8 +165,11 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   @Override
   public void onClick(View v) {
     if (v == _playPause) {
-      if (_player.isPlaying()) { _player.pause(); }
-      else { _player.play(); }
+      if (_player.isPlaying()) {
+        _player.pause();
+      } else {
+        _player.play();
+      }
       updateButtonStates();
     } else if (v == _fullscreen) {
       _player.setFullscreen(!_player.isFullscreen());
@@ -169,7 +184,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _seek.setSecondaryProgress(_player.getBufferPercentage());
     }
     if (_duration != null && _currTime != null) {
-      boolean includeHours = _player.getDuration() >= 1000*60*60;
+      boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
       _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
       _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
     }

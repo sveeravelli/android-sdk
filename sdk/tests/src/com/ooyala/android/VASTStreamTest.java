@@ -14,11 +14,9 @@ public class VASTStreamTest extends AndroidTestCase {
     super();
   }
 
-  protected void setUp() {
-  }
+  protected void setUp() {}
 
-  protected void tearDown() {
-  }
+  protected void tearDown() {}
 
   public void testInitializers() {
     try {
@@ -27,21 +25,23 @@ public class VASTStreamTest extends AndroidTestCase {
       InputStream is = this.getClass().getResourceAsStream(TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
-      Element il = (Element)adXML.getElementsByTagName("InLine").item(0);
-      Element creatives = (Element)il.getElementsByTagName("Creatives").item(0);
-      Element lcreative = (Element)creatives.getElementsByTagName("Creative").item(0);
-      Element linear = (Element)lcreative.getElementsByTagName("Linear").item(0);
-      Element mediaFiles = (Element)linear.getElementsByTagName("MediaFiles").item(0);
-      Element mediaFile = (Element)mediaFiles.getElementsByTagName("MediaFile").item(0);
+      Element il = (Element) adXML.getElementsByTagName("InLine").item(0);
+      Element creatives = (Element) il.getElementsByTagName("Creatives").item(0);
+      Element lcreative = (Element) creatives.getElementsByTagName("Creative").item(0);
+      Element linear = (Element) lcreative.getElementsByTagName("Linear").item(0);
+      Element mediaFiles = (Element) linear.getElementsByTagName("MediaFiles").item(0);
+      Element mediaFile = (Element) mediaFiles.getElementsByTagName("MediaFile").item(0);
       VASTStream stream = new VASTStream(mediaFile);
-      assertEquals(stream.decodedURL().toString(), "http://vindicoasset.edgesuite.net/Repository/CampaignCreative/Campaign_8759/INSTREAMAD/93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4");
-      assertEquals(stream.getVastDeliveryType(),"progressive");
-      assertEquals(stream.getDeliveryType(),Constants.DELIVERY_TYPE_MP4);
-      assertEquals(stream.getWidth(),400);
-      assertEquals(stream.getHeight(),300);
-      assertEquals(stream.getVideoBitrate(),400);
+      assertEquals(
+          stream.decodedURL().toString(),
+          "http://vindicoasset.edgesuite.net/Repository/CampaignCreative/Campaign_8759/INSTREAMAD/93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4");
+      assertEquals(stream.getVastDeliveryType(), "progressive");
+      assertEquals(stream.getDeliveryType(), Constants.DELIVERY_TYPE_MP4);
+      assertEquals(stream.getWidth(), 400);
+      assertEquals(stream.getHeight(), 300);
+      assertEquals(stream.getVideoBitrate(), 400);
     } catch (Exception e) {
-      System.err.println("Exception: "+e.getMessage());
+      System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
       fail();
     }

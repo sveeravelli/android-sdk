@@ -17,8 +17,7 @@ public abstract class AdSpot {
   protected List<URL> _trackingURLs = null;
   protected PlayerAPIClient _api;
 
-  AdSpot() {
-  }
+  AdSpot() {}
 
   AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
     _time = time;
@@ -32,9 +31,7 @@ public abstract class AdSpot {
   }
 
   ReturnState update(JSONObject data) {
-    if (data == null) {
-      return ReturnState.STATE_FAIL;
-    }
+    if (data == null) { return ReturnState.STATE_FAIL; }
 
     try {
       if (!data.isNull(Constants.KEY_TIME)) {
@@ -47,10 +44,8 @@ public abstract class AdSpot {
         try {
           _clickURL = new URL(data.getString(Constants.KEY_CLICK_URL));
         } catch (MalformedURLException exception) {
-          Log.d(
-              this.getClass().getName(),
-              "Malformed Ad Click URL: "
-                  + data.getString(Constants.KEY_CLICK_URL));
+          Log.d(this.getClass().getName(),
+              "Malformed Ad Click URL: " + data.getString(Constants.KEY_CLICK_URL));
           _clickURL = null;
         }
       }
@@ -62,8 +57,8 @@ public abstract class AdSpot {
           try {
             _trackingURLs.add(new URL(pixels.getString(i)));
           } catch (MalformedURLException exception) {
-            Log.d(this.getClass().getName(), "Malformed Ad Tracking URL: "
-                + data.getString(Constants.KEY_TRACKING_URL));
+            Log.d(this.getClass().getName(),
+                "Malformed Ad Tracking URL: " + data.getString(Constants.KEY_TRACKING_URL));
           }
         }
       }
@@ -77,15 +72,12 @@ public abstract class AdSpot {
   public abstract boolean fetchPlaybackInfo();
 
   static AdSpot create(JSONObject data, PlayerAPIClient api) {
-    if (data == null || data.isNull(Constants.KEY_TYPE)) {
-      return null;
-    }
+    if (data == null || data.isNull(Constants.KEY_TYPE)) { return null; }
     String type = null;
     try {
       type = (String) data.getString(Constants.KEY_TYPE);
     } catch (JSONException exception) {
-      Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: "
-          + exception);
+      Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
       return null;
     }
 

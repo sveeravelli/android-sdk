@@ -23,22 +23,16 @@ import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-
 /**
  * A wrapper around android.media.MediaPlayer
  * http://developer.android.com/reference/android/media/MediaPlayer.html
- *
+ * 
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-class MoviePlayer extends Player implements OnBufferingUpdateListener,
-                                                   OnCompletionListener,
-                                                   OnErrorListener,
-                                                   OnPreparedListener,
-                                                   OnVideoSizeChangedListener,
-                                                   OnInfoListener,
-                                                   OnSeekCompleteListener,
-                                                   SurfaceHolder.Callback {
+class MoviePlayer extends Player implements OnBufferingUpdateListener, OnCompletionListener, OnErrorListener,
+    OnPreparedListener, OnVideoSizeChangedListener, OnInfoListener, OnSeekCompleteListener,
+    SurfaceHolder.Callback {
 
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
@@ -51,7 +45,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
 
-  protected static final long TIMER_DELAY  = 0;
+  protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
 
   private class PlayheadUpdateTimerTask extends TimerTask {
@@ -88,7 +82,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
       return;
     }
     setState(State.LOADING);
-    _stream = (Stream)stream;
+    _stream = (Stream) stream;
     setParent(parent);
   }
 
@@ -144,21 +138,21 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
   @Override
   public int currentTime() {
     if (_player == null) { return 0; }
-    switch(_state) {
-    case INIT:
-    case LOADING:
-    case SUSPENDED:
-      return 0;
-    default:
-      break;
-  }
+    switch (_state) {
+      case INIT:
+      case LOADING:
+      case SUSPENDED:
+        return 0;
+      default:
+        break;
+    }
     return _player.getCurrentPosition();
   }
 
   @Override
   public int duration() {
     if (_player == null) { return 0; }
-    switch(_state) {
+    switch (_state) {
       case INIT:
       case LOADING:
       case SUSPENDED:
@@ -183,12 +177,11 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
   private void createMediaPlayer() {
     Log.d(this.getClass().getName(), "TEST - createMediaPlayer");
     try {
-      if (_player==null) {
+      if (_player == null) {
         Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create");
-        _player=new MediaPlayer();
+        _player = new MediaPlayer();
         _player.setScreenOnWhilePlaying(true);
-      }
-      else {
+      } else {
         Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create else");
         stopPlayheadTimer();
         _player.stop();
@@ -196,7 +189,8 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
       }
 
       _player.setDataSource(_stream.decodedURL().toString());
-      Log.d(this.getClass().getName(), "TEST - FRAME SIZE: "+_holder.getSurfaceFrame().right+"x"+_holder.getSurfaceFrame().bottom);
+      Log.d(this.getClass().getName(), "TEST - FRAME SIZE: " + _holder.getSurfaceFrame().right + "x"
+          + _holder.getSurfaceFrame().bottom);
       _player.setDisplay(_holder);
       _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
       _player.setOnPreparedListener(this);
@@ -207,16 +201,15 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
       _player.setOnSeekCompleteListener(this);
       _player.setOnVideoSizeChangedListener(this);
       _player.prepareAsync();
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       Log.e(this.getClass().getName(), "TEST - Exception in media prep", t);
     }
   }
 
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
-    Log.d(this.getClass().getName(), "TEST - onError: "+what+" "+extra);
-    this._error = "MediaPlayer Error: "+what+" "+extra;
+    Log.d(this.getClass().getName(), "TEST - onError: " + what + " " + extra);
+    this._error = "MediaPlayer Error: " + what + " " + extra;
     setState(State.ERROR);
     return false;
   }
@@ -250,7 +243,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
   }
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-    Log.d(this.getClass().getName(), "TEST - onVideoSizeChangedd "+width+"x"+height);
+    Log.d(this.getClass().getName(), "TEST - onVideoSizeChangedd " + width + "x" + height);
     if (_width == 0 && _height == 0 && height > 0) {
       setVideoSize(width, height);
     }
@@ -258,12 +251,16 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-    Log.d(this.getClass().getName(), "TEST - surfaceChanged: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
+    Log.d(this.getClass().getName(), "TEST - surfaceChanged: " + (arg0 == null ? "null" : arg0.isCreating())
+        + " | "
+        + (arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
   }
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    Log.d(this.getClass().getName(), "TEST - surfaceCreated: "+(arg0 == null ? "null" : arg0.isCreating())+" | "+(arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
+    Log.d(this.getClass().getName(), "TEST - surfaceCreated: " + (arg0 == null ? "null" : arg0.isCreating())
+        + " | "
+        + (arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
     if (_width == 0 && _height == 0 && _stream.getHeight() > 0) {
       setVideoSize(_stream.getWidth(), _stream.getHeight());
     }
@@ -295,7 +292,8 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
 
   private void createView(Context c) {
     _view = new MovieView(c);
-    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
   }
 
   private void removeView() {
@@ -379,7 +377,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener,
   private void setVideoSize(int width, int height) {
     _width = width;
     _height = height;
-    ((MovieView)_view).setAspectRatio(((float)_width) / ((float)_height));
+    ((MovieView) _view).setAspectRatio(((float) _width) / ((float) _height));
   }
 
   protected void currentItemCompleted() {

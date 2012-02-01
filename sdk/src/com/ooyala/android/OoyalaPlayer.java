@@ -19,29 +19,21 @@ import android.util.Log;
 
 public class OoyalaPlayer extends Observable implements Observer {
   public static enum ActionAtEnd {
-    CONTINUE,
-    PAUSE,
-    STOP,
-    RESET
+    CONTINUE, PAUSE, STOP, RESET
   };
 
   public static enum State {
-    INIT,
-    LOADING,
-    READY,
-    PLAYING,
-    PAUSED,
-    COMPLETED,
-    SUSPENDED,
-    ERROR
+    INIT, LOADING, READY, PLAYING, PAUSED, COMPLETED, SUSPENDED, ERROR
   };
 
   /**
-   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it is set.
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it
+   * is set.
    */
   public static final int DO_PLAY = 0;
   /**
-   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be paused after it is set.
+   * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be paused after it
+   * is set.
    */
   public static final int DO_PAUSE = 1;
 
@@ -74,7 +66,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
-  private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black, Typeface.DEFAULT);
+  private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black,
+      Typeface.DEFAULT);
   private Map<String, Object> _openTasks = new HashMap<String, Object>();
 
   /**
@@ -119,7 +112,8 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param pcode Your Provider Code
    * @param domain Your Embed Domain
    */
-  public OoyalaPlayer(LayoutController lc, String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
+  public OoyalaPlayer(LayoutController lc, String apiKey, SignatureGenerator signatureGenerator,
+      String pcode, String domain) {
     this(lc, new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
   }
 
@@ -169,9 +163,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setLayoutController(LayoutController lc) {
     _layoutController = lc;
-    if (getLayout() == null) {
-      return;
-    }
+    if (getLayout() == null) { return; }
     if (_adPlayer != null) {
       _adPlayer.setParent(this);
     }
@@ -179,8 +171,8 @@ public class OoyalaPlayer extends Observable implements Observer {
       _player.setParent(this);
     }
     /*
-     * NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of our customers
-     * should actually call setLayout right after initializing the player so this is ok.
+     * NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of
+     * our customers should actually call setLayout right after initializing the player so this is ok.
      */
     _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
   }
@@ -194,32 +186,28 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * Reinitializes the player with a new embed code.
-   * If embedCode is null, this method has no effect and just returns false.
+   * Reinitializes the player with a new embed code. If embedCode is null, this method has no effect and just
+   * returns false.
    * @param embedCode
    * @return true if the embed code was successfully set, false if not.
    */
   public boolean setEmbedCode(String embedCode) {
-    if (embedCode == null) {
-      return false;
-    }
+    if (embedCode == null) { return false; }
     List<String> embeds = new ArrayList<String>();
     embeds.add(embedCode);
     return setEmbedCodes(embeds);
   }
 
   /**
-   * Reinitializes the player with a new set of embed codes.
-   * If embedCodes is null, this method has no effect and just returns false.
+   * Reinitializes the player with a new set of embed codes. If embedCodes is null, this method has no effect
+   * and just returns false.
    * @param embedCodes
    * @return true if the embed codes were successfully set, false if not.
    */
   public boolean setEmbedCodes(List<String> embedCodes) {
-    if (embedCodes == null || embedCodes.isEmpty()) {
-      return false;
-    }
+    if (embedCodes == null || embedCodes.isEmpty()) { return false; }
     cancelOpenTasks();
-    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
@@ -239,32 +227,28 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * Reinitializes the player with a new external ID.
-   * If externalId is null, this method has no effect and just returns false.
+   * Reinitializes the player with a new external ID. If externalId is null, this method has no effect and
+   * just returns false.
    * @param externalId
    * @return true if the external ID was successfully set, false if not.
    */
   public boolean setExternalId(String externalId) {
-    if (externalId == null) {
-      return false;
-    }
+    if (externalId == null) { return false; }
     List<String> ids = new ArrayList<String>();
     ids.add(externalId);
     return setExternalIds(ids);
   }
 
   /**
-   * Reinitializes the player with a new set of external IDs.
-   * If externalIds is null, this method has no effect and just returns false.
+   * Reinitializes the player with a new set of external IDs. If externalIds is null, this method has no
+   * effect and just returns false.
    * @param externalIds
    * @return true if the external IDs were successfully set, false if not.
    */
   public boolean setExternalIds(List<String> externalIds) {
-    if (externalIds == null || externalIds.isEmpty()) {
-      return false;
-    }
+    if (externalIds == null || externalIds.isEmpty()) { return false; }
     cancelOpenTasks();
-    final String taskKey = "setExternalIds"+System.currentTimeMillis();
+    final String taskKey = "setExternalIds" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds, new ContentTreeCallback() {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
@@ -311,7 +295,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       // Async authorize;
       cancelOpenTasks();
-      final String taskKey = "changeCurrentVideo"+System.currentTimeMillis();
+      final String taskKey = "changeCurrentVideo" + System.currentTimeMillis();
       taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
         @Override
         public void callback(boolean result, OoyalaException error) {
@@ -342,7 +326,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       return false;
     }
 
-    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
       @Override
       public void callback(boolean result) {
@@ -379,7 +363,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean reinitialize(ContentItem tree) {
     _rootItem = tree;
     // Async Authorize
-    final String taskKey = "setEmbedCodes"+System.currentTimeMillis();
+    final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.authorize(tree, new AuthorizeCallback() {
       @Override
       public void callback(boolean result, OoyalaException error) {
@@ -488,8 +472,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * Suspend the current video (can be resumed later by calling resume).
-   * This differs from pause in that it completely deconstructs the view so the layout can be changed.
+   * Suspend the current video (can be resumed later by calling resume). This differs from pause in that it
+   * completely deconstructs the view so the layout can be changed.
    */
   public void suspend() {
     _playQueued = false;
@@ -510,8 +494,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * Returns true if in fullscreen mode, false if not.
-   * Fullscreen currently does not work due to limitations in Android.
+   * Returns true if in fullscreen mode, false if not. Fullscreen currently does not work due to limitations
+   * in Android.
    * @return fullscreen mode
    */
   public boolean isFullscreen() {
@@ -519,16 +503,17 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * Set fullscreen mode (will only work if fullscreenLayout is set)
-   * This will call the setFullscreen method on the associated LayoutController. If you are implementing your own
-   * LayoutController here are some things to keep in mind:
-   * <li>If the setFullscreen method of your LayoutController creates a new OoyalaPlayerLayout or switches to a different one,
-   * you *must* call OoyalaPlayer.suspend() before doing so and call OoyalaPlayer.resume() after doing so.
-   * <li>If the setFullscreen method of your LayoutController uses the same OoyalaPlayerLayout, you do not need to do any special handling.
+   * Set fullscreen mode (will only work if fullscreenLayout is set) This will call the setFullscreen method
+   * on the associated LayoutController. If you are implementing your own LayoutController here are some
+   * things to keep in mind: <li>If the setFullscreen method of your LayoutController creates a new
+   * OoyalaPlayerLayout or switches to a different one, you *must* call OoyalaPlayer.suspend() before doing so
+   * and call OoyalaPlayer.resume() after doing so. <li>If the setFullscreen method of your LayoutController
+   * uses the same OoyalaPlayerLayout, you do not need to do any special handling.
    * @param fullscreen true to switch to fullscreen, false to switch out of fullscreen
    */
   public void setFullscreen(boolean fullscreen) {
-    if (isFullscreen() == !fullscreen) { // this is so we don't add/remove cc view if we are not actually changing state.
+    if (isFullscreen() == !fullscreen) { // this is so we don't add/remove cc view if we are not actually
+                                         // changing state.
       removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
       addClosedCaptionsView();
@@ -540,9 +525,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return time in milliseconds
    */
   public int getPlayheadTime() {
-    if (currentPlayer() == null) {
-      return -1;
-    }
+    if (currentPlayer() == null) { return -1; }
     return currentPlayer().currentTime();
   }
 
@@ -555,9 +538,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   public boolean seekable() {
-    if (currentPlayer() == null) {
-      return false;
-    }
+    if (currentPlayer() == null) { return false; }
     return currentPlayer().seekable();
   }
 
@@ -569,7 +550,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (currentPlayer().seekable()) {
       currentPlayer().seekToTime(timeInMillis);
       if (currentPlayer() == _player) {
-        _analytics.reportPlayheadUpdate(((double)timeInMillis)/1000);
+        _analytics.reportPlayheadUpdate(((double) timeInMillis) / 1000);
       }
     }
   }
@@ -591,21 +572,19 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean playAdsBeforeTime(int time) {
-    Log.d(this.getClass().getName(), "TEST - playAdsBeforeTime: "+time);
+    Log.d(this.getClass().getName(), "TEST - playAdsBeforeTime: " + time);
     this._lastPlayedTime = time;
     for (AdSpot ad : _currentItem.getAds()) {
       if (ad.getTime() <= time && !this._playedAds.contains(ad)) {
         _playedAds.add(ad);
-        if (playAd(ad)) {
-          return true;
-        }
+        if (playAd(ad)) { return true; }
       }
     }
     return false;
   }
 
   private boolean playAd(AdSpot ad) {
-    Log.d(this.getClass().getName(), "TEST - playAd: "+ad.getTime());
+    Log.d(this.getClass().getName(), "TEST - playAd: " + ad.getTime());
 
     Class<? extends Player> adPlayerClass = null;
     if (ad instanceof OoyalaAdSpot) {
@@ -644,17 +623,17 @@ public class OoyalaPlayer extends Observable implements Observer {
       ChannelSet parentOfParent = parent.getParent();
       if (parent.hasMoreChildren()) {
         return parent.fetchMoreChildren(listener);
-      } else if (parentOfParent != null && parentOfParent.hasMoreChildren()) {
-        return parentOfParent.fetchMoreChildren(listener);
-      }
+      } else if (parentOfParent != null && parentOfParent.hasMoreChildren()) { return parentOfParent
+          .fetchMoreChildren(listener); }
     }
     return false;
   }
 
   /**
-   * Change the current video to the previous video in the Channel or ChannelSet. If there is no previous video,
-   * this will seek to the beginning of the video.
-   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the video is set.
+   * Change the current video to the previous video in the Channel or ChannelSet. If there is no previous
+   * video, this will seek to the beginning of the video.
+   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the
+   *          video is set.
    * @return true if there was a previous video, false if not.
    */
   public boolean previousVideo(int what) {
@@ -662,7 +641,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       changeCurrentVideo(_currentItem.previousVideo());
       if (what == DO_PLAY) {
         play();
-      } else if(what == DO_PAUSE) {
+      } else if (what == DO_PAUSE) {
         pause();
       }
       return true;
@@ -673,31 +652,30 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   /**
    * Change the current video to the next video in the Channel or ChannelSet. If there is no next video,
-   * nothing will happen. Note that this will trigger a fetch of additional children if the Channel or ChannelSet
-   * is paginated. If so, it may take some time before the video is actually set.
-   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the video is set.
+   * nothing will happen. Note that this will trigger a fetch of additional children if the Channel or
+   * ChannelSet is paginated. If so, it may take some time before the video is actually set.
+   * @param what OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE depending on what to do after the
+   *          video is set.
    * @return true if there was a next video, false if not.
    */
   public boolean nextVideo(int what) {
-    //This is required because android enjoys making things difficult. talk to jigish if you got issues.
+    // This is required because android enjoys making things difficult. talk to jigish if you got issues.
     if (_currentItem.nextVideo() != null) {
       _fetchMoreChildrenHandler.sendEmptyMessage(what);
       return true;
     } else if (what == DO_PLAY && fetchMoreChildren(new PaginatedItemListener() {
-            @Override
-            public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-              _fetchMoreChildrenHandler.sendEmptyMessage(DO_PLAY);
-            }
-          })) {
+      @Override
+      public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+        _fetchMoreChildrenHandler.sendEmptyMessage(DO_PLAY);
+      }
+    })) {
       return true;
     } else if (what == DO_PAUSE && fetchMoreChildren(new PaginatedItemListener() {
-            @Override
-            public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-              _fetchMoreChildrenHandler.sendEmptyMessage(DO_PAUSE);
-            }
-          })) {
-      return true;
-    }
+      @Override
+      public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
+        _fetchMoreChildrenHandler.sendEmptyMessage(DO_PAUSE);
+      }
+    })) { return true; }
     return false;
   }
 
@@ -706,7 +684,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       changeCurrentVideo(_currentItem.nextVideo());
       if (msg.what == DO_PLAY) {
         play();
-      } else if(msg.what == DO_PAUSE) {
+      } else if (msg.what == DO_PAUSE) {
         pause();
       }
     }
@@ -723,15 +701,13 @@ public class OoyalaPlayer extends Observable implements Observer {
     Log.d(this.getClass().getName(), "TEST - COMPLETED - onComplete");
     switch (_actionAtEnd) {
       case CONTINUE:
-        if(nextVideo(DO_PLAY)) {
-        } else {
+        if (nextVideo(DO_PLAY)) {} else {
           reset();
           sendNotification(PLAY_COMPLETED_NOTIFICATION);
         }
         break;
       case PAUSE:
-        if(nextVideo(DO_PAUSE)) {
-        } else {
+        if (nextVideo(DO_PAUSE)) {} else {
           reset();
           sendNotification(PLAY_COMPLETED_NOTIFICATION);
         }
@@ -750,11 +726,11 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    Log.d(this.getClass().getName(), "TEST - Notificationn: "+arg1.toString()+" "+_state);
+    Log.d(this.getClass().getName(), "TEST - Notificationn: " + arg1.toString() + " " + _state);
     if (arg0 == this._player) {
       Log.d(this.getClass().getName(), "TEST - Note from player");
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
-        switch(((Player)arg0).getState()) {
+        switch (((Player) arg0).getState()) {
           case COMPLETED:
             if (!playAdsBeforeTime(Integer.MAX_VALUE)) {
               onComplete();
@@ -777,30 +753,30 @@ public class OoyalaPlayer extends Observable implements Observer {
           case SUSPENDED: // suspended is an internal state. we don't want to pass it through
             break;
           default:
-            setState(((Player)arg0).getState());
+            setState(((Player) arg0).getState());
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _player.getState() == State.PLAYING) {
         sendNotification(TIME_CHANGED_NOTIFICATION);
         this._lastPlayedTime = this._player.currentTime();
         playAdsBeforeTime(this._lastPlayedTime);
-        //closed captions
+        // closed captions
         if (_language != null && _currentItem.hasClosedCaptions()) {
-          double currT = ((double)currentPlayer().currentTime())/1000d;
+          double currT = ((double) currentPlayer().currentTime()) / 1000d;
           if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
-          	Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
-          	if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
-          	  _closedCaptionsView.setCaption(caption);
-          	} else {
-          	  _closedCaptionsView.setCaption(null);
-          	}
+            Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
+            if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
+              _closedCaptionsView.setCaption(caption);
+            } else {
+              _closedCaptionsView.setCaption(null);
+            }
           }
         }
       }
     } else if (arg0 == this._adPlayer) {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
         Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
-        switch(((Player)arg0).getState()) {
+        switch (((Player) arg0).getState()) {
           case ERROR:
             sendNotification(AD_ERROR_NOTIFICATION);
           case COMPLETED:
@@ -832,7 +808,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         sendNotification(TIME_CHANGED_NOTIFICATION);
       }
     }
-    Log.d(this.getClass().getName(), "TEST - Notificationn END: "+arg1.toString()+" "+_state);
+    Log.d(this.getClass().getName(), "TEST - Notificationn END: " + arg1.toString() + " " + _state);
   }
 
   /**
@@ -863,7 +839,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void sendNotification(String obj) {
     setChanged();
     notifyObservers(obj);
-    Log.d(this.getClass().getName(), "TEST - SENT NOTIFICATION "+obj);
+    Log.d(this.getClass().getName(), "TEST - SENT NOTIFICATION " + obj);
   }
 
   /**
@@ -876,12 +852,13 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   public double getBitrate() {
     if (android.os.Build.VERSION.SDK_INT >= 10) {
-      //Query for bitrate
+      // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
       metadataRetreiver.setDataSource(getCurrentItem().getStream().getUrl());
-      return Double.parseDouble(metadataRetreiver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+      return Double.parseDouble(metadataRetreiver
+          .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
-      return (double)(getCurrentItem().getStream().getVideoBitrate() * 1000);
+      return (double) (getCurrentItem().getStream().getVideoBitrate() * 1000);
     }
   }
 
@@ -953,7 +930,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
-   * This will reset the state of all the ads to "unplayed" causing any ad that has already played to play again.
+   * This will reset the state of all the ads to "unplayed" causing any ad that has already played to play
+   * again.
    */
   public void resetAds() {
     _playedAds.clear();
@@ -983,13 +961,13 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private int percentToMillis(int percent) {
-    float fMillis = (((float)percent)/(100f)) * ((float)getDuration());
-    return (int)fMillis;
+    float fMillis = (((float) percent) / (100f)) * ((float) getDuration());
+    return (int) fMillis;
   }
 
   private int millisToPercent(int millis) {
-    float fPercent = (((float)millis)/((float)getDuration()))*(100f);
-    return (int)fPercent;
+    float fPercent = (((float) millis) / ((float) getDuration())) * (100f);
+    return (int) fPercent;
   }
 
   private void queuePlay() {
@@ -1007,8 +985,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void taskStarted(String key, Object task) {
-    if (task != null)
-      _openTasks.put(key, task);
+    if (task != null) _openTasks.put(key, task);
   }
 
   private void taskCompleted(String key) {
@@ -1028,7 +1005,6 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
     this._closedCaptionsStyle = closedCaptionsStyle;
-    if (_closedCaptionsView != null)
-      _closedCaptionsView.setStyle(closedCaptionsStyle);
+    if (_closedCaptionsView != null) _closedCaptionsView.setStyle(closedCaptionsStyle);
   }
 }

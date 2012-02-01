@@ -7,11 +7,12 @@ import com.ooyala.android.OoyalaPlayer.State;
 import android.view.SurfaceView;
 import android.view.View;
 
-
 abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
-  protected State _state = State.INIT; /** the current state of the player */
-  protected String _error = null; /** The Player's current error if it exists */
+  /** the current state of the player */
+  protected State _state = State.INIT;
+  /** The Player's current error if it exists */
+  protected String _error = null;
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
@@ -22,29 +23,24 @@ abstract class Player extends Observable {
   /**
    * Init the player
    */
-  protected Player() {
-  }
+  protected Player() {}
 
-  public void init(OoyalaPlayer parent, Object param) {
-  }
+  public void init(OoyalaPlayer parent, Object param) {}
 
   /**
    * Pause the current video
    */
-  public void pause() {
-  }
+  public void pause() {}
 
   /**
    * Play the current video
    */
-  public void play() {
-  }
+  public void play() {}
 
   /**
    * Stop playback, remove listeners
    */
-  public void stop() {
-  }
+  public void stop() {}
 
   /**
    * Get the current playhead time
@@ -90,8 +86,7 @@ abstract class Player extends Observable {
    * Set the current playhead time of the player
    * @param timeInMillis int millis to set the playhead time to
    */
-  public void seekToTime(int timeInMillis) {
-  }
+  public void seekToTime(int timeInMillis) {}
 
   public State getState() {
     return _state;

@@ -7,11 +7,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 /**
- * This LayoutController is a generic LayoutController that will work in most cases (regardless of the containing Layout type).
- * It uses basic controls and allows additional overlays to be added. Fullscreening is done by opening a full screen Dialog
- * and filling it with a dynamically created OoyalaPlayerLayout. Because of this, playback will be suspended and subsequently
- * resumed during this process. As a result, fullscreening is slower than if the OoyalaPlayerLayout is embeded directly in the
- * Activity's base layout, that base layout is a FrameLayout, and the LayoutController used is FastOoyalaPlayerLayoutController.
+ * This LayoutController is a generic LayoutController that will work in most cases (regardless of the
+ * containing Layout type). It uses basic controls and allows additional overlays to be added. Fullscreening
+ * is done by opening a full screen Dialog and filling it with a dynamically created OoyalaPlayerLayout.
+ * Because of this, playback will be suspended and subsequently resumed during this process. As a result,
+ * fullscreening is slower than if the OoyalaPlayerLayout is embeded directly in the Activity's base layout,
+ * that base layout is a FrameLayout, and the LayoutController used is FastOoyalaPlayerLayoutController.
  * @author jigish
  */
 public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
@@ -24,7 +25,8 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
+      String domain) {
     this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO);
   }
 
@@ -46,7 +48,8 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain, DefaultControlStyle dcs) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
+      String domain, DefaultControlStyle dcs) {
     this(l, new OoyalaPlayer(apiKey, secret, pcode, domain), dcs);
   }
 
@@ -90,7 +93,8 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
       _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen);
       _fullscreenLayout = new OoyalaPlayerLayout(_fullscreenDialog.getContext());
-      _fullscreenLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT, Gravity.FILL));
+      _fullscreenLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.FILL));
       _fullscreenLayout.setLayoutController(this);
       _fullscreenDialog.setContentView(_fullscreenLayout);
       _fullscreenDialog.show();
@@ -102,7 +106,11 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
       }
     }
     _player.resume();
-    if (controlsToShow != null) { controlsToShow.show(); }
-    if (overlayToShow != null) { overlayToShow.show(); }
+    if (controlsToShow != null) {
+      controlsToShow.show();
+    }
+    if (overlayToShow != null) {
+      overlayToShow.show();
+    }
   }
 }

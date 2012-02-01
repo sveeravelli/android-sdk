@@ -33,7 +33,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     }
   }
 
-  //This is required because android enjoys making things difficult. talk to jigish if you got issues.
+  // This is required because android enjoys making things difficult. talk to jigish if you got issues.
   protected final Handler _hideHandler = new Handler() {
     public void handleMessage(Message msg) {
       if (_player.isPlaying()) {
@@ -44,7 +44,12 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
   protected class TouchButton extends ImageButton {
     protected boolean _touching = false;
-    public TouchButton(Context context) { super(context); this.setBackgroundDrawable(null); }
+
+    public TouchButton(Context context) {
+      super(context);
+      this.setBackgroundDrawable(null);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
       if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -59,47 +64,75 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   }
 
   protected class NextButton extends TouchButton {
-    public NextButton(Context context) { super(context); }
+    public NextButton(Context context) {
+      super(context);
+    }
+
     protected void onDraw(Canvas c) {
       if (c == null) { return; }
-      Images.drawImage(Images.NEXT, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+      Images.drawImage(Images.NEXT, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(),
+          getHeight(), MARGIN_SIZE_DP, _touching);
     }
   }
 
   protected class PreviousButton extends TouchButton {
-    public PreviousButton(Context context) { super(context); }
+    public PreviousButton(Context context) {
+      super(context);
+    }
+
     protected void onDraw(Canvas c) {
       if (c == null) { return; }
-      Images.drawImage(Images.PREVIOUS, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+      Images.drawImage(Images.PREVIOUS, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(),
+          getHeight(), MARGIN_SIZE_DP, _touching);
     }
   }
 
   protected class PlayPauseButton extends TouchButton {
     private boolean _playing = false;
-    public PlayPauseButton(Context context) { super(context); }
-    public void setPlaying(boolean playing) { _playing = playing; invalidate(); }
+
+    public PlayPauseButton(Context context) {
+      super(context);
+    }
+
+    public void setPlaying(boolean playing) {
+      _playing = playing;
+      invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas c) {
       if (c == null) { return; }
       if (_playing) {
-        Images.drawImage(Images.PAUSE, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+        Images.drawImage(Images.PAUSE, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(),
+            getHeight(), MARGIN_SIZE_DP, _touching);
       } else {
-        Images.drawImage(Images.PLAY, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+        Images.drawImage(Images.PLAY, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(),
+            getHeight(), MARGIN_SIZE_DP, _touching);
       }
     }
   }
 
   protected class FullscreenButton extends TouchButton {
     private boolean _fullscreen = false;
-    public FullscreenButton(Context context) { super(context); }
-    public void setFullscreen(boolean fullscreen) { _fullscreen = fullscreen; invalidate(); }
+
+    public FullscreenButton(Context context) {
+      super(context);
+    }
+
+    public void setFullscreen(boolean fullscreen) {
+      _fullscreen = fullscreen;
+      invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas c) {
       if (c == null) { return; }
       if (_fullscreen) {
-        Images.drawImage(Images.SMALLSCREEN, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+        Images.drawImage(Images.SMALLSCREEN, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR,
+            getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
       } else {
-        Images.drawImage(Images.FULLSCREEN, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
+        Images.drawImage(Images.FULLSCREEN, this.getContext(), c, BACKGROUND_COLOR, SOFT_WHITE_COLOR,
+            getWidth(), getHeight(), MARGIN_SIZE_DP, _touching);
       }
     }
   }

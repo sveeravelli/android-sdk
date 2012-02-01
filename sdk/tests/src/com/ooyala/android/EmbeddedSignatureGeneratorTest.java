@@ -13,8 +13,7 @@ public class EmbeddedSignatureGeneratorTest extends AndroidTestCase {
     sigGen = new EmbeddedSignatureGenerator(TestConstants.TEST_SECRET);
   }
 
-  protected void tearDown() {
-  }
+  protected void tearDown() {}
 
   public void testSign() {
     String testString = "oogabooga";

@@ -9,24 +9,19 @@ import org.json.JSONObject;
 import com.ooyala.android.Constants.ReturnState;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
-public class Channel extends ContentItem implements PaginatedParentItem
-{
-  protected OrderedMap<String,Video> _videos = new OrderedMap<String,Video>();
+public class Channel extends ContentItem implements PaginatedParentItem {
+  protected OrderedMap<String, Video> _videos = new OrderedMap<String, Video>();
   protected ChannelSet _parent = null;
   protected String _nextChildren = null;
   protected boolean _isFetchingMoreChildren = false;
 
-  Channel()
-  {
-  }
+  Channel() {}
 
-  Channel(JSONObject data, String embedCode, PlayerAPIClient api)
-  {
+  Channel(JSONObject data, String embedCode, PlayerAPIClient api) {
     this(data, embedCode, null, api);
   }
 
-  Channel(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api)
-  {
+  Channel(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api) {
     _embedCode = embedCode;
     _api = api;
     _parent = parent;
@@ -39,15 +34,12 @@ public class Channel extends ContentItem implements PaginatedParentItem
    * @param data the data to use to update this AuthorizableItem
    * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
-  public synchronized ReturnState update(JSONObject data)
-  {
-    switch (super.update(data))
-    {
+  public synchronized ReturnState update(JSONObject data) {
+    switch (super.update(data)) {
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;
       case STATE_UNMATCHED:
-        for (Video video : _videos)
-        {
+        for (Video video : _videos) {
           video.update(data);
         }
         return ReturnState.STATE_UNMATCHED;
@@ -55,67 +47,58 @@ public class Channel extends ContentItem implements PaginatedParentItem
         break;
     }
 
-    try
-    {
+    try {
       JSONObject myData = data.getJSONObject(_embedCode);
-      if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED))
-      {
-        for (Video video : _videos)
-        {
+      if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED)) {
+        for (Video video : _videos) {
           video.update(data);
         }
         return ReturnState.STATE_MATCHED;
       }
 
-      if (!myData.isNull(Constants.KEY_CONTENT_TYPE) && !myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL))
-      {
-        System.out.println("ERROR: Attempted to initialize Channel with content_type: " + myData.getString(Constants.KEY_CONTENT_TYPE));
+      if (!myData.isNull(Constants.KEY_CONTENT_TYPE)
+          && !myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL)) {
+        System.out.println("ERROR: Attempted to initialize Channel with content_type: "
+            + myData.getString(Constants.KEY_CONTENT_TYPE));
         return ReturnState.STATE_FAIL;
       }
 
-      _nextChildren = myData.isNull(Constants.KEY_NEXT_CHILDREN) ? null : myData.getString(Constants.KEY_NEXT_CHILDREN);
+      _nextChildren = myData.isNull(Constants.KEY_NEXT_CHILDREN) ? null : myData
+          .getString(Constants.KEY_NEXT_CHILDREN);
 
-      if (myData.isNull(Constants.KEY_CHILDREN))
-      {
-        if (_nextChildren == null)
-        {
-          System.out.println("ERROR: Attempted to initialize Channel with children == nil and next_children == nil: " + _embedCode);
+      if (myData.isNull(Constants.KEY_CHILDREN)) {
+        if (_nextChildren == null) {
+          System.out
+              .println("ERROR: Attempted to initialize Channel with children == nil and next_children == nil: "
+                  + _embedCode);
           return ReturnState.STATE_FAIL;
         }
         return ReturnState.STATE_MATCHED;
       }
 
       JSONArray children = myData.getJSONArray(Constants.KEY_CHILDREN);
-      if (children.length() > 0)
-      {
-        for (int i = 0; i < children.length(); i++)
-        {
+      if (children.length() > 0) {
+        for (int i = 0; i < children.length(); i++) {
           JSONObject child = children.getJSONObject(i);
-          if (!child.isNull(Constants.KEY_CONTENT_TYPE) && child.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_VIDEO))
-          {
+          if (!child.isNull(Constants.KEY_CONTENT_TYPE)
+              && child.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_VIDEO)) {
             HashMap<String, JSONObject> childMap = new HashMap<String, JSONObject>();
             String childEmbedCode = child.getString(Constants.KEY_EMBED_CODE);
             childMap.put(childEmbedCode, child);
             JSONObject childData = new JSONObject(childMap);
             Video existingChild = _videos.get(childEmbedCode);
-            if (existingChild == null)
-            {
+            if (existingChild == null) {
               addVideo(new Video(childData, childEmbedCode, this, _api));
-            }
-            else
-            {
+            } else {
               existingChild.update(childData);
             }
-          }
-          else
-          {
-            System.out.println("ERROR: Invalid Video content_type: " + child.getString(Constants.KEY_CONTENT_TYPE));
+          } else {
+            System.out.println("ERROR: Invalid Video content_type: "
+                + child.getString(Constants.KEY_CONTENT_TYPE));
           }
         }
       }
-    }
-    catch (JSONException exception)
-    {
+    } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
@@ -125,31 +108,31 @@ public class Channel extends ContentItem implements PaginatedParentItem
 
   /**
    * Get the first Video for this Channel
+   * 
    * @return the first Video this Channel represents
    */
-  public Video firstVideo()
-  {
+  public Video firstVideo() {
     if (_videos == null || _videos.size() == 0) { return null; }
     return _videos.get(0);
   }
 
   /**
    * Get the last Video for this Channel
+   * 
    * @return the last Video this Channel represents
    */
-  public Video lastVideo()
-  {
+  public Video lastVideo() {
     if (_videos == null || _videos.size() == 0) { return null; }
-    return _videos.get(_videos.size()-1);
+    return _videos.get(_videos.size() - 1);
   }
 
   /**
    * Get the next Video for this Channel
+   * 
    * @param currentItem the current Video
    * @return the next Video from Channel
    */
-  public Video nextVideo(Video currentItem)
-  {
+  public Video nextVideo(Video currentItem) {
     int index = _videos.indexForValue(currentItem);
     if (index < 0 || ++index >= _videos.size()) { return _parent == null ? null : _parent.nextVideo(this); }
     return _videos.get(index);
@@ -157,64 +140,68 @@ public class Channel extends ContentItem implements PaginatedParentItem
 
   /**
    * Get the previous Video for this Channel
+   * 
    * @param currentItem the current Video
    * @return the previous Video from Channel
    */
-  public Video previousVideo(Video currentItem)
-  {
+  public Video previousVideo(Video currentItem) {
     int index = _videos.indexForValue(currentItem);
     if (index < 0 || --index < 0) { return _parent == null ? null : _parent.previousVideo(this); }
     return _videos.get(index);
   }
 
-  protected void addVideo(Video video)
-  {
+  protected void addVideo(Video video) {
     _videos.put(video.getEmbedCode(), video);
   }
 
   /**
    * The number of videos this Channel has. Same as getVideos().size().
+   * 
    * @return an int with the number of videos
    */
-  public int childrenCount()
-  {
+  public int childrenCount() {
     return _videos.size();
   }
 
-  public OrderedMap<String,Video> getVideos()
-  {
+  public OrderedMap<String, Video> getVideos() {
     return _videos;
   }
 
   /**
    * The total duration (not including Ads) of this Channel
+   * 
    * @return an int with the total duration in seconds
    */
-  public int getDuration()
-  {
+  public int getDuration() {
     int totalDuration = 0;
-    for (Video video : _videos) { totalDuration += video.getDuration(); }
+    for (Video video : _videos) {
+      totalDuration += video.getDuration();
+    }
     return totalDuration;
   }
 
   /**
    * Find out it this Channel has more children
+   * 
    * @return true if it does, false if it doesn't
    */
-  public boolean hasMoreChildren()
-  {
+  public boolean hasMoreChildren() {
     return _nextChildren != null;
   }
 
   /**
-   * Fetch the additional children if they exist. This will happen in the background and callback will be called when the fetch is complete.
+   * Fetch the additional children if they exist. This will happen in the background and callback will be
+   * called when the fetch is complete.
+   * 
    * @param listener the listener to execute when the children are fetched
-   * @return true if more children exist, false if they don't or they are already in the process of being fetched
+   * @return true if more children exist, false if they don't or they are already in the process of being
+   *         fetched
    */
-  public boolean fetchMoreChildren(PaginatedItemListener listener)
-  {
-    // The two lines below aren't within a synchronized block because we assume single thread
-    // of execution except for the threads we explicitly spawn below, but those set
+  public boolean fetchMoreChildren(PaginatedItemListener listener) {
+    // The two lines below aren't within a synchronized block because we assume
+    // single thread
+    // of execution except for the threads we explicitly spawn below, but those
+    // set
     // _isFetchingMoreChildren = false at the very end of their execution.
     if (!hasMoreChildren() || _isFetchingMoreChildren) { return false; }
     _isFetchingMoreChildren = true;
@@ -224,43 +211,39 @@ public class Channel extends ContentItem implements PaginatedParentItem
     return true;
   }
 
-  private class NextChildrenRunner implements Runnable
-  {
+  private class NextChildrenRunner implements Runnable {
     private String _nextChildren = null;
     private PaginatedItemListener _listener = null;
 
-    public NextChildrenRunner(String nextChildren, PaginatedItemListener listener)
-    {
+    public NextChildrenRunner(String nextChildren, PaginatedItemListener listener) {
       _nextChildren = nextChildren;
       _listener = listener;
     }
 
-    public void run()
-    {
+    public void run() {
       PaginatedItemResponse response = _api.contentTreeNext(_nextChildren, Channel.this);
-      if (response == null)
-      {
-        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "Null response"));
+      if (response == null) {
+        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED,
+            "Null response"));
         _isFetchingMoreChildren = false;
         return;
       }
 
-      if (response.firstIndex < 0)
-      {
-        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
+      if (response.firstIndex < 0) {
+        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+            OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
         _isFetchingMoreChildren = false;
         return;
       }
 
-      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_videos.subList(response.firstIndex, response.firstIndex+response.count));
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_videos.subList(
+          response.firstIndex, response.firstIndex + response.count));
       try {
-        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this))
-        {
+        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this)) {
           _listener.onItemsFetched(response.firstIndex, response.count, null);
-        }
-        else
-        {
-          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        } else {
+          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+              OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
         }
       } catch (OoyalaException e) {
         _listener.onItemsFetched(response.firstIndex, response.count, e);

@@ -19,14 +19,12 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
 
-public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer
-{
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
 
   @Override
-  public void onCreate(Bundle savedInstanceState)
-  {
+  public void onCreate(Bundle savedInstanceState) {
     Log.d(TAG, "TEST - onCreate");
     super.onCreate(savedInstanceState);
     Thread.setDefaultUncaughtExceptionHandler(onUncaughtException);
@@ -36,29 +34,35 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       e.printStackTrace();
     }
 
-    Button end = (Button)findViewById(R.id.end);
+    Button end = (Button) findViewById(R.id.end);
     end.setOnClickListener(this);
 
     // optional localization
-    //LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
+    // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
-    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout)findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
+        (OoyalaPlayerLayout) findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_",
+        "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
-    // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
-    // ooyala preroll:            g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
-    // ooyala midroll (5 sec):    c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
-    // ooyala postroll:           1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
+    // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w",
+    // "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
+    // ooyala preroll: g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
+    // ooyala midroll (5 sec): c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
+    // ooyala postroll: 1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
     // ooyala ad as normal video: JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B
-    // no ads:                    UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
-    // VAST preroll:              w2cXAxMzqpwY5HwqSbHMzYgu92Lj6Fer
-    // Channel:                   NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
-    // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr", "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
-    // VAST preroll:              JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    // Greg's account: "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd", "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com"
-    // HLS:    	"9ydnRhMzq-roTTbvwmG20FIwMEB08xom"
-    // Live Streaming: "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV", "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
+    // no ads: UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
+    // VAST preroll: w2cXAxMzqpwY5HwqSbHMzYgu92Lj6Fer
+    // Channel: NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
+    // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr",
+    // "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
+    // VAST preroll: JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
+    // Greg's account: "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd",
+    // "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com"
+    // HLS: "9ydnRhMzq-roTTbvwmG20FIwMEB08xom"
+    // Live Streaming: "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV",
+    // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
     if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
@@ -71,26 +75,26 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   @Override
   protected void onStop() {
-      super.onStop();
-      Log.d(TAG, "---------------- Stop -----------");
-      if (player != null) {
-    	  player.suspend();
-      }
+    super.onStop();
+    Log.d(TAG, "---------------- Stop -----------");
+    if (player != null) {
+      player.suspend();
+    }
   }
 
   @Override
   protected void onRestart() {
-      super.onRestart();
-      Log.d(TAG, "---------------- Restart -----------");
-      if (player != null) {
-    	  player.resume();
-      }
+    super.onRestart();
+    Log.d(TAG, "---------------- Restart -----------");
+    if (player != null) {
+      player.resume();
+    }
   }
 
   @Override
   protected void onDestroy() {
-      super.onDestroy();
-      player = null;
+    super.onDestroy();
+    player = null;
   }
 
   @Override
@@ -99,17 +103,14 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     super.onConfigurationChanged(newConfig);
   }
 
-  private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler()
-  {
-    public void uncaughtException(Thread thread, Throwable ex)
-    {
+  private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+    public void uncaughtException(Thread thread, Throwable ex) {
       Log.e(TAG, "Uncaught exception", ex);
       showErrorDialog(ex);
     }
   };
 
-  private void showErrorDialog(Throwable t)
-  {
+  private void showErrorDialog(Throwable t) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
     builder.setTitle("Exception!");
@@ -120,14 +121,17 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   @Override
   public void onClick(View arg0) {
-    if (player != null) { player.skipAd(); }
+    if (player != null) {
+      player.skipAd();
+    }
   }
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    Log.d(TAG, "Recieved Notification: "+arg1);
-    //if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState() == State.READY) {
-    //  player.play();
-    //}
+    Log.d(TAG, "Recieved Notification: " + arg1);
+    // if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState()
+    // == State.READY) {
+    // player.play();
+    // }
   }
 }

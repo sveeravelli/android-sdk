@@ -24,29 +24,29 @@ class OoyalaAPIHelper {
     _secureURLGenerator = new EmbeddedSecureURLGenerator(apiKey, signatureGenerator);
   }
 
-  public String jsonForSecureAPI(String host, String uri, Map<String,String> params) {
+  public String jsonForSecureAPI(String host, String uri, Map<String, String> params) {
     URL url = _secureURLGenerator.secureURL(host, uri, params);
     return jsonForAPI(url);
   }
 
-  public JSONObject objectForSecureAPI(String host, String uri, Map<String,String> params) {
+  public JSONObject objectForSecureAPI(String host, String uri, Map<String, String> params) {
     String json = jsonForSecureAPI(host, uri, params);
     return Utils.objectFromJSON(json);
   }
 
-  public static JSONObject objectForAPI(String host, String uri, Map<String,String> params) {
+  public static JSONObject objectForAPI(String host, String uri, Map<String, String> params) {
     String json = jsonForAPI(host, uri, params);
     return Utils.objectFromJSON(json);
   }
 
-  public static String jsonForAPI(String host, String uri, Map<String,String> params) {
+  public static String jsonForAPI(String host, String uri, Map<String, String> params) {
     URL url = Utils.makeURL(host, uri, params);
     if (url == null) { return null; }
     return jsonForAPI(url);
   }
 
   private static String jsonForAPI(URL url) {
-    Log.d(OoyalaAPIHelper.class.getName(), "Sending Request: "+url.toString());
+    Log.d(OoyalaAPIHelper.class.getName(), "Sending Request: " + url.toString());
     StringBuffer sb = new StringBuffer();
     try {
       URLConnection conn = url.openConnection();

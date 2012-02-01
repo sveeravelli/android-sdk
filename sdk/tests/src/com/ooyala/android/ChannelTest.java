@@ -2,29 +2,25 @@ package com.ooyala.android;
 
 import android.test.AndroidTestCase;
 
-public class ChannelTest extends AndroidTestCase
-{
-  public ChannelTest()
-  {
+public class ChannelTest extends AndroidTestCase {
+  public ChannelTest() {
     super();
   }
 
-  protected void setUp()
-  {
+  protected void setUp() {
 
   }
 
-  protected void tearDown()
-  {
+  protected void tearDown() {
 
   }
 
   /**
    * Test the Channel constructor.
    */
-  public void testConstructor()
-  {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, null);
+  public void testConstructor() {
+    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+        TestConstants.TEST_CHANNEL, null);
     assertNotNull(channel);
     assertEquals(TestConstants.TEST_CHANNEL, channel.getEmbedCode());
     assertEquals("Bhangra Empire", channel.getTitle());
@@ -32,22 +28,25 @@ public class ChannelTest extends AndroidTestCase
     assertEquals("best. team. ever.", channel.getDescription());
     assertEquals(Channel.class, channel.getClass());
 
-    OrderedMap<String,Video> videos = channel.getVideos();
+    OrderedMap<String, Video> videos = channel.getVideos();
     assertEquals(5, videos.size());
     assertNotNull(videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
-    assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B").getEmbedCode());
+    assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", videos.get("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")
+        .getEmbedCode());
     assertNotNull(videos.get("lrdnAxMzoTIzfqnDk8m5_T6eGupTsWf6"));
-    assertEquals("lrdnAxMzoTIzfqnDk8m5_T6eGupTsWf6", videos.get("lrdnAxMzoTIzfqnDk8m5_T6eGupTsWf6").getEmbedCode());
+    assertEquals("lrdnAxMzoTIzfqnDk8m5_T6eGupTsWf6", videos.get("lrdnAxMzoTIzfqnDk8m5_T6eGupTsWf6")
+        .getEmbedCode());
     assertNotNull(videos.get("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km"));
-    assertEquals("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km", videos.get("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km").getEmbedCode());
+    assertEquals("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km", videos.get("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")
+        .getEmbedCode());
   }
 
   /**
    * Test embedCodesToAuthorize.
    */
-  public void testEmbedCodesToAuthorize()
-  {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, null);
+  public void testEmbedCodesToAuthorize() {
+    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+        TestConstants.TEST_CHANNEL, null);
     assertEquals(1, channel.embedCodesToAuthorize().size());
     assertEquals(channel.getEmbedCode(), channel.embedCodesToAuthorize().get(0));
   }
@@ -55,9 +54,9 @@ public class ChannelTest extends AndroidTestCase
   /**
    * Test firstVideo
    */
-  public void testFirstVideo()
-  {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, null);
+  public void testFirstVideo() {
+    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+        TestConstants.TEST_CHANNEL, null);
     Video video = channel.getVideos().get(0);
     assertEquals(video, channel.firstVideo());
   }
@@ -65,19 +64,20 @@ public class ChannelTest extends AndroidTestCase
   /**
    * Test lastVideo
    */
-  public void testLastVideo()
-  {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, null);
-    Video video = channel.getVideos().get(channel.getVideos().size()-1);
+  public void testLastVideo() {
+    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+        TestConstants.TEST_CHANNEL, null);
+    Video video = channel.getVideos().get(channel.getVideos().size() - 1);
     assertEquals(video, channel.lastVideo());
   }
 
   /**
    * Test nextVideo.
    */
-  public void testNextVideo()
-  {
-    ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
+  public void testNextVideo() {
+    ChannelSet channelSet = new ChannelSet(
+        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().values().iterator().next();
     Video video = channelSet.firstVideo();
     Video expectedNext = channel.getVideos().get(1);
@@ -96,9 +96,10 @@ public class ChannelTest extends AndroidTestCase
   /**
    * Test previousVideo.
    */
-  public void testPreviousVideo()
-  {
-    ChannelSet channelSet = new ChannelSet(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), TestConstants.TEST_CHANNEL_SET, null);
+  public void testPreviousVideo() {
+    ChannelSet channelSet = new ChannelSet(
+        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().get(0);
     Video video = channel.getVideos().get(1);
     Video expectedPrevious = channel.getVideos().get(0);
@@ -110,7 +111,8 @@ public class ChannelTest extends AndroidTestCase
     assertNull(previous);
     channel = channelSet.getChannels().get(1);
     video = channel.getVideos().get(0);
-    expectedPrevious = channelSet.getChannels().get(0).getVideos().get(channelSet.getChannels().get(0).getVideos().size()-1);
+    expectedPrevious = channelSet.getChannels().get(0).getVideos()
+        .get(channelSet.getChannels().get(0).getVideos().size() - 1);
     previous = channel.previousVideo(video);
     assertEquals(expectedPrevious, previous);
   }

@@ -29,9 +29,8 @@ class VASTAdPlayer extends MoviePlayer {
     public static final String RESUME = "resume";
   }
 
-  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList(
-      "%5BPlace_Random_Number_Here%5D", "[Place_Random_Number_Here]",
-      "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
+  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
+      "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
 
   private class VASTPlayheadUpdateTimerTask extends TimerTask {
     @Override
@@ -42,8 +41,7 @@ class VASTAdPlayer extends MoviePlayer {
       } else if (!_midSent && currentTime() > (currentAd().getDuration() / 2)) {
         sendTrackingEvent(TrackingEvent.MIDPOINT);
         _midSent = true;
-      } else if (!_thirdQSent
-          && currentTime() > (3 * currentAd().getDuration() / 4)) {
+      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() / 4)) {
         sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         _thirdQSent = true;
       }
@@ -78,9 +76,7 @@ class VASTAdPlayer extends MoviePlayer {
       }
     }
 
-    if (_linearAdQueue.isEmpty()) {
-      return;
-    }
+    if (_linearAdQueue.isEmpty()) { return; }
 
     super.init(parent, _linearAdQueue.get(0).getStream());
 
@@ -124,9 +120,7 @@ class VASTAdPlayer extends MoviePlayer {
   }
 
   public void sendTrackingEvent(String event) {
-    if (currentAd() == null || currentAd().getTrackingEvents() == null) {
-      return;
-    }
+    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
@@ -173,7 +167,6 @@ class VASTAdPlayer extends MoviePlayer {
   @Override
   protected void startPlayheadTimer() {
     _playheadUpdateTimer = new Timer();
-    _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(),
-        TIMER_DELAY, TIMER_PERIOD);
+    _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(), TIMER_DELAY, TIMER_PERIOD);
   }
 }

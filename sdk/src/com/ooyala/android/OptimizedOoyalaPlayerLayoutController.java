@@ -4,16 +4,18 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 
 /**
- * This LayoutController is a faster LayoutController that will work only on one specific case: The OoyalaPlayerLayout it controls
- * is a direct child of the Activity's base layout which is a FrameLayout. This LayoutController uses basic controls and allows additional
- * overlays to be added. Fullscreening is done by simply resizing the OoyalaPlayerLayout to fill the entire screen, which does not trigger
- * a player reload thus causing this to be much faster at Fullscreening than OoyalaPlayerLayoutController.
+ * This LayoutController is a faster LayoutController that will work only on one specific case: The
+ * OoyalaPlayerLayout it controls is a direct child of the Activity's base layout which is a FrameLayout. This
+ * LayoutController uses basic controls and allows additional overlays to be added. Fullscreening is done by
+ * simply resizing the OoyalaPlayerLayout to fill the entire screen, which does not trigger a player reload
+ * thus causing this to be much faster at Fullscreening than OoyalaPlayerLayoutController.
  * @author jigish
  */
 public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
   private boolean _fullscreen = false;
   private FrameLayout.LayoutParams _inlineLP = null;
-  private FrameLayout.LayoutParams _fullscreenLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.FILL);
+  private FrameLayout.LayoutParams _fullscreenLP = new FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.FILL);
 
   /**
    * Instantiate a FastOoyalaPlayerLayoutController
@@ -23,7 +25,8 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret,
+      String pcode, String domain) {
     this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO);
   }
 
@@ -45,7 +48,8 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode, String domain, DefaultControlStyle dcs) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret,
+      String pcode, String domain, DefaultControlStyle dcs) {
     this(l, new OoyalaPlayer(apiKey, secret, pcode, domain), dcs);
   }
 
@@ -61,7 +65,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
       _fullscreenControls = _inlineControls;
       _fullscreenOverlay = _inlineOverlay;
     }
-    _inlineLP = (FrameLayout.LayoutParams)_layout.getLayoutParams();
+    _inlineLP = (FrameLayout.LayoutParams) _layout.getLayoutParams();
     _fullscreenLayout = _layout;
   }
 

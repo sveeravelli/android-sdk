@@ -2,8 +2,8 @@ package com.ooyala.android;
 
 public interface OoyalaPlayerControls {
   /**
-   * Set the parent layout that these controls should show on top of.
-   * This method should add the controls to this layout in the correct positions (but they should not actually be visible)
+   * Set the parent layout that these controls should show on top of. This method should add the controls to
+   * this layout in the correct positions (but they should not actually be visible)
    * @param layout the layout that these controls should show on top of
    */
   public void setParentLayout(OoyalaPlayerLayout layout);

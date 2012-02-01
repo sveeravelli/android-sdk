@@ -23,9 +23,7 @@ public class OrderedMap<K, V extends OrderedMapValue<K>> implements Iterable<V> 
   }
 
   private int verifyIndex(int index) throws ArrayIndexOutOfBoundsException {
-    if (index >= _array.size() || index < 0) {
-      throw new ArrayIndexOutOfBoundsException(index);
-    }
+    if (index >= _array.size() || index < 0) { throw new ArrayIndexOutOfBoundsException(index); }
     return index;
   }
 

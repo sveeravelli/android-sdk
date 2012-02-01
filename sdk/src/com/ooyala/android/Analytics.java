@@ -22,7 +22,8 @@ public class Analytics {
    * @param api the API to initialize this Analytics with
    */
   Analytics(Context context, PlayerAPIClient api) {
-    this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST).replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
+    this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
+        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
   }
 
   /**
@@ -32,7 +33,9 @@ public class Analytics {
    */
   Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
-    _jsAnalytics.getSettings().setUserAgentString(String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION, _jsAnalytics.getSettings().getUserAgentString()));
+    _jsAnalytics.getSettings().setUserAgentString(
+        String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION, _jsAnalytics.getSettings()
+            .getUserAgentString()));
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     _jsAnalytics.setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
@@ -47,13 +50,15 @@ public class Analytics {
         if (!_failed) {
           _ready = false;
           _failed = true;
-          Log.e(this.getClass().getName(),"ERROR: Failed to load js Analytics!");
+          Log.e(this.getClass().getName(), "ERROR: Failed to load js Analytics!");
         }
       }
     });
-    //give dummy url to allow for cookie setting
-    _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8", "");
-    Log.d(this.getClass().getName(), "Initializing Analytics with user agent: "+_jsAnalytics.getSettings().getUserAgentString());
+    // give dummy url to allow for cookie setting
+    _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8",
+        "");
+    Log.d(this.getClass().getName(), "Initializing Analytics with user agent: "
+        + _jsAnalytics.getSettings().getUserAgentString());
   }
 
   /**
@@ -63,7 +68,7 @@ public class Analytics {
    */
   void initializeVideo(String embedCode, double duration) {
     if (_failed) { return; }
-    String action = "javascript:reporter.initializeVideo('"+embedCode+"',"+duration+");";
+    String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
     if (!_ready) {
       queue(action);
     } else {
@@ -90,7 +95,7 @@ public class Analytics {
    */
   void reportPlayheadUpdate(double time) {
     if (_failed) { return; }
-    String action = "javascript:reporter.reportPlayheadUpdate("+time*1000+");";
+    String action = "javascript:reporter.reportPlayheadUpdate(" + time * 1000 + ");";
     if (!_ready) {
       queue(action);
     } else {
