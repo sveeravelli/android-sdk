@@ -1028,6 +1028,10 @@ public class OoyalaPlayer extends Observable implements Observer {
     return this._playerAPIClient;
   }
 
+  /**
+   * Set the callback that will be called every time the current item changes
+   * @param callback the CurrentItemChangedCallback that should be called every time the current item changes
+   */
   public void setCurrentItemChangedCallback(CurrentItemChangedCallback callback) {
     _currentItemChangedCallback = callback;
   }
