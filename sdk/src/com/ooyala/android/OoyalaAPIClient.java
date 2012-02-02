@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import android.os.AsyncTask;
+
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
   private OoyalaAPIHelper _apiHelper = null;
@@ -21,17 +23,34 @@ public class OoyalaAPIClient {
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
   }
 
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiKey the API Key to use for secured APIs
+   * @param signatureGenerator the SignatureGenerator to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   */
   public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
   }
 
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param secureURLGenerator the SecureURLGenerator to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   */
   public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
   }
 
-  public OoyalaAPIClient(PlayerAPIClient apiClient) {
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiClient the PlayerAPIClient to use
+   */
+  OoyalaAPIClient(PlayerAPIClient apiClient) {
     _apiHelper = apiClient.getAPIHelper();
     _playerAPI = apiClient;
   }
@@ -48,6 +67,18 @@ public class OoyalaAPIClient {
   }
 
   /**
+   * Asynchronously fetch the root ContentItem associated with the given embed codes. If multiple embed codes
+   * are given, the root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be
+   * videos.
+   * @param embedCodes the embed codes to fetch
+   * @param callback the ContentTreeCallback to execute when the response is received
+   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
+   */
+  public Object contentTree(List<String> embedCodes, ContentTreeCallback callback) {
+    return _playerAPI.contentTree(embedCodes, callback);
+  }
+
+  /**
    * Fetch the root ContentItem associated with the given external ids. If multiple external ids are given,
    * the root item is assumed to be a Dynamic Channel and the external ids are assumed to all be videos.
    * @param externalIds the external ids to fetch
@@ -56,6 +87,18 @@ public class OoyalaAPIClient {
    */
   public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
     return _playerAPI.contentTreeByExternalIds(externalIds);
+  }
+
+  /**
+   * Asynchronously fetch the root ContentItem associated with the given external ids. If multiple external
+   * ids are given, the root item is assumed to be a Dynamic Channel and the external ids are assumed to all
+   * be videos.
+   * @param externalIds the external ids to fetch
+   * @param callback the ContentTreeCallback to execute when the response is received
+   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
+   */
+  public Object contentTreeByExternalIds(List<String> externalIds, ContentTreeCallback callback) {
+    return _playerAPI.contentTreeByExternalIds(externalIds, callback);
   }
 
   /**
@@ -69,14 +112,70 @@ public class OoyalaAPIClient {
     return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
   }
 
-  public SecureURLGenerator getSecureURLGenerator() {
+  private class ObjectFromBacklotAPITask extends AsyncTask<Object, Integer, JSONObject> {
+    protected ObjectFromBacklotAPICallback _callback = null;
+
+    public ObjectFromBacklotAPITask(ObjectFromBacklotAPICallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected JSONObject doInBackground(Object... allParams) {
+      if (allParams == null || allParams.length < 2 || !(allParams[0] instanceof String)
+          || !(allParams[0] instanceof Map)) { return null; }
+      String uri = (String) (allParams[0]);
+      Map<String, String> params = (Map<String, String>) (allParams[1]);
+      return objectFromBacklotAPI(uri, params);
+    }
+
+    @Override
+    protected void onPostExecute(JSONObject result) {
+      _callback.callback(result);
+    }
+  }
+
+  /**
+   * Asynchronously fetch a raw JSONObject from any backlot API (GET requests only)
+   * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request
+   *          https://api.ooyala.com/v2/assets, uri should be "/assets"
+   * @param params Optional parameters to pass to the API
+   * @param callback the ObjectFromBacklotAPICallback to execute when the response is received
+   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
+   */
+  public Object objectFromBacklotAPI(String uri, Map<String, String> params,
+      ObjectFromBacklotAPICallback callback) {
+    ObjectFromBacklotAPITask task = new ObjectFromBacklotAPITask(callback);
+    task.execute(uri, params);
+    return task;
+  }
+
+  /**
+   * Cancel an asynchronous task using the Object returned from the asynchronous method
+   * @param task the Object returned from the asynchronous method to cancel
+   */
+  public void cancel(Object task) {
+    _playerAPI.cancel(task);
+  }
+
+  /**
+   * @return the SecureURLGenerator this OoyalaAPIClient uses
+   */
+  SecureURLGenerator getSecureURLGenerator() {
     return _apiHelper.getSecureURLGenerator();
   }
 
+  /**
+   * @return the pcode this OoyalaAPIClient uses
+   */
   String getPcode() {
     return _playerAPI.getPcode();
   }
 
+  /**
+   * @return the domain this OoyalaAPIClient uses
+   */
   String getDomain() {
     return _playerAPI.getDomain();
   }
