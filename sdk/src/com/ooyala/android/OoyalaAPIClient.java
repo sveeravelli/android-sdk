@@ -103,14 +103,20 @@ public class OoyalaAPIClient {
 
   /**
    * Fetch additional children for the PaginatedParentItem specified using the nextToken specified
-   * @param nextToken
-   * @param parent
-   * @return
+   * @param parent the PaginatedParentItem to fetch additional children for
+   * @return the PaginatedItemResponse
    */
   public PaginatedItemResponse contentTreeNext(PaginatedParentItem parent) {
     return _playerAPI.contentTreeNext(parent);
   }
 
+  /**
+   * Asynchronously fetch additional children for the PaginatedParentItem specified using the nextToken
+   * specified
+   * @param parent the PaginatedParentItem to fetch additional children for
+   * @param callback the ContentTreeNextCallback to execute when the response is received
+   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
+   */
   public Object contentTreeNext(PaginatedParentItem parent, ContentTreeNextCallback callback) {
     return _playerAPI.contentTreeNext(parent, callback);
   }
