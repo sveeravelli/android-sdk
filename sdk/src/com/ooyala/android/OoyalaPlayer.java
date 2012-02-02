@@ -301,7 +301,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       // Async authorize;
       cancelOpenTasks();
-      final String taskKey = "changeCurrentVideo" + System.currentTimeMillis();
+      final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
       taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
         @Override
         public void callback(boolean result, OoyalaException error) {
@@ -313,7 +313,6 @@ public class OoyalaPlayer extends Observable implements Observer {
             sendNotification(ERROR_NOTIFICATION);
             return;
           }
-          sendNotification(AUTHORIZATION_READY_NOTIFICATION);
           changeCurrentItemAfterAuth();
         }
       }));
@@ -328,13 +327,14 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return
    */
   private boolean changeCurrentItemAfterAuth() {
+    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
     if (!_currentItem.isAuthorized()) {
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
       return false;
     }
 
     cancelOpenTasks();
-    final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
+    final String taskKey = "changeCurrentItemAfterAuth" + System.currentTimeMillis();
     taskStarted(taskKey, _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
       @Override
       public void callback(boolean result) {
@@ -379,7 +379,8 @@ public class OoyalaPlayer extends Observable implements Observer {
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     // Async Authorize
-    final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
+    cancelOpenTasks();
+    final String taskKey = "reinitialize" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.authorize(tree, new AuthorizeCallback() {
       @Override
       public void callback(boolean result, OoyalaException error) {
@@ -391,7 +392,6 @@ public class OoyalaPlayer extends Observable implements Observer {
           sendNotification(ERROR_NOTIFICATION);
           return;
         }
-        sendNotification(AUTHORIZATION_READY_NOTIFICATION);
         changeCurrentItem(_rootItem.firstVideo());
       }
     }));
