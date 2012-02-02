@@ -117,17 +117,18 @@ public class Video extends ContentItem implements PlayableItem {
    */
   public void insertAd(AdSpot ad) {
     ad.setAPI(_api);
-    boolean inserted = false;
+    if (_ads == null) {
+      _ads = new ArrayList<AdSpot>();
+      _ads.add(ad);
+      return;
+    }
     for (int i = 0; i < _ads.size(); i++) {
       if (ad.getTime() < _ads.get(i).getTime()) {
         _ads.add(i, ad);
-        inserted = true;
-        break;
+        return;
       }
     }
-    if (!inserted) {
-      _ads.add(ad);
-    }
+    _ads.add(ad);
   }
 
   public Channel getParent() {
