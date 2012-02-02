@@ -333,6 +333,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       return false;
     }
 
+    cancelOpenTasks();
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
       @Override
