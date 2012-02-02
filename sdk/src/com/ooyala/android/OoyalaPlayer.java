@@ -40,7 +40,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
   public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
-  public static final String METADATA_READY_NOTIFICATION = "metadataReady";
+  public static final String CONTENT_TREE_READY_NOTIFICATION = "contentTreeReady";
+  public static final String AUTHORIZATION_READY_NOTIFICATION = "authorizationReady";
   public static final String ERROR_NOTIFICATION = "error";
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
@@ -70,6 +71,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black,
       Typeface.DEFAULT);
   private Map<String, Object> _openTasks = new HashMap<String, Object>();
+  private CurrentItemChangedCallback _currentItemChangedCallback = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -274,7 +276,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return true if the change was successful, false if not
    */
   public boolean changeCurrentItem(String embedCode) {
-    return changeCurrentVideo(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
+    return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem));
   }
 
   /**
@@ -282,7 +284,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param video
    * @return true if the change was successful, false if not
    */
-  public boolean changeCurrentVideo(Video video) {
+  public boolean changeCurrentItem(Video video) {
     if (video == null) {
       cleanupPlayers();
       return false;
@@ -292,6 +294,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     _playedAds.clear();
     _lastPlayedTime = 0;
     _currentItem = video;
+    if (_currentItemChangedCallback != null) {
+      _currentItemChangedCallback.callback(_currentItem);
+    }
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       // Async authorize;
@@ -308,6 +313,7 @@ public class OoyalaPlayer extends Observable implements Observer {
             sendNotification(ERROR_NOTIFICATION);
             return;
           }
+          sendNotification(AUTHORIZATION_READY_NOTIFICATION);
           changeCurrentVideoAfterAuth();
         }
       }));
@@ -369,7 +375,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
     _rootItem = tree;
     _currentItem = tree.firstVideo();
-    sendNotification(METADATA_READY_NOTIFICATION);
+    sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     // Async Authorize
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
@@ -384,7 +390,8 @@ public class OoyalaPlayer extends Observable implements Observer {
           sendNotification(ERROR_NOTIFICATION);
           return;
         }
-        changeCurrentVideo(_rootItem.firstVideo());
+        sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+        changeCurrentItem(_rootItem.firstVideo());
       }
     }));
     return true;
@@ -647,7 +654,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public boolean previousVideo(int what) {
     if (_currentItem.previousVideo() != null) {
-      changeCurrentVideo(_currentItem.previousVideo());
+      changeCurrentItem(_currentItem.previousVideo());
       if (what == DO_PLAY) {
         play();
       } else if (what == DO_PAUSE) {
@@ -690,7 +697,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private final Handler _fetchMoreChildrenHandler = new Handler() {
     public void handleMessage(Message msg) {
-      changeCurrentVideo(_currentItem.nextVideo());
+      changeCurrentItem(_currentItem.nextVideo());
       if (msg.what == DO_PLAY) {
         play();
       } else if (msg.what == DO_PAUSE) {
@@ -1019,5 +1026,9 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   PlayerAPIClient getPlayerAPIClient() {
     return this._playerAPIClient;
+  }
+
+  public void setCurrentItemChangedCallback(CurrentItemChangedCallback callback) {
+    _currentItemChangedCallback = callback;
   }
 }

@@ -12,12 +12,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.CurrentItemChangedCallback;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.Video;
 import com.ooyala.android.testapp.R;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
@@ -54,6 +56,12 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
+    /*
+     * player.setCurrentItemChangedCallback(new CurrentItemChangedCallback() {
+     * 
+     * @Override public void callback(Video currentItem) { currentItem.insertAd(new OoyalaAdSpot(10000, null,
+     * null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")); } });
+     */
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w",
     // "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll: g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
@@ -143,7 +151,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(TAG, "Recieved Notification: " + arg1);
-    if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
       metadataReady = true;
       Log.d(TAG, "AD - metadata true!");
     }

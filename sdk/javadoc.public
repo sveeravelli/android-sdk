@@ -15,6 +15,7 @@ src/com/ooyala/android/Channel.java
 src/com/ooyala/android/ChannelSet.java
 src/com/ooyala/android/ClosedCaptions.java
 src/com/ooyala/android/ContentItem.java
+src/com/ooyala/android/CurrentItemChangedCallback.java
 src/com/ooyala/android/DynamicChannel.java
 src/com/ooyala/android/EmbeddedSecureURLGenerator.java
 src/com/ooyala/android/EmbeddedSignatureGenerator.java
