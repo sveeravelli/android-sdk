@@ -19,6 +19,8 @@ class VASTAdPlayer extends MoviePlayer {
   private boolean _midSent = false;
   private boolean _thirdQSent = false;
 
+  private Object _fetchTask;
+
   private interface TrackingEvent {
     public static final String START = "start";
     public static final String FIRST_QUARTILE = "firstQuartile";
@@ -51,7 +53,7 @@ class VASTAdPlayer extends MoviePlayer {
   }
 
   @Override
-  public void init(OoyalaPlayer parent, Object ad) {
+  public void init(final OoyalaPlayer parent, Object ad) {
     if (!(ad instanceof VASTAdSpot)) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;
@@ -60,8 +62,20 @@ class VASTAdPlayer extends MoviePlayer {
     _seekable = false;
     _ad = (VASTAdSpot) ad;
     if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
-      // TODO async call to fetch playback info!
-      initAfterFetch(parent);
+      this._parent.getPlayerAPIClient().cancel(_fetchTask);
+      _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+
+        @Override
+        public void callback(boolean result) {
+          if (!result) {
+            _error = "Could not authorize Ooyala Ad";
+            setState(State.ERROR);
+            return;
+          }
+          initAfterFetch(parent);
+        }
+
+      });
       return;
     }
     initAfterFetch(parent);
@@ -82,9 +96,11 @@ class VASTAdPlayer extends MoviePlayer {
 
     // TODO[jigish] setup clickthrough
 
-    _pinger = new NetUtils();
-    for (URL url : _ad.getTrackingURLs()) {
-      _pinger.ping(url);
+    if (_ad.getTrackingURLs() != null) {
+      NetUtils pinger = new NetUtils();
+      for (URL url : _ad.getTrackingURLs()) {
+        pinger.ping(url);
+      }
     }
   }
 
@@ -168,5 +184,11 @@ class VASTAdPlayer extends MoviePlayer {
   protected void startPlayheadTimer() {
     _playheadUpdateTimer = new Timer();
     _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(), TIMER_DELAY, TIMER_PERIOD);
+  }
+
+  @Override
+  public void destroy() {
+    if (_fetchTask != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
+    super.destroy();
   }
 }

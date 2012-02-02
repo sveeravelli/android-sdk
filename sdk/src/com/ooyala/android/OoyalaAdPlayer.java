@@ -6,13 +6,14 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 class OoyalaAdPlayer extends MoviePlayer {
   private OoyalaAdSpot _ad;
+  private Object _fetchTask;
 
   public OoyalaAdPlayer() {
     super();
   }
 
   @Override
-  public void init(OoyalaPlayer parent, Object ad) {
+  public void init(final OoyalaPlayer parent, Object ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;
@@ -20,10 +21,23 @@ class OoyalaAdPlayer extends MoviePlayer {
     }
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
-
     if (_ad.getStream() == null) {
-      // TODO async call to fetch playback info!
-      initAfterFetch(parent);
+      if (_fetchTask != null) {
+        this._parent.getPlayerAPIClient().cancel(_fetchTask);
+      }
+      _fetchTask = _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+
+        @Override
+        public void callback(boolean result) {
+          if (!result) {
+            _error = "Error fetching VAST XML";
+            setState(State.ERROR);
+            return;
+          }
+          initAfterFetch(parent);
+        }
+
+      });
       return;
     }
     initAfterFetch(parent);
@@ -34,13 +48,21 @@ class OoyalaAdPlayer extends MoviePlayer {
 
     // TODO[jigish] setup clickthrough
 
-    NetUtils pinger = new NetUtils();
-    for (URL url : _ad.getTrackingURLs()) {
-      pinger.ping(url);
+    if (_ad.getTrackingURLs() != null) {
+      NetUtils pinger = new NetUtils();
+      for (URL url : _ad.getTrackingURLs()) {
+        pinger.ping(url);
+      }
     }
   }
 
   public OoyalaAdSpot getAd() {
     return _ad;
+  }
+
+  @Override
+  public void destroy() {
+    if (_fetchTask != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
+    super.destroy();
   }
 }

@@ -1016,4 +1016,8 @@ public class OoyalaPlayer extends Observable implements Observer {
     this._closedCaptionsStyle = closedCaptionsStyle;
     if (_closedCaptionsView != null) _closedCaptionsView.setStyle(closedCaptionsStyle);
   }
+
+  PlayerAPIClient getPlayerAPIClient() {
+    return this._playerAPIClient;
+  }
 }

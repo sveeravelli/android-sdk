@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.json.*;
 
+import android.os.AsyncTask;
+
 import com.ooyala.android.Constants.ReturnState;
 
 /**
@@ -103,12 +105,38 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   }
 
   public boolean fetchPlaybackInfo() {
+    if (_authCode != AuthCode.NOT_REQUESTED) { return true; }
     try {
       return _api.authorize(this);
     } catch (OoyalaException e) {
       System.out.println("Unable to fetch playback info: " + e.getMessage());
       return false;
     }
+  }
+
+  private class FetchPlaybackInfoTask extends AsyncTask<Void, Integer, Boolean> {
+    protected FetchPlaybackInfoCallback _callback = null;
+
+    public FetchPlaybackInfoTask(FetchPlaybackInfoCallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    protected Boolean doInBackground(Void... params) {
+      return fetchPlaybackInfo();
+    }
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+      _callback.callback(result.booleanValue());
+    }
+  }
+
+  public Object fetchPlaybackInfo(FetchPlaybackInfoCallback callback) {
+    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(callback);
+    task.execute();
+    return task;
   }
 
   public Stream getStream() {

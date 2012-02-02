@@ -8,6 +8,7 @@ import java.util.Set;
 import org.json.*;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.ooyala.android.Constants.ReturnState;
 
@@ -77,7 +78,7 @@ public class Video extends ContentItem implements PlayableItem {
             if (ad != null) {
               _ads.add(ad);
             } else {
-              System.out.println("Unable to create ad.");
+              Log.e(this.getClass().getName(), "Unable to create ad.");
             }
           }
         }
@@ -99,7 +100,7 @@ public class Video extends ContentItem implements PlayableItem {
         }
       }
     } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
+      Log.e(this.getClass().getName(), "JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
 
@@ -116,11 +117,16 @@ public class Video extends ContentItem implements PlayableItem {
    */
   public void insertAd(AdSpot ad) {
     ad.setAPI(_api);
+    boolean inserted = false;
     for (int i = 0; i < _ads.size(); i++) {
       if (ad.getTime() < _ads.get(i).getTime()) {
         _ads.add(i, ad);
+        inserted = true;
         break;
       }
+    }
+    if (!inserted) {
+      _ads.add(ad);
     }
   }
 

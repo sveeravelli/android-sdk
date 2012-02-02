@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
@@ -22,6 +23,11 @@ import com.ooyala.android.testapp.R;
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
+
+  private Button skipAd;
+  private Button insertAd;
+
+  private boolean metadataReady = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -34,8 +40,10 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       e.printStackTrace();
     }
 
-    Button end = (Button) findViewById(R.id.end);
-    end.setOnClickListener(this);
+    skipAd = (Button) findViewById(R.id.skipAd);
+    skipAd.setOnClickListener(this);
+    insertAd = (Button) findViewById(R.id.insertAd);
+    insertAd.setOnClickListener(this);
 
     // optional localization
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
@@ -65,7 +73,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("g3N2wxMzqxoB84c3dan5xyXTxdrhX1km")) {
+    if (player.setEmbedCode("UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
       Log.d(TAG, "TEST - yay!");
       player.play();
     } else {
@@ -121,14 +129,24 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   @Override
   public void onClick(View arg0) {
-    if (player != null) {
+    if (player != null && arg0 == skipAd) {
       player.skipAd();
+    } else if (player != null && arg0 == insertAd) {
+      if (metadataReady) {
+        Log.d(TAG, "AD - INSERTING!");
+        player.getCurrentItem().insertAd(
+            new OoyalaAdSpot(10000, null, null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
+      }
     }
   }
 
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(TAG, "Recieved Notification: " + arg1);
+    if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
+      metadataReady = true;
+      Log.d(TAG, "AD - metadata true!");
+    }
     // if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState()
     // == State.READY) {
     // player.play();

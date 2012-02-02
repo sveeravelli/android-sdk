@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ooyala.android.Constants.ReturnState;
@@ -129,6 +130,31 @@ public class VASTAdSpot extends AdSpot {
       return false;
     }
     return true;
+  }
+
+  private class FetchPlaybackInfoTask extends AsyncTask<Void, Integer, Boolean> {
+    protected FetchPlaybackInfoCallback _callback = null;
+
+    public FetchPlaybackInfoTask(FetchPlaybackInfoCallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    protected Boolean doInBackground(Void... params) {
+      return fetchPlaybackInfo();
+    }
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+      _callback.callback(result.booleanValue());
+    }
+  }
+
+  public Object fetchPlaybackInfo(FetchPlaybackInfoCallback callback) {
+    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(callback);
+    task.execute();
+    return task;
   }
 
   public List<VASTAd> getAds() {

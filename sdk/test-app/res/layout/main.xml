@@ -20,10 +20,16 @@
   </com.ooyala.android.OoyalaPlayerLayout>
 
     <Button
-        android:id="@+id/end"
-        android:layout_width="fill_parent"
+        android:id="@+id/skipAd"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:text="@string/end" />
+        android:layout_gravity="left|bottom"
+        android:text="@string/skipAd" />
+    <Button
+        android:id="@+id/insertAd"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:text="@string/insertAd" />
 
 </FrameLayout>
