@@ -311,13 +311,14 @@ class PlayerAPIClient {
     return task;
   }
 
-  public PaginatedItemResponse contentTreeNext(String nextToken, PaginatedParentItem parent) {
-    String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, _pcode, nextToken);
+  public PaginatedItemResponse contentTreeNext(PaginatedParentItem parent) {
+    if (!parent.hasMoreChildren()) { return null; }
+    String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, _pcode, parent.getNextChildren());
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
     JSONObject contentTree = null;
     List<String> keys = new ArrayList<String>();
-    keys.add(nextToken);
+    keys.add(parent.getNextChildren());
     try {
       contentTree = verifyContentTreeObject(obj, keys);
     } catch (Exception e) {
@@ -330,12 +331,12 @@ class PlayerAPIClient {
      * for it to work with update. We could just create a new update in each class, but this seemed better
      * because that would have a lot of duplicate code.
      */
-    if (contentTree.isNull(nextToken)) {
+    if (contentTree.isNull(parent.getNextChildren())) {
       System.out.println("Could not find token in content_tree_next response.");
       return null;
     }
     try {
-      JSONObject tokenDict = contentTree.getJSONObject(nextToken);
+      JSONObject tokenDict = contentTree.getJSONObject(parent.getNextChildren());
       JSONObject parentDict = new JSONObject();
       parentDict.put(parent.getEmbedCode(), tokenDict);
 
@@ -360,9 +361,8 @@ class PlayerAPIClient {
 
     @Override
     protected PaginatedItemResponse doInBackground(Object... params) {
-      if (params.length < 2 || params[0] == null || !(params[0] instanceof String) || params[1] == null
-          || !(params[1] instanceof PaginatedParentItem)) { return null; }
-      return contentTreeNext((String) (params[0]), (PaginatedParentItem) (params[1]));
+      if (params.length < 1 || params[0] == null || !(params[0] instanceof PaginatedParentItem)) { return null; }
+      return contentTreeNext((PaginatedParentItem) (params[1]));
     }
 
     @Override
@@ -371,9 +371,9 @@ class PlayerAPIClient {
     }
   }
 
-  public Object contentTreeNext(String nextToken, PaginatedParentItem parent, ContentTreeNextCallback callback) {
+  public Object contentTreeNext(PaginatedParentItem parent, ContentTreeNextCallback callback) {
     ContentTreeNextTask task = new ContentTreeNextTask(callback);
-    task.execute(nextToken, parent);
+    task.execute(parent);
     return task;
   }
 

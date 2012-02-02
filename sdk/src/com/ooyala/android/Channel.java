@@ -180,6 +180,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     return totalDuration;
   }
 
+  @Override
   /**
    * Find out it this Channel has more children
    * 
@@ -189,6 +190,16 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     return _nextChildren != null;
   }
 
+  @Override
+  /**
+   * For Internal Use Only.
+   * @return the next children token for this Channel
+   */
+  public String getNextChildren() {
+    return _nextChildren;
+  }
+
+  @Override
   /**
    * Fetch the additional children if they exist. This will happen in the background and callback will be
    * called when the fetch is complete.
@@ -206,22 +217,20 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     if (!hasMoreChildren() || _isFetchingMoreChildren) { return false; }
     _isFetchingMoreChildren = true;
 
-    Thread thread = new Thread(new NextChildrenRunner(_nextChildren, listener));
+    Thread thread = new Thread(new NextChildrenRunner(listener));
     thread.start();
     return true;
   }
 
   private class NextChildrenRunner implements Runnable {
-    private String _nextChildren = null;
     private PaginatedItemListener _listener = null;
 
-    public NextChildrenRunner(String nextChildren, PaginatedItemListener listener) {
-      _nextChildren = nextChildren;
+    public NextChildrenRunner(PaginatedItemListener listener) {
       _listener = listener;
     }
 
     public void run() {
-      PaginatedItemResponse response = _api.contentTreeNext(_nextChildren, Channel.this);
+      PaginatedItemResponse response = _api.contentTreeNext(Channel.this);
       if (response == null) {
         _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED,
             "Null response"));

@@ -14,4 +14,6 @@ public interface PaginatedParentItem {
   public boolean fetchMoreChildren(PaginatedItemListener paginatedItemListener);
 
   public int childrenCount();
+
+  public String getNextChildren();
 }

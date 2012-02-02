@@ -163,6 +163,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     return totalDuration;
   }
 
+  @Override
   /**
    * Find out it this ChannelSet has more children
    * @return true if it does, false if it doesn't
@@ -171,6 +172,16 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     return _nextChildren != null;
   }
 
+  @Override
+  /**
+   * For Internal Use Only.
+   * @return the next children token for this Channel
+   */
+  public String getNextChildren() {
+    return _nextChildren;
+  }
+
+  @Override
   /**
    * Fetch the additional children if they exist
    * @param listener the listener to execute when the children are fetched
@@ -184,22 +195,20 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     if (!hasMoreChildren() || _isFetchingMoreChildren) { return false; }
     _isFetchingMoreChildren = true;
 
-    Thread thread = new Thread(new NextChildrenRunner(_nextChildren, listener));
+    Thread thread = new Thread(new NextChildrenRunner(listener));
     thread.start();
     return true;
   }
 
   private class NextChildrenRunner implements Runnable {
-    private String _nextChildren = null;
     private PaginatedItemListener _listener = null;
 
-    public NextChildrenRunner(String nextChildren, PaginatedItemListener listener) {
-      _nextChildren = nextChildren;
+    public NextChildrenRunner(PaginatedItemListener listener) {
       _listener = listener;
     }
 
     public void run() {
-      PaginatedItemResponse response = _api.contentTreeNext(_nextChildren, ChannelSet.this);
+      PaginatedItemResponse response = _api.contentTreeNext(ChannelSet.this);
       if (response == null) {
         _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED,
             "Null response"));

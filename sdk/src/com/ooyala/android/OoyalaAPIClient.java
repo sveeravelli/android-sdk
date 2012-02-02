@@ -102,6 +102,20 @@ public class OoyalaAPIClient {
   }
 
   /**
+   * Fetch additional children for the PaginatedParentItem specified using the nextToken specified
+   * @param nextToken
+   * @param parent
+   * @return
+   */
+  public PaginatedItemResponse contentTreeNext(PaginatedParentItem parent) {
+    return _playerAPI.contentTreeNext(parent);
+  }
+
+  public Object contentTreeNext(PaginatedParentItem parent, ContentTreeNextCallback callback) {
+    return _playerAPI.contentTreeNext(parent, callback);
+  }
+
+  /**
    * Fetch a raw JSONObject from any backlot API (GET requests only)
    * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request
    *          https://api.ooyala.com/v2/assets, uri should be "/assets"
