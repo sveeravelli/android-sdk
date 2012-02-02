@@ -18,6 +18,7 @@ src/com/ooyala/android/ContentItem.java
 src/com/ooyala/android/DynamicChannel.java
 src/com/ooyala/android/EmbeddedSecureURLGenerator.java
 src/com/ooyala/android/EmbeddedSignatureGenerator.java
+src/com/ooyala/android/FetchPlaybackInfoCallback.java
 src/com/ooyala/android/LayoutController.java
 src/com/ooyala/android/LocalizationSupport.java
 src/com/ooyala/android/OoyalaAdSpot.java
