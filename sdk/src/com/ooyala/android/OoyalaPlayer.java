@@ -554,6 +554,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     seek(timeInMillis);
   }
 
+  /**
+   * @return true if the current player is seekable, false if there is no current player or it is not seekable
+   */
   public boolean seekable() {
     if (currentPlayer() == null) { return false; }
     return currentPlayer().seekable();
@@ -742,6 +745,9 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   @Override
+  /**
+   * For Internal Use Only.
+   */
   public void update(Observable arg0, Object arg1) {
     Log.d(this.getClass().getName(), "TEST - Notificationn: " + arg1.toString() + " " + _state);
     if (arg0 == this._player) {
@@ -844,6 +850,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     this._actionAtEnd = actionAtEnd;
   }
 
+  /**
+   * @return the OoyalaAPIClient used by this player
+   */
   public OoyalaAPIClient getOoyalaAPIClient() {
     return new OoyalaAPIClient(_playerAPIClient);
   }
@@ -867,6 +876,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     _language = language;
   }
 
+  /**
+   * @return get the bitrate of the current item
+   */
   public double getBitrate() {
     if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
     if (android.os.Build.VERSION.SDK_INT >= 14) {
@@ -974,6 +986,9 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   }
 
+  /**
+   * @return true if the OoyalaPlayer is currently showing an ad (in any state). false if not.
+   */
   public boolean isShowingAd() {
     return _adPlayer != null;
   }
@@ -1017,10 +1032,17 @@ public class OoyalaPlayer extends Observable implements Observer {
     _openTasks.clear();
   }
 
+  /**
+   * @return the current ClosedCaptionsStyle
+   */
   public ClosedCaptionsStyle getClosedCaptionsStyle() {
     return _closedCaptionsStyle;
   }
 
+  /**
+   * Set the ClosedCaptionsStyle
+   * @param closedCaptionsStyle the ClosedCaptionsStyle to use
+   */
   public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
     this._closedCaptionsStyle = closedCaptionsStyle;
     if (_closedCaptionsView != null) _closedCaptionsView.setStyle(closedCaptionsStyle);
