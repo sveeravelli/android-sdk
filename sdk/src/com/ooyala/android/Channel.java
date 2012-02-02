@@ -29,11 +29,6 @@ public class Channel extends ContentItem implements PaginatedParentItem {
   }
 
   @Override
-  /** For internal use only.
-   * Update the AuthorizableItem using the specified data (subclasses should override and call this)
-   * @param data the data to use to update this AuthorizableItem
-   * @return a ReturnState based on if the data matched or not (or parsing failed)
-   */
   public synchronized ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
@@ -154,11 +149,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     _videos.put(video.getEmbedCode(), video);
   }
 
-  /**
-   * The number of videos this Channel has. Same as getVideos().size().
-   * 
-   * @return an int with the number of videos
-   */
+  @Override
   public int childrenCount() {
     return _videos.size();
   }
@@ -181,33 +172,16 @@ public class Channel extends ContentItem implements PaginatedParentItem {
   }
 
   @Override
-  /**
-   * Find out it this Channel has more children
-   * 
-   * @return true if it does, false if it doesn't
-   */
   public boolean hasMoreChildren() {
     return _nextChildren != null;
   }
 
   @Override
-  /**
-   * For Internal Use Only.
-   * @return the next children token for this Channel
-   */
   public String getNextChildren() {
     return _nextChildren;
   }
 
   @Override
-  /**
-   * Fetch the additional children if they exist. This will happen in the background and callback will be
-   * called when the fetch is complete.
-   * 
-   * @param listener the listener to execute when the children are fetched
-   * @return true if more children exist, false if they don't or they are already in the process of being
-   *         fetched
-   */
   public boolean fetchMoreChildren(PaginatedItemListener listener) {
     // The two lines below aren't within a synchronized block because we assume
     // single thread
