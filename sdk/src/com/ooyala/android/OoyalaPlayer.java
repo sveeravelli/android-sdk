@@ -314,20 +314,20 @@ public class OoyalaPlayer extends Observable implements Observer {
             return;
           }
           sendNotification(AUTHORIZATION_READY_NOTIFICATION);
-          changeCurrentVideoAfterAuth();
+          changeCurrentItemAfterAuth();
         }
       }));
       return true;
     }
 
-    return changeCurrentVideoAfterAuth();
+    return changeCurrentItemAfterAuth();
   }
 
   /**
-   * This is a helper function ONLY to be used with changeCurrentVideo.
+   * This is a helper function ONLY to be used with changeCurrentItem.
    * @return
    */
-  private boolean changeCurrentVideoAfterAuth() {
+  private boolean changeCurrentItemAfterAuth() {
     if (!_currentItem.isAuthorized()) {
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
       return false;
@@ -343,17 +343,17 @@ public class OoyalaPlayer extends Observable implements Observer {
           setState(State.ERROR);
           return;
         }
-        changeCurrentVideoAfterFetch();
+        changeCurrentItemAfterFetch();
       }
     }));
     return true;
   }
 
   /**
-   * This is a helper function ONLY to be used with changeCurrentVideo (in changeCurrentVideoAfterAuth).
+   * This is a helper function ONLY to be used with changeCurrentItem (in changeCurrentItemAfterAuth).
    * @return
    */
-  private boolean changeCurrentVideoAfterFetch() {
+  private boolean changeCurrentItemAfterFetch() {
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
     if (_player == null) { return false; }
     _player.setSeekable(_seekable);
