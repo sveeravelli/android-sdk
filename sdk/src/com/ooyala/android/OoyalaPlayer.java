@@ -40,6 +40,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
   public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
+  public static final String METADATA_READY_NOTIFICATION = "metadataReady";
   public static final String ERROR_NOTIFICATION = "error";
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
@@ -361,7 +362,15 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean reinitialize(ContentItem tree) {
+    if (tree == null) {
+      _rootItem = null;
+      _currentItem = null;
+      return false;
+    }
     _rootItem = tree;
+    _currentItem = tree.firstVideo();
+    sendNotification(METADATA_READY_NOTIFICATION);
+
     // Async Authorize
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.authorize(tree, new AuthorizeCallback() {
