@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
-import android.R.color;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
 import android.os.Handler;
@@ -69,7 +69,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
-  private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(color.white, color.black,
+  private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
   private Map<String, Object> _openTasks = new HashMap<String, Object>();
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
