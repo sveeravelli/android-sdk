@@ -5,5 +5,6 @@
     <string name="skipAd">Skip Ad</string>
     <string name="app_name">Ooyala Android Test App</string>
     <string name="insertAd">Insert Ad</string>
+    <string name="setEmbed">Set Embed Code</string>
 
 </resources>

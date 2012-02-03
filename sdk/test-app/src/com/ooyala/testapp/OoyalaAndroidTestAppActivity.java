@@ -6,12 +6,15 @@ import java.util.Observer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.ClosedCaptionsStyle;
 import com.ooyala.android.CurrentItemChangedCallback;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaAdSpot;
@@ -28,6 +31,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   private Button skipAd;
   private Button insertAd;
+  private Button setEmbed;
 
   private boolean metadataReady = false;
 
@@ -46,6 +50,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     skipAd.setOnClickListener(this);
     insertAd = (Button) findViewById(R.id.insertAd);
     insertAd.setOnClickListener(this);
+    setEmbed = (Button) findViewById(R.id.setEmbed);
+    setEmbed.setOnClickListener(this);
 
     // optional localization
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
@@ -56,12 +62,16 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
+    // player.setClosedCaptionsStyle(new ClosedCaptionsStyle(Color.GREEN, Color.BLACK, Typeface.DEFAULT));
     /*
      * player.setCurrentItemChangedCallback(new CurrentItemChangedCallback() {
      * 
      * @Override public void callback(Video currentItem) { currentItem.insertAd(new OoyalaAdSpot(10000, null,
      * null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")); } });
      */
+  }
+
+  private void setEmbedCode() {
     // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w",
     // "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
     // ooyala preroll: g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
@@ -81,9 +91,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM")) {
+    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
       Log.d(TAG, "TEST - yay!");
-      player.play();
     } else {
       Log.d(TAG, "TEST - lame :(");
     }
@@ -137,7 +146,9 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   @Override
   public void onClick(View arg0) {
-    if (player != null && arg0 == skipAd) {
+    if (player != null && arg0 == setEmbed) {
+      setEmbedCode();
+    } else if (player != null && arg0 == skipAd) {
       player.skipAd();
     } else if (player != null && arg0 == insertAd) {
       if (metadataReady) {
@@ -150,7 +161,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    Log.d(TAG, "Recieved Notification: " + arg1);
+    Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
     if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
       metadataReady = true;
       Log.d(TAG, "AD - metadata true!");

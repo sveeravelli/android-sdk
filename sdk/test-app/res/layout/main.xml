@@ -26,6 +26,12 @@
         android:layout_gravity="left|bottom"
         android:text="@string/skipAd" />
     <Button
+        android:id="@+id/setEmbed"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:text="@string/setEmbed" />
+    <Button
         android:id="@+id/insertAd"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
