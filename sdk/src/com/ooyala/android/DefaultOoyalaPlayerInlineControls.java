@@ -170,10 +170,11 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       } else {
         _player.play();
       }
-      updateButtonStates();
+      show();
     } else if (v == _fullscreen) {
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
+      hide();
     }
   }
 
