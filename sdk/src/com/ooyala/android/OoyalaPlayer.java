@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
@@ -892,6 +893,23 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setClosedCaptionsLanguage(String language) {
     _language = language;
+  }
+
+  /**
+   * Get the current closed caption language
+   * @return the current closed caption language
+   */
+  public String getClosedCaptionsLanguage() {
+    return _language;
+  }
+
+  /**
+   * Get the available closed captions languages
+   * @return a Set of Strings containing the available closed captions languages
+   */
+  public Set<String> getAvailableClosedCaptionsLanguages() {
+    if (_currentItem == null || _currentItem.getClosedCaptions() == null) { return null; }
+    return getCurrentItem().getClosedCaptions().getLanguages();
   }
 
   /**
