@@ -210,6 +210,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   public boolean setEmbedCodes(List<String> embedCodes) {
     if (embedCodes == null || embedCodes.isEmpty()) { return false; }
     cancelOpenTasks();
+    setState(State.LOADING);
+    cleanupPlayers();
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
       @Override
@@ -251,6 +253,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   public boolean setExternalIds(List<String> externalIds) {
     if (externalIds == null || externalIds.isEmpty()) { return false; }
     cancelOpenTasks();
+    setState(State.LOADING);
+    cleanupPlayers();
     final String taskKey = "setExternalIds" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds, new ContentTreeCallback() {
       @Override
@@ -268,6 +272,18 @@ public class OoyalaPlayer extends Observable implements Observer {
       }
     }));
     return true;
+  }
+
+  /**
+   * Reinitializes the player with the rootItem specified.
+   * @param theRootItem the ContentItem to reinitialize the player with
+   * @return true if the change was successful, false if not
+   */
+  public boolean setRootItem(ContentItem rootItem) {
+    cancelOpenTasks();
+    setState(State.LOADING);
+    cleanupPlayers();
+    return reinitialize(rootItem);
   }
 
   /**
@@ -858,8 +874,10 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void setState(State state) {
-    this._state = state;
-    sendNotification(STATE_CHANGED_NOTIFICATION);
+    if (state != _state) {
+      this._state = state;
+      sendNotification(STATE_CHANGED_NOTIFICATION);
+    }
   }
 
   private void sendNotification(String obj) {
