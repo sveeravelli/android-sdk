@@ -10,4 +10,7 @@ git pull
 
 ${BASEDIR}/script/android-sdk pub -gen -nightly || exit $?
 
+git stash
+git stash drop
+
 cd ${CURRDIR}
