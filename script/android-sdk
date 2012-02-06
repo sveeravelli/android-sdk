@@ -143,6 +143,9 @@ function tests {
   ${ADB} start-server
   sleep 5
   echo "Running Unit Tests..."
+  if [[ -f ${BASEDIR}/test_results.txt ]]; then
+    rm ${BASEDIR}/test_results.txt
+  fi
   echo "  Uninstalling apps..."
   echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
   echo "    UnitTests: `${ADB} wait-for-device uninstall com.ooyala.android.testapp.test`"
