@@ -179,20 +179,33 @@ function setup {
     exit 1
   fi
 
+  NOAVD=false
+  if [[ "$1" != "" ]]; then
+    if [[ "$1" != "-noavd" && "$1" != "-na" ]]; then
+      echo "ERROR: invalid option: $1"
+      usage
+    else
+      NOAVD=true
+    fi
+  fi
 
   echo "sdk.dir=${ANDROID_SDKS}" > $BASEDIR/sdk/local.properties
   cp $BASEDIR/sdk/local.properties $BASEDIR/sdk/test-app/local.properties
   cp $BASEDIR/sdk/local.properties $BASEDIR/sdk/tests/local.properties
 
-  echo "--- IMPORTANT ---"
-  echo "You are about to be asked if you want to create a custom hardware profile. Say yes. Use the default (just press enter) for everything except the following:"
-  echo "  hw.lcd.density -> 240"
-  echo "  hw.ramSize     -> 512"
-  echo "  vm.heapSize    -> 48"
-  echo
-  sleep 2
-  ${ANDROID} delete avd -n ${AVD_NAME}
-  ${ANDROID} create avd -n ${AVD_NAME} -t ${API_TARGET_ID}
+  if [[ ${NOAVD} ]]; then
+    echo "Not creating a new AVD..."
+  else
+    echo "--- IMPORTANT ---"
+    echo "You are about to be asked if you want to create a custom hardware profile. Say yes. Use the default (just press enter) for everything except the following:"
+    echo "  hw.lcd.density -> 240"
+    echo "  hw.ramSize     -> 512"
+    echo "  vm.heapSize    -> 48"
+    echo
+    sleep 2
+    ${ANDROID} delete avd -n ${AVD_NAME}
+    ${ANDROID} create avd -n ${AVD_NAME} -t ${API_TARGET_ID}
+  fi
 }
 
 function usage {
@@ -208,6 +221,8 @@ function usage {
   echo "        -[nightly|n]          : publish the nightly version of the release"
   echo "    run_tests|tests|test|t    : run the unit tests"
   echo "    setup|s                   : setup this repo for use by this script"
+  echo "      options:"
+  echo "        -[noavd|na]           : do not create a new avd"
   exit 1
 }
 
