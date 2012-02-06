@@ -44,7 +44,7 @@ function gen {
     tests
   fi
 
-  cd $BASEDIR
+  cd ${BASEDIR}
   rm -rf ${ZIP_BASE}
   mkdir ${ZIP_BASE}
 
@@ -52,14 +52,14 @@ function gen {
   cd $SDKDIR
   ant clean
   ant release
-  cp bin/classes.jar $BASEDIR/${ZIP_BASE}/${JAR_NAME}
+  cp bin/classes.jar ${BASEDIR}/${ZIP_BASE}/${JAR_NAME}
 
   #update sample apps
-  cp $BASEDIR/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/GettingStartedSampleApp/lib/
-  cp $BASEDIR/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/ChannelBrowserSampleApp/lib/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/GettingStartedSampleApp/lib/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/ChannelBrowserSampleApp/lib/
 
   #copy sample apps
-  cd $BASEDIR
+  cd ${BASEDIR}
   cp -R $SAMPLEDIR ${ZIP_BASE}/SampleApps
 
   #getting started guide
@@ -73,10 +73,10 @@ function gen {
 
   #docs
   doc
-  cp -R sdk/Documentation/public $BASEDIR/${ZIP_BASE}/Documentation
+  cp -R sdk/Documentation/public ${BASEDIR}/${ZIP_BASE}/Documentation
 
   #zip
-  cd $BASEDIR
+  cd ${BASEDIR}
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
@@ -100,7 +100,7 @@ function pub {
     gen
   fi
 
-  cd $BASEDIR
+  cd ${BASEDIR}
 
   if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
@@ -151,8 +151,8 @@ function tests {
   ${ADB} wait-for-device install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
   echo "    UnitTests:"
   ${ADB} wait-for-device install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk
-  ${ADB} wait-for-device shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee $BASEDIR/test_results.txt
-  if [[ "`cat $BASEDIR/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
+  ${ADB} wait-for-device shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee ${BASEDIR}/test_results.txt
+  if [[ "`cat ${BASEDIR}/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
     echo "Tests Failed!"
     echo "  Uninstalling apps..."
     echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
@@ -161,7 +161,7 @@ function tests {
     exit 1
   fi
   echo "Tests Passed!"
-  rm $BASEDIR/test_results.txt
+  rm ${BASEDIR}/test_results.txt
   echo "  Uninstalling apps..."
   echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
   echo "    UnitTests: `${ADB} wait-for-device uninstall com.ooyala.android.testapp.test`"
@@ -189,9 +189,9 @@ function setup {
     fi
   fi
 
-  echo "sdk.dir=${ANDROID_SDKS}" > $BASEDIR/sdk/local.properties
-  cp $BASEDIR/sdk/local.properties $BASEDIR/sdk/test-app/local.properties
-  cp $BASEDIR/sdk/local.properties $BASEDIR/sdk/tests/local.properties
+  echo "sdk.dir=${ANDROID_SDKS}" > ${BASEDIR}/sdk/local.properties
+  cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/test-app/local.properties
+  cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/tests/local.properties
 
   if [[ ${NOAVD} ]]; then
     echo "Not creating a new AVD..."
