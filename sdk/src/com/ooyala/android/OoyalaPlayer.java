@@ -800,17 +800,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         this._lastPlayedTime = this._player.currentTime();
         playAdsBeforeTime(this._lastPlayedTime);
         // closed captions
-        if (_language != null && _currentItem.hasClosedCaptions()) {
-          double currT = ((double) currentPlayer().currentTime()) / 1000d;
-          if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
-            Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
-            if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
-              _closedCaptionsView.setCaption(caption);
-            } else {
-              _closedCaptionsView.setCaption(null);
-            }
-          }
-        }
+        displayCurrentClosedCaption();
       }
     } else if (arg0 == this._adPlayer) {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
@@ -892,6 +882,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setClosedCaptionsLanguage(String language) {
     _language = language;
+    displayCurrentClosedCaption();
   }
 
   /**
@@ -1081,6 +1072,25 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
     this._closedCaptionsStyle = closedCaptionsStyle;
     if (_closedCaptionsView != null) _closedCaptionsView.setStyle(closedCaptionsStyle);
+    displayCurrentClosedCaption();
+  }
+
+  private void displayCurrentClosedCaption() {
+    if (_language != null && _currentItem.hasClosedCaptions()) {
+      double currT = ((double) currentPlayer().currentTime()) / 1000d;
+      if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
+        Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
+        if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
+          _closedCaptionsView.setCaption(caption);
+        } else {
+          _closedCaptionsView.setCaption(null);
+        }
+      }
+    } else {
+      if (_closedCaptionsView != null) {
+        _closedCaptionsView.setCaption(null);
+      }
+    }
   }
 
   PlayerAPIClient getPlayerAPIClient() {
