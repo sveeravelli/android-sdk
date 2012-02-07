@@ -586,9 +586,6 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void seek(int timeInMillis) {
     if (currentPlayer().seekable()) {
       currentPlayer().seekToTime(timeInMillis);
-      if (currentPlayer() == _player) {
-        _analytics.reportPlayheadUpdate(((double) timeInMillis) / 1000);
-      }
     }
   }
 
@@ -797,6 +794,8 @@ public class OoyalaPlayer extends Observable implements Observer {
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _player.getState() == State.PLAYING) {
+        //send analytics ping
+        _analytics.reportPlayheadUpdate((this._player.currentTime()) / 1000);
         sendNotification(TIME_CHANGED_NOTIFICATION);
         this._lastPlayedTime = this._player.currentTime();
         playAdsBeforeTime(this._lastPlayedTime);
