@@ -103,14 +103,21 @@ function pub {
   cd ${BASEDIR}
 
   if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
+    echo "Publish Nightly Release"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip"
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
   else
+    echo "Publish Release"
     if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep ${ZIP_BASE}`" != "" ]]; then
+      echo "  Removing Existing Release"
       rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}*
     fi
 
     VERSION=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
     DATE=`date +%Y%m%d%H%M%S`
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${VERSION}-${DATE}.zip"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${VERSION}-${DATE}.zip"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}"
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${VERSION}-${DATE}.zip
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${VERSION}-${DATE}.zip
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}
