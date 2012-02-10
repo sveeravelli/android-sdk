@@ -49,9 +49,8 @@ class OoyalaAdPlayer extends MoviePlayer {
     // TODO[jigish] setup clickthrough
 
     if (_ad.getTrackingURLs() != null) {
-      NetUtils pinger = new NetUtils();
       for (URL url : _ad.getTrackingURLs()) {
-        pinger.ping(url);
+        NetUtils.ping(url);
       }
     }
   }

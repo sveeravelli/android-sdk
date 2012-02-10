@@ -13,7 +13,6 @@ import com.ooyala.android.OoyalaPlayer.State;
 class VASTAdPlayer extends MoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
-  private NetUtils _pinger;
 
   private boolean _firstQSent = false;
   private boolean _midSent = false;
@@ -97,9 +96,8 @@ class VASTAdPlayer extends MoviePlayer {
     // TODO[jigish] setup clickthrough
 
     if (_ad.getTrackingURLs() != null) {
-      NetUtils pinger = new NetUtils();
       for (URL url : _ad.getTrackingURLs()) {
-        pinger.ping(url);
+        NetUtils.ping(url);
       }
     }
   }
@@ -140,7 +138,7 @@ class VASTAdPlayer extends MoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
-        _pinger.ping(urlFromAdUrlString(url));
+        NetUtils.ping(urlFromAdUrlString(url));
       }
     }
   }

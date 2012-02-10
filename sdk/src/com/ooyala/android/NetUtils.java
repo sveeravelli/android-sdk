@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 
 class NetUtils {
-  public void ping(URL url) {
+  public static void ping(URL url) {
     if (url == null) { return; }
     try {
       url.openConnection();
