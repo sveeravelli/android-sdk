@@ -48,7 +48,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
 
-  private class PlayheadUpdateTimerTask extends TimerTask {
+  protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
       _playheadUpdateTimerHandler.sendEmptyMessage(0);

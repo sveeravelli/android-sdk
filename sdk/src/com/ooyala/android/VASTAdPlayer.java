@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
@@ -33,7 +32,7 @@ class VASTAdPlayer extends MoviePlayer {
   private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
       "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
 
-  private class VASTPlayheadUpdateTimerTask extends TimerTask {
+  private class VASTPlayheadUpdateTimerTask extends PlayheadUpdateTimerTask {
     @Override
     public void run() {
       if (!_firstQSent && currentTime() > (currentAd().getDuration() / 4)) {
@@ -47,7 +46,7 @@ class VASTAdPlayer extends MoviePlayer {
         _thirdQSent = true;
       }
       setChanged();
-      notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+      super.run();
     }
   }
 
