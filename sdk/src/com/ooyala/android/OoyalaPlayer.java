@@ -787,7 +787,15 @@ public class OoyalaPlayer extends Observable implements Observer {
             }
             setState(State.PLAYING);
             break;
-          case SUSPENDED: // suspended is an internal state. we don't want to pass it through
+          case PAUSED:
+            if (_state != State.PAUSED) {
+              setState(State.PAUSED);
+            }
+            break;
+          case SUSPENDED:
+            if (_state != State.SUSPENDED) {
+              setState(State.SUSPENDED);
+            }
             break;
           default:
             setState(((Player) arg0).getState());
@@ -830,6 +838,12 @@ public class OoyalaPlayer extends Observable implements Observer {
             if (_state != State.PAUSED) {
               setState(State.PAUSED);
             }
+            break;
+          case SUSPENDED:
+            if (_state != State.SUSPENDED) {
+              setState(State.SUSPENDED);
+            }
+            break;
           default:
             break;
         }

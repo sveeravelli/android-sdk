@@ -342,14 +342,14 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
     _height = 0;
     _buffer = 0;
     _playQueued = false;
-    _state = State.SUSPENDED;
+    setState(State.SUSPENDED);
   }
 
   @Override
   public void resume() {
     Log.d(this.getClass().getName(), "TEST - resume");
     if (_state != State.SUSPENDED) { return; }
-    _state = State.LOADING;
+    setState(State.LOADING);
     setupView();
     if (_stateBeforeSuspend == State.PLAYING) {
       queuePlay();
