@@ -42,7 +42,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
     assertEquals(10, cc.closedCaptionsForLanguage("fr").size());
     Caption caption = cc.getCaption("en", 0.889);
     assertEquals(
-        "two bytes meet. the first byte asks \"are you ill?\"\n\nthe second byte replies: \"no, just feeling a bit off.\"",
+        "two bytes meet. the first byte asks \"are you ill?\"\nthe second byte replies: \"no, just feeling a bit off.\"",
         caption.getText());
     caption = cc.getCaption("en", 19.900);
     assertEquals("alskdasdkja", caption.getText());
@@ -51,7 +51,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
         caption.getText());
     caption = cc.getCaption("fr", 0.889);
     assertEquals(
-        "FR: two bytes meet. the first byte asks \"are you ill?\"\n\nthe second byte replies: \"no, just feeling a bit off.\"",
+        "FR: two bytes meet. the first byte asks \"are you ill?\"\nthe second byte replies: \"no, just feeling a bit off.\"",
         caption.getText());
     caption = cc.getCaption("fr", 19.900);
     assertEquals("FR: alskdasdkja", caption.getText());
