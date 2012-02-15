@@ -27,7 +27,14 @@ public class Caption {
       return;
     }
 
-    _text = element.getTextContent().trim(); // TODO: May need to clean up the text
+    _text = "";
+    for (int i=0; i< element.getChildNodes().getLength(); i++) {
+      for (String t:element.getChildNodes().item(i).getTextContent().split("[\r\n]")) {
+        _text += t.trim();
+      }
+      if (element.getChildNodes().item(i).getNodeName().equals("br"))
+        _text += "\n";
+    }
   }
 
   public double getBegin() {

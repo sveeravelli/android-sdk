@@ -56,6 +56,5 @@ public class ClosedCaptionsView extends TextView {
     setTextSize(16);
     setBackgroundColor(Color.TRANSPARENT);
     setGravity(Gravity.CENTER);
-    setPadding(20, 0, 20, 20);
   }
 }
