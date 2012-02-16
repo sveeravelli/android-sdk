@@ -9,6 +9,7 @@ import android.util.Log;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 
 public class PlayerDetailActivity extends Activity {
   private static final String TAG = "PlayerDetailActivity";
@@ -28,7 +29,7 @@ public class PlayerDetailActivity extends Activity {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    OoyalaPlayerLayoutController layoutController = new OoyalaPlayerLayoutController(
+    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player), ChannelBrowserSampleAppActivity.APIKEY,
         ChannelBrowserSampleAppActivity.SECRETKEY, ChannelBrowserSampleAppActivity.PCODE,
         ChannelBrowserSampleAppActivity.PLAYERDOMAIN);
