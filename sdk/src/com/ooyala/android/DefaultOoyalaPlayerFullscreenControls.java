@@ -193,6 +193,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     if (fromUser) {
       _player.seekToPercent(progress);
+      _player.play();
+      updateButtonStates();
     }
   }
 
