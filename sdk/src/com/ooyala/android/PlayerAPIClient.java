@@ -234,7 +234,11 @@ class PlayerAPIClient {
       System.out.println("Unable to create objects: " + e);
       throw e;
     }
-    return ContentItem.create(contentTree, embedCodes, this);
+    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
+    if(item==null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
+    }
+    return item;
   }
 
   private class ContentTreeTask extends AsyncTask<List<String>, Integer, ContentItem> {
@@ -284,7 +288,12 @@ class PlayerAPIClient {
       System.out.println("Unable to create externalId objects: " + e);
       throw e;
     }
-    return ContentItem.create(contentTree, embedCodes, this);
+
+    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
+    if(item==null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
+    }
+    return item;
   }
 
   private class ContentTreeByExternalIdsTask extends ContentTreeTask {
