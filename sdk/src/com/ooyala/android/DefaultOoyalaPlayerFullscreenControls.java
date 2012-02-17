@@ -3,6 +3,8 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.ooyala.android.OoyalaPlayer.State;
+
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -29,6 +32,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private TextView _currTime = null;
   private TextView _duration = null;
   private TextView _liveIndicator = null;
+  private ProgressBar _spinner = null;
 
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
@@ -186,6 +190,12 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
         FrameLayout.LayoutParams.MATCH_PARENT);
     _layout.addView(_baseLayout, baseLP);
     hide();
+
+    _spinner = new ProgressBar(_layout.getContext());
+    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+    _layout.addView(_spinner, spinnerLP);
+
     _player.addObserver(this);
   }
 
@@ -235,5 +245,19 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
     _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
     _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
+
+    // update spinner
+    if(arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      State currentState = _player.getState();
+      if(currentState==State.INIT || currentState == State.LOADING) {
+        _spinner.setVisibility(View.VISIBLE);
+      } else {
+        _spinner.setVisibility(View.INVISIBLE);
+      }
+
+      if(!isShowing() && currentState!=State.INIT && currentState!=State.LOADING && currentState!=State.ERROR) {
+        show();
+      }
+    }
   }
 }

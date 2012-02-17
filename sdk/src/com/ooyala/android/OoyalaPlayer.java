@@ -17,6 +17,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.FrameLayout;
 
 public class OoyalaPlayer extends Observable implements Observer {
   public static enum ActionAtEnd {
@@ -185,7 +186,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * Get the current OoyalaPlayerLayout
    * @return the current OoyalaPlayerLayout
    */
-  public OoyalaPlayerLayout getLayout() {
+  public FrameLayout getLayout() {
     return _layoutController.getLayout();
   }
 

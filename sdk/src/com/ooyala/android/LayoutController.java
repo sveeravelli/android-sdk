@@ -1,13 +1,14 @@
 package com.ooyala.android;
 
 import android.view.MotionEvent;
+import android.widget.FrameLayout;
 
 public interface LayoutController {
   /**
    * Get the current active layout to display the video on.
    * @return the current active layout.
    */
-  public OoyalaPlayerLayout getLayout();
+  public FrameLayout getLayout();
 
   /**
    * Set the fullscreen state

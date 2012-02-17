@@ -3,6 +3,8 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.ooyala.android.OoyalaPlayer.State;
+
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -26,6 +29,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private TextView _currTime = null;
   private TextView _duration = null;
   private TextView _liveIndicator = null;
+  private ProgressBar _spinner = null;
 
   public DefaultOoyalaPlayerInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
@@ -134,9 +138,13 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _bottomBar.addView(_liveWrapper);
     _bottomBar.addView(_fullscreen);
     FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
-            | Gravity.CENTER_HORIZONTAL);
+        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
     _baseLayout.addView(_bottomBar, bottomBarLP);
+
+    _spinner = new ProgressBar(_layout.getContext());
+    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+    _layout.addView(_spinner, spinnerLP);
 
     FrameLayout.LayoutParams baseLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT);
@@ -190,6 +198,20 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
       _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
       _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
+    }
+
+    // update spinner
+    if(arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      State currentState = _player.getState();
+      if(currentState==State.INIT || currentState == State.LOADING) {
+        _spinner.setVisibility(View.VISIBLE);
+      } else {
+        _spinner.setVisibility(View.INVISIBLE);
+      }
+
+      if(!isShowing() && currentState!=State.INIT && currentState!=State.LOADING && currentState!=State.ERROR) {
+        show();
+      }
     }
   }
 }

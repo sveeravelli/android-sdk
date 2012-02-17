@@ -1,7 +1,18 @@
 package com.ooyala.android;
 
+import java.util.Observable;
+import java.util.Observer;
+
+import com.ooyala.android.OoyalaPlayer.State;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Application;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.view.MotionEvent;
+import android.widget.FrameLayout;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   public static enum DefaultControlStyle {
@@ -98,8 +109,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * 
    * @return the current active layout
    */
-  public OoyalaPlayerLayout getLayout() {
-    return isFullscreen() ? _fullscreenLayout : _layout;
+  public FrameLayout getLayout() {
+    return isFullscreen() ? _fullscreenLayout.getPlayerFrame() : _layout.getPlayerFrame();
   }
 
   public void setInlineControls(OoyalaPlayerControls controls) {
