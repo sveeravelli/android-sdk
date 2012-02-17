@@ -18,6 +18,7 @@ import com.ooyala.android.Video;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -97,9 +98,6 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   }
 
   private String timeStringFromMillis(int millis, boolean includeHours) {
-    Calendar c = Calendar.getInstance();
-    c.setTimeInMillis(millis + (8 * 60 * 60 * 1000));
-    SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
-    return sdf.format(c.getTime());
+    return DateUtils.formatElapsedTime(millis/1000);
   }
 }

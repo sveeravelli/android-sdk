@@ -13,12 +13,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 class Utils {
@@ -130,9 +132,6 @@ class Utils {
   }
 
   public static String timeStringFromMillis(int millis, boolean includeHours) {
-    Calendar c = Calendar.getInstance();
-    c.setTimeInMillis(millis);
-    SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
-    return sdf.format(c.getTime());
+    return DateUtils.formatElapsedTime(millis/1000);
   }
 }
