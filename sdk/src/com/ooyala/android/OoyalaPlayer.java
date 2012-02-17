@@ -1092,9 +1092,11 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void displayCurrentClosedCaption() {
     if (_language != null && _currentItem.hasClosedCaptions()) {
       double currT = ((double) currentPlayer().currentTime()) / 1000d;
-      if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()) {
+      if (_closedCaptionsView.getCaption() == null
+          || currT > _closedCaptionsView.getCaption().getEnd()
+          || currT < _closedCaptionsView.getCaption().getBegin()) {
         Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
-        if (caption != null && caption.getBegin() <= currT && caption.getEnd() > currT) {
+        if (caption != null && caption.getBegin() <= currT && caption.getEnd() >= currT) {
           _closedCaptionsView.setCaption(caption);
         } else {
           _closedCaptionsView.setCaption(null);
