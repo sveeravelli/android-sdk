@@ -810,6 +810,8 @@ public class OoyalaPlayer extends Observable implements Observer {
         playAdsBeforeTime(this._lastPlayedTime);
         // closed captions
         displayCurrentClosedCaption();
+      } else if (arg1.equals(BUFFER_CHANGED_NOTIFICATION)) {
+        sendNotification(BUFFER_CHANGED_NOTIFICATION);
       }
     } else if (arg0 == this._adPlayer) {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
