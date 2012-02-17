@@ -131,7 +131,7 @@ class Utils {
 
   public static String timeStringFromMillis(int millis, boolean includeHours) {
     Calendar c = Calendar.getInstance();
-    c.setTimeInMillis(millis + (8 * 60 * 60 * 1000));
+    c.setTimeInMillis(millis);
     SimpleDateFormat sdf = new SimpleDateFormat(includeHours ? "HH:mm:ss" : "mm:ss");
     return sdf.format(c.getTime());
   }
