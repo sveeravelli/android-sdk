@@ -235,7 +235,7 @@ class PlayerAPIClient {
       throw e;
     }
     ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if(item==null) {
+    if (item == null) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
     }
     return item;
@@ -290,7 +290,7 @@ class PlayerAPIClient {
     }
 
     ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if(item==null) {
+    if (item == null) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
     }
     return item;
