@@ -17,8 +17,8 @@ ANDROID=${ANDROID_SDKS}/tools/android
 
 # Generate the docs
 function doc {
-  CURRDIR=`pwd`
-  cd $SDKDIR
+  currdir=`pwd`
+  cd ${SDKDIR}
   echo
   echo "Removing Old Docs..."
   rm -rf Documentation/complete Documentation/public
@@ -29,7 +29,7 @@ function doc {
   echo
   echo "Document Generation Complete!"
   echo
-  cd $CURRDIR
+  cd ${currdir}
 }
 
 function git_check {
@@ -69,27 +69,27 @@ function gen {
   mkdir ${ZIP_BASE}
 
   #create jar
-  cd $SDKDIR
+  cd ${SDKDIR}
   ant clean
   ant release
   cp bin/classes.jar ${BASEDIR}/${ZIP_BASE}/${JAR_NAME}
 
   #update sample apps
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/GettingStartedSampleApp/lib/
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} $SAMPLEDIR/ChannelBrowserSampleApp/lib/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/GettingStartedSampleApp/lib/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/ChannelBrowserSampleApp/lib/
 
   #copy sample apps
   cd ${BASEDIR}
-  cp -R $SAMPLEDIR ${ZIP_BASE}/SampleApps
+  cp -R ${SAMPLEDIR} ${ZIP_BASE}/SampleApps
 
   #getting started guide
   cp getting_started.pdf ${ZIP_BASE}/
 
   #version file
-  VERSION=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
-  DATE=`date`
-  echo "v$VERSION" >> ${ZIP_BASE}/VERSION
-  echo "Created On: $DATE" >> ${ZIP_BASE}/VERSION
+  version=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
+  date=`date`
+  echo "v${version}" >> ${ZIP_BASE}/VERSION
+  echo "Created On: ${date}" >> ${ZIP_BASE}/VERSION
 
   #docs
   doc
@@ -135,13 +135,13 @@ function pub {
       rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}*
     fi
 
-    VERSION=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
-    DATE=`date +%Y%m%d%H%M%S`
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${VERSION}-${DATE}.zip"
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${VERSION}-${DATE}.zip"
+    version=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
+    date=`date +%Y%m%d%H%M%S`
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${date}.zip"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${date}.zip"
     echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}"
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${VERSION}-${DATE}.zip
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${VERSION}-${DATE}.zip
+    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${date}.zip
+    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${date}.zip
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}
   fi
 }
@@ -157,8 +157,8 @@ function tests {
     ${EMULATOR} -avd ${AVD_NAME} &
   fi
   echo "Building Unit Tests..."
-  CURRDIR=`pwd`
-  cd $SDKDIR
+  currdir=`pwd`
+  cd ${SDKDIR}
   ant clean
   cd test-app
   ant clean
@@ -189,7 +189,7 @@ function tests {
     echo "  Uninstalling apps..."
     echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
     echo "    UnitTests: `${ADB} wait-for-device uninstall com.ooyala.android.testapp.test`"
-    cd $CURRDIR
+    cd ${currdir}
     exit 1
   fi
   echo "Tests Passed!"
@@ -197,7 +197,7 @@ function tests {
   echo "  Uninstalling apps..."
   echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
   echo "    UnitTests: `${ADB} wait-for-device uninstall com.ooyala.android.testapp.test`"
-  cd $CURRDIR
+  cd ${currdir}
 }
 
 function setup {
@@ -205,19 +205,19 @@ function setup {
     echo "Please set the environment variable ANDROID_SDKS to point to your Android platform SDK directory and try again."
     exit 1
   fi
-  API_TARGET_ID=`${ANDROID_SDKS}/tools/android list targets |grep android-8 |awk '{print $2}'`
-  if [[ "${API_TARGET_ID}" = "" ]]; then
+  api_target_id=`${ANDROID_SDKS}/tools/android list targets |grep android-8 |awk '{print $2}'`
+  if [[ "${api_target_id}" = "" ]]; then
     echo "Please install the Android API Level 8 SDK"
     exit 1
   fi
 
-  NOAVD=false
+  noavd=false
   if [[ "$1" != "" ]]; then
     if [[ "$1" != "-noavd" && "$1" != "-na" ]]; then
       echo "ERROR: invalid option: $1"
       usage
     else
-      NOAVD=true
+      noavd=true
     fi
   fi
 
@@ -225,7 +225,7 @@ function setup {
   cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/test-app/local.properties
   cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/tests/local.properties
 
-  if [[ ${NOAVD} ]]; then
+  if [[ ${noavd} ]]; then
     echo "Not creating a new AVD..."
   else
     echo "--- IMPORTANT ---"
@@ -236,7 +236,7 @@ function setup {
     echo
     sleep 2
     ${ANDROID} delete avd -n ${AVD_NAME}
-    ${ANDROID} create avd -n ${AVD_NAME} -t ${API_TARGET_ID}
+    ${ANDROID} create avd -n ${AVD_NAME} -t ${api_target_id}
   fi
 }
 
@@ -276,4 +276,4 @@ case "$1" in
   *) usage;;
 esac
 
-cd $BEGINDIR
+cd ${BEGINDIR}
