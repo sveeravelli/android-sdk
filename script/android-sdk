@@ -32,8 +32,28 @@ function doc {
   cd $CURRDIR
 }
 
+function git_check {
+  cd ${BASEDIR}
+  if [[ "`git s | grep "working directory clean"`" = "" ]]; then
+    echo
+    git s
+    echo
+    echo "Your working directory is not clean, are you sure you want to continue? (y/n)"
+    read -n 1 cont
+    if [[ "${cont}" != "y" ]]; then
+      echo
+      echo "Please commit or stash your changes and try again."
+      exit 1
+    fi
+    echo
+  fi
+}
+
 # Generate the release
 function gen {
+  echo "Generating the release..."
+  git_check
+
   # Run tests before doing anything to make sure we are passing.
   if [[ "$1" != "" ]]; then
     if [[ "$1" != "-notests" && "$1" != "-notest" && "$1" != "-nt" ]]; then
@@ -80,6 +100,8 @@ function gen {
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
+  echo
+  echo "Release Generated!"
 }
 
 function pub {
@@ -103,11 +125,11 @@ function pub {
   cd ${BASEDIR}
 
   if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
-    echo "Publish Nightly Release"
+    echo "Publishing the Nightly Release"
     echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip"
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
   else
-    echo "Publish Release"
+    echo "Publishing the Release"
     if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep ${ZIP_BASE}`" != "" ]]; then
       echo "  Removing Existing Release"
       rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}*
