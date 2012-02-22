@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION_REGEX='-v[0-9]+.[0-9]+.[0-9]+'
+
 BEGINDIR=`pwd`
 SCRIPTDIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=${SCRIPTDIR}/../
@@ -54,13 +56,23 @@ function gen {
   echo "Generating the release..."
   git_check
 
+  tests=true
+  set_version=false
+  new_version=''
+  for i in $*; do
+    case "$i" in
+      -notests|-notest|-nt) gen=true;;
+      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then set_version=true; new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; usage; fi;;
+    esac
+  done
+
+  # Rev version number if requested
+  if [[ ${set_version} ]]; then
+    sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDKDIR}/src/com/ooyala/android/Constants.java
+  fi
+
   # Run tests before doing anything to make sure we are passing.
-  if [[ "$1" != "" ]]; then
-    if [[ "$1" != "-notests" && "$1" != "-notest" && "$1" != "-nt" ]]; then
-      echo "ERROR: invalid option: $1"
-      usage
-    fi
-  else
+  if [[ ${tests} ]]; then
     tests
   fi
 
@@ -105,26 +117,24 @@ function gen {
 }
 
 function pub {
-  if [[ "$1" != "" ]]; then
-    if [[ "$1" != "-gen" && "$1" != "-g" && "$1" != "-nightly" && "$1" != "-n" ]]; then
-      echo "ERROR: invalid option: $1"
-      usage
-    fi
-  fi
-  if [[ "$2" != "" ]]; then
-    if [[ "$2" != "-gen" && "$2" != "-g" && "$2" != "-nightly" && "$2" != "-n" ]]; then
-      echo "ERROR: invalid option: $2"
-      usage
-    fi
-  fi
+  gen=false
+  nightly=false
+  new_version=''
+  for i in $*; do
+    case "$i" in
+      -gen|-g) gen=true;;
+      -nightly|-n) nightly=true;;
+      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version=$i; else echo "ERROR: invalid option: $i"; usage; fi;;
+    esac
+  done
 
-  if [[ "$1" = "-gen" || "$1" = "-g" || "$2" = "-gen" || "$2" = "-g" ]]; then
-    gen
+  if [[ ${gen} ]]; then
+    gen ${new_version}
   fi
 
   cd ${BASEDIR}
 
-  if [[ "$1" = "-nightly" || "$1" = "-n" || "$2" = "-nightly" || "$2" = "-n" ]]; then
+  if [[ ${nightly} ]]; then
     echo "Publishing the Nightly Release"
     echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip"
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
@@ -247,10 +257,12 @@ function usage {
   echo "    gen_release|gen|g         : generate the release"
   echo "      options:"
   echo "        -[notests|notest|nt]  : do not run the unit tests"
+  echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
   echo "        -[gen|g]              : generate the release prior to publishing"
   echo "        -[nightly|n]          : publish the nightly version of the release"
+  echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
   echo "    run_tests|tests|test|t    : run the unit tests"
   echo "    setup|s                   : setup this repo for use by this script"
   echo "      options:"
@@ -268,9 +280,9 @@ if [[ "`${ANDROID_SDKS}/tools/android list targets |grep android-8 |awk '{print 
 fi
 
 case "$1" in
-  gen_release|gen|g) gen $2;;
+  gen_release|gen|g) gen $2 $3;;
   gen_docs|docs|doc|d) doc;;
-  pub_release|publish|pub|p) pub $2 $3;;
+  pub_release|publish|pub|p) pub $2 $3 $4;;
   run_tests|tests|test|t) tests;;
   setup|s) setup $2;;
   *) usage;;
