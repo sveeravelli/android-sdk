@@ -272,7 +272,7 @@ case "$1" in
   gen_docs|docs|doc|d) doc;;
   pub_release|publish|pub|p) pub $2 $3;;
   run_tests|tests|test|t) tests;;
-  setup|s) setup;;
+  setup|s) setup $2;;
   *) usage;;
 esac
 
