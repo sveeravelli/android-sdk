@@ -34,9 +34,9 @@ function doc {
 
 function git_check {
   cd ${BASEDIR}
-  if [[ "`git s | grep "working directory clean"`" = "" ]]; then
+  if [[ "`git status | grep "working directory clean"`" = "" ]]; then
     echo
-    git s
+    git status
     echo
     echo "Your working directory is not clean, are you sure you want to continue? (y/n)"
     read -n 1 cont
