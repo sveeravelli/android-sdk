@@ -67,12 +67,12 @@ function gen {
   done
 
   # Rev version number if requested
-  if [[ ${set_version} ]]; then
+  if [[ ${set_version} = true ]]; then
     sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDKDIR}/src/com/ooyala/android/Constants.java
   fi
 
   # Run tests before doing anything to make sure we are passing.
-  if [[ ${tests} ]]; then
+  if [[ ${tests} = true ]]; then
     tests
   fi
 
@@ -128,13 +128,13 @@ function pub {
     esac
   done
 
-  if [[ ${gen} ]]; then
+  if [[ ${gen} = true ]]; then
     gen ${new_version}
   fi
 
   cd ${BASEDIR}
 
-  if [[ ${nightly} ]]; then
+  if [[ ${nightly} = true ]]; then
     echo "Publishing the Nightly Release"
     echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip"
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
@@ -237,7 +237,7 @@ function setup {
   cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/test-app/local.properties
   cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/tests/local.properties
 
-  if [[ ${noavd} ]]; then
+  if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."
   else
     echo "--- IMPORTANT ---"
