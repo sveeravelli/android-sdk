@@ -1,5 +1,6 @@
 .DS_Store
 OoyalaSDK-Android.zip
+test_results.txt
 *.class
 */javadoc
 */bin
