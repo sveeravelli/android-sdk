@@ -176,11 +176,13 @@ function tests {
   cd tests
   ant clean
   ant debug
-  echo "Restarting ADB..."
-  # We have to do this because sometimes ADB is stupid.
-  ${ADB} kill-server
-  ${ADB} start-server
-  sleep 5
+  if [[ `${ADB} devices |wc |awk '{print $1}'` < 3 ]]; then
+    # We have to do this because sometimes ADB is stupid.
+    echo "Restarting ADB..."
+    ${ADB} kill-server
+    ${ADB} start-server
+    sleep 5
+  fi
   echo "Running Unit Tests..."
   if [[ -f ${BASEDIR}/test_results.txt ]]; then
     rm ${BASEDIR}/test_results.txt
