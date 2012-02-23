@@ -61,7 +61,7 @@ function gen {
   new_version=''
   for i in $*; do
     case "$i" in
-      -notests|-notest|-nt) gen=true;;
+      -notests|-notest|-nt) tests=false;;
       *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then set_version=true; new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; usage; fi;;
     esac
   done
