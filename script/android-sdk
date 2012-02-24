@@ -1,5 +1,8 @@
 #!/bin/bash
 
+DATE=`date`
+DATESTAMP=`date +%Y%m%d%H%M%S`
+
 VERSION_REGEX='-v[0-9]+.[0-9]+.[0-9]+'
 
 BEGINDIR=`pwd`
@@ -11,8 +14,10 @@ JAR_BASE="OoyalaSDK"
 JAR_NAME="${JAR_BASE}.jar"
 ZIP_BASE="${JAR_BASE}-Android"
 ZIP_NAME="${ZIP_BASE}.zip"
-AVD_NAME="unit_test"
 
+GIT_CHECK_RESULT=true
+
+AVD_NAME="unit_test"
 ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
 ANDROID=${ANDROID_SDKS}/tools/android
@@ -37,10 +42,11 @@ function doc {
 function git_check {
   cd ${BASEDIR}
   if [[ "`git status | grep "working directory clean"`" = "" ]]; then
+    GIT_CHECK_RESULT=false
     echo
     git status
     echo
-    echo "Your working directory is not clean, are you sure you want to continue? (y/n)"
+    echo "Your working directory is dirty (Yuck!), are you sure you want to continue? (y/n)"
     read -n 1 cont
     if [[ "${cont}" != "y" ]]; then
       echo
@@ -58,10 +64,12 @@ function gen {
 
   tests=true
   set_version=false
+  push=false
   new_version=''
   for i in $*; do
     case "$i" in
       -notests|-notest|-nt) tests=false;;
+      -push|-p) push=true;;
       *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then set_version=true; new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; usage; fi;;
     esac
   done
@@ -99,9 +107,8 @@ function gen {
 
   #version file
   version=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
-  date=`date`
   echo "v${version}" >> ${ZIP_BASE}/VERSION
-  echo "Created On: ${date}" >> ${ZIP_BASE}/VERSION
+  echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #docs
   doc
@@ -112,24 +119,42 @@ function gen {
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
+
   echo
   echo "Release Generated!"
+  if [[ ${set_version} = true ]]; then
+    if [[ ${GIT_CHECK_RESULT} = false && ${push} = true ]]; then
+      echo "  Not pushing because your working directory is dirty. Yuck."
+    elif [[ ${push} = true ]]; then
+      echo "  Pushing Gen Release v${new_version} commit."
+      git c -a -m "Gen Release v${new_version}"
+      git tag -a v${new_version} -m "Version ${new_version} (Created On ${DATE})"
+      git push
+      git push --tags
+    fi
+  elif [[ ${push} = true ]]; then
+    echo "  Pushing Gen Release commit."
+    git c -a -m "Gen Release"
+    git push
+  fi
 }
 
 function pub {
   gen=false
   nightly=false
+  push=''
   new_version=''
   for i in $*; do
     case "$i" in
       -gen|-g) gen=true;;
+      -push|-p) push=$i;;
       -nightly|-n) nightly=true;;
       *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version=$i; else echo "ERROR: invalid option: $i"; usage; fi;;
     esac
   done
 
   if [[ ${gen} = true ]]; then
-    gen ${new_version}
+    gen ${new_version} ${push}
   fi
 
   cd ${BASEDIR}
@@ -146,12 +171,11 @@ function pub {
     fi
 
     version=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
-    date=`date +%Y%m%d%H%M%S`
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${date}.zip"
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${date}.zip"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${DATESTAMP}.zip"
+    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${DATESTAMP}.zip"
     echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}"
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${date}.zip
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${date}.zip
+    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${DATESTAMP}.zip
+    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${DATESTAMP}.zip
     cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}
   fi
 }
@@ -260,11 +284,13 @@ function usage {
   echo "      options:"
   echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
+  echo "        -push                 : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
   echo "        -[gen|g]              : generate the release prior to publishing"
   echo "        -[nightly|n]          : publish the nightly version of the release"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
+  echo "        -push                 : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    run_tests|tests|test|t    : run the unit tests"
   echo "    setup|s                   : setup this repo for use by this script"
   echo "      options:"
