@@ -284,17 +284,19 @@ function usage {
   echo "      options:"
   echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
-  echo "        -push                 : push the generated release. Also create a tag if -v<VERSION> was specified"
+  echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
   echo "        -[gen|g]              : generate the release prior to publishing"
   echo "        -[nightly|n]          : publish the nightly version of the release"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
-  echo "        -push                 : push the generated release. Also create a tag if -v<VERSION> was specified"
+  echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    run_tests|tests|test|t    : run the unit tests"
   echo "    setup|s                   : setup this repo for use by this script"
   echo "      options:"
   echo "        -[noavd|na]           : do not create a new avd"
+  echo
+  echo "For example, to generate, tag, and publish the release version 1.2.0: $0 pub -gen -v1.2.0 -push"
   exit 1
 }
 
