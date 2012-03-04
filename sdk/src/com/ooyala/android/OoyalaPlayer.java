@@ -9,8 +9,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import com.ooyala.android.AuthorizableItem.AuthCode;
-
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
@@ -18,6 +16,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.FrameLayout;
+
+import com.ooyala.android.AuthorizableItem.AuthCode;
 
 public class OoyalaPlayer extends Observable implements Observer {
   public static enum ActionAtEnd {
@@ -803,7 +803,7 @@ public class OoyalaPlayer extends Observable implements Observer {
             break;
         }
       } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _player.getState() == State.PLAYING) {
-        //send analytics ping
+        // send analytics ping
         _analytics.reportPlayheadUpdate((this._player.currentTime()) / 1000);
         sendNotification(TIME_CHANGED_NOTIFICATION);
         this._lastPlayedTime = this._player.currentTime();
@@ -959,7 +959,10 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public int getDuration() {
     if (currentPlayer() == null) { return 0; }
-    return currentPlayer().duration();
+    int playerDuration = currentPlayer().duration();
+    if (playerDuration > 0) return playerDuration;
+    if (getCurrentItem() == null) return 0;
+    return getCurrentItem().getDuration();
   }
 
   /**
@@ -1095,8 +1098,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void displayCurrentClosedCaption() {
     if (_language != null && _currentItem.hasClosedCaptions()) {
       double currT = ((double) currentPlayer().currentTime()) / 1000d;
-      if (_closedCaptionsView.getCaption() == null
-          || currT > _closedCaptionsView.getCaption().getEnd()
+      if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
           || currT < _closedCaptionsView.getCaption().getBegin()) {
         Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
         if (caption != null && caption.getBegin() <= currT && caption.getEnd() >= currT) {
