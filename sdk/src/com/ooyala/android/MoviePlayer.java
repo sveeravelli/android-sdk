@@ -3,8 +3,6 @@ package com.ooyala.android;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ooyala.android.OoyalaPlayer.State;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -22,6 +20,8 @@ import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -189,6 +189,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       }
 
       _player.setDataSource(_stream.decodedURL().toString());
+      Log.d(this.getClass().getName(), "TEST - stream url " + _stream.decodedURL().toString());
       Log.d(this.getClass().getName(), "TEST - FRAME SIZE: " + _holder.getSurfaceFrame().right + "x"
           + _holder.getSurfaceFrame().bottom);
       _player.setDisplay(_holder);
@@ -231,7 +232,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
-    Log.d(this.getClass().getName(), "TEST - onBufferingUpdate");
+    Log.d(this.getClass().getName(), "TEST - onBufferingUpdate:" + percent);
     this._buffer = percent;
     setChanged();
     notifyObservers(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION);
