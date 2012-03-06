@@ -26,7 +26,7 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
     params.put("domain", "www.ooyala.com");
     // TODO once we push SAS, go to player.ooyala.com
     String json = apiHelper.jsonForSecureAPI("http://player.ooyala.com",
-        "/sas/player_api/authorization/embed_code/" + TestConstants.TEST_PCODE + "/"
+        "/sas/player_api/v1/authorization/embed_code/" + TestConstants.TEST_PCODE + "/"
             + TestConstants.TEST_VIDEO, params);
     assertTrue(json.contains("\"authorized\":true"));
   }
@@ -37,7 +37,7 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
     params.put("domain", "www.ooyala.com");
     // TODO once we push SAS, go to player.ooyala.com
     JSONObject json = apiHelper.objectForSecureAPI("http://player.ooyala.com",
-        "/sas/player_api/authorization/embed_code/" + TestConstants.TEST_PCODE + "/"
+        "/sas/player_api/v1/authorization/embed_code/" + TestConstants.TEST_PCODE + "/"
             + TestConstants.TEST_VIDEO, params);
     assertFalse(json.isNull("authorization_data"));
     try {
@@ -53,18 +53,18 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
   public void testJSONForAPI() {
     Map<String, String> params = new HashMap<String, String>();
     params.put("device", "android");
-    String json = OoyalaAPIHelper.jsonForAPI("http://player.ooyala.com",
-        "/player_api/content_tree/embed_code/" + TestConstants.TEST_PCODE + "/" + TestConstants.TEST_VIDEO,
-        params);
+    String json = OoyalaAPIHelper
+        .jsonForAPI("http://player.ooyala.com", "/player_api/v1/content_tree/embed_code/"
+            + TestConstants.TEST_PCODE + "/" + TestConstants.TEST_VIDEO, params);
     assertTrue(json.contains("\"embed_code\":\"" + TestConstants.TEST_VIDEO + "\""));
   }
 
   public void testObjectForAPI() {
     Map<String, String> params = new HashMap<String, String>();
     params.put("device", "android");
-    JSONObject json = OoyalaAPIHelper.objectForAPI("http://player.ooyala.com",
-        "/player_api/content_tree/embed_code/" + TestConstants.TEST_PCODE + "/" + TestConstants.TEST_VIDEO,
-        params);
+    JSONObject json = OoyalaAPIHelper
+        .objectForAPI("http://player.ooyala.com", "/player_api/v1/content_tree/embed_code/"
+            + TestConstants.TEST_PCODE + "/" + TestConstants.TEST_VIDEO, params);
     assertFalse(json.isNull("content_tree"));
     try {
       assertFalse(json.getJSONObject("content_tree").isNull(TestConstants.TEST_VIDEO));

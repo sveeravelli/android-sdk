@@ -163,7 +163,7 @@ class PlayerAPIClient {
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent)
       throws OoyalaException {
-    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, _pcode,
+    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());
     JSONObject authData = null;
@@ -223,7 +223,7 @@ class PlayerAPIClient {
   }
 
   public ContentItem contentTree(List<String> embedCodes) throws OoyalaException {
-    String uri = String.format(Constants.CONTENT_TREE_URI, _pcode,
+    String uri = String.format(Constants.CONTENT_TREE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
@@ -235,9 +235,8 @@ class PlayerAPIClient {
       throw e;
     }
     ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if (item == null) {
-      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
-    }
+    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+        "Unknown Content Type"); }
     return item;
   }
 
@@ -275,7 +274,7 @@ class PlayerAPIClient {
   }
 
   public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
-    String uri = String.format(Constants.CONTENT_TREE_BY_EXTERNAL_ID_URI, _pcode,
+    String uri = String.format(Constants.CONTENT_TREE_BY_EXTERNAL_ID_URI, Constants.API_VERSION, _pcode,
         Utils.join(externalIds, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
@@ -290,9 +289,8 @@ class PlayerAPIClient {
     }
 
     ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if (item == null) {
-      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, "Unknown Content Type");
-    }
+    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+        "Unknown Content Type"); }
     return item;
   }
 
@@ -322,7 +320,8 @@ class PlayerAPIClient {
 
   public PaginatedItemResponse contentTreeNext(PaginatedParentItem parent) {
     if (!parent.hasMoreChildren()) { return null; }
-    String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, _pcode, parent.getNextChildren());
+    String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, Constants.API_VERSION, _pcode,
+        parent.getNextChildren());
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
     if (obj == null) { return null; }
     JSONObject contentTree = null;
