@@ -102,8 +102,9 @@ function gen {
   cd ${BASEDIR}
   cp -R ${SAMPLEDIR} ${ZIP_BASE}/SampleApps
 
-  #getting started guide
+  #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
+  cp ReleaseNotes.txt ${ZIP_BASE}/
 
   #version file
   version=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
