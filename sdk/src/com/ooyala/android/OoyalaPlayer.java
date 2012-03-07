@@ -899,6 +899,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setClosedCaptionsLanguage(String language) {
     _language = language;
+    if (_closedCaptionsView != null) _closedCaptionsView.setCaption(null);
     displayCurrentClosedCaption();
   }
 
@@ -1091,7 +1092,10 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
     this._closedCaptionsStyle = closedCaptionsStyle;
-    if (_closedCaptionsView != null) _closedCaptionsView.setStyle(closedCaptionsStyle);
+    if (_closedCaptionsView != null) {
+      _closedCaptionsView.setStyle(closedCaptionsStyle);
+      _closedCaptionsView.setCaption(null);
+    }
     displayCurrentClosedCaption();
   }
 
