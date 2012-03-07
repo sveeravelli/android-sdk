@@ -44,6 +44,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
+  private int _lastPlayhead = -1;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
@@ -51,7 +52,10 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      _playheadUpdateTimerHandler.sendEmptyMessage(0);
+      if (_lastPlayhead != _player.getCurrentPosition()) {
+        _playheadUpdateTimerHandler.sendEmptyMessage(0);
+      }
+      _lastPlayhead = _player.getCurrentPosition();
     }
   }
 
@@ -171,7 +175,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) { return; }
-    stopPlayheadTimer();
     _player.seekTo(timeInMillis);
   }
 
@@ -314,6 +317,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   public void onSeekComplete(MediaPlayer arg0) {
     Log.d(this.getClass().getName(), "TEST - onSeekComplete");
     dequeuePlay();
+    _lastPlayhead = _player.getCurrentPosition();
   }
 
   @Override
