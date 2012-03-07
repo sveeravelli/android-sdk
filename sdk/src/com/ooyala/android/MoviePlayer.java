@@ -171,6 +171,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) { return; }
+    stopPlayheadTimer();
     _player.seekTo(timeInMillis);
   }
 
