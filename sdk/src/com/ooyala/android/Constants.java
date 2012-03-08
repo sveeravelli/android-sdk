@@ -85,6 +85,7 @@ class Constants {
   public static final String KEY_CALLBACK = "callback";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
+  /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
   public static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
 
   public static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
