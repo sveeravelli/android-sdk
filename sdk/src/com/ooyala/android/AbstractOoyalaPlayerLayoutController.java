@@ -1,16 +1,6 @@
 package com.ooyala.android;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import com.ooyala.android.OoyalaPlayer.State;
-
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.Application;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
@@ -142,8 +132,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           if (getControls() != null) {
             if (getControls().isShowing()) {
               getControls().hide();
+              _player.updatePlayerControlVisiblity(false);
             } else {
               getControls().show();
+              _player.updatePlayerControlVisiblity(true);
             }
           }
           if (getOverlay() != null) {

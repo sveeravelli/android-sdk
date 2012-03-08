@@ -38,6 +38,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     public void handleMessage(Message msg) {
       if (_player.isPlaying()) {
         hide();
+        _player.updatePlayerControlVisiblity(false);
       }
     }
   };
