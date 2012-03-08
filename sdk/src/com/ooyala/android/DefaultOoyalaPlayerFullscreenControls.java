@@ -193,8 +193,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     hide();
 
     _spinner = new ProgressBar(_layout.getContext());
-    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
     _layout.addView(_spinner, spinnerLP);
 
     _player.addObserver(this);
@@ -248,15 +248,16 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
 
     // update spinner
-    if(arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       State currentState = _player.getState();
-      if(currentState==State.INIT || currentState == State.LOADING) {
+      if (currentState == State.INIT || currentState == State.LOADING) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);
       }
 
-      if(!isShowing() && currentState!=State.INIT && currentState!=State.LOADING && currentState!=State.ERROR) {
+      if (!isShowing() && currentState != State.INIT && currentState != State.LOADING
+          && currentState != State.ERROR) {
         show();
       }
     }

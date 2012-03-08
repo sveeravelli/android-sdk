@@ -138,12 +138,13 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _bottomBar.addView(_liveWrapper);
     _bottomBar.addView(_fullscreen);
     FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+            | Gravity.CENTER_HORIZONTAL);
     _baseLayout.addView(_bottomBar, bottomBarLP);
 
     _spinner = new ProgressBar(_layout.getContext());
-    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
     _layout.addView(_spinner, spinnerLP);
 
     FrameLayout.LayoutParams baseLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
@@ -201,15 +202,16 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     }
 
     // update spinner
-    if(arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       State currentState = _player.getState();
-      if(currentState==State.INIT || currentState == State.LOADING) {
+      if (currentState == State.INIT || currentState == State.LOADING) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);
       }
 
-      if(!isShowing() && currentState!=State.INIT && currentState!=State.LOADING && currentState!=State.ERROR) {
+      if (!isShowing() && currentState != State.INIT && currentState != State.LOADING
+          && currentState != State.ERROR) {
         show();
       }
     }

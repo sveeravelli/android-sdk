@@ -131,6 +131,6 @@ class Utils {
   }
 
   public static String timeStringFromMillis(int millis, boolean includeHours) {
-    return DateUtils.formatElapsedTime(millis/1000);
+    return DateUtils.formatElapsedTime(millis / 1000);
   }
 }
