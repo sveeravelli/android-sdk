@@ -230,10 +230,12 @@ public class Stream {
 
   public static boolean isDeliveryTypePlayable(Stream stream) {
     String type = stream.getDeliveryType();
+    /**
+     * NOTE(jigish) Android 3.0+ supports HLS, but we support it only on 4.0+ to simplify secure HLS
+     * implementation
+     */
     return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
-        || (Build.VERSION.SDK_INT >= 11 && type.equals(Constants.DELIVERY_TYPE_HLS)); // Android v3+
-                                                                                      // (HONEYCOMB) supports
-                                                                                      // HLS
+        || (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS && type.equals(Constants.DELIVERY_TYPE_HLS));
   }
 
   public static Stream bestStream(Set<Stream> streams) {

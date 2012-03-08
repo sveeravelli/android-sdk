@@ -85,7 +85,7 @@ class Constants {
   public static final String KEY_CALLBACK = "callback";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
-  public static final String DEVICE_ANDROID_3PLUS_SDK = "android_3plus_sdk";
+  public static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
 
   public static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   public static final String CONTENT_TYPE_CHANNEL = "Channel";
@@ -170,6 +170,10 @@ class Constants {
 
   public static final String MIME_TYPE_MP4 = "video/mp4";
   public static final String MIME_TYPE_M3U8 = "application/x-mpegURL";
+
+  // Build.VERSION.SDK_INT values
+  public static final int SDK_INT_HONEYCOMB = 11;
+  public static final int SDK_INT_ICS = 14;
 
   public enum ReturnState {
     STATE_MATCHED, STATE_UNMATCHED, STATE_FAIL

@@ -50,7 +50,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
     if (_liveWrapper != null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
-      if (Build.VERSION.SDK_INT >= 11) {
+      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
     }

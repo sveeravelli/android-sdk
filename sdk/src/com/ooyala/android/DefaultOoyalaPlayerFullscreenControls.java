@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.Constants;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -55,7 +56,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
       _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
     if (_liveWrapper != null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
-      if (Build.VERSION.SDK_INT >= 11) {
+      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
     }

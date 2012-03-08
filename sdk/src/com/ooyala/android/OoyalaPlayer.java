@@ -925,7 +925,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public double getBitrate() {
     if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
-    if (android.os.Build.VERSION.SDK_INT >= 14) {
+    if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
       // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
       metadataRetreiver.setDataSource(getCurrentItem().getStream().getUrl());
