@@ -4,13 +4,19 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Map;
 import org.json.*;
 
+import android.content.Context;
 import android.util.Log;
 
 class OoyalaAPIHelper {
   private SecureURLGenerator _secureURLGenerator = null;
+
+  // Static context and cookies to be used for MoviePlayer instantiation for 4.0+
+  public static Context context = null;
+  public static Map<String, String> cookies = new HashMap<String, String>();
 
   public OoyalaAPIHelper(String apiKey, String secretKey) {
     _secureURLGenerator = new EmbeddedSecureURLGenerator(apiKey, secretKey);
@@ -57,6 +63,18 @@ class OoyalaAPIHelper {
         sb.append(line);
       }
       rd.close();
+
+      String headerName = null;
+      for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
+        if (headerName.equals("Set-Cookie")) {
+          String fullCookie = conn.getHeaderField(i);
+          Log.d(OoyalaAPIHelper.class.getName(), "FOUND COOKIE: " + fullCookie);
+          String cookie = fullCookie.substring(0, fullCookie.indexOf(";"));
+          String cookieName = cookie.substring(0, cookie.indexOf("="));
+          String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
+          OoyalaAPIHelper.cookies.put(cookieName, cookieValue);
+        }
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }

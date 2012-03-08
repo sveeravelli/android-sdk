@@ -171,6 +171,8 @@ class Constants {
   public static final String MIME_TYPE_MP4 = "video/mp4";
   public static final String MIME_TYPE_M3U8 = "application/x-mpegURL";
 
+  public static final String HTML_COOKIE_HEADER_NAME = "Cookie";
+
   // Build.VERSION.SDK_INT values
   public static final int SDK_INT_HONEYCOMB = 11;
   public static final int SDK_INT_ICS = 14;

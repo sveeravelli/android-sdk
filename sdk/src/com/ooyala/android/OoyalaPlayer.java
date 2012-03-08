@@ -180,6 +180,7 @@ public class OoyalaPlayer extends Observable implements Observer {
      * our customers should actually call setLayout right after initializing the player so this is ok.
      */
     _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    OoyalaAPIHelper.context = getLayout().getContext();
   }
 
   /**

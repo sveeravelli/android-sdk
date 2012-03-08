@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,6 +15,8 @@ import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -191,8 +195,24 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
         _player.stop();
         _player.reset();
       }
-
-      _player.setDataSource(_stream.decodedURL().toString());
+      // Set cookies if they exist for 4.0+ Secure HLS Support
+      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+        Log.d(this.getClass().getName(), "TEST - Attempting to set headers with datasource");
+        String cookieHeaderStr = null;
+        for (String cookieName : OoyalaAPIHelper.cookies.keySet()) {
+          if (cookieHeaderStr == null) {
+            cookieHeaderStr = (cookieName + "=" + OoyalaAPIHelper.cookies.get(cookieName));
+          } else {
+            cookieHeaderStr += ("; " + cookieName + "=" + OoyalaAPIHelper.cookies.get(cookieName));
+          }
+        }
+        Map<String, String> cookieHeader = new HashMap<String, String>();
+        cookieHeader.put(Constants.HTML_COOKIE_HEADER_NAME, cookieHeaderStr);
+        _player.setDataSource(OoyalaAPIHelper.context, Uri.parse(_stream.decodedURL().toString()),
+            cookieHeader);
+      } else {
+        _player.setDataSource(_stream.decodedURL().toString());
+      }
       Log.d(this.getClass().getName(), "TEST - stream url " + _stream.decodedURL().toString());
       Log.d(this.getClass().getName(), "TEST - FRAME SIZE: " + _holder.getSurfaceFrame().right + "x"
           + _holder.getSurfaceFrame().bottom);
