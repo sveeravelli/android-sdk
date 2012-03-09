@@ -3,8 +3,6 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.ooyala.android.OoyalaPlayer.State;
-
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -17,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements
     SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
@@ -216,4 +216,10 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       }
     }
   }
+
+  @Override
+  public int bottomBarOffset() {
+    return (PREFERRED_BUTTON_HEIGHT_DP + MARGIN_SIZE_DP * 4);
+  }
+
 }

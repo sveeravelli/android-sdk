@@ -15,7 +15,6 @@ import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
@@ -599,7 +598,6 @@ public class OoyalaPlayer extends Observable implements Observer {
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
     }
-    updatePlayerControlVisiblity(true);
   }
 
   private void removeClosedCaptionsView() {
@@ -1133,12 +1131,4 @@ public class OoyalaPlayer extends Observable implements Observer {
     _currentItemChangedCallback = callback;
   }
 
-  public void updatePlayerControlVisiblity(boolean visible) {
-    if (_closedCaptionsView != null) {
-      MarginLayoutParams params = (MarginLayoutParams) _closedCaptionsView.getLayoutParams();
-      int bottomMargin = isFullscreen() ? 120 : 60;
-      params.bottomMargin = visible ? bottomMargin : 0;
-      _closedCaptionsView.setLayoutParams(params);
-    }
-  }
 }

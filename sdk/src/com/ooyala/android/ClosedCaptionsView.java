@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -46,6 +47,9 @@ public class ClosedCaptionsView extends TextView {
     setTextColor(style.getColor());
     setBackgroundColor(style.getBackgroundColor());
     setTypeface(style.getFont());
+    MarginLayoutParams params = (MarginLayoutParams) this.getLayoutParams();
+    params.bottomMargin = style.getBottomMargin();
+    this.setLayoutParams(params);
   }
 
   public void initStyle() {

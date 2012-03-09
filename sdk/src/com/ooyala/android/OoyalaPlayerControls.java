@@ -28,4 +28,11 @@ public interface OoyalaPlayerControls {
    * @return true if the controls are currently showing, false otherwise
    */
   public boolean isShowing();
+
+  /**
+   * @return absolute pixel of the bottom bar's top distance to the bottom of the device. used by
+   *         ClosedCaption to determine offset to the bottom.
+   */
+  public int bottomBarOffset();
+
 }

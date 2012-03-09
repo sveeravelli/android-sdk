@@ -132,10 +132,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           if (getControls() != null) {
             if (getControls().isShowing()) {
               getControls().hide();
-              _player.updatePlayerControlVisiblity(false);
             } else {
               getControls().show();
-              _player.updatePlayerControlVisiblity(true);
             }
           }
           if (getOverlay() != null) {

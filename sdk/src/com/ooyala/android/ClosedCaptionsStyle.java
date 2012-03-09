@@ -6,11 +6,13 @@ public class ClosedCaptionsStyle {
   private int color;
   private int backgroundColor;
   private Typeface font;
+  private int bottomMargin;
 
   public ClosedCaptionsStyle(int color, int backgroundColor, Typeface font) {
     this.color = color;
     this.backgroundColor = backgroundColor;
     this.font = font;
+    this.bottomMargin = 0;
   }
 
   public int getColor() {
@@ -27,6 +29,14 @@ public class ClosedCaptionsStyle {
 
   public void setBackgroundColor(int backgroundColor) {
     this.backgroundColor = backgroundColor;
+  }
+
+  public int getBottomMargin() {
+    return bottomMargin;
+  }
+
+  public void setBottomMargin(int value) {
+    this.bottomMargin = value;
   }
 
   public Typeface getFont() {

@@ -3,9 +3,6 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.Constants;
-
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -18,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
     SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
@@ -233,6 +232,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
       }
       show();
     } else if (v == _fullscreen) {
+      _canUpdateClosedCaptionStyle = false;
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
       hide();
@@ -261,5 +261,12 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
         show();
       }
     }
+  }
+
+  @Override
+  public int bottomBarOffset() {
+    if (_baseLayout == null) return 0;
+    int pixelValue = OVERLAY_PREFERRED_BUTTON_HEIGHT_DP + OVERLAY_MARGIN_SIZE_DP * 4;
+    return Images.dpToPixels(_baseLayout.getContext(), pixelValue);
   }
 }
