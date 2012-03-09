@@ -212,12 +212,15 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       }
       Log.d("Rui inline", currentState.toString());
       if (currentState == State.READY) _isPlayerReady = true;
-      if (currentState == State.SUSPENDED) _isPlayerReady = false;
+      if (currentState == State.SUSPENDED) {
+        _isPlayerReady = false;
+        hide();
+      }
       if (currentState == State.PLAYING) {
         updateButtonStates();
       }
       if (!isShowing() && currentState != State.INIT && currentState != State.LOADING
-          && currentState != State.ERROR && !_player.isFullscreen()) {
+          && currentState != State.ERROR && currentState != State.SUSPENDED && !_player.isFullscreen()) {
         show();
       }
     }
