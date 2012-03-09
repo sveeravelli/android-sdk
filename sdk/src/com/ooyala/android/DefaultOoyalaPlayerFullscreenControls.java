@@ -6,7 +6,6 @@ import java.util.Observer;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -255,7 +254,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
       } else {
         _spinner.setVisibility(View.INVISIBLE);
       }
-      Log.d("Rui full", currentState.toString());
+
       if (currentState == State.READY) _isPlayerReady = true;
       if (currentState == State.SUSPENDED) {
         _isPlayerReady = false;
