@@ -26,7 +26,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   protected static final int BACKGROUND_COLOR = Color.TRANSPARENT;
   protected static final int SOFT_WHITE_COLOR = Color.argb(245, 240, 240, 240);
 
-  protected boolean _canUpdateClosedCaptionStyle = false;
+  protected boolean _isPlayerReady = false;
 
   protected class HideTimerTask extends TimerTask {
     @Override
@@ -123,7 +123,6 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
     public void setFullscreen(boolean fullscreen) {
       _fullscreen = fullscreen;
-      _canUpdateClosedCaptionStyle = false;
       invalidate();
     }
 
@@ -161,19 +160,18 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     updateButtonStates();
     _hideTimer = new Timer();
     _hideTimer.schedule(new HideTimerTask(), HIDE_AFTER_MILLIS);
-    if (_player != null) {
+    if (_player != null && _isPlayerReady) {
       ClosedCaptionsStyle ccStyle = _player.getClosedCaptionsStyle();
       if (ccStyle != null) {
         ccStyle.setBottomMargin(this.bottomBarOffset());
         _player.setClosedCaptionsStyle(ccStyle);
       }
     }
-    _canUpdateClosedCaptionStyle = true;
   }
 
   @Override
   public void hide() {
-    if (_player != null && _canUpdateClosedCaptionStyle) {
+    if (_player != null && _isPlayerReady) {
       ClosedCaptionsStyle ccStyle = _player.getClosedCaptionsStyle();
       if (ccStyle != null) {
         ccStyle.setBottomMargin(0);
