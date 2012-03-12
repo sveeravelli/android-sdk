@@ -1101,6 +1101,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void displayCurrentClosedCaption() {
+    if (_closedCaptionsView == null) return;
     if (_language != null && _currentItem.hasClosedCaptions()) {
       double currT = ((double) currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
@@ -1113,9 +1114,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         }
       }
     } else {
-      if (_closedCaptionsView != null) {
-        _closedCaptionsView.setCaption(null);
-      }
+      _closedCaptionsView.setCaption(null);
     }
   }
 
