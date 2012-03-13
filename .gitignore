@@ -8,6 +8,8 @@ test_results.txt
 */gen
 */tests/gen
 */local.properties
+sample-apps/*/local.properties
+sample-apps/keys
 sdk/Documentation
 sdk/*/bin
 sdk/*/gen

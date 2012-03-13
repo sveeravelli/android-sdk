@@ -95,8 +95,8 @@ function gen {
   cp bin/classes.jar ${BASEDIR}/${ZIP_BASE}/${JAR_NAME}
 
   #update sample apps
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/GettingStartedSampleApp/lib/
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/ChannelBrowserSampleApp/lib/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/GettingStartedSampleApp/libs/
+  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/ChannelBrowserSampleApp/libs/
 
   #copy sample apps
   cd ${BASEDIR}
