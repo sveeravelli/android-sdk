@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import android.R;
 import android.app.Dialog;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -91,7 +92,18 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
         overlayToShow = _inlineOverlay;
       }
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
-      _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen);
+      _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen) {
+        @Override
+        public void onBackPressed() {
+          if (_player.isFullscreen()) {
+            Log.d(this.getClass().getName(), "TEST - BACK - Exiting fullscreen on back");
+            _player.setFullscreen(false);
+          } else {
+            Log.d(this.getClass().getName(), "TEST - BACK - NOT Exiting fullscreen on back");
+            super.onBackPressed();
+          }
+        }
+      };
       _fullscreenLayout = new OoyalaPlayerLayout(_fullscreenDialog.getContext());
       _fullscreenLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.MATCH_PARENT, Gravity.FILL));
