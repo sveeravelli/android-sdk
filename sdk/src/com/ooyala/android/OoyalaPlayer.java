@@ -279,7 +279,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   /**
    * Reinitializes the player with the rootItem specified.
-   * @param theRootItem the ContentItem to reinitialize the player with
+   * @param rootItem the ContentItem to reinitialize the player with
    * @return true if the change was successful, false if not
    */
   public boolean setRootItem(ContentItem rootItem) {

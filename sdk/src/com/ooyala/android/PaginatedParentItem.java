@@ -26,7 +26,7 @@ public interface PaginatedParentItem {
    * Fetch the additional children if they exist. This will happen in the background and callback will be
    * called when the fetch is complete.
    * 
-   * @param listener the listener to execute when the children are fetched
+   * @param paginatedItemListener the PaginatedItemListener to execute when the children are fetched
    * @return true if more children exist, false if they don't or they are already in the process of being
    *         fetched
    */
