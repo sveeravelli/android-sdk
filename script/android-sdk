@@ -102,6 +102,17 @@ function gen {
   cd ${BASE_DIR}
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
 
+  mkdir ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/AbstractDefaultOoyalaPlayerControls.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/AbstractOoyalaPlayerLayoutController.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerFullscreenControls.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerInlineControls.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/Images.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/LayoutController.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerControls.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerLayoutController.java ${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/OptimizedOoyalaPlayerLayoutController.java ${ZIP_BASE}/DefaultControlsSource
+
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
   cp ReleaseNotes.txt ${ZIP_BASE}/
