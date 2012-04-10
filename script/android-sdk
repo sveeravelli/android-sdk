@@ -5,11 +5,11 @@ DATESTAMP=`date +%Y%m%d%H%M%S`
 
 VERSION_REGEX='-v[0-9]+.[0-9]+.[0-9]+'
 
-BEGINDIR=`pwd`
-SCRIPTDIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BASEDIR=${SCRIPTDIR}/../
-SDKDIR=${BASEDIR}/sdk
-SAMPLEDIR=${BASEDIR}/sample-apps
+BEGIN_DIR=`pwd`
+SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASE_DIR=${SCRIPT_DIR}/../
+SDK_DIR=${BASE_DIR}/sdk
+SAMPLE_DIR=${BASE_DIR}/sample-apps
 JAR_BASE="OoyalaSDK"
 JAR_NAME="${JAR_BASE}.jar"
 ZIP_BASE="${JAR_BASE}-Android"
@@ -25,7 +25,7 @@ ANDROID=${ANDROID_SDKS}/tools/android
 # Generate the docs
 function doc {
   currdir=`pwd`
-  cd ${SDKDIR}
+  cd ${SDK_DIR}
   echo
   echo "Removing Old Docs..."
   rm -rf Documentation/complete Documentation/public
@@ -40,7 +40,7 @@ function doc {
 }
 
 function git_check {
-  cd ${BASEDIR}
+  cd ${BASE_DIR}
   if [[ "`git status | grep "working directory clean"`" = "" ]]; then
     GIT_CHECK_RESULT=false
     echo
@@ -76,7 +76,7 @@ function gen {
 
   # Rev version number if requested
   if [[ ${set_version} = true ]]; then
-    sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDKDIR}/src/com/ooyala/android/Constants.java
+    sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDK_DIR}/src/com/ooyala/android/Constants.java
   fi
 
   # Run tests before doing anything to make sure we are passing.
@@ -84,23 +84,23 @@ function gen {
     tests
   fi
 
-  cd ${BASEDIR}
+  cd ${BASE_DIR}
   rm -rf ${ZIP_BASE}
   mkdir ${ZIP_BASE}
 
   #create jar
-  cd ${SDKDIR}
+  cd ${SDK_DIR}
   ant clean
   ant release
-  cp bin/classes.jar ${BASEDIR}/${ZIP_BASE}/${JAR_NAME}
+  cp bin/classes.jar ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME}
 
   #update sample apps
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/GettingStartedSampleApp/libs/
-  cp ${BASEDIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLEDIR}/ChannelBrowserSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
 
   #copy sample apps
-  cd ${BASEDIR}
-  cp -R ${SAMPLEDIR} ${ZIP_BASE}/SampleApps
+  cd ${BASE_DIR}
+  cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
@@ -113,10 +113,10 @@ function gen {
 
   #docs
   doc
-  cp -R sdk/Documentation/public ${BASEDIR}/${ZIP_BASE}/Documentation
+  cp -R sdk/Documentation/public ${BASE_DIR}/${ZIP_BASE}/Documentation
 
   #zip
-  cd ${BASEDIR}
+  cd ${BASE_DIR}
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
@@ -158,7 +158,7 @@ function pub {
     gen ${new_version} ${push}
   fi
 
-  cd ${BASEDIR}
+  cd ${BASE_DIR}
 
   if [[ ${nightly} = true ]]; then
     echo "Publishing the Nightly Release"
@@ -193,7 +193,7 @@ function tests {
   fi
   echo "Building Unit Tests..."
   currdir=`pwd`
-  cd ${SDKDIR}
+  cd ${SDK_DIR}
   ant clean
   cd test-app
   ant clean
@@ -209,8 +209,8 @@ function tests {
     sleep 5
   fi
   echo "Running Unit Tests..."
-  if [[ -f ${BASEDIR}/test_results.txt ]]; then
-    rm ${BASEDIR}/test_results.txt
+  if [[ -f ${BASE_DIR}/test_results.txt ]]; then
+    rm ${BASE_DIR}/test_results.txt
   fi
   echo "  Uninstalling apps..."
   echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
@@ -220,8 +220,8 @@ function tests {
   ${ADB} wait-for-device install ../test-app/bin/OoyalaAndroidTestAppActivity-debug-unaligned.apk
   echo "    UnitTests:"
   ${ADB} wait-for-device install bin/OoyalaAndroidTestAppActivityTest-debug-unaligned.apk
-  ${ADB} wait-for-device shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee ${BASEDIR}/test_results.txt
-  if [[ "`cat ${BASEDIR}/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
+  ${ADB} wait-for-device shell am instrument -w com.ooyala.android.testapp.test/android.test.InstrumentationTestRunner 2>&1 |tee ${BASE_DIR}/test_results.txt
+  if [[ "`cat ${BASE_DIR}/test_results.txt |egrep "OK \([0-9]+ tests\)"`" = "" ]]; then
     echo "Tests Failed!"
     echo "  Uninstalling apps..."
     echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
@@ -230,7 +230,7 @@ function tests {
     exit 1
   fi
   echo "Tests Passed!"
-  rm ${BASEDIR}/test_results.txt
+  rm ${BASE_DIR}/test_results.txt
   echo "  Uninstalling apps..."
   echo "    TestApp:   `${ADB} wait-for-device uninstall com.ooyala.android.testapp`"
   echo "    UnitTests: `${ADB} wait-for-device uninstall com.ooyala.android.testapp.test`"
@@ -258,9 +258,9 @@ function setup {
     fi
   fi
 
-  echo "sdk.dir=${ANDROID_SDKS}" > ${BASEDIR}/sdk/local.properties
-  cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/test-app/local.properties
-  cp ${BASEDIR}/sdk/local.properties ${BASEDIR}/sdk/tests/local.properties
+  echo "sdk.dir=${ANDROID_SDKS}" > ${BASE_DIR}/sdk/local.properties
+  cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/test-app/local.properties
+  cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/tests/local.properties
 
   if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."
@@ -319,4 +319,4 @@ case "$1" in
   *) usage;;
 esac
 
-cd ${BEGINDIR}
+cd ${BEGIN_DIR}
