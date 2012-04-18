@@ -45,7 +45,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
    */
   public void testStreamsInfo() {
     PlayerAPIClient api = new PlayerAPIClient(new OoyalaAPIHelper(TestConstants.TEST_API_KEY,
-        TestConstants.TEST_SECRET), TestConstants.TEST_PCODE, "www.ooyala.com");
+        TestConstants.TEST_SECRET), TestConstants.TEST_PCODE, "www.ooyala.com", null);
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
         ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), api);
     assertTrue(adSpot.fetchPlaybackInfo());

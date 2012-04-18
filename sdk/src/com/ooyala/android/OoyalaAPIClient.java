@@ -20,7 +20,20 @@ public class OoyalaAPIClient {
    */
   public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(apiKey, secret);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
+  }
+
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiKey the API Key to use for secured APIs
+   * @param secret the Secret to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   * @param generator the Embed Token Generator to use
+   */
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain, EmbedTokenGenerator generator) {
+    _apiHelper = new OoyalaAPIHelper(apiKey, secret);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
 
   /**
@@ -32,7 +45,20 @@ public class OoyalaAPIClient {
    */
   public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
+  }
+
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiKey the API Key to use for secured APIs
+   * @param signatureGenerator the SignatureGenerator to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   * @param generator the Embed Token Generator to use
+   */
+  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain, EmbedTokenGenerator generator) {
+    _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
 
   /**
@@ -43,7 +69,19 @@ public class OoyalaAPIClient {
    */
   public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
     _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
+  }
+
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param secureURLGenerator the SecureURLGenerator to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   * @param generator the Embed Token Generator to use
+   */
+  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain, EmbedTokenGenerator generator) {
+    _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
+    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
 
   /**

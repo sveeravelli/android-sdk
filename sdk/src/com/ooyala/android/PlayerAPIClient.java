@@ -19,13 +19,15 @@ class PlayerAPIClient {
   protected OoyalaAPIHelper _apiHelper = null;
   protected int _width = -1;
   protected int _height = -1;
+  protected EmbedTokenGenerator _embedTokenGenerator;
 
   public PlayerAPIClient() {}
 
-  public PlayerAPIClient(OoyalaAPIHelper apiHelper, String pcode, String domain) {
+  public PlayerAPIClient(OoyalaAPIHelper apiHelper, String pcode, String domain, EmbedTokenGenerator embedTokenGenerator) {
     _apiHelper = apiHelper;
     _pcode = pcode;
     _domain = domain;
+    _embedTokenGenerator = embedTokenGenerator;
   }
 
   private JSONObject verifyAuthorizeJSON(String json, List<String> embedCodes) throws OoyalaException {
@@ -139,10 +141,13 @@ class PlayerAPIClient {
     return contentTreeData;
   }
 
-  private Map<String, String> authorizeParams() {
+  private Map<String, String> authorizeParams(List<String> embedCodes) {
     Map<String, String> params = new HashMap<String, String>();
     params.put(Constants.KEY_DEVICE, Utils.device());
     params.put(Constants.KEY_DOMAIN, _domain);
+    if (_embedTokenGenerator != null) {
+      params.put("embedToken", _embedTokenGenerator.getTokenForEmbedCodes(embedCodes));
+    }
     return params;
   }
 
@@ -165,7 +170,7 @@ class PlayerAPIClient {
       throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams());
+    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
