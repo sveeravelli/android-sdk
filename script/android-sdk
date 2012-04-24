@@ -119,7 +119,7 @@ function gen {
   cp ReleaseNotes.txt ${ZIP_BASE}/
 
   #version file
-  version=`cat src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
+  version=`cat ${SDK_DIR}/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
   echo "v${version}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
