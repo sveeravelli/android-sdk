@@ -56,6 +56,8 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
+      if(_player == null) return;
+
       if (_lastPlayhead != _player.getCurrentPosition() && _player.isPlaying()) {
         _playheadUpdateTimerHandler.sendEmptyMessage(0);
       }
