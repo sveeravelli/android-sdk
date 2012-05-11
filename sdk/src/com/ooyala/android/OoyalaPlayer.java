@@ -94,8 +94,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param domain Your Embed Domain
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayer(String apiKey, String secret, String pcode, String domain,
-      EmbedTokenGenerator generator) {
+  public OoyalaPlayer(String apiKey, String secret, String pcode, String domain, EmbedTokenGenerator generator) {
     this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, generator);
   }
 
@@ -256,8 +255,8 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param domain Your Embed Domain
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayer(LayoutController lc, SecureURLGenerator secureURLGenerator, String pcode, String domain,
-      EmbedTokenGenerator generator) {
+  public OoyalaPlayer(LayoutController lc, SecureURLGenerator secureURLGenerator, String pcode,
+      String domain, EmbedTokenGenerator generator) {
     this(secureURLGenerator, pcode, domain, generator);
     setLayoutController(lc);
   }
@@ -871,7 +870,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
         switch (((Player) arg0).getState()) {
           case COMPLETED:
-            if (!playAdsBeforeTime(Integer.MAX_VALUE)) {
+            if (!playAdsBeforeTime(Integer.MAX_VALUE - 1)) {
               onComplete();
             }
             break;
