@@ -9,5 +9,6 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 1280
+  "width": 1280,
+  "profile": "baseline"
 }

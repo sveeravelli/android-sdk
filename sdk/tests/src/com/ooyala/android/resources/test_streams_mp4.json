@@ -9,7 +9,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 1280
+  "width": 1280,
+  "profile": "baseline"
 }, {
   "video_bitrate": 900,
   "height": 720,
@@ -21,7 +22,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 1280
+  "width": 1280,
+  "profile": "baseline"
 }, {
   "video_bitrate": 1200,
   "height": 360,
@@ -33,7 +35,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 640
+  "width": 640,
+  "profile": "baseline"
 }, {
   "video_bitrate": 600,
   "height": 360,
@@ -45,7 +48,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 640
+  "width": 640,
+  "profile": "baseline"
 }, {
   "video_bitrate": 2000,
   "height": 720,
@@ -57,7 +61,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 1280
+  "width": 1280,
+  "profile": "baseline"
 }, {
   "video_bitrate": 900,
   "height": 360,
@@ -69,7 +74,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 640
+  "width": 640,
+  "profile": "baseline"
 }, {
   "video_bitrate": 2000,
   "height": 360,
@@ -81,7 +87,8 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 640
+  "width": 640,
+  "profile": "baseline"
 }, {
   "video_bitrate": 600,
   "height": 720,
@@ -93,5 +100,6 @@
   },
   "video_codec": "h264",
   "audio_bitrate": 128,
-  "width": 1280
+  "width": 1280,
+  "profile": "baseline"
 }]

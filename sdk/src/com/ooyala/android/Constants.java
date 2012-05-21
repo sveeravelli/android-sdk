@@ -83,6 +83,7 @@ class Constants {
   public static final String KEY_PARENT = "parent";
   public static final String KEY_API = "api";
   public static final String KEY_CALLBACK = "callback";
+  public static final String KEY_PROFILE = "profile";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
@@ -112,6 +113,8 @@ class Constants {
   public static final String DELIVERY_TYPE_HLS = "hls";
   public static final String DELIVERY_TYPE_MP4 = "mp4";
   public static final String DELIVERY_TYPE_REMOTE_ASSET = "remote_asset";
+
+  public static final String PROFILE_BASELINE = "baseline";
 
   public static final int DEFAULT_AD_TIME_SECONDS = 0;
 

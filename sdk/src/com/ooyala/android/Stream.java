@@ -23,6 +23,7 @@ public class Stream {
   protected String _url = null;
   protected String _aspectRatio = null;
   protected boolean _isLiveStream = false;
+  protected String _profile = null;
 
   private static class DefaultStreamSelector implements StreamSelector {
     public DefaultStreamSelector() {}
@@ -37,6 +38,7 @@ public class Stream {
         if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
             || stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) { return stream; }
         if (Stream.isDeliveryTypePlayable(stream)
+            && Stream.isProfilePlayable(stream)
             && (lowestBitrateStream == null
                 || stream.getCombinedBitrate() < lowestBitrateStream.getCombinedBitrate() || (stream
                 .getCombinedBitrate() == lowestBitrateStream.getCombinedBitrate() && stream.getHeight() < lowestBitrateStream
@@ -117,6 +119,7 @@ public class Stream {
           .getString(Constants.KEY_ASPECT_RATIO);
       _isLiveStream = data.isNull(Constants.KEY_IS_LIVE_STREAM) ? _isLiveStream : data
           .getBoolean(Constants.KEY_IS_LIVE_STREAM);
+      _profile = data.isNull(Constants.KEY_PROFILE) ? _profile : data.getString(Constants.KEY_PROFILE);
     } catch (JSONException jsonException) {
       System.out.println("ERROR: Fail to update stream with dictionary because of invalid JSON: "
           + jsonException);
@@ -213,6 +216,14 @@ public class Stream {
     this._isLiveStream = isLiveStream;
   }
 
+  public String getProfile() {
+    return _profile;
+  }
+
+  public void setProfile(String profile) {
+    this._profile = profile;
+  }
+
   public int getCombinedBitrate() {
     return (_videoBitrate + _audioBitrate);
   }
@@ -236,6 +247,11 @@ public class Stream {
      */
     return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
         || (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS && type.equals(Constants.DELIVERY_TYPE_HLS));
+  }
+
+  public static boolean isProfilePlayable(Stream stream) {
+    if (!Constants.DELIVERY_TYPE_MP4.equals(stream.getDeliveryType())) { return true; }
+    return stream.getProfile() == null || Constants.PROFILE_BASELINE.equals(stream.getProfile());
   }
 
   public static Stream bestStream(Set<Stream> streams) {
