@@ -3,7 +3,8 @@
 DATE=`date`
 DATESTAMP=`date +%Y%m%d%H%M%S`
 
-VERSION_REGEX='-v[0-9]+.[0-9]+.[0-9]+'
+VERSION_REGEX='^-v[0-9]+.[0-9]+.[0-9]+$'
+RC_REGEX='^-rc[0-9]+$'
 
 BEGIN_DIR=`pwd`
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -14,6 +15,14 @@ JAR_BASE="OoyalaSDK"
 JAR_NAME="${JAR_BASE}.jar"
 ZIP_BASE="${JAR_BASE}-Android"
 ZIP_NAME="${ZIP_BASE}.zip"
+USER_DIR=`cd ~; pwd`
+if [[ "${BOX_DIR}" = "" ]]; then
+  BOX_DIR="${USER_DIR}/Documents/Box Documents/"
+  echo "BOX_DIR not set, using ${BOX_DIR}"
+fi
+CANDIDATE_DIR="${BOX_DIR}X-Device/SDKs/Android/Candidate/"
+RELEASE_DIR="${BOX_DIR}X-Device/SDKs/Android/Release/"
+VERSIONS_SUFFIX=Versions/
 
 GIT_CHECK_RESULT=true
 
@@ -54,6 +63,8 @@ function git_check {
       exit 1
     fi
     echo
+  else
+    git pull
   fi
 }
 
@@ -66,13 +77,29 @@ function gen {
   set_version=false
   push=false
   new_version=''
+  new_rc=''
   for i in $*; do
     case "$i" in
       -notests|-notest|-nt) tests=false;;
       -push|-p) push=true;;
-      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then set_version=true; new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; usage; fi;;
+      *)
+        if [[ "$i" =~ ${VERSION_REGEX} ]]; then
+          set_version=true
+          new_version="`echo $i | sed s/-v//g`"
+        elif [[ "$i" =~ ${RC_REGEX} ]]; then
+          new_rc="`echo $i | sed s/-rc//g`"
+        else
+          echo "ERROR: invalid option: $i"
+          usage
+        fi
+        ;;
     esac
   done
+
+  if [[ ( ${set_version} = true ) && ( ${new_rc} = "" ) ]]; then
+    echo "ERROR: cannot set version if rc doesn't exist"
+    usage
+  fi
 
   # Rev version number if requested
   if [[ ${set_version} = true ]]; then
@@ -121,6 +148,9 @@ function gen {
   #version file
   version=`cat ${SDK_DIR}/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
   echo "v${version}" >> ${ZIP_BASE}/VERSION
+  if [[ ! ( "${new_rc}" = "" ) ]]; then
+    echo "RC${new_rc}" >> ${ZIP_BASE}/VERSION
+  fi
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #docs
@@ -139,9 +169,9 @@ function gen {
     if [[ ${GIT_CHECK_RESULT} = false && ${push} = true ]]; then
       echo "  Not pushing because your working directory is dirty. Yuck."
     elif [[ ${push} = true ]]; then
-      echo "  Pushing Gen Release v${new_version} commit."
-      git commit -a -m "Gen Release v${new_version}"
-      git tag -a v${new_version} -m "Version ${new_version} (Created On ${DATE})"
+      echo "  Pushing Gen Release v${new_version}_RC${new_rc} commit."
+      git commit -a -m "Gen Release v${new_version}_RC${new_rc}"
+      git tag -a v${new_version}_RC${new_rc} -m "Version ${new_version}_RC${new_rc} (Created On ${DATE})"
       git push
       git push --tags
     fi
@@ -153,43 +183,79 @@ function gen {
 }
 
 function pub {
-  gen=false
-  nightly=false
+  rc=false
   push=''
   new_version=''
+  new_rc=''
   for i in $*; do
     case "$i" in
-      -gen|-g) gen=true;;
       -push|-p) push=$i;;
-      -nightly|-n) nightly=true;;
-      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version=$i; else echo "ERROR: invalid option: $i"; usage; fi;;
+      -candidate|-rc|-c) rc=true;;
+      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; usage; fi;;
     esac
   done
 
-  if [[ ${gen} = true ]]; then
-    gen ${new_version} ${push}
+  cd ${BASE_DIR}
+  version="${new_version}"
+  if [[ "${version}" = "" ]]; then
+    version=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
   fi
 
-  cd ${BASE_DIR}
+  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ ${version} ) ]]; then
+    echo "ERROR: Please update ReleaseNotes.txt before pushing a version"
+    usage
+  fi
 
-  if [[ ${nightly} = true ]]; then
-    echo "Publishing the Nightly Release"
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip"
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Nightly/${ZIP_BASE}-Nightly.zip
+  if [[ ${rc} = true ]]; then
+    # Figure out which release candidate this is.
+    cd "${CANDIDATE_DIR}"
+    last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1 | sed 's/^OoyalaSDK-Android-[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)\.zip$/\1/'`
+    if [[ ! ( ${last_rc} =~ ^[0-9]*$ ) ]]; then
+      echo "Error: Could not figure out last release candidate"
+      usage
+    fi
+    new_rc=$((last_rc+1))
+    gen -v${version} -rc${new_rc} ${push}
+    version_with_rc=${version}_RC${new_rc}
+    cd ${BASE_DIR}
+    if [[ "`ls \"${CANDIDATE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
+      echo "  Removing Existing Release Candidate"
+      rm "${CANDIDATE_DIR}"${ZIP_BASE}-*
+    fi
+    echo "Publishing the Release Candidate..."
+    echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_BASE}-${version_with_rc}.zip"
+    cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_BASE}-${version_with_rc}.zip
+    echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip"
+    cp ${ZIP_NAME} "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip
+    echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_NAME}"
+    cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_NAME}
   else
-    echo "Publishing the Release"
-    if [[ "`ls ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/ |grep ${ZIP_BASE}`" != "" ]]; then
+    echo "Publishing the Release..."
+    if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
       echo "  Removing Existing Release"
-      rm ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}*
+      rm "${RELEASE_DIR}"${ZIP_BASE}-*
     fi
 
-    version=`cat sdk/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${DATESTAMP}.zip"
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${DATESTAMP}.zip"
-    echo "  Copying ${ZIP_NAME} to ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}"
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_BASE}-${version}-${DATESTAMP}.zip
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/Versions/${ZIP_BASE}-${version}-${DATESTAMP}.zip
-    cp ${ZIP_NAME} ~/Documents/Box\ Documents/X-Device/SDKs/Android/Release/${ZIP_NAME}
+    cd "${CANDIDATE_DIR}"
+    last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1`
+    if [[ ! ( ${last_rc} =~ ^OoyalaSDK-Android-[0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\.zip$ ) ]]; then
+      echo "Error: Could not figure out last release candidate to release"
+      usage
+    fi
+
+    #add release tag
+    if [[ ${push} = true ]]; then
+      curr_tag=`echo "${last_rc}" | sed 's/^OoyalaSDK-Android-\([0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\)\.zip$/v\1/'`
+      git tag ${version} ${curr_tag}
+      git push --tags
+    fi
+
+    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${last_rc}"
+    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${last_rc}
+    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${VERSIONS_SUFFIX}${last_rc}"
+    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${VERSIONS_SUFFIX}${last_rc}
+    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${ZIP_NAME}"
+    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
   fi
 }
 
@@ -297,11 +363,11 @@ function usage {
   echo "      options:"
   echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
+  echo "        -rc<CANDIDATE>        : set the release candidate number to <CANDIDATE>"
   echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
-  echo "        -[gen|g]              : generate the release prior to publishing"
-  echo "        -[nightly|n]          : publish the nightly version of the release"
+  echo "        -[candidate|rc|c]     : publish the release candidate version of the release"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
   echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    run_tests|tests|test|t    : run the unit tests"
@@ -309,7 +375,7 @@ function usage {
   echo "      options:"
   echo "        -[noavd|na]           : do not create a new avd"
   echo
-  echo "For example, to generate, tag, and publish the release version 1.2.0: $0 pub -gen -v1.2.0 -push"
+  echo "For example, to generate, tag, and publish the release candidate for the latest version: $0 pub -rc -push"
   exit 1
 }
 
