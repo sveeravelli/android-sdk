@@ -56,7 +56,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if(_player == null) return;
+      if (_player == null) return;
 
       if (_lastPlayhead != _player.getCurrentPosition() && _player.isPlaying()) {
         _playheadUpdateTimerHandler.sendEmptyMessage(0);
@@ -82,6 +82,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   public void init(OoyalaPlayer parent, Object stream) {
     Log.d(this.getClass().getName(), "TEST - init");
     if (stream == null) {
+      Log.e(this.getClass().getName(), "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;

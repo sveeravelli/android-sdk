@@ -462,7 +462,10 @@ public class OoyalaPlayer extends Observable implements Observer {
           setState(State.ERROR);
           return;
         }
-        changeCurrentItemAfterFetch();
+        if (!changeCurrentItemAfterFetch()) {
+          _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+          setState(State.ERROR);
+        }
       }
     }));
     return true;
@@ -474,7 +477,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   private boolean changeCurrentItemAfterFetch() {
     _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
-    if (_player == null) { return false; }
+    if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
 
     addClosedCaptionsView();
