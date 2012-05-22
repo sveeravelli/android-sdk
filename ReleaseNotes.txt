@@ -1,4 +1,12 @@
-Current Version: PRE-RELEASE 0.4.0
+Current Version: 1.1.0
+
+------------ 1.1.0 ------------
+
+Limit default playable mp4 streams to baseline profile
+
+------------ 1.0.0 ------------
+
+Bug fixes
 
 ------------ 0.4.0 ------------
 
