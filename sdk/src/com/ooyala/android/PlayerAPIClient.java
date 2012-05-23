@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -142,11 +143,23 @@ class PlayerAPIClient {
   }
 
   private Map<String, String> authorizeParams(List<String> embedCodes) {
-    Map<String, String> params = new HashMap<String, String>();
+    final Map<String, String> params = new HashMap<String, String>();
     params.put(Constants.KEY_DEVICE, Utils.device());
     params.put(Constants.KEY_DOMAIN, _domain);
     if (_embedTokenGenerator != null) {
-      params.put("embedToken", _embedTokenGenerator.getTokenForEmbedCodes(embedCodes));
+      final Semaphore sem = new Semaphore(0);
+      _embedTokenGenerator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
+        @Override
+        public void setEmbedToken(String token) {
+          params.put("embedToken", token);
+          sem.release();
+        }
+      });
+      try {
+        sem.acquire();
+      } catch (InterruptedException e) {
+        return params;
+      }
     }
     return params;
   }
