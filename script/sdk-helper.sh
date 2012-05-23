@@ -163,6 +163,9 @@ function gen {
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
   cp ReleaseNotes.txt ${ZIP_BASE}/
+  if [[ -f "WhyYourCodeDoesntCompile.txt" ]]; then
+    cp WhyYourCodeDoesntCompile.txt ${ZIP_BASE}/
+  fi
 
   #version file
   version=$(get_version)
