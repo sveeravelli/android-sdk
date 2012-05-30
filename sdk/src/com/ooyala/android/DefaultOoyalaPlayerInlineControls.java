@@ -46,9 +46,9 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _fullscreen.setFullscreen(_player.isFullscreen());
     }
 
-    if (_seekWrapper != null)
+    if (_seekWrapper != null && _player.getCurrentItem() != null)
       _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
-    if (_liveWrapper != null) {
+    if (_liveWrapper != null && _player.getCurrentItem() != null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
