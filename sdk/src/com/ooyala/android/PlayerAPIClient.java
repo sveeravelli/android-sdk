@@ -244,7 +244,6 @@ class PlayerAPIClient {
     String uri = String.format(Constants.CONTENT_TREE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
-    if (obj == null) { return null; }
     JSONObject contentTree = null;
     try {
       contentTree = verifyContentTreeObject(obj, embedCodes);
