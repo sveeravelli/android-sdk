@@ -70,6 +70,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
+  private int _queuedSeekTime;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
   private Map<String, Object> _openTasks = new HashMap<String, Object>();
@@ -313,6 +314,8 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (embedCodes == null || embedCodes.isEmpty()) { return false; }
     cancelOpenTasks();
     setState(State.LOADING);
+    _playQueued = false;
+    _queuedSeekTime = 0;
     cleanupPlayers();
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
@@ -603,6 +606,10 @@ public class OoyalaPlayer extends Observable implements Observer {
   public void play() {
     Log.d(this.getClass().getName(), "TEST - play");
     if (currentPlayer() != null) {
+      if (_queuedSeekTime > 0) {
+        seek(_queuedSeekTime);
+        _queuedSeekTime = 0;
+      }
       currentPlayer().play();
     } else {
       queuePlay();
@@ -688,6 +695,10 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param timeInMillis in milliseconds
    */
   public void seek(int timeInMillis) {
+    if (currentPlayer() == null) {
+      _queuedSeekTime = timeInMillis;
+      return;
+    }
     if (currentPlayer().seekable()) {
       currentPlayer().seekToTime(timeInMillis);
     }
