@@ -878,62 +878,53 @@ public class OoyalaPlayer extends Observable implements Observer {
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    Log.d(this.getClass().getName(), "TEST - Notificationn: " + arg1.toString() + " " + _state);
-    if (arg0 == this._player) {
-      Log.d(this.getClass().getName(), "TEST - Note from player");
-      if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
-        switch (((Player) arg0).getState()) {
-          case COMPLETED:
+    Player player = (Player)arg0;
+    String notification = arg1.toString();
+
+    if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
+      sendNotification(TIME_CHANGED_NOTIFICATION);
+
+      if (player == _player) {
+        // send analytics ping
+        _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+
+        // play ads
+        _lastPlayedTime = _player.currentTime();
+        playAdsBeforeTime(this._lastPlayedTime);
+
+        // closed captions
+        displayCurrentClosedCaption();
+      }
+    } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
+      switch(player.getState()) {
+        case COMPLETED:
+          if (player == _player) {
             if (!playAdsBeforeTime(Integer.MAX_VALUE - 1)) {
               onComplete();
             }
-            break;
-          case ERROR:
+          } else {
+            cleanupPlayer(_adPlayer);
+            _adPlayer = null;
+            sendNotification(AD_COMPLETED_NOTIFICATION);
+            if (!playAdsBeforeTime(this._lastPlayedTime)) {
+              if (_player.getState() == State.COMPLETED) {
+                onComplete();
+              } else {
+               _player.resume();
+               addClosedCaptionsView();
+              }
+            }
+          }
+          break;
+        case ERROR:
+          if (player == _player) {
             cleanupPlayers();
-            _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+            _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
+              player.getError());
             setState(State.ERROR);
             sendNotification(ERROR_NOTIFICATION);
-            break;
-          case PLAYING:
-            if (_lastPlayedTime == 0) {
-              _analytics.reportPlayStarted();
-              playAdsBeforeTime(250);
-              sendNotification(PLAY_STARTED_NOTIFICATION);
-            }
-            setState(State.PLAYING);
-            break;
-          case PAUSED:
-            if (_state != State.PAUSED) {
-              setState(State.PAUSED);
-            }
-            break;
-          case SUSPENDED:
-            if (_state != State.SUSPENDED) {
-              setState(State.SUSPENDED);
-            }
-            break;
-          default:
-            setState(((Player) arg0).getState());
-            break;
-        }
-      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _player.getState() == State.PLAYING) {
-        // send analytics ping
-        _analytics.reportPlayheadUpdate((this._player.currentTime()) / 1000);
-        sendNotification(TIME_CHANGED_NOTIFICATION);
-        this._lastPlayedTime = this._player.currentTime();
-        playAdsBeforeTime(this._lastPlayedTime);
-        // closed captions
-        displayCurrentClosedCaption();
-      } else if (arg1.equals(BUFFER_CHANGED_NOTIFICATION)) {
-        sendNotification(BUFFER_CHANGED_NOTIFICATION);
-      }
-    } else if (arg0 == this._adPlayer) {
-      if (arg1.equals(STATE_CHANGED_NOTIFICATION)) {
-        Log.d(this.getClass().getName(), "TEST - Note from adPlayer");
-        switch (((Player) arg0).getState()) {
-          case ERROR:
+          } else {
             sendNotification(AD_ERROR_NOTIFICATION);
-          case COMPLETED:
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
@@ -945,27 +936,24 @@ public class OoyalaPlayer extends Observable implements Observer {
                 addClosedCaptionsView();
               }
             }
+          }
+          break;
+        case PLAYING:
+          if (_lastPlayedTime == 0) {
+            _analytics.reportPlayStarted();
+            playAdsBeforeTime(250);
+            sendNotification(PLAY_STARTED_NOTIFICATION);
+          }
+          setState(State.PLAYING);
+          break;
+        case READY:
+          if (player == _adPlayer)
             break;
-          case PLAYING:
-            if (_state != State.PLAYING) {
-              setState(State.PLAYING);
-            }
-            break;
-          case PAUSED:
-            if (_state != State.PAUSED) {
-              setState(State.PAUSED);
-            }
-            break;
-          case SUSPENDED:
-            if (_state != State.SUSPENDED) {
-              setState(State.SUSPENDED);
-            }
-            break;
-          default:
-            break;
-        }
-      } else if (arg1.equals(TIME_CHANGED_NOTIFICATION) && _adPlayer.getState() == State.PLAYING) {
-        sendNotification(TIME_CHANGED_NOTIFICATION);
+        case INIT:
+        case LOADING:
+        case PAUSED:
+        default:
+          setState(player.getState());
       }
     }
     Log.d(this.getClass().getName(), "TEST - Notificationn END: " + arg1.toString() + " " + _state);
