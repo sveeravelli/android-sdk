@@ -322,7 +322,6 @@ public class OoyalaPlayer extends Observable implements Observer {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
         taskCompleted(taskKey);
-        Log.d(this.getClass().getName(), "TEST - CALLBACK");
         if (error != null) {
           _error = error;
           Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", error);
@@ -365,7 +364,6 @@ public class OoyalaPlayer extends Observable implements Observer {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
         taskCompleted(taskKey);
-        Log.d(this.getClass().getName(), "TEST - CALLBACK");
         if (error != null) {
           _error = error;
           Log.d(this.getClass().getName(), "Exception in setExternalIds!", error);
@@ -604,7 +602,6 @@ public class OoyalaPlayer extends Observable implements Observer {
    * Play the current video
    */
   public void play() {
-    Log.d(this.getClass().getName(), "TEST - play");
     if (currentPlayer() != null) {
       if (_queuedSeekTime > 0) {
         seek(_queuedSeekTime);
@@ -721,7 +718,6 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean playAdsBeforeTime(int time) {
-    Log.d(this.getClass().getName(), "TEST - playAdsBeforeTime: " + time);
     this._lastPlayedTime = time;
     for (AdSpot ad : _currentItem.getAds()) {
       if (ad.getTime() <= time && !this._playedAds.contains(ad)) {
@@ -733,8 +729,6 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean playAd(AdSpot ad) {
-    Log.d(this.getClass().getName(), "TEST - playAd: " + ad.getTime());
-
     Class<? extends Player> adPlayerClass = null;
     if (ad instanceof OoyalaAdSpot) {
       adPlayerClass = OoyalaAdPlayer.class;
@@ -743,14 +737,12 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
 
     if (adPlayerClass == null) {
-      Log.d(this.getClass().getName(), "TEST - playAd fail class null");
       return false;
     }
 
     _adPlayer = initializePlayer(adPlayerClass, ad);
 
     if (_adPlayer == null || _adPlayer.getState() == State.ERROR) {
-      Log.d(this.getClass().getName(), "TEST - playAd fail player null");
       return false;
     }
     _adPlayer.setSeekable(_adsSeekable);
@@ -847,7 +839,6 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void onComplete() {
-    Log.d(this.getClass().getName(), "TEST - COMPLETED - onComplete");
     switch (_actionAtEnd) {
       case CONTINUE:
         if (nextVideo(DO_PLAY)) {} else {
@@ -991,7 +982,6 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void sendNotification(String obj) {
     setChanged();
     notifyObservers(obj);
-    Log.d(this.getClass().getName(), "TEST - SENT NOTIFICATION " + obj);
   }
 
   /**
@@ -1152,14 +1142,11 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void queuePlay() {
-    Log.d(this.getClass().getName(), "TEST - queuePlayy");
     _playQueued = true;
   }
 
   private void dequeuePlay() {
-    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
     if (_playQueued && currentPlayer() != null) {
-      Log.d(this.getClass().getName(), "TEST - dequeuePlay queued");
       _playQueued = false;
       play();
     }
