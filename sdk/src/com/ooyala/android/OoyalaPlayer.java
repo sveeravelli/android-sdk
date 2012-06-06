@@ -749,7 +749,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
     _adPlayer = initializePlayer(adPlayerClass, ad);
 
-    if (_adPlayer == null) {
+    if (_adPlayer == null || _adPlayer.getState() == State.ERROR) {
       Log.d(this.getClass().getName(), "TEST - playAd fail player null");
       return false;
     }
