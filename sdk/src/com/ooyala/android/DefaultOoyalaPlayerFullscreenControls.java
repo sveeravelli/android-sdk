@@ -156,6 +156,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     _liveIndicator = new TextView(_liveWrapper.getContext());
     _liveIndicator.setText(LocalizationSupport.localizedStringFor("LIVE"));
     _liveIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
+    @SuppressWarnings("deprecation")
     LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(
         ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     liveIndicatorLP.gravity = Gravity.CENTER;

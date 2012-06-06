@@ -309,6 +309,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
     setupView();
   }
 
+  @SuppressWarnings("deprecation")
   private void setupView() {
     Log.d(this.getClass().getName(), "TEST - setupView");
     createView(_parent.getLayout().getContext());
