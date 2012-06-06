@@ -956,7 +956,6 @@ public class OoyalaPlayer extends Observable implements Observer {
           setState(player.getState());
       }
     }
-    Log.d(this.getClass().getName(), "TEST - Notificationn END: " + arg1.toString() + " " + _state);
   }
 
   /**
