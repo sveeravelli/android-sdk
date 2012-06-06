@@ -66,7 +66,7 @@ class VASTAdPlayer extends MoviePlayer {
         @Override
         public void callback(boolean result) {
           if (!result) {
-            _error = "Could not authorize Ooyala Ad";
+            _error = "Could not fetch VAST Ad";
             setState(State.ERROR);
             return;
           }
