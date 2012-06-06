@@ -169,9 +169,9 @@ if [[ "`${ANDROID_SDKS}/tools/android list targets |grep android-8 |awk '{print 
 fi
 
 case "$1" in
-  gen_release|gen|g) gen $2 $3;;
+  gen_release|gen|g) shift; gen $*;;
   gen_docs|docs|doc|d) doc;;
-  pub_release|publish|pub|p) pub $2 $3 $4;;
+  pub_release|publish|pub|p) shift; pub $*;;
   run_tests|tests|test|t) tests;;
   setup|s) setup $2;;
   *) usage;;
