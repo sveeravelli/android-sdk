@@ -872,6 +872,10 @@ public class OoyalaPlayer extends Observable implements Observer {
     Player player = (Player)arg0;
     String notification = arg1.toString();
 
+    if (currentPlayer() != null && currentPlayer() != player) {
+      return;
+    }
+
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
 
