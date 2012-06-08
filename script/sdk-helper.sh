@@ -104,6 +104,34 @@ function tests {
   cd "${tests_currdir}"
 }
 
+function verify {
+  verify_currdir=`pwd`
+  cd ${BASE_DIR}
+  if [[ ! ( -d "${ZIP_BASE}/Documentation" ) ]]; then
+    echo "ERROR: docs not included"
+    exit 1
+  fi
+  if [[ ! ( -d "${ZIP_BASE}/SampleApps" ) ]]; then
+    echo "ERROR: sample apps not included"
+    exit 1
+  fi
+  if [[ ! ( -f "${ZIP_BASE}/VERSION" ) ]]; then
+    echo "ERROR: VERSION file not included"
+    exit 1
+  fi
+  if [[ ! ( -f "${ZIP_BASE}/ReleaseNotes.txt" ) ]]; then
+    echo "ERROR: ReleaseNotes.txt file not included"
+    exit 1
+  fi
+  if [[ ! ( -f "${ZIP_BASE}/getting_started.pdf" ) ]]; then
+    echo "ERROR: getting started guide not included"
+    exit 1
+  fi
+  custom_verify
+  echo "Zip Verified."
+  cd ${verify_currdir}
+}
+
 # Generate the release
 function gen {
   gen_currdir=`pwd`
@@ -181,6 +209,8 @@ function gen {
 
   #zip
   cd ${BASE_DIR}
+  #verify everything exists
+  verify
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}

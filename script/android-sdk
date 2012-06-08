@@ -33,6 +33,13 @@ function complete_docs {
   cd "${currdir}"
 }
 
+function custom_verify {
+  if [[ ! ( -f "${ZIP_BASE}/${JAR_NAME}" ) ]]; then
+    echo "ERROR: jar not included"
+    exit 1
+  fi
+}
+
 function custom_gen {
   currdir=`pwd`
 
