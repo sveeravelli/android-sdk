@@ -180,7 +180,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
     try {
       if (_player == null) {
         _player = new MediaPlayer();
-        _player.setScreenOnWhilePlaying(true);
       } else {
         stopPlayheadTimer();
         _player.stop();
@@ -205,6 +204,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       }
       _player.setDisplay(_holder);
       _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+      _player.setScreenOnWhilePlaying(true);
       _player.setOnPreparedListener(this);
       _player.setOnCompletionListener(this);
       _player.setOnBufferingUpdateListener(this);
