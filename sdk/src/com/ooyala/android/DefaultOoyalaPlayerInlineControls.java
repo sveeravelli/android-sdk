@@ -211,6 +211,9 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     // update spinner
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       State currentState = _player.getState();
+
+      updateButtonStates();
+
       if (currentState == State.INIT || currentState == State.LOADING) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
@@ -221,9 +224,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       if (currentState == State.SUSPENDED) {
         _isPlayerReady = false;
         hide();
-      }
-      if (currentState == State.PLAYING) {
-        updateButtonStates();
       }
       if (!isShowing() && currentState != State.INIT && currentState != State.LOADING
           && currentState != State.ERROR && currentState != State.SUSPENDED && !_player.isFullscreen()) {

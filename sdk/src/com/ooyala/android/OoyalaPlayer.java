@@ -597,10 +597,6 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void play() {
     if (currentPlayer() != null) {
-      if (_queuedSeekTime > 0) {
-        seek(_queuedSeekTime);
-        _queuedSeekTime = 0;
-      }
       currentPlayer().play();
     } else {
       queuePlay();
@@ -677,8 +673,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return true if the current player is seekable, false if there is no current player or it is not seekable
    */
   public boolean seekable() {
-    if (currentPlayer() == null) { return false; }
-    return currentPlayer().seekable();
+    return currentPlayer() != null && currentPlayer().seekable();
   }
 
   /**
@@ -686,12 +681,11 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @param timeInMillis in milliseconds
    */
   public void seek(int timeInMillis) {
-    if (currentPlayer() == null) {
-      _queuedSeekTime = timeInMillis;
-      return;
-    }
-    if (currentPlayer().seekable()) {
+    if (seekable()) {
       currentPlayer().seekToTime(timeInMillis);
+      _queuedSeekTime = 0;
+    } else {
+      _queuedSeekTime = timeInMillis;
     }
   }
 
@@ -935,6 +929,9 @@ public class OoyalaPlayer extends Observable implements Observer {
           setState(State.PLAYING);
           break;
         case READY:
+          if (_queuedSeekTime > 0) {
+            seek(_queuedSeekTime);
+          }
           if (player == _adPlayer)
             break;
         case INIT:
