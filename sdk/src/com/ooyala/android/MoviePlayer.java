@@ -73,14 +73,8 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
     }
   };
 
-  public MoviePlayer() {
-    super();
-    Log.d(this.getClass().getName(), "TEST - INSTANTIATING MOVIE PLAYER");
-  }
-
   @Override
   public void init(OoyalaPlayer parent, Object stream) {
-    Log.d(this.getClass().getName(), "TEST - init");
     if (stream == null) {
       Log.e(this.getClass().getName(), "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
@@ -112,7 +106,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void play() {
-    Log.d(this.getClass().getName(), "TEST - play");
     _playQueued = false;
     switch (_state) {
       case INIT:
@@ -132,12 +125,10 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void stop() {
-    Log.d(this.getClass().getName(), "TEST - stop");
     stopPlayheadTimer();
     _playQueued = false;
     _player.stop();
     _player.release();
-    Log.d(this.getClass().getName(), "TEST - stop end");
   }
 
   @Override
@@ -186,21 +177,17 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   }
 
   private void createMediaPlayer() {
-    Log.d(this.getClass().getName(), "TEST - createMediaPlayer");
     try {
       if (_player == null) {
-        Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create");
         _player = new MediaPlayer();
         _player.setScreenOnWhilePlaying(true);
       } else {
-        Log.d(this.getClass().getName(), "TEST - createMediaPlayer - create else");
         stopPlayheadTimer();
         _player.stop();
         _player.reset();
       }
       // Set cookies if they exist for 4.0+ Secure HLS Support
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-        Log.d(this.getClass().getName(), "TEST - Attempting to set headers with datasource");
         String cookieHeaderStr = null;
         for (String cookieName : OoyalaAPIHelper.cookies.keySet()) {
           if (cookieHeaderStr == null) {
@@ -216,9 +203,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       } else {
         _player.setDataSource(_stream.decodedURL().toString());
       }
-      Log.d(this.getClass().getName(), "TEST - stream url " + _stream.decodedURL().toString());
-      Log.d(this.getClass().getName(), "TEST - FRAME SIZE: " + _holder.getSurfaceFrame().right + "x"
-          + _holder.getSurfaceFrame().bottom);
       _player.setDisplay(_holder);
       _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
       _player.setOnPreparedListener(this);
@@ -230,13 +214,11 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       _player.setOnVideoSizeChangedListener(this);
       _player.prepareAsync();
     } catch (Throwable t) {
-      Log.e(this.getClass().getName(), "TEST - Exception in media prep", t);
     }
   }
 
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
-    Log.d(this.getClass().getName(), "TEST - onError: " + what + " " + extra);
     this._error = "MediaPlayer Error: " + what + " " + extra;
     setState(State.ERROR);
     return false;
@@ -244,7 +226,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    Log.d(this.getClass().getName(), "TEST - onPrepared");
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
@@ -259,7 +240,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
-    Log.d(this.getClass().getName(), "TEST - onBufferingUpdate:" + percent);
     this._buffer = percent;
     setChanged();
     notifyObservers(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION);
@@ -271,7 +251,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   }
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-    Log.d(this.getClass().getName(), "TEST - onVideoSizeChangedd " + width + "x" + height);
     if (_width == 0 && _height == 0 && height > 0) {
       setVideoSize(width, height);
     }
@@ -279,16 +258,10 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-    Log.d(this.getClass().getName(), "TEST - surfaceChanged: " + (arg0 == null ? "null" : arg0.isCreating())
-        + " | "
-        + (arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
   }
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    Log.d(this.getClass().getName(), "TEST - surfaceCreated: " + (arg0 == null ? "null" : arg0.isCreating())
-        + " | "
-        + (arg0 == null || arg0.getSurfaceFrame() == null ? "null" : arg0.getSurfaceFrame().toShortString()));
     if (_width == 0 && _height == 0 && _stream.getHeight() > 0) {
       setVideoSize(_stream.getWidth(), _stream.getHeight());
     }
@@ -299,19 +272,16 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    Log.d(this.getClass().getName(), "TEST - surfaceDestroyed");
   }
 
   @Override
   public void setParent(OoyalaPlayer parent) {
-    Log.d(this.getClass().getName(), "TEST - setParent");
     super.setParent(parent);
     setupView();
   }
 
   @SuppressWarnings("deprecation")
   private void setupView() {
-    Log.d(this.getClass().getName(), "TEST - setupView");
     createView(_parent.getLayout().getContext());
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
@@ -326,7 +296,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
   }
 
   private void removeView() {
-    Log.d(this.getClass().getName(), "TEST - removeView");
     if (_parent != null) {
       _parent.getLayout().removeView(_view);
     }
@@ -339,14 +308,12 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
-    Log.d(this.getClass().getName(), "TEST - onSeekComplete");
     dequeuePlay();
     _lastPlayhead = _player.getCurrentPosition();
   }
 
   @Override
   public boolean onInfo(MediaPlayer arg0, int arg1, int arg2) {
-    Log.d(this.getClass().getName(), "TEST - onInfo");
     return true;
   }
 
@@ -357,7 +324,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    Log.d(this.getClass().getName(), "TEST - suspend");
     if (_state == State.SUSPENDED) { return; }
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
@@ -365,9 +331,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       stop();
       _player = null;
     }
-    Log.d(this.getClass().getName(), "TEST - suspend - before remove");
     removeView();
-    Log.d(this.getClass().getName(), "TEST - suspend - after remove");
     _width = 0;
     _height = 0;
     _buffer = 0;
@@ -377,7 +341,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void resume() {
-    Log.d(this.getClass().getName(), "TEST - resume");
     if (_state != State.SUSPENDED) { return; }
     setState(State.LOADING);
     setupView();
@@ -429,19 +392,15 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   // Must queue play and wait for ready
   private void queuePlay() {
-    Log.d(this.getClass().getName(), "TEST - queuePlayy");
     _playQueued = true;
   }
 
   private void dequeuePlay() {
-    Log.d(this.getClass().getName(), "TEST - dequeuePlay");
     if (_playQueued) {
-      Log.d(this.getClass().getName(), "TEST - dequeuePlay queued");
       switch (_state) {
         case PAUSED:
         case READY:
         case COMPLETED:
-          Log.d(this.getClass().getName(), "TEST - should play");
           _playQueued = false;
           play();
         default:

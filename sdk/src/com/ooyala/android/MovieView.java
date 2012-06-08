@@ -44,17 +44,14 @@ class MovieView extends SurfaceView {
         // bounded by the available height
         newWidth = (int) (_aspectRatio * ((float) pHeight));
         newHeight = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by height: " + newWidth + "," + newHeight);
       } else if (availableAspectRatio < _aspectRatio) {
         // bounded by the available width
         newWidth = pWidth;
         newHeight = (int) (((float) pWidth) / _aspectRatio);
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by width: " + newWidth + "," + newHeight);
       } else {
         // no bound, aspect ratios are the same.
         newWidth = pWidth;
         newHeight = pHeight;
-        Log.d(this.getClass().getName(), "TEST - resizing bounded by nothing: " + newWidth + "," + newHeight);
       }
       setMeasuredDimension(newWidth, newHeight);
     }

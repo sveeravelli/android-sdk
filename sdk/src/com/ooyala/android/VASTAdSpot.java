@@ -92,7 +92,6 @@ public class VASTAdSpot extends AdSpot {
       return ReturnState.STATE_FAIL;
     }
 
-    Log.d(this.getClass().getName(), "TEST - init ad with time: " + _time);
     return ReturnState.STATE_MATCHED;
   }
 

@@ -2,7 +2,6 @@ package com.ooyala.android;
 
 import android.R;
 import android.app.Dialog;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -125,10 +124,8 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
         @Override
         public void onBackPressed() {
           if (_player.isFullscreen()) {
-            Log.d(this.getClass().getName(), "TEST - BACK - Exiting fullscreen on back");
             _player.setFullscreen(false);
           } else {
-            Log.d(this.getClass().getName(), "TEST - BACK - NOT Exiting fullscreen on back");
             super.onBackPressed();
           }
         }
