@@ -47,7 +47,7 @@ function usage {
 
 # Generate the docs
 function doc {
-  currdir=`pwd`
+  doc_currdir=`pwd`
   cd ${SDK_DIR}
   echo
   echo "Removing Old Docs..."
@@ -59,12 +59,12 @@ function doc {
   echo
   echo "Document Generation Complete!"
   echo
-  cd "${currdir}"
+  cd "${doc_currdir}"
 }
 
 GIT_CHECK_RESULT=true
 function git_check {
-  currdir=`pwd`
+  git_currdir=`pwd`
   cd ${BASE_DIR}
   if [[ "`git status | grep "working directory clean"`" = "" ]]; then
     GIT_CHECK_RESULT=false
@@ -76,18 +76,18 @@ function git_check {
     if [[ "${cont}" != "y" ]]; then
       echo
       echo "Please commit or stash your changes and try again."
-      cd "${currdir}"
+      cd "${git_currdir}"
       exit 1
     fi
     echo
   else
     git pull
   fi
-  cd "${currdir}"
+  cd "${git_currdir}"
 }
 
 function tests {
-  currdir=`pwd`
+  tests_currdir=`pwd`
   echo "Running Unit Tests..."
   if [[ -f ${BASE_DIR}/test_results.txt ]]; then
     rm ${BASE_DIR}/test_results.txt
@@ -96,17 +96,17 @@ function tests {
   return_val=$?
   if [[ "${return_val}" -eq "${RETURN_FAIL}" ]]; then
     echo "Tests Failed!"
-    cd "${currdir}"
+    cd "${tests_currdir}"
     exit 1
   fi
   echo "Tests Passed!"
   rm ${BASE_DIR}/test_results.txt
-  cd "${currdir}"
+  cd "${tests_currdir}"
 }
 
 # Generate the release
 function gen {
-  currdir=`pwd`
+  gen_currdir=`pwd`
   echo "Generating the release..."
   git_check
 
@@ -127,7 +127,7 @@ function gen {
           new_rc="`echo $i | sed s/-rc//g`"
         else
           echo "ERROR: invalid option: $i"
-          cd "${currdir}"
+          cd "${gen_currdir}"
           usage
         fi
         ;;
@@ -136,7 +136,7 @@ function gen {
 
   if [[ ( ${set_version} = true ) && ( ${new_rc} = "" ) ]]; then
     echo "ERROR: cannot set version if rc doesn't exist"
-    cd "${currdir}"
+    cd "${gen_currdir}"
     usage
   fi
 
@@ -177,7 +177,7 @@ function gen {
 
   #docs
   doc
-  cp -R sdk/Documentation/public ${ZIP_BASE}/Documentation
+  cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
 
   #zip
   cd ${BASE_DIR}
@@ -202,11 +202,11 @@ function gen {
     git c -a -m "Gen Release"
     git push
   fi
-  cd "${currdir}"
+  cd "${gen_currdir}"
 }
 
 function pub {
-  currdir=`pwd`
+  pub_currdir=`pwd`
   rc=false
   push=''
   new_version=''
@@ -215,7 +215,7 @@ function pub {
     case "$i" in
       -push|-p) push=$i;;
       -candidate|-rc|-c) rc=true;;
-      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; cd "${currdir}"; usage; fi;;
+      *) if [[ "$i" =~ ${VERSION_REGEX} ]]; then new_version="`echo $i | sed s/-v//g`"; else echo "ERROR: invalid option: $i"; cd "${pub_currdir}"; usage; fi;;
     esac
   done
 
@@ -227,7 +227,7 @@ function pub {
 
   if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ ${version} ) ]]; then
     echo "ERROR: Please update ReleaseNotes.txt before pushing a version"
-    cd "${currdir}"
+    cd "${pub_currdir}"
     usage
   fi
 
@@ -237,7 +237,7 @@ function pub {
     last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1 | sed "s/^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)\.zip$/\1/"`
     if [[ ! ( ${last_rc} =~ ^[0-9]*$ ) ]]; then
       echo "Error: Could not figure out last release candidate"
-      cd "${currdir}"
+      cd "${pub_currdir}"
       usage
     fi
     new_rc=$((last_rc+1))
@@ -266,7 +266,7 @@ function pub {
     last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1`
     if [[ ! ( ${last_rc} =~ ^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\.zip$ ) ]]; then
       echo "Error: Could not figure out last release candidate to release"
-      cd "${currdir}"
+      cd "${pub_currdir}"
       usage
     fi
 
@@ -285,5 +285,5 @@ function pub {
     echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
   fi
-  cd "${currdir}"
+  cd "${pub_currdir}"
 }
