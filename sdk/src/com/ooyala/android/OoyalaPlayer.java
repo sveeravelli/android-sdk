@@ -477,7 +477,8 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
-    _player = initializePlayer(MoviePlayer.class, _currentItem.getStream());
+    _player = new MoviePlayer();
+    initializePlayer(_player, _currentItem.getStream());
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
 
@@ -520,14 +521,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     return true;
   }
 
-  private Player initializePlayer(Class<? extends Player> playerClass, Object param) {
-    Player p = null;
-    try {
-      p = playerClass.newInstance();
-    } catch (Exception e) {
-      _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_INTERNAL_ANDROID, e);
-      return null;
-    }
+  private Player initializePlayer(Player p, Object param) {
     p.addObserver(this);
     p.init(this, param);
     return p;
@@ -729,18 +723,17 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean playAd(AdSpot ad) {
-    Class<? extends Player> adPlayerClass = null;
     if (ad instanceof OoyalaAdSpot) {
-      adPlayerClass = OoyalaAdPlayer.class;
+      _adPlayer = new OoyalaAdPlayer();
     } else if (ad instanceof VASTAdSpot) {
-      adPlayerClass = VASTAdPlayer.class;
+      _adPlayer = new VASTAdPlayer();
     }
 
-    if (adPlayerClass == null) {
+    if (_adPlayer == null) {
       return false;
     }
 
-    _adPlayer = initializePlayer(adPlayerClass, ad);
+    initializePlayer(_adPlayer, ad);
 
     if (_adPlayer == null || _adPlayer.getState() == State.ERROR) {
       return false;
