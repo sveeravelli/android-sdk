@@ -33,6 +33,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private TextView _duration = null;
   private TextView _liveIndicator = null;
   private ProgressBar _spinner = null;
+  private boolean _wasPlaying;
+  private boolean _seeking;
 
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
@@ -204,19 +206,23 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     if (fromUser) {
       _player.seekToPercent(progress);
-      _player.play();
-      updateButtonStates();
+      update(null, null);
     }
   }
 
   @Override
   public void onStartTrackingTouch(SeekBar seekBar) {
-    // noop
+    _seeking = true;
+    _wasPlaying = _player.isPlaying();
+    _player.pause();
   }
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
-    // noop
+    _seeking = false;
+    if (_wasPlaying) {
+      _player.play();
+    }
   }
 
   @Override
@@ -241,8 +247,10 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    _seek.setProgress(_player.getPlayheadPercentage());
-    _seek.setSecondaryProgress(_player.getBufferPercentage());
+    if (_seek != null && !_seeking) {
+      _seek.setProgress(_player.getPlayheadPercentage());
+      _seek.setSecondaryProgress(_player.getBufferPercentage());
+    }
     boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
     _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
     _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));

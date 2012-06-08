@@ -168,7 +168,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   @Override
   public void onStartTrackingTouch(SeekBar seekBar) {
     _seeking = true;
-    _wasPlaying = _player.getState() == State.PLAYING;
+    _wasPlaying = _player.isPlaying();
     _player.pause();
   }
 
