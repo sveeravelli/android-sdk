@@ -755,7 +755,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private Player currentPlayer() {
-    return (_player == null || _player._view == null) ? _adPlayer : _player;
+    return (_adPlayer != null) ? _adPlayer : _player;
   }
 
   private boolean fetchMoreChildren(PaginatedItemListener listener) {
