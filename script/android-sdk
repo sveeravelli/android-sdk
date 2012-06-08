@@ -22,14 +22,14 @@ function set_version {
 function public_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
-  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public > /dev/null 2>&1
   cd "${currdir}"
 }
 
 function complete_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
-  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete > /dev/null 2>&1
   cd "${currdir}"
 }
 
