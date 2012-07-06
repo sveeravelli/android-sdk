@@ -42,6 +42,7 @@ function usage {
   echo "    run_tests|tests|test|t    : run the unit tests"
   custom_usage
   echo "For example, to generate, tag, and publish the release candidate for the latest version: $0 pub -rc -push"
+  echo "To mark the latest release candidate as the release version: $0 pub -push"
   exit 1
 }
 
