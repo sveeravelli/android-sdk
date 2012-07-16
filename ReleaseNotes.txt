@@ -2,6 +2,7 @@ Current Version: 1.1.0
 
 ------------ 1.1.0 ------------
 
+Bug Fixes
 Limit default playable mp4 streams to baseline profile
 
 ------------ 1.0.0 ------------
