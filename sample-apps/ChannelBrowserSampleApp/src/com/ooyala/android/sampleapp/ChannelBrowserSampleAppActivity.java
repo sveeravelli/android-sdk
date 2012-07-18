@@ -1,15 +1,14 @@
 package com.ooyala.android.sampleapp;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ooyala.android.Channel;
 import com.ooyala.android.ContentItem;
+import com.ooyala.android.ContentTreeCallback;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaException;
 
@@ -38,27 +37,37 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   private String[] embedCodes = { CHANNEL_CODE };
   private Channel rootItem = null;
 
+  class MyContentTreeCallback implements ContentTreeCallback {
+    private ChannelBrowserSampleAppActivity _self;
+
+    public MyContentTreeCallback(ChannelBrowserSampleAppActivity self) {
+      this._self = self;
+    }
+
+    @Override
+    public void callback(ContentItem item, OoyalaException ex) {
+      if (ex != null) {
+        Log.e(TAG, "can not find content tree from api");
+        return;
+      }
+      if (item != null && item instanceof Channel) {
+        rootItem = (Channel) item;
+        setListAdapter(new OoyalaVideoListAdapter(_self, getData(), R.layout.embed_list_item, new String[] {
+            "title", "thumbnail", "duration" }, new int[] { R.id.asset_title, R.id.asset_thumbnail,
+            R.id.asset_duration }));
+        getListView().setTextFilterEnabled(false);
+
+      } else {
+        Log.e(TAG, "Should not be here!");
+      }
+    }
+  }
+
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    ContentItem item = null;
-    try {
-      item = api.contentTree(Arrays.asList(embedCodes));
-    } catch (OoyalaException e) {
-      Log.e(TAG, "can not find content tree from api");
-    }
-    if (item != null && item instanceof Channel) {
-      rootItem = (Channel) item;
-      setListAdapter(new OoyalaVideoListAdapter(this, getData(), R.layout.embed_list_item, new String[] {
-          "title", "thumbnail", "duration" }, new int[] { R.id.asset_title, R.id.asset_thumbnail,
-          R.id.asset_duration }));
-      getListView().setTextFilterEnabled(false);
-
-    } else {
-      Log.e(TAG, "Should not be here!");
-    }
-
+    api.contentTree(Arrays.asList(embedCodes), new MyContentTreeCallback(this));
   }
 
   protected List<Map<String, Object>> getData() {
@@ -98,6 +107,6 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   }
 
   private String timeStringFromMillis(int millis, boolean includeHours) {
-    return DateUtils.formatElapsedTime(millis/1000);
+    return DateUtils.formatElapsedTime(millis / 1000);
   }
 }

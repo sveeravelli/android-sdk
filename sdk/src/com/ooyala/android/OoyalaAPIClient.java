@@ -31,7 +31,8 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    * @param generator the Embed Token Generator to use
    */
-  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain, EmbedTokenGenerator generator) {
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain,
+      EmbedTokenGenerator generator) {
     _apiHelper = new OoyalaAPIHelper(apiKey, secret);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
@@ -56,7 +57,8 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    * @param generator the Embed Token Generator to use
    */
-  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain, EmbedTokenGenerator generator) {
+  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain,
+      EmbedTokenGenerator generator) {
     _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
@@ -79,7 +81,8 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    * @param generator the Embed Token Generator to use
    */
-  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain, EmbedTokenGenerator generator) {
+  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain,
+      EmbedTokenGenerator generator) {
     _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
     _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
   }
@@ -95,7 +98,8 @@ public class OoyalaAPIClient {
 
   /**
    * Fetch the root ContentItem associated with the given embed codes. If multiple embed codes are given, the
-   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos.
+   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos. As this
+   * method is not asynchronous it should be used within an AsyncTask.
    * @param embedCodes the embed codes to fetch
    * @return the root ContentItem representing embedCodes
    * @throws OoyalaException
@@ -118,7 +122,8 @@ public class OoyalaAPIClient {
 
   /**
    * Fetch the root ContentItem associated with the given external ids. If multiple external ids are given,
-   * the root item is assumed to be a Dynamic Channel and the external ids are assumed to all be videos.
+   * the root item is assumed to be a Dynamic Channel and the external ids are assumed to all be videos. As
+   * this method is not asynchronous it should be used within an AsyncTask.
    * @param externalIds the external ids to fetch
    * @return the root ContentItem representing externalIds
    * @throws OoyalaException
@@ -140,7 +145,8 @@ public class OoyalaAPIClient {
   }
 
   /**
-   * Fetch additional children for the PaginatedParentItem specified using the nextToken specified
+   * Fetch additional children for the PaginatedParentItem specified using the nextToken specified. As this
+   * method is not asynchronous it should be used within an AsyncTask.
    * @param parent the PaginatedParentItem to fetch additional children for
    * @return the PaginatedItemResponse
    */
@@ -150,7 +156,7 @@ public class OoyalaAPIClient {
 
   /**
    * Asynchronously fetch additional children for the PaginatedParentItem specified using the nextToken
-   * specified
+   * specified.
    * @param parent the PaginatedParentItem to fetch additional children for
    * @param callback the ContentTreeNextCallback to execute when the response is received
    * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
@@ -160,7 +166,8 @@ public class OoyalaAPIClient {
   }
 
   /**
-   * Fetch a raw JSONObject from any backlot API (GET requests only)
+   * Fetch a raw JSONObject from any backlot API (GET requests only). As this method is not asynchronous it
+   * should be used within an AsyncTask.
    * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request
    *          https://api.ooyala.com/v2/assets, uri should be "/assets"
    * @param params Optional parameters to pass to the API
