@@ -479,6 +479,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean changeCurrentItemAfterFetch() {
     _player = new MoviePlayer();
     initializePlayer(_player, _currentItem.getStream());
+    //_player = new WidevinePlayer();
+    //initializePlayer(_player, "http://widevine-test.s3.amazonaws.com/Widevine/sintel_500.mp4");
     initializePlayer(_player, _currentItem.getStream().decodedURL().toString());
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
