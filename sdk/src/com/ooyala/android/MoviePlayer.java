@@ -40,7 +40,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
-  protected Stream _stream = null;
+  protected String _streamUrl = "";
   protected int _width = 0;
   protected int _height = 0;
   private boolean _playQueued = false;
@@ -87,7 +87,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       return;
     }
     setState(State.LOADING);
-    _stream = (Stream) stream;
+    _streamUrl = (String)stream;
     setParent(parent);
   }
 
@@ -176,7 +176,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
     _player.seekTo(timeInMillis);
   }
 
-  private void createMediaPlayer() {
+  protected void createMediaPlayer() {
     try {
       if (_player == null) {
         _player = new MediaPlayer();
@@ -197,10 +197,9 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
         }
         Map<String, String> cookieHeader = new HashMap<String, String>();
         cookieHeader.put(Constants.HTML_COOKIE_HEADER_NAME, cookieHeaderStr);
-        _player.setDataSource(OoyalaAPIHelper.context, Uri.parse(_stream.decodedURL().toString()),
-            cookieHeader);
+        _player.setDataSource(OoyalaAPIHelper.context, Uri.parse(_streamUrl));
       } else {
-        _player.setDataSource(_stream.decodedURL().toString());
+        _player.setDataSource(_streamUrl);
       }
       _player.setDisplay(_holder);
       _player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -262,9 +261,6 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    if (_width == 0 && _height == 0 && _stream.getHeight() > 0) {
-      setVideoSize(_stream.getWidth(), _stream.getHeight());
-    }
     if (_state == State.LOADING) {
       createMediaPlayer();
     }

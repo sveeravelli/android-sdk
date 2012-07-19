@@ -90,7 +90,7 @@ class VASTAdPlayer extends MoviePlayer {
 
     if (_linearAdQueue.isEmpty()) { return; }
 
-    super.init(parent, _linearAdQueue.get(0).getStream());
+    super.init(parent, _linearAdQueue.get(0).getStream().decodedURL().toString());
 
     // TODO[jigish] setup clickthrough
 

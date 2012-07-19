@@ -479,6 +479,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean changeCurrentItemAfterFetch() {
     _player = new MoviePlayer();
     initializePlayer(_player, _currentItem.getStream());
+    initializePlayer(_player, _currentItem.getStream().decodedURL().toString());
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
 
