@@ -5,7 +5,9 @@ import java.util.Observer;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.opengl.Visibility;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,8 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private boolean _wasPlaying;
   private boolean _seeking;
 
+  private boolean _adUi = false;
+
   public DefaultOoyalaPlayerInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
     setOoyalaPlayer(player);
@@ -48,8 +52,14 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _fullscreen.setFullscreen(_player.isFullscreen());
     }
 
-    if (_seekWrapper != null && _player.getCurrentItem() != null)
-      _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
+    if (_seekWrapper != null && _player.getCurrentItem() != null) {
+      if(_player.getCurrentItem().isLive()) {
+        _seekWrapper.setVisibility(View.GONE);
+      } else {
+        _seekWrapper.setVisibility(_adUi ? View.INVISIBLE : View.VISIBLE);
+      }
+    }
+
     if (_liveWrapper != null && _player.getCurrentItem() != null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
@@ -190,6 +200,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       }
       show();
     } else if (v == _fullscreen && _isPlayerReady) {
+      Log.d("bla", "fullscreen clicked......!!!!!!");
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
       hide();
@@ -206,6 +217,21 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
       _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
       _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
+    }
+
+    // update UI on adStarted/adCompleted
+    if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+      _isPlayerReady = true;
+      _adUi = true;
+      updateButtonStates();
+    }
+
+    if(arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION ||
+        arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION ||
+        arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION ) {
+      _isPlayerReady = false;
+      _adUi = false;
+      updateButtonStates();
     }
 
     // update spinner

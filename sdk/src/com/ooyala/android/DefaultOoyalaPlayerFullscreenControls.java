@@ -36,6 +36,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private boolean _wasPlaying;
   private boolean _seeking;
 
+  private boolean _adUi = false;
+
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
   private static final int OVERLAY_PREFERRED_BUTTON_HEIGHT_DP = (int) ((float) PREFERRED_BUTTON_HEIGHT_DP * OVERLAY_SCALE);
@@ -53,8 +55,14 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     _playPause.setPlaying(_player.isPlaying());
     _fullscreen.setFullscreen(_player.isFullscreen());
 
-    if (_seekWrapper != null && _player.getCurrentItem() != null)
-      _seekWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.GONE : View.VISIBLE);
+    if (_seekWrapper != null && _player.getCurrentItem() != null) {
+      if(_player.getCurrentItem().isLive()) {
+        _seekWrapper.setVisibility(View.GONE);
+      } else {
+        _seekWrapper.setVisibility(_adUi ? View.INVISIBLE : View.VISIBLE);
+      }
+    }
+
     if (_liveWrapper != null && _player.getCurrentItem() != null) {
       _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
@@ -254,6 +262,21 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
     _duration.setText(Utils.timeStringFromMillis(_player.getDuration(), includeHours));
     _currTime.setText(Utils.timeStringFromMillis(_player.getPlayheadTime(), includeHours));
+
+    // update UI on adStarted/adCompleted
+    if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+      _isPlayerReady = true;
+      _adUi = true;
+      updateButtonStates();
+    }
+
+    if(arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION ||
+        arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION ||
+        arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION ) {
+      _isPlayerReady = false;
+      _adUi = false;
+      updateButtonStates();
+    }
 
     // update spinner
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
