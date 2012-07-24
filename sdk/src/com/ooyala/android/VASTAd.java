@@ -158,7 +158,7 @@ public class VASTAd {
         companions = (Element) type;
       }
       if (ad == null && nonLinears == null && companions == null) { return; }
-      if (sequenceNumStr != null) {
+      if (sequenceNumStr != null && sequenceNumStr.length() > 0) {
         int sequenceNum = Integer.parseInt(sequenceNumStr);
         boolean added = false;
         for (VASTSequenceItem item : _sequence) {

@@ -70,16 +70,24 @@ class VASTAdPlayer extends MoviePlayer {
             setState(State.ERROR);
             return;
           }
-          initAfterFetch(parent);
+          if(!initAfterFetch(parent)) {
+            _error = "Bad VAST Ad";
+            setState(State.ERROR);
+            return;
+          }
         }
 
       });
       return;
     }
-    initAfterFetch(parent);
+    if(!initAfterFetch(parent)) {
+      _error = "Bad VAST Ad";
+      setState(State.ERROR);
+      return;
+    }
   }
 
-  private void initAfterFetch(OoyalaPlayer parent) {
+  private boolean initAfterFetch(OoyalaPlayer parent) {
     for (VASTAd vastAd : _ad.getAds()) {
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear()) {
@@ -88,7 +96,9 @@ class VASTAdPlayer extends MoviePlayer {
       }
     }
 
-    if (_linearAdQueue.isEmpty()) { return; }
+    if (_linearAdQueue.isEmpty()) { return false; }
+    if (_linearAdQueue.get(0).getStreams() == null ||
+        _linearAdQueue.get(0).getStreams().size() <= 0)  { return false; }
 
     super.init(parent, _linearAdQueue.get(0).getStream().decodedURL().toString());
 
@@ -99,6 +109,8 @@ class VASTAdPlayer extends MoviePlayer {
         NetUtils.ping(url);
       }
     }
+
+    return true;
   }
 
   @Override
