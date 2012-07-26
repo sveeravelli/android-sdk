@@ -97,8 +97,7 @@ class VASTAdPlayer extends MoviePlayer {
     }
 
     if (_linearAdQueue.isEmpty()) { return false; }
-    if (_linearAdQueue.get(0).getStreams() == null ||
-        _linearAdQueue.get(0).getStreams().size() <= 0)  { return false; }
+    if (_linearAdQueue.get(0) == null || _linearAdQueue.get(0).getStream() == null)  { return false; }
 
     super.init(parent, _linearAdQueue.get(0).getStream().decodedURL().toString());
 
