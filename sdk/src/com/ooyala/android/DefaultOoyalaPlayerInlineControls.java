@@ -200,7 +200,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       }
       show();
     } else if (v == _fullscreen && _isPlayerReady) {
-      Log.d("bla", "fullscreen clicked......!!!!!!");
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
       hide();
@@ -246,7 +245,10 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
         _spinner.setVisibility(View.INVISIBLE);
       }
 
-      if (currentState == State.READY) _isPlayerReady = true;
+      if (currentState == State.READY || currentState == State.PLAYING || currentState == State.PAUSED) {
+        _isPlayerReady = true;
+      }
+
       if (currentState == State.SUSPENDED) {
         _isPlayerReady = false;
         hide();

@@ -290,7 +290,10 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
         _spinner.setVisibility(View.INVISIBLE);
       }
 
-      if (currentState == State.READY) _isPlayerReady = true;
+      if (currentState == State.READY || currentState == State.PLAYING || currentState == State.PAUSED) {
+        _isPlayerReady = true;
+      }
+
       if (currentState == State.SUSPENDED) {
         _isPlayerReady = false;
         hide();
