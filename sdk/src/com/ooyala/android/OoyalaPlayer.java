@@ -710,7 +710,12 @@ public class OoyalaPlayer extends Observable implements Observer {
   private boolean playAdsBeforeTime(int time) {
     this._lastPlayedTime = time;
     for (AdSpot ad : _currentItem.getAds()) {
-      if (ad.getTime() <= time && !this._playedAds.contains(ad)) {
+      int adTime = ad.getTime();
+      //Align ad times to 10 second (HLS chunk length) boundaries
+      if (getCurrentItem().getStream().getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) {
+        adTime = ((adTime + 5000) / 10000) * 10000;
+      }
+      if (adTime <= time && !this._playedAds.contains(ad)) {
         _playedAds.add(ad);
         if (playAd(ad)) { return true; }
       }
