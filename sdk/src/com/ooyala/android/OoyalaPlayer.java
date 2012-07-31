@@ -1036,6 +1036,13 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   /**
+   * @return true if currently playing ad, false otherwise
+   */
+  public boolean isAdPlaying() {
+    return currentPlayer() == _adPlayer;
+  }
+
+  /**
    * Seek to the given percentage
    * @param percent percent (between 0 and 100) to seek to
    */

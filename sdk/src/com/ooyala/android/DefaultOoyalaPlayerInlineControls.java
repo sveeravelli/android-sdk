@@ -35,8 +35,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private boolean _wasPlaying;
   private boolean _seeking;
 
-  private boolean _adUi = false;
-
   public DefaultOoyalaPlayerInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
     setOoyalaPlayer(player);
@@ -56,7 +54,8 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       if(_player.getCurrentItem().isLive()) {
         _seekWrapper.setVisibility(View.GONE);
       } else {
-        _seekWrapper.setVisibility(_adUi ? View.INVISIBLE : View.VISIBLE);
+        _seekWrapper.setVisibility(View.VISIBLE);
+        _seekWrapper.setEnabled(!_player.isAdPlaying());
       }
     }
 
@@ -221,7 +220,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
       _isPlayerReady = true;
-      _adUi = true;
       updateButtonStates();
     }
 
@@ -229,7 +227,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
         arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION ||
         arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION ) {
       _isPlayerReady = false;
-      _adUi = false;
       updateButtonStates();
     }
 

@@ -36,8 +36,6 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private boolean _wasPlaying;
   private boolean _seeking;
 
-  private boolean _adUi = false;
-
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
   private static final int OVERLAY_PREFERRED_BUTTON_HEIGHT_DP = (int) ((float) PREFERRED_BUTTON_HEIGHT_DP * OVERLAY_SCALE);
@@ -59,7 +57,8 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
       if(_player.getCurrentItem().isLive()) {
         _seekWrapper.setVisibility(View.GONE);
       } else {
-        _seekWrapper.setVisibility(_adUi ? View.INVISIBLE : View.VISIBLE);
+        _seekWrapper.setVisibility(View.VISIBLE);
+        _seekWrapper.setEnabled(!_player.isAdPlaying());
       }
     }
 
@@ -266,7 +265,6 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
       _isPlayerReady = true;
-      _adUi = true;
       updateButtonStates();
     }
 
@@ -274,7 +272,6 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
         arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION ||
         arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION ) {
       _isPlayerReady = false;
-      _adUi = false;
       updateButtonStates();
     }
 
