@@ -14,15 +14,16 @@ import com.widevine.drmapi.android.WVStatus;
 public class WidevinePlayer extends MoviePlayer implements WVEventListener {
   private WVPlayback wvplayback = new WVPlayback();
   private OoyalaPlayer parent;
-  private String wvUrl = "";
+  private String _wvUrl = "";
   @Override
   public void init(OoyalaPlayer parent, Object stream) {
     HashMap<String, Object> options = new HashMap<String, Object>();
     //this should point to SAS once we get the proxy up
-    options.put("WVDRMServer", "http://wstfcps005.shibboleth.tv/widevine/cypherpc/cgi-bin/GetEMMs.cgi");
+    options.put("WVDRMServer", "http://chrisl-wifi.mtv:4567/drm/widevine/v1");
     options.put("WVPortalKey", "ooyala");
-    
-    this.wvUrl = (String)stream;
+    options.put("WVLicenseTypeKey", 3);
+
+    this._wvUrl = (String)stream;
     this.parent = parent;
 
     wvplayback.initialize(OoyalaAPIHelper.context, options, this);
@@ -40,7 +41,7 @@ public class WidevinePlayer extends MoviePlayer implements WVEventListener {
       new Handler(Looper.getMainLooper()).post(new Runnable() {
         @Override
         public void run() {
-          init2(wvplayback.play((String)wvUrl));
+          init2(wvplayback.play((String)_wvUrl));
         }
       });
     } else if (event == WVEvent.InitializeFailed) {
