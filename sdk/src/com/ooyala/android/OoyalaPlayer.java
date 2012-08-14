@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
@@ -1025,6 +1026,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   /**
    * @return get the bitrate of the current item
    */
+  @TargetApi(10)
   public double getBitrate() {
     if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
     if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {

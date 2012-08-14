@@ -5,9 +5,7 @@ import java.util.Observer;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.opengl.Visibility;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
