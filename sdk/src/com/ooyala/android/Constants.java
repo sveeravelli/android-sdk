@@ -113,6 +113,8 @@ class Constants {
   public static final String DELIVERY_TYPE_HLS = "hls";
   public static final String DELIVERY_TYPE_MP4 = "mp4";
   public static final String DELIVERY_TYPE_REMOTE_ASSET = "remote_asset";
+  public static final String DELIVERY_TYPE_WV_MP4 = "wv_mp4";
+  public static final String DELIVERY_TYPE_WV_WVM = "wv_wvm";
 
   public static final String PROFILE_BASELINE = "baseline";
 
@@ -174,6 +176,7 @@ class Constants {
 
   public static final String MIME_TYPE_MP4 = "video/mp4";
   public static final String MIME_TYPE_M3U8 = "application/x-mpegURL";
+  public static final String MIME_TYPE_WIDEVINE = "video/wvm";
 
   public static final String HTML_COOKIE_HEADER_NAME = "Cookie";
 

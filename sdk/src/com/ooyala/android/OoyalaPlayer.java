@@ -477,10 +477,20 @@ public class OoyalaPlayer extends Observable implements Observer {
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
-    _player = new MoviePlayer();
-    //_player = new WidevinePlayer();
-    //initializePlayer(_player, "http://widevine-test.s3.amazonaws.com/Widevine/sintel_500.mp4");
-    initializePlayer(_player, _currentItem.getStream().decodedURL().toString());
+    Stream s = _currentItem.getStream();
+    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM)) {
+      _player = new WidevineOsPlayer();
+      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(), getPlayerAPIClient().getPcode()));
+    } else if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_MP4)) {
+      _player = new WidevineLibPlayer();
+      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(), getPlayerAPIClient().getPcode()));
+    } else {
+      _player = new MoviePlayer();
+      initializePlayer(_player, s.decodedURL().toString());
+    }
+    //_player = new WidevineLibPlayer();
+    //initializePlayer(_player, new WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(), getPlayerAPIClient().getPcode()));
+
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
 
