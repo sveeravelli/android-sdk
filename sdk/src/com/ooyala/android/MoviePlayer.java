@@ -231,7 +231,7 @@ class MoviePlayer extends Player implements OnBufferingUpdateListener, OnComplet
       }
     }
     if (_timeBeforeSuspend > 0) {
-      _player.seekTo(_timeBeforeSuspend);
+      seekToTime(_timeBeforeSuspend);
       _timeBeforeSuspend = -1;
     }
     setState(State.READY);
