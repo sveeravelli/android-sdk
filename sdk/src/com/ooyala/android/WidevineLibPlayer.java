@@ -3,6 +3,8 @@ import java.util.HashMap;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+
 import com.ooyala.android.OoyalaPlayer.State;
 import com.widevine.drmapi.android.WVEvent;
 import com.widevine.drmapi.android.WVEventListener;
@@ -15,7 +17,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   private static final int INIT = 0;
   private static final int ERROR = -1;
 
-  private WVPlayback _wvplayback = new WVPlayback();
+  private static WVPlayback _wvplayback = new WVPlayback();
   private Handler _handler = new Handler(this);
   private OoyalaPlayer parent;
   private String stream = "";
@@ -38,6 +40,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   @Override
   public WVStatus onEvent(WVEvent event, HashMap<String, Object> attributes) {
+    Log.d("WIDEVINE", event.toString() + ": " + attributes.toString());
     switch (event) {
       case InitializeFailed:
         this._error = "Widevine Initialization Failed";
@@ -81,5 +84,11 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
       default:
     }
     return true;
+  }
+
+  @Override
+  public void destroy() {
+    _wvplayback.terminate();
+    super.destroy();
   }
 }
