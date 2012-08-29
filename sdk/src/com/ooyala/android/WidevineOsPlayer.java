@@ -33,13 +33,14 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
       _drmClient.setOnInfoListener(this);
     }
 
-    // replace scheme of widevine live assets
+    // replace scheme of widevine assets
     // need to be widevine:// vs http://
     Uri uri = Uri.parse(params.url);
+    //live check
     if (uri.getLastPathSegment().endsWith(".m3u8")) {
-      params.url = uri.buildUpon().scheme("widevine").build().toString();
       _live = true;
     }
+    params.url = uri.buildUpon().scheme("widevine").build().toString();
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     //this should point to SAS once we get the proxy up
