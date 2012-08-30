@@ -32,7 +32,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     HashMap<String, Object> options = new HashMap<String, Object>();
     //this should point to SAS once we get the proxy up
     options.put("WVDRMServer", "http://chrisl.mtv:4567/drm/widevine/v1");
-    options.put("WVPortalKey", "ooyala");
+    options.put("WVPortalKey", ""); //add this value in SAS
     options.put("WVLicenseTypeKey", 3);
 
     _wvplayback.initialize(OoyalaAPIHelper.context, options, this);
@@ -40,7 +40,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   @Override
   public WVStatus onEvent(WVEvent event, HashMap<String, Object> attributes) {
-    Log.d("WIDEVINE", event.toString() + ": " + attributes.toString());
+    Log.d("Widevine", event.toString() + ": " + attributes.toString());
     switch (event) {
       case InitializeFailed:
         this._error = "Widevine Initialization Failed";
