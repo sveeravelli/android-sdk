@@ -31,8 +31,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
     HashMap<String, Object> options = new HashMap<String, Object>();
     //this should point to SAS once we get the proxy up
-    String path = "http://172.16.100.176:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/";
-    options.put("WVPortalKey", "ooyala"); //override in SAS
+    String path = "http://jdlew-wifi.mtv:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/JDLEW";
+    options.put("WVPortalKey", ""); //add this value in SAS
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
 

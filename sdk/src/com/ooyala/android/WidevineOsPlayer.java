@@ -44,7 +44,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     //this should point to SAS once we get the proxy up
-    String path = "http://172.16.100.176:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/";
+    String path = "http://jdlew-wifi.mtv:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/JDLEW";
     request.put("WVDRMServerKey", path);
     request.put("WVAssetURIKey", params.url);
     request.put("WVPortalKey", "ooyala");  //override in SAS

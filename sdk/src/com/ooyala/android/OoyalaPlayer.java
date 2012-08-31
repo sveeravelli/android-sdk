@@ -479,7 +479,7 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   private boolean changeCurrentItemAfterFetch() {
     Stream s = _currentItem.getStream();
-    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM)) {
+    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM) || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_HLS)) {
       _player = new WidevineOsPlayer();
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(), getPlayerAPIClient().getPcode()));
     } else if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_MP4)) {
@@ -489,8 +489,9 @@ public class OoyalaPlayer extends Observable implements Observer {
       _player = new MoviePlayer();
       initializePlayer(_player, s.decodedURL().toString());
     }
-    //_player = new WidevineLibPlayer();
+    //_player = new WidevineOsPlayer();
     //initializePlayer(_player, new WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(), getPlayerAPIClient().getPcode()));
+    //initializePlayer(_player, new WidevineParams("https://dl.dropbox.com/u/39391582/expendable.wvm", getEmbedCode(), getPlayerAPIClient().getPcode()));
 
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
