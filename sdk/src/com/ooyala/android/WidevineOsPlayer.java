@@ -47,6 +47,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     String path = "http://172.16.100.176:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/";
     request.put("WVDRMServerKey", path);
     request.put("WVAssetURIKey", params.url);
+    request.put("WVPortalKey", "ooyala");  //override in SAS
     request.put("WVDeviceIDKey", Secure.getString(OoyalaAPIHelper.context.getContentResolver(), Secure.ANDROID_ID));
     request.put("WVLicenseTypeKey", "3");
 
