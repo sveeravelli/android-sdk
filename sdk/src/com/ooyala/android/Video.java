@@ -158,11 +158,11 @@ public class Video extends ContentItem implements PlayableItem {
   public boolean fetchPlaybackInfo() {
     if (hasAds()) {
       for (AdSpot ad : _ads) {
-        if (!ad.fetchPlaybackInfo()) { return false; }
+    	ad.fetchPlaybackInfo();
       }
     }
 
-    if (_closedCaptions != null) if (!_closedCaptions.fetchClosedCaptionsInfo()) return false;
+    if (_closedCaptions != null) _closedCaptions.fetchClosedCaptionsInfo();
 
     return true;
   }

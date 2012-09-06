@@ -60,8 +60,10 @@ class VASTAdPlayer extends MoviePlayer {
     _seekable = false;
     _ad = (VASTAdSpot) ad;
     if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
-      this._parent.getPlayerAPIClient().cancel(_fetchTask);
-      _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+      if (_fetchTask != null) {
+        this._parent.getPlayerAPIClient().cancel(_fetchTask);
+      }
+      _fetchTask = _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
 
         @Override
         public void callback(boolean result) {
@@ -196,7 +198,7 @@ class VASTAdPlayer extends MoviePlayer {
 
   @Override
   public void destroy() {
-    if (_fetchTask != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
+    if (_fetchTask != null && this._parent != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
     super.destroy();
   }
 }
