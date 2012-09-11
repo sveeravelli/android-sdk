@@ -23,7 +23,7 @@ class Constants {
   public static final String AUTHORIZE_PUBLIC_KEY_NAME = "sas_public_key";
   public static final int AUTHORIZE_SIGNATURE_DIGEST_LENGTH = 20;
 
-  public static final String DRM_HOST = "http://player-next-staging.ooyala.com"; // TODO: change to player
+  public static final String DRM_HOST = "http://player.ooyala.com";
   public static final String DRM_TENENT_PATH = "/sas/drm2/%s/%s/%s/%s"; // '/drm2/:pcode/:embed_code/:drm_type/:tenant'
 
   public static final String BACKLOT_HOST = "https://api.ooyala.com";
