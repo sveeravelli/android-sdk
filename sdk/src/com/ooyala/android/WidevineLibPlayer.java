@@ -1,4 +1,5 @@
 package com.ooyala.android;
+
 import java.util.HashMap;
 
 import android.os.Handler;
@@ -13,7 +14,7 @@ import com.widevine.drmapi.android.WVStatus;
 
 //Use the 2.x API for pre-honeycomb devices.
 public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, Handler.Callback {
-  //messages
+  // messages
   private static final int INIT = 0;
   private static final int ERROR = -1;
 
@@ -24,15 +25,17 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   @Override
   public void init(OoyalaPlayer parent, Object o) {
-    WidevineParams params = (WidevineParams)o;
+    WidevineParams params = (WidevineParams) o;
 
     this.stream = params.url;
     this.parent = parent;
 
     HashMap<String, Object> options = new HashMap<String, Object>();
-    //this should point to SAS once we get the proxy up
-    String path = "http://jdlew-wifi.mtv:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/JDLEW";
-    options.put("WVPortalKey", "ooyala"); //add this value in SAS
+    // this should point to SAS once we get the proxy up
+    String path = Constants.DRM_HOST
+        + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
+
+    options.put("WVPortalKey", "ooyala"); // add this value in SAS
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
 
@@ -50,10 +53,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
       case PlayFailed:
         this._error = "Widevine Playback Failed";
         _handler.sendEmptyMessage(ERROR);
-        if (attributes.containsKey("WVStatusKey"))
-          return (WVStatus)attributes.get("WVStatusKey");
-        else
-          return WVStatus.OK;
+        if (attributes.containsKey("WVStatusKey")) return (WVStatus) attributes.get("WVStatusKey");
+        else return WVStatus.OK;
       case Initialized:
         _handler.sendEmptyMessage(INIT);
       case NullEvent:

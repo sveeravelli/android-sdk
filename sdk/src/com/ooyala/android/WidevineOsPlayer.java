@@ -1,7 +1,5 @@
 package com.ooyala.android;
 
-import com.ooyala.android.OoyalaPlayer.State;
-
 import android.annotation.TargetApi;
 import android.drm.DrmErrorEvent;
 import android.drm.DrmEvent;
@@ -11,12 +9,15 @@ import android.drm.DrmManagerClient;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.provider.Settings.Secure;
+import android.util.Log;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 //the widevine player using the built in libraries, for honeycomb+
 @TargetApi(11)
-class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorListener, DrmManagerClient.OnEventListener, DrmManagerClient.OnInfoListener {
+class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorListener,
+    DrmManagerClient.OnEventListener, DrmManagerClient.OnInfoListener {
 
   private static DrmManagerClient _drmClient;
 
@@ -24,7 +25,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
   @Override
   public void init(OoyalaPlayer parent, Object o) {
-    WidevineParams params = (WidevineParams)o;
+    WidevineParams params = (WidevineParams) o;
 
     if (_drmClient == null) {
       _drmClient = new DrmManagerClient(OoyalaAPIHelper.context);
@@ -36,19 +37,21 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     // replace scheme of widevine assets
     // need to be widevine:// vs http://
     Uri uri = Uri.parse(params.url);
-    //live check
+    // live check
     if (uri.getLastPathSegment().endsWith(".m3u8")) {
       _live = true;
     }
     params.url = uri.buildUpon().scheme("widevine").build().toString();
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
-    //this should point to SAS once we get the proxy up
-    String path = "http://jdlew-wifi.mtv:4567/sas/drm2/" + params.pcode + "/" + params.embedCode + "/widevine/ooyala/JDLEW";
+    // this should point to SAS once we get the proxy up
+    String path = Constants.DRM_HOST
+        + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
     request.put("WVDRMServerKey", path);
     request.put("WVAssetURIKey", params.url);
-    request.put("WVPortalKey", "ooyala");  //override in SAS
-    request.put("WVDeviceIDKey", Secure.getString(OoyalaAPIHelper.context.getContentResolver(), Secure.ANDROID_ID));
+    request.put("WVPortalKey", "ooyala"); // override in SAS
+    request.put("WVDeviceIDKey",
+        Secure.getString(OoyalaAPIHelper.context.getContentResolver(), Secure.ANDROID_ID));
     request.put("WVLicenseTypeKey", "3");
 
     _drmClient.acquireRights(request);
@@ -82,8 +85,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   @Override
   // Disable seeking in Live mode
   public void seekToTime(int timeInMillis) {
-    if (_live)
-      return;
+    if (_live) return;
     super.seekToTime(timeInMillis);
   }
 
