@@ -6,23 +6,16 @@ import java.util.Observer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.ooyala.android.ClosedCaptionsStyle;
-import com.ooyala.android.CurrentItemChangedCallback;
-import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
-import com.ooyala.android.Video;
 import com.ooyala.android.testapp.R;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
@@ -57,8 +50,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_",
-        "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w", "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com");
+        (OoyalaPlayerLayout) findViewById(R.id.player), "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh.9G7cT",
+        "217cVYc3ul6tCt_nZflNc6yLgT0Rok60UyBZ5Ggh", "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
@@ -91,7 +84,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p")) {
+    if (player.setEmbedCode("01am1yNTrAWIbmz4Inj6E_ptVvTMnDn7")) {
       Log.d(TAG, "TEST - yay!");
     } else {
       Log.d(TAG, "TEST - lame :(");
