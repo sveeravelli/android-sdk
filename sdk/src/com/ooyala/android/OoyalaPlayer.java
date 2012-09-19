@@ -479,19 +479,26 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   private boolean changeCurrentItemAfterFetch() {
     Stream s = _currentItem.getStream();
-    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM) || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_HLS)) {
+    if (s == null) { return false; }
+    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM)
+        || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_HLS)) {
       _player = new WidevineOsPlayer();
-      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(), getPlayerAPIClient().getPcode()));
+      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
+          getPlayerAPIClient().getPcode()));
     } else if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_MP4)) {
       _player = new WidevineLibPlayer();
-      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(), getPlayerAPIClient().getPcode()));
+      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
+          getPlayerAPIClient().getPcode()));
     } else {
       _player = new MoviePlayer();
       initializePlayer(_player, s.decodedURL().toString());
     }
-    //_player = new WidevineOsPlayer();
-    //initializePlayer(_player, new WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(), getPlayerAPIClient().getPcode()));
-    //initializePlayer(_player, new WidevineParams("https://dl.dropbox.com/u/39391582/expendable.wvm", getEmbedCode(), getPlayerAPIClient().getPcode()));
+    // _player = new WidevineOsPlayer();
+    // initializePlayer(_player, new
+    // WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(),
+    // getPlayerAPIClient().getPcode()));
+    // initializePlayer(_player, new WidevineParams("https://dl.dropbox.com/u/39391582/expendable.wvm",
+    // getEmbedCode(), getPlayerAPIClient().getPcode()));
 
     if (_player == null || _player.getError() != null) { return false; }
     _player.setSeekable(_seekable);
@@ -723,7 +730,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     this._lastPlayedTime = time;
     for (AdSpot ad : _currentItem.getAds()) {
       int adTime = ad.getTime();
-      //Align ad times to 10 second (HLS chunk length) boundaries
+      // Align ad times to 10 second (HLS chunk length) boundaries
       if (getCurrentItem().getStream().getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) {
         adTime = ((adTime + 5000) / 10000) * 10000;
       }
@@ -742,15 +749,11 @@ public class OoyalaPlayer extends Observable implements Observer {
       _adPlayer = new VASTAdPlayer();
     }
 
-    if (_adPlayer == null) {
-      return false;
-    }
+    if (_adPlayer == null) { return false; }
 
     initializePlayer(_adPlayer, ad);
 
-    if (_adPlayer == null || _adPlayer.getState() == State.ERROR) {
-      return false;
-    }
+    if (_adPlayer == null || _adPlayer.getState() == State.ERROR) { return false; }
     _adPlayer.setSeekable(_adsSeekable);
 
     _player.suspend();
@@ -875,12 +878,10 @@ public class OoyalaPlayer extends Observable implements Observer {
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    Player player = (Player)arg0;
+    Player player = (Player) arg0;
     String notification = arg1.toString();
 
-    if (currentPlayer() != null && currentPlayer() != player) {
-      return;
-    }
+    if (currentPlayer() != null && currentPlayer() != player) { return; }
 
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
@@ -897,7 +898,7 @@ public class OoyalaPlayer extends Observable implements Observer {
         displayCurrentClosedCaption();
       }
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      switch(player.getState()) {
+      switch (player.getState()) {
         case COMPLETED:
           if (player == _player) {
             if (!playAdsBeforeTime(Integer.MAX_VALUE - 1)) {
@@ -911,8 +912,8 @@ public class OoyalaPlayer extends Observable implements Observer {
               if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
-               _player.resume();
-               addClosedCaptionsView();
+                _player.resume();
+                addClosedCaptionsView();
               }
             }
           }
@@ -921,7 +922,7 @@ public class OoyalaPlayer extends Observable implements Observer {
           if (player == _player) {
             cleanupPlayers();
             _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
-              player.getError());
+                player.getError());
             setState(State.ERROR);
             sendNotification(ERROR_NOTIFICATION);
           } else {
@@ -951,8 +952,7 @@ public class OoyalaPlayer extends Observable implements Observer {
           if (_queuedSeekTime > 0) {
             seek(_queuedSeekTime);
           }
-          if (player == _adPlayer)
-            break;
+          if (player == _adPlayer) break;
         case INIT:
         case LOADING:
         case PAUSED:
