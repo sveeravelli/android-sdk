@@ -61,6 +61,20 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public static boolean enableHLS = false;
 
+  /**
+   * For internal use only
+   */
+  public static enum Environment {
+    PRODUCTION, STAGING, LOCAL
+  };
+
+  /**
+   * For internal use only
+   */
+  public static void setEnvironment(Environment e) {
+    Constants.setEnvironment(e);
+  }
+
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
   private OoyalaException _error = null;

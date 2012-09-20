@@ -7,29 +7,52 @@ class Constants {
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;
 
-  public static final String JS_ANALYTICS_HOST = "http://player.ooyala.com";
-  public static final String JS_ANALYTICS_URI = "/reporter.js";
-  public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
-
   public static final String API_CONTENT_TREE = "content_tree";
   public static final String API_CONTENT_TREE_NEXT = "content_tree_next";
   public static final String API_AUTHORIZE = "authorize";
   public static final String API_METADATA = "metadata";
 
-  public static final String AUTHORIZE_HOST = "http://player.ooyala.com";
+  public static String JS_ANALYTICS_HOST = "http://player.ooyala.com";
+  public static String AUTHORIZE_HOST = "http://player.ooyala.com";
+  public static String CONTENT_TREE_HOST = "http://player.ooyala.com";
+  public static String DRM_HOST = "http://player.ooyala.com";
+  public static String BACKLOT_HOST = "https://api.ooyala.com";
+
+  public static void setEnvironment(OoyalaPlayer.Environment e) {
+    if (e == OoyalaPlayer.Environment.PRODUCTION) {
+      JS_ANALYTICS_HOST = "http://player.ooyala.com";
+      AUTHORIZE_HOST = "http://player.ooyala.com";
+      CONTENT_TREE_HOST = "http://player.ooyala.com";
+      DRM_HOST = "http://player.ooyala.com";
+      BACKLOT_HOST = "https://api.ooyala.com";
+    } else if (e == OoyalaPlayer.Environment.STAGING) {
+      JS_ANALYTICS_HOST = "http://player-staging.ooyala.com";
+      AUTHORIZE_HOST = "http://player-staging.ooyala.com";
+      CONTENT_TREE_HOST = "http://player-staging.ooyala.com";
+      DRM_HOST = "http://player-staging.ooyala.com";
+      BACKLOT_HOST = "https://api-staging.ooyala.com";
+    } else if (e == OoyalaPlayer.Environment.LOCAL) {
+      JS_ANALYTICS_HOST = "http://dev.corp.ooyala.com:3000";
+      AUTHORIZE_HOST = "http://dev.corp.ooyala.com:4567";
+      CONTENT_TREE_HOST = "http://dev.corp.ooyala.com:3000";
+      DRM_HOST = "http://dev.corp.ooyala.com:4567";
+      BACKLOT_HOST = "https://api-staging.ooyala.com";
+    }
+  }
+
+  public static final String JS_ANALYTICS_URI = "/reporter.js";
+  public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
+
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
   public static final String AUTHORIZE_PUBLIC_KEY_B64 = "MCgCIQD1PX86jvLr5bB3b5IFEze7TiWGEaRSHl5Ls7/3AKO5IwIDAQAB";
   public static final String AUTHORIZE_PUBLIC_KEY_NAME = "sas_public_key";
   public static final int AUTHORIZE_SIGNATURE_DIGEST_LENGTH = 20;
 
-  public static final String DRM_HOST = "http://player.ooyala.com";
   public static final String DRM_TENENT_PATH = "/sas/drm2/%s/%s/%s/%s"; // '/drm2/:pcode/:embed_code/:drm_type/:tenant'
 
-  public static final String BACKLOT_HOST = "https://api.ooyala.com";
   public static final String BACKLOT_URI_PREFIX = "/v2";
 
-  public static final String CONTENT_TREE_HOST = "http://player.ooyala.com";
   public static final String CONTENT_TREE_URI = "/player_api/v%s/content_tree/embed_code/%s/%s";
   public static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/v%s/content_tree/external_id/%s/%s";
   public static final String CONTENT_TREE_NEXT_URI = "/player_api/v%s/content_tree/next/%s/%s";
