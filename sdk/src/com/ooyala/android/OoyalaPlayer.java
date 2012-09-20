@@ -54,6 +54,13 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
 
+  /**
+   * If set to true, this will allow HLS streams regardless of the Android version. WARNING: Ooyala's internal
+   * testing has shown that Android 3.x HLS support is unstable. Android 2.x does not support HLS at all. If
+   * set to false, HLS streams will only be allowed on Android 4.x and above
+   */
+  public static boolean enableHLS = false;
+
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
   private OoyalaException _error = null;
