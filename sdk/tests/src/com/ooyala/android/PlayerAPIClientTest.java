@@ -47,8 +47,11 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertEquals(videoHLS.getAuthCode(), AuthCode.AUTHORIZED);
     assertTrue(videoHLS instanceof Video);
     String url = ((Video) videoHLS).getStream().decodedURL().toString();
-    assertTrue(url + " != http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8",
-        url.startsWith("http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8"));
+    assertTrue(
+        url + " != http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8",
+        url.startsWith("http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8")
+            || url
+                .startsWith("http://player.ooyala.com/player/android_3plus_sdk/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8"));
     OoyalaPlayer.enableHLS = false;
 
     video = ContentItem.create(
