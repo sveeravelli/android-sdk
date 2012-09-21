@@ -16,7 +16,8 @@ class Constants {
   public static String AUTHORIZE_HOST = "http://player.ooyala.com";
   public static String CONTENT_TREE_HOST = "http://player.ooyala.com";
   public static String DRM_HOST = "http://player.ooyala.com";
-  public static String BACKLOT_HOST = "https://api.ooyala.com";
+  public static String BACKLOT_HOST = "http://cdn.api.ooyala.com";
+  public static String METADATA_HOST = "http://player.ooyala.com";
 
   public static void setEnvironment(OoyalaPlayer.Environment e) {
     if (e == OoyalaPlayer.Environment.PRODUCTION) {
@@ -24,19 +25,29 @@ class Constants {
       AUTHORIZE_HOST = "http://player.ooyala.com";
       CONTENT_TREE_HOST = "http://player.ooyala.com";
       DRM_HOST = "http://player.ooyala.com";
-      BACKLOT_HOST = "https://api.ooyala.com";
+      BACKLOT_HOST = "http://cdn.api.ooyala.com";
+      METADATA_HOST = "http://player.ooyala.com";
     } else if (e == OoyalaPlayer.Environment.STAGING) {
       JS_ANALYTICS_HOST = "http://player-staging.ooyala.com";
       AUTHORIZE_HOST = "http://player-staging.ooyala.com";
       CONTENT_TREE_HOST = "http://player-staging.ooyala.com";
       DRM_HOST = "http://player-staging.ooyala.com";
-      BACKLOT_HOST = "https://api-staging.ooyala.com";
+      BACKLOT_HOST = "http://api-staging.ooyala.com";
+      METADATA_HOST = "http://player-staging.ooyala.com";
     } else if (e == OoyalaPlayer.Environment.LOCAL) {
       JS_ANALYTICS_HOST = "http://dev.corp.ooyala.com:3000";
       AUTHORIZE_HOST = "http://dev.corp.ooyala.com:4567";
       CONTENT_TREE_HOST = "http://dev.corp.ooyala.com:3000";
       DRM_HOST = "http://dev.corp.ooyala.com:4567";
-      BACKLOT_HOST = "https://api-staging.ooyala.com";
+      BACKLOT_HOST = "http://api-staging.ooyala.com";
+      METADATA_HOST = "http://dev.corp.ooyala.com:3000";
+    } else {
+      JS_ANALYTICS_HOST = "http://player.ooyala.com";
+      AUTHORIZE_HOST = "http://player.ooyala.com";
+      CONTENT_TREE_HOST = "http://player.ooyala.com";
+      DRM_HOST = "http://player.ooyala.com";
+      BACKLOT_HOST = "http://cdn.api.ooyala.com";
+      METADATA_HOST = "http://player.ooyala.com";
     }
   }
 
@@ -57,7 +68,6 @@ class Constants {
   public static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/v%s/content_tree/external_id/%s/%s";
   public static final String CONTENT_TREE_NEXT_URI = "/player_api/v%s/content_tree/next/%s/%s";
 
-  public static final String METADATA_HOST = "http://player.ooyala.com";
   public static final String METADATA_CONTENT_ID_URI = "/player_api/v%s/metadata/content_id/%s/%s/android";
   public static final String METADATA_EMBED_CODE_URI = "/player_api/v%s/metadata/embed_code/%s/%s/android";
 
