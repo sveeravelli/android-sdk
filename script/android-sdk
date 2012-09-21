@@ -79,7 +79,7 @@ function custom_tests {
     exit 1
   fi
 
-  if [[ `${ADB} devices |grep -v "devices" |grep -v "daemon" |wc |awk '{print $1}'` < 3 ]]; then
+  if [[ `${ADB} devices |grep -v "devices" |grep -v "daemon" |grep -v -e "^$" |wc |awk '{print $1}'` < 1 ]]; then
     echo "Starting emulator..."
     ${EMULATOR} -avd ${AVD_NAME} &
   fi
@@ -93,7 +93,7 @@ function custom_tests {
   cd tests
   ant clean
   ant debug
-  if [[ `${ADB} devices |grep -v "devices" |grep -v "daemon" |wc |awk '{print $1}'` < 3 ]]; then
+  if [[ `${ADB} devices |grep -v "devices" |grep -v "daemon" |grep -v -e "^$" |wc |awk '{print $1}'` < 1 ]]; then
     # We have to do this because sometimes ADB is stupid.
     echo "Restarting ADB..."
     ${ADB} kill-server
