@@ -28,23 +28,34 @@ public class Caption {
     }
 
     _text = "";
-    for (int i=0; i< element.getChildNodes().getLength(); i++) {
-      for (String t:element.getChildNodes().item(i).getTextContent().split("[\r\n]")) {
+    for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+      for (String t : element.getChildNodes().item(i).getTextContent().split("[\r\n]")) {
         _text += t.trim();
       }
-      if (element.getChildNodes().item(i).getNodeName().equals("br"))
-        _text += "\n";
+      if (element.getChildNodes().item(i).getNodeName().equals("br")) _text += "\n";
     }
   }
 
+  /**
+   * Fetch the time to begin showing this Caption
+   * @return the time to begin showing this Caption (seconds)
+   */
   public double getBegin() {
     return _begin;
   }
 
+  /**
+   * Fetch the time to stop showing this Caption
+   * @return the time to stop showing this Caption (seconds)
+   */
   public double getEnd() {
     return _end;
   }
 
+  /**
+   * Fetch the text of this Caption
+   * @return the text of this Caption
+   */
   public String getText() {
     return _text;
   }

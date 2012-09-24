@@ -69,6 +69,11 @@ public abstract class AdSpot {
     return ReturnState.STATE_MATCHED;
   }
 
+  /**
+   * This method will fetch all the information required to play this AdSpot. This method should automatically
+   * get called during playback. There is no reason to call it unless you want to prefetch the data.
+   * @return true if success, false if failure.
+   */
   public abstract boolean fetchPlaybackInfo();
 
   static AdSpot create(JSONObject data, PlayerAPIClient api) {
@@ -93,14 +98,26 @@ public abstract class AdSpot {
     }
   }
 
+  /**
+   * Fetch the time at which this AdSpot should play.
+   * @return The time at which this AdSpot should play in milliseconds.
+   */
   public int getTime() {
     return _time;
   }
 
+  /**
+   * Fetch the URL to ping when this AdSpot is clicked.
+   * @return the click URL
+   */
   public URL getClickURL() {
     return _clickURL;
   }
 
+  /**
+   * Fetch the list of tracking URLs to ping when this AdSpot is played.
+   * @return the list of tracking URLs
+   */
   public List<URL> getTrackingURLs() {
     return _trackingURLs;
   }

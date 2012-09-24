@@ -76,6 +76,7 @@ public class ClosedCaptions {
   }
 
   /**
+   * Fetch the Set of supported languages
    * @return the Set of supported languages
    */
   public Set<String> getLanguages() {
@@ -83,14 +84,16 @@ public class ClosedCaptions {
   }
 
   /**
-   * @return the default language
+   * Fetch the default language to display ClosedCaptions in.
+   * @return the default language to display ClosedCaptions in.
    */
   public String getDefaultLanguage() {
     return _defaultLanguage;
   }
 
   /**
-   * @return the URL
+   * Fetch the URL of the ClosedCaptions file.
+   * @return the URL pf the ClosedCaptions file.
    */
   public URL getURL() {
     return _url;
@@ -149,6 +152,10 @@ public class ClosedCaptions {
     return true;
   }
 
+  /**
+   * Fetch the ClosedCaptions information required for playback. This should get called automatically.
+   * @return true if success, false if failure
+   */
   public boolean fetchClosedCaptionsInfo() {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -162,10 +169,21 @@ public class ClosedCaptions {
     }
   }
 
+  /**
+   * Fetch the list of Caption objects for the language specified.
+   * @param language the language to fetch the Caption objects for
+   * @return a list of Caption objects
+   */
   public List<Caption> closedCaptionsForLanguage(String language) {
     return _captions.get(language.toLowerCase());
   }
 
+  /**
+   * Fetch the Caption object corresponding to the language and time specified
+   * @param language the language to fetch the Caption object for
+   * @param time the time to fetch the Caption object for
+   * @return the Caption object
+   */
   public Caption getCaption(String language, double time) {
     List<Caption> captionsForLanguage = closedCaptionsForLanguage(language);
     if (captionsForLanguage == null || captionsForLanguage.size() == 0) { return null; }

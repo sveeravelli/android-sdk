@@ -93,37 +93,66 @@ public class VASTLinearAd implements PlayableItem {
 
   /**
    * Return the stream to play
-   * @return he lowest bitrate mp4 stream
+   * @return the lowest bitrate mp4 stream
    */
   @Override
   public Stream getStream() {
     return Stream.bestStream(_streams);
   }
 
+  /**
+   * Fetch the duration of this VASTLinearAd in seconds.
+   * @return the duration in seconds.
+   */
   public double getDuration() {
     return _duration;
   }
 
+  /**
+   * Fetch a HashMap containing the tracking events.
+   * @return a HashMap containing the tracking events. The key is the event name and the value is a Set of
+   *         Strings.
+   */
   public HashMap<String, Set<String>> getTrackingEvents() {
     return _trackingEvents;
   }
 
+  /**
+   * Fetch the additional ad parameters.
+   * @return the additional ad parameters.
+   */
   public String getParameters() {
     return _parameters;
   }
 
+  /**
+   * Fetch the URL go to when the user clicks this ad.
+   * @return the URL go to when the user clicks this ad.
+   */
   public String getClickThroughURL() {
     return _clickThroughURL;
   }
 
+  /**
+   * Fetch the Set of URLs to ping when the user clicks this ad.
+   * @return The Set of URLs to ping when the user clicks this ad.
+   */
   public Set<String> getClickTrackingURLs() {
     return _clickTrackingURLs;
   }
 
+  /**
+   * Fetch the custom click URLs as a Set of Strings
+   * @return the custom click URLs as a Set of Strings
+   */
   public Set<String> getCustomClickURLs() {
     return _customClickURLs;
   }
 
+  /**
+   * Fetch all the streams associated with this VASTLinearAd.
+   * @return a Set of Stream objects
+   */
   public Set<Stream> getStreams() {
     return _streams;
   }

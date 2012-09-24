@@ -203,42 +203,83 @@ public class VASTAd {
     }
   }
 
+  /**
+   * Fetch the id of this VASTAd. This doesn't really mean anything.
+   * @return the id of this VASTAd.
+   */
   public String getAdID() {
     return _adID;
   }
 
+  /**
+   * Fetch the VASTAd's System. This is a String defining which ad provider this VASTAd uses.
+   * @return the VASTAd's System.
+   */
   public String getSystem() {
     return _system;
   }
 
+  /**
+   * Fetch the VASTAd's System's Version.
+   * @return the version of the VASTAd's System.
+   */
   public String getSystemVersion() {
     return _systemVersion;
   }
 
+  /**
+   * Fetch the title of this VASTAd.
+   * @return the title of this VASTAd.
+   */
   public String getTitle() {
     return _title;
   }
 
+  /**
+   * Fetch the description of this VASTAd.
+   * @return the description of this VASTAd.
+   */
   public String getDescription() {
     return _description;
   }
 
+  /**
+   * Fetch the list of Survey URLs associated with this VASTAd.
+   * @return the list of Survey URLs associated with this VASTAd.
+   */
   public List<String> getSurveyURLs() {
     return _surveyURLs;
   }
 
+  /**
+   * Fetch the list of URLs to ping when this VASTAd throws an error.
+   * @return the list of URls to ping when this VASTAd throws an error.
+   */
   public List<String> getErrorURLs() {
     return _errorURLs;
   }
 
+  /**
+   * Fetch the list of URLs to ping when this VASTAd plays.
+   * @return the list of URLs to ping when this VASTAd plays.
+   */
   public List<String> getImpressionURLs() {
     return _impressionURLs;
   }
 
+  /**
+   * Fetch the list of VASTSequenceItem objects that make up this VASTAd. This list defines the order to play
+   * or show the various different VASTAd types such as linear, non-linear and companion ads.
+   * @return the list of VASTSequenceItem objects.
+   */
   public List<VASTSequenceItem> getSequence() {
     return _sequence;
   }
 
+  /**
+   * Fetch the raw XML Element object for the VAST Extensions associated with this VASTAd.
+   * @return the Element object containing the VAST Extensions.
+   */
   public Element getExtensions() {
     return _extensions;
   }

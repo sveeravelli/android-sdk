@@ -55,18 +55,34 @@ public class VASTStream extends Stream {
     this._url = data.getTextContent();
   }
 
+  /**
+   * Check whether this VASTStream is scalable or not.
+   * @return true if it is, false if not.
+   */
   public boolean isScalable() {
     return _scalable;
   }
 
+  /**
+   * Check whether this VASTStream should maintian its aspect ratio when scaling or not.
+   * @return true if yes, false if no.
+   */
   public boolean isMaintainAspectRatio() {
     return _maintainAspectRatio;
   }
 
+  /**
+   * Get the delivery type (format) of this VASTStream.
+   * @return a String denoting the delivery type.
+   */
   public String getVastDeliveryType() {
     return _vastDeliveryType;
   }
 
+  /**
+   * Get the API Framework of this VASTStream.
+   * @return the API Framework as a String.
+   */
   public String getApiFramework() {
     return _apiFramework;
   }
