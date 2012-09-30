@@ -62,6 +62,14 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static boolean enableHLS = false;
 
   /**
+   * If set to true, this will allow Higher Resolution HLS streams regardless of the Android version. WARNING:
+   * Ooyala's internal testing has shown that Android 3.x HLS support is unstable. Android 2.x does not
+   * support HLS at all. If set to false, HLS streams will only be allowed on Android 4.x and above. Also this
+   * will internally make Ooyala's APIs think that the device is iPad and may have undesired results.
+   */
+  public static boolean enableHighResHLS = false;
+
+  /**
    * For internal use only
    */
   public static enum Environment {

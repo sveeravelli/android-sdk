@@ -22,8 +22,11 @@ import android.util.Log;
 class Utils {
   public static String device() {
     // temporarily disable HLS
-    if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) return Constants.DEVICE_ANDROID_HLS_SDK;
-    else return Constants.DEVICE_ANDROID_SDK;
+    if (OoyalaPlayer.enableHighResHLS) { // hack for Washington Post - See PB-279
+      return Constants.DEVICE_IPAD;
+    } else if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+      return Constants.DEVICE_ANDROID_HLS_SDK;
+    } else return Constants.DEVICE_ANDROID_SDK;
   }
 
   public static URL makeURL(String host, String uri, Map<String, String> params) {

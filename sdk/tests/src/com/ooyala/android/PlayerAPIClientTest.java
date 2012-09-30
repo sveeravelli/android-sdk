@@ -54,6 +54,18 @@ public class PlayerAPIClientTest extends AndroidTestCase {
                 .startsWith("http://player.ooyala.com/player/android_3plus_sdk/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8"));
     OoyalaPlayer.enableHLS = false;
 
+    OoyalaPlayer.enableHighResHLS = true;
+    videoHLS = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+        TestConstants.TEST_VIDEO, api);
+    assertTrue(api.authorize(videoHLS));
+    assertTrue(videoHLS.isAuthorized());
+    assertEquals(videoHLS.getAuthCode(), AuthCode.AUTHORIZED);
+    assertTrue(videoHLS instanceof Video);
+    url = ((Video) videoHLS).getStream().decodedURL().toString();
+    assertTrue(url + " != http://player.ooyala.com/player/ipad/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8",
+        url.startsWith("http://player.ooyala.com/player/ipad/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8"));
+    OoyalaPlayer.enableHighResHLS = false;
+
     video = ContentItem.create(
         ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA),
         TestConstants.TEST_VIDEO_WITH_AD_OOYALA, api);
