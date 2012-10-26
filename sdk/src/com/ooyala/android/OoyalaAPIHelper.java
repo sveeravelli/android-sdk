@@ -69,10 +69,12 @@ class OoyalaAPIHelper {
         if (headerName.equals("Set-Cookie")) {
           String fullCookie = conn.getHeaderField(i);
           Log.d(OoyalaAPIHelper.class.getName(), "FOUND COOKIE: " + fullCookie);
-          String cookie = fullCookie.substring(0, fullCookie.indexOf(";"));
-          String cookieName = cookie.substring(0, cookie.indexOf("="));
-          String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
-          OoyalaAPIHelper.cookies.put(cookieName, cookieValue);
+          if (fullCookie.indexOf(";") > 0) {
+            String cookie = fullCookie.substring(0, fullCookie.indexOf(";"));
+            String cookieName = cookie.substring(0, cookie.indexOf("="));
+            String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
+            OoyalaAPIHelper.cookies.put(cookieName, cookieValue);
+          }
         }
       }
     } catch (Exception e) {
