@@ -19,11 +19,11 @@ public class GettingStartedSampleAppActivity extends Activity {
         "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
         "R2d3I6s06RyB712DN0_2GsQS-R-Y", "www.ooyala.com");
     OoyalaPlayer player = playerLayoutController.getPlayer();
-    if (player.setEmbedCode("lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe")) {
+    if (player.setEmbedCode("5waDl3NTrAjyO-VJfc8A1TZ2M4JQOelo")) {
       // The Embed Code works
       player.play();
     } else {
-      Log.d(this.getClass().getName(), "Something Went Wrong!");
+      Log.d(this.getClass().getName(), "Something Went Wrong!!");
     }
   }
 }

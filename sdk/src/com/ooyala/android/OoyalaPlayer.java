@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.FrameLayout;
+import com.ooyala.android.NexPlayerMoviePlayer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
@@ -519,7 +520,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode()));
     } else {
-      _player = new MoviePlayer();
+      _player = new NexPlayerMoviePlayer();
       initializePlayer(_player, s.decodedURL().toString());
     }
     // _player = new WidevineOsPlayer();
