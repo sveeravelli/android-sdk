@@ -1,43 +1,31 @@
 package com.ooyala.android;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.media.AudioManager;
+import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnInfoListener;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
-import android.media.MediaPlayer.OnVideoSizeChangedListener;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.View;
+import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
-
 import com.ooyala.android.OoyalaPlayer.State;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
-import com.visualon.OSMPUtils.voLog;
 import com.visualon.OSMPUtils.voOSType;
 
 /**
  * A wrapper around android.media.MediaPlayer
  * http://developer.android.com/reference/android/media/MediaPlayer.html
- * 
+ *
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
@@ -61,6 +49,27 @@ class VisualOnMoviePlayer extends Player implements
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
+
+  /* Copy file from Assets directory to destination. Used for licenses and processor-specific configurations */
+  private static void copyfile(Context context, String filename, String desName)
+  {
+    try {
+      InputStream InputStreamis  = context.getAssets().open(filename);
+      File desFile = new File("/data/data/" +
+            context.getPackageName() + "/" + desName);
+      desFile.createNewFile();
+      FileOutputStream  fos = new FileOutputStream(desFile);
+      int bytesRead;
+      byte[] buf = new byte[4 * 1024]; //4K buffer
+      while((bytesRead = InputStreamis.read(buf)) != -1) {
+      fos.write(buf, 0, bytesRead);
+      }
+      fos.flush();
+      fos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
@@ -98,9 +107,18 @@ class VisualOnMoviePlayer extends Player implements
       setState(State.ERROR);
       return;
     }
+
     setState(State.LOADING);
     _streamUrl = (String) stream;
     setParent(parent);
+
+
+    // Copy license file,
+    copyfile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
+    copyfile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
+
+
+    setupView();
   }
 
   @Override
@@ -206,32 +224,18 @@ class VisualOnMoviePlayer extends Player implements
       if (_player == null) {
         _player = new voOSBasePlayer();
       } else {
-        _player.SetView(_view);
-        _player.SetDisplaySize(_width, _height);
+
+        _player.Uninit();
+        _player = new voOSBasePlayer();
+        //player.SetView(_view);
+        //_player.SetDisplaySize(_width, _height);
         return;
         // TODO: _player.reset();
-      }
-      // Set cookies if they exist for 4.0+ Secure HLS Support
-      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-        String cookieHeaderStr = null;
-        for (String cookieName : OoyalaAPIHelper.cookies.keySet()) {
-          if (cookieHeaderStr == null) {
-            cookieHeaderStr = (cookieName + "=" + OoyalaAPIHelper.cookies
-                .get(cookieName));
-          } else {
-            cookieHeaderStr += ("; " + cookieName + "=" + OoyalaAPIHelper.cookies
-                .get(cookieName));
-          }
-        }
-        Map<String, String> cookieHeader = new HashMap<String, String>();
-        cookieHeader.put(Constants.HTML_COOKIE_HEADER_NAME, cookieHeaderStr);
-      } else {
       }
 
       // SDK player engine type
       int nParam = voOSType.VOOSMP_VOME2_PLAYER;
 
-      _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
       // Location of libraries
       String apkPath = "/data/data/"
           + _parent.getLayout().getContext().getPackageName() + "/lib/";
@@ -253,35 +257,33 @@ class VisualOnMoviePlayer extends Player implements
 
       // Register SDK event listener
       _player.setEventListener(this);
-      _player.setRequestListener(this);
+
+      /* Configure DRM parameters */
+      _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
+      _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
+
+      /* Configure Dolby Audio Effect parameters */
+      _player.SetParam(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
 
       /* Processor-specific settings */
-      /*
-       * String cfgPath = "/data/data/" +
-       * _parent
-       * .getLayout().getContext().getPackageName
-       * () + "/"; String capFile = cfgPath +
-       * "cap.xml"; _player.SetParam(voOSType.
-       * VOOSMP_SRC_PID_CAP_TABLE_PATH,
-       * capFile);
-       */
+        String cfgPath = "/data/data/" + _parent.getLayout().getContext().getPackageName() + "/";
+        String capFile = cfgPath + "cap.xml";
+        _player.SetParam(voOSType.VOOSMP_SRC_PID_CAP_TABLE_PATH, capFile);
 
-      nRet = _player
-          .Open(
-              "http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8",
-              voOSType.VOOSMP_FLAG_SOURCE_URL, 0, 0, 0);
-      if (nRet == voOSType.VOOSMP_ERR_None) {
-        Log.v(TAG, "MediaPlayer is Opened.");
-      } else {
-        onError(_player, nRet, 0);
-        return;
-      }
-
+        //Open then run the player
+        nRet = _player.Open(
+            "http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8",
+            voOSType.VOOSMP_FLAG_SOURCE_URL, 0, 0, 0);
+          if (nRet == voOSType.VOOSMP_ERR_None) {
+            Log.v(TAG, "MediaPlayer is Opened.");
+          } else {
+            onError(_player, nRet, 0);
+            return;
+          }
       setState(State.READY);
-      play();
 
     } catch (Throwable t) {
-    }
+      t.printStackTrace(); }
   }
 
   public boolean onError(voOSBasePlayer mp, int what, int extra) {
@@ -307,15 +309,25 @@ class VisualOnMoviePlayer extends Player implements
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
     Log.i(TAG, "Surface Changed");
-    if (_player != null)
-      _player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+    /*if (_player != null)
+      _player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);*/
   }
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Created");
+
+    if (_player !=null)
+    {
+      // If SDK player already exists, show media controls
+      _player.SetParam(voOSType.VOOSMP_PID_VIEW_ACTIVE, _view);
+      return;
+    }
+
     if (_state == State.LOADING) {
       createMediaPlayer();
+
+      play();
     }
   }
 
@@ -330,12 +342,11 @@ class VisualOnMoviePlayer extends Player implements
   @Override
   public void setParent(OoyalaPlayer parent) {
     super.setParent(parent);
-    setupView();
   }
 
   @SuppressWarnings("deprecation")
   private void setupView() {
-    _view = new MovieView(_parent.getLayout().getContext());
+    _view = new SurfaceView(_parent.getLayout().getContext());
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -343,7 +354,8 @@ class VisualOnMoviePlayer extends Player implements
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    _holder.setFormat(PixelFormat.RGBA_8888);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
   }
 
   private void removeView() {
@@ -555,7 +567,7 @@ class VisualOnMoviePlayer extends Player implements
     {
       Log.v(TAG, "onEvent: Video Size Changed");
       return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Video buffering
+    } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Vid seteo buffering
                                                        // stopped
     {
       return 0;
