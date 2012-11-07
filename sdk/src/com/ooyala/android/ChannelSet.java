@@ -144,7 +144,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
   }
 
   /**
-   * The total duration (not including Ads) of this ChannelSet
+   * The total duration (not including Ads) of this ChannelSet. This only accounts for currently loaded channels.
    * @return an int with the total duration in seconds
    */
   public int getDuration() {
