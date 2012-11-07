@@ -230,7 +230,7 @@ function gen {
     fi
   elif [[ ${push} = true ]]; then
     echo "  Pushing Gen Release commit."
-    git c -a -m "Gen Release"
+    git commit -a -m "Gen Release"
     git push
   fi
   cd "${gen_currdir}"
