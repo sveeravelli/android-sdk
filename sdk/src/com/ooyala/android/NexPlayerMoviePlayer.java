@@ -32,7 +32,7 @@ import com.ooyala.android.OoyalaPlayer.State;
  */
 class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     GLRenderer.IListener, SurfaceHolder.Callback {
-  private static final String TAG = "[PLAYER_SAMPLE]";
+  private static final String TAG = "[PLAYER_SAMPLE]:NexPlayer";
 
   protected NexPlayer _player = null;
   protected SurfaceHolder _holder = null;
@@ -98,10 +98,14 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
         queuePlay();
         break;
       case PAUSED:
-      case READY:
-      case COMPLETED:
         _player.resume();
         setState(State.PLAYING);
+        break;
+      case READY:
+      case COMPLETED:
+        _player.start(0);
+        setState(State.PLAYING);
+        break;
       default:
         break;
     }
@@ -111,13 +115,16 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   public void stop() {
     _playQueued = false;
     _player.stop();
-    _player.release();
   }
 
+  private boolean waitingForStopToResume = false;
   @Override
   public void reset() {
     suspend(0, State.PAUSED);
-    resume();
+    if (!waitingForStopToResume)
+    {
+      resume();
+    }
   }
 
   @Override
@@ -156,6 +163,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) { return; }
+    Log.d(TAG, "seeking:" + timeInMillis + "ms. seekable: " + _player.getSeekableRangeInfo()[0] + ", " + _player.getSeekableRangeInfo()[1]);
     _playheadTime = timeInMillis;
     _player.seek(timeInMillis);
   }
@@ -170,7 +178,9 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
       }
 //"http://www.playon.tv/online/iphone5/main.m3u8"
       //http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8
-      _player.open( "https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8", null, null,
+//      https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8
+      _playheadTime = 0;
+      _player.open( _streamUrl, null, null,
           NexPlayer.NEXPLAYER_SOURCE_TYPE_STREAMING,
           NexPlayer.NEXPLAYER_TRANSPORT_TYPE_TCP, 0);
     } catch (Throwable t) {
@@ -213,8 +223,8 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    int rendermode = _player.GetRenderMode();
-    if(rendermode != NexPlayer.NEX_USE_RENDER_JAVA)//ignore when java renderer mode
+  //ignore when java renderer mode
+    if(_player == null || _player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_JAVA)
       _surfaceCreated = false;
   }
 
@@ -238,6 +248,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
   private void createView(Context c) {
     // _view = new MovieView(c);
+    Log.d(TAG, "CreateView");
     _player = new NexPlayer();
 
     _player.init(OoyalaAPIHelper.context, android.os.Build.MODEL,
@@ -277,10 +288,17 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     if (_state == State.SUSPENDED) {
       return;
     }
+    Log.d(TAG, "Suspend");
     if (_player != null) {
       _stateBeforeSuspend = stateToResume;
-      stop();
-      _player = null;
+      
+      //If playing, we have to stop the player before we close
+      if (_player.getState() == NexPlayer.NEXPLAYER_STATE_PLAY)
+      {
+        waitingForStopToResume = true;
+        stop();
+      }
+      else { _player.close(); _player.release(); }
     }
     removeView();
     _width = 0;
@@ -292,9 +310,11 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
   @Override
   public void resume() {
+    Log.d(TAG, "Resuming");
     if (_state != State.SUSPENDED) { return; }
     setState(State.LOADING);
     setupView();
+    createMediaPlayer();
     if (_stateBeforeSuspend == State.PLAYING) {
       queuePlay();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
@@ -305,7 +325,8 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   @Override
   public void destroy() {
     if (_player != null) {
-      stop();
+      _player.close();
+      _player.release(); 
       _player = null;
     }
     removeView();
@@ -373,7 +394,18 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   // onEndofContent is called when content meets end.
   @Override
   public void onEndOfContent(NexPlayer mp) {
-    _player.stop();
+    Log.d(TAG, "eonEndOfContent called");
+    mHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          currentItemCompleted();
+        }catch (Throwable e)
+        {
+          e.printStackTrace();
+        }
+      }
+    });
   }
 
   // onStartVideoTask is called when VideoTask is created.
@@ -581,9 +613,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     switch (command) {
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_LOCAL:
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_STREAMING:
-      _player.start(0);
-
-
       mHandler.post(new Runnable() {
         @Override
         public void run() {
@@ -591,12 +620,36 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
              _view.setVisibility(View.VISIBLE);
              setState(State.READY);
+             dequeuePlay();
           }catch (Throwable e)
           {
             e.printStackTrace();
           }
         }
       });
+      break;
+    case NexPlayer.NEXPLAYER_ASYNC_CMD_SEEK:
+      Log.d(TAG, "ASYNC Seek. res " + result + ", p1 " + param1 + ", p2 " + param2);
+      break;
+      
+    case NexPlayer.NEXPLAYER_ASYNC_CMD_STOP:
+      Log.d(TAG, "ASYNC Stop");
+      if(waitingForStopToResume) {
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            try { 
+              _player.close();
+              resume(); }
+            catch (Throwable e) { e.printStackTrace(); }
+          }
+        });
+      }
+      break;
+    default:
+      Log.d(TAG, "ASYNC Unhandled cmd: " + command + ". res " + result + ", p1 " + param1 + ", p2 " + param2);
+      break;
+      
     }
   }
 
