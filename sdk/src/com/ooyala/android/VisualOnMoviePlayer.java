@@ -18,6 +18,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+
 import com.ooyala.android.OoyalaPlayer.State;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPUtils.voOSType;
@@ -32,13 +34,16 @@ import com.visualon.OSMPUtils.voOSType;
 class VisualOnMoviePlayer extends Player implements
     voOSBasePlayer.onEventListener, voOSBasePlayer.onRequestListener,
     SurfaceHolder.Callback {
-  private static final String TAG = "[PLAYER_SAMPLE]";
+  private static final String TAG = "[PLAYER_SAMPLE]:VisualOn";
 
   protected voOSBasePlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
   protected int _width = 0;
   protected int _height = 0;
+  protected int _videoWidth = 16;
+  protected int _videoHeight = 9;
+
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
   private int _timeBeforeSuspend = -1;
@@ -141,10 +146,16 @@ class VisualOnMoviePlayer extends Player implements
     case INIT:
     case LOADING:
       queuePlay();
+      Log.v(TAG, "Play: still laoding, queued");
       break;
     case PAUSED:
     case READY:
     case COMPLETED:
+      Log.v(TAG, "Play: ready - about to run");
+      if (_timeBeforeSuspend >=0 ) {
+        _player.SetPos(_timeBeforeSuspend);
+        _timeBeforeSuspend = -1;
+      }
       int nRet = _player.Run();
       if (nRet == voOSType.VOOSMP_ERR_None) {
         Log.v(TAG, "MediaPlayer run.");
@@ -154,17 +165,18 @@ class VisualOnMoviePlayer extends Player implements
       setState(State.PLAYING);
       startPlayheadTimer();
     default:
+      Log.v(TAG, "Play: invalid status?" + _state);
       break;
     }
   }
 
   @Override
   public void stop() {
+    Log.v(TAG, "MediaPlayer stopped.");
     stopPlayheadTimer();
     _playQueued = false;
     _player.Stop();
     _player.Close();
-    Log.v(TAG, "MediaPlayer stoped.");
   }
 
   @Override
@@ -272,12 +284,14 @@ class VisualOnMoviePlayer extends Player implements
 
         //Open then run the player
         nRet = _player.Open(
-            "http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8",
+            _streamUrl,
             voOSType.VOOSMP_FLAG_SOURCE_URL, 0, 0, 0);
           if (nRet == voOSType.VOOSMP_ERR_None) {
             Log.v(TAG, "MediaPlayer is Opened.");
           } else {
-            onError(_player, nRet, 0);
+
+            Toast.makeText(_parent.getLayout().getContext(), "Could not connect to " + _streamUrl + "!", Toast.LENGTH_LONG).show();
+            //onError(_player, nRet, 0);
             return;
           }
       setState(State.READY);
@@ -308,9 +322,17 @@ class VisualOnMoviePlayer extends Player implements
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    Log.i(TAG, "Surface Changed");
-    /*if (_player != null)
-      _player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);*/
+    Log.i(TAG, "Surface Changed, width " + width + ", height " + height +  " original is " + _width + ", " + _height);
+
+    ViewGroup.LayoutParams lp = _view.getLayoutParams();
+    lp.width = _width;
+    lp.height = _width * _videoHeight / _videoWidth;
+    _view.setLayoutParams(lp);
+
+
+   if (_player != null)
+      _player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+
   }
 
   @Override
@@ -326,8 +348,7 @@ class VisualOnMoviePlayer extends Player implements
 
     if (_state == State.LOADING) {
       createMediaPlayer();
-
-      play();
+      dequeuePlay();
     }
   }
 
@@ -348,8 +369,8 @@ class VisualOnMoviePlayer extends Player implements
   private void setupView() {
     _view = new SurfaceView(_parent.getLayout().getContext());
     _view.setLayoutParams(new FrameLayout.LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
@@ -385,6 +406,7 @@ class VisualOnMoviePlayer extends Player implements
       _stateBeforeSuspend = stateToResume;
       stop();
       _player.Uninit();
+      _player = null;
     }
     removeView();
     _width = 0;
@@ -413,6 +435,7 @@ class VisualOnMoviePlayer extends Player implements
   public void destroy() {
     if (_player != null) {
       stop();
+      _player.Uninit();
       _player = null;
     }
     removeView();
@@ -423,12 +446,9 @@ class VisualOnMoviePlayer extends Player implements
     _playQueued = false;
     _timeBeforeSuspend = -1;
     _state = State.INIT;
-    _player.Uninit();
   }
 
   private void setVideoSize(int width, int height) {
-    _width = width;
-    _height = height;
     ((MovieView) _view).setAspectRatio(((float) _width) / ((float) _height));
   }
 
@@ -552,7 +572,6 @@ class VisualOnMoviePlayer extends Player implements
     } else if (id == voOSType.VOOSMP_CB_PlayComplete) {
       Log.v(TAG, "onEvent: Play Complete");
       currentItemCompleted();
-      stop();
       return 0;
     } else if (id == voOSType.VOOSMP_CB_SeekComplete) // Seek (SetPos) complete
     {
@@ -565,7 +584,9 @@ class VisualOnMoviePlayer extends Player implements
       return 0;
     } else if (id == voOSType.VOOSMP_CB_VideoSizeChanged) // Video size changed
     {
-      Log.v(TAG, "onEvent: Video Size Changed");
+      _videoWidth = param1;
+      _videoHeight = param2;
+      Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
       return 0;
     } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Vid seteo buffering
                                                        // stopped
