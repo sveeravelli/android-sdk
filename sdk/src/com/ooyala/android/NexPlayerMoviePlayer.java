@@ -48,7 +48,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   private boolean _useOpenGL = true;
 
   private boolean _surfaceCreated = false;
-  private boolean _isQuitting = false;
   private boolean _playbackStarted = false;
 
   protected static final long TIMER_DELAY = 0;
@@ -191,7 +190,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
     if (_width == 0 && _height == 0 && height > 0) {
-      //setVideoSize(width, height);
+      setVideoSize(width, height);
     }
   }
 
@@ -199,21 +198,12 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
 
     Log.d(TAG, "surfaceChanged: " + arg0 + ", " + arg1 + ", "
-        + width + ", " + height + ". using videowidth " + mVideoWidth + ", vidHeight " + mVideoHeight );
+        + width + ", " + height);
 
-    _width = width;
-    _height = height;
-    float scale = Math.min((float) _width / (float) mVideoWidth, (float) _height / (float) mVideoHeight);
+    mVideoWidth = width;
+    mVideoHeight = height;
 
-    int w = (int) (mVideoWidth * scale);
-    int h = (int) (mVideoHeight * scale);
-    int top = (_height - h) / 2;
-    int left = (_width - w) / 2;
-
-    Log.d(TAG, "surfaceChanged: " + w + ", h "  + h + ", t " + top + ", l " + left + ", scale " + scale);
-    if( w != 0 && h != 0) {
-      _player.setOutputPos(left, top, w, h);
-    }
+    _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
   }
 
   @Override
@@ -236,7 +226,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   //ignore when java renderer mode
     if(_player == null || _player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_JAVA)
       _surfaceCreated = false;
-      _isQuitting = true;
   }
 
   @Override
@@ -272,8 +261,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
       _useOpenGL = false;
       _view = new MovieView(c);
     }
-
-    _playQueued = false;
     _player.setListener(this);
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -304,7 +291,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     Log.d(TAG, "Suspend");
     if (_player != null) {
       _stateBeforeSuspend = stateToResume;
-
+      
       //If playing, we have to stop the player before we close
       if (_player.getState() == NexPlayer.NEXPLAYER_STATE_PLAY)
       {
@@ -313,7 +300,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
       }
       else { _player.close(); _player.release(); }
     }
-    _isQuitting = true;
     removeView();
     _width = 0;
     _height = 0;
@@ -326,7 +312,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   public void resume() {
     Log.d(TAG, "Resuming");
     if (_state != State.SUSPENDED) { return; }
-    _isQuitting = true;
     setState(State.LOADING);
     setupView();
     createMediaPlayer();
@@ -341,10 +326,9 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   public void destroy() {
     if (_player != null) {
       _player.close();
-      _player.release();
+      _player.release(); 
       _player = null;
     }
-    _isQuitting = true;
     removeView();
     _parent = null;
     _width = 0;
@@ -355,6 +339,8 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   }
 
   private void setVideoSize(int width, int height) {
+    _width = width;
+    _height = height;
     ((MovieView) _view).setAspectRatio(((float) _width) / ((float) _height));
   }
 
@@ -531,13 +517,10 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   @Override
   public void onVideoRenderCreate(NexPlayer mp, int width, int height,
       Object rgbBuffer) {
-
-
-    mVideoWidth = width;
-    mVideoHeight = height;
-
     Log.d(TAG, "onVideoRenderCreate called ( Width:" + width + " Height : "
-        + height + ", surfaceWidth: " + _width + ", surfaceHeight: " + _height + ")");
+        + height + ")");
+
+    Log.d(TAG, "VideoRender Created :" + mVideoWidth + " " + mVideoHeight + " ");
 
     if(_player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_JAVA &&
        _player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_OPENGL)
@@ -545,29 +528,16 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
       try
       {
         // app must wait until suface is created because nexplayer didn't render without surface.
-        int waiting = 0;
-        while (_surfaceCreated == false || _isQuitting)
+        while (_surfaceCreated == false)
         {
           Log.d(TAG, "WAIT for surface creation!");
           Thread.sleep(10);
-          if(waiting++ > 8000) {
-            Log.d(TAG, "onVideoRenderCreate failed ( Width:" + width + " Height : " + height + ")");
-            return;
-          }
         }
         _player.setDisplay(_holder);
         }
       catch(Exception e) {}
     }
-    float scale = Math.min((float) _width / (float) mVideoWidth, (float) _height / (float) mVideoHeight);
-
-    int w = (int) (mVideoWidth * scale);
-    int h = (int) (mVideoHeight * scale);
-    int top = (_height - h) / 2;
-    int left = (_width - w) / 2;
-
-    Log.d(TAG, "onVideoRenderCreate: " + w + ", h "  + h + ", t " + top + ", l " + left + ", scale " + scale);
-    _player.setOutputPos(left, top, w, h);
+    _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
     _playbackStarted = true;
   }
 
@@ -643,11 +613,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     switch (command) {
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_LOCAL:
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_STREAMING:
-
-      if( result != 0) {
-        Log.e(TAG, "There was an error with opening stream! " + result);
-        return;
-      }
       mHandler.post(new Runnable() {
         @Override
         public void run() {
@@ -666,16 +631,16 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     case NexPlayer.NEXPLAYER_ASYNC_CMD_SEEK:
       Log.d(TAG, "ASYNC Seek. res " + result + ", p1 " + param1 + ", p2 " + param2);
       break;
-
+      
     case NexPlayer.NEXPLAYER_ASYNC_CMD_STOP:
       Log.d(TAG, "ASYNC Stop");
       if(waitingForStopToResume) {
         mHandler.post(new Runnable() {
           @Override
           public void run() {
-            try {
+            try { 
               _player.close();
-            }
+              resume(); }
             catch (Throwable e) { e.printStackTrace(); }
           }
         });
@@ -684,7 +649,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     default:
       Log.d(TAG, "ASYNC Unhandled cmd: " + command + ". res " + result + ", p1 " + param1 + ", p2 " + param2);
       break;
-
+      
     }
   }
 
@@ -798,16 +763,10 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     Log.d(TAG, "GLsurfaceChanged called width : " + width + "   height : "
         + height);
 
-    _width = width;
-    _height = height;
-    float scale = Math.min((float) _width / (float) mVideoWidth, (float) _height / (float) mVideoHeight);
+    mVideoWidth = width;
+    mVideoHeight = height;
 
-    int w = (int) (mVideoWidth * scale);
-    int h = (int) (mVideoHeight * scale);
-    int top = (_height - h) / 2;
-    int left = (_width - w) / 2;
-
-    _player.setOutputPos(left, top, w, h);
+    _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
 
     if(_useOpenGL)
     {
