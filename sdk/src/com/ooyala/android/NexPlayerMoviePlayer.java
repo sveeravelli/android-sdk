@@ -1,16 +1,10 @@
 package com.ooyala.android;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -18,8 +12,6 @@ import com.nextreaming.nexplayerengine.GLRenderer;
 import com.nextreaming.nexplayerengine.NexClosedCaption;
 import com.nextreaming.nexplayerengine.NexContentInformation;
 import com.nextreaming.nexplayerengine.NexID3TagInformation;
-import com.nextreaming.nexplayerengine.NexID3TagPicture;
-import com.nextreaming.nexplayerengine.NexID3TagText;
 import com.nextreaming.nexplayerengine.NexPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
@@ -44,15 +36,9 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   private boolean _completedQueued = false;
   private State _stateBeforeSuspend = State.INIT;
   private int _playheadTime = 0;
-
   private boolean _useOpenGL = true;
-
-  private boolean _surfaceCreated = false;
-  private boolean _playbackStarted = false;
-
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
-  public static final Handler mHandler = new Handler();
 
   @Override
   public void init(OoyalaPlayer parent, Object stream) {
@@ -71,10 +57,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     setState(State.LOADING);
     _streamUrl = (String) stream;
     setParent(parent);
-
-    if (_state == State.LOADING) {
-      createMediaPlayer();
-    }
   }
 
   @Override
@@ -100,7 +82,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
       case PAUSED:
       case READY:
       case COMPLETED:
-        _player.resume();
+        _player.start(0);
         setState(State.PLAYING);
       default:
         break;
@@ -156,7 +138,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) { return; }
-    _playheadTime = timeInMillis;
     _player.seek(timeInMillis);
   }
 
@@ -168,11 +149,12 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
         _player.stop();
         _player.resume();
       }
-//"http://www.playon.tv/online/iphone5/main.m3u8"
-      //http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8
-      _player.open( "https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8", null, null,
+
+      _player.open("http://www.playon.tv/online/iphone5/main.m3u8", null, null,
           NexPlayer.NEXPLAYER_SOURCE_TYPE_STREAMING,
           NexPlayer.NEXPLAYER_TRANSPORT_TYPE_TCP, 0);
+
+      System.gc();
     } catch (Throwable t) {
       Log.e(TAG, "COULD NOT CREATE MEDIA PLAYER", t);
     }
@@ -185,37 +167,22 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   }
 
   @Override
-  public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
+  public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
 
-    Log.d(TAG, "surfaceChanged: " + arg0 + ", " + arg1 + ", "
-        + width + ", " + height);
-
-    mVideoWidth = width;
-    mVideoHeight = height;
-
-    _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
+    Log.d(TAG, "onTextRenderInit ClassNum : " + arg0 + ", " + arg1 + ", "
+        + arg2 + ", " + arg3);
+    _player.GLInit(arg1, arg2);
   }
 
   @Override
-  public void surfaceCreated(SurfaceHolder holder) {
-
-
-    Log.d(TAG, "Surface register again!");
-    // JAVA Renderer and  openGL Renderer don't need register surface to nexPlayer.
-    if(_player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_JAVA && _player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_OPENGL)
-    {
-      _surfaceCreated = true;
-      if( _playbackStarted ) {
-      _player.setDisplay(holder);
-      }
+  public void surfaceCreated(SurfaceHolder arg0) {
+    if (_state == State.LOADING) {
+      createMediaPlayer();
     }
   }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    int rendermode = _player.GetRenderMode();
-    if(rendermode != NexPlayer.NEX_USE_RENDER_JAVA)//ignore when java renderer mode
-      _surfaceCreated = false;
   }
 
   @Override
@@ -230,10 +197,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
-
-    _holder.setFormat(PixelFormat.RGB_565);
-    //_view.setVisibility(View.INVISIBLE);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
   private void createView(Context c) {
@@ -241,16 +205,13 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     _player = new NexPlayer();
 
     _player.init(OoyalaAPIHelper.context, android.os.Build.MODEL,
-        android.os.Build.MODEL, 0, 1);
+        NexPlayer.NEX_DEVICE_USE_OPENGL, 3, 1);
     if (_player.GetRenderMode() == NexPlayer.NEX_USE_RENDER_OPENGL) {
       _useOpenGL = true;
-      glRenderer = new GLRenderer(c, _player, this, 1);
-      _view = glRenderer;
-    } else {
-      _useOpenGL = false;
-      _view = new MovieView(c);
     }
     _player.setListener(this);
+    glRenderer = new GLRenderer(c, _player, this, 1);
+    _view = glRenderer;
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -373,7 +334,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   // onEndofContent is called when content meets end.
   @Override
   public void onEndOfContent(NexPlayer mp) {
-    _player.stop();
+
   }
 
   // onStartVideoTask is called when VideoTask is created.
@@ -393,18 +354,9 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   public void onTime(NexPlayer mp, int sec) {
     Log.d(TAG, "onTime called (" + sec + " msec)");
     _playheadTime = sec;
-    mHandler.post(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          setChanged();
-          notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
-        }catch (Throwable e)
-        {
-          e.printStackTrace();
-        }
-      }
-    });
+
+    setChanged();
+    notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
   }
 
   // onError is called when error is generated.
@@ -489,24 +441,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
         + height + ")");
 
     Log.d(TAG, "VideoRender Created :" + mVideoWidth + " " + mVideoHeight + " ");
-
-    if(_player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_JAVA &&
-       _player.GetRenderMode() != NexPlayer.NEX_USE_RENDER_OPENGL)
-    {
-      try
-      {
-        // app must wait until suface is created because nexplayer didn't render without surface.
-        while (_surfaceCreated == false)
-        {
-          Log.d(TAG, "WAIT for surface creation!");
-          Thread.sleep(10);
-        }
-        _player.setDisplay(_holder);
-        }
-      catch(Exception e) {}
-    }
     _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
-    _playbackStarted = true;
   }
 
   // this is called when video renderer is deleted.
@@ -582,21 +517,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_LOCAL:
     case NexPlayer.NEXPLAYER_ASYNC_CMD_OPEN_STREAMING:
       _player.start(0);
-
-
-      mHandler.post(new Runnable() {
-        @Override
-        public void run() {
-          try {
-
-             _view.setVisibility(View.VISIBLE);
-             setState(State.READY);
-          }catch (Throwable e)
-          {
-            e.printStackTrace();
-          }
-        }
-      });
     }
   }
 
@@ -637,9 +557,6 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   @Override
   public void onBuffering(NexPlayer mp, int progress_in_percent) {
     Log.d(TAG, "Buffering " + progress_in_percent + " %");
-    this._buffer = progress_in_percent;
-    setChanged();
-    notifyObservers(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION);
   }
 
   // nexPlayer have some change, this is called
@@ -712,13 +629,30 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
 
     mVideoWidth = width;
     mVideoHeight = height;
+    int surfaceWidth = width;
+    int surfaceHeight = height;
 
-    _player.setOutputPos(0, 0, mVideoWidth, mVideoHeight);
+    int tx = 0;
+    int ty = 0;
+    int regwidth = 0;
+    int regheight = 0;
+    boolean isExistTextbox = false;
 
-    if(_useOpenGL)
-    {
-      glRenderer.requestRender();
-    }
+    int w = width;
+    int h = height;
+    int top = (surfaceHeight - h) / 2;
+    int left = (surfaceWidth - w) / 2;
+
+    Log.d(TAG, "GLSurface - FILLSCREEN : " + left + " " + top + " " + w + " "
+        + h + " ");
+    Log.d(TAG, "Surface Width : " + surfaceWidth + " SurfaceHeight : "
+        + surfaceHeight);
+    _player.setOutputPos(left, top, w, h);
+
+    glRenderer.requestRender();
+
   }
+
+  // JDKIM : end
 
 }
