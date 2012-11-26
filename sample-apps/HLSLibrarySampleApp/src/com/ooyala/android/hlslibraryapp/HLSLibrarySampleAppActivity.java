@@ -1,4 +1,4 @@
-package com.ooyala.android.sampleapp;
+package com.ooyala.android.hlslibraryapp;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,9 +31,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.hlslibraryapp.R;
 import com.visualon.OSMPUtils.voLog;
 
-public class GettingStartedSampleAppActivity extends Activity {
+public class HLSLibrarySampleAppActivity extends Activity {
   /** Called when the activity is first created. */
   OoyalaPlayer player = null;
   String _lastUrl = "";
@@ -87,13 +88,13 @@ public class GettingStartedSampleAppActivity extends Activity {
         if(spinUrl.getSelectedItem().toString() == getString(R.string.strAddLink)) {
           _lastUrl = null;
 
-          AlertDialog.Builder alert = new AlertDialog.Builder(GettingStartedSampleAppActivity.this);
+          AlertDialog.Builder alert = new AlertDialog.Builder(HLSLibrarySampleAppActivity.this);
 
           alert.setTitle("Add your own Link");
           alert.setMessage("URL shorteners don't work well.  \nDon't forget 'http://'.\n If it doesn't work, put full urls in url.txt on your sd card");
 
           // Set an EditText view to get user input
-          final EditText input = new EditText(GettingStartedSampleAppActivity.this);
+          final EditText input = new EditText(HLSLibrarySampleAppActivity.this);
           alert.setView(input);
 
           alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
