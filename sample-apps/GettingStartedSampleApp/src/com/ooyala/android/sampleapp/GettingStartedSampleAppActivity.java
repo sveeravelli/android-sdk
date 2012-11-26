@@ -53,6 +53,7 @@ public class GettingStartedSampleAppActivity extends Activity {
     Button btnGo = (Button) findViewById(R.id.btnGo);
 
     _listUrl.add(getString(R.string.strAddLink));
+    _listUrl.add("http://player.ooyala.com/player/iphone/liMDE4NjqFlpZJYb6bYRtMgxkItkaGgq.m3u8?geo_country=US");
     _listUrl.add("https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8");
     _listUrl.add("http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8");
     _listUrl.add("http://csm-e.cds1.yospace.com/csm/restart/live/24537085?yo.p=3&yo.l=true&ext=.m3u8");

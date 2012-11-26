@@ -16,3 +16,4 @@ sdk/*/gen
 sdk/*/local.properties
 sample-apps/*/bin
 sample-apps/*/gen
+.metadata/*
