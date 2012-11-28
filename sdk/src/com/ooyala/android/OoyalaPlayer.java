@@ -22,6 +22,9 @@ import com.ooyala.android.NexPlayerMoviePlayer;
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
 public class OoyalaPlayer extends Observable implements Observer {
+  public static final String PLAYER_VISUALON = "VisualOn";
+  public static final String PLAYER_NEXPLAYER = "NexPlayer";
+  public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
     CONTINUE, PAUSE, STOP, RESET
   };
@@ -473,8 +476,12 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private String _playerType = "ViusalOn";
-  public void changePlayerType(String playerType) {
+  public void playerType(String playerType) {
     _playerType = playerType;
+  }
+
+  public String playerType() {
+    return _playerType;
   }
 
   private String _url;

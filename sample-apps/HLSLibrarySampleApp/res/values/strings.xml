@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, GettingStartedSampleAppActivity!</string>
-    <string name="app_name">GettingStartedSampleApp</string>
+    <string name="hello">Hello World, HLS Library App!</string>
+    <string name="app_name">HLS Library  Sample App</string>
     <string name="strAddLink">Add your own link...</string>
 
 </resources>

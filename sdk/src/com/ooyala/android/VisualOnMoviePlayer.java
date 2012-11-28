@@ -266,7 +266,6 @@ class VisualOnMoviePlayer extends Player implements
       _height = _view.getHeight();
       _player.SetDisplaySize(_width, _height);
       _player.SetView(_view);
-
       // Register SDK event listener
       _player.setEventListener(this);
 
@@ -322,7 +321,7 @@ class VisualOnMoviePlayer extends Player implements
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    Log.i(TAG, "Surface Changed, width " + width + ", height " + height +  " original is " + _width + ", " + _height);
+    Log.e(TAG, "Surface Changed");
 
     ViewGroup.LayoutParams lp = _view.getLayoutParams();
     lp.width = _width;
@@ -365,7 +364,6 @@ class VisualOnMoviePlayer extends Player implements
     super.setParent(parent);
   }
 
-  @SuppressWarnings("deprecation")
   private void setupView() {
     _view = new SurfaceView(_parent.getLayout().getContext());
     _view.setLayoutParams(new FrameLayout.LayoutParams(
@@ -376,7 +374,6 @@ class VisualOnMoviePlayer extends Player implements
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setFormat(PixelFormat.RGBA_8888);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
   }
 
   private void removeView() {

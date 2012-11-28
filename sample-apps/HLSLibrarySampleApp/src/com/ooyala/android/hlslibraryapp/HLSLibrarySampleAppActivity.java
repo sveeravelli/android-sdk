@@ -70,9 +70,9 @@ public class HLSLibrarySampleAppActivity extends Activity {
     spinUrl.setAdapter(adapter);
 
     final ArrayList<String> arrPlayers = new ArrayList<String>();
-    arrPlayers.add("VisualOn");
-    arrPlayers.add("NexPlayer");
-    arrPlayers.add("Android Default");
+    arrPlayers.add(OoyalaPlayer.PLAYER_VISUALON);
+    arrPlayers.add(OoyalaPlayer.PLAYER_NEXPLAYER);
+    arrPlayers.add(OoyalaPlayer.PLAYER_ANDROID);
     ArrayAdapter<String> playerAdapter = new ArrayAdapter<String>(this,
         android.R.layout.simple_spinner_item, arrPlayers);
     spinPlayer.setAdapter(playerAdapter);
@@ -104,7 +104,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
             String url = input.getText().toString();
 
             player.changeHardCodedUrl(url);
-            player.changePlayerType(spinPlayer.getSelectedItem().toString());
+            player.playerType(spinPlayer.getSelectedItem().toString());
             player.setEmbedCode("AxYnZrNToCSMFZItXb2oERT8tEFhxro-"); //"JzOHNuNTpVEV7-U5B1q1nsAjUb8nWA2c"
             player.play();
             return;
@@ -122,7 +122,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
         }
 
         player.changeHardCodedUrl(spinUrl.getSelectedItem().toString());
-        player.changePlayerType(spinPlayer.getSelectedItem().toString());
+        player.playerType(spinPlayer.getSelectedItem().toString());
         player.setEmbedCode("AxYnZrNToCSMFZItXb2oERT8tEFhxro-"); //"JzOHNuNTpVEV7-U5B1q1nsAjUb8nWA2c"
         player.play();
         return;
