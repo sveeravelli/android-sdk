@@ -43,6 +43,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
   private State _stateBeforeSuspend = State.INIT;
+  private int _millisToResume = 0;
   private int _playheadTime = 0;
 
   private boolean _useOpenGL = true;
@@ -104,7 +105,8 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
         break;
       case READY:
       case COMPLETED:
-        _player.start(0);
+        _player.start(_millisToResume);
+        _millisToResume = 0;
         setState(State.PLAYING);
         break;
       default:
@@ -260,7 +262,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
   private void createView(Context c) {
     // _view = new MovieView(c);
     Log.d(TAG, "CreateView");
-    _player = new NexPlayer();
+    if (_player == null) _player = new NexPlayer();
 
     _player.init(OoyalaAPIHelper.context, android.os.Build.MODEL,
         android.os.Build.MODEL, 0, 1);
@@ -304,14 +306,24 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     Log.d(TAG, "Suspend");
     if (_player != null) {
       _stateBeforeSuspend = stateToResume;
+      _millisToResume = millisToResume;
 
       //If playing, we have to stop the player before we close
       if (_player.getState() == NexPlayer.NEXPLAYER_STATE_PLAY)
       {
         waitingForStopToResume = true;
         stop();
+        while (waitingForStopToResume)
+        {
+          try {
+          Thread.sleep(100);
+          } catch (InterruptedException e) {
+          }
+        }
       }
-      else { _player.close(); _player.release(); }
+      _player.close();
+      _player.release();
+      _player = null;
     }
     _isQuitting = true;
     removeView();
@@ -670,15 +682,7 @@ class NexPlayerMoviePlayer extends Player implements NexPlayer.IListener,
     case NexPlayer.NEXPLAYER_ASYNC_CMD_STOP:
       Log.d(TAG, "ASYNC Stop");
       if(waitingForStopToResume) {
-        mHandler.post(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              _player.close();
-            }
-            catch (Throwable e) { e.printStackTrace(); }
-          }
-        });
+        waitingForStopToResume = false;
       }
       break;
     default:

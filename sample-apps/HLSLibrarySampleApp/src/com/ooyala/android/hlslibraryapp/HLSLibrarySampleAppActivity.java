@@ -46,7 +46,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
         "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-        "R2d3I6s06RyB712DN0_2GsQS-R-Y", "www.ooyala.com");
+        "B3MDExOuTldXc1CiXbzAauYN7Iui", "www.ooyala.com");
     player = playerLayoutController.getPlayer();
 
     Spinner spinPlayer = (Spinner) findViewById(R.id.spinPlayer);
@@ -58,11 +58,14 @@ public class HLSLibrarySampleAppActivity extends Activity {
     _listUrl.add("https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8");
     _listUrl.add("http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8");
     _listUrl.add("http://csm-e.cds1.yospace.com/csm/restart/live/24537085?yo.p=3&yo.l=true&ext=.m3u8");
+    _listUrl.add("http://dev-freewheel.espn.go.com/ad/g/1?_dv=2&nw=87146&csid=watchespn:ios:phone:espn1&caid=15321273&vdur=100&vprn=846897&pvrn=134525&afid=241335&sfid=241335&flag=+sltp+exvt-slcb&prof=87146:watchespn_ios_hls&resp=m3u8;_fw_lpu=http://brs-l3-espn1-hls.espn.go.com/espn1/p/adhoc-s/adhoc-s.m3u8");
+    _listUrl.add("http://brs-l3-espn1-hls.espn.go.com/espn1/p/adhoc-s/adhoc-s.m3u8");
+    /*
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG100.m3u8?IS=0&ET=1384213559&CIP=1.2.3.4&KO=2&KN=1&US=e9bafc104e737b26115700fa51be679c");
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG101.m3u8?IS=0&ET=1384213540&CIP=1.2.3.4&KO=2&KN=1&US=5c153e2237c56423f49f76c08d341e06");
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG102.m3u8?IS=0&ET=1384213529&CIP=1.2.3.4&KO=2&KN=1&US=76faf450e8fd1d383c500558d712bee3");
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG103.m3u8?IS=0&ET=1384213189&CIP=1.2.3.4&KO=2&KN=1&US=b4713747d5b1acfa360698babf4380ad");
-
+    */
 
     ReadUrlInfo();
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
