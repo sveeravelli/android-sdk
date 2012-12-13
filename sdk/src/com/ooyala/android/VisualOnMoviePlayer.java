@@ -15,12 +15,15 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -265,7 +268,12 @@ class VisualOnMoviePlayer extends Player implements
         return;
       }
 
-      _player.SetDisplaySize(1280, 800);
+      DisplayMetrics dm  = new DisplayMetrics();
+      WindowManager wm = (WindowManager) _view.getContext().getSystemService(Context.WINDOW_SERVICE);
+      Display display = wm.getDefaultDisplay();
+      display.getMetrics(dm);
+
+      _player.SetDisplaySize(dm.widthPixels, dm.heightPixels);
       _player.SetView(_view);
       // Register SDK event listener
       _player.setEventListener(this);
@@ -366,13 +374,13 @@ class VisualOnMoviePlayer extends Player implements
 			int parentHeight = _parent.getLayout().getBottom() - _parent.getLayout().getTop();
 			int parentWidth = _parent.getLayout().getRight() - _parent.getLayout().getLeft();
 			int wantedWidth = parentWidth;
-			int wantedHeight = wantedWidth * 9 / 16;
+			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
 			int offset = (parentHeight - wantedHeight) / 2;
 
 			if(offset < 0) {
 				// oops, too much width, let's align horizontally
 				wantedHeight = parentHeight;
-				wantedWidth = parentHeight * 16 / 9;
+				wantedWidth = parentHeight * _videoWidth / _videoHeight;
 				offset = (parentWidth - wantedWidth) / 2;
 			}
 
