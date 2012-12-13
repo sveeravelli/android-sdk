@@ -106,7 +106,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
 
             player.changeHardCodedUrl(url);
             player.playerType(spinPlayer.getSelectedItem().toString());
-            player.setEmbedCode("AxYnZrNToCSMFZItXb2oERT8tEFhxro-"); //"JzOHNuNTpVEV7-U5B1q1nsAjUb8nWA2c"
+            player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro" VOD
             player.play();
             return;
             }
@@ -124,7 +124,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
 
         player.changeHardCodedUrl(spinUrl.getSelectedItem().toString());
         player.playerType(spinPlayer.getSelectedItem().toString());
-        player.setEmbedCode("AxYnZrNToCSMFZItXb2oERT8tEFhxro-"); //"JzOHNuNTpVEV7-U5B1q1nsAjUb8nWA2c"
+        player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro-" - VOD
         player.play();
         return;
       }

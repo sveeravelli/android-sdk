@@ -203,7 +203,7 @@ class VisualOnMoviePlayer extends Player implements
     default:
       break;
     }
-    // Log.v(TAG, "currentTime: " + _player.GetPos());
+    //Log.v(TAG, "currentTime: " + _player.GetPos());
     return _player.GetPos();
   }
 
@@ -220,6 +220,7 @@ class VisualOnMoviePlayer extends Player implements
     default:
       break;
     }
+    //Log.v(TAG, "currentDuration: " + _player.GetDuration());
     return _player.GetDuration();
   }
 
