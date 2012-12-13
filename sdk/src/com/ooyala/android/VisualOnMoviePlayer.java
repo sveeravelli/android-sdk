@@ -7,15 +7,19 @@ import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -39,8 +43,6 @@ class VisualOnMoviePlayer extends Player implements
   protected voOSBasePlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
-  protected int _width = 0;
-  protected int _height = 0;
   protected int _videoWidth = 16;
   protected int _videoHeight = 9;
 
@@ -237,6 +239,7 @@ class VisualOnMoviePlayer extends Player implements
         _player = new voOSBasePlayer();
       } else {
 
+    	  Log.e(TAG, "DANGER DANGER");
         _player.Uninit();
         _player = new voOSBasePlayer();
         //player.SetView(_view);
@@ -262,9 +265,7 @@ class VisualOnMoviePlayer extends Player implements
         return;
       }
 
-      _width = _view.getWidth();
-      _height = _view.getHeight();
-      _player.SetDisplaySize(_width, _height);
+      _player.SetDisplaySize(1280, 800);
       _player.SetView(_view);
       // Register SDK event listener
       _player.setEventListener(this);
@@ -305,32 +306,19 @@ class VisualOnMoviePlayer extends Player implements
     return false;
   }
 
-  /*
-   * @Override public void onPrepared(MediaPlayer mp) { if (_width == 0 &&
-   * _height == 0) { if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
-   * setVideoSize(mp.getVideoWidth(), mp.getVideoHeight()); } } if
-   * (_timeBeforeSuspend > 0) { seekToTime(_timeBeforeSuspend);
-   * _timeBeforeSuspend = -1; } setState(State.READY); }
-   */
-
-  public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-    if (_width == 0 && _height == 0 && height > 0) {
-      setVideoSize(width, height);
-    }
-  }
-
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    Log.e(TAG, "Surface Changed");
+    Log.e(TAG, "Surface Changed: " + width + ","+ height);
 
     ViewGroup.LayoutParams lp = _view.getLayoutParams();
-    lp.width = _width;
-    lp.height = _width * _videoHeight / _videoWidth;
+    lp.width = width;
+    lp.height = height;
     _view.setLayoutParams(lp);
 
 
-   if (_player != null)
-      _player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+    if (_player != null) {
+    	_player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+    }
 
   }
 
@@ -365,10 +353,38 @@ class VisualOnMoviePlayer extends Player implements
   }
 
   private void setupView() {
-    _view = new SurfaceView(_parent.getLayout().getContext());
+    _view = new SurfaceView(_parent.getLayout().getContext()) {
+
+    	/*
+    	 * Manually updates internal surface to match parent size
+    	 */
+		@Override
+		protected void onLayout (boolean changed, int left, int top, int right, int bottom) {
+			super.onLayout(changed, left, top, right, bottom);
+
+			// assume to much vertical space, so need to align vertically
+			int parentHeight = _parent.getLayout().getBottom() - _parent.getLayout().getTop();
+			int parentWidth = _parent.getLayout().getRight() - _parent.getLayout().getLeft();
+			int wantedWidth = parentWidth;
+			int wantedHeight = wantedWidth * 9 / 16;
+			int offset = (parentHeight - wantedHeight) / 2;
+
+			if(offset < 0) {
+				// oops, too much width, let's align horizontally
+				wantedHeight = parentHeight;
+				wantedWidth = parentHeight * 16 / 9;
+				offset = (parentWidth - wantedWidth) / 2;
+			}
+
+			getHolder().setFixedSize(wantedWidth, wantedHeight);
+		}
+
+    };
+
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
 
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
@@ -406,8 +422,6 @@ class VisualOnMoviePlayer extends Player implements
       _player = null;
     }
     removeView();
-    _width = 0;
-    _height = 0;
     _buffer = 0;
     _playQueued = false;
     setState(State.SUSPENDED);
@@ -437,16 +451,10 @@ class VisualOnMoviePlayer extends Player implements
     }
     removeView();
     _parent = null;
-    _width = 0;
-    _height = 0;
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
     _state = State.INIT;
-  }
-
-  private void setVideoSize(int width, int height) {
-    ((MovieView) _view).setAspectRatio(((float) _width) / ((float) _height));
   }
 
   protected void currentItemCompleted() {
