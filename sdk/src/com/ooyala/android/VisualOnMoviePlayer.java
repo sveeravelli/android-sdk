@@ -7,12 +7,8 @@ import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -21,7 +17,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -29,6 +24,10 @@ import android.widget.Toast;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
+import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleDisplayInfo;
+import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfo;
+import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfoEntry;
+import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleTextRowInfo;
 import com.visualon.OSMPUtils.voOSType;
 
 /**
@@ -286,6 +285,9 @@ class VisualOnMoviePlayer extends Player implements
       /* Configure Dolby Audio Effect parameters */
       _player.SetParam(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
 
+      // Enable CC
+      _player.SetParam(voOSType.VOOSMP_PID_CLOSED_CAPTION_OUTPUT, 1);
+
       /* Processor-specific settings */
         String cfgPath = "/data/data/" + _parent.getLayout().getContext().getPackageName() + "/";
         String capFile = cfgPath + "cap.xml";
@@ -371,6 +373,8 @@ class VisualOnMoviePlayer extends Player implements
 		protected void onLayout (boolean changed, int left, int top, int right, int bottom) {
 			super.onLayout(changed, left, top, right, bottom);
 
+			Log.v(TAG, "Layout: "+ left + "," + top + " -- " + right + ","+bottom);
+
 			// assume to much vertical space, so need to align vertically
 			int parentHeight = _parent.getLayout().getBottom() - _parent.getLayout().getTop();
 			int parentWidth = _parent.getLayout().getRight() - _parent.getLayout().getLeft();
@@ -385,7 +389,15 @@ class VisualOnMoviePlayer extends Player implements
 				offset = (parentWidth - wantedWidth) / 2;
 			}
 
-			getHolder().setFixedSize(wantedWidth, wantedHeight);
+			if(_player!=null) {
+				_player.updateVideoAspectRatio(wantedWidth, wantedHeight);
+				_player.SetDisplaySize(wantedWidth, wantedHeight);
+				Log.v(TAG, "Setting aspect rates to: "+ wantedWidth + "," + wantedHeight);
+				Log.v(TAG, "Video size: "+ _videoWidth + "," + _videoHeight);
+			}
+
+			//getHolder().setFixedSize(wantedWidth, wantedHeight);
+			//Log.v(TAG, "Setting surface to: "+ wantedWidth + "," + wantedHeight);
 		}
 
     };
@@ -540,6 +552,7 @@ class VisualOnMoviePlayer extends Player implements
   @Override
   public int onEvent(int id, int param1, int param2, Object obj) {
     if (id == voOSType.VOOSMP_SRC_CB_Adaptive_Streaming_Info) {
+    	_view.requestLayout();
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
         Log.v(
@@ -601,6 +614,7 @@ class VisualOnMoviePlayer extends Player implements
       _videoWidth = param1;
       _videoHeight = param2;
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+      _view.requestLayout();
       return 0;
     } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Vid seteo buffering
                                                        // stopped
@@ -634,12 +648,68 @@ class VisualOnMoviePlayer extends Player implements
               + param1);
     } else if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
       Log.v(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
-    } else {
+    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData)	// CC data 
+	{
+		// Retrieve subtitle info
+		voSubtitleInfo info = (voSubtitleInfo)obj; 
+
+		// Retrieve CC text
+		String cc = GetCCString(info);
+		Log.v(TAG, "GOT CC: "+ cc);
+		_parent.displayClosedCaptionText(cc);
+		return 0;
+	} else {
       Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
           + param1 + ", " + param2);
     }
 
     return 0;
   }
+  
+	/* Extract text string from CC data. Does not handle position, color, font type, etc. */
+	public String GetCCString(voSubtitleInfo subtitleInfo)
+	{
+		if(subtitleInfo == null)
+			return "";
+		if(subtitleInfo.getSubtitleEntry() == null)
+			return "";
+		
+		String strTextAll = "";
+		for(int i = 0; i<subtitleInfo.getSubtitleEntry().size(); i++)
+		{
+			// Retrieve the display info for each subtitle entry
+			voSubtitleInfoEntry info = subtitleInfo.getSubtitleEntry().get(i);
+			voSubtitleDisplayInfo dispInfo = info.getSubtitleDispInfo();
+			if(dispInfo.getTextRowInfo() != null)
+			{
+				for(int j = 0; j < dispInfo.getTextRowInfo().size() ; j++)
+				{
+					// Retrieve the row info for display
+					voSubtitleTextRowInfo rowInfo = dispInfo.getTextRowInfo().get(j);
+					if( rowInfo == null)
+						continue;
+					if( rowInfo.getTextInfoEntry() == null)
+						continue;
+					
+					String strRow = "";
+					for(int k = 0; k < rowInfo.getTextInfoEntry().size() ; k++)
+					{
+						// Get the string for each row
+						strRow+=rowInfo.getTextInfoEntry().get(k).getStringText();//.stringText;
+					}
+					if(strRow.length()>0)
+					{
+						if(strTextAll.length()>0)
+							strTextAll+="\n";
+						strTextAll+=strRow;
+						
+					}
+					
+				}
+			}
+		}
+		return strTextAll;
+	}
+
 
 }
