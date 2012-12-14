@@ -99,6 +99,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private int _lastPlayedTime = 0;
   private LayoutController _layoutController = null;
   private ClosedCaptionsView _closedCaptionsView = null;
+  private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
   private String _language = Locale.getDefault().getLanguage();
   private boolean _adsSeekable = false;
@@ -764,7 +765,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private void addClosedCaptionsView() {
     removeClosedCaptionsView();
-    if (_currentItem != null && _currentItem.hasClosedCaptions()) {
+    if (_currentItem != null && _currentItem.hasClosedCaptions() || _streamBasedCC) {
       _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
@@ -1263,6 +1264,8 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private void displayCurrentClosedCaption() {
     if (_closedCaptionsView == null) return;
+    if (_streamBasedCC) return;
+
     if (_language != null && _currentItem.hasClosedCaptions()) {
       double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
@@ -1277,6 +1280,14 @@ public class OoyalaPlayer extends Observable implements Observer {
     } else {
       _closedCaptionsView.setCaption(null);
     }
+  }
+
+  public void displayClosedCaptionText(String text) {
+	  _streamBasedCC = true;
+	  if (_closedCaptionsView == null) {
+		  addClosedCaptionsView();
+	  }
+	  _closedCaptionsView.setCaptionText(text);
   }
 
   PlayerAPIClient getPlayerAPIClient() {

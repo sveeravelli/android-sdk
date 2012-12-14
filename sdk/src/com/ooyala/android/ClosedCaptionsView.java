@@ -43,6 +43,17 @@ public class ClosedCaptionsView extends TextView {
     }
   }
 
+  // Useful for when captions are coming live, not from pre-defined file
+  public void setCaptionText(String text) {
+    if (text != null) {
+      setBackgroundColor(Color.BLACK);
+      setText(text);
+    } else {
+      setBackgroundColor(Color.TRANSPARENT);
+      setText("");
+    }
+  }
+
   public void setStyle(ClosedCaptionsStyle style) {
     setTextColor(style.getColor());
     setBackgroundColor(style.getBackgroundColor());
