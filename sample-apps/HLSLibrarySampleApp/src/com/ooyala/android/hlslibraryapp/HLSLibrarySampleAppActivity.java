@@ -64,6 +64,8 @@ public class HLSLibrarySampleAppActivity extends Activity {
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG101.m3u8?IS=0&ET=1384213540&CIP=1.2.3.4&KO=2&KN=1&US=5c153e2237c56423f49f76c08d341e06");
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG102.m3u8?IS=0&ET=1384213529&CIP=1.2.3.4&KO=2&KN=1&US=76faf450e8fd1d383c500558d712bee3");
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG103.m3u8?IS=0&ET=1384213189&CIP=1.2.3.4&KO=2&KN=1&US=b4713747d5b1acfa360698babf4380ad");
+    _listUrl.add("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8");
+    _listUrl.add("http://www.cpcweb.com/webcasts/hls/cpcdemo.m3u8");
 
     ReadUrlInfo();
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
