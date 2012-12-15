@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.hlslibraryapp.R;
 import com.visualon.OSMPUtils.voLog;
 
@@ -44,7 +45,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
+    OptimizedOoyalaPlayerLayoutController playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout,
         "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
         "B3MDExOuTldXc1CiXbzAauYN7Iui", "www.ooyala.com");
     player = playerLayoutController.getPlayer();
