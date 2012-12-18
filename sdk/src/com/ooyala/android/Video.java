@@ -151,10 +151,6 @@ public class Video extends ContentItem implements PlayableItem {
     return _parent == null ? null : _parent.previousVideo(this);
   }
 
-  public Stream getStream() {
-    return Stream.bestStream(_streams);
-  }
-
   public boolean fetchPlaybackInfo() {
     if (hasAds()) {
       for (AdSpot ad : _ads) {
@@ -220,5 +216,10 @@ public class Video extends ContentItem implements PlayableItem {
   public Video videoFromEmbedCode(String embedCode, Video currentItem) {
     if (_embedCode.equals(embedCode)) { return this; }
     return null;
+  }
+
+  @Override
+  public Set<Stream> getStreams() {
+    return _streams;
   }
 }

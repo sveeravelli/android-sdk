@@ -160,4 +160,9 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   public int getAuthCode() {
     return _authCode;
   }
+
+  @Override
+  public Set<Stream> getStreams() {
+    return _streams;
+  }
 }

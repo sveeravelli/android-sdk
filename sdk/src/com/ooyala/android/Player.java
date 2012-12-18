@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import java.util.Observable;
-
 import com.ooyala.android.OoyalaPlayer.State;
 
 import android.view.SurfaceView;
@@ -113,6 +112,10 @@ abstract class Player extends Observable {
   public int getBufferPercentage() {
     return _buffer;
   }
+  
+  public boolean isPlaying() {
+    return false;
+  }
 
   public abstract void reset();
 
@@ -121,6 +124,8 @@ abstract class Player extends Observable {
   public abstract void suspend(int millisToResume, State stateToResume);
 
   public abstract void resume();
+  
+  public abstract void resume(int millisToResume, State stateToResume);
 
   public abstract void destroy();
 }

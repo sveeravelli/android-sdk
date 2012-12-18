@@ -1,6 +1,7 @@
 package com.ooyala.testapp;
 
 import java.util.Observable;
+
 import java.util.Observer;
 
 import android.app.Activity;
@@ -17,6 +18,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
+import com.ooyala.android.BaseMoviePlayer;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
   private static final String TAG = "OoyalaSampleApp";
@@ -50,10 +52,11 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh.9G7cT",
-        "217cVYc3ul6tCt_nZflNc6yLgT0Rok60UyBZ5Ggh", "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh", "www.ooyala.com");
+        (OoyalaPlayerLayout) findViewById(R.id.player), "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr",
+        "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
+    player.addObserver(this);
     player.addObserver(this);
     // player.setClosedCaptionsStyle(new ClosedCaptionsStyle(Color.GREEN, Color.BLACK, Typeface.DEFAULT));
     /*
@@ -84,7 +87,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
     // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("01am1yNTrAWIbmz4Inj6E_ptVvTMnDn7")) {
+    if (player.setEmbedCode("VvM2RuNzpA4jP_f7RZwlL5gke4hsFqOv")) {
       Log.d(TAG, "TEST - yay!");
     } else {
       Log.d(TAG, "TEST - lame :(");
@@ -142,7 +145,9 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     if (player != null && arg0 == setEmbed) {
       setEmbedCode();
     } else if (player != null && arg0 == skipAd) {
-      player.skipAd();
+      player.setBasePlayer(new BaseMoviePlayer());
+      
+      //player.skipAd();
     } else if (player != null && arg0 == insertAd) {
       if (metadataReady) {
         Log.d(TAG, "AD - INSERTING!");

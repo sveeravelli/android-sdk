@@ -4,15 +4,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
 import java.util.Set;
-import java.util.Timer;
-
 import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends MoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
 
+  private boolean _startSent = false;
   private boolean _firstQSent = false;
   private boolean _midSent = false;
   private boolean _thirdQSent = false;
@@ -32,23 +32,6 @@ class VASTAdPlayer extends MoviePlayer {
   private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
       "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
 
-  private class VASTPlayheadUpdateTimerTask extends PlayheadUpdateTimerTask {
-    @Override
-    public void run() {
-      if (!_firstQSent && currentTime() > (currentAd().getDuration() / 4)) {
-        sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
-        _firstQSent = true;
-      } else if (!_midSent && currentTime() > (currentAd().getDuration() / 2)) {
-        sendTrackingEvent(TrackingEvent.MIDPOINT);
-        _midSent = true;
-      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() / 4)) {
-        sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
-        _thirdQSent = true;
-      }
-      setChanged();
-      super.run();
-    }
-  }
 
   @Override
   public void init(final OoyalaPlayer parent, Object ad) {
@@ -99,9 +82,11 @@ class VASTAdPlayer extends MoviePlayer {
     }
 
     if (_linearAdQueue.isEmpty()) { return false; }
-    if (_linearAdQueue.get(0) == null || _linearAdQueue.get(0).getStream() == null)  { return false; }
+    if (_linearAdQueue.get(0) == null || _linearAdQueue.get(0).getStreams() == null)  { return false; }
 
-    super.init(parent, _linearAdQueue.get(0).getStream().decodedURL().toString());
+    addQuartileBoundaryObserver();
+    
+    super.init(parent, _linearAdQueue.get(0).getStreams());
 
     // TODO[jigish] setup clickthrough
 
@@ -120,16 +105,11 @@ class VASTAdPlayer extends MoviePlayer {
       setState(State.COMPLETED);
       return;
     }
-    if (_player == null) {
-      super.play();
-      return;
-    } // while state is loading, player will be null, so just call super to
-      // queue
+
     if (currentTime() != 0) {
       sendTrackingEvent(TrackingEvent.RESUME);
-    } else {
-      sendTrackingEvent(TrackingEvent.START);
     }
+
     super.play();
   }
 
@@ -145,31 +125,25 @@ class VASTAdPlayer extends MoviePlayer {
     super.pause();
   }
 
-  public void sendTrackingEvent(String event) {
-    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
-    Set<String> urls = currentAd().getTrackingEvents().get(event);
-    if (urls != null) {
-      for (String url : urls) {
-        NetUtils.ping(urlFromAdUrlString(url));
-      }
-    }
-  }
+
 
   public VASTAdSpot getAd() {
     return _ad;
   }
 
   @Override
-  protected void currentItemCompleted() {
-    _linearAdQueue.remove(0);
-    sendTrackingEvent(TrackingEvent.COMPLETE);
-    if (_linearAdQueue.isEmpty()) {
-      super.currentItemCompleted();
-    } else {
-      OoyalaPlayer parent = _parent;
-      destroy();
-      super.init(parent, _linearAdQueue.get(0).getStream());
+  protected void setState(State state) {
+    //look for state changing to complete here to ensure it happens before any observers notified.
+    if (state == State.COMPLETED) {
+      _linearAdQueue.remove(0);
+      sendTrackingEvent(TrackingEvent.COMPLETE);
+      if (!_linearAdQueue.isEmpty()) {
+        addQuartileBoundaryObserver();
+        super.init(_parent, _linearAdQueue.get(0).getStreams());
+        return;
+      }
     }
+    super.setState(state);
   }
 
   private VASTLinearAd currentAd() {
@@ -189,16 +163,46 @@ class VASTAdPlayer extends MoviePlayer {
     }
   }
 
-  // Timer tasks for playhead updates
-  @Override
-  protected void startPlayheadTimer() {
-    _playheadUpdateTimer = new Timer();
-    _playheadUpdateTimer.scheduleAtFixedRate(new VASTPlayheadUpdateTimerTask(), TIMER_DELAY, TIMER_PERIOD);
+  private void addQuartileBoundaryObserver() {
+    _startSent = false;
+    _firstQSent = false;
+    _midSent = false;
+    _thirdQSent = false;
+    addObserver(this);
+  }
+
+  public void update(Observable arg0, Object arg) {
+    if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      if (!_startSent && currentTime() > 0) {
+        sendTrackingEvent(TrackingEvent.START);
+        _firstQSent = true;
+      } else if (!_firstQSent && currentTime() > (currentAd().getDuration() / 4)) {
+        sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
+        _firstQSent = true;
+      } else if (!_midSent && currentTime() > (currentAd().getDuration() / 2)) {
+        sendTrackingEvent(TrackingEvent.MIDPOINT);
+        _midSent = true;
+      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() / 4)) {
+        sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
+        _thirdQSent = true;
+      }
+    }
+  }
+
+  public void sendTrackingEvent(String event) {
+    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
+    Set<String> urls = currentAd().getTrackingEvents().get(event);
+    if (urls != null) {
+      for (String url : urls) {
+        NetUtils.ping(urlFromAdUrlString(url));
+      }
+    }
   }
 
   @Override
   public void destroy() {
     if (_fetchTask != null && this._parent != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
+    deleteObserver(this);
     super.destroy();
   }
 }
