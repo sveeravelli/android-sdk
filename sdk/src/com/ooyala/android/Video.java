@@ -61,6 +61,7 @@ public class Video extends ContentItem implements PlayableItem {
           _streams.clear();
           for (int i = 0; i < streams.length(); i++) {
             Stream stream = new Stream(streams.getJSONObject(i));
+            _live = _live || stream._isLiveStream;	// live stream means the video is live
             if (stream != null) {
               _streams.add(stream);
             }
