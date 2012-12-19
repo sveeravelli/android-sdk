@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.FrameLayout;
+import com.ooyala.android.NexPlayerMoviePlayer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
@@ -91,7 +92,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private Player _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
   private State _state = State.INIT;
-  private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
+  private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
   private LayoutController _layoutController = null;
   private ClosedCaptionsView _closedCaptionsView = null;
@@ -103,7 +104,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private int _queuedSeekTime;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
-  private Map<String, Object> _openTasks = new HashMap<String, Object>();
+  private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
 
   /**
@@ -471,6 +472,15 @@ public class OoyalaPlayer extends Observable implements Observer {
     return changeCurrentItemAfterAuth();
   }
 
+  private String _playerType = "ViusalOn";
+  public void changePlayerType(String playerType) {
+    _playerType = playerType;
+  }
+
+  private String _url;
+  public void changeHardCodedUrl(String url) {
+    _url = url;
+  }
   /**
    * This is a helper function ONLY to be used with changeCurrentItem.
    * @return
@@ -519,8 +529,14 @@ public class OoyalaPlayer extends Observable implements Observer {
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode()));
     } else {
-      _player = new MoviePlayer();
-      initializePlayer(_player, s.decodedURL().toString());
+
+      if(_playerType == "Android Default")
+        _player = new MoviePlayer();
+      else if(_playerType == "NexPlayer")
+        _player = new NexPlayerMoviePlayer();
+      else //if(_playerType == "VisualOn")
+        _player = new VisualOnMoviePlayer();
+      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     }
     // _player = new WidevineOsPlayer();
     // initializePlayer(_player, new
@@ -859,6 +875,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private final Handler _fetchMoreChildrenHandler = new Handler() {
+    @Override
     public void handleMessage(Message msg) {
       changeCurrentItem(_currentItem.nextVideo());
       if (msg.what == DO_PLAY) {
@@ -1066,7 +1083,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       return Double.parseDouble(metadataRetreiver
           .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
-      return (double) (getCurrentItem().getStream().getVideoBitrate() * 1000);
+      return getCurrentItem().getStream().getVideoBitrate() * 1000;
     }
   }
 
@@ -1182,7 +1199,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private int percentToMillis(int percent) {
-    float fMillis = (((float) percent) / (100f)) * ((float) getDuration());
+    float fMillis = ((percent) / (100f)) * (getDuration());
     return (int) fMillis;
   }
 
@@ -1240,7 +1257,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private void displayCurrentClosedCaption() {
     if (_closedCaptionsView == null) return;
     if (_language != null && _currentItem.hasClosedCaptions()) {
-      double currT = ((double) currentPlayer().currentTime()) / 1000d;
+      double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
           || currT < _closedCaptionsView.getCaption().getBegin()) {
         Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
