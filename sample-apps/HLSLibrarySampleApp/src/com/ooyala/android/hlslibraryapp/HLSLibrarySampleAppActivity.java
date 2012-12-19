@@ -46,8 +46,8 @@ public class HLSLibrarySampleAppActivity extends Activity {
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OptimizedOoyalaPlayerLayoutController playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout,
-        "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-        "B3MDExOuTldXc1CiXbzAauYN7Iui", "www.ooyala.com");
+        "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd",
+        "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com");
     player = playerLayoutController.getPlayer();
 
     Spinner spinPlayer = (Spinner) findViewById(R.id.spinPlayer);
@@ -55,6 +55,12 @@ public class HLSLibrarySampleAppActivity extends Activity {
     Button btnGo = (Button) findViewById(R.id.btnGo);
 
     _listUrl.add(getString(R.string.strAddLink));
+
+    _listUrl.add("cwbm9xNzpPMo0SYzmZpFLAihh5BzPW6_");  // ESPN Live Stream
+    _listUrl.add("l0eW9xNzquhixKTQGdRTJabO6z-xjLLv");  // PAC-12 Live Stream
+    _listUrl.add("o4MHBxNzrAji6pU-pHf-N05DfxpvxkiU");  // Telstra Live Stream
+    _listUrl.add("xpMHBxNzrxI6UhRv55pWaHx9PW6Q6imO");  // CC Vod Demo
+/*
     _listUrl.add("http://player.ooyala.com/player/iphone/liMDE4NjqFlpZJYb6bYRtMgxkItkaGgq.m3u8?geo_country=US");
     _listUrl.add("https://dl.dropbox.com/u/98081242/hls_vod_with_ads.m3u8");
     _listUrl.add("http://player.ooyala.com/player/iphone/I1cmRoNjpD5gJC7ZwNPQO7ZO7M1oahn5.m3u8");
@@ -68,6 +74,7 @@ public class HLSLibrarySampleAppActivity extends Activity {
     _listUrl.add("http://ooyalaonlinehlslive667.ngcdn01.telstra.net/hls/c304/index-ASG103.m3u8?IS=0&ET=1384213189&CIP=1.2.3.4&KO=2&KN=1&US=b4713747d5b1acfa360698babf4380ad");
     _listUrl.add("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8");
     _listUrl.add("http://www.cpcweb.com/webcasts/hls/cpcdemo.m3u8");
+*/
 
     ReadUrlInfo();
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -76,7 +83,6 @@ public class HLSLibrarySampleAppActivity extends Activity {
 
     final ArrayList<String> arrPlayers = new ArrayList<String>();
     arrPlayers.add(OoyalaPlayer.PLAYER_VISUALON);
-    //arrPlayers.add(OoyalaPlayer.PLAYER_NEXPLAYER);
     arrPlayers.add(OoyalaPlayer.PLAYER_ANDROID);
     ArrayAdapter<String> playerAdapter = new ArrayAdapter<String>(this,
         android.R.layout.simple_spinner_item, arrPlayers);
@@ -108,9 +114,15 @@ public class HLSLibrarySampleAppActivity extends Activity {
             Spinner spinPlayer = (Spinner) findViewById(R.id.spinPlayer);
             String url = input.getText().toString();
 
-            player.changeHardCodedUrl(url);
+            if(url.startsWith("http")) {
+                player.changeHardCodedUrl(url);
+                player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro" VOD
+            } else {
+                player.changeHardCodedUrl(null);
+            	player.setEmbedCode(url);
+            }
+
             player.playerType(spinPlayer.getSelectedItem().toString());
-            player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro" VOD
             player.play();
             return;
             }
@@ -126,9 +138,16 @@ public class HLSLibrarySampleAppActivity extends Activity {
           return;
         }
 
-        player.changeHardCodedUrl(spinUrl.getSelectedItem().toString());
-        player.playerType(spinPlayer.getSelectedItem().toString());
-        player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro-" - VOD
+        String url = spinUrl.getSelectedItem().toString();
+        if(url.startsWith("http")) {
+	        player.changeHardCodedUrl(spinUrl.getSelectedItem().toString());
+	        player.playerType(spinPlayer.getSelectedItem().toString());
+	        player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro-" - VOD
+        } else {
+	        player.changeHardCodedUrl(null);
+	        player.playerType(spinPlayer.getSelectedItem().toString());
+	        player.setEmbedCode(url);
+        }
         player.play();
         return;
       }

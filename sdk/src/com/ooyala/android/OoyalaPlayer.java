@@ -23,7 +23,6 @@ import com.ooyala.android.AuthorizableItem.AuthCode;
 
 public class OoyalaPlayer extends Observable implements Observer {
   public static final String PLAYER_VISUALON = "VisualOn";
-  public static final String PLAYER_NEXPLAYER = "NexPlayer";
   public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
     CONTINUE, PAUSE, STOP, RESET
