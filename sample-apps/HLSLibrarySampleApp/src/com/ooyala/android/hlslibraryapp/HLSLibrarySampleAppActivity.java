@@ -33,7 +33,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.hlslibraryapp.R;
-import com.visualon.OSMPUtils.voLog;
+
 
 public class HLSLibrarySampleAppActivity extends Activity {
   /** Called when the activity is first created. */

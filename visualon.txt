@@ -1,0 +1,20 @@
+Instructions for adding VisualOn HLS playback engine to your Ooyala SDK based app.
+
+1. Obtain visualon-dist.zip package that is distributed separately
+2. Unzip the content of the package into <your-app-root>/libs folder, such as it will now contain the following items (in addition to other libraries you may have):
+
+  armeabi/libvo*.so files
+  voOSBasePlayer.jar
+  voOSDataSource.jar
+  voOSEngine.jar
+  voOSUtils.jar
+
+3. Refresh, clean and re-build your project, you should now see the new items appearing in the libs folder in the project
+
+4. Enable the HLS playback on Android 2+ by setting the following flags:
+            OoyalaPlayer.enableHLS = true;
+            OoyalaPlayer.enableCustomHLSPlayer = true;
+
+5. Deploy your app to a device for testing. If everything was done correctly, you will now be able to play HLS encoded videos (including Live streaming) on your Android 2+ devices.
+
+6. For a more extended example, please look at the HLSLibrarySampleApp distributed with the Ooyala SDK.
