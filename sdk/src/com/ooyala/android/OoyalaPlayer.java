@@ -73,6 +73,13 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static boolean enableHighResHLS = false;
 
   /**
+   * If set to true, HLS content will be played using our custom HLS implementation rather than native the Android one.
+   * To achieve HLS playback on Android versions before 4, set this to true and also set the enableHLS flag to true.
+   * This will have no affect unless the custom playback engine is linked and loaded in addition to the standard Ooyala Android SDK
+   */
+  public static boolean enableCustomHLSPlayer = false;
+
+  /**
    * For internal use only
    */
   public static enum Environment {
@@ -475,6 +482,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     return changeCurrentItemAfterAuth();
   }
 
+/*
   private String _playerType = "ViusalOn";
   public void playerType(String playerType) {
     _playerType = playerType;
@@ -483,6 +491,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   public String playerType() {
     return _playerType;
   }
+*/
 
   private String _url;
   public void changeHardCodedUrl(String url) {
@@ -535,16 +544,16 @@ public class OoyalaPlayer extends Observable implements Observer {
       _player = new WidevineLibPlayer();
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode()));
+    } else if (enableCustomHLSPlayer
+    		&& (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
+    				|| s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+      _player = new VisualOnMoviePlayer();
+      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     } else {
-
-      if(_playerType == "Android Default")
-        _player = new MoviePlayer();
-      else if(_playerType == "NexPlayer")
-        _player = new NexPlayerMoviePlayer();
-      else //if(_playerType == "VisualOn")
-        _player = new VisualOnMoviePlayer();
+      _player = new MoviePlayer();
       initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     }
+
     // _player = new WidevineOsPlayer();
     // initializePlayer(_player, new
     // WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(),

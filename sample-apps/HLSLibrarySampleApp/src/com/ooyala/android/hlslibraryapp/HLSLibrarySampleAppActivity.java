@@ -82,8 +82,8 @@ public class HLSLibrarySampleAppActivity extends Activity {
     spinUrl.setAdapter(adapter);
 
     final ArrayList<String> arrPlayers = new ArrayList<String>();
-    arrPlayers.add(OoyalaPlayer.PLAYER_VISUALON);
-    arrPlayers.add(OoyalaPlayer.PLAYER_ANDROID);
+    arrPlayers.add("EnableHLS");
+    arrPlayers.add("Native");
     ArrayAdapter<String> playerAdapter = new ArrayAdapter<String>(this,
         android.R.layout.simple_spinner_item, arrPlayers);
     spinPlayer.setAdapter(playerAdapter);
@@ -96,56 +96,20 @@ public class HLSLibrarySampleAppActivity extends Activity {
         Spinner spinPlayer = (Spinner) findViewById(R.id.spinPlayer);
         Spinner spinUrl = (Spinner) findViewById(R.id.spinUrl);
 
-        if(spinUrl.getSelectedItem().toString() == getString(R.string.strAddLink)) {
-          _lastUrl = null;
-
-          AlertDialog.Builder alert = new AlertDialog.Builder(HLSLibrarySampleAppActivity.this);
-
-          alert.setTitle("Add your own Link");
-          alert.setMessage("URL shorteners don't work well.  \nDon't forget 'http://'.\n If it doesn't work, put full urls in url.txt on your sd card");
-
-          // Set an EditText view to get user input
-          final EditText input = new EditText(HLSLibrarySampleAppActivity.this);
-          alert.setView(input);
-
-          alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int whichButton) {
-
-            Spinner spinPlayer = (Spinner) findViewById(R.id.spinPlayer);
-            String url = input.getText().toString();
-
-            if(url.startsWith("http")) {
-                player.changeHardCodedUrl(url);
-                player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro" VOD
-            } else {
-                player.changeHardCodedUrl(null);
-            	player.setEmbedCode(url);
-            }
-
-            player.playerType(spinPlayer.getSelectedItem().toString());
-            player.play();
-            return;
-            }
-          });
-
-          alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-              // Canceled.
-            }
-          });
-
-          alert.show();
-          return;
+        String url = spinUrl.getSelectedItem().toString();
+        if(spinPlayer.getSelectedItem().toString().equals("EnableHLS")) {
+            OoyalaPlayer.enableHLS = true;
+            OoyalaPlayer.enableCustomHLSPlayer = true;
+        } else {
+            OoyalaPlayer.enableHLS = false;
+            OoyalaPlayer.enableCustomHLSPlayer = false;
         }
 
-        String url = spinUrl.getSelectedItem().toString();
         if(url.startsWith("http")) {
 	        player.changeHardCodedUrl(spinUrl.getSelectedItem().toString());
-	        player.playerType(spinPlayer.getSelectedItem().toString());
 	        player.setEmbedCode("w5bDRsNzpULkgdCdCqG_4jXPQgTR4P3S"); //"AxYnZrNToCSMFZItXb2oERT8tEFhxro-" - VOD
         } else {
 	        player.changeHardCodedUrl(null);
-	        player.playerType(spinPlayer.getSelectedItem().toString());
 	        player.setEmbedCode(url);
         }
         player.play();
