@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -17,6 +19,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -321,11 +324,9 @@ class VisualOnMoviePlayer extends Player implements
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
     Log.e(TAG, "Surface Changed: " + width + ","+ height);
 
-    ViewGroup.LayoutParams lp = _view.getLayoutParams();
-    lp.width = width;
-    lp.height = height;
-    _view.setLayoutParams(lp);
-
+    _view.setLayoutParams(new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
     if (_player != null) {
     	_player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
@@ -363,21 +364,21 @@ class VisualOnMoviePlayer extends Player implements
     super.setParent(parent);
   }
 
-  private void setupView() {
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+private void setupView() {
     _view = new SurfaceView(_parent.getLayout().getContext()) {
 
-    	/*
-    	 * Manually updates internal surface to match parent size
-    	 */
-		@Override
-		protected void onLayout (boolean changed, int left, int top, int right, int bottom) {
-			super.onLayout(changed, left, top, right, bottom);
+    	@Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
 
-			Log.v(TAG, "Layout: "+ left + "," + top + " -- " + right + ","+bottom);
+    		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+    		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-			// assume to much vertical space, so need to align vertically
-			int parentHeight = _parent.getLayout().getBottom() - _parent.getLayout().getTop();
-			int parentWidth = _parent.getLayout().getRight() - _parent.getLayout().getLeft();
+
+    		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
+
+    		// assume to much vertical space, so need to align vertically
 			int wantedWidth = parentWidth;
 			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
 			int offset = (parentHeight - wantedHeight) / 2;
@@ -389,27 +390,19 @@ class VisualOnMoviePlayer extends Player implements
 				offset = (parentWidth - wantedWidth) / 2;
 			}
 
-			if(_player!=null) {
-				_player.updateVideoAspectRatio(wantedWidth, wantedHeight);
-				_player.SetDisplaySize(wantedWidth, wantedHeight);
-				Log.v(TAG, "Setting aspect rates to: "+ wantedWidth + "," + wantedHeight);
-				Log.v(TAG, "Video size: "+ _videoWidth + "," + _videoHeight);
-			}
-
-			//getHolder().setFixedSize(wantedWidth, wantedHeight);
-			//Log.v(TAG, "Setting surface to: "+ wantedWidth + "," + wantedHeight);
-		}
-
+			setMeasuredDimension(wantedWidth, wantedHeight);
+			Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
+        }
     };
 
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
-
     _parent.getLayout().addView(_view);
     _holder = _view.getHolder();
     _holder.addCallback(this);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     _holder.setFormat(PixelFormat.RGBA_8888);
   }
 
@@ -552,13 +545,20 @@ class VisualOnMoviePlayer extends Player implements
   @Override
   public int onEvent(int id, int param1, int param2, Object obj) {
     if (id == voOSType.VOOSMP_SRC_CB_Adaptive_Streaming_Info) {
-    	_view.requestLayout();
-      switch (param1) {
+
+        _view.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+
+        switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
         Log.v(
             TAG,
             "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . "
                 + param2);
+
+
         break;
       }
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
@@ -611,10 +611,15 @@ class VisualOnMoviePlayer extends Player implements
       return 0;
     } else if (id == voOSType.VOOSMP_CB_VideoSizeChanged) // Video size changed
     {
+
       _videoWidth = param1;
       _videoHeight = param2;
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
-      _view.requestLayout();
+
+      _view.setLayoutParams(new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
       return 0;
     } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Vid seteo buffering
                                                        // stopped
@@ -655,7 +660,7 @@ class VisualOnMoviePlayer extends Player implements
 
 		// Retrieve CC text
 		String cc = GetCCString(info);
-		Log.v(TAG, "GOT CC: "+ cc);
+		//Log.v(TAG, "GOT CC: "+ cc);
 		_parent.displayClosedCaptionText(cc);
 		return 0;
 	} else {
