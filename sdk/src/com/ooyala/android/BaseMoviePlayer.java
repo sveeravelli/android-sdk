@@ -404,10 +404,4 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     super.setState(state);
     dequeueAll();
   }
-
-  @Override
-  protected void notifyTimeChanged() {
-    super.notifyTimeChanged();
-    Log.e("Timer","OMGwTFTIME");
-  }
 }
