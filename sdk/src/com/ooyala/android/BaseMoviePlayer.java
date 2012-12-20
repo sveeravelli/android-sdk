@@ -3,10 +3,6 @@ package com.ooyala.android;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -19,8 +15,6 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -49,11 +43,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   private boolean _completedQueued = false;
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
-  protected Timer _playheadUpdateTimer = null;
-  private int _lastPlayhead = -1;
-
-  protected static final long TIMER_DELAY = 0;
-  protected static final long TIMER_PERIOD = 250;
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -159,7 +148,10 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void seekToTime(int timeInMillis) {
-    if (_player == null) { return; }
+    if (_player == null) {
+      _timeBeforeSuspend = timeInMillis;
+      return;
+    }
     _player.seekTo(timeInMillis);
   }
 
@@ -292,7 +284,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
     dequeuePlay();
-    _lastPlayhead = _player.getCurrentPosition();
   }
 
   @Override
@@ -405,7 +396,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   
   @Override
   public boolean isPlaying() {
-    return _player.isPlaying();
+    return _player != null && _player.isPlaying();
   }
 
   @Override
@@ -413,40 +404,10 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     super.setState(state);
     dequeueAll();
   }
-  
-  protected class PlayheadUpdateTimerTask extends TimerTask {
-    @Override
-    public void run() {
 
-      if (_lastPlayhead != currentTime() && isPlaying()) {
-        _playheadUpdateTimerHandler.sendEmptyMessage(0);
-      }
-      _lastPlayhead = currentTime();
-    }
-  }
-
-  // This is required because android enjoys making things difficult. talk to jigish if you got issues.
-  @SuppressLint("HandlerLeak")
-  private final Handler _playheadUpdateTimerHandler = new Handler() {
-    public void handleMessage(Message msg) {
-      setChanged();
-      notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
-    }
-  };
-
-  // Timer tasks for playhead updates
-  protected void startPlayheadTimer() {
-    if (_playheadUpdateTimer != null) {
-      stopPlayheadTimer();
-    }
-    _playheadUpdateTimer = new Timer();
-    _playheadUpdateTimer.scheduleAtFixedRate(new PlayheadUpdateTimerTask(), TIMER_DELAY, TIMER_PERIOD);
-  }
-
-  protected void stopPlayheadTimer() {
-    if (_playheadUpdateTimer != null) {
-      _playheadUpdateTimer.cancel();
-      _playheadUpdateTimer = null;
-    }
+  @Override
+  protected void notifyTimeChanged() {
+    super.notifyTimeChanged();
+    Log.e("Timer","OMGwTFTIME");
   }
 }

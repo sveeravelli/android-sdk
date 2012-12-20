@@ -587,9 +587,8 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private Player initializePlayer(MoviePlayer p, Object param) {
     p.addObserver(this);
-    p.init(this, param);
     p.setBasePlayer(_basePlayer);
-
+    p.init(this, param);
     return p;
   }
 
@@ -808,7 +807,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     return true;
   }
 
-  private Player currentPlayer() {
+  private MoviePlayer currentPlayer() {
     return (_adPlayer != null) ? _adPlayer : _player;
   }
 

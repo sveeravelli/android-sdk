@@ -12,7 +12,7 @@ public class MoviePlayer extends Player implements Observer {
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
-  private boolean _suspended = false;
+  private boolean _suspended = true;
 
   @SuppressWarnings("unchecked")
   public void init(OoyalaPlayer parent, Object streams) {
@@ -27,6 +27,7 @@ public class MoviePlayer extends Player implements Observer {
     _streams = streams;
     _suspended = false;
     if (_basePlayer != null) {
+      _basePlayer.addObserver(this);
       _basePlayer.init(parent, streams);
     }
   }
@@ -93,10 +94,10 @@ public class MoviePlayer extends Player implements Observer {
       _basePlayer.addObserver(this);
      // if (stateToResume == State.INIT) {
         _basePlayer.init(_parent, _streams);
+        _basePlayer.seekToTime(millisToResume);
         
         if (stateToResume == State.PLAYING) {
           _basePlayer.play();
-          _basePlayer.seekToTime(millisToResume);
         }
         //} else {
         //_basePlayer.resume(millisToResume, stateToResume);
