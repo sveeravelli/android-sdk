@@ -65,6 +65,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     setState(State.LOADING);
     _streamUrl = stream.toString();
     setParent(parent);
+    if (_player != null) { _player.reset(); }
   }
 
   @Override

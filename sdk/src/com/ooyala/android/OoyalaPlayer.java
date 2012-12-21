@@ -787,6 +787,8 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private boolean playAd(AdSpot ad) {
+    _player.suspend();
+
     if (ad instanceof OoyalaAdSpot) {
       _adPlayer = new OoyalaAdPlayer();
     } else if (ad instanceof VASTAdSpot) {
@@ -800,7 +802,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     if (_adPlayer == null || _adPlayer.getState() == State.ERROR) { return false; }
     _adPlayer.setSeekable(_adsSeekable);
 
-    _player.suspend();
+
     removeClosedCaptionsView();
     sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();

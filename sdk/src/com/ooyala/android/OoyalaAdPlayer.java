@@ -44,7 +44,7 @@ class OoyalaAdPlayer extends MoviePlayer {
   }
 
   private void initAfterFetch(OoyalaPlayer parent) {
-    super.init(parent, _ad.getStream().decodedURL().toString());
+    super.init(parent, _ad.getStreams());
 
     // TODO[jigish] setup clickthrough
 
