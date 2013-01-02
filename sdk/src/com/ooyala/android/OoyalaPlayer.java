@@ -1092,15 +1092,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   @TargetApi(10)
   public double getBitrate() {
     if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
-    if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-      // Query for bitrate
-      MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
-      metadataRetreiver.setDataSource(getCurrentItem().getStream().getUrl());
-      return Double.parseDouble(metadataRetreiver
-          .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
-    } else {
-      return getCurrentItem().getStream().getVideoBitrate() * 1000;
-    }
+    return getCurrentItem().getStream().getVideoBitrate() * 1000;
   }
 
   /**
