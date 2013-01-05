@@ -285,6 +285,10 @@ class VisualOnMoviePlayer extends Player implements
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
 
+      /* Set the license */
+      String licenseText = "VOTRUST_OOYALA_754321974";		// Magic string from VisualOn, must match voVidDec.dat to work
+      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
+
       /* Configure Dolby Audio Effect parameters */
       _player.SetParam(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
 
