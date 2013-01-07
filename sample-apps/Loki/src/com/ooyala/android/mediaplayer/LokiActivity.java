@@ -1,6 +1,8 @@
-package com.ooyala.android.loki;
+package com.ooyala.android.mediaplayer;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -15,7 +17,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
-public class LokiActivity extends Activity implements EmbedTokenGenerator {
+public class LokiActivity extends Activity implements EmbedTokenGenerator, Observer {
   /** Called when the activity is first created. */
 
   String token = null;
@@ -60,6 +62,7 @@ public class LokiActivity extends Activity implements EmbedTokenGenerator {
     OoyalaPlayer player = playerLayoutController.getPlayer();
     if (embedCode != null && player.setEmbedCode(embedCode)) {
       // The Embed Code works
+      player.addObserver(this);
       player.play();
     } else {
       CharSequence text = "Invalid embed code";
@@ -76,5 +79,11 @@ public class LokiActivity extends Activity implements EmbedTokenGenerator {
         callback.setEmbedToken(token);
     // TODO Auto-generated method stub
     
+  }
+  @Override
+  public void update(Observable observable, Object data) {
+    if (data.toString() == "playCompleted") {
+      this.finish();
+    }
   }
 }
