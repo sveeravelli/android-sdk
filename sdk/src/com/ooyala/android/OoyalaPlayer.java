@@ -1302,4 +1302,10 @@ public class OoyalaPlayer extends Observable implements Observer {
     _currentItemChangedCallback = callback;
   }
 
+  public void setCustomAnalyticsTags(List<String> tags) {
+    if (_analytics != null) {
+      _analytics.setTags(tags);
+    }
+  }
+
 }
