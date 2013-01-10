@@ -1,4 +1,9 @@
-Current Version: 1.1.0
+Current Version: 1.2.0
+
+------------ 1.2.0 ------------
+
+Bug fixes
+Support for HLS playback using 3rd party player
 
 ------------ 1.1.0 ------------
 

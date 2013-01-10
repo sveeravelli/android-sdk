@@ -129,6 +129,16 @@ public class Analytics {
     }
   }
 
+  void setTags(List<String> tags) {
+    if (_failed) { return; }
+    String action = "javascript:reporter.setTags([\"" + Utils.join(tags, "\",\"") + "\"]);";
+    if (!_ready) {
+      queue(action);
+    } else {
+      _jsAnalytics.loadUrl(action);
+    }
+  }
+
   private void queue(String action) {
     _queue.add(action);
   }

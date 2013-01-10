@@ -17,10 +17,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.FrameLayout;
+import com.ooyala.android.NexPlayerMoviePlayer;
 
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
 public class OoyalaPlayer extends Observable implements Observer {
+  public static final String PLAYER_VISUALON = "VisualOn";
+  public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
     CONTINUE, PAUSE, STOP, RESET
   };
@@ -70,6 +73,13 @@ public class OoyalaPlayer extends Observable implements Observer {
   public static boolean enableHighResHLS = false;
 
   /**
+   * If set to true, HLS content will be played using our custom HLS implementation rather than native the Android one.
+   * To achieve HLS playback on Android versions before 4, set this to true and also set the enableHLS flag to true.
+   * This will have no affect unless the custom playback engine is linked and loaded in addition to the standard Ooyala Android SDK
+   */
+  public static boolean enableCustomHLSPlayer = false;
+
+  /**
    * For internal use only
    */
   public static enum Environment {
@@ -91,10 +101,11 @@ public class OoyalaPlayer extends Observable implements Observer {
   private Player _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
   private State _state = State.INIT;
-  private List<AdSpot> _playedAds = new ArrayList<AdSpot>();
+  private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
   private LayoutController _layoutController = null;
   private ClosedCaptionsView _closedCaptionsView = null;
+  private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
   private String _language = Locale.getDefault().getLanguage();
   private boolean _adsSeekable = false;
@@ -103,7 +114,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   private int _queuedSeekTime;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
-  private Map<String, Object> _openTasks = new HashMap<String, Object>();
+  private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
 
   /**
@@ -471,6 +482,21 @@ public class OoyalaPlayer extends Observable implements Observer {
     return changeCurrentItemAfterAuth();
   }
 
+/*
+  private String _playerType = "ViusalOn";
+  public void playerType(String playerType) {
+    _playerType = playerType;
+  }
+
+  public String playerType() {
+    return _playerType;
+  }
+*/
+
+  private String _url;
+  public void changeHardCodedUrl(String url) {
+    _url = url;
+  }
   /**
    * This is a helper function ONLY to be used with changeCurrentItem.
    * @return
@@ -518,10 +544,16 @@ public class OoyalaPlayer extends Observable implements Observer {
       _player = new WidevineLibPlayer();
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode()));
+    } else if (enableCustomHLSPlayer
+    		&& (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
+    				|| s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+      _player = new VisualOnMoviePlayer();
+      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     } else {
       _player = new MoviePlayer();
-      initializePlayer(_player, s.decodedURL().toString());
+      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     }
+
     // _player = new WidevineOsPlayer();
     // initializePlayer(_player, new
     // WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(),
@@ -741,7 +773,7 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private void addClosedCaptionsView() {
     removeClosedCaptionsView();
-    if (_currentItem != null && _currentItem.hasClosedCaptions()) {
+    if (_currentItem != null && _currentItem.hasClosedCaptions() || _streamBasedCC) {
       _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
@@ -859,6 +891,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private final Handler _fetchMoreChildrenHandler = new Handler() {
+    @Override
     public void handleMessage(Message msg) {
       changeCurrentItem(_currentItem.nextVideo());
       if (msg.what == DO_PLAY) {
@@ -1059,15 +1092,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   @TargetApi(10)
   public double getBitrate() {
     if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
-    if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-      // Query for bitrate
-      MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
-      metadataRetreiver.setDataSource(getCurrentItem().getStream().getUrl());
-      return Double.parseDouble(metadataRetreiver
-          .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
-    } else {
-      return (double) (getCurrentItem().getStream().getVideoBitrate() * 1000);
-    }
+    return getCurrentItem().getStream().getVideoBitrate() * 1000;
   }
 
   /**
@@ -1182,7 +1207,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private int percentToMillis(int percent) {
-    float fMillis = (((float) percent) / (100f)) * ((float) getDuration());
+    float fMillis = ((percent) / (100f)) * (getDuration());
     return (int) fMillis;
   }
 
@@ -1239,8 +1264,10 @@ public class OoyalaPlayer extends Observable implements Observer {
 
   private void displayCurrentClosedCaption() {
     if (_closedCaptionsView == null) return;
+    if (_streamBasedCC) return;
+
     if (_language != null && _currentItem.hasClosedCaptions()) {
-      double currT = ((double) currentPlayer().currentTime()) / 1000d;
+      double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
           || currT < _closedCaptionsView.getCaption().getBegin()) {
         Caption caption = _currentItem.getClosedCaptions().getCaption(_language, currT);
@@ -1255,6 +1282,14 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   }
 
+  public void displayClosedCaptionText(String text) {
+	  _streamBasedCC = true;
+	  if (_closedCaptionsView == null) {
+		  addClosedCaptionsView();
+	  }
+	  _closedCaptionsView.setCaptionText(text);
+  }
+
   PlayerAPIClient getPlayerAPIClient() {
     return this._playerAPIClient;
   }
@@ -1265,6 +1300,12 @@ public class OoyalaPlayer extends Observable implements Observer {
    */
   public void setCurrentItemChangedCallback(CurrentItemChangedCallback callback) {
     _currentItemChangedCallback = callback;
+  }
+
+  public void setCustomAnalyticsTags(List<String> tags) {
+    if (_analytics != null) {
+      _analytics.setTags(tags);
+    }
   }
 
 }

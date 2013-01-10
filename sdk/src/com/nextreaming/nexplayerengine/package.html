@@ -1,0 +1,638 @@
+<html>
+<head>
+<title>NexPlayer Engine</title>
+</head>
+<body>
+
+<img src="doc-files/nexlogo.gif" style="display:block; margin-left:auto; margin-right:auto; margin-bottom: 14pt;" />
+NexPlayer&trade; provides audio and video decoding and playback services
+that application developers can use to build custom multimedia players
+rapidly and efficiently. NexPlayer&trade; has been built to be reliable
+and robust without any sacrifice in performance, and has proven compatibility with
+international standards.<p>
+
+<ul>
+<li><a href="#about">About this Documentation</a></li>
+<li><a href="#support">NexPlayer&trade; Capabilities and Limitations</a></li>
+<li><a href="#mediaplay">Media Playback</a></li>
+<li><a href="#multiAV">Multi-Audio and Multi-Video Stream Playback</a></li>
+<li><a href="#jellybean">Jelly Bean Support</a></li>
+<li><a href="#honeycomb">Honeycomb Support</a></li>
+<li><a href="#glrenderer">OpenGL Renderer</a></li>
+<li><a href="#javarenderer">Java Renderer</a></li>
+<li><a href="#timeshift">Support for Time Shift in Live Content</a></li>
+<li><a href="#crashlog">Recording Recent Log Output When an Exception Occurs</a></li>
+<li><a href="#avsync">Audio Video Synchronization</a></li>
+<li><a href="#codeclibs">Selective Codec Support</a></li>
+</ul>
+
+
+NexPlayer&trade; includes support for:<p>
+<ul>
+<li>HTTP download</li>
+<li>HTTP progressive download</li>
+<li>HTTP and live streaming</li>
+<li>RTSP streaming</li>
+<li>Local content</li>
+</ul>
+
+<h3><a name="about">About this Documentation</a></h3>
+
+This documentation is a work in progress.<p>
+
+Additional details and sample code will continue to be added.<p>
+
+Recent updates include support for the Android OS Jelly Bean (version 4.1), 
+information about support for HLS 4.0, <a href="#multiAV">multi-audio and multi-video stream playback</a>,
+time shifting playback in live content, timed
+metadata in HLS, the Downloader module for PD Piff content,  the SmoothStreaming <code> LiveBackOff</code> and
+<code> LivePlaybackOffset</code> properties,
+more details on the <code>IListener</code> interface,
+and updated full support for CEA 608 Closed Captions.<p>
+
+There are still some methods of the <code>IListener</code> interface that are not fully documented.
+However, the key methods needed for playback are documented, and combined with the example
+code, this should provide enough information to implement this interface. More
+detailed documentation will be added in the future.<p>
+
+Please also be aware that while NexStreaming does its best to support the Android emulator
+for testing and development purposes, no guarantees can be made about performance as there are
+known differences and issues between the emulator and actual Android devices, including the fact
+that the OpenGL renderer does not run properly within the emulator environment.
+Frequent testing on actual devices is strongly recommended during development and all apps should
+be tested on actual devices, not merely in an emulator, prior to release.<p>
+
+<h3><a name="support">NexPlayer&trade; Capabilities and Limitations</a></h3>
+
+<h4>Chipsets</h4>
+      <ul><li> Software specifically optimized for ARM devices: ARM9, ARM11, Cortex-A8/9 </li></ul>
+<h4>Operating Systems</h4>
+      <ul><li> Android 1.6 and above </li></ul>
+<h4>Protocols</h4>
+      <ul>
+      <li> HTTP Live Streaming version 4.0 (IETF draft-pantos-http-live-streaming-07) </li>
+      <li> Smooth Streaming ( [MS-SSTR] Smooth Streaming Protocol) </li>
+      <li> 3GPP Progressive Download </li>
+      <li> Local File Formats: .mp4, .3gp, .avi, .wmv, .asf, .wma, .piff </li>
+      <li> AES128 </li>
+      <li> HTTPS </li>
+      </ul>
+<h4>Codecs</h4>
+      <ul>
+      <li> H.264 Baseline Profile </li>
+      <li> WMV: VC-1 Simple Profile, Main Profile, Advanced Profile </li>
+      <li> AAC, AAC+, eAAC+, MP3, WMA9 Standard, WMA10 Pro </li>
+      </ul>
+
+
+<h3><a name="mediaplay">Media Playback</a></h3>
+Playback is controlled through the
+{@link com.nextreaming.nexplayerengine.NexPlayer} class, which
+handles acquisition and decoding of the media data.  The application creates
+an instance of this class and issues commands to it by calling instance
+methods.  NexPlayer&trade; carries out these commands asynchronously and
+notifies the application of changes in status.<p>
+
+The application is also notified when NexPlayer&trade; needs a surface on which to display video
+or an audio track object through which to play audio.  The application must create the
+relevant objects when necessary or supply references to existing instances that NexPlayer&trade;
+can use.  For more information, see the
+  {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderCreate onVideoRenderCreate},
+  {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderRender onVideoRenderRender},
+  {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderDelete onVideoRenderDelete},
+  {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onAudioRenderCreate onAudioRenderCreate}, and
+  {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onAudioRenderDelete onAudioRenderDelete}</code>
+methods in {@link com.nextreaming.nexplayerengine.NexPlayer.IListener}.<p>
+
+It is possible to set certain properties on the NexPlayer&trade; instance, which affect
+how media is played back, how audio/video synchronization is handled, which player
+features are enabled, and so on.  In general, the default property settings are
+suitable for most applications.  However, if you are developing a streaming media
+application that uses HLS (HTTP Live Streaming), you may want to adjust the buffering time.<p>
+
+For more information on properties, see {@link com.nextreaming.nexplayerengine.NexPlayer.NexProperty}.<p>
+
+The application may also need to handle displaying of decoded frames, if the Java rendering method
+is being used.  This is necessary to support Honeycomb.  See <a href="#honeycomb">Honeycomb Support</a>
+for more details.<p>
+
+Notifications are handled through the
+{@link com.nextreaming.nexplayerengine.NexPlayer.IListener} interface.
+The application <i>must</i> provide an object which implements this interface,
+and must call {@link com.nextreaming.nexplayerengine.NexPlayer#setListener setListener}
+to associate it with the NexPlayer&trade; instance.  <i>This must be the first thing the
+application does after instantiating NexPlayer&trade;, before calling any other
+methods.</i><p>
+
+Once the event listener interface has been set up, the application may call
+methods on the NexPlayer&trade; object to control the media source.
+Certain calls, such as <code>open</code> and <code>close</code> must be
+given in matched pairs. The basic structure of calls for media playback is as follows:<p>
+
+<ul>
+  <li>{@link com.nextreaming.nexplayerengine.NexPlayer#open(String, String, String, int, int, int)}</li>
+  <ul>
+    <li>{@link com.nextreaming.nexplayerengine.NexPlayer#start(int)}</li>
+    <ul>
+      <li>{@link com.nextreaming.nexplayerengine.NexPlayer#pause()}</li>
+      <li>{@link com.nextreaming.nexplayerengine.NexPlayer#seek(int)}</li>
+      <li>{@link com.nextreaming.nexplayerengine.NexPlayer#resume()}</li>
+    </ul>
+    <li>{@link com.nextreaming.nexplayerengine.NexPlayer#stop()}</li>
+  </ul>
+  <li>{@link com.nextreaming.nexplayerengine.NexPlayer#close()}</li>
+</ul>
+
+<h3><a name="multiAV">Multi-Audio and Multi-Video Stream Playback</a></h3>
+
+Certain streaming protocols provide multiple audio and video streams of the same content which are generally intended to be
+selected by the user.  NexPlayer&trade;&nbsp;provides the {@link com.nextreaming.nexplayerengine.NexPlayer#setMediaStream setMediaStream()}
+API to allow these streams to be selected from the User Interface.
+
+The full list of available streams (if any) for particular content can be found in
+the {@link com.nextreaming.nexplayerengine.NexContentInformation#mArrStreamInformation mArrStreamInformation}
+array in NexContentInformation.
+
+<h4>Smooth Streaming</h4>
+
+In the case of Smooth Streaming, each stream is either an audio stream or a video stream, and one of each may
+be selected for presentation.  There may also be custom attributes associated with the video streams which
+limit playback to a subset of tracks within the stream.
+ *
+Custom attributes are key/value pairs.  Each possible pairing (from all the tracks in a stream) is
+listed in {@link com.nextreaming.nexplayerengine.NexStreamInformation#mArrCustomAttribInformation mArrCustomAttribInformation}
+along with an associated integer ID.  Specifying that particular integer ID causes
+only tracks with that particular key/value pairing to be used.  Only one ID may be
+specified at any given time.
+
+Smooth Streaming also supports the multiple text streams for particular content (for example for multi-language
+subtitles), which can be chosen in addition to the audio and video streams selected, usually also from the UI.
+
+<h4>HTTP Live Streaming (HLS) version 4.0 (draft 07)</h4>
+
+HTTP Live Streaming supports multiple audio and video streams for particular content but does so in a slightly
+different way from Smooth Streaming.
+ *
+There are three possible use cases available:
+<ol>
+  <li> <b>A variant playlist with alternative audio</b>:\n
+       <p>Audio and video are delivered in separate streams or groups of tracks.  In this case, video and audio
+       can be selected independently.</p>
+       <p>For example, there could be two different audio tracks (different languages) for video stream A,
+       which includes multiple tracks to be selected internally by the player by adaptive bitrate streaming.</p>
+       <p>The audio tracks should be selected by the user while the player will display the appropriate video track
+       based on network conditions and the device.</p></li>
+ <li> <b>A variant playlist with alternative video</b>:\n
+       <p>Each track contains both audio and video, but alternative video streams are available (for example different
+       camera angles or views of the same content).  In this case, the same audio is included in each track, and
+       the user chooses which video stream to display.  Tracks within a stream are selected internally based on
+       network conditions and the device but the user can change video streams from the UI.</p></li>
+ <li> <b>A combination of a variant playlist with alternative video and audio</b>: \n
+       <p>This use case is a combination of cases 1 and 2, where a main video stream provides video tracks at different bitrates
+       but INCLUDING the same audio, and separate audio tracks are available for optional language selection.  To play the
+       alternative audio tracks, the user selects them from the UI.</p></li>
+</ol>
+
+See {@link com.nextreaming.nexplayerengine.NexPlayer#setMediaStream setMediaStream()}
+See {@link com.nextreaming.nexplayerengine.NexStreamInformation NexStreamInformation} for more details about available content streams.
+
+<h3><a name="jellybean">Jelly Bean Support</a></h3>
+
+Starting from the <i>Jelly Bean</i> version of the Android operating system (version 4.1), only the OpenGL video renderer
+is supported.  The other video renderers may not be used on devices running Jelly Bean.
+
+<h3><a name="honeycomb">Honeycomb Support</a></h3>
+
+Under the <i>Honeycomb</i> version of the Android operating system, only the OpenGL ES 2.0 or
+the Java-based video renderers are currently supported.  Both of these renderers require supporting
+code in the application.  This means that in order to support Honeycomb, you must
+implement OpenGL ES 2.0 or Java renderer support in your application.  For other Android OS versions, this
+is not necessary, although on some devices there may be performance advantages
+from using the OpenGL ES 2.0 renderer.  While either the OpenGL ES 2.0 renderer or the Java
+renderer will work on Honeycomb, it is recommended to use the OpenGL ES 2.0 renderer, as
+performance is generally better with that renderer, and implementation is easier.<p>
+
+See <a href="#javarenderer">Java Renderer</a> and <a href="#glrenderer">OpenGL Renderer</a>for details.<p>
+
+In addition, use caution with the following APIs on Honeycomb:
+<ul>
+<li>{@link com.nextreaming.nexplayerengine.NexPlayer#setOutputPos(int, int, int, int) setOutputPos} is not
+	supported with the Java renderer.
+	For this same functionality, you may perform scaling yourself in the <code>onVideoRenderRender</code>
+	callback (see the <a href="#javarenderer">Java Renderer</a> explanation for details).</li>
+<li>{@link com.nextreaming.nexplayerengine.NexPlayer#setDisplay(SurfaceHolder) setDisplay} is not supported
+	on Honeycomb at all and must NOT be called.  It is also not supported by the OpenGL renderer and must
+	not be called if the OpenGL renderer is being used.</li>
+</ul>
+
+
+<h3><a name="glrenderer">OpenGL Renderer</a></h3>
+
+This version of the NexPlayer&trade; engine supports OpenGL ES 2.0 rendering.  This renderer may be used on
+devices running Froyo and later and is the default renderer for Honeycomb and Ice Cream Sandwich (ICS).  This is 
+also the <b>ONLY</b> renderer supported for Jelly Bean.
+However <i>there are certain Froyo devices that do NOT support the OpenGL Renderer</i>.  In
+these cases, it is necessary to check which renderer is in use when
+{@link com.nextreaming.nexplayerengine.NexPlayer#open NexPlayer.open}
+is called by also calling {@link com.nextreaming.nexplayerengine.NexPlayer#GetRenderMode() GetRenderMode}.<p>
+
+If this is not implemented by the application, another renderer must
+be specifically requested when calling NexPlayer&trade;'s
+{@link com.nextreaming.nexplayerengine.NexPlayer#init(Context,String,String,int,int) init} method.<p>
+
+<b>WARNING:</b> <i> When testing an application, please note that the OpenGL renderer does <b>not</b> work in the Android emulator
+provided with the Android SDK.  If an application is to be tested in the emulator, it will be necessary to use one
+of the other renderers available.  Testing content using the OpenGL renderer must happen on an actual device, not through
+the emulator.</i><p>
+
+NOTE: While the Android renderer may be the default renderer for Gingerbread, there are instances where another renderer may
+provide better performance on certain devices.  In particular, while the Kindle Fire runs on Gingerbread,
+the OpenGL renderer is recommended because it provides better performance.  See
+{@link com.nextreaming.nexplayerengine.NexPlayer#init(Context,String,String,int,int) init} for more details.
+
+To use the OpenGL renderer, the application must create an instance of the GLRenderer class (supplied
+as part of the NexPlayer&trade; SDK). <code>GLRenderer</code> is a GLSurfaceView subclass, and the video
+frame will be displayed within it. By default, the frame is stretched to fill the entire surface.
+The rectangle in which the video is drawn can be changed by calling
+{@link com.nextreaming.nexplayerengine.NexPlayer#setOutputPos(int, int, int, int) setOutputPos}.
+This rectangle is in screen pixels (not in the OpenGL coordinate space) but the position is relative to
+the GLRenderer.
+
+In addition, an application must also do the following, in order to
+support the OpenGL renderer:
+<ol>
+   <li> <p>Call NexPlayer&trade;'s {@link com.nextreaming.nexplayerengine.NexPlayer#init(Context,String,String,int,int) init}
+        method, passing the model name of the current device and choose to use the OpenGL renderer
+        for debugging purposes by passing <code>NEX_DEVICE_USE_OPENGL</code> as the Render mode in parameter <code>strRenderMode</code>.</p>
+        </li>
+   <li> <p>After initializing NexPlayer&trade;, check which renderer is being used to determine if it is the
+        OpenGL renderer.  Any special code to support the OpenGL renderer should be conditional based on the
+        renderer in use.  To determine the current renderer in use, call
+        {@link com.nextreaming.nexplayerengine.NexPlayer#GetRenderMode() GetRenderMode}
+        and check the result, as follows:</p>
+       <pre>
+         if(mNexPlayer.GetRenderMode() == NexPlayer.NEX_USE_RENDER_OPENGL) {
+             UseOpenGL = true;
+         }
+       </pre>
+       </li>
+   <li> <p>Create an instance of the GLRenderer class and add it to the main view for the activity or some other visible view in your layout:</p>
+        <pre>
+        if(UseOpenGL) {
+           mContext = this;
+           mGLListener = this;
+           glRenderer = new GLRenderer(mContext, mNexPlayer, mGLListener, colorDepth);
+           FrameLayout v = (FrameLayout)findViewById(R.id.gl_container);
+           v.addView(glRenderer);
+        }
+        </pre>
+        <p>NOTE: Once the GLRenderer has been created, the <code>onSurfaceCreated</code> and <code>onSurfaceChanged</code> methods of
+            GLSurfaceView.Renderer will be automatically called.  \c onSurfaceChanged is also called when the
+            size of the surface has changed (for example, due to a device orientation change).</p></li>
+   <li> <p>In the implementation of <code>GLSurfaceView.Renderer.onSurfaceChanged</code>,
+        {@link com.nextreaming.nexplayerengine.NexPlayer#GLInit(int, int) NexPlayer.GLInit}
+        must be called to inform NexPlayer&trade; of the new size of the surface:</p>
+        <pre>
+         public void onSurfaceChanged(GL10 gl, int width, int height) {
+            mNexPlayer.GLInit(width, height);
+         }
+        </pre>
+       </li>
+    <li><p> In {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderCreate onVideoRenderCreate}, the dimensions
+        of the video frame are known, so scaling calculations can be performed and the correct output size can be set:</p>
+        <pre>
+              if(nRenderMode != NexPlayer.NEX_USE_RENDER_JAVA) {
+              int left = (mSurfaceWidth - mVideoWidth) / 2;
+              int top = (mSurfaceHeight - mVideoHeight) / 2;
+              mNexPlayer.setOutputPos( left, top, mVideoWidth, mVideoHeight );
+          }
+        </pre>
+        </li>
+    <li><p> When NexPlayer&trade; is ready to display a new frame, it calls
+        {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderRender onVideoRenderRender}.
+        For most rendering modes, there is nothing to be done in reponse, but for OpenGL, it is necessary
+        to request a rendering pass from the GLRenderer as follows:</p>
+        <pre>
+          if(UseOpenGL) {
+             glRenderer.requestRender();
+          }
+        </pre>
+        <p>This causes the GLRenderer to render its contents.</p></li>
+ </ol>
+
+<p>NOTE:  Whenever the size of the surface changes, for example due to an orientation change, the GLRenderer must also pass
+	the new dimensions to the application through the <code>IListener</code> interface by:</p>
+    <pre>
+      void onGLChangeSurfaceSize( int width, int height);
+    </pre>
+
+<h3><a name="javarenderer">Java Renderer</a></h3>
+
+This version of the NexPlayer&trade; engine supports Java-based rendering in addition to the usual
+video rendering methods.  However, the Java renderer is never automatically selected; if you wish
+to use the Java-based renderer, you must explicitly request it when calling NexPlayer&trade;'s
+<code>init</code> method.  Please note though that from the Jelly Bean operating system, the Java renderer is <b>not</b> supported.<p>
+
+With Java-based rendering, NexPlayer&trade; doesn't display the video after it is decoded, but
+rather passes each frame to the application, which then must display the frames as they are
+received.<p>
+
+Java-based rendering tends to be slower, particularly on low-end devices, but allows the
+application to perform post-processing or custom scaling operations on each frame.<p>
+
+On the <i>Honeycomb</i> operating system, only Java-based rendering or OpenGL renderer is supported.
+Therefore, in order to support Honeycomb, your application must implement one of the two.<p>
+
+If for some reason, you wish to force the use of the Java renderer, you can do so by passing
+{@link com.nextreaming.nexplayerengine.NexPlayer#NEX_DEVICE_USE_JAVA NexPlayer.NEX_DEVICE_USE_JAVA}
+to NexPlayer's {@link com.nextreaming.nexplayerengine.NexPlayer#init(Context,String,int) init}
+method.<p>
+
+To support the Java renderer, the application must do the following:<p>
+
+<ul>
+<li><p>In {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderCreate onVideoRenderCreate}, the
+	application must create a bitmap
+	that NexPlayer&trade; can render frames into.</p>
+	<p>NexPlayer&trade; can render in either RGBA8888 or RGB565.  The color depth is specified in the call to
+	 NexPlayer's {@link com.nextreaming.nexplayerengine.NexPlayer#init init}
+	method. The bitmap you create here must match that color depth.  Once the bitmap has been
+	created, it must be registered with the player engine by calling {@link com.nextreaming.nexplayerengine.NexPlayer#SetBitmap SetBitmap}</p>
+	<p>Here's the recommended way to support the Java renderer in <code>onVideoRenderCreate</code>:</p>
+	<pre>
+	{@code
+	private ByteBuffer mRGBBuffer = null;
+	private Bitmap mFrameBitmap = null;
+
+	public void onVideoRenderCreate(
+		NexPlayer mp, int width, int height,
+		Object rgbBuffer)
+	{
+
+		// ...other necessary onVideoRenderCreate code goes here...
+
+		if(mNexPlayer.GetRenderMode() == NexPlayer.NEX_USE_RENDER_JAVA)
+		{
+			if(this.mScreenPixelFormat == PixelFormat.RGBA_8888)
+			{
+				mFrameBitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888 );
+			}
+			else
+			{
+				mFrameBitmap = Bitmap.createBitmap(width, height, Config.RGB_565 );
+			}
+			mNexPlayer.SetBitmap( mFrameBitmap );
+		}
+	}
+	}
+	</pre>
+	</li>
+<li>The application must implement {@link com.nextreaming.nexplayerengine.NexPlayer.IListener#onVideoRenderRender onVideoRenderRender}.
+	The bitmap registered in onVideoRenderCreate will have been filled in with the rendered frame before this method
+	was called.  The application must draw that bitmap to the screen, taking into account scaling and other factors.  This can be done using standard
+	Android API calls and standard Java methods.  Scaling should be taken into account.  See the sample application that
+	accompanies the SDK for an example implementation of this method.</li>
+</ul>
+
+<b>Determining the Renderer:</b>  To determine the current renderer in use, call
+{@link com.nextreaming.nexplayerengine.NexPlayer#GetRenderMode() GetRenderMode}. For example, to determine
+if the Java renderer is in use:
+<pre>
+  if(mNexPlayer.GetRenderMode() == NexPlayer.NEX_USE_RENDER_JAVA) {
+    // code for Java renderer only
+  }
+</pre>
+
+
+<h3><a name="timeshift">Support for Time Shift in Live Content</a></h3>
+
+This version of the NexPlayer&trade;&nbsp;SDK introduces support for timeshifting playback in HLS Live and Smooth Streaming content.
+While content may be viewed live, a certain amount of time in the past or future may also be available to be played, depending on the server
+for the given content.  NexPlayer&trade;&nbsp;uses the method <code>getSeekableRangeInfo</code> to determine the range within
+content where <code>seek</code> can be performed and thus within which playback may be timeshifted.<p>
+
+<p>For examples of how to implement this feature in an application, please look at how the methods <code>onTime(NexPlayer mp, int sec)</code>,
+<code>mRewListener</code>, <code>mFFListener</code>, and <code>mGoLiveListener</code> are used in the Sample code.</p>
+
+<p>Please also see {@link com.nextreaming.nexplayerengine.NexPlayer.getSeekableRangeInfo getSeekableRangeInfo()} for more information.</p>
+
+
+<h3><a name="crashlog">Recording Recent Log Output When an Exception Occurs</a></h3>
+In the event of a crash or exception, NexPlayer can save the most recent <b><font size="3">adb logcat</font></b> entries to a file on the SD card.
+Currently, a maximum of 60kb worth of log entries can be saved per crash, although that number may be changed in future versions.<p>
+
+This behavior is disabled by default.  In order to enable the saving of log entries when your application stops due to a crash or exception,<br>
+you have to make the following changes to your application:<p>
+
+<OL>
+
+<li>Import the (provided) "NexLogger.jar" file into your android project,</li><p>
+
+<li>Your application will use the <i>android.permission.READ_LOGS permission</i>.  To indicate this, add the following line to your application's manifest:<br>
+    <xmp>    <uses-permission android:name="android.permission.READ_LOGS"></uses-permission></xmp></li><p>
+
+<li> You must declare the logging service in the application manifest, by adding the following code to the manifest:  <br>
+            <xmp>
+            <service android:name="com.nextreaming.nexlogger.NexLogService" android:enabled="true"
+                android:process=":remote">
+                <intent-filter>
+                    <action android:name="com.nextreaming.nexlogger.NexLogService" />
+                </intent-filter>
+            </service>
+            </xmp></li><p>
+<li> In your activity subclass (the one that implements NexPlayer.IListener and SurfaceHolder.Callback) you must make the following changes:<p>
+
+     i)  In the beginning of the <b><font size="3">onCreate</font></b> method, add:<br>
+         &nbsp;&nbsp;&nbsp;&nbsp;NexLogRecorder.getInstance().startLogging(this);<p>
+
+     ii)  In the beginning of the <b><font size="3">onStop</font></b> method, add:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;NexLogRecorder.getInstance().stopLogging();<p>
+
+     You will also need to import the following classes:<br>
+
+      &nbsp;&nbsp;&nbsp;&nbsp;java.io.UnsupportedEncodingException<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;com.nextreaming.nexlogger.NexLogRecorder</li>
+</OL><p>
+After completing these changes, recent <b><font size="3">adb logcat</font></b> output will be saved whenever a crash occurs.  Logs will be saved on the SD card, in the following location:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;/sdcard/Android/data/NexPlayer/<p><p>
+
+
+<h3><a name="avsync">Audio-Video Synchronization</a></h3>
+
+When using NexPlayer&trade;&nbsp;to playback audio-video content, audio-video synchronization is optimized internally
+but there may still be some devices that display video slightly out of sync with the audio.
+To support devices like these, the audio-video synchronization may be set manually using the NexProperty
+{@link com.nextreaming.nexplayerengine.NexPlayer.NexProperty#AV_SYNC_OFFSET AV_SYNC_OFFSET} and the best value
+to set this property for a particular device should be determined by guessing and testing.<p>
+
+The code of the included sample application illustrates how this property can be set to different values for specific devices.<p>
+
+Currently, devices with known AV-sync issues include the Galaxy Nexus, the Kindle Fire, and the Galaxy Note although synchronization challenges may also
+occur on other devices.<p>
+
+<p>For example, to improve synchronization on the Galaxy Nexus, set AV_SYNC_OFFSET to the value XXX as follows:</p>
+<pre>
+  if(android.os.Build.MODEL.equalsIgnoreCase("Galaxy Nexus"))
+  {
+            mDevAVSyncOffset = XXX;
+  }
+
+  Log.d(TAG, "Device Model Name : " + android.os.Build.MODEL + "   Dev Offset Time : " + mDevAVSyncOffset);
+
+  mNexPlayer.setProperty(NexProperty.AV_SYNC_OFFSET, mDevAVSyncOffset);
+</pre>
+
+<p> Appropriate values for any devices displaying AV-sync issues can be determined by trial and error with different values, but
+ most devices' AV synchronization should generally be handled by NexPlayer&trade; internally.</p>
+
+<h3><a name="codeclibs">Selective Codec Support</a></h3>
+
+If your application is too large, you can reduce the size by removing NexPlayer&trade; components
+that you are not using.<p>
+
+NexPlayer&trade; comprises a total of 31 libraries (excluding DRM sample libraries).
+Of these, four libraries are always required (these comprise the engine and the rendering layer).  The
+remaining libraries provide support for various codecs.<p>
+
+NexPlayer&trade; has a total of 32 libraries (excluding DRM sample libraries).
+Of these, eight libraries are always required.  These comprise the engine and the rendering layer and include:
+<ul>
+  <li> libnexplayerengine.so</li>
+  <li> libnexralbody_audio.so</li>
+  <li> libnexralbody_video_xx.so where xx are shortforms for the various versions of Android OS (Cupcake, Eclair, etc.)</li>
+</ul>
+<p>The remaining libraries provide support for various codecs.</p>
+
+NexPlayer&trade; dynamically loads codec support only for those libraries that it finds during
+initialization, so you can safely delete any library that you don't need, and NexPlayer&trade; will simply
+load without support for the codecs provided by that library.<p>
+
+The libraries are located in the <code>libs</code> folder in your project.<p>
+
+The following table summarizes the codecs supported by each library, and the libraries required
+to support each protocol type.
+
+<table border=1 cellpadding=2 cellspacing=0>
+<tr style="background: #ddeeff;">
+	<td colspan=2>Codec Library</td>
+	<td align=center>Local</td>
+	<td align=center>PD</td>
+	<td align=center>RTSP</td>
+	<td align=center>WMS</td>
+	<td align=center>HLS</td>
+	<td align=center>MS Smooth Streaming</td>
+	<td align=center>Supported Codecs</td>
+</tr>
+
+<tr>
+	<td rowspan=4>Video</td>
+	<td >libnexcal_h264_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td >H.264 Baseline profile</td>
+</tr>
+
+<tr style="background: #ffeedd;">
+	<td >libnexcal_divx_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td >DivX, Xvid, MPEG-4 Video, H.263</td>
+</tr>
+
+<tr>
+	<td >libnexcal_wmv_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td >WMV7, WMV8</td>
+</tr>
+
+<tr style="background: #ffeedd;">
+	<td >libnexcal_wvc1.armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td >WMV9, VC-1(WMV9 Advanced Profile)</td>
+</tr>
+
+<tr>
+	<td rowspan=5>Audio</td>
+	<td >libnexcal_aac_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td >AAC, AAC-Plus, HE-AAC</td>
+</tr>
+
+<tr style="background: #ffeedd;">
+	<td >libnexcal_mp3_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td >MP2,MP3</td>
+</tr>
+
+<tr>
+	<td >libnexcal_wma_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>O</td>
+	<td >WMA</td>
+</tr>
+
+<tr style="background: #ffeedd;">
+	<td >libnexcal_amr_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td >AMR-Narrow band</td>
+</tr>
+
+<tr>
+	<td >libnexcal_amrwb_armv?.so</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>O</td>
+	<td align=center>X</td>
+	<td align=center>X</td>
+	<td >AMR-Wide band</td>
+</tr>
+
+</table>
+
+
+
+
+@author NexStreaming Corporation
+@version 5.12
+
+</body>
+</html>
