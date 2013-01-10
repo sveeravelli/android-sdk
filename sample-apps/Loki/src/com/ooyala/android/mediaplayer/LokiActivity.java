@@ -37,7 +37,7 @@ public class LokiActivity extends Activity implements EmbedTokenGenerator, Obser
     }
     
     if (embedCode == null || pcode == null) {
-      CharSequence text = "No embed code or pcode.";
+      CharSequence text = "Please navigate back to your website and play the video";
       int duration = Toast.LENGTH_LONG;
       Toast toast = Toast.makeText(this, text, duration);
       toast.show();
@@ -60,6 +60,8 @@ public class LokiActivity extends Activity implements EmbedTokenGenerator, Obser
           pcode, "www.ooyala.com");
     }
     OoyalaPlayer player = playerLayoutController.getPlayer();
+    //this will be used in the future to enable Third party HLS for Loki
+    //player.setLoki();
     if (embedCode != null && player.setEmbedCode(embedCode)) {
       // The Embed Code works
       player.addObserver(this);
