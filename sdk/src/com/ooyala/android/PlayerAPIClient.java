@@ -21,6 +21,8 @@ class PlayerAPIClient {
   protected int _width = -1;
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
+  private boolean _isLoki;
+  public static final String LOKI = "-omp";
 
   public PlayerAPIClient() {}
 
@@ -144,7 +146,7 @@ class PlayerAPIClient {
 
   private Map<String, String> authorizeParams(List<String> embedCodes) {
     final Map<String, String> params = new HashMap<String, String>();
-    params.put(Constants.KEY_DEVICE, Utils.device());
+    params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
     params.put(Constants.KEY_DOMAIN, _domain);
     if (_embedTokenGenerator != null) {
       final Semaphore sem = new Semaphore(0);
@@ -166,7 +168,7 @@ class PlayerAPIClient {
 
   private Map<String, String> contentTreeParams() {
     Map<String, String> params = new HashMap<String, String>();
-    params.put(Constants.KEY_DEVICE, Utils.device());
+    params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
     if (_height > 0 && _width > 0) {
       params.put(Constants.KEY_WIDTH, Integer.toString(_width));
       params.put(Constants.KEY_HEIGHT, Integer.toString(_height));
@@ -410,6 +412,9 @@ class PlayerAPIClient {
     return _domain;
   }
 
+  public void setLoki() {
+    _isLoki = true;
+  }
   public OoyalaAPIHelper getAPIHelper() {
     return _apiHelper;
   }

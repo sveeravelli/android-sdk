@@ -303,6 +303,10 @@ public class OoyalaPlayer extends Observable implements Observer {
     setLayoutController(lc);
   }
 
+  public void setLoki()
+  {
+    _playerAPIClient.setLoki();
+  }
   /**
    * Set the layout controller from which the OoyalaPlayer should fetch the layout to display to.
    * @param lc the LayoutController to use.
