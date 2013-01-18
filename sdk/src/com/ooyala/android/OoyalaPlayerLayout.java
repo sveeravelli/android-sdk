@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 public class OoyalaPlayerLayout extends FrameLayout {
   private LayoutController _controller = null;
 
-  private FrameLayout _playerFrame = null;
+  protected FrameLayout _playerFrame = null;
 
   /**
    * Initialize the OoyalaPlayerLayout with the given Context
