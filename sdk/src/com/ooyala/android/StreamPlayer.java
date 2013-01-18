@@ -42,6 +42,9 @@ public abstract class StreamPlayer extends Player {
 
       @Override
       public String getDevice() { return "android-html5"; }
+
+      @Override
+      public String getUserAgent() { return null; }
     };
 
   public PlayerInfo getPlayerInfo() {

@@ -1290,6 +1290,7 @@ public class OoyalaPlayer extends Observable implements Observer {
   
   public void setBasePlayer(StreamPlayer basePlayer) {
     _basePlayer = basePlayer;
+    _analytics.setUserAgent(basePlayer.getPlayerInfo().getUserAgent());
 
     if (getCurrentItem() == null) { return; }
 

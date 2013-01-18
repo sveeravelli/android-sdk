@@ -13,6 +13,7 @@ public class Analytics {
   private boolean _failed = false;
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
+  private String _userAgent = "";
 
   private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad=\"reporter = new Ooyala.Reporter('_PCODE_');\"></body></html>";
 
@@ -33,9 +34,9 @@ public class Analytics {
    */
   Analytics(Context context, String embedHTML) {
     _jsAnalytics = new WebView(context);
-    _jsAnalytics.getSettings().setUserAgentString(
-        String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION, _jsAnalytics.getSettings()
-            .getUserAgentString()));
+    _userAgent = String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION,
+        _jsAnalytics.getSettings().getUserAgentString());
+    _jsAnalytics.getSettings().setUserAgentString(_userAgent);
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     _jsAnalytics.setWebViewClient(new WebViewClient() {
       public void onPageFinished(WebView view, String url) {
@@ -137,5 +138,11 @@ public class Analytics {
     for (String action : _queue) {
       _jsAnalytics.loadUrl(action);
     }
+  }
+
+  public void setUserAgent(String userAgent) {
+    if (userAgent == null) return;
+    _userAgent = userAgent;
+    _jsAnalytics.getSettings().setUserAgentString(_userAgent);
   }
 }

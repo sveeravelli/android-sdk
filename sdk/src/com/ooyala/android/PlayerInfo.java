@@ -9,4 +9,5 @@ public interface PlayerInfo {
   public int getMaxWidth();
   public int getMaxHeight();
   public int getMaxBitrate();
+  public String getUserAgent();
 }
