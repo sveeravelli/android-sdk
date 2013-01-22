@@ -539,11 +539,11 @@ public class OoyalaPlayer extends Observable implements Observer {
         || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_HLS)) {
       _player = new WidevineOsPlayer();
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
-          getPlayerAPIClient().getPcode()));
+          getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
     } else if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_MP4)) {
       _player = new WidevineLibPlayer();
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
-          getPlayerAPIClient().getPcode()));
+          getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
     } else if (enableCustomHLSPlayer
     		&& (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
     				|| s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {

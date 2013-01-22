@@ -47,6 +47,11 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     // this should point to SAS once we get the proxy up
     String path = Constants.DRM_HOST
         + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
+
+    //  If SAS included a widevine server path, use that instead
+    if(params.widevineServerPath != null) {
+      path = params.widevineServerPath;
+    }
     request.put("WVDRMServerKey", path);
     request.put("WVAssetURIKey", params.url);
     request.put("WVPortalKey", "ooyala"); // override in SAS
