@@ -120,6 +120,7 @@ class Constants {
   public static final String KEY_API = "api";
   public static final String KEY_CALLBACK = "callback";
   public static final String KEY_PROFILE = "profile";
+  public static final String KEY_WIDEVINE_SERVER_PATH = "widevine_server_path";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

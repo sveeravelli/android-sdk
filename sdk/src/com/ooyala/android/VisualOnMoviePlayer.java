@@ -107,6 +107,7 @@ class VisualOnMoviePlayer extends Player implements
 
   @Override
   public void init(OoyalaPlayer parent, Object stream) {
+    Log.d(this.getClass().getName(), "Using VOPlayer");
     if (stream == null) {
       Log.e(this.getClass().getName(),
           "ERROR: Invalid Stream (no valid stream available)");
@@ -171,6 +172,11 @@ class VisualOnMoviePlayer extends Player implements
       }
       setState(State.PLAYING);
       startPlayheadTimer();
+    break;
+    case SUSPENDED:
+      queuePlay();
+      Log.v(TAG, "Play: Suspended already. re-queue" + _state);
+      break;
     default:
       Log.v(TAG, "Play: invalid status?" + _state);
       break;
@@ -289,6 +295,18 @@ class VisualOnMoviePlayer extends Player implements
       String licenseText = "VOTRUST_OOYALA_754321974";		// Magic string from VisualOn, must match voVidDec.dat to work
       _player.SetParam(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
 
+      //Setup license content, or screen can green flicker.
+      InputStream is = null;
+      byte[] b = new byte[32*1024];
+      try {
+          is = _view.getContext().getAssets().open("voVidDec.dat");
+          is.read(b);
+          is.close();
+      } catch (IOException e) {
+          e.printStackTrace();
+      }
+      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_CONTENT, b);
+
       /* Configure Dolby Audio Effect parameters */
       _player.SetParam(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
 
@@ -326,12 +344,13 @@ class VisualOnMoviePlayer extends Player implements
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    Log.e(TAG, "Surface Changed: " + width + ","+ height);
+    Log.v(TAG, "Surface Changed: " + width + ","+ height);
 
-    _view.setLayoutParams(new FrameLayout.LayoutParams(
+    if (_view != null) {
+      _view.setLayoutParams(new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
+    }
     if (_player != null) {
     	_player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
     }
@@ -370,6 +389,7 @@ class VisualOnMoviePlayer extends Player implements
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 private void setupView() {
+    if (_view == null) {
     _view = new SurfaceView(_parent.getLayout().getContext()) {
 
     	@Override
@@ -408,17 +428,24 @@ private void setupView() {
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     _holder.setFormat(PixelFormat.RGBA_8888);
+    }
+    else {
+      if (_state == State.LOADING) {
+        createMediaPlayer();
+      }
+    }
   }
 
   private void removeView() {
     if (_parent != null) {
-      _parent.getLayout().removeView(_view);
+      //_parent.getLayout().removeView(_view);
+      //_view.setVisibility(0);
     }
     if (_holder != null) {
-      _holder.removeCallback(this);
+      //_holder.removeCallback(this);
     }
-    _view = null;
-    _holder = null;
+    //_view = null;
+    //_holder = null;
   }
 
   @Override
@@ -439,7 +466,7 @@ private void setupView() {
       _player.Uninit();
       _player = null;
     }
-    removeView();
+    //removeView();
     _buffer = 0;
     _playQueued = false;
     setState(State.SUSPENDED);
@@ -453,8 +480,8 @@ private void setupView() {
     }
     setState(State.LOADING);
     setupView();
-    if (_stateBeforeSuspend == State.PLAYING) {
-      queuePlay();
+    if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
+      play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
       queueCompleted();
     }

@@ -24,6 +24,7 @@ public class Stream {
   protected String _aspectRatio = null;
   protected boolean _isLiveStream = false;
   protected String _profile = null;
+  protected String _widevineServerPath = null;  // A path from SAS when this is a widevine encrypted stream
 
   private static class DefaultStreamSelector implements StreamSelector {
     public DefaultStreamSelector() {}
@@ -102,6 +103,9 @@ public class Stream {
     }
 
     try {
+      if (!data.isNull(Constants.KEY_WIDEVINE_SERVER_PATH)) {
+        _widevineServerPath =  data.getString(Constants.KEY_WIDEVINE_SERVER_PATH);
+      }
       _deliveryType = data.getString(Constants.KEY_DELIVERY_TYPE);
       _url = urlData.getString(Constants.KEY_DATA);
       _urlFormat = urlData.getString(Constants.KEY_FORMAT);
@@ -226,6 +230,10 @@ public class Stream {
 
   public int getCombinedBitrate() {
     return (_videoBitrate + _audioBitrate);
+  }
+
+  public String getWidevineServerPath() {
+    return _widevineServerPath;
   }
 
   public URL decodedURL() {

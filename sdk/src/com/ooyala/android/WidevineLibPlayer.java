@@ -35,6 +35,10 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     String path = Constants.DRM_HOST
         + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
 
+    //  If SAS included a widevine server path, use that instead
+    if(params.widevineServerPath != null) {
+      path = params.widevineServerPath;
+    }
     options.put("WVPortalKey", "ooyala"); // add this value in SAS
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
