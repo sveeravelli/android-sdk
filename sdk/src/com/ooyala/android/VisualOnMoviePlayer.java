@@ -251,13 +251,9 @@ class VisualOnMoviePlayer extends Player implements
         _player = new voOSBasePlayer();
       } else {
 
-    	  Log.e(TAG, "DANGER DANGER");
+    	  Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
         _player.Uninit();
-        _player = new voOSBasePlayer();
-        //player.SetView(_view);
-        //_player.SetDisplaySize(_width, _height);
         return;
-        // TODO: _player.reset();
       }
 
       // SDK player engine type
@@ -390,9 +386,9 @@ class VisualOnMoviePlayer extends Player implements
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 private void setupView() {
     if (_view == null) {
-    _view = new SurfaceView(_parent.getLayout().getContext()) {
+      _view = new SurfaceView(_parent.getLayout().getContext()) {
 
-    	@Override
+        @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
 
@@ -438,14 +434,13 @@ private void setupView() {
 
   private void removeView() {
     if (_parent != null) {
-      //_parent.getLayout().removeView(_view);
-      //_view.setVisibility(0);
+      _parent.getLayout().removeView(_view);
     }
     if (_holder != null) {
-      //_holder.removeCallback(this);
+      _holder.removeCallback(this);
     }
-    //_view = null;
-    //_holder = null;
+    _view = null;
+    _holder = null;
   }
 
   @Override
@@ -466,7 +461,7 @@ private void setupView() {
       _player.Uninit();
       _player = null;
     }
-    //removeView();
+    removeView();
     _buffer = 0;
     _playQueued = false;
     setState(State.SUSPENDED);
