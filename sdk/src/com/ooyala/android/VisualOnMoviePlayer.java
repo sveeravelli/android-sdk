@@ -58,6 +58,8 @@ class VisualOnMoviePlayer extends Player implements
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
   private boolean mTrackProgressing = false;
+  private boolean _isLiveClosedCaptionsAvailable = false;
+  private boolean _isLiveClosedCaptionsEnabled = false;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
@@ -679,18 +681,18 @@ private void setupView() {
               + param1);
     } else if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
       Log.v(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
-    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData)	// CC data 
-	{
-		// Retrieve subtitle info
-		voSubtitleInfo info = (voSubtitleInfo)obj; 
+    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData) { //CC data
 
-		// Retrieve CC text
-		String cc = GetCCString(info);
-		//Log.v(TAG, "GOT CC: "+ cc);
-		_parent.displayClosedCaptionText(cc);
-		return 0;
-	} else {
-      Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
+      // Remember if we have recieved live closed captions at some point duirng playback
+      _isLiveClosedCaptionsAvailable = true;
+      if (_isLiveClosedCaptionsEnabled) {
+        // Retrieve subtitle info, get text, and display it
+        voSubtitleInfo info = (voSubtitleInfo)obj;
+        String cc = GetCCString(info);
+        _parent.displayClosedCaptionText(cc);
+      }
+    } else {
+    Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
           + param1 + ", " + param2);
     }
 
@@ -733,14 +735,24 @@ private void setupView() {
 						if(strTextAll.length()>0)
 							strTextAll+="\n";
 						strTextAll+=strRow;
-						
+
 					}
-					
+
 				}
 			}
 		}
 		return strTextAll;
 	}
 
+	//Sets enablement of live CC, which is checked every time VisualOn recieves CC data on stream
+  @Override
+  public void setLiveClosedCaptionsEnabled(boolean enabled){
+    _isLiveClosedCaptionsEnabled = enabled;
+  }
+
+	@Override
+	public boolean isLiveClosedCaptionsAvailable() {
+	  return _isLiveClosedCaptionsAvailable;
+	}
 
 }

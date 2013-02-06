@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
 
+  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "cc";
   /**
    * If set to true, this will allow HLS streams regardless of the Android version. WARNING: Ooyala's internal
    * testing has shown that Android 3.x HLS support is unstable. Android 2.x does not support HLS at all. If
@@ -1087,6 +1089,15 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void setClosedCaptionsLanguage(String language) {
     _language = language;
+
+    //If we're given the "cc" language, we know it's live closed captions
+    if(_language == LIVE_CLOSED_CAPIONS_LANGUAGE) {
+      _player.setLiveClosedCaptionsEnabled(true);
+      return;
+    }
+    if(_language == null) {
+      _player.setLiveClosedCaptionsEnabled(false);
+    }
     if (_closedCaptionsView != null) _closedCaptionsView.setCaption(null);
     displayCurrentClosedCaption();
   }
@@ -1104,7 +1115,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return a Set of Strings containing the available closed captions languages
    */
   public Set<String> getAvailableClosedCaptionsLanguages() {
-    if (_currentItem == null || _currentItem.getClosedCaptions() == null) { return null; }
+
+    //If our player found live closed captions, only show option for CC.
+    if (_player != null && _player.isLiveClosedCaptionsAvailable()) {
+      Set<String> retval = new HashSet<String>();
+      retval.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
+      return retval;
+    }
+    if (_currentItem == null || _currentItem.getClosedCaptions() == null) { return new HashSet<String>(); }
     return getCurrentItem().getClosedCaptions().getLanguages();
   }
 
