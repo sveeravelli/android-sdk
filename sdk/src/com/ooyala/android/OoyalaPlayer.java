@@ -17,9 +17,10 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import com.ooyala.android.NexPlayerMoviePlayer;
 
+import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.AuthorizableItem.AuthCode;
 
-public class OoyalaPlayer extends Observable implements Observer {
+public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbeatErrorListener {
   public static final String PLAYER_VISUALON = "VisualOn";
   public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
@@ -115,6 +116,7 @@ public class OoyalaPlayer extends Observable implements Observer {
       Typeface.DEFAULT);
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
+  private AuthHeartbeat _authHeartbeat;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -511,6 +513,14 @@ public class OoyalaPlayer extends Observable implements Observer {
       return false;
     }
 
+    if (_currentItem.isReauthRequired()) {
+      if (_authHeartbeat == null) {
+        _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+        _authHeartbeat.setAuthHeartbeatErrorListener(this);
+      }
+      _authHeartbeat.start();
+    }
+
     cancelOpenTasks();
     final String taskKey = "changeCurrentItemAfterAuth" + System.currentTimeMillis();
     taskStarted(taskKey, _currentItem.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
@@ -613,6 +623,9 @@ public class OoyalaPlayer extends Observable implements Observer {
   }
 
   private void cleanupPlayers() {
+    if (_authHeartbeat != null) {
+      _authHeartbeat.stop();
+    }
     cleanupPlayer(_adPlayer);
     _adPlayer = null;
     cleanupPlayer(_player);
@@ -1318,4 +1331,11 @@ public class OoyalaPlayer extends Observable implements Observer {
     }
   }
 
+  @Override
+  public void onAuthHeartbeatError(OoyalaException e) {
+      cleanupPlayers();
+      _error = e;
+      setState(State.ERROR);
+      sendNotification(ERROR_NOTIFICATION);
+  }
 }

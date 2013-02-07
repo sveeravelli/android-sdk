@@ -23,6 +23,8 @@ class PlayerAPIClient {
   protected EmbedTokenGenerator _embedTokenGenerator;
   private boolean _isLoki;
   public static final String LOKI = "-omp";
+  protected String _authToken = "";
+  protected int _reauthInterval = 300;
 
   public PlayerAPIClient() {}
 
@@ -58,6 +60,18 @@ class PlayerAPIClient {
                   + embedCode); }
         }
 
+        //parse out and save auth token and reauth data
+        if (!authResult.isNull(Constants.KEY_AUTH_TOKEN)) {
+          setAuthToken(authResult.getString(Constants.KEY_AUTH_TOKEN));
+        }
+
+        if (!authResult.isNull(Constants.KEY_REAUTH_DATA)) {
+          JSONObject reauthData = authResult.getJSONObject(Constants.KEY_REAUTH_DATA);
+          if (!reauthData.isNull(Constants.KEY_REAUTH_INTERVAL)) {
+            _reauthInterval = reauthData.getInt(Constants.KEY_REAUTH_INTERVAL);
+          }
+        }
+
         // TODO(mikhail): currently we do not check signature. fix this once we properly implement signatures
         // server side.
 
@@ -68,6 +82,28 @@ class PlayerAPIClient {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
           "Authorization response invalid (exception).");
     }
+  }
+
+  private JSONObject verifyAuthorizeHeartbeatJSON(String json) throws OoyalaException {
+    JSONObject result = Utils.objectFromJSON(json);
+    if (result == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+        "response invalid (nil)."); }
+
+    if (result.isNull(Constants.KEY_MESSAGE)) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+          "response invalid (nil).");
+    }
+    try {
+      if(!result.getString(Constants.KEY_MESSAGE).equals("OK")) {
+        throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+            "response code (" + result.getString(Constants.KEY_MESSAGE) + ").");
+      }
+    } catch (JSONException e) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+          "response invalid (error).");
+    }
+
+    return result;
   }
 
   private JSONObject getContentTreeData(JSONObject contentTree) throws OoyalaException {
@@ -148,6 +184,11 @@ class PlayerAPIClient {
     final Map<String, String> params = new HashMap<String, String>();
     params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
     params.put(Constants.KEY_DOMAIN, _domain);
+
+    if (_authToken != null && _authToken.length() > 0) {
+      params.put(Constants.KEY_AUTH_TOKEN, _authToken);
+    }
+
     if (_embedTokenGenerator != null) {
       final Semaphore sem = new Semaphore(0);
       _embedTokenGenerator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
@@ -238,6 +279,58 @@ class PlayerAPIClient {
       AuthorizeCallback callback) {
     AuthorizeTask task = new AuthorizeTask(callback);
     task.execute(embedCodes, parent);
+    return task;
+  }
+
+  // boolean here refers to the response.
+  public boolean authorizeHeartbeat() throws OoyalaException {
+    String uri = String.format(Constants.AUTHORIZE_HEARTBEAT_URI, Constants.API_VERSION, _pcode, getAuthToken());
+    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, null);
+    try {
+      return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
+    } catch (OoyalaException e) {
+      System.out.println("Unable to authorize: " + e);
+      throw e;
+    }
+  }
+
+  private class AuthorizeHeartbeatTask extends AsyncTask<Void, Void, Boolean> {
+    protected OoyalaException _error = null;
+    protected AuthorizeHeartbeatCallback _callback = null;
+
+    public AuthorizeHeartbeatTask(AuthorizeHeartbeatCallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    protected Boolean doInBackground(Void... params) { //params should be null here
+      try {
+        return authorizeHeartbeat();
+      } catch (OoyalaException e) {
+        _error = e;
+        return Boolean.FALSE;
+      }
+    }
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+      _callback.callback(result.booleanValue(), _error);
+    }
+  }
+
+  public interface AuthorizeHeartbeatCallback {
+    /**
+     * This callback is used for asynchronous authorize heartbeat calls
+     * @param result true if the authorize call succeeded, false otherwise
+     * @param error the OoyalaException if there was one
+     */
+    public void callback(boolean result, OoyalaException error);
+  }
+
+  public Object authorizeHeartbeat(AuthorizeHeartbeatCallback callback) {
+    AuthorizeHeartbeatTask task = new AuthorizeHeartbeatTask(callback);
+    task.execute();
     return task;
   }
 
@@ -411,9 +504,23 @@ class PlayerAPIClient {
     return _domain;
   }
 
+  private void setAuthToken(String authToken) {
+    //@todo persist this shit, yo
+    _authToken = authToken;
+  }
+
+  public String getAuthToken() {
+    return _authToken;
+  }
+
+  public int getReauthInterval() {
+    return _reauthInterval;
+  }
+
   public void setLoki() {
     _isLoki = true;
   }
+
   public OoyalaAPIHelper getAPIHelper() {
     return _apiHelper;
   }

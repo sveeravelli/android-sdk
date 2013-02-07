@@ -56,6 +56,7 @@ class Constants {
 
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
+  public static final String AUTHORIZE_HEARTBEAT_URI = "/sas/player_api/v%s/auth_heartbeat/pcode/%s/auth_token/%s";
   public static final String AUTHORIZE_PUBLIC_KEY_B64 = "MCgCIQD1PX86jvLr5bB3b5IFEze7TiWGEaRSHl5Ls7/3AKO5IwIDAQAB";
   public static final String AUTHORIZE_PUBLIC_KEY_NAME = "sas_public_key";
   public static final int AUTHORIZE_SIGNATURE_DIGEST_LENGTH = 20;
@@ -121,6 +122,10 @@ class Constants {
   public static final String KEY_CALLBACK = "callback";
   public static final String KEY_PROFILE = "profile";
   public static final String KEY_WIDEVINE_SERVER_PATH = "widevine_server_path";
+  public static final String KEY_REQUIRE_REAUTH = "require_reauth";
+  public static final String KEY_REAUTH_DATA = "reauth_data";
+  public static final String KEY_REAUTH_INTERVAL = "reauth_interval";
+  public static final String KEY_AUTH_TOKEN = "auth_token";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

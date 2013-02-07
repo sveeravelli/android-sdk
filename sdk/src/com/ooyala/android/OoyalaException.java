@@ -17,7 +17,9 @@ public class OoyalaException extends Exception {
     /** An Internal Android Error. Check the Throwable properties. */
     ERROR_INTERNAL_ANDROID,
     /** Playback failed */
-    ERROR_PLAYBACK_FAILED
+    ERROR_PLAYBACK_FAILED,
+    /** Authorization Heartbeat failed.  Check properties. */
+    ERROR_AUTHORIZATION_HEARTBEAT_FAILED
 
   };
 

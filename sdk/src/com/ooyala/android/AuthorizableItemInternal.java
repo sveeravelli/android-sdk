@@ -20,4 +20,6 @@ interface AuthorizableItemInternal extends AuthorizableItem {
    * @return the embed codes to authorize as a List
    */
   public List<String> embedCodesToAuthorize();
+
+  public boolean isReauthRequired();
 }

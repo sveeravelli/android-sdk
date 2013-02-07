@@ -21,6 +21,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   protected String _promoImageURL = null;
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
+  protected boolean _reauthRequired;
 
   ContentItem() {}
 
@@ -113,6 +114,9 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
           } else {
             _authCode = authCode;
           }
+        }
+        if (!myData.isNull(Constants.KEY_REQUIRE_REAUTH)) {
+          _reauthRequired = myData.getBoolean(Constants.KEY_REQUIRE_REAUTH);
         }
         return ReturnState.STATE_MATCHED;
       }
@@ -222,5 +226,10 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
 
   public String getKey() {
     return _embedCode;
+  }
+
+  @Override
+  public boolean isReauthRequired() {
+    return _reauthRequired;
   }
 }
