@@ -12,9 +12,7 @@ import java.util.Set;
 import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.MediaMetadataRetriever;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.widget.FrameLayout;
 import com.ooyala.android.NexPlayerMoviePlayer;
@@ -93,6 +91,7 @@ public class OoyalaPlayer extends Observable implements Observer {
     Constants.setEnvironment(e);
   }
 
+  private Handler _handler = new Handler();
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
   private OoyalaException _error = null;
@@ -876,35 +875,42 @@ public class OoyalaPlayer extends Observable implements Observer {
   public boolean nextVideo(int what) {
     // This is required because android enjoys making things difficult. talk to jigish if you got issues.
     if (_currentItem.nextVideo() != null) {
-      _fetchMoreChildrenHandler.sendEmptyMessage(what);
-      return true;
+      changeCurrentItem(_currentItem.nextVideo());
+      if (what == DO_PLAY) {
+        play();
+        return true;
+      } else if (what == DO_PAUSE) {
+        pause();
+        return true;
+      }
+      return false;
     } else if (what == DO_PLAY && fetchMoreChildren(new PaginatedItemListener() {
       @Override
       public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-        _fetchMoreChildrenHandler.sendEmptyMessage(DO_PLAY);
+        _handler.post(new Runnable() {
+          @Override
+          public void run() {
+            changeCurrentItem(_currentItem.nextVideo());
+            play();
+          }
+        });
       }
     })) {
       return true;
     } else if (what == DO_PAUSE && fetchMoreChildren(new PaginatedItemListener() {
       @Override
       public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
-        _fetchMoreChildrenHandler.sendEmptyMessage(DO_PAUSE);
+        _handler.post(new Runnable() {
+          @Override
+          public void run() {
+            changeCurrentItem(_currentItem.nextVideo());
+            pause();
+          }
+        });
       }
     })) { return true; }
     return false;
   }
-
-  private final Handler _fetchMoreChildrenHandler = new Handler() {
-    @Override
-    public void handleMessage(Message msg) {
-      changeCurrentItem(_currentItem.nextVideo());
-      if (msg.what == DO_PLAY) {
-        play();
-      } else if (msg.what == DO_PAUSE) {
-        pause();
-      }
-    }
-  };
 
   private void reset() {
     removeClosedCaptionsView();
