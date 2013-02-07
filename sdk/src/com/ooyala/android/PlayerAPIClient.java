@@ -213,15 +213,14 @@ class PlayerAPIClient {
     protected Boolean doInBackground(Object... params) { // first param is List<String> of embed codes to
                                                          // authorize, second param is
                                                          // AuthorizableItemInternal parent
-      if (params.length == 0 || params[0] == null || !(params[0] instanceof List<?>)) { return new Boolean(
-          false); }
+      if (params.length == 0 || params[0] == null || !(params[0] instanceof List<?>)) { return Boolean.FALSE; }
       List<String> embedCodeList = ((List<String>) (params[0]));
       try {
         return authorizeEmbedCodes(embedCodeList, params.length >= 2 && params[1] != null
             && params[1] instanceof AuthorizableItemInternal ? (AuthorizableItemInternal) params[1] : null);
       } catch (OoyalaException e) {
         _error = e;
-        return new Boolean(false);
+        return Boolean.FALSE;
       }
     }
 
