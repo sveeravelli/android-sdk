@@ -326,6 +326,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
      * our customers should actually call setLayout right after initializing the player so this is ok.
      */
     _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    _playerAPIClient.setContext(getLayout().getContext());
     OoyalaAPIHelper.context = getLayout().getContext();
   }
 

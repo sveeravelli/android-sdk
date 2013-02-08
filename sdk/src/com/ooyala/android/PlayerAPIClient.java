@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -23,8 +25,9 @@ class PlayerAPIClient {
   protected EmbedTokenGenerator _embedTokenGenerator;
   private boolean _isLoki;
   public static final String LOKI = "-omp";
-  protected String _authToken = "";
+  private String _authToken = null; // ALWAYS use getters and setters for this
   protected int _reauthInterval = 300;
+  protected Context _context;
 
   public PlayerAPIClient() {}
 
@@ -185,8 +188,8 @@ class PlayerAPIClient {
     params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
     params.put(Constants.KEY_DOMAIN, _domain);
 
-    if (_authToken != null && _authToken.length() > 0) {
-      params.put(Constants.KEY_AUTH_TOKEN, _authToken);
+    if (getAuthToken().length() > 0) {
+      params.put(Constants.KEY_AUTH_TOKEN, getAuthToken());
     }
 
     if (_embedTokenGenerator != null) {
@@ -285,7 +288,7 @@ class PlayerAPIClient {
   // boolean here refers to the response.
   public boolean authorizeHeartbeat() throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_HEARTBEAT_URI, Constants.API_VERSION, _pcode, getAuthToken());
-    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, null);
+    String json = OoyalaAPIHelper.jsonForAPI(Constants.AUTHORIZE_HOST, uri, null);
     try {
       return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
     } catch (OoyalaException e) {
@@ -505,11 +508,24 @@ class PlayerAPIClient {
   }
 
   private void setAuthToken(String authToken) {
-    //@todo persist this shit, yo
     _authToken = authToken;
+    if (_context != null) {
+      SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+      SharedPreferences.Editor editor = preferences.edit();
+      editor.putString("authToken", authToken);
+      editor.commit();
+    }
   }
 
   public String getAuthToken() {
+    if (_authToken == null) {
+      if (_context != null) {
+        SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+        _authToken = preferences.getString("authToken", "");
+      } else {
+        _authToken = "";
+      }
+    }
     return _authToken;
   }
 
@@ -523,6 +539,10 @@ class PlayerAPIClient {
 
   public OoyalaAPIHelper getAPIHelper() {
     return _apiHelper;
+  }
+
+  public void setContext(Context context) {
+    _context = context;
   }
 
   @SuppressWarnings("rawtypes")
