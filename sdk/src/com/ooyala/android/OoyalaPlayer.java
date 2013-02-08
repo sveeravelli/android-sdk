@@ -892,12 +892,10 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       changeCurrentItem(_currentItem.nextVideo());
       if (what == DO_PLAY) {
         play();
-        return true;
       } else if (what == DO_PAUSE) {
         pause();
-        return true;
       }
-      return false;
+      return true;
     } else if (what == DO_PLAY && fetchMoreChildren(new PaginatedItemListener() {
       @Override
       public void onItemsFetched(int firstIndex, int count, OoyalaException error) {
