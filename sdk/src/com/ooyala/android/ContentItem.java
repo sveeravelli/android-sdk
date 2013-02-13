@@ -21,7 +21,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   protected String _promoImageURL = null;
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
-  protected boolean _reauthRequired;
+  protected boolean _heartbeatRequired;
 
   ContentItem() {}
 
@@ -115,8 +115,8 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
             _authCode = authCode;
           }
         }
-        if (!myData.isNull(Constants.KEY_REQUIRE_REAUTH)) {
-          _reauthRequired = myData.getBoolean(Constants.KEY_REQUIRE_REAUTH);
+        if (!myData.isNull(Constants.KEY_REQUIRE_HEARTBEAT)) {
+          _heartbeatRequired = myData.getBoolean(Constants.KEY_REQUIRE_HEARTBEAT);
         }
         return ReturnState.STATE_MATCHED;
       }
@@ -229,7 +229,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   }
 
   @Override
-  public boolean isReauthRequired() {
-    return _reauthRequired;
+  public boolean isHeartbeatRequired() {
+    return _heartbeatRequired;
   }
 }

@@ -21,5 +21,5 @@ interface AuthorizableItemInternal extends AuthorizableItem {
    */
   public List<String> embedCodesToAuthorize();
 
-  public boolean isReauthRequired();
+  public boolean isHeartbeatRequired();
 }

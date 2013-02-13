@@ -122,9 +122,9 @@ class Constants {
   public static final String KEY_CALLBACK = "callback";
   public static final String KEY_PROFILE = "profile";
   public static final String KEY_WIDEVINE_SERVER_PATH = "widevine_server_path";
-  public static final String KEY_REQUIRE_REAUTH = "require_reauth";
-  public static final String KEY_REAUTH_DATA = "reauth_data";
-  public static final String KEY_REAUTH_INTERVAL = "reauth_interval";
+  public static final String KEY_REQUIRE_HEARTBEAT = "require_heartbeat";
+  public static final String KEY_HEARTBEAT_DATA = "heartbeat_data";
+  public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
   public static final String KEY_AUTH_TOKEN = "auth_token";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";

@@ -26,7 +26,7 @@ class PlayerAPIClient {
   private boolean _isLoki;
   public static final String LOKI = "-omp";
   private String _authToken = null; // ALWAYS use getters and setters for this
-  protected int _reauthInterval = 300;
+  protected int _heartbeatInterval = 300;
   protected Context _context;
 
   public PlayerAPIClient() {}
@@ -63,15 +63,15 @@ class PlayerAPIClient {
                   + embedCode); }
         }
 
-        //parse out and save auth token and reauth data
+        //parse out and save auth token and heartbeat data
         if (!authResult.isNull(Constants.KEY_AUTH_TOKEN)) {
           setAuthToken(authResult.getString(Constants.KEY_AUTH_TOKEN));
         }
 
-        if (!authResult.isNull(Constants.KEY_REAUTH_DATA)) {
-          JSONObject reauthData = authResult.getJSONObject(Constants.KEY_REAUTH_DATA);
-          if (!reauthData.isNull(Constants.KEY_REAUTH_INTERVAL)) {
-            _reauthInterval = reauthData.getInt(Constants.KEY_REAUTH_INTERVAL);
+        if (!authResult.isNull(Constants.KEY_HEARTBEAT_DATA)) {
+          JSONObject heartbeatData = authResult.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
+          if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
+            _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
           }
         }
 
@@ -529,8 +529,8 @@ class PlayerAPIClient {
     return _authToken;
   }
 
-  public int getReauthInterval() {
-    return _reauthInterval;
+  public int getHeartbeatInterval() {
+    return _heartbeatInterval;
   }
 
   public void setLoki() {

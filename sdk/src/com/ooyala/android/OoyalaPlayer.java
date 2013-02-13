@@ -514,7 +514,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       return false;
     }
 
-    if (_currentItem.isReauthRequired()) {
+    if (_currentItem.isHeartbeatRequired()) {
       if (_authHeartbeat == null) {
         _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
         _authHeartbeat.setAuthHeartbeatErrorListener(this);

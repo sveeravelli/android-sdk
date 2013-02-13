@@ -20,7 +20,7 @@ class AuthHeartbeat {
     stop();
     _timer = new Timer("AuthHeartbeat");
     _timer.schedule(new AuthHeartbeatTimerTask(), 0); //send initial ping right now.
-    _timer.scheduleAtFixedRate(new AuthHeartbeatTimerTask(), 0, _apiClient.getReauthInterval() * 1000);
+    _timer.scheduleAtFixedRate(new AuthHeartbeatTimerTask(), 0, _apiClient.getHeartbeatInterval() * 1000);
   }
 
   public void stop() {
