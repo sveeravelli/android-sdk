@@ -34,12 +34,24 @@ class AuthHeartbeat {
 
     @Override
     public void run() {
+      tryHeartbeat(3);
+    }
+
+    private void tryHeartbeat(int attempt) {
+      OoyalaException exception = null;
       try {
         if (!_apiClient.authorizeHeartbeat()) {
-          sendError(new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED, "Unauthorized"));
+          exception = new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED, "Unauthorized");
         }
       } catch (OoyalaException e) {
-        sendError(e);
+        exception = e;
+      }
+      if (exception != null) {
+        if (attempt > 0) {
+          tryHeartbeat(attempt - 1);
+        } else {
+          sendError(exception);
+        }
       }
     }
 

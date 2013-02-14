@@ -119,6 +119,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
   private AuthHeartbeat _authHeartbeat;
+  private long _suspendTime = System.currentTimeMillis();
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -714,12 +715,49 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       currentPlayer().suspend();
       removeClosedCaptionsView();
     }
+    if (_authHeartbeat != null) {
+      _suspendTime = System.currentTimeMillis();
+      _authHeartbeat.stop();
+    }
   }
 
   /**
    * Resume the current video from a suspended state
    */
   public void resume() {
+    if (getCurrentItem().isHeartbeatRequired()) {
+      if (System.currentTimeMillis() > _suspendTime + (_playerAPIClient._heartbeatInterval * 1000)) {
+        cancelOpenTasks();
+        final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
+        taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
+          @Override
+          public void callback(boolean result, OoyalaException error) {
+            taskCompleted(taskKey);
+            if (error != null) {
+              _error = error;
+              Log.d(this.getClass().getName(), "Error Reauthorizing Video", error);
+              setState(State.ERROR);
+              sendNotification(ERROR_NOTIFICATION);
+              return;
+            }
+            sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+            if (!_currentItem.isAuthorized()) {
+              _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+              return;
+            }
+            _suspendTime = System.currentTimeMillis();
+            resume();
+          }
+        }));
+        return;
+      } else {
+        if (_authHeartbeat == null) {
+          _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+        }
+        _authHeartbeat.start();
+      }
+    }
+
     if (currentPlayer() != null) {
       currentPlayer().resume();
       addClosedCaptionsView();
