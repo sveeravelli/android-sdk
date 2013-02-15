@@ -345,8 +345,11 @@ class PlayerAPIClient {
   }
 
   public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
-    Map<String, String> params = new HashMap<String, String>(1);
-    params.put(Constants.KEY_AD_SET_CODE, adSetCode);
+    Map<String, String> params = null;
+    if (adSetCode != null) {
+      params = new HashMap<String, String>(1);
+      params.put(Constants.KEY_AD_SET_CODE, adSetCode);
+    }
 
     String uri = String.format(Constants.CONTENT_TREE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
@@ -449,6 +452,10 @@ class PlayerAPIClient {
   }
 
   public Object contentTreeByExternalIds(List<String> externalIds, ContentTreeCallback callback) {
+    return contentTreeByExternalIdsWithAdSetCode(externalIds, null, callback);
+  }
+
+  public Object contentTreeByExternalIdsWithAdSetCode(List<String> externalIds, String adSetCode, ContentTreeCallback callback) {
     ContentTreeByExternalIdsTask task = new ContentTreeByExternalIdsTask(callback);
     ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
     taskParam.idList = externalIds;
