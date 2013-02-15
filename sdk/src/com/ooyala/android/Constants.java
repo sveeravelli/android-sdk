@@ -106,6 +106,7 @@ class Constants {
   public static final String KEY_ADS = "ads";
   public static final String KEY_TYPE = "type";
   public static final String KEY_AD_EMBED_CODE = "ad_embed_code";
+  public static final String KEY_AD_SET_CODE = "adSetCode";
   public static final String KEY_TIME = "time";
   public static final String KEY_CLICK_URL = "click_url";
   public static final String KEY_TRACKING_URL = "tracking_url";

@@ -210,8 +210,11 @@ class PlayerAPIClient {
     return params;
   }
 
-  private Map<String, String> contentTreeParams() {
+  private Map<String, String> contentTreeParams(Map<String, String> additionalParams) {
     Map<String, String> params = new HashMap<String, String>();
+    if (additionalParams != null) {
+      params.putAll(additionalParams);
+    }
     params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
     if (_height > 0 && _width > 0) {
       params.put(Constants.KEY_WIDTH, Integer.toString(_width));
@@ -338,9 +341,16 @@ class PlayerAPIClient {
   }
 
   public ContentItem contentTree(List<String> embedCodes) throws OoyalaException {
+    return contentTreeWithAdSet(embedCodes, null);
+  }
+
+  public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
+    Map<String, String> params = new HashMap<String, String>(1);
+    params.put(Constants.KEY_AD_SET_CODE, adSetCode);
+
     String uri = String.format(Constants.CONTENT_TREE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(params));
     JSONObject contentTree = null;
     try {
       contentTree = verifyContentTreeObject(obj, embedCodes);
@@ -354,7 +364,12 @@ class PlayerAPIClient {
     return item;
   }
 
-  private class ContentTreeTask extends AsyncTask<List<String>, Integer, ContentItem> {
+  private class ContentTreeTaskParam {
+    public List<String> idList;
+    public String adSetCode;
+  }
+
+  private class ContentTreeTask extends AsyncTask<ContentTreeTaskParam, Integer, ContentItem> {
     protected OoyalaException _error = null;
     protected ContentTreeCallback _callback = null;
 
@@ -364,10 +379,11 @@ class PlayerAPIClient {
     }
 
     @Override
-    protected ContentItem doInBackground(List<String>... embedCodeLists) {
-      if (embedCodeLists.length == 0 || embedCodeLists[0] == null || embedCodeLists[0].isEmpty()) { return null; }
+    protected ContentItem doInBackground(ContentTreeTaskParam... taskParams) {
+      if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].idList == null ||
+          taskParams[0].idList.isEmpty()) { return null; }
       try {
-        return contentTree(embedCodeLists[0]);
+        return contentTreeWithAdSet(taskParams[0].idList, taskParams[0].adSetCode);
       } catch (OoyalaException e) {
         _error = e;
         return null;
@@ -380,17 +396,23 @@ class PlayerAPIClient {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public Object contentTree(List<String> embedCodes, ContentTreeCallback callback) {
+    return contentTreeWithAdSet(embedCodes, null, callback);
+  }
+
+  public Object contentTreeWithAdSet(List<String> embedCodes, String adSetCode, ContentTreeCallback callback) {
     ContentTreeTask task = new ContentTreeTask(callback);
-    task.execute(embedCodes);
+    ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
+    taskParam.idList = embedCodes;
+    taskParam.adSetCode = adSetCode;
+    task.execute(taskParam);
     return task;
   }
 
   public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
     String uri = String.format(Constants.CONTENT_TREE_BY_EXTERNAL_ID_URI, Constants.API_VERSION, _pcode,
         Utils.join(externalIds, Constants.SEPARATOR_COMMA));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(null));
     if (obj == null) { return null; }
     List<String> embedCodes = new ArrayList<String>(); // will be filled in by verifyContentTreeObject call
                                                        // below
@@ -414,10 +436,11 @@ class PlayerAPIClient {
     }
 
     @Override
-    protected ContentItem doInBackground(List<String>... externalIdLists) {
-      if (externalIdLists.length == 0 || externalIdLists[0] == null || externalIdLists[0].isEmpty()) { return null; }
+    protected ContentItem doInBackground(ContentTreeTaskParam... taskParams) {
+      if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].idList == null ||
+          taskParams[0].idList.isEmpty()) { return null; }
       try {
-        return contentTreeByExternalIds(externalIdLists[0]);
+        return contentTreeByExternalIds(taskParams[0].idList);
       } catch (OoyalaException e) {
         _error = e;
         return null;
@@ -425,10 +448,11 @@ class PlayerAPIClient {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public Object contentTreeByExternalIds(List<String> externalIds, ContentTreeCallback callback) {
     ContentTreeByExternalIdsTask task = new ContentTreeByExternalIdsTask(callback);
-    task.execute(externalIds);
+    ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
+    taskParam.idList = externalIds;
+    task.execute(taskParam);
     return task;
   }
 
@@ -436,7 +460,7 @@ class PlayerAPIClient {
     if (!parent.hasMoreChildren()) { return null; }
     String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, Constants.API_VERSION, _pcode,
         parent.getNextChildren());
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams());
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(null));
     if (obj == null) { return null; }
     JSONObject contentTree = null;
     List<String> keys = new ArrayList<String>();

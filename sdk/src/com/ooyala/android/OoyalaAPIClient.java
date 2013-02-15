@@ -121,6 +121,34 @@ public class OoyalaAPIClient {
   }
 
   /**
+   * Fetch the root ContentItem associated with the given embed codes and ad set code. If multiple embed
+   * codes are given, the root item is assumed to be a Dynamic Channel and the embed codes are assumed to all
+   * be videos. The ad set code specifies which ad set be used. As this method is not asynchronous it should
+   * be used within an AsyncTask.
+   * @param embedCodes the embed codes to fetch
+   * @param adSetCode the ad set code to assign
+   * @return the root ContentItem representing embedCodes
+   * @throws OoyalaException
+   */
+  public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
+    return _playerAPI.contentTreeWithAdSet(embedCodes, adSetCode);
+  }
+
+  /**
+   * Asynchronously fetch the root ContentItem associated with the given embed codes. If multiple embed codes
+   * are given, the root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be
+   * videos. The ad set code specifies which ad set be used.
+   * @param embedCodes the embed codes to fetch
+   * @param adSetCode the ad set code to assign
+   * @param callback the ContentTreeCallback to execute when the response is received
+   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
+   */
+  public Object contentTreeWithAdSet(List<String> embedCodes, String adSetCode,
+      ContentTreeCallback callback) {
+    return _playerAPI.contentTreeWithAdSet(embedCodes, adSetCode, callback);
+  }
+
+  /**
    * Fetch the root ContentItem associated with the given external ids. If multiple external ids are given,
    * the root item is assumed to be a Dynamic Channel and the external ids are assumed to all be videos. As
    * this method is not asynchronous it should be used within an AsyncTask.
