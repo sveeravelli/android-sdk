@@ -162,7 +162,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   }
 
   @Override
-  public boolean isReauthRequired() {
+  public boolean isHeartbeatRequired() {
     return false;
   }
 }

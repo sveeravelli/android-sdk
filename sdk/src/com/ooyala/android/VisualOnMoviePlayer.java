@@ -58,6 +58,8 @@ class VisualOnMoviePlayer extends Player implements
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
   private boolean mTrackProgressing = false;
+  private boolean _isLiveClosedCaptionsAvailable = false;
+  private boolean _isLiveClosedCaptionsEnabled = false;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
@@ -251,13 +253,9 @@ class VisualOnMoviePlayer extends Player implements
         _player = new voOSBasePlayer();
       } else {
 
-    	  Log.e(TAG, "DANGER DANGER");
+    	  Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
         _player.Uninit();
-        _player = new voOSBasePlayer();
-        //player.SetView(_view);
-        //_player.SetDisplaySize(_width, _height);
         return;
-        // TODO: _player.reset();
       }
 
       // SDK player engine type
@@ -389,63 +387,73 @@ class VisualOnMoviePlayer extends Player implements
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 private void setupView() {
+    if (_view != null) {
+      Log.e(TAG, "DANGER DANGER: setupView while we still have a view");
+      return;
+    }
+
+    //Check if a surfaceView is already instantiated in this layout
+    for (int x=0; x < _parent.getLayout().getChildCount(); x++) {
+      if (_parent.getLayout().getChildAt(x) instanceof SurfaceView) {
+        _view = (SurfaceView) _parent.getLayout().getChildAt(x);
+        createMediaPlayer();
+      }
+    }
+
+    //If no surfaceView yet, make one
     if (_view == null) {
-    _view = new SurfaceView(_parent.getLayout().getContext()) {
+      _view = new SurfaceView(_parent.getLayout().getContext()) {
 
-    	@Override
+        @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
+      		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
 
-    		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-    		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+      		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+      		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 
 
-    		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
+      		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
 
-    		// assume to much vertical space, so need to align vertically
-			int wantedWidth = parentWidth;
-			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
-			int offset = (parentHeight - wantedHeight) / 2;
+       	// assume to much vertical space, so need to align vertically
+    			int wantedWidth = parentWidth;
+    			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
+    			int offset = (parentHeight - wantedHeight) / 2;
 
-			if(offset < 0) {
-				// oops, too much width, let's align horizontally
-				wantedHeight = parentHeight;
-				wantedWidth = parentHeight * _videoWidth / _videoHeight;
-				offset = (parentWidth - wantedWidth) / 2;
-			}
+    			if(offset < 0) {
+    				// oops, too much width, let's align horizontally
+    				wantedHeight = parentHeight;
+    				wantedWidth = parentHeight * _videoWidth / _videoHeight;
+    				offset = (parentWidth - wantedWidth) / 2;
+    			}
 
-			setMeasuredDimension(wantedWidth, wantedHeight);
-			Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
+          setMeasuredDimension(wantedWidth, wantedHeight);
+          Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
         }
-    };
+      };
 
-    _view.setLayoutParams(new FrameLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
-    _parent.getLayout().addView(_view);
+      _view.setLayoutParams(new FrameLayout.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+      _parent.getLayout().addView(_view);
+    }
+
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     _holder.setFormat(PixelFormat.RGBA_8888);
-    }
-    else {
-      if (_state == State.LOADING) {
-        createMediaPlayer();
-      }
-    }
   }
 
   private void removeView() {
     if (_parent != null) {
       //_parent.getLayout().removeView(_view);
-      //_view.setVisibility(0);
     }
     if (_holder != null) {
-      //_holder.removeCallback(this);
+      _holder.removeCallback(this);
     }
-    //_view = null;
-    //_holder = null;
+    _view = null;
+    _holder = null;
   }
 
   @Override
@@ -463,10 +471,11 @@ private void setupView() {
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
       stop();
+      _player.SetView(null);
       _player.Uninit();
       _player = null;
     }
-    //removeView();
+    removeView();
     _buffer = 0;
     _playQueued = false;
     setState(State.SUSPENDED);
@@ -684,18 +693,18 @@ private void setupView() {
               + param1);
     } else if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
       Log.v(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
-    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData)	// CC data 
-	{
-		// Retrieve subtitle info
-		voSubtitleInfo info = (voSubtitleInfo)obj; 
+    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData) { //CC data
 
-		// Retrieve CC text
-		String cc = GetCCString(info);
-		//Log.v(TAG, "GOT CC: "+ cc);
-		_parent.displayClosedCaptionText(cc);
-		return 0;
-	} else {
-      Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
+      // Remember if we have recieved live closed captions at some point duirng playback
+      _isLiveClosedCaptionsAvailable = true;
+      if (_isLiveClosedCaptionsEnabled) {
+        // Retrieve subtitle info, get text, and display it
+        voSubtitleInfo info = (voSubtitleInfo)obj;
+        String cc = GetCCString(info);
+        _parent.displayClosedCaptionText(cc);
+      }
+    } else {
+    Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
           + param1 + ", " + param2);
     }
 
@@ -738,14 +747,24 @@ private void setupView() {
 						if(strTextAll.length()>0)
 							strTextAll+="\n";
 						strTextAll+=strRow;
-						
+
 					}
-					
+
 				}
 			}
 		}
 		return strTextAll;
 	}
 
+	//Sets enablement of live CC, which is checked every time VisualOn recieves CC data on stream
+  @Override
+  public void setLiveClosedCaptionsEnabled(boolean enabled){
+    _isLiveClosedCaptionsEnabled = enabled;
+  }
+
+	@Override
+	public boolean isLiveClosedCaptionsAvailable() {
+	  return _isLiveClosedCaptionsAvailable;
+	}
 
 }

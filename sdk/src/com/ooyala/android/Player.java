@@ -4,6 +4,7 @@ import java.util.Observable;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
+import android.R.bool;
 import android.view.SurfaceView;
 import android.view.View;
 
@@ -113,6 +114,21 @@ abstract class Player extends Observable {
   public int getBufferPercentage() {
     return _buffer;
   }
+
+  /**
+   * Returns if the current player has found live closed caption info in the stream
+   * @return true if the stream has embedded live closed captions
+   */
+  public boolean isLiveClosedCaptionsAvailable(){
+    return false;
+  }
+
+
+  /**
+   * Enables and disables live closed captions on the player
+   * @param enabled weather to disable or enable live closed captions
+   */
+  public void setLiveClosedCaptionsEnabled(boolean enabled){}
 
   public abstract void reset();
 
