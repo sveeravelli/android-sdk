@@ -51,7 +51,7 @@ public class DynamicChannel extends Channel {
           } else if (videoData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_VIDEO)) {
             Video existingChild = _videos.get(videoEmbedCode);
             if (existingChild == null) {
-              addVideo(new Video(videoData, videoEmbedCode, this, _api));
+              addVideo(new Video(data, videoEmbedCode, this, _api));
             } else {
               existingChild.update(videoData);
             }
