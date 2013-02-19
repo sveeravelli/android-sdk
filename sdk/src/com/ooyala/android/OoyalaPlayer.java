@@ -348,10 +348,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if the embed code was successfully set, false if not.
    */
   public boolean setEmbedCode(String embedCode) {
-    if (embedCode == null) { return false; }
-    List<String> embeds = new ArrayList<String>();
-    embeds.add(embedCode);
-    return setEmbedCodes(embeds);
+    return setEmbedCodeWithAdSetCode(embedCode, null);
   }
 
   /**
@@ -361,6 +358,31 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if the embed codes were successfully set, false if not.
    */
   public boolean setEmbedCodes(List<String> embedCodes) {
+    return setEmbedCodesWithAdSetCode(embedCodes, null);
+  }
+
+  /**
+   * Reinitializes the player with a new embed code. If embedCode is null, this method has no effect and just
+   * returns false. An ad set can be dynamically associated using the adSetCode param.
+   * @param embedCode
+   * @param adSetCode
+   * @return true if the embed code was successfully set, false if not.
+   */
+  public boolean setEmbedCodeWithAdSetCode(String embedCode, String adSetCode) {
+    if (embedCode == null) { return false; }
+    List<String> embeds = new ArrayList<String>();
+    embeds.add(embedCode);
+    return setEmbedCodesWithAdSetCode(embeds, adSetCode);
+  }
+
+  /**
+   * Reinitializes the player with a new set of embed codes. If embedCodes is null, this method has no effect
+   * and just returns false. An ad set can be dynamically associated using the adSetCode param.
+   * @param embedCodes
+   * @param adSetCode
+   * @return true if the embed codes were successfully set, false if not.
+   */
+  public boolean setEmbedCodesWithAdSetCode(List<String> embedCodes, String adSetCode) {
     if (embedCodes == null || embedCodes.isEmpty()) { return false; }
     cancelOpenTasks();
     setState(State.LOADING);
@@ -368,7 +390,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _queuedSeekTime = 0;
     cleanupPlayers();
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
-    taskStarted(taskKey, _playerAPIClient.contentTree(embedCodes, new ContentTreeCallback() {
+    taskStarted(taskKey, _playerAPIClient.contentTreeWithAdSet(embedCodes, adSetCode, new ContentTreeCallback() {
       @Override
       public void callback(ContentItem item, OoyalaException error) {
         taskCompleted(taskKey);
@@ -562,8 +584,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
     } else if (enableCustomHLSPlayer
-    		&& (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
-    				|| s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+        && (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
+            || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
       _player = new VisualOnMoviePlayer();
       initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
     } else {
@@ -1361,11 +1383,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   public void displayClosedCaptionText(String text) {
-	  _streamBasedCC = true;
-	  if (_closedCaptionsView == null) {
-		  addClosedCaptionsView();
-	  }
-	  _closedCaptionsView.setCaptionText(text);
+    _streamBasedCC = true;
+    if (_closedCaptionsView == null) {
+      addClosedCaptionsView();
+    }
+    _closedCaptionsView.setCaptionText(text);
   }
 
   PlayerAPIClient getPlayerAPIClient() {
