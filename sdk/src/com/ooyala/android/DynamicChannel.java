@@ -53,7 +53,7 @@ public class DynamicChannel extends Channel {
             if (existingChild == null) {
               addVideo(new Video(data, videoEmbedCode, this, _api));
             } else {
-              existingChild.update(videoData);
+              existingChild.update(data);
             }
           } else {
             System.out.println("ERROR: Invalid Video(DynamicChannel) content_type: "
