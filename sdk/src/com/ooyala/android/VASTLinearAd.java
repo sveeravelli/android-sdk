@@ -92,15 +92,6 @@ public class VASTLinearAd implements PlayableItem {
   }
 
   /**
-   * Return the stream to play
-   * @return the lowest bitrate mp4 stream
-   */
-  @Override
-  public Stream getStream() {
-    return Stream.bestStream(_streams);
-  }
-
-  /**
    * Fetch the duration of this VASTLinearAd in seconds.
    * @return the duration in seconds.
    */

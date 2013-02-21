@@ -13,6 +13,7 @@ import java.util.Set;
 import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.MediaMetadataRetriever;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
@@ -98,8 +99,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private ContentItem _rootItem = null;
   private OoyalaException _error = null;
   private ActionAtEnd _actionAtEnd;
-  private Player _player = null;
-  private Player _adPlayer = null;
+  private MoviePlayer _player = null;
+  private MoviePlayer _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
   private State _state = State.INIT;
   private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
@@ -119,6 +120,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
+  private StreamPlayer _basePlayer = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -489,10 +491,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
+      PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _basePlayer.getPlayerInfo();
+
       // Async authorize;
       cancelOpenTasks();
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
-      taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
+      taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo, new AuthorizeCallback() {
         @Override
         public void callback(boolean result, OoyalaException error) {
           taskCompleted(taskKey);
@@ -512,21 +516,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     return changeCurrentItemAfterAuth();
   }
 
-/*
-  private String _playerType = "ViusalOn";
-  public void playerType(String playerType) {
-    _playerType = playerType;
-  }
-
-  public String playerType() {
-    return _playerType;
-  }
-*/
-
-  private String _url;
-  public void changeHardCodedUrl(String url) {
-    _url = url;
-  }
   /**
    * This is a helper function ONLY to be used with changeCurrentItem.
    * @return
@@ -571,25 +560,40 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
-    Stream s = _currentItem.getStream();
-    if (s == null) { return false; }
-    if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_WVM)
-        || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_HLS)) {
+    if (_basePlayer == null) {
+      _basePlayer = getPlayerForStreams(_currentItem.getStreams());
+    }
+
+    Set<Stream> streams = _currentItem.getStreams();
+    if (streams == null || streams.size() == 0) { return false; }
+    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM)) {
       _player = new WidevineOsPlayer();
+      Stream s = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM);
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
-    } else if (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_WV_MP4)) {
+    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS)) {
+      _player = new WidevineOsPlayer();
+      Stream s = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS);
+      initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
+          getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
+    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
       _player = new WidevineLibPlayer();
+      Stream s = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4);
       initializePlayer(_player, new WidevineParams(s.decodedURL().toString(), getEmbedCode(),
           getPlayerAPIClient().getPcode(), s.getWidevineServerPath()));
     } else if (enableCustomHLSPlayer
-        && (s.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)
-            || s.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+        && Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS)) {
+      Stream s = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_HLS);
       _player = new VisualOnMoviePlayer();
-      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
+      initializePlayer(_player, s.decodedURL().toString());
+    } else if (enableCustomHLSPlayer
+      && Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET)) {
+      Stream s = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET);
+      _player = new VisualOnMoviePlayer();
+      initializePlayer(_player, s.decodedURL().toString());
     } else {
       _player = new MoviePlayer();
-      initializePlayer(_player, _url != null ? _url : s.decodedURL().toString());
+      initializePlayer(_player, streams);
     }
 
     // _player = new WidevineOsPlayer();
@@ -621,10 +625,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _currentItem = tree.firstVideo();
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
+    PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _basePlayer.getPlayerInfo();
     // Async Authorize
     cancelOpenTasks();
     final String taskKey = "reinitialize" + System.currentTimeMillis();
-    taskStarted(taskKey, _playerAPIClient.authorize(tree, new AuthorizeCallback() {
+    taskStarted(taskKey, _playerAPIClient.authorize(tree, playerInfo, new AuthorizeCallback() {
       @Override
       public void callback(boolean result, OoyalaException error) {
         taskCompleted(taskKey);
@@ -641,8 +646,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     return true;
   }
 
-  private Player initializePlayer(Player p, Object param) {
+  private Player initializePlayer(MoviePlayer p, Object param) {
     p.addObserver(this);
+    p.setBasePlayer(_basePlayer);
     p.init(this, param);
     return p;
   }
@@ -870,7 +876,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     for (AdSpot ad : _currentItem.getAds()) {
       int adTime = ad.getTime();
       // Align ad times to 10 second (HLS chunk length) boundaries
-      if (getCurrentItem().getStream().getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) {
+      if (Stream.streamSetContainsDeliveryType(getCurrentItem().getStreams(), Constants.DELIVERY_TYPE_HLS)) {
         adTime = ((adTime + 5000) / 10000) * 10000;
       }
       if (adTime <= time && !this._playedAds.contains(ad)) {
@@ -882,6 +888,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   private boolean playAd(AdSpot ad) {
+    _player.suspend();
+
     if (ad instanceof OoyalaAdSpot) {
       _adPlayer = new OoyalaAdPlayer();
     } else if (ad instanceof VASTAdSpot) {
@@ -895,14 +903,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_adPlayer == null || _adPlayer.getState() == State.ERROR) { return false; }
     _adPlayer.setSeekable(_adsSeekable);
 
-    _player.suspend();
+
     removeClosedCaptionsView();
     sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();
     return true;
   }
 
-  private Player currentPlayer() {
+  private MoviePlayer currentPlayer() {
     return (_adPlayer != null) ? _adPlayer : _player;
   }
 
@@ -1190,8 +1198,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   @TargetApi(10)
   public double getBitrate() {
-    if (getCurrentItem() == null || getCurrentItem().getStream() == null) { return -1; }
-    return getCurrentItem().getStream().getVideoBitrate() * 1000;
+    if (getCurrentItem() == null || Stream.bestStream(getCurrentItem().getStreams()) == null) { return -1; }
+    if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+      // Query for bitrate
+      MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
+      metadataRetreiver.setDataSource(Stream.bestStream(getCurrentItem().getStreams()).getUrl());
+      return Double.parseDouble(metadataRetreiver
+          .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+    } else {
+      return (double) (Stream.bestStream(getCurrentItem().getStreams()).getVideoBitrate() * 1000);
+    }
   }
 
   /**
@@ -1399,6 +1415,53 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void setCurrentItemChangedCallback(CurrentItemChangedCallback callback) {
     _currentItemChangedCallback = callback;
+  }
+
+  public StreamPlayer getBasePlayer() {
+    return _basePlayer;
+  }
+
+  public void setBasePlayer(StreamPlayer basePlayer) {
+    _basePlayer = basePlayer;
+    _analytics.setUserAgent(basePlayer.getPlayerInfo().getUserAgent());
+
+    if (getCurrentItem() == null) { return; }
+
+    this.cancelOpenTasks();
+
+    final String taskKey = "setBasePlayer" + System.currentTimeMillis();
+    PlayerInfo playerInfo = basePlayer == null ? StreamPlayer.defaultPlayerInfo : basePlayer.getPlayerInfo();
+    taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo, new AuthorizeCallback() {
+      @Override
+      public void callback(boolean result, OoyalaException error) {
+        taskCompleted(taskKey);
+        if (error != null) {
+          _error = error;
+          Log.d(this.getClass().getName(), "Movie is not authorized for this device!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+          return;
+        }
+
+        if (_basePlayer == null) {
+          _basePlayer = getPlayerForStreams(getCurrentItem().getStreams());
+        }
+
+        if (_player != null) {
+          _player.setBasePlayer(_basePlayer);
+        }
+
+        if (_adPlayer != null) {
+          _adPlayer.setBasePlayer(_basePlayer);
+        }
+      }
+
+    }));
+
+  }
+
+  private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
+    return new BaseMoviePlayer();
   }
 
   public void setCustomAnalyticsTags(List<String> tags) {

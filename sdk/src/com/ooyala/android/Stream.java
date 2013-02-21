@@ -268,4 +268,15 @@ public class Stream {
     return _selector.bestStream(streams);
   }
 
+  public static boolean streamSetContainsDeliveryType(Set<Stream> streams, String deliveryType) {
+    return getStreamWithDeliveryType(streams, deliveryType) != null;
+  }
+
+  public static Stream getStreamWithDeliveryType(Set<Stream> streams, String deliveryType) {
+    for (Stream stream:streams) {
+      if (stream.getDeliveryType().equals(deliveryType)) { return stream; }
+    }
+    return null;
+  }
+
 }

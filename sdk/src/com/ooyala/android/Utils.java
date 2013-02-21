@@ -91,18 +91,20 @@ class Utils {
     return result;
   }
 
-  public static String join(List<String> list, String separator) {
+  public static String join(Collection<? extends Object> list, String separator) {
     if (list == null) { return null; }
+
     StringBuffer result = new StringBuffer();
-    if (!list.isEmpty()) {
-      result.append(list.get(0));
-      for (int i = 1; i < list.size(); i++) {
-        if (separator != null) {
-          result.append(separator);
-        }
-        result.append(list.get(i));
-      }
+
+    for (Object o : list) {
+      result.append(o.toString());
+      result.append(separator);
     }
+
+    if (result.length() > 0) {
+      result = result.deleteCharAt(result.length() -1);
+    }
+
     return result.toString();
   }
 

@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import java.util.Observable;
-
 import com.ooyala.android.OoyalaPlayer.State;
 
 import android.R.bool;
@@ -115,6 +114,10 @@ abstract class Player extends Observable {
     return _buffer;
   }
 
+  public boolean isPlaying() {
+    return false;
+  }
+
   /**
    * Returns if the current player has found live closed caption info in the stream
    * @return true if the stream has embedded live closed captions
@@ -137,6 +140,8 @@ abstract class Player extends Observable {
   public abstract void suspend(int millisToResume, State stateToResume);
 
   public abstract void resume();
+
+  public abstract void resume(int millisToResume, State stateToResume);
 
   public abstract void destroy();
 }

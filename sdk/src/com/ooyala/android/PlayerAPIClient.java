@@ -228,11 +228,53 @@ class PlayerAPIClient {
     return authorizeEmbedCodes(embedCodes, item);
   }
 
+  public boolean authorize(AuthorizableItemInternal item, PlayerInfo playerInfo) throws OoyalaException {
+    List<String> embedCodes = item.embedCodesToAuthorize();
+    return authorizeEmbedCodes(embedCodes, item, playerInfo);
+  }
+
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent)
       throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
+    JSONObject authData = null;
+    try {
+      authData = verifyAuthorizeJSON(json, embedCodes);
+    } catch (OoyalaException e) {
+      System.out.println("Unable to authorize: " + e);
+      throw e;
+    }
+    if (parent != null) {
+      parent.update(authData);
+    }
+    return true;
+  }
+
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent, PlayerInfo playerInfo)
+      throws OoyalaException {
+    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
+        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
+    Map<String, String> params = authorizeParams(embedCodes);
+    params.put("device", playerInfo.getDevice());
+
+    if (playerInfo.getSupportedFormats() != null)
+      params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
+
+    if (playerInfo.getSupportedProfiles() != null)
+      params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
+
+    if (playerInfo.getMaxHeight() > 0)
+      params.put("h", Integer.toString(playerInfo.getMaxHeight()));
+
+    if (playerInfo.getMaxWidth() > 0)
+      params.put("w", Integer.toString(playerInfo.getMaxWidth()));
+
+    if (playerInfo.getMaxBitrate() > 0) {
+      params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+    }
+
+    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, params);
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
@@ -257,17 +299,33 @@ class PlayerAPIClient {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Boolean doInBackground(Object... params) { // first param is List<String> of embed codes to
-                                                         // authorize, second param is
+    protected Boolean doInBackground(Object... params) { // List<String> embedCodes
                                                          // AuthorizableItemInternal parent
-      if (params.length == 0 || params[0] == null || !(params[0] instanceof List<?>)) { return Boolean.FALSE; }
-      List<String> embedCodeList = ((List<String>) (params[0]));
-      try {
-        return authorizeEmbedCodes(embedCodeList, params.length >= 2 && params[1] != null
-            && params[1] instanceof AuthorizableItemInternal ? (AuthorizableItemInternal) params[1] : null);
-      } catch (OoyalaException e) {
-        _error = e;
-        return Boolean.FALSE;
+      if (params.length < 2) { return false; }
+      if (!(params[0] instanceof List<?>)) { return false; }
+
+      List<String> embedCodes = (List<String>)params[0];
+      AuthorizableItemInternal parent = params[1] instanceof AuthorizableItemInternal ?
+          (AuthorizableItemInternal) params[1] : null;
+
+      switch (params.length) {
+        case 2:
+          try {
+            return authorizeEmbedCodes(embedCodes, parent);
+          } catch (OoyalaException e) {
+            _error = e;
+            return false;
+          }
+        case 3:
+          PlayerInfo playerInfo = params[2] instanceof PlayerInfo ? (PlayerInfo)params[2] : null;
+          try {
+            return authorizeEmbedCodes(embedCodes,  parent, playerInfo);
+          } catch (OoyalaException e) {
+            _error = e;
+            return false;
+          }
+          default:
+            return false;
       }
     }
 
@@ -279,6 +337,10 @@ class PlayerAPIClient {
 
   public Object authorize(AuthorizableItemInternal item, AuthorizeCallback callback) {
     return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, callback);
+  }
+
+  public Object authorize(AuthorizableItemInternal item, PlayerInfo playerInfo, AuthorizeCallback callback) {
+    return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, playerInfo, callback);
   }
 
   public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
@@ -337,6 +399,12 @@ class PlayerAPIClient {
   public Object authorizeHeartbeat(AuthorizeHeartbeatCallback callback) {
     AuthorizeHeartbeatTask task = new AuthorizeHeartbeatTask(callback);
     task.execute();
+    return task;
+  }
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
+      PlayerInfo playerInfo, AuthorizeCallback callback) {
+    AuthorizeTask task = new AuthorizeTask(callback);
+    task.execute(embedCodes, parent, playerInfo);
     return task;
   }
 

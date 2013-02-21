@@ -161,8 +161,10 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     return _authCode;
   }
 
-  @Override
   public boolean isHeartbeatRequired() {
     return false;
+  }
+  public Set<Stream> getStreams() {
+    return _streams;
   }
 }
