@@ -16,7 +16,6 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
-import com.ooyala.android.NexPlayerMoviePlayer;
 
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.AuthorizableItem.AuthCode;
