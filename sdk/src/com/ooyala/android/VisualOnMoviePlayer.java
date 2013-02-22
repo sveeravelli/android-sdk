@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,7 +41,7 @@ import com.visualon.OSMPUtils.voOSType;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-class VisualOnMoviePlayer extends MoviePlayer implements
+class VisualOnMoviePlayer extends StreamPlayer implements
     voOSBasePlayer.onEventListener, voOSBasePlayer.onRequestListener,
     SurfaceHolder.Callback {
   private static final String TAG = "[PLAYER_SAMPLE]:VisualOn";
@@ -107,9 +108,17 @@ class VisualOnMoviePlayer extends MoviePlayer implements
     }
   };
 
+
   @Override
-  public void init(OoyalaPlayer parent, Object stream) {
+  public void init(OoyalaPlayer parent, Set<Stream> streams) {
     Log.d(this.getClass().getName(), "Using VOPlayer");
+    Stream stream = null;
+    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS)) {
+      stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_HLS);
+    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET)) {
+      stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET);
+    }
+
     if (stream == null) {
       Log.e(this.getClass().getName(),
           "ERROR: Invalid Stream (no valid stream available)");
@@ -124,7 +133,7 @@ class VisualOnMoviePlayer extends MoviePlayer implements
     }
 
     setState(State.LOADING);
-    _streamUrl = (String) stream;
+    _streamUrl = stream.decodedURL().toString();
     setParent(parent);
 
 
@@ -289,10 +298,6 @@ class VisualOnMoviePlayer extends MoviePlayer implements
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
 
-      /* Set the license */
-      String licenseText = "VOTRUST_OOYALA_754321974";		// Magic string from VisualOn, must match voVidDec.dat to work
-      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
-
       //Setup license content, or screen can green flicker.
       InputStream is = null;
       byte[] b = new byte[32*1024];
@@ -447,7 +452,7 @@ private void setupView() {
 
   private void removeView() {
     if (_parent != null) {
-      //_parent.getLayout().removeView(_view);
+      _parent.getLayout().removeView(_view);
     }
     if (_holder != null) {
       _holder.removeCallback(this);
@@ -482,6 +487,10 @@ private void setupView() {
   }
 
   @Override
+  public void resume(int millisToResume, State stateToResume) {
+    resume();
+  }
+
   public void resume() {
     Log.v(TAG, "Player Resume");
     if (_state != State.SUSPENDED) {

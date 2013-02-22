@@ -1,6 +1,8 @@
 package com.ooyala.android;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.os.Handler;
 import android.os.Message;
@@ -21,23 +23,33 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   private static WVPlayback _wvplayback = new WVPlayback();
   private Handler _handler = new Handler(this);
   private OoyalaPlayer parent;
-  private String stream = "";
+  private Stream _stream = null;
 
   @Override
-  public void init(OoyalaPlayer parent, Object o) {
-    WidevineParams params = (WidevineParams) o;
+  public void init(OoyalaPlayer parent, Set<Stream> streams) {
 
-    this.stream = params.url;
+    _stream = null;
+    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
+      _stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4);
+    }
+    if (_stream == null) {
+      Log.e("Widevine", "No available streams for the WidevineLib Player, Cannot continue." + streams.toString());
+      this._error = "Invalid Stream";
+      setState(State.ERROR);
+      return;
+    }
+
     this.parent = parent;
 
     HashMap<String, Object> options = new HashMap<String, Object>();
     // this should point to SAS once we get the proxy up
     String path = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
+        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
+            parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
-    if(params.widevineServerPath != null) {
-      path = params.widevineServerPath;
+    if(_stream.getWidevineServerPath() != null) {
+      path = _stream.getWidevineServerPath();
     }
     options.put("WVPortalKey", "ooyala"); // add this value in SAS
     options.put("WVDRMServer", path);
@@ -82,7 +94,12 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   public boolean handleMessage(Message msg) {
     switch (msg.what) {
       case INIT:
-        super.init(parent, _wvplayback.play(stream));
+        // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
+        _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
+        Set<Stream> newStreams = new HashSet<Stream>();
+        _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
+        newStreams.add(_stream);
+        super.init(parent, newStreams);
         break;
       case ERROR:
         setState(State.ERROR);

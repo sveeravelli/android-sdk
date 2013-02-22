@@ -3,6 +3,7 @@ package com.ooyala.android;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -46,24 +47,21 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-    init(parent, Stream.bestStream(streams).decodedURL());
-  }
-
-  @Override
-  public void init(OoyalaPlayer parent, Object stream) {
+    Stream stream =  Stream.bestStream(streams);
     if (stream == null) {
       Log.e(this.getClass().getName(), "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
     }
+
     if (parent == null) {
       this._error = "Invalid Parent";
       setState(State.ERROR);
       return;
     }
     setState(State.LOADING);
-    _streamUrl = stream.toString();
+    _streamUrl = stream.getUrlFormat().equals(Constants.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString() : stream.getUrl();
     setParent(parent);
     if (_player != null) { _player.reset(); }
   }

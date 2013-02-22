@@ -4,7 +4,7 @@ import java.net.URL;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-class OoyalaAdPlayer extends MoviePlayer {
+class OoyalaAdPlayer extends AdMoviePlayer {
   private OoyalaAdSpot _ad;
   private Object _fetchTask;
 
@@ -13,7 +13,7 @@ class OoyalaAdPlayer extends MoviePlayer {
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, Object ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;

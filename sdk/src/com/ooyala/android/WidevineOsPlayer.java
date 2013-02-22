@@ -1,5 +1,8 @@
 package com.ooyala.android;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.annotation.TargetApi;
 import android.drm.DrmErrorEvent;
 import android.drm.DrmEvent;
@@ -24,9 +27,23 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   private boolean _live = false;
 
   @Override
-  public void init(OoyalaPlayer parent, Object o) {
-    WidevineParams params = (WidevineParams) o;
+  public void init(OoyalaPlayer parent, Set<Stream> streams) {
 
+    // Get the correct (presumably only) stream to play widevine
+    Stream stream = null;
+    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM)) {
+       stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM);
+    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS)) {
+       stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS);
+    }
+    if (stream == null) {
+      Log.e("Widevine", "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
+      this._error = "Invalid Stream";
+      setState(State.ERROR);
+      return;
+    }
+
+    //Setup DRM Client
     if (_drmClient == null) {
       _drmClient = new DrmManagerClient(OoyalaAPIHelper.context);
       _drmClient.setOnErrorListener(this);
@@ -36,31 +53,37 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     // replace scheme of widevine assets
     // need to be widevine:// vs http://
-    Uri uri = Uri.parse(params.url);
+    Uri uri = Uri.parse(stream.decodedURL().toString());
     // live check
     if (uri.getLastPathSegment().endsWith(".m3u8")) {
       _live = true;
     }
-    params.url = uri.buildUpon().scheme("widevine").build().toString();
+    stream.setUrl(uri.buildUpon().scheme("widevine").build().toString());
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     // this should point to SAS once we get the proxy up
-    String path = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, params.pcode, params.embedCode, "widevine", "ooyala");
+    String serverPath = Constants.DRM_HOST
+        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
+                        parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
-    if(params.widevineServerPath != null) {
-      path = params.widevineServerPath;
+    if(stream.getWidevineServerPath() != null) {
+      serverPath = stream.getWidevineServerPath();
     }
-    request.put("WVDRMServerKey", path);
-    request.put("WVAssetURIKey", params.url);
+    request.put("WVDRMServerKey", serverPath);
+    request.put("WVAssetURIKey", stream.getUrl());
     request.put("WVPortalKey", "ooyala"); // override in SAS
     request.put("WVDeviceIDKey",
         Secure.getString(OoyalaAPIHelper.context.getContentResolver(), Secure.ANDROID_ID));
     request.put("WVLicenseTypeKey", "3");
 
     _drmClient.acquireRights(request);
-    super.init(parent, params.url);
+
+    // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
+    Set<Stream> newStreams = new HashSet<Stream>();
+    stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
+    newStreams.add(stream);
+    super.init(parent, newStreams);
   }
 
   @Override

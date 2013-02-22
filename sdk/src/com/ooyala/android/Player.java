@@ -1,6 +1,8 @@
 package com.ooyala.android;
 
 import java.util.Observable;
+import java.util.Set;
+
 import com.ooyala.android.OoyalaPlayer.State;
 
 import android.R.bool;
@@ -25,7 +27,7 @@ abstract class Player extends Observable {
    */
   protected Player() {}
 
-  public void init(OoyalaPlayer parent, Object param) {}
+  public void init(OoyalaPlayer parent, Set<Stream> streams) {}
 
   /**
    * Pause the current video

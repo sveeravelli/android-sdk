@@ -8,7 +8,7 @@ import java.util.Observable;
 import java.util.Set;
 import com.ooyala.android.OoyalaPlayer.State;
 
-class VASTAdPlayer extends MoviePlayer {
+class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
 
@@ -34,7 +34,7 @@ class VASTAdPlayer extends MoviePlayer {
 
 
   @Override
-  public void init(final OoyalaPlayer parent, Object ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof VASTAdSpot)) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;

@@ -41,22 +41,25 @@ public abstract class StreamPlayer extends Player {
       public int getMaxBitrate() { return -1; }
 
       @Override
-      public String getDevice() { return "android_3plus_sdk"; }
+      public String getDevice() { return "android_html"; }
 
       @Override
       public String getUserAgent() { return null; }
     };
 
+  private PlayerInfo customPlayerInfo;
   public PlayerInfo getPlayerInfo() {
-    return defaultPlayerInfo;
+    return customPlayerInfo != null ? customPlayerInfo : defaultPlayerInfo;
+  }
+
+  public void setPlayerInfo(PlayerInfo info) {
+    customPlayerInfo = info;
   }
 
   protected Timer _playheadUpdateTimer = null;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
-
-  public abstract void init(OoyalaPlayer parent, Set<Stream> streams);
 
   // Playhead time update notifications
   private static class TimerHandler extends Handler {

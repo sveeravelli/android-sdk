@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -14,22 +15,33 @@ public class MoviePlayer extends Player implements Observer {
   private Set<Stream> _streams;
   private boolean _suspended = true;
 
-  @SuppressWarnings("unchecked")
-  public void init(OoyalaPlayer parent, Object streams) {
-    super.init(parent, streams);
-    if (streams instanceof Set<?>) {
-      init(parent, (Set<Stream>)streams);
+
+  /**
+   * Check which base player would be best suited for this MoviePlayer
+   * @param streams
+   * @return the correct default base player
+   */
+  private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
+    if (streams == null || streams.size() == 0) { return null; }
+    StreamPlayer player;
+    if (OoyalaPlayer.enableCustomHLSPlayer &&
+        (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS) ||
+         Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+      player =  new VisualOnMoviePlayer();
+    } else {
+      player = new BaseMoviePlayer();
     }
+    return player;
   }
-  
+
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
+   // super.init(parent, stream);
     _parent = parent;
     _streams = streams;
     _suspended = false;
-    if (_basePlayer != null) {
-      _basePlayer.addObserver(this);
-      _basePlayer.init(parent, streams);
-    }
+    _basePlayer = getPlayerForStreams(streams);
+    _basePlayer.addObserver(this);
+    _basePlayer.init(parent, streams);
   }
 
   public StreamPlayer getBasePlayer() {
@@ -45,6 +57,9 @@ public class MoviePlayer extends Player implements Observer {
     boolean shouldResume = !_suspended;
     if (shouldResume) {
       suspend();
+    }
+    if (basePlayer == null) {
+      _basePlayer = getPlayerForStreams(_streams);
     }
 
     _basePlayer = basePlayer;
@@ -88,7 +103,7 @@ public class MoviePlayer extends Player implements Observer {
   }
   
   @Override
-  public void resume(int millisToResume, State stateToResume) {
+  public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
     if (_basePlayer != null) {
       _basePlayer.addObserver(this);
