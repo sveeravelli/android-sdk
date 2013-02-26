@@ -298,6 +298,9 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
       _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
 
+      /* Set the license */
+      String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
+      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
       //Setup license content, or screen can green flicker.
       InputStream is = null;
       byte[] b = new byte[32*1024];
@@ -324,7 +327,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
         //Open then run the player
         nRet = _player.Open(
             _streamUrl,
-            voOSType.VOOSMP_FLAG_SOURCE_URL, 0, 0, 0);
+            voOSType.VOOSMP_FLAG_SOURCE_URL | voOSType.VOOSMP_FLAG_SOURCE_OPEN_ASYNC, 0, 0, 0);
           if (nRet == voOSType.VOOSMP_ERR_None) {
             Log.v(TAG, "MediaPlayer is Opened.");
           } else {
@@ -333,7 +336,6 @@ class VisualOnMoviePlayer extends StreamPlayer implements
             //onError(_player, nRet, 0);
             return;
           }
-      setState(State.READY);
 
     } catch (Throwable t) {
       t.printStackTrace(); }
@@ -373,7 +375,6 @@ class VisualOnMoviePlayer extends StreamPlayer implements
 
     if (_state == State.LOADING) {
       createMediaPlayer();
-      dequeuePlay();
     }
   }
 
@@ -397,52 +398,41 @@ private void setupView() {
       return;
     }
 
-    //Check if a surfaceView is already instantiated in this layout
-    for (int x=0; x < _parent.getLayout().getChildCount(); x++) {
-      if (_parent.getLayout().getChildAt(x) instanceof SurfaceView) {
-        _view = (SurfaceView) _parent.getLayout().getChildAt(x);
-        createMediaPlayer();
+    _view = new SurfaceView(_parent.getLayout().getContext()) {
+
+      @Override
+      protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
+
+    		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+    		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+
+    		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
+
+     	// assume to much vertical space, so need to align vertically
+  			int wantedWidth = parentWidth;
+  			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
+  			int offset = (parentHeight - wantedHeight) / 2;
+
+  			if(offset < 0) {
+  				// oops, too much width, let's align horizontally
+  				wantedHeight = parentHeight;
+  				wantedWidth = parentHeight * _videoWidth / _videoHeight;
+  				offset = (parentWidth - wantedWidth) / 2;
+  			}
+
+        setMeasuredDimension(wantedWidth, wantedHeight);
+        Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
       }
-    }
-
-    //If no surfaceView yet, make one
-    if (_view == null) {
-      _view = new SurfaceView(_parent.getLayout().getContext()) {
-
-        @Override
-        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-      		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
-
-      		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-      		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+    };
 
 
-      		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
+    _view.setLayoutParams(new FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
-       	// assume to much vertical space, so need to align vertically
-    			int wantedWidth = parentWidth;
-    			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
-    			int offset = (parentHeight - wantedHeight) / 2;
-
-    			if(offset < 0) {
-    				// oops, too much width, let's align horizontally
-    				wantedHeight = parentHeight;
-    				wantedWidth = parentHeight * _videoWidth / _videoHeight;
-    				offset = (parentWidth - wantedWidth) / 2;
-    			}
-
-          setMeasuredDimension(wantedWidth, wantedHeight);
-          Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
-        }
-      };
-
-
-      _view.setLayoutParams(new FrameLayout.LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
-      _parent.getLayout().addView(_view);
-    }
+    _parent.getLayout().addView(_view);
 
     _holder = _view.getHolder();
     _holder.addCallback(this);
@@ -593,7 +583,12 @@ private void setupView() {
 
   @Override
   public int onEvent(int id, int param1, int param2, Object obj) {
-    if (id == voOSType.VOOSMP_SRC_CB_Adaptive_Streaming_Info) {
+
+    // After createMediaPlayer
+    if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
+      setState(State.READY);
+    }
+    else if (id == voOSType.VOOSMP_SRC_CB_Adaptive_Streaming_Info) {
 
         _view.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

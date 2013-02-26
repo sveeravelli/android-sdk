@@ -24,9 +24,17 @@ public class MoviePlayer extends Player implements Observer {
   private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
     if (streams == null || streams.size() == 0) { return null; }
     StreamPlayer player;
+
+    // If custom HLS Player is enabled, and one of the following:
+    //   1.) Delviery type is HLS
+    //   2.) Delviery type is Remote Asset, and the url contains .m3u8
+    // use VisualOn
     if (OoyalaPlayer.enableCustomHLSPlayer &&
         (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS) ||
-         Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET))) {
+         (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
+          Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).getUrl().contains("m3u8"))
+        )
+       ) {
       player =  new VisualOnMoviePlayer();
     } else {
       player = new BaseMoviePlayer();
