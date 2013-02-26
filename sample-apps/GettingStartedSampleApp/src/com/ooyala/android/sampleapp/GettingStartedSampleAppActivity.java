@@ -8,7 +8,16 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
 public class GettingStartedSampleAppActivity extends Activity {
-  /** Called when the activity is first created. */
+
+  final String EMBED  = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe";  //Embed Code, or Content ID
+  final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
+  final String APIKEY = "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd";
+  final String SECRET = "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN";
+  final String DOMAIN = "www.ooyala.com";
+
+  /**
+   * Called when the activity is first created.
+   */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -16,11 +25,9 @@ public class GettingStartedSampleAppActivity extends Activity {
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-        "R2d3I6s06RyB712DN0_2GsQS-R-Y", "www.ooyala.com");
+        APIKEY, SECRET, PCODE, DOMAIN);
     OoyalaPlayer player = playerLayoutController.getPlayer();
-    if (player.setEmbedCode("lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe")) {
-      // The Embed Code works
+    if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {
       Log.d(this.getClass().getName(), "Something Went Wrong!");
