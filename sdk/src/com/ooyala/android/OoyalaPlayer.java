@@ -638,8 +638,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private Player initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
     p.addObserver(this);
     if(_customBasePlayer != null) {
-    p.setBasePlayer(_customBasePlayer);
-  }
+      p.setBasePlayer(_customBasePlayer);
+    }
     p.init(this, ad);
     return p;
   }

@@ -61,7 +61,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
       return;
     }
     setState(State.LOADING);
-    _streamUrl = stream.getUrlFormat().equals(Constants.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString() : stream.getUrl();
+    _streamUrl = stream.getUrlFormat().equals(Constants.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
     setParent(parent);
     if (_player != null) { _player.reset(); }
   }

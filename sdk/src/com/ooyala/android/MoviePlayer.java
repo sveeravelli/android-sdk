@@ -63,6 +63,7 @@ public class MoviePlayer extends Player implements Observer {
     }
 
     _basePlayer = basePlayer;
+    _basePlayer.addObserver(this);
 
     if (shouldResume) {
       resume();

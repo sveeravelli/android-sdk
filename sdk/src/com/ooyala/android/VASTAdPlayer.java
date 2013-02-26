@@ -168,7 +168,6 @@ class VASTAdPlayer extends AdMoviePlayer {
     _firstQSent = false;
     _midSent = false;
     _thirdQSent = false;
-    addObserver(this);
   }
 
   public void update(Observable arg0, Object arg) {
@@ -187,6 +186,7 @@ class VASTAdPlayer extends AdMoviePlayer {
         _thirdQSent = true;
       }
     }
+    super.update(arg0,  arg);
   }
 
   public void sendTrackingEvent(String event) {
