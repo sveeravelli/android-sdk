@@ -3,6 +3,7 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -39,6 +40,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     setupControls();
   }
 
+  @SuppressLint("NewApi")
   @Override
   protected void updateButtonStates() {
     if (_playPause != null) {
@@ -234,7 +236,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
       updateButtonStates();
 
-      if (currentState == State.INIT || currentState == State.LOADING) {
+      if (isShowing() && (currentState == State.INIT || currentState == State.LOADING)) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);

@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import android.R;
 import android.app.Dialog;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -130,6 +131,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
           }
         }
       };
+      _inlineControls.hide();
       _fullscreenLayout = new OoyalaPlayerLayout(_fullscreenDialog.getContext());
       _fullscreenLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.MATCH_PARENT, Gravity.FILL));
@@ -143,12 +145,12 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
         overlayToShow = _fullscreenOverlay;
       }
     }
-    _player.resume();
     if (controlsToShow != null) {
       controlsToShow.show();
     }
     if (overlayToShow != null) {
       overlayToShow.show();
     }
+    _player.resume();
   }
 }
