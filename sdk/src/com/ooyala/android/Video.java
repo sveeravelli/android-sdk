@@ -223,4 +223,8 @@ public class Video extends ContentItem implements PlayableItem {
   public Set<Stream> getStreams() {
     return _streams;
   }
+
+  public Stream getStream() {
+    return Stream.bestStream(_streams);
+  }
 }

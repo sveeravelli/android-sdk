@@ -147,4 +147,11 @@ public class VASTLinearAd implements PlayableItem {
   public Set<Stream> getStreams() {
     return _streams;
   }
+  /**
+   * Fetch the best stream for this ad
+   * @return a Set of Stream objects
+   */
+  public Stream getStream() {
+    return Stream.bestStream(_streams);
+  }
 }
