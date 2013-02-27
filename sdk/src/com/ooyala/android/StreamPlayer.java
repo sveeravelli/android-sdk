@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 
@@ -22,11 +23,15 @@ public abstract class StreamPlayer extends Player {
         supportedFormats.add("mp4");
         supportedFormats.add("wv_mp4");
 
-        /*if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+        if (OoyalaPlayer.enableHLS || OoyalaPlayer.enableCustomHLSPlayer) {
+          supportedFormats.add("m3u8");
+        }
+
+        if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
           supportedFormats.add("m3u8");
           supportedFormats.add("wv_wvm");
           supportedFormats.add("wv_hls");
-        }*/
+        }
 
         return supportedFormats;
       }
