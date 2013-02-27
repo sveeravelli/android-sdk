@@ -524,6 +524,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private boolean changeCurrentItemAfterAuth() {
     sendNotification(AUTHORIZATION_READY_NOTIFICATION);
     if (!_currentItem.isAuthorized()) {
+      Log.e(this.getClass().toString(), "This video was not authorized!");
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
       return false;
     }
