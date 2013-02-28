@@ -382,6 +382,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
   public void surfaceDestroyed(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Destroyed");
     if (_player != null) {
+      _player.Stop();
       _player.SetView(null);
     }
   }
