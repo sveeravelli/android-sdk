@@ -97,6 +97,10 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
+    // If we're already suspended, we don't need to do it again)
+    if (stateToResume == State.SUSPENDED) {
+      return;
+    }
     _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
