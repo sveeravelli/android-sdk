@@ -205,8 +205,6 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
         FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
     _layout.addView(_spinner, spinnerLP);
-
-    _player.addObserver(this);
   }
 
   @Override

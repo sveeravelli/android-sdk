@@ -103,6 +103,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if (dcs == DefaultControlStyle.AUTO) {
       setInlineControls(createDefaultControls(_layout, false));
       _inlineControls.hide();
+      _player.addObserver(_inlineControls);
     }
   }
 

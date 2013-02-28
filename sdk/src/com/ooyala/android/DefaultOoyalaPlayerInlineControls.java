@@ -163,7 +163,6 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
         FrameLayout.LayoutParams.MATCH_PARENT);
     _layout.addView(_baseLayout, baseLP);
     hide();
-    _player.addObserver(this);
   }
 
   @Override
@@ -236,7 +235,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
       updateButtonStates();
 
-      if (isShowing() && (currentState == State.INIT || currentState == State.LOADING)) {
+      if (currentState == State.INIT || currentState == State.LOADING) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);

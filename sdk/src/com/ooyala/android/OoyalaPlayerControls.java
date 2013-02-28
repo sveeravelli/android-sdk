@@ -1,6 +1,8 @@
 package com.ooyala.android;
 
-public interface OoyalaPlayerControls {
+import java.util.Observer;
+
+public interface OoyalaPlayerControls extends Observer {
   /**
    * Set the parent layout that these controls should show on top of. This method should add the controls to
    * this layout in the correct positions (but they should not actually be visible)

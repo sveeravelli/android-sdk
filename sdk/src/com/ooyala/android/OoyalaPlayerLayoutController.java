@@ -120,6 +120,13 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
         _inlineOverlay.setParentLayout(_layout);
         overlayToShow = _inlineOverlay;
       }
+
+      if (_inlineControls != null) {
+        _player.addObserver(_inlineControls);
+      }
+      if (_fullscreenControls != null) {
+        _player.deleteObserver(_fullscreenControls);
+      }
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
       _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen) {
         @Override
@@ -131,7 +138,6 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
           }
         }
       };
-      _inlineControls.hide();
       _fullscreenLayout = new OoyalaPlayerLayout(_fullscreenDialog.getContext());
       _fullscreenLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.MATCH_PARENT, Gravity.FILL));
@@ -143,6 +149,13 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
       if (_fullscreenOverlay != null) {
         _fullscreenOverlay.setParentLayout(_fullscreenLayout);
         overlayToShow = _fullscreenOverlay;
+      }
+
+      if (_inlineControls != null) {
+        _player.deleteObserver(_inlineControls);
+      }
+      if (_fullscreenControls != null) {
+        _player.addObserver(_fullscreenControls);
       }
     }
     if (controlsToShow != null) {
