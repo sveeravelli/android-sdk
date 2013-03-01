@@ -562,37 +562,18 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
-
-    Set<Stream> streams = _currentItem.getStreams();
-
-    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM) ||
-        Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS)) {
-      _player = new WidevineOsPlayer();
-    }
-    else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
-      _player =  new WidevineLibPlayer();
-    }
-    else {
-      _player = new MoviePlayer();
-    }
-
-    initializePlayer(_player, streams);
-    // _player = new WidevineOsPlayer();
-    // initializePlayer(_player, new
-    // WidevineParams("http://widevine-test.s3.amazonaws.com/Bloomberg_1200_encrypted.mp4", getEmbedCode(),
-    // getPlayerAPIClient().getPcode()));
-    // initializePlayer(_player, new WidevineParams("https://dl.dropbox.com/u/39391582/expendable.wvm",
-    // getEmbedCode(), getPlayerAPIClient().getPcode()));
-
-    if (_player == null || _player.getError() != null) { return false; }
-    _player.setSeekable(_seekable);
-
-    addClosedCaptionsView();
-
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
 
-    dequeuePlay();
+    //Play Pre-Rolls first
+    boolean didAdsPlay = playAdsBeforeTime(0);
+
+    //If there were no ads, initialize the player and play
+    if (!didAdsPlay) {
+      _player = getCorrectMoviePlayer(_currentItem);
+      if (initializePlayer(_player, _currentItem) == null) return false;
+      dequeuePlay();
+    }
     return true;
   }
 
@@ -628,12 +609,35 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     return true;
   }
 
-  private Player initializePlayer(MoviePlayer p, Set<Stream> streams) {
+  private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
+    Set<Stream> streams = currentItem.getStreams();
+
+    //Get correct type of Movie Player
+    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM) ||
+        Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS)) {
+      return new WidevineOsPlayer();
+    }
+    else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
+      return new WidevineLibPlayer();
+    }
+
+    return new MoviePlayer();
+  }
+
+  private Player initializePlayer(MoviePlayer p, Video currentItem) {
+    Set<Stream> streams = currentItem.getStreams();
+
+    //Initialize this player
     p.addObserver(this);
     if(_customBasePlayer != null) {
       p.setBasePlayer(_customBasePlayer);
     }
     p.init(this, streams);
+
+    addClosedCaptionsView();
+
+    if (p == null || p.getError() != null) { return null; }
+    p.setSeekable(_seekable);
     return p;
   }
   private Player initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
@@ -880,7 +884,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   private boolean playAd(AdSpot ad) {
-    _player.suspend();
+    if(_player != null && _player.getBasePlayer() != null) {
+      _player.suspend();
+    }
 
     if (ad instanceof OoyalaAdSpot) {
       _adPlayer = new OoyalaAdPlayer();
@@ -1054,7 +1060,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
             if (!playAdsBeforeTime(this._lastPlayedTime)) {
-              if (_player.getState() == State.COMPLETED) {
+
+              // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
+              if (_player == null) {
+                _player = getCorrectMoviePlayer(_currentItem);
+                initializePlayer(_player, _currentItem);
+                dequeuePlay();
+              }
+
+              //If these were post-roll ads, clean up.  Otherwise, resume playback
+              else if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
                 _player.resume();
@@ -1088,7 +1103,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         case PLAYING:
           if (_lastPlayedTime == 0) {
             _analytics.reportPlayStarted();
-            playAdsBeforeTime(250);
             sendNotification(PLAY_STARTED_NOTIFICATION);
           }
           setState(State.PLAYING);

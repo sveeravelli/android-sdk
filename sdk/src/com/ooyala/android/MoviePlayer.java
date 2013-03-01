@@ -5,6 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import android.util.Log;
 import android.view.View;
 import com.ooyala.android.OoyalaPlayer.State;
 
@@ -97,10 +98,12 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    // If we're already suspended, we don't need to do it again)
+    // If we're already suspended, we don't need to do it again
     if (stateToResume == State.SUSPENDED) {
+      Log.e(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
       return;
     }
+    Log.d(this.getClass().toString(), "suspending: msToResume:" + millisToResume + ". state to resume" + stateToResume);
     _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
@@ -117,19 +120,15 @@ public class MoviePlayer extends Player implements Observer {
   
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
+    Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
     _suspended = false;
     if (_basePlayer != null) {
       _basePlayer.addObserver(this);
-     // if (stateToResume == State.INIT) {
-        _basePlayer.init(_parent, _streams);
+      _basePlayer.init(_parent, _streams);
+      if (stateToResume == State.PLAYING) {
         _basePlayer.seekToTime(millisToResume);
-        
-        if (stateToResume == State.PLAYING) {
-          _basePlayer.play();
-        }
-        //} else {
-        //_basePlayer.resume(millisToResume, stateToResume);
-     // }
+        _basePlayer.play();
+      }
     }
   }
 
