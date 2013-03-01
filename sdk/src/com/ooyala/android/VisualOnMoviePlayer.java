@@ -700,12 +700,16 @@ private void setupView() {
       Log.v(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
     } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData) { //CC data
 
-      // Remember if we have recieved live closed captions at some point duirng playback
-      _isLiveClosedCaptionsAvailable = true;
+      // Remember if we have received live closed captions at some point during playback
+      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
+      voSubtitleInfo info = (voSubtitleInfo)obj;
+      String cc = GetCCString(info);
+      if (!cc.equals("")) {
+        _isLiveClosedCaptionsAvailable = true;
+      }
+
+      //Show closed captions if someone enabled them
       if (_isLiveClosedCaptionsEnabled) {
-        // Retrieve subtitle info, get text, and display it
-        voSubtitleInfo info = (voSubtitleInfo)obj;
-        String cc = GetCCString(info);
         _parent.displayClosedCaptionText(cc);
       }
     } else {
