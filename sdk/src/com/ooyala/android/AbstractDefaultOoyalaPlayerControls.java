@@ -139,6 +139,25 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     }
   }
 
+  /**
+   * Closed Captons Button
+   */
+  protected class ClosedCaptionsButton extends TouchButton {
+    public ClosedCaptionsButton(Context context) {
+      super(context);
+    }
+
+    @Override
+    protected void onDraw(Canvas c) {
+      if (c == null) {
+        return;
+      }
+      Images.drawImage(Images.CLOSED_CAPTIONS, this.getContext(), c,BACKGROUND_COLOR,
+            SOFT_WHITE_COLOR, getWidth(), getHeight(), MARGIN_SIZE_DP,
+            _touching);
+    }
+  }
+
   @Override
   public void setParentLayout(OoyalaPlayerLayout layout) {
     _layout = layout;

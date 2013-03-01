@@ -22,6 +22,12 @@ public interface LayoutController {
    */
   public boolean isFullscreen();
 
+
+  /**
+   * Show the Closed Captions selector menu
+   */
+  public void showClosedCaptionsMenu();
+
   /**
    * Handle the touch events from OoyalaPlayerLayout
    * @param event the event

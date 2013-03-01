@@ -1,8 +1,13 @@
 package com.ooyala.android;
 
+import java.util.Set;
+
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   public static enum DefaultControlStyle {
@@ -195,5 +200,36 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     } else {
       return new DefaultOoyalaPlayerInlineControls(_player, layout);
     }
+  }
+
+  /**
+   * Create and display the list of available languages.
+   */
+  public void showClosedCaptionsMenu() {
+    AlertDialog dialog;
+    Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
+    languageSet.add("None");
+
+    final String[] items = languageSet.toArray(new String[0]);
+    AlertDialog.Builder builder = new AlertDialog.Builder(_layout.getContext());
+    builder.setTitle("Subtitles/Closed Captions");
+
+    builder.setItems(items, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int pos) {
+        String toastText = "Selected Language: "+items[pos];
+        String language = items[pos];
+
+        // Special case the None language
+        if(language.equals("None")) {
+          language = null;
+          toastText = "Closed captions disabled";
+        }
+
+        Toast.makeText(_layout.getContext(),toastText,Toast.LENGTH_SHORT).show();
+        _player.setClosedCaptionsLanguage(language);
+      }
+    });
+    dialog = builder.create();
+    dialog.show();
   }
 }

@@ -1,10 +1,13 @@
 package com.ooyala.android;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Base64;
 
 class Images {
   public static final int PLAY = 0;
@@ -13,6 +16,7 @@ class Images {
   public static final int SMALLSCREEN = 3;
   public static final int NEXT = 4;
   public static final int PREVIOUS = 5;
+  public static final int CLOSED_CAPTIONS = 6;
 
   public static GradientDrawable gradientBackground(GradientDrawable.Orientation orientation) {
     GradientDrawable gradient = new GradientDrawable(orientation, new int[] { 0xFF000000, 0x80151515 });
@@ -184,6 +188,17 @@ class Images {
     c.drawPath(path, p);
   }
 
+  public static void closedCaptions(Canvas c, Paint p, int width, int height, int marginPixels) {
+    String encodedImage = "iVBORw0KGgoAAAANSUhEUgAAAUAAAAE1CAMAAAChocnqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////////VXz1bAAAAAJ0Uk5T/wDltzBKAAAEC0lEQVR42uzdQXIjMQxDUeD+l56sZ5UOKImUPva0xWcnVa1mWzKJIggABBBAAAmAAAIIIAEQQAABJAACCCCABEAAAQSQAAgggAASAAEEEEACIIAAAkgABBBAAAmAAAIIIAEQQAABBJAACCCAABIAAQQQQALgeEC1yxxANU5/QLVPZ0ANSU9AjUo7QI1LK0CNTBtAjU0PQOl5QT3KV0aoZ/mKCPWyX4WgnvYrENTTfAWEet0vFdTzfqGg8MsEhV8mKPwyQeGXCQq/TFD4ZYLCLxMEcCOghGACKCGYAEoIAngQUEIwAZQQPAF4cOysF+AcuN0rXwHYbgbyPOBgvdUNFAO6bY4CXuC3rIlKQDdPd0D7DsF6wEv41rRSBWjfI1gNeJNffTc1gPZVggBOA7TvEqwFvM2vuKMCQPs6QQAnAdr3CVYC6kVAbQS03/4KAgjgbED7SkEAAQQQQAABBPB6QPtOQQABBBBAAAEEEEAAAQQQwMcBJ1Q0BvxetKNiDOD3sh0VYwC/F+6omAP4vXJHxRzA73uWOyrmAH6fP9lRMQfw+yTtjoo5gN8fyNhRMQfw+zNBOyquA9TmijmA35+M3FEB4DOA0tfudlQA+AygPje3o+JSQG2rABBAAAEEEEAAAQQQQAABBBBANhMAZD+Q/cAUcGcF90S4qQTgr9/oe287KphMeGcygdkYprOYD0w+4A6ATKjGb1R8eVBUMQjQlf/a6yoGAfKciHlS6Tjg/y/RpWISYMsAeAcgP/0EIIAAAggggABOBeSHuAEEcDYgx2G8+BUs7IkjgQAcD8ixaI8J1vbD0ZAA3gDI8bjPCJb3whHhGwA5pH4PoO7wOwjYm3BRE/IjgqtaKAbsSriuAZUvoJ/h0sWvAGxluHrlWrSO45C7FrwYcEHWrm4ZYGvBg36/B3RfwJN+EwE1FLCt4FE/yx7+R3zWz/JwwcN+QwG1YkkbAPt9BY/7WZ4seN7PnzcfWgme9/P3i+dGgA38/IeLvzaCHfz8l6u/JoAt/Pynq5fL4t2Axi8ENH4h4D2E+c63nxb0OUDjFwLOJ6y5eXXi1tc9fCmgn/dz/EJv8xUATiQsvYF/cArgAr4iwEGG9SMkx6dRJuvVAjY3XDXE1GYuap7dKsAGn8bOBfpCQQMYARrASNAARoIGMAI0gJkggJmgAYwADWAkaAAjQQMYARrATBDATNAARoAGMBI0gJGgAYwADWAkaAABPCloACNBAxgBGsBI0ABGggYwAjSAmSCAmaABjAANYCRoACNBAxgBGsBI0ABmggBmgAbwjgAIIIAAAkgABBBAAAmAAAIIIAEQQAABJAACCCCABEAAAQSQAAgggAASAAEEEEACIIAAAkgABBBAAMlP/gkwAEQgHow8opxxAAAAAElFTkSuQmCC";
+
+    byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+    options.inDither = true;
+    Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+    c.drawBitmap(Bitmap.createScaledBitmap(image, width, height,true), 0, 0, p);
+
+  }
   public static void drawImage(int i, Context ct, Canvas c, int background, int fill, int width, int height,
       int marginDP, boolean glow) {
     c.drawColor(background);
@@ -212,6 +227,9 @@ class Images {
         break;
       case PREVIOUS:
         Images.previous(c, p, width, height, marginPixels);
+        break;
+      case CLOSED_CAPTIONS:
+        Images.closedCaptions(c, p, width, height, marginPixels);
         break;
     }
     if (glow) {

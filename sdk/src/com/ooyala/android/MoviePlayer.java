@@ -166,4 +166,6 @@ public class MoviePlayer extends Player implements Observer {
   protected void setState(State state) { _basePlayer.setState(state); }
   public String getError() { return _basePlayer.getError(); }
   public int getBufferPercentage() { return _basePlayer.getBufferPercentage(); }
+  public boolean isLiveClosedCaptionsAvailable() { return _basePlayer.isLiveClosedCaptionsAvailable(); }
+  public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
 }

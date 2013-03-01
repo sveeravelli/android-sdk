@@ -26,6 +26,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private LinearLayout _liveWrapper = null;
   private PlayPauseButton _playPause = null;
   private FullscreenButton _fullscreen = null;
+  private ClosedCaptionsButton _closedCaptions = null;
   private SeekBar _seek = null;
   private TextView _currTime = null;
   private TextView _duration = null;
@@ -64,6 +65,12 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
+    }
+
+    // Show Closed Captions only if there is a language to select
+    if (_closedCaptions != null && _player.getCurrentItem() != null) {
+      _closedCaptions.setVisibility(_player.getAvailableClosedCaptionsLanguages().isEmpty() ?
+         View.GONE : View.VISIBLE);
     }
   }
 
@@ -145,9 +152,16 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _fullscreen.setLayoutParams(fsLP);
     _fullscreen.setOnClickListener(this);
 
+    _closedCaptions = new ClosedCaptionsButton(_bottomBar.getContext());
+    ViewGroup.LayoutParams ccLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(),
+        PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
+    _closedCaptions.setLayoutParams(ccLP);
+    _closedCaptions.setOnClickListener(this);
+
     _bottomBar.addView(_playPause);
     _bottomBar.addView(_seekWrapper);
     _bottomBar.addView(_liveWrapper);
+    _bottomBar.addView(_closedCaptions);
     _bottomBar.addView(_fullscreen);
     FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
@@ -201,6 +215,8 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
       hide();
+    } else if (v == _closedCaptions) {
+      _layout.getLayoutController().showClosedCaptionsMenu();
     }
   }
 
