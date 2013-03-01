@@ -25,7 +25,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
-   * 
+   *
    * @param l the layout to use
    * @param apiKey the API Key to use
    * @param secret the secret to use
@@ -54,7 +54,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
-   * 
+   *
    * @param l the layout to use
    * @param p the instantiated player to use
    */
@@ -64,7 +64,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
-   * 
+   *
    * @param l the layout to use
    * @param apiKey the API Key to use
    * @param secret the secret to use
@@ -79,7 +79,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
-   * 
+   *
    * @param l the layout to use
    * @param apiKey the API Key to use
    * @param secret the secret to use
@@ -124,7 +124,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Get the OoyalaPlayer associated with this Controller
-   * 
+   *
    * @return the OoyalaPlayer
    */
   public OoyalaPlayer getPlayer() {
@@ -133,7 +133,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   /**
    * Get the current active layout
-   * 
+   *
    * @return the current active layout
    */
   public FrameLayout getLayout() {

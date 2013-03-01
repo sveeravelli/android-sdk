@@ -715,7 +715,7 @@ private void setupView() {
 
     return 0;
   }
-  
+
 	/* Extract text string from CC data. Does not handle position, color, font type, etc. */
 	public String GetCCString(voSubtitleInfo subtitleInfo)
 	{
@@ -723,7 +723,7 @@ private void setupView() {
 			return "";
 		if(subtitleInfo.getSubtitleEntry() == null)
 			return "";
-		
+
 		String strTextAll = "";
 		for(int i = 0; i<subtitleInfo.getSubtitleEntry().size(); i++)
 		{
@@ -740,7 +740,7 @@ private void setupView() {
 						continue;
 					if( rowInfo.getTextInfoEntry() == null)
 						continue;
-					
+
 					String strRow = "";
 					for(int k = 0; k < rowInfo.getTextInfoEntry().size() ; k++)
 					{

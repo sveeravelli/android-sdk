@@ -84,7 +84,7 @@ public class MoviePlayer extends Player implements Observer {
     if (_basePlayer != null) {
       _basePlayer.reset();
     }
-    
+
   }
 
   @Override
@@ -117,7 +117,7 @@ public class MoviePlayer extends Player implements Observer {
   public void resume() {
     resume(_millisToResume, _stateToResume);
   }
-  
+
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
@@ -149,7 +149,7 @@ public class MoviePlayer extends Player implements Observer {
 
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
-    _basePlayer.setParent(parent); 
+    _basePlayer.setParent(parent);
   }
 
   //Delegated to base player

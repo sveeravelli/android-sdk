@@ -26,11 +26,11 @@ class Images {
 
   public static void play(Canvas c, Paint p, int width, int height, int marginPixels) {
     Path path = new Path();
-    path.moveTo((float) marginPixels, (float) marginPixels);
-    path.lineTo((float) width - (float) marginPixels, (float) marginPixels
-        + ((float) height - 2f * (float) marginPixels) / 2f);
-    path.lineTo((float) marginPixels, (float) height - (float) marginPixels);
-    path.lineTo((float) marginPixels, (float) marginPixels);
+    path.moveTo(marginPixels, marginPixels);
+    path.lineTo((float) width - (float) marginPixels, marginPixels
+        + (height - 2f * marginPixels) / 2f);
+    path.lineTo(marginPixels, (float) height - (float) marginPixels);
+    path.lineTo(marginPixels, marginPixels);
     c.drawPath(path, p);
   }
 
@@ -39,29 +39,29 @@ class Images {
     float widthMinusMargins = width - 2f * marginPixels;
     float heightMinusMargins = height - 2f * marginPixels;
     // Left rectangle
-    path.moveTo(marginPixels + 1.5f * widthMinusMargins / 8f, (float) marginPixels);
-    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, (float) marginPixels);
-    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, (float) marginPixels + heightMinusMargins);
-    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, (float) marginPixels + heightMinusMargins);
-    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, (float) marginPixels);
+    path.moveTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels);
+    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, marginPixels);
+    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels);
     // Right rectangle
-    path.moveTo(marginPixels + 4.5f * widthMinusMargins / 8f, (float) marginPixels);
-    path.lineTo(marginPixels + 6.5f * widthMinusMargins / 8f, (float) marginPixels);
-    path.lineTo(marginPixels + 6.5f * widthMinusMargins / 8f, (float) marginPixels + heightMinusMargins);
-    path.lineTo(marginPixels + 4.5f * widthMinusMargins / 8f, (float) marginPixels + heightMinusMargins);
-    path.lineTo(marginPixels + 4.5f * widthMinusMargins / 8f, (float) marginPixels);
+    path.moveTo(marginPixels + 4.5f * widthMinusMargins / 8f, marginPixels);
+    path.lineTo(marginPixels + 6.5f * widthMinusMargins / 8f, marginPixels);
+    path.lineTo(marginPixels + 6.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + 4.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + 4.5f * widthMinusMargins / 8f, marginPixels);
     c.drawPath(path, p);
   }
 
   public static void fullscreen(Canvas c, Paint p, int width, int height, int marginPixels) {
     Path path = new Path();
-    float marginX = (float) marginPixels;
-    float marginY = (float) marginPixels;
+    float marginX = marginPixels;
+    float marginY = marginPixels;
     // square-ify margins
     if (width > height) {
-      marginX += ((float) (width - height)) / 2.0f;
+      marginX += (width - height) / 2.0f;
     } else if (height > width) {
-      marginY += ((float) (height - width)) / 2.0f;
+      marginY += (height - width) / 2.0f;
     }
     float widthMinusMargins = width - 2.0f * marginX;
     float heightMinusMargins = height - 2.0f * marginY;
@@ -92,13 +92,13 @@ class Images {
 
   public static void smallscreen(Canvas c, Paint p, int width, int height, int marginPixels) {
     Path path = new Path();
-    float marginX = (float) marginPixels;
-    float marginY = (float) marginPixels;
+    float marginX = marginPixels;
+    float marginY = marginPixels;
     // square-ify margins
     if (width > height) {
-      marginX += ((float) (width - height)) / 2.0f;
+      marginX += (width - height) / 2.0f;
     } else if (height > width) {
-      marginY += ((float) (height - width)) / 2.0f;
+      marginY += (height - width) / 2.0f;
     }
     float widthMinusMargins = width - 2.0f * marginX;
     float heightMinusMargins = height - 2.0f * marginY;
@@ -135,18 +135,18 @@ class Images {
     float heightMinusMargins = height - 2f * marginPixels;
     float barWidth = (widthMinusMargins / 10f);
     // Left Arrow
-    path.moveTo((float) marginPixels, (float) marginPixels);
-    path.lineTo((float) marginPixels + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels
+    path.moveTo(marginPixels, marginPixels);
+    path.lineTo(marginPixels + ((widthMinusMargins - barWidth) / 2f), marginPixels
         + (heightMinusMargins) / 2f);
-    path.lineTo((float) marginPixels, (float) marginPixels + heightMinusMargins);
-    path.lineTo((float) marginPixels, (float) marginPixels);
+    path.lineTo(marginPixels, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels, marginPixels);
     // Right Arrow
-    path.moveTo((float) marginPixels + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels);
-    path.lineTo((float) marginPixels + widthMinusMargins - barWidth, (float) marginPixels
+    path.moveTo(marginPixels + ((widthMinusMargins - barWidth) / 2f), marginPixels);
+    path.lineTo(marginPixels + widthMinusMargins - barWidth, marginPixels
         + (heightMinusMargins) / 2f);
-    path.lineTo((float) marginPixels + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels
+    path.lineTo(marginPixels + ((widthMinusMargins - barWidth) / 2f), marginPixels
         + heightMinusMargins);
-    path.lineTo((float) marginPixels + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels);
+    path.lineTo(marginPixels + ((widthMinusMargins - barWidth) / 2f), marginPixels);
     c.drawPath(path, p);
     // Vertical Bar
     Paint linePaint = new Paint();
@@ -154,9 +154,9 @@ class Images {
     linePaint.setColor(p.getColor());
     linePaint.setStyle(Paint.Style.STROKE);
     linePaint.setStrokeWidth(barWidth);
-    c.drawLine((float) marginPixels + (widthMinusMargins) - barWidth / 2f, (float) marginPixels,
-        (float) marginPixels + (widthMinusMargins) - barWidth / 2f,
-        (float) marginPixels + heightMinusMargins, linePaint);
+    c.drawLine(marginPixels + (widthMinusMargins) - barWidth / 2f, marginPixels,
+        marginPixels + (widthMinusMargins) - barWidth / 2f,
+        marginPixels + heightMinusMargins, linePaint);
   }
 
   public static void previous(Canvas c, Paint p, int width, int height, int marginPixels) {
@@ -170,20 +170,20 @@ class Images {
     linePaint.setColor(p.getColor());
     linePaint.setStyle(Paint.Style.STROKE);
     linePaint.setStrokeWidth(barWidth);
-    c.drawLine((float) marginPixels + barWidth / 2f, (float) marginPixels, (float) marginPixels + barWidth
-        / 2f, (float) marginPixels + heightMinusMargins, linePaint);
+    c.drawLine(marginPixels + barWidth / 2f, marginPixels, marginPixels + barWidth
+        / 2f, marginPixels + heightMinusMargins, linePaint);
     // Left Arrow
-    path.moveTo((float) marginPixels + barWidth, (float) marginPixels + heightMinusMargins / 2f);
-    path.lineTo((float) marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels);
-    path.lineTo((float) marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels
+    path.moveTo(marginPixels + barWidth, marginPixels + heightMinusMargins / 2f);
+    path.lineTo(marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), marginPixels);
+    path.lineTo(marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), marginPixels
         + heightMinusMargins);
-    path.lineTo((float) marginPixels + barWidth, (float) marginPixels + heightMinusMargins / 2f);
+    path.lineTo(marginPixels + barWidth, marginPixels + heightMinusMargins / 2f);
     // Right Arrow
-    path.moveTo((float) marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels
+    path.moveTo(marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), marginPixels
         + heightMinusMargins / 2f);
-    path.lineTo((float) marginPixels + widthMinusMargins, (float) marginPixels);
-    path.lineTo((float) marginPixels + widthMinusMargins, (float) marginPixels + heightMinusMargins);
-    path.lineTo((float) marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), (float) marginPixels
+    path.lineTo(marginPixels + widthMinusMargins, marginPixels);
+    path.lineTo(marginPixels + widthMinusMargins, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + barWidth + ((widthMinusMargins - barWidth) / 2f), marginPixels
         + heightMinusMargins / 2f);
     c.drawPath(path, p);
   }
