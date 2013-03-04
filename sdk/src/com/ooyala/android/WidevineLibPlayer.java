@@ -27,7 +27,6 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-
     _stream = null;
     if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
       _stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4);
@@ -55,7 +54,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
 
-    _wvplayback.initialize(OoyalaAPIHelper.context, options, this);
+    _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+    _handler.sendEmptyMessage(INIT);
   }
 
   @Override
@@ -72,7 +72,14 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
         if (attributes.containsKey("WVStatusKey")) return (WVStatus) attributes.get("WVStatusKey");
         else return WVStatus.OK;
       case Initialized:
-        _handler.sendEmptyMessage(INIT);
+        //_handler.sendEmptyMessage(INIT);
+
+        // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
+        _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
+        Set<Stream> newStreams = new HashSet<Stream>();
+        _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
+        newStreams.add(_stream);
+        super.init(parent, newStreams);
       case NullEvent:
       case Playing:
       case Stopped:
@@ -94,12 +101,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   public boolean handleMessage(Message msg) {
     switch (msg.what) {
       case INIT:
-        // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
-        _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
-        Set<Stream> newStreams = new HashSet<Stream>();
-        _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
-        newStreams.add(_stream);
-        super.init(parent, newStreams);
+        // This was originally used when Widevine initialization was asynchronous.  Saving in case we do
+        // asynch again.
         break;
       case ERROR:
         setState(State.ERROR);
