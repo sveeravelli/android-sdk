@@ -216,16 +216,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     builder.setItems(items, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int pos) {
-        String toastText = "Selected Language: "+items[pos];
-        String language = items[pos];
+        String language = !items[pos].equals("None") ? items[pos] : null;
 
-        // Special case the None language
-        if(language.equals("None")) {
-          language = null;
-          toastText = "Closed captions disabled";
-        }
-
-        Toast.makeText(_layout.getContext(),toastText,Toast.LENGTH_SHORT).show();
         _player.setClosedCaptionsLanguage(language);
       }
     });

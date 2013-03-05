@@ -57,7 +57,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
 
-  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "cc";
+  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
   /**
    * If set to true, this will allow HLS streams regardless of the Android version. WARNING: Ooyala's internal
    * testing has shown that Android 3.x HLS support is unstable. Android 2.x does not support HLS at all. If
