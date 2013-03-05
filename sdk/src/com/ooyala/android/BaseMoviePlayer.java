@@ -27,7 +27,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 /**
  * A wrapper around android.media.MediaPlayer
  * http://developer.android.com/reference/android/media/MediaPlayer.html
- * 
+ *
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
@@ -246,6 +246,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
+    Log.i(this.getClass().getName(), "Surface Destroyed");
   }
 
   @Override
@@ -316,7 +317,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   public void resume() {
     resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
-  
+
   @Override
   public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
@@ -392,7 +393,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     dequeueCompleted();
     dequeuePlay();
   }
-  
+
   @Override
   public boolean isPlaying() {
     return _player != null && _player.isPlaying();

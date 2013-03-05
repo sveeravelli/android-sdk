@@ -44,7 +44,7 @@ import com.visualon.OSMPUtils.voOSType;
 class VisualOnMoviePlayer extends StreamPlayer implements
     voOSBasePlayer.onEventListener, voOSBasePlayer.onRequestListener,
     SurfaceHolder.Callback {
-  private static final String TAG = "[PLAYER_SAMPLE]:VisualOn";
+  private static final String TAG = "VisualOnMoviePlayer";
 
   protected voOSBasePlayer _player = null;
   protected SurfaceHolder _holder = null;

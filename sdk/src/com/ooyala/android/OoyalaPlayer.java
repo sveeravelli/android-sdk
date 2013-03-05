@@ -1212,7 +1212,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       return Double.parseDouble(metadataRetreiver
           .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
-      return (double) (Stream.bestStream(getCurrentItem().getStreams()).getVideoBitrate() * 1000);
+      return Stream.bestStream(getCurrentItem().getStreams()).getVideoBitrate() * 1000;
     }
   }
 
