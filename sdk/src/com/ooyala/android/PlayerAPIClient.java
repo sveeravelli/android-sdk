@@ -23,8 +23,8 @@ class PlayerAPIClient {
   protected int _width = -1;
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
-  private boolean _isLoki;
-  public static final String LOKI = "-omp";
+  private boolean _isHook;
+  public static final String HOOK = "-hook";
   private String _authToken = null; // ALWAYS use getters and setters for this
   protected int _heartbeatInterval = 300;
   protected Context _context;
@@ -185,7 +185,7 @@ class PlayerAPIClient {
 
   private Map<String, String> authorizeParams(List<String> embedCodes) {
     final Map<String, String> params = new HashMap<String, String>();
-    params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
+    params.put(Constants.KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
     params.put(Constants.KEY_DOMAIN, _domain);
 
     if (getAuthToken().length() > 0) {
@@ -215,7 +215,7 @@ class PlayerAPIClient {
     if (additionalParams != null) {
       params.putAll(additionalParams);
     }
-    params.put(Constants.KEY_DEVICE, Utils.device() + (_isLoki ? LOKI : ""));
+    params.put(Constants.KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
     if (_height > 0 && _width > 0) {
       params.put(Constants.KEY_WIDTH, Integer.toString(_width));
       params.put(Constants.KEY_HEIGHT, Integer.toString(_height));
@@ -257,6 +257,7 @@ class PlayerAPIClient {
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     Map<String, String> params = authorizeParams(embedCodes);
     params.put("device", playerInfo.getDevice());
+    //TODO: Please uncomment after SAS gets changed to HOOK params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
 
     if (playerInfo.getSupportedFormats() != null)
       params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
@@ -632,8 +633,8 @@ class PlayerAPIClient {
     return _heartbeatInterval;
   }
 
-  public void setLoki() {
-    _isLoki = true;
+  public void setHook() {
+    _isHook = true;
   }
 
   public OoyalaAPIHelper getAPIHelper() {

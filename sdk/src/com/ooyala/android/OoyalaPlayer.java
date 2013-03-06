@@ -308,9 +308,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     setLayoutController(lc);
   }
 
-  public void setLoki()
+  public void setHook()
   {
-    _playerAPIClient.setLoki();
+    _playerAPIClient.setHook();
   }
   /**
    * Set the layout controller from which the OoyalaPlayer should fetch the layout to display to.
