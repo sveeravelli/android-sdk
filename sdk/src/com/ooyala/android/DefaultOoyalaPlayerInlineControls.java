@@ -34,6 +34,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private ProgressBar _spinner = null;
   private boolean _wasPlaying;
   private boolean _seeking;
+  private boolean _fullscreenButtonShowing = true;
 
   public DefaultOoyalaPlayerInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
@@ -47,8 +48,10 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     if (_playPause != null) {
       _playPause.setPlaying(_player.isPlaying());
     }
+
     if (_fullscreen != null) {
       _fullscreen.setFullscreen(_player.isFullscreen());
+      _fullscreen.setVisibility(_fullscreenButtonShowing ? View.VISIBLE : View.GONE);
     }
 
     if (_seekWrapper != null && _player.getCurrentItem() != null) {
@@ -277,4 +280,8 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     return (PREFERRED_BUTTON_HEIGHT_DP + MARGIN_SIZE_DP * 4);
   }
 
+  @Override
+  public void setFullscreenButtonShowing(boolean showing) {
+    _fullscreenButtonShowing = showing;
+  }
 }

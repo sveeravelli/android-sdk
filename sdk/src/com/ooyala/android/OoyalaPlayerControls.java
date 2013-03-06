@@ -37,4 +37,5 @@ public interface OoyalaPlayerControls extends Observer {
    */
   public int bottomBarOffset();
 
+  public void setFullscreenButtonShowing(boolean showing);
 }

@@ -35,6 +35,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private ProgressBar _spinner = null;
   private boolean _wasPlaying;
   private boolean _seeking;
+  private boolean _fullscreenButtonShowing = true;
 
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
@@ -50,8 +51,14 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
 
   @Override
   protected void updateButtonStates() {
-    _playPause.setPlaying(_player.isPlaying());
-    _fullscreen.setFullscreen(_player.isFullscreen());
+    if (_playPause != null) {
+      _playPause.setPlaying(_player.isPlaying());
+    }
+
+    if (_fullscreen != null) {
+      _fullscreen.setFullscreen(_player.isFullscreen());
+      _fullscreen.setVisibility(_fullscreenButtonShowing ? View.VISIBLE : View.GONE);
+    }
 
     if (_seekWrapper != null && _player.getCurrentItem() != null) {
       if(_player.getCurrentItem().isLive()) {
@@ -306,4 +313,10 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     int pixelValue = OVERLAY_PREFERRED_BUTTON_HEIGHT_DP + OVERLAY_MARGIN_SIZE_DP * 4;
     return Images.dpToPixels(_baseLayout.getContext(), pixelValue);
   }
+
+  @Override
+  public void setFullscreenButtonShowing(boolean showing) {
+    _fullscreenButtonShowing = showing;
+  }
+
 }

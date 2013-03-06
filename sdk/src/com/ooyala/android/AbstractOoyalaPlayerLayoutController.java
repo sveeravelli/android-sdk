@@ -22,6 +22,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected OoyalaPlayerControls _inlineOverlay = null;
   protected OoyalaPlayerControls _fullscreenOverlay = null;
   protected OoyalaPlayer _player = null;
+  protected boolean _fullscreenButtonShowing = true;
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
@@ -142,10 +143,12 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   public void setInlineControls(OoyalaPlayerControls controls) {
     _inlineControls = controls;
+    _inlineControls.setFullscreenButtonShowing(_fullscreenButtonShowing);
   }
 
   public void setFullscreenControls(OoyalaPlayerControls controls) {
     _fullscreenControls = controls;
+    _fullscreenControls.setFullscreenButtonShowing(_fullscreenButtonShowing);
   }
 
   public OoyalaPlayerControls getControls() {
@@ -223,5 +226,19 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     });
     dialog = builder.create();
     dialog.show();
+  }
+
+  /**
+   * setFullscreenButtonShowing will enable and disable visibility of the fullscreen button
+   */
+  public void setFullscreenButtonShowing(boolean showing){
+
+    if (_inlineControls != null) {
+      _inlineControls.setFullscreenButtonShowing(showing);
+    }
+    if (_fullscreenControls != null) {
+      _fullscreenControls.setFullscreenButtonShowing(showing);
+    }
+    _fullscreenButtonShowing = showing;
   }
 }
