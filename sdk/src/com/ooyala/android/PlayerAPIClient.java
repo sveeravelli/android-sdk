@@ -24,7 +24,7 @@ class PlayerAPIClient {
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
   private boolean _isHook;
-  public static final String HOOK = "-hook";
+  public static final String HOOK = "-omp";
   private String _authToken = null; // ALWAYS use getters and setters for this
   protected int _heartbeatInterval = 300;
   protected Context _context;
