@@ -636,6 +636,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     addClosedCaptionsView();
 
+    // Player must have been initialized, as well as player's basePlayer, in order to continue
     if (p == null || p.getError() != null) { return null; }
     p.setSeekable(_seekable);
     return p;

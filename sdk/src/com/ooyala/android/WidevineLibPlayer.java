@@ -54,7 +54,13 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
 
-    _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+    WVStatus initStatus = _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+
+    // If we notice we're already initialized, we have to reset the WV object.
+    if (initStatus == WVStatus.AlreadyInitialized) {
+      _wvplayback.terminateSynchronous();
+      _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+    }
     _handler.sendEmptyMessage(INIT);
   }
 
