@@ -40,28 +40,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
     this.parent = parent;
 
-    HashMap<String, Object> options = new HashMap<String, Object>();
-    // this should point to SAS once we get the proxy up
-    String path = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
-            parent.getEmbedCode(), "widevine", "ooyala");
-
-    //  If SAS included a widevine server path, use that instead
-    if(_stream.getWidevineServerPath() != null) {
-      path = _stream.getWidevineServerPath();
-    }
-    options.put("WVPortalKey", "ooyala"); // add this value in SAS
-    options.put("WVDRMServer", path);
-    options.put("WVLicenseTypeKey", 3);
-
-    WVStatus initStatus = _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
-
-    // If we notice we're already initialized, we have to reset the WV object.
-    if (initStatus == WVStatus.AlreadyInitialized) {
-      _wvplayback.terminateSynchronous();
-      _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
-    }
-    _handler.sendEmptyMessage(INIT);
+    initializeWidevine();
   }
 
   @Override
@@ -81,6 +60,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
         //_handler.sendEmptyMessage(INIT);
 
         // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
+        WVStatus status = _wvplayback.registerAsset(_stream.decodedURL().toString());
+        status = _wvplayback.requestLicense(_stream.decodedURL().toString());
         _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
         Set<Stream> newStreams = new HashSet<Stream>();
         _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
@@ -118,6 +99,54 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     return true;
   }
 
+  private void initializeWidevine() {
+    HashMap<String, Object> options = new HashMap<String, Object>();
+    // this should point to SAS once we get the proxy up
+    String path = Constants.DRM_HOST
+        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
+            parent.getEmbedCode(), "widevine", "ooyala");
+
+    //  If SAS included a widevine server path, use that instead
+    if(_stream.getWidevineServerPath() != null) {
+      path = _stream.getWidevineServerPath();
+    }
+    options.put("WVPortalKey", "ooyala"); // add this value in SAS
+    options.put("WVDRMServer", path);
+    options.put("WVLicenseTypeKey", 3);
+
+    WVStatus initStatus = _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+
+    // If we notice we're already initialized, we have to reset the WV object.
+    if (initStatus == WVStatus.AlreadyInitialized) {
+      _wvplayback.terminateSynchronous();
+      _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+    }
+    _handler.sendEmptyMessage(INIT);
+  }
+
+  @Override
+  public void suspend(int millisToResume, State stateToResume) {
+    _wvplayback.terminateSynchronous();
+    super.suspend(millisToResume, stateToResume);
+  }
+
+
+  @Override
+  public void suspend() {
+    super.suspend();
+  }
+
+
+  @Override
+  public void resume() {
+    super.resume();
+  }
+
+  @Override
+  public void resume(int millisToResume, State stateToResume) {
+    initializeWidevine();
+    super.resume(millisToResume, stateToResume);
+  }
   @Override
   public void destroy() {
     _wvplayback.terminate();
