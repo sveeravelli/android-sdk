@@ -1435,7 +1435,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void setBasePlayer(StreamPlayer basePlayer) {
     _customBasePlayer = basePlayer;
-    _analytics.setUserAgent(basePlayer.getPlayerInfo().getUserAgent());
+
+    _analytics.setUserAgent(_customBasePlayer != null ?
+        _customBasePlayer.getPlayerInfo().getUserAgent() : null);
 
     if (getCurrentItem() == null) { return; }
 

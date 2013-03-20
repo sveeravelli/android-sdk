@@ -49,8 +49,11 @@ public class MoviePlayer extends Player implements Observer {
     _parent = parent;
     _streams = streams;
     _suspended = false;
-    _basePlayer = getPlayerForStreams(streams);
-    _basePlayer.addObserver(this);
+    if(_basePlayer == null)
+    {
+      _basePlayer = getPlayerForStreams(streams);
+      _basePlayer.addObserver(this);
+    }
     _basePlayer.init(parent, streams);
   }
 
@@ -71,8 +74,9 @@ public class MoviePlayer extends Player implements Observer {
     if (basePlayer == null) {
       _basePlayer = getPlayerForStreams(_streams);
     }
-
-    _basePlayer = basePlayer;
+    else {
+      _basePlayer = basePlayer;
+    }
     _basePlayer.addObserver(this);
 
     if (shouldResume) {
