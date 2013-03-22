@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvInputURL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="@string/str_AddURL" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/edtInputURL"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </EditText>
+
+        <TextView
+            android:id="@+id/tvSelectURL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select a URL on /sdcard/url.txt" />
+
+        <Spinner
+            android:id="@+id/spSelectURL"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+        
+        <TextView
+            android:id="@+id/tvSelectSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select a subtitle URL on /sdcard/ttml_url.txt" />
+
+        <Spinner
+            android:id="@+id/spSelectSubtitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+            
+    </LinearLayout>
+</ScrollView>

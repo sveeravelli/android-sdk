@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/black" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerInParent="true" >
+
+        <SurfaceView
+            android:id="@+id/svMain"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/transparent_background"
+            android:layout_centerInParent="true" >
+        </SurfaceView>
+
+    </RelativeLayout>
+
+    <TableLayout
+        android:id="@+id/tlTop"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/transparent_background"
+        android:orientation="horizontal"
+        android:paddingTop="32dp"
+        android:stretchColumns="1"
+        android:visibility="invisible" >
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/tvCurrentTime"
+                android:layout_width="55dp"
+                android:layout_height="38dp"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:text="0:11:10"
+                android:textStyle="bold" />
+
+            <SeekBar
+                android:id="@+id/sbMain"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:max="100"
+                android:paddingBottom="2dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="2dp"
+                android:progress="0"
+                android:thumb="@drawable/seek" />
+
+            <TextView
+                android:id="@+id/tvTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="1:49:00"
+                android:textStyle="bold" />
+        </TableRow>
+    </TableLayout>
+    
+    <RelativeLayout
+        android:id="@+id/rlBottom"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/transparent"
+        android:layout_below="@id/tlTop">
+        <ImageButton
+            android:id="@+id/ibPlayPause"
+            android:layout_width="116dp"
+            android:layout_height="116dp"
+             android:layout_centerInParent="true"
+            android:background="@drawable/transparent_background"
+            android:src="@drawable/pause_button" >
+        </ImageButton>
+        
+        <RelativeLayout
+            android:id="@+id/rlLeft"
+            android:layout_width="280dp"
+            android:layout_height="217dp"
+            android:layout_marginBottom="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/transparent" >
+            
+            <RelativeLayout
+                android:id="@+id/rlChannel"
+                android:layout_width="20dp"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_player_left_channel_off" >
+
+            </RelativeLayout>
+            
+            <ListView
+                android:id="@+id/lvChannel"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_toRightOf="@id/rlChannel"
+                android:background="#55000000"
+                android:cacheColorHint="#00000000"
+                android:divider="@drawable/bg_horizontal_divider"
+                android:visibility="invisible" >
+
+            </ListView>
+            
+        </RelativeLayout>
+          
+        
+        <RelativeLayout
+            android:id="@+id/rlRight"
+            android:layout_width="226dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent" >
+
+            <ScrollView
+                android:id="@+id/svRight"
+                android:layout_width="fill_parent"
+                android:layout_height="217dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="40dp"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                android:visibility="visible" >
+
+                <LinearLayout
+                    android:id="@+id/llRight"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:orientation="vertical" >
+
+                    <RelativeLayout
+                        android:id="@+id/rlCloseCaptionSelector"
+                        android:layout_width="fill_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="28dp"
+                        android:background="@android:color/transparent" >
+
+                        <ImageButton
+                            android:id="@+id/ibCloseCaptionSelector"
+                            android:layout_width="66dp"
+                            android:layout_height="fill_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/selector_btn_ccselector"
+                            android:contentDescription="@string/str_option" >
+                        </ImageButton>
+
+                        <HorizontalScrollView
+                            android:id="@+id/hsvCloseCaptionSelectorPopupMenu"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_toLeftOf="@id/ibCloseCaptionSelector"
+                            android:scrollbars="none"
+                            android:visibility="invisible" >
+
+                            <LinearLayout
+                                android:id="@+id/llCloseCaptionSelectorPopupMenu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_gravity="left"
+                                android:background="@android:color/transparent"
+                                android:gravity="right"
+                                android:layoutAnimation="@anim/la_fadein_reverse"
+                                android:orientation="horizontal" >
+                            </LinearLayout>
+                        </HorizontalScrollView>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/rlBpsQuality"
+                        android:layout_width="fill_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="28dp"
+                        android:background="@android:color/transparent" >
+
+                        <ImageButton
+                            android:id="@+id/ibBpsQuality"
+                            android:layout_width="66dp"
+                            android:layout_height="fill_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/selector_btn_bpsquality"
+                            android:contentDescription="@string/str_option" >
+                        </ImageButton>
+
+                        <HorizontalScrollView
+                            android:id="@+id/hsvBpsQualityPopupMenu"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_toLeftOf="@id/ibBpsQuality"
+                            android:scrollbars="none"
+                            android:visibility="invisible" >
+
+                            <LinearLayout
+                                android:id="@+id/llBpsQualityPopupMenu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_gravity="left"
+                                android:background="@android:color/transparent"
+                                android:gravity="right"
+                                android:layoutAnimation="@anim/la_fadein_reverse"
+                                android:orientation="horizontal" >
+                            </LinearLayout>
+                        </HorizontalScrollView>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/rlAudioTrack"
+                        android:layout_width="fill_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="28dp"
+                        android:background="@android:color/transparent" >
+
+                        <ImageButton
+                            android:id="@+id/ibAudioTrack"
+                            android:layout_width="66dp"
+                            android:layout_height="fill_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/selector_btn_audiotrack"
+                            android:contentDescription="@string/str_option" >
+                        </ImageButton>
+
+                        <HorizontalScrollView
+                            android:id="@+id/hsvAudioTrackPopupMenu"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_toLeftOf="@id/ibAudioTrack"
+                            android:scrollbars="none"
+                            android:visibility="invisible" >
+
+                            <LinearLayout
+                                android:id="@+id/llAudioTrackPopupMenu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_gravity="left"
+                                android:gravity="right"
+                                android:layoutAnimation="@anim/la_fadein_reverse"
+                                android:orientation="horizontal" >
+                            </LinearLayout>
+                        </HorizontalScrollView>
+                    </RelativeLayout>
+                </LinearLayout>
+            </ScrollView>
+        </RelativeLayout>
+    
+    </RelativeLayout>
+    
+    <ProgressBar
+        android:id="@+id/pbBuffer"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" >
+    </ProgressBar>
+  
+</RelativeLayout>
