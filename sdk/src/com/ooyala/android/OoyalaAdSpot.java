@@ -107,7 +107,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   public boolean fetchPlaybackInfo() {
     if (_authCode != AuthCode.NOT_REQUESTED) { return true; }
     try {
-      return _api.authorize(this);
+      return _api.authorize(this, StreamPlayer.defaultPlayerInfo);
     } catch (OoyalaException e) {
       System.out.println("Unable to fetch playback info: " + e.getMessage());
       return false;
