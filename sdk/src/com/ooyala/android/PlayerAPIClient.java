@@ -256,8 +256,7 @@ class PlayerAPIClient {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     Map<String, String> params = authorizeParams(embedCodes);
-    params.put("device", playerInfo.getDevice());
-    //TODO: Please uncomment after SAS gets changed to HOOK params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
+    params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
 
     if (playerInfo.getSupportedFormats() != null)
       params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
