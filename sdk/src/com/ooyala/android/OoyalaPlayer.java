@@ -736,7 +736,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * completely deconstructs the view so the layout can be changed.
    */
   public void suspend() {
-    _playQueued = false;
     if (currentPlayer() != null) {
       currentPlayer().suspend();
       removeClosedCaptionsView();
