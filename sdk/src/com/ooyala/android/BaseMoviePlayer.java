@@ -35,6 +35,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     OnPreparedListener, OnVideoSizeChangedListener, OnInfoListener, OnSeekCompleteListener,
     SurfaceHolder.Callback {
 
+  private static final String TAG = BaseMoviePlayer.class.getName();
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -49,7 +50,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     Stream stream =  Stream.bestStream(streams);
     if (stream == null) {
-      Log.e(this.getClass().getName(), "ERROR: Invalid Stream (no valid stream available)");
+      Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
@@ -198,7 +199,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   public boolean onError(MediaPlayer mp, int what, int extra) {
     this._error = "MediaPlayer Error: " + what + " " + extra;
     if (what == -10 && extra == -10) {  //I think this means unsupported format
-      Log.e(this.getClass().getName(), "Unsupported video type given to base media player");
+      Log.e(TAG, "Unsupported video type given to base media player");
     }
     setState(State.ERROR);
     return false;
@@ -226,6 +227,18 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   }
 
   @Override
+  public boolean onInfo(MediaPlayer mp, int what, int extra) {
+
+    //These refer to when mid-playback buffering happens.  This doesn't apply to initial buffer
+    if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+      Log.d(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
+    } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+      Log.d(TAG, "onInfo: Buffering Done! " + what + ", extra: " + extra);
+    }
+    return true;
+  }
+
+  @Override
   public void onCompletion(MediaPlayer mp) {
     currentItemCompleted();
   }
@@ -249,7 +262,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    Log.i(this.getClass().getName(), "Surface Destroyed");
+    Log.i(TAG, "Surface Destroyed");
   }
 
   @Override
@@ -287,11 +300,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
     dequeuePlay();
-  }
-
-  @Override
-  public boolean onInfo(MediaPlayer arg0, int arg1, int arg2) {
-    return true;
   }
 
   @Override
