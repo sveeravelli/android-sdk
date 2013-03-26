@@ -745,6 +745,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       _suspendTime = System.currentTimeMillis();
       _authHeartbeat.stop();
     }
+    setState(State.SUSPENDED);
   }
 
   /**
@@ -787,6 +788,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (currentPlayer() != null) {
       currentPlayer().resume();
       addClosedCaptionsView();
+      setState(currentPlayer().getState());
     }
   }
 
