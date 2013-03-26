@@ -1094,7 +1094,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
-            if (!playAdsBeforeTime(this._lastPlayedTime)) {
+            if (!playAdsBeforeTime(this._lastPlayedTime) && _player != null) {
               if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
