@@ -197,6 +197,9 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
     this._error = "MediaPlayer Error: " + what + " " + extra;
+    if (what == -10 && extra == -10) {  //I think this means unsupported format
+      Log.e(this.getClass().getName(), "Unsupported video type given to base media player");
+    }
     setState(State.ERROR);
     return false;
   }

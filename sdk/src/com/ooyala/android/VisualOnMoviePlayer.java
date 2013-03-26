@@ -642,12 +642,12 @@ private void setupView() {
       onError(_player, 1, 0);
       return 0;
     } else if (id == voOSType.VOOSMP_CB_PlayComplete) {
-      Log.v(TAG, "onEvent: Play Complete");
+      Log.d(TAG, "onEvent: Play Complete");
       currentItemCompleted();
       return 0;
     } else if (id == voOSType.VOOSMP_CB_SeekComplete) // Seek (SetPos) complete
     {
-      Log.v(TAG, "onEvent: Seek Complete");
+      Log.d(TAG, "onEvent: Seek Complete");
       dequeuePlay();
       return 0;
     } else if (id == voOSType.VOOSMP_CB_BufferStatus) // Updated buffer status
@@ -666,13 +666,13 @@ private void setupView() {
               ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 
       return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Vid seteo buffering
-                                                       // stopped
+    } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Video buffering stop
     {
+      Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
       return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoStartBuff) // Video buffering
-                                                        // started
+    } else if (id == voOSType.VOOSMP_CB_VideoStartBuff) // Video buffering start
     {
+      Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
       return 0;
     } else if (id == voOSType.VOOSMP_SRC_CB_Connection_Fail
         || id == voOSType.VOOSMP_SRC_CB_Download_Fail
@@ -697,7 +697,7 @@ private void setupView() {
           "OnEvent VOOSMP_SRC_CB_Download_Fail_Recover_Success, param is %d . "
               + param1);
     } else if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
-      Log.v(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
+      Log.d(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
     } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData) { //CC data
 
       // Remember if we have received live closed captions at some point during playback
