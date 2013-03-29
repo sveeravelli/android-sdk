@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.visualon.OSMPUtils.voOSType;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -255,9 +256,9 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    if (_state == State.LOADING) {
-      createMediaPlayer();
-    }
+    Log.i(TAG, "Surface Created");
+
+    createMediaPlayer();
   }
 
   @Override

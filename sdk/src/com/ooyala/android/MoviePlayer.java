@@ -135,11 +135,8 @@ public class MoviePlayer extends Player implements Observer {
     _suspended = false;
     if (_basePlayer != null) {
       _basePlayer.addObserver(this);
-      _basePlayer.init(_parent, _streams);
-      if (stateToResume == State.PLAYING) {
-        _basePlayer.seekToTime(millisToResume);
-        _basePlayer.play();
-      }
+
+      _basePlayer.resume(millisToResume, stateToResume);
     }
   }
 

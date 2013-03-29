@@ -373,9 +373,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       return;
     }
 
-    if (_state == State.LOADING) {
-      createMediaPlayer();
-    }
+    createMediaPlayer();
   }
 
   @Override
@@ -479,21 +477,24 @@ private void setupView() {
 
   @Override
   public void resume(int millisToResume, State stateToResume) {
-    resume();
-  }
+    _timeBeforeSuspend = millisToResume;
+    _stateBeforeSuspend = stateToResume;
 
-  public void resume() {
     Log.v(TAG, "Player Resume");
     if (_state != State.SUSPENDED) {
       return;
     }
-    setState(State.LOADING);
+
     setupView();
     if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
       play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
       queueCompleted();
     }
+  }
+
+  public void resume() {
+    resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
   @Override
