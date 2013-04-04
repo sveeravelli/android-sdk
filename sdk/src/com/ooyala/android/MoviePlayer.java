@@ -15,7 +15,6 @@ public class MoviePlayer extends Player implements Observer {
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
   private boolean _suspended = true;
-  private String error = null;
 
 
   /**
@@ -47,8 +46,8 @@ public class MoviePlayer extends Player implements Observer {
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
    // super.init(parent, stream);
     if (streams == null || streams.size() == 0) {
-      error = "There are no streams to play";
-      Log.e(this.getClass().toString(), error);
+      _error = "There are no streams to play";
+      Log.e(this.getClass().toString(), _error);
       return;
     }
 
@@ -172,7 +171,7 @@ public class MoviePlayer extends Player implements Observer {
   public void seekToTime(int timeInMillis) { _basePlayer.seekToTime(timeInMillis); }
   public State getState() { return _basePlayer.getState(); }
   protected void setState(State state) { _basePlayer.setState(state); }
-  public String getError() { return _basePlayer != null ? _basePlayer.getError() : error; }
+  public String getError() { return _basePlayer != null ? _basePlayer.getError() : _error; }
   public int getBufferPercentage() { return _basePlayer.getBufferPercentage(); }
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer.isLiveClosedCaptionsAvailable(); }
   public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }

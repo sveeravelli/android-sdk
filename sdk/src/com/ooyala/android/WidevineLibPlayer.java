@@ -48,11 +48,11 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     Log.d("Widevine", event.toString() + ": " + attributes.toString());
     switch (event) {
       case InitializeFailed:
-        this._error = "Widevine Initialization Failed";
+        if (this._error == null) this._error = "Widevine Initialization Failed";
       case LicenseRequestFailed:
-        this._error = "Widevine License Request Failed";
+        if (this._error == null) this._error = "Widevine License Request Failed";
       case PlayFailed:
-        this._error = "Widevine Playback Failed";
+        if (this._error == null) this._error = "Widevine Playback Failed";
         _handler.sendEmptyMessage(ERROR);
         if (attributes.containsKey("WVStatusKey")) return (WVStatus) attributes.get("WVStatusKey");
         else return WVStatus.OK;
