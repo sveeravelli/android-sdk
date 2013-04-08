@@ -245,9 +245,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   }
 
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-    if (_width == 0 && _height == 0 && height > 0) {
-      setVideoSize(width, height);
-    }
+    setVideoSize(width, height);
   }
 
   @Override
