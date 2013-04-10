@@ -1,8 +1,6 @@
 package com.ooyala.android;
 
-import android.R;
 import android.app.Dialog;
-import android.graphics.Color;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -128,7 +126,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
         _player.deleteObserver(_fullscreenControls);
       }
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
-      _fullscreenDialog = new Dialog(_layout.getContext(), R.style.Theme_Black_NoTitleBar_Fullscreen) {
+      _fullscreenDialog = new Dialog(_layout.getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
         @Override
         public void onBackPressed() {
           if (_player.isFullscreen()) {

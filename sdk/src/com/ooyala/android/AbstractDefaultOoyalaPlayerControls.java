@@ -36,13 +36,16 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   }
 
   // This is required because android enjoys making things difficult. talk to jigish if you got issues.
-  protected final Handler _hideHandler = new Handler() {
-    public void handleMessage(Message msg) {
+  protected final Handler _hideHandler = new Handler(new Handler.Callback() {
+
+    @Override
+    public boolean handleMessage(Message msg) {
       if (_player.isPlaying()) {
         hide();
       }
+      return false;
     }
-  };
+  });
 
   protected class TouchButton extends ImageButton {
     protected boolean _touching = false;

@@ -7,7 +7,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   public static enum DefaultControlStyle {

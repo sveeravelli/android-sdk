@@ -18,7 +18,7 @@ public class OrderedMap<K, V extends OrderedMapValue<K>> implements Iterable<V> 
     int i = 0;
     _keyToIndex.clear();
     for (V e : _array) {
-      _keyToIndex.put(e.getKey(), new Integer(i++));
+      _keyToIndex.put(e.getKey(), Integer.valueOf(i++));
     }
   }
 
@@ -39,7 +39,7 @@ public class OrderedMap<K, V extends OrderedMapValue<K>> implements Iterable<V> 
 
   public boolean add(V e) {
     _map.put(e.getKey(), e);
-    _keyToIndex.put(e.getKey(), new Integer(_array.size()));
+    _keyToIndex.put(e.getKey(), Integer.valueOf(_array.size()));
     _array.add(e);
     return true;
   }

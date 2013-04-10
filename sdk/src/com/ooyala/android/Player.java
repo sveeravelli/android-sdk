@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-import android.R.bool;
 import android.view.SurfaceView;
 import android.view.View;
 

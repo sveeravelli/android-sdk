@@ -19,6 +19,7 @@ import org.xml.sax.InputSource;
 
 import org.json.*;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.ooyala.android.Constants.ReturnState;
@@ -174,6 +175,7 @@ public class ClosedCaptions {
    * @param language the language to fetch the Caption objects for
    * @return a list of Caption objects
    */
+  @SuppressLint("DefaultLocale")
   public List<Caption> closedCaptionsForLanguage(String language) {
     return _captions.get(language.toLowerCase());
   }

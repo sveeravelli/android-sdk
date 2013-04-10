@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
-import com.visualon.OSMPUtils.voOSType;
 
 /**
  * A wrapper around android.media.MediaPlayer

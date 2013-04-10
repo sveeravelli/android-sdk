@@ -3,11 +3,13 @@ package com.ooyala.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+@SuppressLint("SetJavaScriptEnabled")
 public class Analytics {
   private boolean _ready = false;
   private boolean _failed = false;

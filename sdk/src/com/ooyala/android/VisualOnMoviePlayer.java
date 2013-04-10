@@ -20,7 +20,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -58,7 +57,6 @@ class VisualOnMoviePlayer extends StreamPlayer implements
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
-  private boolean mTrackProgressing = false;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
 
@@ -70,8 +68,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
   {
     try {
       InputStream InputStreamis  = context.getAssets().open(filename);
-      File desFile = new File("/data/data/" +
-            context.getPackageName() + "/" + desName);
+      File desFile = new File(context.getFilesDir().getParentFile().getPath() + "/" + desName);
       desFile.createNewFile();
       FileOutputStream  fos = new FileOutputStream(desFile);
       int bytesRead;
@@ -101,13 +98,15 @@ class VisualOnMoviePlayer extends StreamPlayer implements
 
   // This is required because android enjoys making things difficult. talk to
   // jigish if you got issues.
-  private final Handler _playheadUpdateTimerHandler = new Handler() {
-    public void handleMessage(Message msg) {
+  private final Handler _playheadUpdateTimerHandler = new Handler(new Handler.Callback() {
+
+    @Override
+    public boolean handleMessage(Message msg) {
       setChanged();
       notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+      return false;
     }
-  };
-
+  });
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -271,8 +270,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       int nParam = voOSType.VOOSMP_VOME2_PLAYER;
 
       // Location of libraries
-      String apkPath = "/data/data/"
-          + _parent.getLayout().getContext().getPackageName() + "/lib/";
+      String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib";
 
       // Initialize SDK player
       int nRet = _player.Init(_parent.getLayout().getContext(), apkPath, null,
@@ -320,7 +318,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       _player.SetParam(voOSType.VOOSMP_PID_CLOSED_CAPTION_OUTPUT, 1);
 
       /* Processor-specific settings */
-        String cfgPath = "/data/data/" + _parent.getLayout().getContext().getPackageName() + "/";
+        String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
         String capFile = cfgPath + "cap.xml";
         _player.SetParam(voOSType.VOOSMP_SRC_PID_CAP_TABLE_PATH, capFile);
 
@@ -390,8 +388,9 @@ class VisualOnMoviePlayer extends StreamPlayer implements
     super.setParent(parent);
   }
 
+  @SuppressWarnings("deprecation")
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-private void setupView() {
+  private void setupView() {
     if (_view != null) {
       Log.e(TAG, "DANGER DANGER: setupView while we still have a view");
       return;

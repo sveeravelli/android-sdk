@@ -14,6 +14,7 @@ import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
@@ -1206,7 +1207,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   /**
    * @return get the bitrate of the current item
    */
-  @TargetApi(10)
+  @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
   public double getBitrate() {
     if (getCurrentItem() == null || Stream.bestStream(getCurrentItem().getStreams()) == null) { return -1; }
     if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {

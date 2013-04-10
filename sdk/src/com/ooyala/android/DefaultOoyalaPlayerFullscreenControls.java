@@ -3,6 +3,7 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Observer;
 
+import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -49,6 +50,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
     setupControls();
   }
 
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   @Override
   protected void updateButtonStates() {
     if (_playPause != null) {

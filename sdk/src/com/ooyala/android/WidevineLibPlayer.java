@@ -60,8 +60,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
         //_handler.sendEmptyMessage(INIT);
 
         // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
-        WVStatus status = _wvplayback.registerAsset(_stream.decodedURL().toString());
-        status = _wvplayback.requestLicense(_stream.decodedURL().toString());
+        _wvplayback.registerAsset(_stream.decodedURL().toString());
+        _wvplayback.requestLicense(_stream.decodedURL().toString());
         _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
         Set<Stream> newStreams = new HashSet<Stream>();
         _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
