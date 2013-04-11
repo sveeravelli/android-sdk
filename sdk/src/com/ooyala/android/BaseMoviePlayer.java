@@ -215,7 +215,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     }
     if (_timeBeforeSuspend > 0) {
       seekToTime(_timeBeforeSuspend);
-      _timeBeforeSuspend = -1;
     }
     setState(State.READY);
   }
@@ -306,6 +305,18 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
+
+    //For m3u8s on 3+ phones, seeking before start() doesn't work.  If we're told seek is done
+    // but seek isn't actaully done, try it again
+    if(_player.getCurrentPosition() < _timeBeforeSuspend) {
+      Log.i(this.getClass().getName(), "Seek failed, Try again");
+      _player.seekTo(_timeBeforeSuspend);
+    }
+
+    // Seeking SHOULD work if our duration actually exists.  This is just in case, so we don't infinite loop
+    if (_player.getDuration() != 0) {
+      _timeBeforeSuspend = -1;
+    }
     dequeuePlay();
   }
 
