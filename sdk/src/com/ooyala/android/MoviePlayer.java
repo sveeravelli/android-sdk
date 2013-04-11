@@ -15,7 +15,6 @@ public class MoviePlayer extends Player implements Observer {
   private Set<Stream> _streams;
   private boolean _suspended = true;
 
-
   /**
    * Check which base player would be best suited for this MoviePlayer
    * @param streams
@@ -53,11 +52,10 @@ public class MoviePlayer extends Player implements Observer {
     _parent = parent;
     _streams = streams;
     _suspended = false;
-    if(_basePlayer == null)
-    {
+    if(_basePlayer == null) {
       _basePlayer = getPlayerForStreams(streams);
-      _basePlayer.addObserver(this);
     }
+    _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
   }
 
@@ -81,7 +79,7 @@ public class MoviePlayer extends Player implements Observer {
     else {
       _basePlayer = basePlayer;
     }
-    _basePlayer.addObserver(this);
+    _basePlayer.init(_parent, _streams);
 
     if (shouldResume) {
       resume();
