@@ -504,7 +504,6 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       _player = null;
     }
     removeView();
-    _parent = null;
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
