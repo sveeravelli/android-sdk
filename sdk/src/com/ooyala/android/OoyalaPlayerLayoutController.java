@@ -125,6 +125,9 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
       if (_fullscreenControls != null) {
         _player.deleteObserver(_fullscreenControls);
       }
+
+      _inlineControls.setVisible(true);
+
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
       _fullscreenDialog = new Dialog(_layout.getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
         @Override
@@ -142,6 +145,9 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
       _fullscreenLayout.setLayoutController(this);
       _fullscreenDialog.setContentView(_fullscreenLayout);
       _fullscreenDialog.show();
+
+      _inlineControls.setVisible(false);
+
       setFullscreenControls(createDefaultControls(_fullscreenLayout, true));
       controlsToShow = _fullscreenControls;
       if (_fullscreenOverlay != null) {

@@ -37,5 +37,13 @@ public interface OoyalaPlayerControls extends Observer {
    */
   public int bottomBarOffset();
 
+  /**
+   * Enable or disable the fullscreen button
+   */
   public void setFullscreenButtonShowing(boolean showing);
+
+  /**
+   * Enable or disable all controls
+   */
+  public void setVisible(boolean visible);
 }

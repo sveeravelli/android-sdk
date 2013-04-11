@@ -35,6 +35,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   private boolean _wasPlaying;
   private boolean _seeking;
   private boolean _fullscreenButtonShowing = true;
+  private boolean _isVisible = true;
 
   public DefaultOoyalaPlayerInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
@@ -254,7 +255,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
       updateButtonStates();
 
-      if (currentState == State.INIT || currentState == State.LOADING) {
+      if ((currentState == State.INIT || currentState == State.LOADING) && _isVisible) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);
@@ -283,5 +284,9 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
   @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
+  }
+
+  public void setVisible(boolean visible) {
+    _isVisible = visible;
   }
 }
