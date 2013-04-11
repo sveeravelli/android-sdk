@@ -45,10 +45,11 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   private boolean _completedQueued = false;
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
+  Stream stream = null;
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-    Stream stream =  Stream.bestStream(streams);
+    stream =  Stream.bestStream(streams);
     if (stream == null) {
       Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
@@ -273,6 +274,14 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   private void setupView() {
     createView(_parent.getLayout().getContext());
     _parent.getLayout().addView(_view);
+
+    // Try to figure out the video size.  If not, use our default
+    if (stream.getWidth() > 0 && stream.getHeight() > 0) {
+      setVideoSize(stream.getWidth(), stream.getHeight());
+    } else {
+      setVideoSize(16,9);
+    }
+
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
