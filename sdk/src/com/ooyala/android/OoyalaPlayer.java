@@ -752,7 +752,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * Resume the current video from a suspended state
    */
   public void resume() {
-    if (getCurrentItem().isHeartbeatRequired()) {
+    if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime + (_playerAPIClient._heartbeatInterval * 1000)) {
         cancelOpenTasks();
         final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
