@@ -34,7 +34,11 @@ public class MoviePlayer extends Player implements Observer {
             .toString().contains("m3u8"))
         )
        ) {
-      player =  new VisualOnMoviePlayer();
+      try {
+        player =  new VisualOnMoviePlayer();
+      } catch(NoClassDefFoundError e) {
+        return null;
+      }
     } else {
       player = new BaseMoviePlayer();
     }
