@@ -644,11 +644,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
   private Player initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
     p.addObserver(this);
-    /*
     if(_customBasePlayer != null) {
       p.setBasePlayer(_customBasePlayer);
     }
-    */
     p.init(this, ad);
     return p;
   }
@@ -1465,11 +1463,10 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         if (_player != null) {
           _player.setBasePlayer(_customBasePlayer);
         }
-/*
+
         if (_adPlayer != null) {
           _adPlayer.setBasePlayer(_customBasePlayer);
         }
-        */
       }
 
     }));
