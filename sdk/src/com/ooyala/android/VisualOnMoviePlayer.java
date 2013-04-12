@@ -270,7 +270,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       int nParam = voOSType.VOOSMP_VOME2_PLAYER;
 
       // Location of libraries
-      String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib";
+      String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
 
       // Initialize SDK player
       int nRet = _player.Init(_parent.getLayout().getContext(), apkPath, null,
