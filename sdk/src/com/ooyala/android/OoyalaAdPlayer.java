@@ -21,22 +21,24 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     }
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
-    if (_ad.getStream() == null) {
+    if (_ad.getStream() == null || getBasePlayer() != null) {
       if (_fetchTask != null) {
         this._parent.getPlayerAPIClient().cancel(_fetchTask);
       }
-      _fetchTask = _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
+      PlayerInfo info = getBasePlayer() != null ? getBasePlayer().getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
+
+      _fetchTask = _ad._api.authorize(_ad, info, new AuthorizeCallback() {
 
         @Override
-        public void callback(boolean result) {
-          if (!result) {
+        public void callback(boolean result, OoyalaException error) {
+          if (error != null || !_ad.isAuthorized()) {
             _error = "Error fetching VAST XML";
             setState(State.ERROR);
             return;
+          } else {
+            initAfterFetch(parent);
           }
-          initAfterFetch(parent);
         }
-
       });
       return;
     }
@@ -57,6 +59,34 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
   public OoyalaAdSpot getAd() {
     return _ad;
+  }
+
+  @Override
+  public void setBasePlayer(StreamPlayer basePlayer) {
+    if (_ad == null) {
+      setBasePlayer2(basePlayer);
+      return;
+    }
+
+    PlayerInfo info = basePlayer != null ? basePlayer.getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
+    final StreamPlayer player = basePlayer;
+
+    _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+
+      @Override
+      public void callback(boolean result, OoyalaException error) {
+        if (error != null || !_ad.isAuthorized()) {
+          return;
+        } else {
+          setBasePlayer2(player);
+        }
+      }
+    });
+  }
+
+  // we can't access super in an anonymous class
+  private void setBasePlayer2(StreamPlayer basePlayer) {
+    super.setBasePlayer(basePlayer);
   }
 
   @Override

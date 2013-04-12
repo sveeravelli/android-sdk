@@ -73,13 +73,8 @@ public class MoviePlayer extends Player implements Observer {
     if (shouldResume) {
       suspend();
     }
-    if (basePlayer == null) {
-      _basePlayer = getPlayerForStreams(_streams);
-    }
-    else {
-      _basePlayer = basePlayer;
-    }
-    _basePlayer.init(_parent, _streams);
+
+    _basePlayer = basePlayer != null ? basePlayer : getPlayerForStreams(_streams);
 
     if (shouldResume) {
       resume();
@@ -91,7 +86,6 @@ public class MoviePlayer extends Player implements Observer {
     if (_basePlayer != null) {
       _basePlayer.reset();
     }
-
   }
 
   @Override
@@ -129,11 +123,9 @@ public class MoviePlayer extends Player implements Observer {
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
     _suspended = false;
-    if (_basePlayer != null) {
-      _basePlayer.addObserver(this);
-
-      _basePlayer.resume(millisToResume, stateToResume);
-    }
+    _basePlayer.init(_parent, _streams);
+    _basePlayer.addObserver(this);
+    _basePlayer.resume(millisToResume, stateToResume);
   }
 
   @Override
