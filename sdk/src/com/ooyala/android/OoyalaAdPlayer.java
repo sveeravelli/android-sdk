@@ -21,6 +21,13 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     }
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
+
+    //If this ad tried to authorize and failed
+    if(!_ad.isAuthorized() && _ad.getAuthCode() > 0) {
+      this._error = "This ad was unauthorized to play";
+      this._state = State.ERROR;
+      return;
+    }
     if (_ad.getStream() == null || getBasePlayer() != null) {
       if (_fetchTask != null) {
         this._parent.getPlayerAPIClient().cancel(_fetchTask);

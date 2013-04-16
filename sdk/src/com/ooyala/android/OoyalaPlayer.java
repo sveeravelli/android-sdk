@@ -957,7 +957,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     initializeAdPlayer(_adPlayer, ad);
 
-    if (_adPlayer == null || _adPlayer.getBasePlayer() == null || _adPlayer.getState() == State.ERROR) { return false; }
+    //The Ad initialization didn't work.  Destroy the _adPlayer and go back to playing the video
+    if (_adPlayer == null || _adPlayer.getBasePlayer() == null || _adPlayer.getState() == State.ERROR) {
+      Log.d(this.getClass().getName(), "Ad playback failed.  Continuing to play video");
+      _adPlayer = null;
+      return false;
+    }
     _adPlayer.setSeekable(_adsSeekable);
 
 
