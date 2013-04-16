@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 /**
  * Stores the info and metatdata for the specified movie.
- * 
+ *
  */
 public interface AuthorizableItem {
   /**
@@ -51,6 +51,29 @@ public interface AuthorizableItem {
     public static int MAX_AUTH_CODE = 16;
   }
 
+  /*
+   * Text descriptions of the auth responses
+   */
+  public static String[] authCodeDescription = {
+    "authorized",
+    "unauthorized parent",
+    "unauthorized domain",
+    "unauthorized location",
+    "current time is before the flight start time",
+    "current time is after the flight end time",
+    "current time is outside any availability period",
+    "this is not a recognized embed code",
+    "invalid signature",
+    "missing parameters",
+    "missing rule set",
+    "unauthorized",
+    "missing pcode",
+    "unauthorized device",
+    "invalid token",
+    "movie expired",
+    "Too many open videos. Close other videos on this account and try again in a few minutes",
+    "missing account id"
+   };
   /**
    * Whether or not this AuthorizableItem is authorized
    * @return true if authorized, false if not

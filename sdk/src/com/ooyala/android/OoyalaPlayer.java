@@ -34,53 +34,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     INIT, LOADING, READY, PLAYING, PAUSED, COMPLETED, SUSPENDED, ERROR
   };
 
-  /*
-   * Possible Authorziation responses from SAS.
-   */
-  public static enum authCode {
-    AUTHORIZED,
-    UNAUTHORIZED_PARENT,
-    UNAUTHORIZED_DOMAIN,
-    UNAUTHORIZED_LOCATION,
-    UNAUTHORIZED_DEVICE,
-    BEFORE_FLIGHT_TIME,
-    AFTER_FLIGHT_TIME,
-    OUTSIDE_RECURRING_FLIGHT_TIMES,
-    BAD_EMBED_CODE,
-    INVALID_SIGNATURE,
-    MISSING_PARAMS,
-    MISSING_RULE_SET,
-    UNAUTHORIZED,
-    MISSING_PCODE,
-    INVALID_TOKEN,
-    PROVIDER_DELETED,
-    TOO_MANY_ACTIVE_STREAMS,
-    MISSING_ACCOUNT_ID,
-  };
 
-  /*
-   * Text descriptions of the auth responses
-   */
-  public static String[] authCodeDescription = {
-    "authorized",
-    "unauthorized parent",
-    "unauthorized domain",
-    "unauthorized location",
-    "unauthorized device",
-    "current time is before the flight start time",
-    "current time is after the flight end time",
-    "current time is outside any availability period",
-    "this is not a recognized embed code",
-    "invalid signature",
-    "missing parameters",
-    "missing rule set",
-    "unauthorized",
-    "missing pcode",
-    "invalid token",
-    "movie expired",
-    "Too many open videos. Close other videos on this account and try again in a few minutes",
-    "missing account id"
-   };
   /**
    * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it
    * is set.
@@ -1561,13 +1515,13 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
 
     // Out of bounds of authCodes
-    if(currentItem.getAuthCode() < 0 || currentItem.getAuthCode() >= authCodeDescription.length) {
+    if(currentItem.getAuthCode() < 0 || currentItem.getAuthCode() >= AuthorizableItem.authCodeDescription.length) {
       Log.e(this.getClass().getName(), "Invalid Authorization Error Code");
       return null;
     }
 
     // Get description and make the exception
-    String description = "Authorization Error: "  + authCodeDescription[currentItem.getAuthCode()];
+    String description = "Authorization Error: "  + AuthorizableItem.authCodeDescription[currentItem.getAuthCode()];
     Log.e(this.getClass().toString(), "This video was not authorized! " + description);
     return new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, description);
   }
