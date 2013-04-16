@@ -112,11 +112,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     Log.d(this.getClass().getName(), "Using VOPlayer");
     Stream stream = null;
-    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS)) {
-      stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_HLS);
-    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET)) {
-      stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET);
-    }
+    stream = Stream.bestStream(streams);
 
     if (stream == null) {
       Log.e(this.getClass().getName(),
