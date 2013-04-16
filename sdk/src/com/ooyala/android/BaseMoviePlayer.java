@@ -112,6 +112,8 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void reset() {
     suspend(0, State.PAUSED);
+    setState(State.LOADING);
+    setupView();
     resume();
   }
 

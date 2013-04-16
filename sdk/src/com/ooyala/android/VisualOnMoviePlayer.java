@@ -205,6 +205,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
   @Override
   public void reset() {
     suspend(0, State.PAUSED);
+    setupView();
     resume();
   }
 
