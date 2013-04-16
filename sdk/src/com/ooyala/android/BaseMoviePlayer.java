@@ -65,6 +65,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     setState(State.LOADING);
     _streamUrl = stream.getUrlFormat().equals(Constants.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
     setParent(parent);
+    setupView();
     if (_player != null) { _player.reset(); }
   }
 
@@ -266,7 +267,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void setParent(OoyalaPlayer parent) {
     super.setParent(parent);
-    setupView();
   }
 
   @SuppressWarnings("deprecation")
@@ -350,9 +350,6 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
-    if (_state != State.SUSPENDED) { return; }
-    setState(State.LOADING);
-    setupView();
     if (stateToResume == State.PLAYING) {
       queuePlay();
     } else if (stateToResume == State.COMPLETED) {

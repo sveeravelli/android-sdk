@@ -480,11 +480,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
     _stateBeforeSuspend = stateToResume;
 
     Log.v(TAG, "Player Resume");
-    if (_state != State.SUSPENDED) {
-      return;
-    }
 
-    setupView();
     if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
       play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
