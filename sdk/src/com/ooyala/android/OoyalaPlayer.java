@@ -1125,7 +1125,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               if (_player == null) {
                 _player = getCorrectMoviePlayer(_currentItem);
                 initializePlayer(_player, _currentItem);
-                dequeuePlay();
+                play();
               }
 
               //If these were post-roll ads, clean up.  Otherwise, resume playback
