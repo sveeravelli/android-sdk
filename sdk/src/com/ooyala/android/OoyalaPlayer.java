@@ -1508,20 +1508,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return a properly described OoyalaException
    */
   private OoyalaException getAuthError(Video currentItem) {
-    // Actually authorized
-    if(currentItem.getAuthCode() == 0) {
-      Log.e(this.getClass().getName(), "Trying to get Authorization Error for when asset is authorized!");
-      return null;
-    }
-
-    // Out of bounds of authCodes
-    if(currentItem.getAuthCode() < 0 || currentItem.getAuthCode() >= AuthorizableItem.authCodeDescription.length) {
-      Log.e(this.getClass().getName(), "Invalid Authorization Error Code");
-      return null;
-    }
-
     // Get description and make the exception
-    String description = "Authorization Error: "  + AuthorizableItem.authCodeDescription[currentItem.getAuthCode()];
+    String description = "Authorization Error: "  + ContentItem.getAuthError(currentItem.getAuthCode());
     Log.e(this.getClass().toString(), "This video was not authorized! " + description);
     return new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, description);
   }

@@ -24,7 +24,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     //If this ad tried to authorize and failed
     if(!_ad.isAuthorized() && _ad.getAuthCode() > 0) {
-      this._error = "This ad was unauthorized to play";
+      this._error = "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode());
       this._state = State.ERROR;
       return;
     }

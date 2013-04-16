@@ -232,4 +232,24 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   public boolean isHeartbeatRequired() {
     return _heartbeatRequired;
   }
+
+  /**
+   * Generate the authorization error of a video item.
+   * @param currentItem
+   * @return a properly described OoyalaException
+   */
+  public static String getAuthError(int authCode) {
+    // Actually authorized
+    if(authCode == 0) {
+      return "Video is authorized!";
+    }
+
+    // Out of bounds of authCodes
+    if(authCode < 0 || authCode >= ContentItem.authCodeDescription.length) {
+      return "Invalid Authorization Error Code";
+    }
+
+    // Get description and make the exception
+    return AuthorizableItem.authCodeDescription[authCode];
+  }
 }
