@@ -24,8 +24,8 @@ public class OmnitureSampleAppActivity extends Activity {
     setContentView(R.layout.main);
 
     TrackingHelper.configureAppMeasurement(this);
-    TrackingHelper.trackLogonEvent("THIS IS ANDROID!");
-    
+    TrackingHelper.configureMediaMeasurement();
+
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
         APIKEY, SECRET, PCODE, DOMAIN);
