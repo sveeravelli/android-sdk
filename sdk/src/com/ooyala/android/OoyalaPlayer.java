@@ -10,6 +10,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -59,6 +61,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
+  public static final String METADATA_READY_NOTIFICATION = "metadataReady";
 
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
   /**
@@ -100,6 +103,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private Handler _handler = new Handler();
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
+  private JSONObject _metadata = null;
   private OoyalaException _error = null;
   private ActionAtEnd _actionAtEnd;
   private MoviePlayer _player = null;
@@ -393,6 +397,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _playQueued = false;
     _queuedSeekTime = 0;
     cleanupPlayers();
+
+    // request content tree
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeWithAdSet(embedCodes, adSetCode, new ContentTreeCallback() {
       @Override
@@ -408,6 +414,24 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         reinitialize(item);
       }
     }));
+
+    // request metadata
+    final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
+    taskStarted(taskKey, _playerAPIClient.metadata(embedCodes, new MetadataFetchedCallback() {
+      @Override
+      public void callback(JSONObject metadata, OoyalaException error) {
+        taskCompleted(metadataTaskKey);
+        if (error != null) {
+          _metadata = null;
+          Log.d(this.getClass().getName(), "Exception fetching metadata from setEmbedCodes!", error);
+        } else {
+          _metadata = metadata;
+          Log.d(this.getClass().getName(), "Loaded Metadata: " + _metadata.toString());
+          sendNotification(METADATA_READY_NOTIFICATION);
+        }
+      }
+    }));
+
     return true;
   }
 
@@ -693,6 +717,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public ContentItem getRootItem() {
     return _rootItem;
+  }
+
+  /**
+   * The metadata for current root item
+   * @return metadata
+   */
+  public JSONObject getMetadata() {
+    return _metadata;
   }
 
   /**

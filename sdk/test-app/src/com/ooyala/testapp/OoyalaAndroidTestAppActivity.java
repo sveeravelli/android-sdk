@@ -61,7 +61,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // player.setClosedCaptionsStyle(new ClosedCaptionsStyle(Color.GREEN, Color.BLACK, Typeface.DEFAULT));
     /*
      * player.setCurrentItemChangedCallback(new CurrentItemChangedCallback() {
-     * 
+     *
      * @Override public void callback(Video currentItem) { currentItem.insertAd(new OoyalaAdSpot(10000, null,
      * null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")); } });
      */
@@ -146,7 +146,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       setEmbedCode();
     } else if (player != null && arg0 == skipAd) {
       player.setBasePlayer(new BaseMoviePlayer());
-      
+
       //player.skipAd();
     } else if (player != null && arg0 == insertAd) {
       if (metadataReady) {
@@ -163,6 +163,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
       metadataReady = true;
       Log.d(TAG, "AD - metadata true!");
+    } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
+      Log.d(TAG, "Woot, here is the current metadata: " + player.getMetadata());
     }
     // if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState()
     // == State.READY) {

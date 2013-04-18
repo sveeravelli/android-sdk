@@ -69,8 +69,7 @@ class Constants {
   public static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/v%s/content_tree/external_id/%s/%s";
   public static final String CONTENT_TREE_NEXT_URI = "/player_api/v%s/content_tree/next/%s/%s";
 
-  public static final String METADATA_CONTENT_ID_URI = "/player_api/v%s/metadata/content_id/%s/%s/android";
-  public static final String METADATA_EMBED_CODE_URI = "/player_api/v%s/metadata/embed_code/%s/%s/android";
+  public static final String METADATA_EMBED_CODE_URI = "/player_api/v%s/metadata/embed_code/%s/%s";
 
   public static final String KEY_EMBED_CODE = "embed_code";
   public static final String KEY_EXTERNAL_ID = "external_id";
