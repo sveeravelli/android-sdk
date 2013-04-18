@@ -71,17 +71,17 @@ public class TrackingHelper {
     mediaMeasurement.contextDataMapping = contextDataMapping;
   }
 
-  public static void open(String mediaName, Double mediaLength, String playerName) {
+  public static void open(String mediaName, double mediaLength, String playerName) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
     mediaMeasurement.open(mediaName, mediaLength, playerName);
   }
 
-  public static void play(String mediaName, Double offset) {
+  public static void play(String mediaName, double offset) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
     mediaMeasurement.play(mediaName, offset);
   }
 
-  public static void stop(String mediaName, Double offset) {
+  public static void stop(String mediaName, double offset) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
     mediaMeasurement.stop(mediaName, offset);
   }
