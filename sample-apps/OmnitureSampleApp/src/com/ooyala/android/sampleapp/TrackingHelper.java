@@ -49,14 +49,6 @@ public class TrackingHelper {
     measurement.trackAppState(appState, contextData);
   }
 
-  public static void trackLogonEvent (String username_value) {
-    Hashtable<String, Object> contextData = new Hashtable<String, Object>();
-    contextData.put("username", username_value);
-
-    ADMS_Measurement measurement = ADMS_Measurement.sharedInstance();
-    measurement.trackEvents("event1", contextData);
-  }
-
   public static void configureMediaMeasurement() {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
     Hashtable<String, Object> contextDataMapping = new Hashtable<String, Object>();
