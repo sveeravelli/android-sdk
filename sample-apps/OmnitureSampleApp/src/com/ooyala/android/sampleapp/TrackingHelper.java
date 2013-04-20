@@ -1,3 +1,10 @@
+//
+//  TrackingHelper.java
+//  OmnitureSampleApp
+//
+//  A helper class for OmnitureSampleAppActivity
+//
+
 package com.ooyala.android.sampleapp;
 
 import java.util.Hashtable;
@@ -9,10 +16,9 @@ import com.adobe.adms.mediameasurement.ADMS_MediaMeasurement;
 
 public class TrackingHelper {
 
-  //private static final String TRACKING_RSID = "YOUR_REPORTSUITEID";
-  //private static final String TRACKING_SERVER = "YOUR_TRACKINGSERVER";
-  private static final String TRACKING_RSID = "123";
-  private static final String TRACKING_SERVER = "172.16.100.241:57365";
+  // Use your reportSuiteID and Tracking Server here
+  private static final String TRACKING_RSID = "YOUR_REPORTSUITEID";
+  private static final String TRACKING_SERVER = "YOUR_TRACKINGSERVER";
 
   public static void startActivity(Activity activity) {
     ADMS_Measurement measurement = ADMS_Measurement.sharedInstance(activity);
@@ -52,6 +58,8 @@ public class TrackingHelper {
   public static void configureMediaMeasurement() {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
     Hashtable<String, Object> contextDataMapping = new Hashtable<String, Object>();
+
+    // Put the Config variables that were set up in SiteCatalyst here. evar, prop and events
     contextDataMapping.put("a.media.name", "eVar2,prop2");
     contextDataMapping.put("a.media.segment", "eVar3");
     contextDataMapping.put("a.contentType", "eVar1"); //note that this is not in the .media namespace
