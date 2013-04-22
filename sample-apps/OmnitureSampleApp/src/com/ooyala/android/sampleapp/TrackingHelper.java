@@ -68,6 +68,13 @@ public class TrackingHelper {
     contextDataMapping.put("a.media.segmentView", "event2");
     contextDataMapping.put("a.media.complete", "event7");
 
+    // Map Milestone
+    Hashtable<String, Object> milestoneMapping = new Hashtable<String, Object>();
+    milestoneMapping.put("25", "event4");
+    milestoneMapping.put("50", "event5");
+    milestoneMapping.put("75", "event6");
+    contextDataMapping.put("a.media.milestones", milestoneMapping);
+
     mediaMeasurement.contextDataMapping = contextDataMapping;
   }
 
