@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="lib" path="/Users/agunawan/repos/android-sdk/sample-apps/OmnitureSampleApp/libs/OoyalaSDK.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/agunawan/repos/android-sdk/sample-apps/OmnitureSampleApp/libs/admsAppLibrary.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="/Users/agunawan/repos/android-sdk/third_party_sample_apps/OmnitureSampleApp/libs/admsAppLibrary.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/agunawan/repos/android-sdk/third_party_sample_apps/OmnitureSampleApp/libs/OoyalaSDK.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
