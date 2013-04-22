@@ -56,23 +56,23 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
   }
 
   @Override
-  public void update(Observable arg0, Object arg1) {
+  public void update(Observable observable, Object data) {
     // Omniture integration, reports to Omniture when player's STATE changes
-    if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
-      double playheadTime = ((double) ((OoyalaPlayer) arg0).getPlayheadTime()) / 1000;
-      switch (((OoyalaPlayer)arg0).getState()) {
+    if (((String)data).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+      OoyalaPlayer player = (OoyalaPlayer) observable;
+      double playheadTime = ((double) player.getPlayheadTime()) / 1000;
+      switch (player.getState()) {
 
         // Player is ready, call Media.open()
         case READY:
-          mediaName = ((OoyalaPlayer) arg0).getCurrentItem().getTitle();
-          mediaLength = ((double) ((OoyalaPlayer) arg0).getDuration()) / 1000;
+          mediaName = player.getCurrentItem().getTitle();
+          mediaLength = ((double) player.getDuration()) / 1000;
           TrackingHelper.open(mediaName, mediaLength, playerName);
           Log.i(TAG, "omni:open " + mediaName + " " + mediaLength + " " + playerName);
           break;
 
         // Player is playing, call Media.play()
         case PLAYING:
-          playheadTime = ((double) ((OoyalaPlayer) arg0).getPlayheadTime()) / 1000;
           TrackingHelper.play(mediaName, playheadTime);
           Log.i(TAG, "omni:play " + mediaName + " " + playheadTime);
           break;
@@ -80,7 +80,6 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
         // Player is paused, call Media.stop()
         case PAUSED:
         case SUSPENDED:
-          playheadTime = ((double) ((OoyalaPlayer) arg0).getPlayheadTime()) / 1000;
           TrackingHelper.stop(mediaName, playheadTime);
           Log.i(TAG, "omni:stop " + mediaName + " " + playheadTime);
           break;
@@ -95,7 +94,6 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
 
         // Player has error, call Media.stop() and Media.close()
         case ERROR:
-          playheadTime = ((double) ((OoyalaPlayer) arg0).getPlayheadTime()) / 1000;
           TrackingHelper.stop(mediaName, playheadTime);
           Log.i(TAG, "omni:stop " + mediaName + " " + playheadTime);
           TrackingHelper.close(mediaName);
