@@ -24,6 +24,7 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
   private static final String playerName = "Android_Sample_Player";
   private String mediaName;
   private double mediaLength;
+  private boolean shouldReopenOmni = false;
 
   final String EMBED  = "ZlMDJ4NTp8nbPls_7lJX8AJD3Nm0UNC8";  //Embed Code, or Content ID
   final String PCODE  = "B3MDExOuTldXc1CiXbzAauYN7Iui";
@@ -49,7 +50,6 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
       // Initialized Omniture media Measurement
       TrackingHelper.configureMediaMeasurement();
       player.addObserver(this);
-      player.setActionAtEnd(ActionAtEnd.STOP);
     } else {
       Log.d(this.getClass().getName(), "Something Went Wrong!");
     }
@@ -57,49 +57,73 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
 
   @Override
   public void update(Observable observable, Object data) {
+    OoyalaPlayer player = (OoyalaPlayer) observable;
     // Omniture integration, reports to Omniture when player's STATE changes
-    if (((String)data).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
-      OoyalaPlayer player = (OoyalaPlayer) observable;
+    if (((String)data).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) &&
+        !player.isShowingAd())
+    {
       double playheadTime = ((double) player.getPlayheadTime()) / 1000;
       switch (player.getState()) {
-
-        // Player is ready, call Media.open()
-        case READY:
-          mediaName = player.getCurrentItem().getTitle();
-          mediaLength = ((double) player.getDuration()) / 1000;
-          TrackingHelper.open(mediaName, mediaLength, playerName);
-          Log.i(TAG, "omni:open " + mediaName + " " + mediaLength + " " + playerName);
+        case INIT:
+        case LOADING:
+          // state of the player when seeking
+          // don't need to do anything here since omniture only
+          // cares about 'pause' and 'playing' state
           break;
-
-        // Player is playing, call Media.play()
+        case READY:
+          // state of the player when ready to play content
+          // don't need to do anything here since we use the
+          // currentItemChanged notification instead
+          break;
         case PLAYING:
+          if (shouldReopenOmni) {
+            TrackingHelper.open(mediaName, mediaLength, playerName);
+            Log.i(TAG, "omni:open " + mediaName + " " + mediaLength + " " + playerName);
+          }
           TrackingHelper.play(mediaName, playheadTime);
           Log.i(TAG, "omni:play " + mediaName + " " + playheadTime);
           break;
-
-        // Player is paused, call Media.stop()
         case PAUSED:
         case SUSPENDED:
           TrackingHelper.stop(mediaName, playheadTime);
           Log.i(TAG, "omni:stop " + mediaName + " " + playheadTime);
           break;
-
-        // Player is completed, call Media.stop() with the full duration of video, then Media.close()
         case COMPLETED:
-          TrackingHelper.stop(mediaName, mediaLength);
-          Log.i(TAG, "omni:stop " + mediaName + " " + mediaLength);
+          // state of the player when video ends
+          // don't need to do anything here since we use the
+          // playCompleted notification instead
+          break;
+        case ERROR:
+          // Player has error, call Media.stop() and Media.close()
+          TrackingHelper.stop(mediaName, playheadTime);
+          Log.i(TAG, "omni:stop " + mediaName + " " + playheadTime);
           TrackingHelper.close(mediaName);
           Log.i(TAG, "omni:close " + mediaName);
           break;
-
-        // Player has error, call Media.stop() and Media.close()
-        case ERROR:
+        default:
+          // should never enter this!
+          Log.e(TAG, "Player in unknown state");
           TrackingHelper.stop(mediaName, playheadTime);
           Log.i(TAG, "omni:stop " + mediaName + " " + playheadTime);
           TrackingHelper.close(mediaName);
           Log.i(TAG, "omni:close " + mediaName);
           break;
       }
+    }
+    else if (((String)data).equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION))
+    {
+      mediaName = player.getCurrentItem().getTitle();
+      mediaLength = ((double) player.getDuration()) / 1000;
+      TrackingHelper.open(mediaName, mediaLength, playerName);
+      Log.i(TAG, "omni:open " + mediaName + " " + mediaLength + " " + playerName);
+    }
+    else if (((String)data).equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION))
+    {
+      TrackingHelper.stop(mediaName, mediaLength);
+      Log.i(TAG, "omni:stop " + mediaName + " " + mediaLength);
+      TrackingHelper.close(mediaName);
+      Log.i(TAG, "omni:close " + mediaName);
+      shouldReopenOmni = true;
     }
   }
 }

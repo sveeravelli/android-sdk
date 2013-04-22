@@ -18,7 +18,7 @@ public class TrackingHelper {
 
   // Use your reportSuiteID and Tracking Server here
   private static final String TRACKING_RSID = "YOUR_REPORTSUITEID";
-  private static final String TRACKING_SERVER = "YOUR_TRACKINGSERVER";
+  private static final String TRACKING_SERVER = "172.16.100.135:57365";
 
   public static void startActivity(Activity activity) {
     ADMS_Measurement measurement = ADMS_Measurement.sharedInstance(activity);
@@ -68,29 +68,26 @@ public class TrackingHelper {
     contextDataMapping.put("a.media.segmentView", "event2");
     contextDataMapping.put("a.media.complete", "event7");
 
-    // Map Milestone
-    Hashtable<String, Object> milestoneMapping = new Hashtable<String, Object>();
-    milestoneMapping.put("25", "event4");
-    milestoneMapping.put("50", "event5");
-    milestoneMapping.put("75", "event6");
-    contextDataMapping.put("a.media.milestones", milestoneMapping);
-
     mediaMeasurement.contextDataMapping = contextDataMapping;
+
+    // track Milestones & segmentByMilestones:
+    mediaMeasurement.trackMilestones = "25,50,75";
+    mediaMeasurement.segmentByMilestones = true;
   }
 
-  public static void open(String mediaName, double mediaLength, String playerName) {
+  public static void open(String mediaName, double mediaLength, String mediaPlayerName) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
-    mediaMeasurement.open(mediaName, mediaLength, playerName);
+    mediaMeasurement.open(mediaName, mediaLength, mediaPlayerName);
   }
 
-  public static void play(String mediaName, double offset) {
+  public static void play(String mediaName, double mediaOffset) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
-    mediaMeasurement.play(mediaName, offset);
+    mediaMeasurement.play(mediaName, mediaOffset);
   }
 
-  public static void stop(String mediaName, double offset) {
+  public static void stop(String mediaName, double mediaOffset) {
     ADMS_MediaMeasurement mediaMeasurement = ADMS_MediaMeasurement.sharedInstance();
-    mediaMeasurement.stop(mediaName, offset);
+    mediaMeasurement.stop(mediaName, mediaOffset);
   }
 
   public static void close(String mediaName) {
