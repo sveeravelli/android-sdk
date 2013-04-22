@@ -18,7 +18,7 @@ public class TrackingHelper {
 
   // Use your reportSuiteID and Tracking Server here
   private static final String TRACKING_RSID = "YOUR_REPORTSUITEID";
-  private static final String TRACKING_SERVER = "172.16.100.135:57365";
+  private static final String TRACKING_SERVER = "YOUR_TRACKING_SERVER";
 
   public static void startActivity(Activity activity) {
     ADMS_Measurement measurement = ADMS_Measurement.sharedInstance(activity);

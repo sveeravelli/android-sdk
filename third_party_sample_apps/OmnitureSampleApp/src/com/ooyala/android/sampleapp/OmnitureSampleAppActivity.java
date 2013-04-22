@@ -26,10 +26,10 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
   private double mediaLength;
   private boolean shouldReopenOmni = false;
 
-  final String EMBED  = "ZlMDJ4NTp8nbPls_7lJX8AJD3Nm0UNC8";  //Embed Code, or Content ID
-  final String PCODE  = "B3MDExOuTldXc1CiXbzAauYN7Iui";
-  final String APIKEY = "B3MDExOuTldXc1CiXbzAauYN7Iui.SMqJf";
-  final String SECRET = "M6Cj01VpLjTXzS65Xeb4Y9KrvO1B-ZhyUPH8kNKE";
+  final String EMBED  = "VvM2RuNzpA4jP_f7RZwlL5gke4hsFqOv";  //Embed Code, or Content ID
+  final String PCODE  = "Uzbm46asiensk3opIgwfFn5KFemv";
+  final String APIKEY = "";
+  final String SECRET = "";
   final String DOMAIN = "www.ooyala.com";
 
   /**
