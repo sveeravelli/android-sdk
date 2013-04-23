@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.ActionAtEnd;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
