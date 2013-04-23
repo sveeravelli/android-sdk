@@ -60,13 +60,13 @@ public class TrackingHelper {
     Hashtable<String, Object> contextDataMapping = new Hashtable<String, Object>();
 
     // Put the Config variables that were set up in SiteCatalyst here. evar, prop and events
-    contextDataMapping.put("a.media.name", "eVar2,prop2");
-    contextDataMapping.put("a.media.segment", "eVar3");
-    contextDataMapping.put("a.contentType", "eVar1"); //note that this is not in the .media namespace
-    contextDataMapping.put("a.media.timePlayed", "event3");
-    contextDataMapping.put("a.media.view", "event1");
-    contextDataMapping.put("a.media.segmentView", "event2");
-    contextDataMapping.put("a.media.complete", "event7");
+    contextDataMapping.put("a.media.name", "eVar29,prop29");
+    contextDataMapping.put("a.media.segment", "eVar55");
+    contextDataMapping.put("a.contentType", "eVar5"); //note that this is not in the .media namespace
+    contextDataMapping.put("a.media.timePlayed", "event26");
+    contextDataMapping.put("a.media.view", "event8");
+    contextDataMapping.put("a.media.segmentView", "event25");
+    contextDataMapping.put("a.media.complete", "event12");
 
     mediaMeasurement.contextDataMapping = contextDataMapping;
 
