@@ -19,7 +19,9 @@ public class OoyalaException extends Exception {
     /** Playback failed */
     ERROR_PLAYBACK_FAILED,
     /** Authorization Heartbeat failed.  Check properties. */
-    ERROR_AUTHORIZATION_HEARTBEAT_FAILED
+    ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+    /** Metadata fetch failed*/
+    ERROR_METADATA_FETCH_FAILED,
 
   };
 

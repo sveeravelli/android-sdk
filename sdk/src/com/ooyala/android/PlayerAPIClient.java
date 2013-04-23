@@ -598,6 +598,70 @@ class PlayerAPIClient {
     return task;
   }
 
+
+  public JSONObject fetchMetadata(List<String> embedCodes) throws OoyalaException {
+    // fetch metadata
+    String uri = String.format(Constants.METADATA_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
+        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
+    JSONObject root = OoyalaAPIHelper.objectForAPI(Constants.METADATA_HOST, uri, contentTreeParams(null));
+
+    // validate the result
+    if (root == null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Empty metadata response");
+    }
+
+    try {
+      int errorCode = root.getJSONObject("errors").getInt("code");
+      if(errorCode != 0) {
+        throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Non-zero metadata response code");
+      }
+    } catch (JSONException je) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Failed to parse metadata");
+    }
+
+    // return the JSON data
+    return root;
+  }
+
+  private class MetadataFetchTaskParam {
+    public List<String> idList;
+  }
+
+  private class MetadataFetchTask extends AsyncTask<MetadataFetchTaskParam, Integer, JSONObject> {
+    protected OoyalaException _error = null;
+    protected MetadataFetchedCallback _callback = null;
+
+    public MetadataFetchTask(MetadataFetchedCallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    protected JSONObject doInBackground(MetadataFetchTaskParam... taskParams) {
+      if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].idList == null ||
+          taskParams[0].idList.isEmpty()) { return null; }
+      try {
+        return fetchMetadata(taskParams[0].idList);
+      } catch (OoyalaException e) {
+        _error = e;
+        return null;
+      }
+    }
+
+    @Override
+    protected void onPostExecute(JSONObject result) {
+      _callback.callback(result, _error);
+    }
+  }
+
+  public Object metadata(List<String> embedCodes, MetadataFetchedCallback callback) {
+    MetadataFetchTask task = new MetadataFetchTask(callback);
+    MetadataFetchTaskParam taskParam = new MetadataFetchTaskParam();
+    taskParam.idList = embedCodes;
+    task.execute(taskParam);
+    return task;
+  }
+
   public String getPcode() {
     return _pcode;
   }
