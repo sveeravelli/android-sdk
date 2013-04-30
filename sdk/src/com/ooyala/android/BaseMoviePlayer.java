@@ -308,10 +308,21 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
   @Override
   public void onSeekComplete(MediaPlayer arg0) {
 
-    //For m3u8s on 3+ phones, seeking before start() doesn't work.  If we're told seek is done
+    // For m3u8s on 3+ phones, seeking before start() doesn't work.  If we're told seek is done
     // but seek isn't actaully done, try it again
-    if(_player.getCurrentPosition() < _timeBeforeSuspend) {
-      Log.i(this.getClass().getName(), "Seek failed, Try again");
+
+    // If we're resuming, and we're not near the desired seek position, try again
+    if(_timeBeforeSuspend >= 0 && Math.abs(_player.getCurrentPosition() - _timeBeforeSuspend) > 3000) {
+      Log.i(this.getClass().getName(), "Seek failed. currentPos: " + _player.getCurrentPosition() +
+          ", timeBefore" + _timeBeforeSuspend + "duration: " + _player.getDuration());
+
+      // This looks pretty nasty, but it's a very specific case of HLS videos during the race condition of
+      // seek right when play starts
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       _player.seekTo(_timeBeforeSuspend);
     }
 
