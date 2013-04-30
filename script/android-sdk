@@ -9,6 +9,7 @@ AVD_NAME="unit_test"
 ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
 ANDROID=${ANDROID_SDKS}/tools/android
+DOCS_CLASSPATH=${ANDROID_SDKS}/tools/support/annotations.jar
 
 function get_version {
   echo `cat ${SDK_DIR}/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)";/\1/'`
@@ -22,14 +23,14 @@ function set_version {
 function public_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
-  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public > /dev/null 2>&1
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
 
 function complete_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
-  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete > /dev/null 2>&1
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
 
