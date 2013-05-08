@@ -127,7 +127,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private CurrentItemChangedCallback _currentItemChangedCallback = null;
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
-  private StreamPlayer _customBasePlayer = null;
+  private StreamPlayer _basePlayer = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -518,8 +518,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
-      PlayerInfo playerInfo = _player == null || _player.getBasePlayer() == null ?
-                                  StreamPlayer.defaultPlayerInfo : _player.getBasePlayer().getPlayerInfo();
+      PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _player.getBasePlayer().getPlayerInfo();
 
       // Async authorize;
       cancelOpenTasks();
@@ -615,8 +614,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _currentItem = tree.firstVideo();
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
-    PlayerInfo playerInfo = _player == null || _player.getBasePlayer() == null ?
-                                StreamPlayer.defaultPlayerInfo : _player.getBasePlayer().getPlayerInfo();
+    PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _basePlayer.getPlayerInfo();
+
     // Async Authorize
     cancelOpenTasks();
     final String taskKey = "reinitialize" + System.currentTimeMillis();
@@ -664,8 +663,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     //Initialize this player
     p.addObserver(this);
-    if(_customBasePlayer != null) {
-      p.setBasePlayer(_customBasePlayer);
+    if(_basePlayer != null) {
+      p.setBasePlayer(_basePlayer);
     }
     p.init(this, streams);
 
@@ -678,8 +677,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
   private Player initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
     p.addObserver(this);
-    if(_customBasePlayer != null) {
-      p.setBasePlayer(_customBasePlayer);
+    if(_basePlayer != null) {
+      p.setBasePlayer(_basePlayer);
     }
     p.init(this, ad);
     return p;
@@ -794,9 +793,10 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public void resume() {
     if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime + (_playerAPIClient._heartbeatInterval * 1000)) {
+        PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _basePlayer.getPlayerInfo();
         cancelOpenTasks();
         final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
-        taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, new AuthorizeCallback() {
+        taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo, new AuthorizeCallback() {
           @Override
           public void callback(boolean result, OoyalaException error) {
             taskCompleted(taskKey);
@@ -1475,7 +1475,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   public StreamPlayer getBasePlayer() {
-    return _customBasePlayer;
+    return _basePlayer;
   }
 
   /**
@@ -1484,10 +1484,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @param basePlayer
    */
   public void setBasePlayer(StreamPlayer basePlayer) {
-    _customBasePlayer = basePlayer;
+    _basePlayer = basePlayer;
 
-    _analytics.setUserAgent(_customBasePlayer != null ?
-        _customBasePlayer.getPlayerInfo().getUserAgent() : null);
+    _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo().getUserAgent() : null);
 
     if (getCurrentItem() == null) { return; }
 
@@ -1508,11 +1507,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         }
 
         if (_player != null) {
-          _player.setBasePlayer(_customBasePlayer);
+          _player.setBasePlayer(_basePlayer);
         }
 
         if (_adPlayer != null) {
-          _adPlayer.setBasePlayer(_customBasePlayer);
+          _adPlayer.setBasePlayer(_basePlayer);
         }
       }
 
