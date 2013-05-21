@@ -44,6 +44,31 @@
             android:id="@+id/spSelectSubtitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
+        
+        <RelativeLayout
+            android:id="@+id/rlOptions"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/chbOpenMAXAL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="OpenMAX AL" />
+
+            <CheckBox
+                android:id="@+id/chbAsync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/chbOpenMAXAL"
+                android:checked="true"
+                android:text="Asynchronous"
+                android:visibility="visible"  />
             
+        </RelativeLayout>
+        
     </LinearLayout>
 </ScrollView>

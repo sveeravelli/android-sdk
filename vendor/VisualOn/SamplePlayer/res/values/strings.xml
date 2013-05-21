@@ -13,7 +13,7 @@
     <string name="str_about">About</string>
     <string name="str_totalFiles">%d files</string>
     <string name="str_AboutTitle">About VisualOn OnStream Demo Player</string>
-    <string name="str_AboutBody">This software and its related services are provided under license by VisualOn, Inc. \n\n© 2012 VisualOn, Inc. All Rights Reserved.\nhttp://www.visualon.com</string>
+    <string name="str_AboutBody">This software and its related services are provided under license by VisualOn, Inc. \n\n© 2013 VisualOn, Inc. All Rights Reserved.\nhttp://www.visualon.com</string>
 	<string name="str_Render_Title">Select Video Render Type</string>
 	<string name="str_Render_Comment">Java render, C render, Native window</string>
 	<string name="str_Render_Dialog_Title">Select Video Render Type</string>
@@ -59,16 +59,16 @@
 	<string name="str_URL">URL...</string>
 	<string name="str_AddURL">Input streaming URL address or file path</string>
 	<string name="str_SelURL">Select a URL address</string>
-	<string name="str_SelURL_FirstLine">Select a url from the following!</string>
-	<string name="str_SelSubtitle_FirstLine">Select a subtitle from the following!</string>
+	<string name="str_SelURL_FirstLine">Select a url from the following</string>
+	<string name="str_SelSubtitle_FirstLine">Select a subtitle from the following</string>
 	<string name="str_option">Option</string>
 	<string name="str_colorRGB8888_comment">If Checked, use RGB8888 as pixels format; else use RGB565</string>
 	<string name="str_colorRGB8888">RGB8888</string>
 	<string name="str_MAX_Performance">Max Performance</string>
-	<string name="str_MAX_Performance_comment">If Checked, make the application run at max performance</string>
+	<string name="str_MAX_Performance_comment">Turn off CPU dynamic frequency scaling</string>
 	<string name="str_use_surface_render">Surface render</string>
 	<string name="str_use_surface_render_comment">If Checked, video surface render is enabled; else java render will be used</string>
-	<string name="str_dolby_effect">Enable Dolby Effect</string>
+	<string name="str_dolby_effect">Enable Dolby Surround</string>
 	<string name="str_Audio_Animation">Audio Screen Animation</string>
 	<string name="str_Audio_Animation_comment">Enable / disable audio 3D background animation</string>
 	<string name="str_Threads_Title">Select Threads Count</string>
@@ -84,5 +84,5 @@
 	<string name="str_SocketType_Dialog_Title">Set RTSP Default Connection Type</string>
 	<string name="str_HLS_OPTION">Set HLS bit rate</string>
 	<string name="str_HLS_Summary">Input HLS max bit rate</string>
-	<string name="str_HLS_Dialog_message">Please input HLS max bit rate(bps), 0 present not limited</string>
+	<string name="str_HLS_Dialog_message">A value of 0 indicates the max bit rate is unlimited</string>
 </resources>
