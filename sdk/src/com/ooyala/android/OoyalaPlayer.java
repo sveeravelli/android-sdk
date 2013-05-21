@@ -36,6 +36,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     INIT, LOADING, READY, PLAYING, PAUSED, COMPLETED, SUSPENDED, ERROR
   };
 
+  public static enum SeekStyle {
+    NONE, BASIC, ENHANCED
+  };
 
   /**
    * Used by previousVideo and nextVideo. When passed to them, it will cause the video to be played after it
@@ -1543,5 +1546,13 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     String description = "Authorization Error: "  + ContentItem.getAuthError(currentItem.getAuthCode());
     Log.e(this.getClass().toString(), "This video was not authorized! " + description);
     return new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, description);
+  }
+
+  public SeekStyle getSeekStyle() {
+    if (getBasePlayer() != null) {
+      return getBasePlayer().getSeekStyle();
+    } else {
+      return SeekStyle.ENHANCED;
+    }
   }
 }

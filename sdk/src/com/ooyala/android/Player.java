@@ -3,6 +3,7 @@ package com.ooyala.android;
 import java.util.Observable;
 import java.util.Set;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 import android.view.SurfaceView;
@@ -127,12 +128,15 @@ abstract class Player extends Observable {
     return false;
   }
 
-
   /**
    * Enables and disables live closed captions on the player
    * @param enabled weather to disable or enable live closed captions
    */
   public void setLiveClosedCaptionsEnabled(boolean enabled){}
+
+  public SeekStyle getSeekStyle() {
+    return SeekStyle.ENHANCED;
+  }
 
   public abstract void reset();
 

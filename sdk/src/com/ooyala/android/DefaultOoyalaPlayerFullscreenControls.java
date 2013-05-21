@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
@@ -219,7 +220,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
 
   @Override
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-    if (fromUser) {
+    if (fromUser && _player.getSeekStyle() == SeekStyle.ENHANCED) {
       _player.seekToPercent(progress);
       update(null, null);
     }
@@ -234,6 +235,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
+    _player.seekToPercent(seekBar.getProgress());
     _seeking = false;
     if (_wasPlaying) {
       _player.play();
