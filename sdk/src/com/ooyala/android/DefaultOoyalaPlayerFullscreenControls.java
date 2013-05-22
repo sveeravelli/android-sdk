@@ -236,6 +236,7 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
     _player.seekToPercent(seekBar.getProgress());
+    update(null, null);
     _seeking = false;
     if (_wasPlaying) {
       _player.play();
