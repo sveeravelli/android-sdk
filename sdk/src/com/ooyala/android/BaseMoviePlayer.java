@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -211,6 +212,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
 
   @Override
   public void onPrepared(MediaPlayer mp) {
+    _view.setBackgroundColor(Color.TRANSPARENT);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
@@ -292,6 +294,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     _view = new MovieView(c);
     _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+    _view.setBackgroundColor(Color.BLACK);
   }
 
   private void removeView() {
