@@ -16,5 +16,7 @@ sdk/*/gen
 sdk/*/local.properties
 sample-apps/*/bin
 sample-apps/*/gen
+vendor/VisualOn/SamplePlayer/bin
+vendor/VisualOn/SamplePlayer/gen
 .metadata/*
 .settings
