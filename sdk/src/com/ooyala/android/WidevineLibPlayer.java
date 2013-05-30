@@ -20,7 +20,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   private static final int INIT = 0;
   private static final int ERROR = -1;
 
-  private static WVPlayback _wvplayback = new WVPlayback();
+  private WVPlayback _wvplayback = new WVPlayback();
   private Handler _handler = new Handler(this);
   private OoyalaPlayer parent;
   private Stream _stream = null;
