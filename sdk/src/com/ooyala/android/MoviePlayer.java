@@ -134,7 +134,7 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void destroy() {
-    _basePlayer.destroy();
+    if (_basePlayer != null) _basePlayer.destroy();
   }
 
   @Override
@@ -156,16 +156,26 @@ public class MoviePlayer extends Player implements Observer {
   public void pause() { _basePlayer.pause(); }
   public void play() { _basePlayer.play(); }
   public void stop() { _basePlayer.stop(); }
-  public int currentTime() { return _basePlayer.currentTime(); }
-  public int duration() { return _basePlayer.duration(); }
-  public int buffer() { return _basePlayer.buffer(); }
-  public boolean seekable() { return _basePlayer.seekable(); }
+
+  public int currentTime() { return _basePlayer != null ? _basePlayer.currentTime() : 0; }
+  public int duration() { return _basePlayer != null ? _basePlayer.duration() : 0; }
+  public int buffer() { return _basePlayer != null ? _basePlayer.buffer() : 0; }
+  public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
+
+  public boolean seekable() { return _basePlayer != null ? _basePlayer.seekable() : false; }
   public void setSeekable(boolean seekable) { _basePlayer.setSeekable(seekable); }
   public void seekToTime(int timeInMillis) { _basePlayer.seekToTime(timeInMillis); }
-  public State getState() { return _basePlayer.getState(); }
-  protected void setState(State state) { _basePlayer.setState(state); }
+
+  public State getState() { return _basePlayer != null ? _basePlayer.getState() : super.getState(); }
+  protected void setState(State state) {
+    if (_basePlayer != null) {
+      _basePlayer.setState(state);
+    } else {
+      super.setState(state);
+    }
+  }
+
   public String getError() { return _basePlayer != null ? _basePlayer.getError() : _error; }
-  public int getBufferPercentage() { return _basePlayer.getBufferPercentage(); }
-  public boolean isLiveClosedCaptionsAvailable() { return _basePlayer.isLiveClosedCaptionsAvailable(); }
+  public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
   public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
 }
