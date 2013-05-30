@@ -97,7 +97,7 @@ class PlayerAPIClient {
           "response invalid (nil).");
     }
     try {
-      if(!result.getString(Constants.KEY_MESSAGE).equals("OK")) {
+      if(!result.getString(Constants.KEY_MESSAGE).equals("OK") || result.getInt(Constants.KEY_EXPIRES) < System.currentTimeMillis()/1000  ) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
             "response code (" + result.getString(Constants.KEY_MESSAGE) + ").");
       }
@@ -105,7 +105,6 @@ class PlayerAPIClient {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
           "response invalid (error).");
     }
-
     return result;
   }
 
