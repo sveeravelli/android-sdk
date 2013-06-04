@@ -135,7 +135,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   protected void setState(State state) {
     //look for state changing to complete here to ensure it happens before any observers notified.
     if (state == State.COMPLETED) {
-      _linearAdQueue.remove(0);
+      if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
       sendTrackingEvent(TrackingEvent.COMPLETE);
       if (!_linearAdQueue.isEmpty()) {
         addQuartileBoundaryObserver();

@@ -118,6 +118,9 @@ class Utils {
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);
       return null;
+    } catch (ClassCastException exception) {
+      System.out.println("ClassCastException: " + exception);
+      return null;
     }
   }
 
