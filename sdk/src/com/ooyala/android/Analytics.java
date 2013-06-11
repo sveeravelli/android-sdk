@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class Analytics {
    */
   Analytics(Context context, PlayerAPIClient api) {
     this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()));
+        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()), api.getDomain());
   }
 
   /**
@@ -36,6 +38,18 @@ public class Analytics {
    * @param embedHTML the HTML to use when initializing this Analytics
    */
   Analytics(Context context, String embedHTML) {
+    //compatible with old behavior.  only used for test..
+    this(context, embedHTML, "http://www.ooyala.com/analytics.html");
+  }
+
+  /**
+   * Initialize an Analytics using the specified api and HTML (used internally)
+   * @param context the context the initialize the internal WebView with
+   * @param embedHTML the HTML to use when initializing this Analytics
+   * @param embedDomain the domain of the dummy page hosting reporter.js
+   */
+  @SuppressLint("SetJavaScriptEnabled")
+  private Analytics(Context context, String embedHTML, String embedDomain) {
     _jsAnalytics = new WebView(context);
     _defaultUserAgent = String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION,
         _jsAnalytics.getSettings().getUserAgentString());
@@ -60,8 +74,15 @@ public class Analytics {
       }
     });
     // give dummy url to allow for cookie setting
-    _jsAnalytics.loadDataWithBaseURL("http://www.ooyala.com/analytics.html", embedHTML, "text/html", "UTF-8",
-        "");
+    String url = "http://www.ooyala.com/analytics.html";
+
+    try {
+      url = new URL("http", embedDomain, "/").toString();
+    } catch (MalformedURLException e) {
+      System.out.println("falling back to default analytics URL");
+    }
+
+    _jsAnalytics.loadDataWithBaseURL(url, embedHTML, "text/html", "UTF-8", "");
     Log.d(this.getClass().getName(), "Initializing Analytics with user agent: "
         + _jsAnalytics.getSettings().getUserAgentString());
   }
