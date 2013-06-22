@@ -649,8 +649,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
     else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
       try {
-        return new WidevineLibPlayer();
-      } catch(NoClassDefFoundError e) {
+        return (MoviePlayer) getClass().getClassLoader().loadClass(Constants.WIDEVINE_LIB_PLAYER).newInstance();
+      } catch(Exception e) {
         _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
             "Could not initialize Widevine Player");
         Log.d(this.getClass().getName(), "Please include the Widevine Library in your project", _error);

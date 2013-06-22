@@ -228,6 +228,9 @@ class Constants {
   public static final int SDK_INT_HONEYCOMB = 11;
   public static final int SDK_INT_ICS = 14;
 
+  static final String VISUALON_PLAYER = "com.ooyala.android.VisualOnMoviePlayer";
+  static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
+
   public enum ReturnState {
     STATE_MATCHED, STATE_UNMATCHED, STATE_FAIL
   };

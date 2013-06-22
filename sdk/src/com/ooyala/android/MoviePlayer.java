@@ -21,7 +21,7 @@ public class MoviePlayer extends Player implements Observer {
    * @return the correct default base player
    */
   private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
-    StreamPlayer player;
+    StreamPlayer player = null;
 
     // If custom HLS Player is enabled, and one of the following:
     //   1.) Delviery type is HLS
@@ -35,9 +35,9 @@ public class MoviePlayer extends Player implements Observer {
         )
        ) {
       try {
-        player =  new VisualOnMoviePlayer();
-      } catch(NoClassDefFoundError e) {
-        return null;
+        player = (StreamPlayer)getClass().getClassLoader().loadClass(Constants.VISUALON_PLAYER).newInstance();
+      } catch(Exception e) {
+        player = new BaseMoviePlayer();
       }
     } else {
       player = new BaseMoviePlayer();
