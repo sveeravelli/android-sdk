@@ -19,7 +19,6 @@ abstract class Player extends Observable {
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
   protected boolean _fullscreen = false;
-  protected boolean _seekable = true;
   protected boolean _pausable = true;
 
   /**
@@ -66,22 +65,6 @@ abstract class Player extends Observable {
    */
   public int buffer() {
     return 0;
-  }
-
-  /**
-   * Returns whether this player is seekable
-   * @return true if seekable, false if not
-   */
-  public boolean seekable() {
-    return _seekable;
-  }
-
-  /**
-   * Set whether this player is seekable
-   * @param seekable true if seekable, false if not
-   */
-  public void setSeekable(boolean seekable) {
-    _seekable = seekable;
   }
 
   /**

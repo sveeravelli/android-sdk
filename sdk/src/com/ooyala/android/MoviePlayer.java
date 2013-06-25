@@ -14,6 +14,7 @@ public class MoviePlayer extends Player implements Observer {
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
   private boolean _suspended = true;
+  protected boolean _seekable = true;
 
   /**
    * Check which base player would be best suited for this MoviePlayer
@@ -162,9 +163,9 @@ public class MoviePlayer extends Player implements Observer {
   public int buffer() { return _basePlayer != null ? _basePlayer.buffer() : 0; }
   public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
 
-  public boolean seekable() { return _basePlayer != null ? _basePlayer.seekable() : false; }
-  public void setSeekable(boolean seekable) { _basePlayer.setSeekable(seekable); }
-  public void seekToTime(int timeInMillis) { _basePlayer.seekToTime(timeInMillis); }
+  public boolean seekable() { return _seekable; }
+  public void setSeekable(boolean seekable) { _seekable = seekable; }
+  public void seekToTime(int timeInMillis) { if (_seekable) { _basePlayer.seekToTime(timeInMillis); } }
 
   public State getState() { return _basePlayer != null ? _basePlayer.getState() : super.getState(); }
   protected void setState(State state) {
