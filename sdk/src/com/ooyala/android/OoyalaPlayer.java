@@ -939,7 +939,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     return false;
   }
 
-  private boolean playAd(AdSpot ad) {
+  public boolean playAd(AdSpot ad) {
     if(_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
     }
