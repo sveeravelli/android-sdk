@@ -598,10 +598,10 @@ class PlayerAPIClient {
   }
 
 
-  public JSONObject fetchMetadata(List<String> embedCodes) throws OoyalaException {
+  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
     // fetch metadata
     String uri = String.format(Constants.METADATA_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
+        Utils.join(item.embedCodesToAuthorize(), Constants.SEPARATOR_COMMA));
     JSONObject root = OoyalaAPIHelper.objectForAPI(Constants.METADATA_HOST, uri, contentTreeParams(null));
 
     // validate the result
@@ -614,19 +614,22 @@ class PlayerAPIClient {
       if(errorCode != 0) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Non-zero metadata response code");
       }
+
+      item.update(root.getJSONObject(Constants.KEY_METADATA));
+
     } catch (JSONException je) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Failed to parse metadata");
     }
 
     // return the JSON data
-    return root;
+    return true;
   }
 
   private class MetadataFetchTaskParam {
-    public List<String> idList;
+    public ContentItem item;
   }
 
-  private class MetadataFetchTask extends AsyncTask<MetadataFetchTaskParam, Integer, JSONObject> {
+  private class MetadataFetchTask extends AsyncTask<MetadataFetchTaskParam, Integer, Boolean> {
     protected OoyalaException _error = null;
     protected MetadataFetchedCallback _callback = null;
 
@@ -636,11 +639,10 @@ class PlayerAPIClient {
     }
 
     @Override
-    protected JSONObject doInBackground(MetadataFetchTaskParam... taskParams) {
-      if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].idList == null ||
-          taskParams[0].idList.isEmpty()) { return null; }
+    protected Boolean doInBackground(MetadataFetchTaskParam... taskParams) {
+      if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].item == null) { return false; }
       try {
-        return fetchMetadata(taskParams[0].idList);
+        return fetchMetadata(taskParams[0].item);
       } catch (OoyalaException e) {
         _error = e;
         return null;
@@ -648,15 +650,15 @@ class PlayerAPIClient {
     }
 
     @Override
-    protected void onPostExecute(JSONObject result) {
+    protected void onPostExecute(Boolean result) {
       _callback.callback(result, _error);
     }
   }
 
-  public Object metadata(List<String> embedCodes, MetadataFetchedCallback callback) {
+  public Object metadata(ContentItem item, MetadataFetchedCallback callback) {
     MetadataFetchTask task = new MetadataFetchTask(callback);
     MetadataFetchTaskParam taskParam = new MetadataFetchTaskParam();
-    taskParam.idList = embedCodes;
+    taskParam.item = item;
     task.execute(taskParam);
     return task;
   }

@@ -1,7 +1,10 @@
 package com.ooyala.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.json.*;
 
@@ -22,6 +25,8 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
   protected boolean _heartbeatRequired;
+  protected Map<String, String> _metadata;
+  protected Map<String, ModuleData> _moduleData;
 
   ContentItem() {}
 
@@ -142,6 +147,23 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
       if (!myData.isNull(Constants.KEY_PROMO_IMAGE)) {
         _promoImageURL = myData.getString(Constants.KEY_PROMO_IMAGE);
       }
+      if (myData.has(Constants.KEY_METADATA_BASE)) {
+        _metadata = Utils.mapFromJSONObject(myData.getJSONObject(Constants.KEY_METADATA_BASE));
+      }
+      if (myData.has(Constants.KEY_METADATA_MODULES)) {
+        _moduleData = new HashMap<String, ModuleData>();
+        JSONObject modules = myData.getJSONObject(Constants.KEY_METADATA_MODULES);
+
+        Iterator<?> itr = modules.keys();
+        while (itr.hasNext()) {
+          String key = (String)itr.next();
+          JSONObject module = modules.getJSONObject(key);
+          String type = module.optString(Constants.KEY_METADATA_MODULE_TYPE);
+          Map<String, String> metadata = Utils.mapFromJSONObject(module.getJSONObject(Constants.KEY_METADATA));
+
+          _moduleData.put(key, new ModuleData(key, type, metadata));
+        }
+      }
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);
       return ReturnState.STATE_FAIL;
@@ -231,6 +253,14 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   @Override
   public boolean isHeartbeatRequired() {
     return _heartbeatRequired;
+  }
+
+  public Map<String, String> getMetadata() {
+    return _metadata;
+  }
+
+  public Map<String, ModuleData> getModuleData() {
+    return _moduleData;
   }
 
   /**
