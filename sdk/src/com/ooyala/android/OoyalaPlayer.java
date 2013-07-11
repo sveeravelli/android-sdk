@@ -131,6 +131,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
   private StreamPlayer _basePlayer = null;
+  private Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -275,8 +276,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @param domain Your Embed Domain
    */
   public OoyalaPlayer(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
-    _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(secureURLGenerator), pcode, domain, null);
-    _actionAtEnd = ActionAtEnd.CONTINUE;
+    this(secureURLGenerator, pcode, domain, null);
   }
 
   /**
@@ -290,6 +290,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       EmbedTokenGenerator generator) {
     _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(secureURLGenerator), pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
+
+    // Initialize Ad Players
+    _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
+    registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
+    registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
   }
 
   /**
@@ -944,6 +949,18 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       _player.suspend();
     }
 
+    _adPlayer = null;
+    try {
+      Class<? extends AdMoviePlayer> adPlayerClass = _adPlayers.get(ad.getClass());
+      if (adPlayerClass != null) {
+        _adPlayer = adPlayerClass.newInstance();
+      }
+    } catch (InstantiationException e) {
+      // do nothing
+    } catch (IllegalAccessException e) {
+      // do nothing
+    }
+
     if (ad instanceof OoyalaAdSpot) {
       _adPlayer = new OoyalaAdPlayer();
     } else if (ad instanceof VASTAdSpot) {
@@ -1561,5 +1578,15 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     } else {
       return SeekStyle.ENHANCED;
     }
+  }
+
+  /**
+   * Register an Ad player
+   *   our players and remember it
+   * @param adTypeClass A type of AdSpot that the player is capable of playing
+   * @param adPlayerClass A player that plays the ad
+   */
+  public void registerAdPlayer(Class<? extends AdSpot> adTypeClass, Class<? extends AdMoviePlayer> adPlayerClass) {
+    _adPlayers.put(adTypeClass, adPlayerClass);
   }
 }
