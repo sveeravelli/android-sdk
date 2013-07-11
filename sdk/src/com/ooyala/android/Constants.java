@@ -126,6 +126,10 @@ class Constants {
   public static final String KEY_HEARTBEAT_DATA = "heartbeat_data";
   public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
   public static final String KEY_AUTH_TOKEN = "auth_token";
+  public static final String KEY_METADATA = "metadata";
+  public static final String KEY_METADATA_BASE = "base";
+  public static final String KEY_METADATA_MODULES = "modules";
+  public static final String KEY_METADATA_MODULE_TYPE = "type";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

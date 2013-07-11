@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -122,6 +123,26 @@ class Utils {
       System.out.println("ClassCastException: " + exception);
       return null;
     }
+  }
+
+  public static Map<String, String> mapFromJSONObject(JSONObject obj) {
+    Map<String, String> map = new HashMap<String, String>();
+
+    if (obj == null) {
+      return map;
+    }
+
+    Iterator<?> itr = obj.keys();
+    while (itr.hasNext()) {
+      String key = (String)itr.next();
+      try {
+        map.put(key, obj.getString(key));
+      } catch (JSONException e) {
+        //do nothing
+      }
+    }
+
+    return map;
   }
 
   public static double secondsFromTimeString(String time) {

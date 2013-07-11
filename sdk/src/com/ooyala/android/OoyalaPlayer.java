@@ -418,23 +418,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       }
     }));
 
-    // request metadata
-    final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
-    taskStarted(taskKey, _playerAPIClient.metadata(embedCodes, new MetadataFetchedCallback() {
-      @Override
-      public void callback(JSONObject metadata, OoyalaException error) {
-        taskCompleted(metadataTaskKey);
-        if (error != null) {
-          _metadata = null;
-          Log.d(this.getClass().getName(), "Exception fetching metadata from setEmbedCodes!", error);
-        } else {
-          _metadata = metadata;
-          Log.d(this.getClass().getName(), "Loaded Metadata: " + _metadata.toString());
-          sendNotification(METADATA_READY_NOTIFICATION);
-        }
-      }
-    }));
-
     return true;
   }
 
@@ -519,12 +502,31 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
+    cancelOpenTasks();
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+
+    // request metadata
+    final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
+    taskStarted(metadataTaskKey, _playerAPIClient.metadata(_rootItem, new MetadataFetchedCallback() {
+      @Override
+      public void callback(boolean result, OoyalaException error) {
+        taskCompleted(metadataTaskKey);
+        if (error != null) {
+          _error = error;
+          Log.d(this.getClass().getName(), "Exception fetching metadata from setEmbedCodes!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+        } else {
+          sendNotification(METADATA_READY_NOTIFICATION);
+          changeCurrentItemAfterAuth();
+        }
+      }
+    }));
+
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _player.getBasePlayer().getPlayerInfo();
 
       // Async authorize;
-      cancelOpenTasks();
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
       taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo, new AuthorizeCallback() {
         @Override
@@ -537,12 +539,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             sendNotification(ERROR_NOTIFICATION);
             return;
           }
+          sendNotification(AUTHORIZATION_READY_NOTIFICATION);
           changeCurrentItemAfterAuth();
         }
       }));
       return true;
     }
 
+    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
     return changeCurrentItemAfterAuth();
   }
 
@@ -551,13 +555,17 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterAuth() {
+    // wait for metadata and auth to return
+    if (_currentItem.getModuleData() == null || _currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
+      return false;
+    }
+
     if (!_currentItem.isAuthorized()) {
       this._error = getAuthError(_currentItem);
       setState(State.ERROR);
       sendNotification(ERROR_NOTIFICATION);
       return false;
     }
-    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
 
     if (_currentItem.isHeartbeatRequired()) {
       if (_authHeartbeat == null) {
