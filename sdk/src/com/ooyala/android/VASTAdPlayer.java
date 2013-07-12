@@ -75,7 +75,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   private boolean initAfterFetch(OoyalaPlayer parent) {
     for (VASTAd vastAd : _ad.getAds()) {
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
-        if (seqItem.hasLinear()) {
+        if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
           _linearAdQueue.add(seqItem.getLinear());
         }
       }
