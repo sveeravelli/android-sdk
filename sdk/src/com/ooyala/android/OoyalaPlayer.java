@@ -965,6 +965,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       _adPlayer = new OoyalaAdPlayer();
     } else if (ad instanceof VASTAdSpot) {
       _adPlayer = new VASTAdPlayer();
+    } else if (ad instanceof IMAAdSpot) {
+      _adPlayer = new IMAAdPlayer();
     }
 
     if (_adPlayer == null) { return false; }
@@ -1127,6 +1129,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         displayCurrentClosedCaption();
       }
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
+      Log.d(this.getClass().toString(), "Ooyala Player State Changed: " + player.getState());
       switch (player.getState()) {
         case COMPLETED:
           if (player == _player) {
