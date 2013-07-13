@@ -11,42 +11,18 @@ import org.json.*;
 import android.util.Log;
 
 class OoyalaAPIHelper {
-  private SecureURLGenerator _secureURLGenerator = null;
 
   // Static context and cookies to be used for MoviePlayer instantiation for 4.0+
   public static Map<String, String> cookies = new HashMap<String, String>();
 
-  public OoyalaAPIHelper(String apiKey, String secretKey) {
-    _secureURLGenerator = new EmbeddedSecureURLGenerator(apiKey, secretKey);
-  }
-
-  public OoyalaAPIHelper(SecureURLGenerator secureURLGenerator) {
-    _secureURLGenerator = secureURLGenerator;
-  }
-
-  public OoyalaAPIHelper(String apiKey, SignatureGenerator signatureGenerator) {
-    _secureURLGenerator = new EmbeddedSecureURLGenerator(apiKey, signatureGenerator);
-  }
-
-  public String jsonForSecureAPI(String host, String uri, Map<String, String> params) {
-    URL url = _secureURLGenerator.secureURL(host, uri, params);
-    return jsonForAPI(url);
-  }
-
-  public JSONObject objectForSecureAPI(String host, String uri, Map<String, String> params) {
-    String json = jsonForSecureAPI(host, uri, params);
-    return Utils.objectFromJSON(json);
-  }
-
   public static JSONObject objectForAPI(String host, String uri, Map<String, String> params) {
-    String json = jsonForAPI(host, uri, params);
-    return Utils.objectFromJSON(json);
-  }
-
-  public static String jsonForAPI(String host, String uri, Map<String, String> params) {
     URL url = Utils.makeURL(host, uri, params);
     if (url == null) { return null; }
-    return jsonForAPI(url);
+    return objectForAPI(url);
+  }
+
+  public static JSONObject objectForAPI(URL url) {
+    return Utils.objectFromJSON(jsonForAPI(url));
   }
 
   private static String jsonForAPI(URL url) {
@@ -80,9 +56,5 @@ class OoyalaAPIHelper {
     }
 
     return sb.toString();
-  }
-
-  public SecureURLGenerator getSecureURLGenerator() {
-    return _secureURLGenerator;
   }
 }

@@ -52,8 +52,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr",
-        "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com");
+        (OoyalaPlayerLayout) findViewById(R.id.player), "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com");
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
