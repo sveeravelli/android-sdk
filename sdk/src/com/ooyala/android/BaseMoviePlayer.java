@@ -181,7 +181,7 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
         }
         Map<String, String> cookieHeader = new HashMap<String, String>();
         cookieHeader.put(Constants.HTML_COOKIE_HEADER_NAME, cookieHeaderStr);
-        _player.setDataSource(OoyalaAPIHelper.context, Uri.parse(_streamUrl));
+        _player.setDataSource(_parent.getLayout().getContext(), Uri.parse(_streamUrl));
       } else {
         _player.setDataSource(_streamUrl);
       }

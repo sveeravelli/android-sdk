@@ -8,14 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.*;
 
-import android.content.Context;
 import android.util.Log;
 
 class OoyalaAPIHelper {
   private SecureURLGenerator _secureURLGenerator = null;
 
   // Static context and cookies to be used for MoviePlayer instantiation for 4.0+
-  public static Context context = null;
   public static Map<String, String> cookies = new HashMap<String, String>();
 
   public OoyalaAPIHelper(String apiKey, String secretKey) {

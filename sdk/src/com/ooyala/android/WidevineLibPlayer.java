@@ -114,12 +114,12 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     options.put("WVDRMServer", path);
     options.put("WVLicenseTypeKey", 3);
 
-    WVStatus initStatus = _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+    WVStatus initStatus = _wvplayback.initializeSynchronous(_parent.getLayout().getContext(), options, this);
 
     // If we notice we're already initialized, we have to reset the WV object.
     if (initStatus == WVStatus.AlreadyInitialized) {
       _wvplayback.terminateSynchronous();
-      _wvplayback.initializeSynchronous(OoyalaAPIHelper.context, options, this);
+      _wvplayback.initializeSynchronous(_parent.getLayout().getContext(), options, this);
     }
     _handler.sendEmptyMessage(INIT);
   }
@@ -129,7 +129,6 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     _wvplayback.terminateSynchronous();
     super.suspend(millisToResume, stateToResume);
   }
-
 
   @Override
   public void suspend() {
