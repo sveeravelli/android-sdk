@@ -1,15 +1,17 @@
 package com.ooyala.android;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
-  private OoyalaAPIHelper _apiHelper = null;
+  private SecureURLGenerator _secureUrlGenerator = null;
 
   /**
    * Instantiate an OoyalaAPIClient
@@ -19,22 +21,7 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    */
   public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain) {
-    _apiHelper = new OoyalaAPIHelper(apiKey, secret);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
-  }
-
-  /**
-   * Instantiate an OoyalaAPIClient
-   * @param apiKey the API Key to use for secured APIs
-   * @param secret the Secret to use for secured APIs
-   * @param pcode the Provider Code
-   * @param domain the Embed Domain to use
-   * @param generator the Embed Token Generator to use
-   */
-  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    _apiHelper = new OoyalaAPIHelper(apiKey, secret);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
+    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
   }
 
   /**
@@ -45,22 +32,7 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    */
   public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
-    _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
-  }
-
-  /**
-   * Instantiate an OoyalaAPIClient
-   * @param apiKey the API Key to use for secured APIs
-   * @param signatureGenerator the SignatureGenerator to use for secured APIs
-   * @param pcode the Provider Code
-   * @param domain the Embed Domain to use
-   * @param generator the Embed Token Generator to use
-   */
-  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    _apiHelper = new OoyalaAPIHelper(apiKey, signatureGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
+    this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
   }
 
   /**
@@ -70,21 +42,17 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    */
   public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
-    _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, null);
+    this(pcode, domain);
+    _secureUrlGenerator = secureURLGenerator;
   }
 
   /**
    * Instantiate an OoyalaAPIClient
-   * @param secureURLGenerator the SecureURLGenerator to use for secured APIs
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
-   * @param generator the Embed Token Generator to use
    */
-  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    _apiHelper = new OoyalaAPIHelper(secureURLGenerator);
-    _playerAPI = new PlayerAPIClient(_apiHelper, pcode, domain, generator);
+  public OoyalaAPIClient(String pcode, String domain) {
+    this(new PlayerAPIClient(pcode, domain, null));
   }
 
   /**
@@ -92,7 +60,6 @@ public class OoyalaAPIClient {
    * @param apiClient the PlayerAPIClient to use
    */
   OoyalaAPIClient(PlayerAPIClient apiClient) {
-    _apiHelper = apiClient.getAPIHelper();
     _playerAPI = apiClient;
   }
 
@@ -202,7 +169,12 @@ public class OoyalaAPIClient {
    * @return the raw JSONObject representing the response
    */
   public JSONObject objectFromBacklotAPI(String uri, Map<String, String> params) {
-    return _apiHelper.objectForSecureAPI(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
+    if (_secureUrlGenerator == null) {
+      Log.d(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
+      return null;
+    }
+    URL url = _secureUrlGenerator.secureURL(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
+    return OoyalaAPIHelper.objectForAPI(url);
   }
 
   private class ObjectFromBacklotAPITask extends AsyncTask<Object, Integer, JSONObject> {
@@ -256,7 +228,7 @@ public class OoyalaAPIClient {
    * @return the SecureURLGenerator this OoyalaAPIClient uses
    */
   SecureURLGenerator getSecureURLGenerator() {
-    return _apiHelper.getSecureURLGenerator();
+    return _secureUrlGenerator;
   }
 
   /**

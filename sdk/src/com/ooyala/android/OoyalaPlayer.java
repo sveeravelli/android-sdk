@@ -135,160 +135,29 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * @param apiKey Your API Key
-   * @param secret Your Secret
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   */
-  public OoyalaPlayer(String apiKey, String secret, String pcode, String domain) {
-    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param apiKey Your API Key
-   * @param secret Your Secret
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(String apiKey, String secret, String pcode, String domain, EmbedTokenGenerator generator) {
-    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiKey Your API Key
-   * @param secret Your Secret
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   */
-  public OoyalaPlayer(LayoutController lc, String apiKey, String secret, String pcode, String domain) {
-    this(lc, new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiKey Your API Key
-   * @param secret Your Secret
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(LayoutController lc, String apiKey, String secret, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    this(lc, new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param apiKey Your API Key
-   * @param signatureGenerator the SignatureGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   */
-  public OoyalaPlayer(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
-    this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param apiKey Your API Key
-   * @param signatureGenerator the SignatureGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain, generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiKey Your API Key
-   * @param signatureGenerator the SignatureGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   */
-  public OoyalaPlayer(LayoutController lc, String apiKey, SignatureGenerator signatureGenerator,
-      String pcode, String domain) {
-    this(lc, new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiKey Your API Key
-   * @param signatureGenerator the SignatureGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(LayoutController lc, String apiKey, SignatureGenerator signatureGenerator,
-      String pcode, String domain, EmbedTokenGenerator generator) {
-    this(lc, new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain, generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param apiClient the initialized OoyalaAPIClient to use
+   * @param ooyalaAPIClient an initialized OoyalaApiClient
    */
   public OoyalaPlayer(OoyalaAPIClient apiClient) {
-    this(apiClient.getSecureURLGenerator(), apiClient.getPcode(), apiClient.getDomain());
+    this(apiClient.getPcode(), apiClient.getDomain(), null);
   }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * @param apiClient the initialized OoyalaAPIClient to use
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(OoyalaAPIClient apiClient, EmbedTokenGenerator generator) {
-    this(apiClient.getSecureURLGenerator(), apiClient.getPcode(), apiClient.getDomain(), generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiClient the initialized OoyalaAPIClient to use
-   */
-  public OoyalaPlayer(LayoutController lc, OoyalaAPIClient apiClient) {
-    this(lc, apiClient.getSecureURLGenerator(), apiClient.getPcode(), apiClient.getDomain());
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param apiClient the initialized OoyalaAPIClient to use
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(LayoutController lc, OoyalaAPIClient apiClient, EmbedTokenGenerator generator) {
-    this(lc, apiClient.getSecureURLGenerator(), apiClient.getPcode(), apiClient.getDomain(), generator);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param secureURLGenerator the SecureURLGenerator to use
    * @param pcode Your Provider Code
    * @param domain Your Embed Domain
    */
-  public OoyalaPlayer(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
-    this(secureURLGenerator, pcode, domain, null);
+  public OoyalaPlayer(String pcode, String domain) {
+    this(pcode, domain, null);
   }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * @param secureURLGenerator the SecureURLGenerator to use
    * @param pcode Your Provider Code
    * @param domain Your Embed Domain
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayer(SecureURLGenerator secureURLGenerator, String pcode, String domain,
-      EmbedTokenGenerator generator) {
-    _playerAPIClient = new PlayerAPIClient(new OoyalaAPIHelper(secureURLGenerator), pcode, domain, generator);
+  public OoyalaPlayer(String pcode, String domain, EmbedTokenGenerator generator) {
+    _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
 
     // Initialize Ad Players
@@ -298,55 +167,18 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param secureURLGenerator the SecureURLGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
+   * Set the layout controller from which the OoyalaPlayer should fetch the layout to display to
+   * @param layoutController the layoutController to use.
    */
-  public OoyalaPlayer(LayoutController lc, SecureURLGenerator secureURLGenerator, String pcode, String domain) {
-    this(secureURLGenerator, pcode, domain);
-    setLayoutController(lc);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   * @param lc the LayoutController to use
-   * @param secureURLGenerator the SecureURLGenerator to use
-   * @param pcode Your Provider Code
-   * @param domain Your Embed Domain
-   * @param generator An embedTokenGenerator used to sign SAS requests
-   */
-  public OoyalaPlayer(LayoutController lc, SecureURLGenerator secureURLGenerator, String pcode,
-      String domain, EmbedTokenGenerator generator) {
-    this(secureURLGenerator, pcode, domain, generator);
-    setLayoutController(lc);
+  public void setLayoutController(LayoutController layoutController) {
+    _layoutController = layoutController;
+    _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    _playerAPIClient.setContext(getLayout().getContext());
   }
 
   public void setHook()
   {
     _playerAPIClient.setHook();
-  }
-  /**
-   * Set the layout controller from which the OoyalaPlayer should fetch the layout to display to.
-   * @param lc the LayoutController to use.
-   */
-  public void setLayoutController(LayoutController lc) {
-    _layoutController = lc;
-    if (getLayout() == null) { return; }
-    if (_adPlayer != null) {
-      _adPlayer.setParent(this);
-    }
-    if (_player != null) {
-      _player.setParent(this);
-    }
-    /*
-     * NOTE(jigish): we have to do this here because we need the context from the layout. Theoretically all of
-     * our customers should actually call setLayout right after initializing the player so this is ok.
-     */
-    _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
-    _playerAPIClient.setContext(getLayout().getContext());
-    OoyalaAPIHelper.context = getLayout().getContext();
   }
 
   /**

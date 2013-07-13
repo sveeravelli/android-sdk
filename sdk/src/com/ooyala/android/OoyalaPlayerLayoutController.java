@@ -19,28 +19,22 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
   /**
    * Instantiate an OoyalaPlayerLayoutController
    * @param l the layout to use
-   * @param apiKey the API Key to use
-   * @param secret the secret to use
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
-      String domain) {
-    this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO);
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain) {
+    this(l, pcode, domain, DefaultControlStyle.AUTO);
   }
 
   /**
    * Instantiate an OoyalaPlayerLayoutController
    * @param l the layout to use
-   * @param apiKey the API Key to use
-   * @param secret the secret to use
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
-      String domain, EmbedTokenGenerator generator) {
-    this(l, apiKey, secret, pcode, domain, DefaultControlStyle.AUTO, generator);
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, EmbedTokenGenerator generator) {
+    this(l, pcode, domain, DefaultControlStyle.AUTO, generator);
   }
 
   /**
@@ -55,30 +49,24 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
   /**
    * Instantiate an OoyalaPlayerLayoutController
    * @param l the layout to use
-   * @param apiKey the API Key to use
-   * @param secret the secret to use
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
-      String domain, DefaultControlStyle dcs) {
-    this(l, new OoyalaPlayer(apiKey, secret, pcode, domain), dcs);
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs) {
+    this(l, pcode, domain, dcs, null);
   }
 
   /**
    * Instantiate an OoyalaPlayerLayoutController
    * @param l the layout to use
-   * @param apiKey the API Key to use
-   * @param secret the secret to use
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String apiKey, String secret, String pcode,
-      String domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(apiKey, secret, pcode, domain, generator), dcs);
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
+    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
   }
 
   /**

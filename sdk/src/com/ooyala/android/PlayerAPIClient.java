@@ -19,7 +19,6 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 class PlayerAPIClient {
   protected String _pcode = null;
   protected String _domain = null;
-  protected OoyalaAPIHelper _apiHelper = null;
   protected int _width = -1;
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
@@ -31,15 +30,13 @@ class PlayerAPIClient {
 
   public PlayerAPIClient() {}
 
-  public PlayerAPIClient(OoyalaAPIHelper apiHelper, String pcode, String domain, EmbedTokenGenerator embedTokenGenerator) {
-    _apiHelper = apiHelper;
+  public PlayerAPIClient(String pcode, String domain, EmbedTokenGenerator embedTokenGenerator) {
     _pcode = pcode;
     _domain = domain;
     _embedTokenGenerator = embedTokenGenerator;
   }
 
-  private JSONObject verifyAuthorizeJSON(String json, List<String> embedCodes) throws OoyalaException {
-    JSONObject authResult = Utils.objectFromJSON(json);
+  private JSONObject verifyAuthorizeJSON(JSONObject authResult, List<String> embedCodes) throws OoyalaException {
     if (authResult == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
         "Authorization response invalid (nil)."); }
 
@@ -87,8 +84,7 @@ class PlayerAPIClient {
     }
   }
 
-  private JSONObject verifyAuthorizeHeartbeatJSON(String json) throws OoyalaException {
-    JSONObject result = Utils.objectFromJSON(json);
+  private JSONObject verifyAuthorizeHeartbeatJSON(JSONObject result) throws OoyalaException {
     if (result == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
         "response invalid (nil)."); }
 
@@ -236,7 +232,7 @@ class PlayerAPIClient {
       throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
         Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
@@ -273,7 +269,7 @@ class PlayerAPIClient {
       params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
     }
 
-    String json = _apiHelper.jsonForSecureAPI(Constants.AUTHORIZE_HOST, uri, params);
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, params);
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
@@ -352,7 +348,7 @@ class PlayerAPIClient {
   // boolean here refers to the response.
   public boolean authorizeHeartbeat() throws OoyalaException {
     String uri = String.format(Constants.AUTHORIZE_HEARTBEAT_URI, Constants.API_VERSION, _pcode, getAuthToken());
-    String json = OoyalaAPIHelper.jsonForAPI(Constants.AUTHORIZE_HOST, uri, null);
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, null);
     try {
       return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
     } catch (OoyalaException e) {
@@ -699,10 +695,6 @@ class PlayerAPIClient {
 
   public void setHook() {
     _isHook = true;
-  }
-
-  public OoyalaAPIHelper getAPIHelper() {
-    return _apiHelper;
   }
 
   public void setContext(Context context) {
