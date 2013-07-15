@@ -441,7 +441,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _analytics.reportPlayerLoad();
 
     //Play Pre-Rolls first
-    boolean didAdsPlay = playAdsBeforeTime(0);
+    boolean didAdsPlay = playAdsBeforeTime(0) || isAdPlaying();
 
     //If there were no ads, initialize the player and play
     if (!didAdsPlay) {
