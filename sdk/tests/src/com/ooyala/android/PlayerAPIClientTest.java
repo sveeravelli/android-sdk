@@ -19,8 +19,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   }
 
   protected void setUp() {
-    api = new PlayerAPIClient(new OoyalaAPIHelper(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET),
-        TestConstants.TEST_PCODE, "www.ooyala.com", null);
+    api = new PlayerAPIClient(TestConstants.TEST_PCODE, "www.ooyala.com", null);
   }
 
   protected void tearDown() {}
