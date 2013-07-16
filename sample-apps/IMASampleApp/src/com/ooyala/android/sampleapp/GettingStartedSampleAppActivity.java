@@ -26,8 +26,7 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main); OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        APIKEY, SECRET, PCODE, DOMAIN);
+    playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
     OoyalaPlayer player = playerLayoutController.getPlayer();
 
     player.addObserver(this);
@@ -46,7 +45,7 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
 
     if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
       String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
-      OoyalaIMAManager imaManager = new OoyalaIMAManager(this.getBaseContext(), url, playerLayoutController);
+      OoyalaIMAManager imaManager = new OoyalaIMAManager(this, url, playerLayoutController);
     }
 
   }
