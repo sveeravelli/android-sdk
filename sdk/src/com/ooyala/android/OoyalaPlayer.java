@@ -781,7 +781,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       _player.suspend();
     }
 
-    _adPlayer = null;
+    //If an ad is playing, take it out of playedAds, and save it for playback later
+    if(_adPlayer != null) {
+      AdSpot oldAd = _adPlayer.getAd();
+      _playedAds.remove(oldAd);
+      _adPlayer.destroy();
+      _adPlayer = null;
+    }
+
     try {
       Class<? extends AdMoviePlayer> adPlayerClass = _adPlayers.get(ad.getClass());
       if (adPlayerClass != null) {
@@ -978,22 +985,23 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
-            if (!playAdsBeforeTime(this._lastPlayedTime)) {
 
-              // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
-              if (_player == null) {
-                _player = getCorrectMoviePlayer(_currentItem);
-                initializePlayer(_player, _currentItem);
-                play();
-              }
+            if (resumeContent) {
+              if (!playAdsBeforeTime(this._lastPlayedTime)) {
 
-              //If these were post-roll ads, clean up.  Otherwise, resume playback
-              else if (_player.getState() == State.COMPLETED) {
-                onComplete();
-              } else {
-                if (resumeContent) {
-                  _player.resume();
-                  addClosedCaptionsView();
+                // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
+                if (_player == null) {
+                  _player = getCorrectMoviePlayer(_currentItem);
+                  initializePlayer(_player, _currentItem);
+                  play();
+                }
+
+                //If these were post-roll ads, clean up.  Otherwise, resume playback
+                else if (_player.getState() == State.COMPLETED) {
+                  onComplete();
+                } else {
+                    _player.resume();
+                    addClosedCaptionsView();
                 }
               }
             }
