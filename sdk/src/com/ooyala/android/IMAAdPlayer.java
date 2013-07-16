@@ -57,6 +57,7 @@ class IMAAdPlayer extends AdMoviePlayer {
   @Override
   public void pause() {
     Log.d(TAG, "Pausing ad player");
+    super.pause();
   }
 
 

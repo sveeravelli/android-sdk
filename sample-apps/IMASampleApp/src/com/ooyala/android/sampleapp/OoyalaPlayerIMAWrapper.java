@@ -66,6 +66,12 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   @Override
   public void pauseAd() {
     Log.d(TAG, "Pausing Ad");
+    if(isPlayingIMAAd && player.isShowingAd()) {
+      player.pause();
+    }
+    else {
+      Log.e(TAG, "Pausing an ad when an IMA Ad isn't even playing!!");
+    }
 //    video.pause();
   }
 
@@ -130,6 +136,7 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
       }
       //If completing a non-IMA ad
       else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
+        Log.d(TAG, "Update: Non IMA ad completed");
       }
 
 
@@ -169,6 +176,12 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
           Log.d(TAG, "Update: Player Content start");
           for (VideoAdPlayerCallback callback : adCallbacks) {
             callback.onPlay();
+          }
+          break;
+        case PAUSED:
+          Log.d(TAG, "Update: Player Content Pause");
+          for (VideoAdPlayerCallback callback : adCallbacks) {
+            callback.onPause();
           }
           break;
         default:
