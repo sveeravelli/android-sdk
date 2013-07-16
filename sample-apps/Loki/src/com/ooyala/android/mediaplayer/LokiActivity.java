@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ooyala.android.EmbedTokenGenerator;
@@ -50,14 +49,10 @@ public class LokiActivity extends Activity implements EmbedTokenGenerator, Obser
     
     OoyalaPlayerLayoutController playerLayoutController;
     if(token != null) {
-     playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-        pcode, "www.ooyala.com", this);
+     playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, pcode, "www.ooyala.com", this);
     }
     else {
-       playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-          "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd", "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN",
-          pcode, "www.ooyala.com");
+       playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, pcode, "www.ooyala.com");
     }
     OoyalaPlayer player = playerLayoutController.getPlayer();
     //this will be used in the future to enable Third party HLS for Loki

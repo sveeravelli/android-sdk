@@ -164,7 +164,7 @@ public class PlayerActivity extends Activity {
             }
         });
 
-        playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, Constants.OOYALA_API_KEY, Constants.OOYALA_SECRET_KEY, Constants.OOYALA_P_CODE, Constants.OOYALA_PLAYER_DOMAIN);
+        playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, Constants.OOYALA_P_CODE, Constants.OOYALA_PLAYER_DOMAIN);
         playerLayoutController.getLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {

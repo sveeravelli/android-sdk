@@ -9,8 +9,6 @@ import android.view.View;
 import android.widget.Button;
 
 public class AdobePassDemoAppActivity extends Activity implements OnAuthorizationChangedListener {
-  private static final String API_KEY = "pqdHc6rN2_wYW2z-pOmDqkUmMnI1.lpezz";
-  private static final String SECRET = "zJfIg9IRPSL6lZH0GLgPLrxaEg8abFCDDoqhi6V4";
   private static final String PROVIDER_CODE = "pqdHc6rN2_wYW2z-pOmDqkUmMnI1";
   private static final String DOMAIN = "www.ooyala.com";
 
@@ -28,8 +26,7 @@ public class AdobePassDemoAppActivity extends Activity implements OnAuthorizatio
     adobePassController.checkAuth();
 
     ooController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player),
-        API_KEY, SECRET, PROVIDER_CODE, DOMAIN, adobePassController);
+        (OoyalaPlayerLayout) findViewById(R.id.player), PROVIDER_CODE, DOMAIN, adobePassController);
   }
 
   public void onLoginClick(View v) {
