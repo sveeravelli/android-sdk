@@ -970,6 +970,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               onComplete();
             }
           } else {
+            boolean resumeContent = true;
+            if (_adPlayer instanceof IMAAdPlayer) {
+              resumeContent = false;
+            }
+
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
@@ -986,8 +991,10 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               else if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
-                _player.resume();
-                addClosedCaptionsView();
+                if (resumeContent) {
+                  _player.resume();
+                  addClosedCaptionsView();
+                }
               }
             }
           }

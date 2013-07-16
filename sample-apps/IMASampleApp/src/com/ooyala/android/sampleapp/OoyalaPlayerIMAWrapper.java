@@ -13,28 +13,32 @@ import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayer
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.IMAAdSpot;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
 
 public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   static String TAG = "OoyalaPlayerIMAWrapper";
 
   OoyalaPlayer player;
   private AdSpot adSpot;
+  private boolean isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
 
   public OoyalaPlayerIMAWrapper(OoyalaPlayer p){
     player = p;
     Log.d(TAG, "Creating IMA Wrapper");
     player.addObserver(this);
+    isPlayingIMAAd = false;
   }
   // Methods implementing VideoAdPlayer interface.
 
   @Override
   public void playAd() {
     Log.d(TAG, "Playing Ad");
+    isPlayingIMAAd = true;
+
     for (VideoAdPlayerCallback callback : adCallbacks) {
       callback.onPlay();
     }
-
     player.playAd(adSpot);
     //stopAd();
     //video.start();
@@ -43,25 +47,19 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   @Override
   public void stopAd() {
     Log.d(TAG, "StoppingAd");
-    for (VideoAdPlayerCallback callback : adCallbacks) {
-      callback.onEnded();
-    }
 //    video.stopPlayback();
   }
 
   @Override
   public void loadAd(String url) {
-    Log.d(TAG, "LoadingAd");
+    Log.d(TAG, "LoadingAd: " + url);
     adSpot = new IMAAdSpot(url);
 //    video.setVideoPath(url);
   }
 
   @Override
   public void pauseAd() {
-    Log.d(TAG, "Pausign Ad");
-    for (VideoAdPlayerCallback callback : adCallbacks) {
-      callback.onPause();
-    }
+    Log.d(TAG, "Pausing Ad");
 //    video.pause();
   }
 
@@ -87,10 +85,25 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   @Override
   public VideoProgressUpdate getProgress() {
-//    int durationMs =  video.getDuration();
+   int durationMs =  player.getDuration();
 
-    Log.d(TAG, "GetProgress");
-    return new VideoProgressUpdate(player.getPlayheadTime(), player.getDuration());
+    if (durationMs <= 0) {
+      Log.d(TAG, "GetProgress Not Ready");
+      return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
+    }
+//    Log.d(TAG, "GetProgress time: " + (player.getPlayheadTime() + 1) + ", duration: " + durationMs);
+    return new VideoProgressUpdate(player.getPlayheadTime() + 1, player.getDuration());
+  }
+
+  public void pauseContent(){
+
+  }
+
+  public void playContent(){
+    for (VideoAdPlayerCallback callback : adCallbacks) {
+      callback.onPlay();
+    }
+    player.resume();
   }
 
 
@@ -99,9 +112,67 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     OoyalaPlayer player = (OoyalaPlayer) arg0;
     String notification = arg.toString();
 
-    if(notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
-      for (VideoAdPlayerCallback callback : adCallbacks) {
-     //   callback.onEnded();
+    //If playing a non-IMA ad
+    if(!isPlayingIMAAd && player.isShowingAd()) {
+
+      //If starting a non-IMA Ad, we're pausing the content
+      if (notification.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION)) {
+        Log.d(TAG, "Update: Non IMA ad playing");
+        for (VideoAdPlayerCallback callback : adCallbacks) {
+          callback.onPause();
+        }
+      }
+      //If completing a non-IMA ad
+      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
+      }
+
+
+    }
+    else if (isPlayingIMAAd){
+      //If an IMA ad is playing while state is being changed
+      if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && player.isShowingAd()) {
+        switch (player.getState()) {
+        case PLAYING:
+          Log.d(TAG, "Update: Player  Ad start");
+          break;
+        case PAUSED:
+          Log.d(TAG, "Update: Player  Ad Pause");
+          for (VideoAdPlayerCallback callback : adCallbacks) {
+            callback.onPause();
+          }
+        default:
+          break;
+        }
+      }
+
+      //If we get an AD_COMPLETE duirng an IMA ad, our ad has finished
+      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
+        Log.d(TAG, "Update: Player  Ad Complete");
+        isPlayingIMAAd = false;
+        for (VideoAdPlayerCallback callback : adCallbacks) {
+          callback.onEnded();
+        }
+      }
+    }
+
+    //Notifications from content playback
+    else {
+      if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+        switch (player.getState()) {
+        case PLAYING:
+          Log.d(TAG, "Update: Player Content start");
+          for (VideoAdPlayerCallback callback : adCallbacks) {
+            callback.onPlay();
+          }
+
+          break;
+        case COMPLETED:
+          Log.d(TAG, "Update: Player  Content Complete");
+
+          break;
+        default:
+          break;
+        }
       }
     }
   }

@@ -16,6 +16,7 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
@@ -27,7 +28,7 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   protected ImaSdkFactory sdkFactory;
   protected ImaSdkSettings sdkSettings;
   protected OoyalaPlayerLayoutController layoutController;
-  protected VideoAdPlayer ooyalaPlayerWrapper;
+  protected OoyalaPlayerIMAWrapper ooyalaPlayerWrapper;
 
   static String TAG = "OoyalaIMAManager";
   protected ImaSdkSettings getImaSdkSettings() {
@@ -103,15 +104,11 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   //        if (contentStarted) {
   //          videoPlayer.pauseContent();
   //        }
-        layoutController.getPlayer().suspend();
+    //    layoutController.getPlayer().suspend();
+        ooyalaPlayerWrapper.pauseContent();
         break;
       case CONTENT_RESUME_REQUESTED:
-//        if (contentStarted) {
-//          videoPlayer.resumeContent();
-//        } else {
-//          playVideo();
-//        }
-        layoutController.getPlayer().resume();
+        ooyalaPlayerWrapper.playContent();
         break;
       case STARTED:
         break;
