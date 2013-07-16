@@ -22,12 +22,18 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   private AdSpot adSpot;
   private boolean isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
+  private final CompleteCallback completeCallback;
 
-  public OoyalaPlayerIMAWrapper(OoyalaPlayer p){
+  public interface CompleteCallback {
+    public void onComplete();
+  }
+
+  public OoyalaPlayerIMAWrapper(OoyalaPlayer p, CompleteCallback c){
     player = p;
     Log.d(TAG, "Creating IMA Wrapper");
     player.addObserver(this);
     isPlayingIMAAd = false;
+    completeCallback = c;
   }
   // Methods implementing VideoAdPlayer interface.
 
@@ -157,22 +163,21 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
     //Notifications from content playback
     else {
-      if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+      if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
         switch (player.getState()) {
         case PLAYING:
           Log.d(TAG, "Update: Player Content start");
           for (VideoAdPlayerCallback callback : adCallbacks) {
             callback.onPlay();
           }
-
-          break;
-        case COMPLETED:
-          Log.d(TAG, "Update: Player  Content Complete");
-
           break;
         default:
           break;
         }
+      }
+      else if (notification.equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
+        Log.d(TAG, "Update: Player Content Complete");
+        completeCallback.onComplete();
       }
     }
   }

@@ -19,9 +19,10 @@ import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.sampleapp.OoyalaPlayerIMAWrapper.CompleteCallback;
 
 
-public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdEventListener {
+public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdEventListener, CompleteCallback {
   protected AdsLoader adsLoader;
   protected AdsManager adsManager;
   protected AdDisplayContainer container;
@@ -38,9 +39,14 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     return sdkSettings;
   }
 
+  @Override
+  public void onComplete() {
+      adsLoader.contentComplete();
+  }
+
   public OoyalaIMAManager(Context c, String url, OoyalaPlayerLayoutController layoutController) {
     this.layoutController = layoutController;
-    ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(layoutController.getPlayer());
+    ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(layoutController.getPlayer(), this);
     sdkFactory = ImaSdkFactory.getInstance();
     //createAdsLoader
     adsLoader = sdkFactory.createAdsLoader(c, getImaSdkSettings());
