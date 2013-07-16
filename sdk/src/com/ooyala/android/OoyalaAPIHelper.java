@@ -31,7 +31,7 @@ class OoyalaAPIHelper {
     try {
       URLConnection conn = url.openConnection();
 
-      BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
       String line;
       while ((line = rd.readLine()) != null) {
         sb.append(line);
