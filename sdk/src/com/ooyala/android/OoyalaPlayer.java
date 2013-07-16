@@ -441,7 +441,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _analytics.reportPlayerLoad();
 
     //Play Pre-Rolls first
-    boolean didAdsPlay = playAdsBeforeTime(0) || isAdPlaying();
+    boolean didAdsPlay = playAdsBeforeTime(0) || isShowingAd();
 
     //If there were no ads, initialize the player and play
     if (!didAdsPlay) {
@@ -1141,7 +1141,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if currently playing ad, false otherwise
    */
   public boolean isAdPlaying() {
-    return currentPlayer() == _adPlayer;
+    return currentPlayer() == _adPlayer && _adPlayer != null;
   }
 
   /**
