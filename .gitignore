@@ -8,6 +8,7 @@ test_results.txt
 */gen
 */tests/gen
 */local.properties
+**/lint.xml
 sample-apps/*/local.properties
 sample-apps/keys
 sdk/Documentation
