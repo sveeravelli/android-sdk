@@ -32,10 +32,10 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   public OoyalaPlayerIMAWrapper(OoyalaPlayer p, CompleteCallback c){
     player = p;
     Log.d(TAG, "Creating IMA Wrapper");
-    player.addObserver(this);
     isPlayingIMAAd = false;
     completeCallback = c;
     liveContentTimePlayed = 0;
+    player.addObserver(this);
   }
   // Methods implementing VideoAdPlayer interface.
 

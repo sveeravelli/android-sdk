@@ -1,6 +1,8 @@
 package com.ooyala.android.sampleapp;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.content.Context;
 import android.util.Log;
@@ -20,19 +22,24 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
+import com.ooyala.android.IMAAdSpot;
+import com.ooyala.android.IMAAdPlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.Video;
 import com.ooyala.android.sampleapp.OoyalaPlayerIMAWrapper.CompleteCallback;
 
 
-public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdEventListener, CompleteCallback {
+public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdEventListener, CompleteCallback, Observer {
   protected AdsLoader adsLoader;
   protected AdsManager adsManager;
   protected AdDisplayContainer container;
   protected ImaSdkFactory sdkFactory;
   protected ImaSdkSettings sdkSettings;
+
   protected OoyalaPlayerLayoutController layoutController;
   protected OoyalaPlayerIMAWrapper ooyalaPlayerWrapper;
+  protected OoyalaPlayer player;
 
   static String TAG = "OoyalaIMAManager";
   protected ImaSdkSettings getImaSdkSettings() {
@@ -49,12 +56,19 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
   public OoyalaIMAManager(Context c, OoyalaPlayerLayoutController layoutController) {
     this.layoutController = layoutController;
+    player = layoutController.getPlayer();
+
+    //Initialize OoyalaPlayer-IMA Bridge
     ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(layoutController.getPlayer(), this);
+    layoutController.getPlayer().registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
+    layoutController.getPlayer().addObserver(this);
+
+    //Initialize IMA classes
     sdkFactory = ImaSdkFactory.getInstance();
-    //createAdsLoader
     adsLoader = sdkFactory.createAdsLoader(c, getImaSdkSettings());
     adsLoader.addAdErrorListener(this);
     adsLoader.addAdsLoadedListener(this);
+
 
   }
 
@@ -122,4 +136,15 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     }
   }
 
+
+  @Override
+  public void update(Observable observable, Object data) {
+    if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
+      String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
+      Video currentItem = player.getCurrentItem();
+      String url2 = currentItem.getMetadata().get("ad_tag_url");
+      loadAds(url);
+    }
+
+  }
 }

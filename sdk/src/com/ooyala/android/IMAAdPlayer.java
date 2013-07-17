@@ -1,37 +1,15 @@
 package com.ooyala.android;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
-import java.util.Set;
-
 import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-class IMAAdPlayer extends AdMoviePlayer {
+public class IMAAdPlayer extends AdMoviePlayer {
   private IMAAdSpot _ad;
 
-  private boolean _startSent = false;
-  private boolean _firstQSent = false;
-  private boolean _midSent = false;
-  private boolean _thirdQSent = false;
   static String TAG= "IMAAdPlayer";
 
   private Object _fetchTask;
-
-  private interface TrackingEvent {
-    public static final String START = "start";
-    public static final String FIRST_QUARTILE = "firstQuartile";
-    public static final String MIDPOINT = "midpoint";
-    public static final String THIRD_QUARTILE = "thirdQuartile";
-    public static final String COMPLETE = "complete";
-    public static final String PAUSE = "pause";
-    public static final String RESUME = "resume";
-  }
-
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
@@ -67,6 +45,12 @@ class IMAAdPlayer extends AdMoviePlayer {
     super.destroy();
   }
 
+
+  @Override
+  public void setState(State state){
+    Log.d(TAG, "Setting IMA State: " + state);
+    super.setState(state);
+  }
 
   public IMAAdSpot getAd() {
     return _ad;
