@@ -86,11 +86,10 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
   @Override
   public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-    Log.d(TAG, "Ads loaded!");
+    Log.d(TAG, "IMA Ad manager loaded");
     adsManager = event.getAdsManager();
     adsManager.addAdErrorListener(this);
     adsManager.addAdEventListener(this);
-    Log.d(TAG, "Calling init.");
     adsManager.init();
   }
 
@@ -105,10 +104,6 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
         adsManager.start();
         break;
       case CONTENT_PAUSE_REQUESTED:
-  //        if (contentStarted) {
-  //          videoPlayer.pauseContent();
-  //        }
-    //    layoutController.getPlayer().suspend();
         ooyalaPlayerWrapper.pauseContent();
         break;
       case CONTENT_RESUME_REQUESTED:

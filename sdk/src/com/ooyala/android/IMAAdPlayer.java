@@ -35,6 +35,8 @@ class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
+    Log.d(TAG, "Initializing the IMA player");
+
     if (!(ad instanceof IMAAdSpot)) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;
@@ -43,51 +45,19 @@ class IMAAdPlayer extends AdMoviePlayer {
     _seekable = false;
     _ad = (IMAAdSpot) ad;
     super.init(parent, _ad.getStreams());
-    Log.d(TAG, "I'm Initing the ad player!");
   }
 
 
   @Override
   public void play() {
-    Log.d(TAG, "Playing the ad player");
-
+    Log.d(TAG, "Playing the IMA player");
     super.play();
   }
 
   @Override
   public void pause() {
-    Log.d(TAG, "Pausing ad player");
+    Log.d(TAG, "Pausing IMA player");
     super.pause();
-  }
-
-
-  public IMAAdSpot getAd() {
-    return _ad;
-  }
-
-//  @Override
-//  protected void setState(State state) {
-//    //look for state changing to complete here to ensure it happens before any observers notified.
-//    if (state == State.COMPLETED) {
-//      if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
-//      sendTrackingEvent(TrackingEvent.COMPLETE);
-//      if (!_linearAdQueue.isEmpty()) {
-//        addQuartileBoundaryObserver();
-//        super.init(_parent, _linearAdQueue.get(0).getStreams());
-//        return;
-//      }
-//    }
-//    super.setState(state);
-//  }
-
-  public void sendTrackingEvent(String event) {
-//    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
-//    Set<String> urls = currentAd().getTrackingEvents().get(event);
-//    if (urls != null) {
-//      for (String url : urls) {
-//        NetUtils.ping(urlFromAdUrlString(url));
-//      }
-//    }
   }
 
   @Override
@@ -96,4 +66,10 @@ class IMAAdPlayer extends AdMoviePlayer {
     deleteObserver(this);
     super.destroy();
   }
+
+
+  public IMAAdSpot getAd() {
+    return _ad;
+  }
+
 }

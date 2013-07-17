@@ -52,13 +52,13 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   @Override
   public void stopAd() {
-    Log.d(TAG, "StoppingAd");
+    Log.d(TAG, "Stopping Ad");
 //    video.stopPlayback();
   }
 
   @Override
   public void loadAd(String url) {
-    Log.d(TAG, "LoadingAd: " + url);
+    Log.d(TAG, "Loading Ad: " + url);
     adSpot = new IMAAdSpot(url);
 //    video.setVideoPath(url);
   }
@@ -83,14 +83,14 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   @Override
   public void addCallback(VideoAdPlayerCallback callback) {
-    Log.d(TAG, "AddCallback");
+    Log.d(TAG, "Add Callback");
     adCallbacks.add(callback);
 //    video.addCallback(callback);
   }
 
   @Override
   public void removeCallback(VideoAdPlayerCallback callback) {
-    Log.d(TAG, "RemovingCallback");
+    Log.d(TAG, "Removing Callback");
     adCallbacks.remove(callback);
 //    video.removeCallback(callback);
   }
@@ -158,7 +158,7 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
         }
       }
 
-      //If we get an AD_COMPLETE duirng an IMA ad, our ad has finished
+      //If we get an AD_COMPLETE during an IMA ad, our ad has finished
       else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
         Log.d(TAG, "Update: Player  Ad Complete");
         isPlayingIMAAd = false;
