@@ -44,9 +44,6 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     Log.d(TAG, "Playing Ad");
     isPlayingIMAAd = true;
 
-    for (VideoAdPlayerCallback callback : adCallbacks) {
-      callback.onPlay();
-    }
     player.playAd(adSpot);
     //stopAd();
     //video.start();
@@ -158,6 +155,9 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
         switch (player.getState()) {
         case PLAYING:
           Log.d(TAG, "Update: Player  Ad start");
+          for (VideoAdPlayerCallback callback : adCallbacks) {
+            callback.onPlay();
+          }
           break;
         case PAUSED:
           Log.d(TAG, "Update: Player  Ad Pause");
