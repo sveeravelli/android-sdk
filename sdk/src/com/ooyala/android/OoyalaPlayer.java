@@ -680,6 +680,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       addClosedCaptionsView();
       setState(currentPlayer().getState());
     }
+    else {
+      _player = getCorrectMoviePlayer(_currentItem);
+      initializePlayer(_player, _currentItem);
+      dequeuePlay();
+    }
   }
 
   /**
