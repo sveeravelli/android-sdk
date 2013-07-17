@@ -15,6 +15,7 @@ public class MoviePlayer extends Player implements Observer {
   private Set<Stream> _streams;
   private boolean _suspended = true;
   protected boolean _seekable = true;
+  private boolean _live = false;
 
   /**
    * Check which base player would be best suited for this MoviePlayer
@@ -62,6 +63,14 @@ public class MoviePlayer extends Player implements Observer {
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
+  }
+
+  /**
+   * Specify if this baseplayer will be playing a live video or not (default false)
+   * @param isLive
+   */
+  public void setLive(boolean isLive) {
+    _live = isLive;
   }
 
   public StreamPlayer getBasePlayer() {
@@ -126,10 +135,13 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
-    Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
     _suspended = false;
     _basePlayer.init(_parent, _streams);
     _basePlayer.addObserver(this);
+
+    if(_live) millisToResume = 0;
+
+    Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
   }
 

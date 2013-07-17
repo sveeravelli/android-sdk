@@ -23,6 +23,7 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   private boolean isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
   private final CompleteCallback completeCallback;
+  private int liveContentTimePlayed;
 
   public interface CompleteCallback {
     public void onComplete();
@@ -34,6 +35,7 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     player.addObserver(this);
     isPlayingIMAAd = false;
     completeCallback = c;
+    liveContentTimePlayed = 0;
   }
   // Methods implementing VideoAdPlayer interface.
 
@@ -98,17 +100,26 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   @Override
   public VideoProgressUpdate getProgress() {
    int durationMs =  player.getDuration();
+   int playheadMs = player.getPlayheadTime();
 
-    if (durationMs <= 0) {
-      Log.d(TAG, "GetProgress Not Ready");
-      return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
-    }
-//    Log.d(TAG, "GetProgress time: " + (player.getPlayheadTime() + 1) + ", duration: " + durationMs);
-    return new VideoProgressUpdate(player.getPlayheadTime() + 1, player.getDuration());
+   if(!isPlayingIMAAd) {
+     playheadMs += liveContentTimePlayed;
+     Log.d(TAG, "added livecontent:" + liveContentTimePlayed);
+   }
+
+//    if (durationMs <= 0) {
+//      Log.d(TAG, "GetProgress Not Ready");
+//      return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
+//    }
+    if (durationMs == 0) durationMs = Integer.MAX_VALUE;
+    Log.d(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
+    return new VideoProgressUpdate(playheadMs, durationMs);
   }
 
   public void pauseContent(){
-
+    if(player.getCurrentItem().isLive()) {
+      liveContentTimePlayed = liveContentTimePlayed + player.getPlayheadTime();
+    }
   }
 
   public void playContent(){

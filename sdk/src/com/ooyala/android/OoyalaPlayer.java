@@ -516,6 +516,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
     p.init(this, streams);
 
+    p.setLive(currentItem.isLive());
+
     addClosedCaptionsView();
 
     // Player must have been initialized, as well as player's basePlayer, in order to continue
