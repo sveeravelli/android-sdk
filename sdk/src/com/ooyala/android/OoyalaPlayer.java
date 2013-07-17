@@ -148,6 +148,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public OoyalaPlayer(String pcode, String domain) {
     this(pcode, domain, null);
+
   }
 
   /**
@@ -807,14 +808,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       // do nothing
     } catch (IllegalAccessException e) {
       // do nothing
-    }
-
-    if (ad instanceof OoyalaAdSpot) {
-      _adPlayer = new OoyalaAdPlayer();
-    } else if (ad instanceof VASTAdSpot) {
-      _adPlayer = new VASTAdPlayer();
-    } else if (ad instanceof IMAAdSpot) {
-      _adPlayer = new IMAAdPlayer();
     }
 
     if (_adPlayer == null) { return false; }
