@@ -677,6 +677,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     if (currentPlayer() != null) {
       currentPlayer().resume();
+      dequeuePlay();
       addClosedCaptionsView();
       setState(currentPlayer().getState());
     }
