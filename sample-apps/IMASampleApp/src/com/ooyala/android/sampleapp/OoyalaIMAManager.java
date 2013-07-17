@@ -1,5 +1,7 @@
 package com.ooyala.android.sampleapp;
 
+import java.util.List;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
 import com.google.ads.interactivemedia.v3.api.AdsRequest;
+import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
@@ -44,7 +47,7 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
       adsLoader.contentComplete();
   }
 
-  public OoyalaIMAManager(Context c, String url, OoyalaPlayerLayoutController layoutController) {
+  public OoyalaIMAManager(Context c, OoyalaPlayerLayoutController layoutController) {
     this.layoutController = layoutController;
     ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(layoutController.getPlayer(), this);
     sdkFactory = ImaSdkFactory.getInstance();
@@ -53,6 +56,12 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     adsLoader.addAdErrorListener(this);
     adsLoader.addAdsLoadedListener(this);
 
+  }
+
+  public void loadAds(String url) {
+    loadAds(url, null);
+  }
+  public void loadAds(String url, List<CompanionAdSlot> companionAdSlots) {
     //buildAdsRequest
     container = sdkFactory.createAdDisplayContainer();
     container.setPlayer(ooyalaPlayerWrapper);
@@ -61,21 +70,10 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     AdsRequest request = sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
 
-//    ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<CompanionAdSlot>();
+    if (companionAdSlots != null) {
+      container.setCompanionSlots(companionAdSlots);
+    }
 
-    //CompanionAdSlot companionAdSlot = sdkFactory.createCompanionAdSlot();
-    //companionAdSlot.setContainer(companionView);
-    //companionAdSlot.setSize(300, 50);
-    //companionAdSlots.add(companionAdSlot);
-
-//    if (leaderboardCompanionView != null) {
-//      CompanionAdSlot leaderboardCompanionAdSlot = sdkFactory.createCompanionAdSlot();
-//      leaderboardCompanionAdSlot.setContainer(leaderboardCompanionView);
-//      leaderboardCompanionAdSlot.setSize(728, 90);
-//      companionAdSlots.add(leaderboardCompanionAdSlot);
-//    }
-
-//    container.setCompanionSlots(companionAdSlots);
     request.setAdDisplayContainer(container);
 
     adsLoader.requestAds(request);
