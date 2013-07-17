@@ -1,15 +1,16 @@
-package com.ooyala.android;
+package com.ooyala.android.sampleapp;
 
 import android.util.Log;
 
+import com.ooyala.android.AdMoviePlayer;
+import com.ooyala.android.AdSpot;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class IMAAdPlayer extends AdMoviePlayer {
   private IMAAdSpot _ad;
 
   static String TAG= "IMAAdPlayer";
-
-  private Object _fetchTask;
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
@@ -40,7 +41,6 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void destroy() {
-    if (_fetchTask != null && this._parent != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
     deleteObserver(this);
     super.destroy();
   }

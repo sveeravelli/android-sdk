@@ -980,9 +980,10 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             }
           } else {
             boolean resumeContent = true;
-            if (_adPlayer instanceof IMAAdPlayer) {
-              resumeContent = false;
-            }
+            //TODO: Get IMAAdPlayer to work correctly!
+//            if (_adPlayer instanceof IMAAdPlayer) {
+//              resumeContent = false;
+//            }
 
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
