@@ -12,8 +12,14 @@ import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.OoyalaPlayer;
 
+/**
+ * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.
+ *
+ * @author michael.len
+ *
+ */
 public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
-  static String TAG = "OoyalaPlayerIMAWrapper";
+  private static String TAG = "OoyalaPlayerIMAWrapper";
 
   OoyalaPlayer player;
   private AdSpot adSpot;
@@ -22,19 +28,28 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   private final CompleteCallback completeCallback;
   private int liveContentTimePlayed;
 
+  /**
+   * A simple interface to allow for a callback when content is completed
+   * @author michael.len
+   *
+   */
   public interface CompleteCallback {
     public void onComplete();
   }
 
-  public OoyalaPlayerIMAWrapper(OoyalaPlayer p, CompleteCallback c){
-    player = p;
+  /**
+   * Wrap an instantiated OoyalaPlayer to provide the IMA interface
+   * @param player the OoyalaPlayer to use
+   * @param callback a callback for when content is completed
+   */
+  public OoyalaPlayerIMAWrapper(OoyalaPlayer player, CompleteCallback callback){
+    this.player = player;
     Log.d(TAG, "Creating IMA Wrapper");
     isPlayingIMAAd = false;
-    completeCallback = c;
+    completeCallback = callback;
     liveContentTimePlayed = 0;
     player.addObserver(this);
   }
-
 
   // Methods implementing VideoAdPlayer interface.
   @Override
@@ -98,7 +113,7 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   @Override
   public VideoProgressUpdate getProgress() {
-   int durationMs =  player.getDuration();
+   int durationMs = player.getDuration();
    int playheadMs = player.getPlayheadTime();
 
    if(!isPlayingIMAAd) {
@@ -110,12 +125,20 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     return new VideoProgressUpdate(playheadMs, durationMs);
   }
 
+  /**
+   * Only called from the IMAManager when content should be paused. Note: This does not really pause content.
+   * However, it informs the player wrapper that content will be paused.
+   */
   public void pauseContent(){
     if(player.getCurrentItem().isLive()) {
       liveContentTimePlayed = liveContentTimePlayed + player.getPlayheadTime();
     }
   }
 
+  /**
+   * Called when the IMAManager wants to resume content after advertisements.  This is how content is resumed
+   * after IMA ads are played.
+   */
   public void playContent(){
     for (VideoAdPlayerCallback callback : adCallbacks) {
       callback.onPlay();
@@ -145,11 +168,10 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
       else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
         Log.d(TAG, "Update: Non IMA ad completed");
       }
-
-
     }
+
+    //If an IMA ad is playing while state is being changed
     else if (isPlayingIMAAd){
-      //If an IMA ad is playing while state is being changed
       if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && player.isShowingAd()) {
         switch (player.getState()) {
         case PLAYING:

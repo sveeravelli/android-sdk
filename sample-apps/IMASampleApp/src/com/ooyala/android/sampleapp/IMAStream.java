@@ -1,17 +1,16 @@
 package com.ooyala.android.sampleapp;
 
-
 import com.ooyala.android.Stream;
 
 public class IMAStream extends Stream {
   /**
-   * Initialize a Stream using the specified VAST MediaFile XML (subclasses should override this)
-   * @param data the Element containing the xml to use to initialize this Stream
+   *  Initialize an IMA Stream that is used to playback an IMA ad spot
+   *  * @param url the URL of the media file to play as the advertisement
    */
   IMAStream(String url) {
     super();
-    this._deliveryType = "mp4";
-    this._urlFormat = "text";
+    this._deliveryType = "mp4"; // mp4 may not be correct 100% of the time, but the IMA Ad manager actually
+    this._urlFormat = "text";   // determines playable video types, and always returns playable video for android
     this._url = url;
   }
 }

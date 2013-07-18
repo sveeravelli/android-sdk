@@ -25,8 +25,15 @@ import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.Video;
 import com.ooyala.android.sampleapp.OoyalaPlayerIMAWrapper.CompleteCallback;
 
-
+/**
+ * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
+ * automatically be configured, as long as the VAST URL is properly configured in Third Module Metadata.
+ * @author michael.len
+ *
+ */
 public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdEventListener, CompleteCallback, Observer {
+  private static String TAG = "OoyalaIMAManager";
+
   protected AdsLoader adsLoader;
   protected AdsManager adsManager;
   protected AdDisplayContainer container;
@@ -37,7 +44,6 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   protected OoyalaPlayerIMAWrapper ooyalaPlayerWrapper;
   protected OoyalaPlayer player;
 
-  static String TAG = "OoyalaIMAManager";
   protected ImaSdkSettings getImaSdkSettings() {
     if (sdkSettings == null) {
       sdkSettings = sdkFactory.createImaSdkSettings();
@@ -45,12 +51,14 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     return sdkSettings;
   }
 
-  @Override
-  public void onComplete() {
-      adsLoader.contentComplete();
-  }
-
-  public OoyalaIMAManager(Context c, OoyalaPlayerLayoutController layoutController) {
+  /**
+   * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
+   * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
+   * Module Metadata.
+   * @param context The context of the activity, which will be used to redirect end users to the browser
+   * @param layoutController The Ooyala layout controller you initialized
+   */
+  public OoyalaIMAManager(Context context, OoyalaPlayerLayoutController layoutController) {
     this.layoutController = layoutController;
     player = layoutController.getPlayer();
 
@@ -61,18 +69,29 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
     //Initialize IMA classes
     sdkFactory = ImaSdkFactory.getInstance();
-    adsLoader = sdkFactory.createAdsLoader(c, getImaSdkSettings());
+    adsLoader = sdkFactory.createAdsLoader(context, getImaSdkSettings());
     adsLoader.addAdErrorListener(this);
     adsLoader.addAdsLoadedListener(this);
-
-
   }
 
+  /**
+   * Manually load an IMA Vast URL to initialize the IMA Manager.
+   * You do not need to do this if a VAST URL is properly configured in Third Party Module Metadata
+   * @param url VAST url for IMA
+   */
   public void loadAds(String url) {
     loadAds(url, null);
   }
+
+  /**
+   * Manually load an IMA Vast URL to initialize the IMA Manager
+   * @param url VAST url for IMA
+   * @param companionAdSlots Companion Ad Slots that can be given banner ads.
+   */
   public void loadAds(String url, List<CompanionAdSlot> companionAdSlots) {
-    //buildAdsRequest
+    if(container != null) {
+      Log.d(TAG, "The customer is loading ads a second time!");
+    }
     container = sdkFactory.createAdDisplayContainer();
     container.setPlayer(ooyalaPlayerWrapper);
     container.setAdContainer(layoutController.getLayout());
@@ -85,7 +104,6 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     }
 
     request.setAdDisplayContainer(container);
-
     adsLoader.requestAds(request);
   }
 
@@ -102,7 +120,6 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     adsManager.addAdEventListener(this);
     adsManager.init();
   }
-
 
   @Override
   public void onAdEvent(AdEvent event) {
@@ -132,6 +149,10 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
     }
   }
 
+  @Override
+  public void onComplete() {
+      adsLoader.contentComplete();
+  }
 
   @Override
   public void update(Observable observable, Object data) {
