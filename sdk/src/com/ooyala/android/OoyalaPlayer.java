@@ -26,6 +26,7 @@ import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbeatErrorListener {
+
   public static final String PLAYER_VISUALON = "VisualOn";
   public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
@@ -102,6 +103,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static void setEnvironment(Environment e) {
     Constants.setEnvironment(e);
   }
+
+  private static final String TAG = OoyalaPlayer.class.getName();
 
   private Handler _handler = new Handler();
   private Video _currentItem = null;
@@ -247,7 +250,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", error);
+          Log.d(TAG, "Exception in setEmbedCodes!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -290,7 +293,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in setExternalIds!", error);
+          Log.d(TAG, "Exception in setExternalIds!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -351,7 +354,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(metadataTaskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception fetching metadata from setEmbedCodes!", error);
+          Log.d(TAG, "Exception fetching metadata from setEmbedCodes!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
         } else {
@@ -372,7 +375,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           taskCompleted(taskKey);
           if (error != null) {
             _error = error;
-            Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", error);
+            Log.d(TAG, "Exception in changeCurrentVideo!", error);
             setState(State.ERROR);
             sendNotification(ERROR_NOTIFICATION);
             return;
@@ -474,7 +477,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in reinitialize!", error);
+          Log.d(TAG, "Exception in reinitialize!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -499,7 +502,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       } catch(Exception e) {
         _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
             "Could not initialize Widevine Player");
-        Log.d(this.getClass().getName(), "Please include the Widevine Library in your project", _error);
+        Log.d(TAG, "Please include the Widevine Library in your project", _error);
         setState(State.ERROR);
       }
     }
@@ -653,7 +656,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(this.getClass().getName(), "Error Reauthorizing Video", error);
+              Log.d(TAG, "Error Reauthorizing Video", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -786,7 +789,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   public boolean playAd(AdSpot ad) {
-    Log.d(this.getClass().getName(), "Will try to play an ad");
+    Log.d(TAG, "Will try to play an ad");
     if(_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
     }
@@ -816,7 +819,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     //The Ad initialization didn't work.  Destroy the _adPlayer and go back to playing the video
     if (_adPlayer == null || _adPlayer.getBasePlayer() == null || _adPlayer.getState() == State.ERROR) {
-      Log.d(this.getClass().getName(), "Ad playback failed.  Continuing to play video");
+      Log.d(TAG, "Ad playback failed.  Continuing to play video");
       _adPlayer = null;
       return false;
     }
@@ -1381,7 +1384,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Movie is not authorized for this device!", error);
+          Log.d(TAG, "Movie is not authorized for this device!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
