@@ -25,7 +25,6 @@ public class IMAAdSpot extends AdSpot {
   public IMAAdSpot(String url) {
     super();
     stream = new IMAStream(url);
-    Log.d(TAG, "Initing the IMA Ad Spot");
   }
 
   @Override

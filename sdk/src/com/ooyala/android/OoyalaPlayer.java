@@ -26,7 +26,6 @@ import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbeatErrorListener {
-
   public static final String PLAYER_VISUALON = "VisualOn";
   public static final String PLAYER_ANDROID = "Android Default";
   public static enum ActionAtEnd {
@@ -445,7 +444,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _analytics.reportPlayerLoad();
 
     //Play Pre-Rolls first
-    boolean didAdsPlay = playAdsBeforeTime(0) || isShowingAd();
+    boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0);
 
     //If there were no ads, initialize the player and play
     if (!didAdsPlay) {
@@ -789,7 +788,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   public boolean playAd(AdSpot ad) {
-    Log.d(TAG, "Will try to play an ad");
+    Log.d(TAG, "Ooyala Player: Playing Ad");
     if(_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
     }
@@ -974,7 +973,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         displayCurrentClosedCaption();
       }
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      Log.d(this.getClass().toString(), "Ooyala Player State Changed: " + player.getState());
       switch (player.getState()) {
         case COMPLETED:
           if (player == _player) {
@@ -999,8 +997,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               else if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
-                  _player.resume();
-                  addClosedCaptionsView();
+                _player.resume();
+                addClosedCaptionsView();
               }
             }
           }

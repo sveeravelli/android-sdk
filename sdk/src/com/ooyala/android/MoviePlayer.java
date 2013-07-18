@@ -115,10 +115,10 @@ public class MoviePlayer extends Player implements Observer {
   public void suspend(int millisToResume, State stateToResume) {
     // If we're already suspended, we don't need to do it again
     if (stateToResume == State.SUSPENDED) {
-      Log.e(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
+      Log.i(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
       return;
     }
-    Log.d(this.getClass().toString(), "suspending: msToResume:" + millisToResume + ". state to resume" + stateToResume);
+    Log.d(this.getClass().toString(), "Movie Player Suspending. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
@@ -141,7 +141,7 @@ public class MoviePlayer extends Player implements Observer {
 
     if(_live) millisToResume = 0;
 
-    Log.d(this.getClass().toString(), "Resuming: msToResume:" + millisToResume + ". state to resume" + stateToResume);
+    Log.d(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
   }
 

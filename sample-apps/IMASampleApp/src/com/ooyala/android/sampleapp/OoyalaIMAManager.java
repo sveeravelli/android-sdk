@@ -90,12 +90,12 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
    */
   public void loadAds(String url, List<CompanionAdSlot> companionAdSlots) {
     if(container != null) {
-      Log.d(TAG, "The customer is loading ads a second time!");
+      Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
     container = sdkFactory.createAdDisplayContainer();
     container.setPlayer(ooyalaPlayerWrapper);
     container.setAdContainer(layoutController.getLayout());
-    Log.d(TAG, "Requesting ads");
+    Log.d(TAG, "IMA Managaer: Requesting ads");
     AdsRequest request = sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
 
@@ -109,7 +109,7 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
   @Override
   public void onAdError(AdErrorEvent event) {
-    Log.e(TAG, event.getError().getMessage() + "\n");
+    Log.e(TAG, "IMA Manager Error: " + event.getError().getMessage() + "\n");
   }
 
   @Override
@@ -123,11 +123,11 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
   @Override
   public void onAdEvent(AdEvent event) {
-    Log.d(TAG,"IMA Ad Event:" + event.getType());
+    Log.d(TAG,"IMA Ad Event: " + event.getType());
 
     switch (event.getType()) {
       case LOADED:
-        Log.d(TAG,"Calling start.");
+        Log.d(TAG,"IMA Ad Manager: Starting ad");
         adsManager.start();
         break;
       case CONTENT_PAUSE_REQUESTED:
@@ -157,7 +157,7 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   @Override
   public void update(Observable observable, Object data) {
     if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
-    //  String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
+    // String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
       Video currentItem = player.getCurrentItem();
       String url = currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("ad_tag_url");
 

@@ -21,7 +21,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
-    Log.d(TAG, "Initializing the IMA player");
+    Log.d(TAG, "IMA Ad Player: Initializing");
 
     if (!(ad instanceof IMAAdSpot)) {
       this._error = "Invalid Ad";
@@ -35,13 +35,13 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
-    Log.d(TAG, "Playing the IMA player");
+    Log.d(TAG, "IMA Ad Player: Playing");
     super.play();
   }
 
   @Override
   public void pause() {
-    Log.d(TAG, "Pausing IMA player");
+    Log.d(TAG, "IMA Ad Player: Pausing");
     super.pause();
   }
 
@@ -63,12 +63,6 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
 
     super.update(arg0, arg);
-  }
-
-  @Override
-  public void setState(State state){
-    Log.d(TAG, "Setting IMA State: " + state);
-    super.setState(state);
   }
 
   public IMAAdSpot getAd() {
