@@ -1,5 +1,7 @@
 package com.ooyala.android.sampleapp;
 
+import java.util.Observable;
+
 import android.util.Log;
 
 import com.ooyala.android.AdMoviePlayer;
@@ -45,6 +47,18 @@ public class IMAAdPlayer extends AdMoviePlayer {
     super.destroy();
   }
 
+  @Override
+  public void update(Observable arg0, Object arg) {
+    String notification = arg.toString();
+
+
+    if (notification == "stateChanged" && getState() == State.COMPLETED) {
+      Log.d(TAG, "Swallowing Completed event!");
+      arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
+    }
+
+    super.update(arg0, arg);
+  }
 
   @Override
   public void setState(State state){

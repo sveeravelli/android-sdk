@@ -798,7 +798,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if(_adPlayer != null) {
       AdSpot oldAd = _adPlayer.getAd();
       _playedAds.remove(oldAd);
-      _adPlayer.destroy();
+      cleanupPlayer(_adPlayer);
       _adPlayer = null;
     }
 
@@ -982,33 +982,25 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               onComplete();
             }
           } else {
-            boolean resumeContent = true;
-            //TODO: Get IMAAdPlayer to work correctly!
-//            if (_adPlayer instanceof IMAAdPlayer) {
-//              resumeContent = false;
-//            }
-
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
 
-            if (resumeContent) {
-              if (!playAdsBeforeTime(this._lastPlayedTime)) {
+            if (!playAdsBeforeTime(this._lastPlayedTime)) {
 
-                // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
-                if (_player == null) {
-                  _player = getCorrectMoviePlayer(_currentItem);
-                  initializePlayer(_player, _currentItem);
-                  play();
-                }
+              // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
+              if (_player == null) {
+                _player = getCorrectMoviePlayer(_currentItem);
+                initializePlayer(_player, _currentItem);
+                play();
+              }
 
-                //If these were post-roll ads, clean up.  Otherwise, resume playback
-                else if (_player.getState() == State.COMPLETED) {
-                  onComplete();
-                } else {
-                    _player.resume();
-                    addClosedCaptionsView();
-                }
+              //If these were post-roll ads, clean up.  Otherwise, resume playback
+              else if (_player.getState() == State.COMPLETED) {
+                onComplete();
+              } else {
+                  _player.resume();
+                  addClosedCaptionsView();
               }
             }
           }
@@ -1053,6 +1045,13 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         default:
           setState(player.getState());
       }
+
+    //AD_COMPLETED_NOTIFICATION can only be seen here if a MoviePlayer or AdPlayer fires the notification.
+    // If it is fired, that means an ad player has completed an ad, but expects an ad manager to resume content
+    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
+      cleanupPlayer(_adPlayer);
+      _adPlayer = null;
+      sendNotification(AD_COMPLETED_NOTIFICATION);
     }
   }
 
