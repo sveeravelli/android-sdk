@@ -22,6 +22,7 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
+import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.Video;
@@ -138,10 +139,13 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   @Override
   public void update(Observable observable, Object data) {
     if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
-      String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
+    //  String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
       Video currentItem = player.getCurrentItem();
-      String url2 = currentItem.getMetadata().get("ad_tag_url");
-      loadAds(url);
+      String url = currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("ad_tag_url");
+
+      if(url != null) {
+        loadAds(url);
+      }
     }
 
   }
