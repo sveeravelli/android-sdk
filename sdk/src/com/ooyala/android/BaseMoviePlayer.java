@@ -347,14 +347,15 @@ public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateLi
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
-      stop();
+
+      _player.stop();
+      _player.release();
       _player = null;
     }
     removeView();
     _width = 0;
     _height = 0;
     _buffer = 0;
-    _playQueued = false;
     setState(State.SUSPENDED);
   }
 
