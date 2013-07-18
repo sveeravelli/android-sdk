@@ -9,10 +9,8 @@ import android.util.Log;
 
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
-import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
 
 public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   static String TAG = "OoyalaPlayerIMAWrapper";
@@ -36,16 +34,15 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     liveContentTimePlayed = 0;
     player.addObserver(this);
   }
-  // Methods implementing VideoAdPlayer interface.
 
+
+  // Methods implementing VideoAdPlayer interface.
   @Override
   public void playAd() {
     Log.d(TAG, "Playing Ad");
     isPlayingIMAAd = true;
 
     player.playAd(adSpot);
-    //stopAd();
-    //video.start();
   }
 
   @Override
@@ -63,7 +60,6 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   public void loadAd(String url) {
     Log.d(TAG, "Loading Ad: " + url);
     adSpot = new IMAAdSpot(url);
-//    video.setVideoPath(url);
   }
 
   @Override
@@ -92,14 +88,12 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   public void addCallback(VideoAdPlayerCallback callback) {
     Log.d(TAG, "Add Callback");
     adCallbacks.add(callback);
-//    video.addCallback(callback);
   }
 
   @Override
   public void removeCallback(VideoAdPlayerCallback callback) {
     Log.d(TAG, "Removing Callback");
     adCallbacks.remove(callback);
-//    video.removeCallback(callback);
   }
 
   @Override
@@ -109,15 +103,10 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
    if(!isPlayingIMAAd) {
      playheadMs += liveContentTimePlayed;
-     Log.d(TAG, "added livecontent:" + liveContentTimePlayed);
    }
 
-//    if (durationMs <= 0) {
-//      Log.d(TAG, "GetProgress Not Ready");
-//      return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
-//    }
     if (durationMs == 0) durationMs = Integer.MAX_VALUE;
-    Log.d(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
+    Log.v(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
     return new VideoProgressUpdate(playheadMs, durationMs);
   }
 
@@ -136,7 +125,6 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     }
     player.resume();
   }
-
 
   @Override
   public void update(Observable arg0, Object arg) {

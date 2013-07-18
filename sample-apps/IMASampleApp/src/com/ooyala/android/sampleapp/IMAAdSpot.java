@@ -21,7 +21,6 @@ public class IMAAdSpot extends AdSpot {
 
   @Override
   public boolean fetchPlaybackInfo() {
-    // TODO Auto-generated method stub
     return false;
   }
 
