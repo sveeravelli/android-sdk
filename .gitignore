@@ -1,5 +1,6 @@
 .DS_Store
 OoyalaSDK-Android.zip
+OoyalaIMASDK-Android.zip
 test_results.txt
 *.class
 */javadoc
@@ -19,6 +20,7 @@ sample-apps/*/bin
 sample-apps/*/gen
 third_party_sample_apps/*/bin
 third_party_sample_apps/*/gen
+third_party_sdks/*/Documentation
 third_party_sdks/*/bin
 third_party_sdks/*/gen
 vendor/VisualOn/SamplePlayer/bin

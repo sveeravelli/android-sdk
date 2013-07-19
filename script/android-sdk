@@ -5,6 +5,7 @@ SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLATFORM_NAME="Android"
 source ${SCRIPT_DIR}/sdk-helper.sh
 JAR_NAME="${LIB_BASE}.jar"
+IMA_JAR_NAME="${IMA_LIB_BASE}.jar"
 AVD_NAME="unit_test"
 ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
@@ -24,12 +25,18 @@ function public_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
   javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
+
+  cd ${IMA_SDK_DIR}
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
 
 function complete_docs {
   currdir=`pwd`
   cd ${SDK_DIR}
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
+
+  cd ${IMA_SDK_DIR}
   javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
@@ -50,6 +57,13 @@ function custom_gen {
   ant release
   cp bin/classes.jar ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME}
 
+  #create IMA jar
+  cd ${IMA_SDK_DIR}
+  ant clean
+  ant release
+  cp bin/classes.jar ${BASE_DIR}/${IMA_ZIP_BASE}/${IMA_JAR_NAME}
+  cp libs/google-ima-sdk.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
+
   #update sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
@@ -57,7 +71,12 @@ function custom_gen {
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/AdobePassDemoApp/libs/
 
   #update third party sample apps
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/OmnitureSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
+
+  #update IMA Sample App
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  cp bin/classes.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/${IMA_JAR_NAME}
+  cp libs/google-ima-sdk.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
