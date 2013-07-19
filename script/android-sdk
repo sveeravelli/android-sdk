@@ -61,8 +61,12 @@ function custom_gen {
   cd ${IMA_SDK_DIR}
   ant clean
   ant release
-  cp bin/classes.jar ${BASE_DIR}/${IMA_ZIP_BASE}/${IMA_JAR_NAME}
-  cp libs/google-ima-sdk.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
+  ant jar
+  cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
+  #update IMA Sample App
+  cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  rm OoyalaIMASDK.jar
 
   #update sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
@@ -73,10 +77,6 @@ function custom_gen {
   #update third party sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
 
-  #update IMA Sample App
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
-  cp bin/classes.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/${IMA_JAR_NAME}
-  cp libs/google-ima-sdk.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
