@@ -1,4 +1,5 @@
-package com.ooyala.android.sampleapp;
+package com.ooyala.android.imasdk;
+
 
 import java.util.Observable;
 

@@ -1,12 +1,11 @@
-package com.ooyala.android.sampleapp;
+package com.ooyala.android.imasdk;
+
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.Stream;
-
-import android.util.Log;
 
 /**
  * The ad spot that holds the single video stream for an IMA ad spot

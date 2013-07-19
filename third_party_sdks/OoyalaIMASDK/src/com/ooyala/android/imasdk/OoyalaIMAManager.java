@@ -1,4 +1,5 @@
-package com.ooyala.android.sampleapp;
+package com.ooyala.android.imasdk;
+
 
 import java.util.List;
 import java.util.Observable;
@@ -23,7 +24,7 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.Video;
-import com.ooyala.android.sampleapp.OoyalaPlayerIMAWrapper.CompleteCallback;
+import com.ooyala.android.imasdk.OoyalaPlayerIMAWrapper.CompleteCallback;
 
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will

@@ -1,12 +1,12 @@
 package com.ooyala.android.sampleapp;
 
+import com.ooyala.android.imasdk.*;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
-import com.ooyala.android.sampleapp.OoyalaIMAManager;
 
 public class GettingStartedSampleAppActivity extends Activity {
 
