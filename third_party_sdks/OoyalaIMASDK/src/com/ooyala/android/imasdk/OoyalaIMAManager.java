@@ -43,6 +43,7 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
 
   protected OoyalaPlayerLayoutController layoutController;
   protected OoyalaPlayerIMAWrapper ooyalaPlayerWrapper;
+  protected List<CompanionAdSlot> companionAdSlots;
   protected OoyalaPlayer player;
 
   protected ImaSdkSettings getImaSdkSettings() {
@@ -76,23 +77,22 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   }
 
   /**
+   * Specify a list of views that the IMA Manager can use to show companion ads.
+   * @param companionAdSlots
+   */
+  public void setCompanionAdSlots(List<CompanionAdSlot> companionAdSlots) {
+    this.companionAdSlots = companionAdSlots;
+  }
+  /**
    * Manually load an IMA Vast URL to initialize the IMA Manager.
    * You do not need to do this if a VAST URL is properly configured in Third Party Module Metadata
    * @param url VAST url for IMA
    */
   public void loadAds(String url) {
-    loadAds(url, null);
-  }
-
-  /**
-   * Manually load an IMA Vast URL to initialize the IMA Manager
-   * @param url VAST url for IMA
-   * @param companionAdSlots Companion Ad Slots that can be given banner ads.
-   */
-  public void loadAds(String url, List<CompanionAdSlot> companionAdSlots) {
     if(container != null) {
       Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
+
     container = sdkFactory.createAdDisplayContainer();
     container.setPlayer(ooyalaPlayerWrapper);
     container.setAdContainer(layoutController.getLayout());

@@ -8,6 +8,19 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/hello" />
+    <FrameLayout
+        android:id="@+id/companionFrame"
+        android:layout_width="300dp"
+        android:layout_height="50dp" >
+
+        <TextView
+            android:id="@+id/companionPlaceholder"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="companion placeholder"
+            android:textSize="25dp" />
+
+    </FrameLayout>
 
     <com.ooyala.android.OoyalaPlayerLayout
       android:id="@+id/ooyalaPlayer"

@@ -1,14 +1,24 @@
-package com.ooyala.android.sampleapp;
+package com.ooyala.android.imasampleapp;
 
+import java.util.ArrayList;
+
+import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
+import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.ooyala.android.imasdk.*;
+import com.ooyala.android.imasampleapp.R;
+import com.ooyala.android.imasampleapp.R.id;
+import com.ooyala.android.imasampleapp.R.layout;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
+
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 
-public class GettingStartedSampleAppActivity extends Activity {
+public class IMASampleAppActivity extends Activity {
 
   final String EMBED  = "91bThhODokcxQNhlk3ttzNZs3HoTZ12M";  //Embed Code, or Content ID
   //final String EMBED  = "Rva245YTpHWP-9bchhJL25BMl1shI2fG"; //BYU Live Closed
@@ -29,6 +39,15 @@ public class GettingStartedSampleAppActivity extends Activity {
     //String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
 
     imaManager = new OoyalaIMAManager(this, playerLayoutController);
+    ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<CompanionAdSlot>();
+    ViewGroup companionView = (ViewGroup) findViewById(R.id.companionFrame);
+    //Initialize IMA classes
+    ImaSdkFactory sdkFactory = ImaSdkFactory.getInstance();
+    CompanionAdSlot companionAdSlot = sdkFactory.createCompanionAdSlot();
+    companionAdSlot.setContainer(companionView);
+    companionAdSlot.setSize(300, 50);
+    companionAdSlots.add(companionAdSlot);
+    imaManager.setCompanionAdSlots(companionAdSlots);
 
     if (player.setEmbedCode(EMBED)) {
       player.play();
