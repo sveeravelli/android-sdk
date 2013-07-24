@@ -577,6 +577,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   /**
+   * Get the authToken for the current player.
+   * @return authToken
+   */
+  public String getAuthToken() {
+	    return _playerAPIClient.getAuthToken();
+  }
+
+  /**
    * Get current player state. One of playing, paused, buffering, channel, or error
    * @return state
    */
