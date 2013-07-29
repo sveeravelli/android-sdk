@@ -90,7 +90,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   public void onError(DrmManagerClient client, DrmErrorEvent event) {
     Log.d("Widevine", "WidevineError: " + eventToString(event));
 
-    _error = "Widevine Error: " + eventToString(event);
+    _error = event.toString();
 
     new Handler(Looper.getMainLooper()).post(new Runnable() {
       @Override
