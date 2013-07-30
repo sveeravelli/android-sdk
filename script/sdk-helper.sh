@@ -55,8 +55,8 @@ function doc {
   rm -rf Documentation/complete Documentation/public
   echo "Generating Public Docs..."
   public_docs
-#  echo "Generating Complete Docs..."
-#  complete_docs
+  echo "Generating Complete Docs..."
+  complete_docs
   echo
   echo "Document Generation Complete!"
   echo
