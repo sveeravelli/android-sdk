@@ -158,6 +158,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public OoyalaPlayer(String pcode, String domain, EmbedTokenGenerator generator) {
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
+    Log.i(this.getClass().getName(), "Ooyala SDK Version: " + getVersion());
   }
 
   /**
@@ -1392,5 +1393,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     } else {
       return SeekStyle.ENHANCED;
     }
+  }
+  /**
+   * Get the SDK version and RC number of this Ooyala Player SDK
+   * @return the SDK version as a string
+   */
+  public String getVersion() {
+    return Constants.SDK_VERSION;
   }
 }

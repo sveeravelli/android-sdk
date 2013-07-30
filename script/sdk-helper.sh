@@ -171,7 +171,7 @@ function gen {
 
   # Rev version number if requested
   if [[ ${set_version} = true ]]; then
-    set_version ${new_version}
+    set_version ${new_version}_RC${new_rc}
   fi
 
   # Run tests before doing anything to make sure we are passing.
@@ -199,9 +199,6 @@ function gen {
   #version file
   version=$(get_version)
   echo "v${version}" >> ${ZIP_BASE}/VERSION
-  if [[ ! ( "${new_rc}" = "" ) ]]; then
-    echo "RC${new_rc}" >> ${ZIP_BASE}/VERSION
-  fi
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #docs
