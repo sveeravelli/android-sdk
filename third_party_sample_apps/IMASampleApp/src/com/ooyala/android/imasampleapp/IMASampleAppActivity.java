@@ -20,10 +20,9 @@ import com.ooyala.android.OoyalaPlayerLayoutController;
 
 public class IMASampleAppActivity extends Activity {
 
-  final String EMBED  = "91bThhODokcxQNhlk3ttzNZs3HoTZ12M";  //Embed Code, or Content ID
-  //final String EMBED  = "Rva245YTpHWP-9bchhJL25BMl1shI2fG"; //BYU Live Closed
+  final String EMBED  = "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M";  //Embed Code, or Content ID
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "byu.edu";
+  final String DOMAIN = "ooyala.com";
   OoyalaPlayerLayoutController playerLayoutController;
   OoyalaIMAManager imaManager;
   /**
@@ -32,21 +31,22 @@ public class IMASampleAppActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.main); OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
+    setContentView(R.layout.main);
+    OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
     OoyalaPlayer player = playerLayoutController.getPlayer();
-    //String url = "https://dl.dropboxusercontent.com/u/98081242/ad.xml";
-    //String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
 
+    //Initialize IMA classes
     imaManager = new OoyalaIMAManager(this, playerLayoutController);
+
     ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<CompanionAdSlot>();
     ViewGroup companionView = (ViewGroup) findViewById(R.id.companionFrame);
-    //Initialize IMA classes
     ImaSdkFactory sdkFactory = ImaSdkFactory.getInstance();
     CompanionAdSlot companionAdSlot = sdkFactory.createCompanionAdSlot();
     companionAdSlot.setContainer(companionView);
     companionAdSlot.setSize(300, 50);
     companionAdSlots.add(companionAdSlot);
+
     imaManager.setCompanionAdSlots(companionAdSlots);
 
     if (player.setEmbedCode(EMBED)) {

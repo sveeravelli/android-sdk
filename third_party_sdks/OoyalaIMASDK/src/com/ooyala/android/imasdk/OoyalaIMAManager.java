@@ -85,7 +85,9 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   }
   /**
    * Manually load an IMA Vast URL to initialize the IMA Manager.
-   * You do not need to do this if a VAST URL is properly configured in Third Party Module Metadata
+   * You do not need to do this if a VAST URL is properly configured in Third Party Module Metadata.
+   * It is not advised usage to manually load an IMA VAST URL while any IMA URL is configured in Third Party
+   * Module Metadata.
    * @param url VAST url for IMA
    */
   public void loadAds(String url) {
@@ -158,7 +160,6 @@ public class OoyalaIMAManager implements AdErrorListener, AdsLoadedListener, AdE
   @Override
   public void update(Observable observable, Object data) {
     if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
-    // String url="http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F15018773%2Feverything2&ciu_szs=300x250%2C468x60%2C728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]&cmsid=133&vid=10XWSh7W4so&ad_rule=1";
       Video currentItem = player.getCurrentItem();
       String url = currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("ad_tag_url");
 
