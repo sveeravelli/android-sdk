@@ -32,11 +32,11 @@ import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.sampleapp.R;
 
 public class DeviceManagementSampleAppActivity extends Activity implements EmbedTokenGenerator, Observer{
-
-	final String EMBED  = "5jYTVtZDpQhoZxbo3QKoA91En1eh7nTW";
-	final String PCODE  = "FoeG863GnBL4IhhlFC1Q2jqbkH9m";
-	final String APIKEY = "FoeG863GnBL4IhhlFC1Q2jqbkH9m.-E1Kw";
-	final String SECRET = "J9U-ZbBPlu75YLonkPKukDyRmsaTK2HXfHs9KKQ0";
+	
+	final String EMBED  = "fill me in";
+	final String PCODE  = "fill me in";
+	final String APIKEY = "fill me in";
+	final String SECRET = "fill me in";
 	final String DOMAIN = "www.ooyala.com";
 
 	private OoyalaPlayer player;
@@ -63,7 +63,9 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 	@Override
 	public void getTokenForEmbedCodes(List<String> embedCodes,
 			EmbedTokenGeneratorCallback callback) {
-		callback.setEmbedToken("http://player.ooyala.com/sas/embed_token/FoeG863GnBL4IhhlFC1Q2jqbkH9m/5jYTVtZDpQhoZxbo3QKoA91En1eh7nTW?account_id=brian&api_key=FoeG863GnBL4IhhlFC1Q2jqbkH9m.-E1Kw&expires=2374785235&signature=vIu3g8A1lkmm%2BE71NDRjKtkl51%2BTZ41urxOCrGhkYPA");
+		//add embed token/OPT in the setEmbedToken() example below
+		// http://player.ooyala.com/sas/embed_token/pcode/embed_code?account_id=account&api_key=apikey&expires=expires&signature=signature
+		callback.setEmbedToken("fill me in");
 
 	}
 	// make http requests async
