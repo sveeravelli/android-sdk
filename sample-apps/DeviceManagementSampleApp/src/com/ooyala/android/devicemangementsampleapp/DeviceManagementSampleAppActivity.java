@@ -32,7 +32,7 @@ import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.sampleapp.R;
 
 public class DeviceManagementSampleAppActivity extends Activity implements EmbedTokenGenerator, Observer{
-	
+
 	final String EMBED  = "fill me in";
 	final String PCODE  = "fill me in";
 	final String APIKEY = "fill me in";
@@ -84,13 +84,14 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 				final String publicDeviceId = jsonObject.getString("public_device_id");
 				if (result.equals("new device registered")) {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
-					final EditText input = new EditText(this); 
-					final String nicknameUrl = "http://player.ooyala.com/sas/api/v1/device_management/auth_token/" + player.getAuthToken() + "/devices/" + publicDeviceId;                 
-					alert.setTitle("Device Registration");  
-					alert.setMessage("Enter Device Nickname: ");                	   			        
+					final EditText input = new EditText(this);
+					final String nicknameUrl = "http://player.ooyala.com/sas/api/v1/device_management/auth_token/" + player.getAuthToken() + "/devices/" + publicDeviceId;
+					alert.setTitle("Device Registration");
+					alert.setMessage("Enter Device Nickname: ");
 					alert.setView(input);
-					alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {  
-						public void onClick(DialogInterface dialog, int whichButton) {  
+					alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						@Override
+            public void onClick(DialogInterface dialog, int whichButton) {
 							final String value = "{\"nickname\":\""+ input.getText().toString() +"\"}";
 							HttpPut httpPut = new HttpPut(nicknameUrl);
 							try {
@@ -102,17 +103,18 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							}		   								   			                	
-							return;                  
-						}  
-					});  
-					alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-							return;   
+							}
+							return;
 						}
 					});
-					alert.show();           
+					alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+            public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							return;
+						}
+					});
+					alert.show();
 
 				}
 			}
@@ -165,11 +167,11 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
+
 			} else if (player.getError().getMessage().equals(DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED +"")){
 				// regular widevine error
 			}
 			// else if {} ... check the DRMErrorEvent doc for other Widevine errors
-		} 
+		}
 	}
 }
