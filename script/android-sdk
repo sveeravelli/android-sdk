@@ -58,6 +58,8 @@ function custom_gen {
 
   #update third party sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/OmnitureSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
+
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
