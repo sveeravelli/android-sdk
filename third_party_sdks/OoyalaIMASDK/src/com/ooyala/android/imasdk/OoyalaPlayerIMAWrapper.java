@@ -1,6 +1,5 @@
 package com.ooyala.android.imasdk;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -19,14 +18,13 @@ import com.ooyala.android.OoyalaPlayer;
  * @author michael.len
  *
  */
-public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
+class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   private static String TAG = "OoyalaPlayerIMAWrapper";
 
   OoyalaPlayer player;
   private AdSpot adSpot;
   private boolean isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
-  private final CompleteCallback completeCallback;
   private int liveContentTimePlayed;
 
   /**
@@ -34,8 +32,8 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
    * @author michael.len
    *
    */
-  public interface CompleteCallback {
-    public void onComplete();
+  interface CompleteCallback {
+    void onComplete();
   }
 
   /**
@@ -43,11 +41,10 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
    * @param player the OoyalaPlayer to use
    * @param callback a callback for when content is completed
    */
-  public OoyalaPlayerIMAWrapper(OoyalaPlayer player, CompleteCallback callback){
+  public OoyalaPlayerIMAWrapper(OoyalaPlayer player){
     this.player = player;
     Log.d(TAG, "IMA Ad Wrapper: Initializing");
     isPlayingIMAAd = false;
-    completeCallback = callback;
     liveContentTimePlayed = 0;
     player.addObserver(this);
   }
@@ -144,8 +141,9 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     }
     if(isPlayingIMAAd) {
       player.skipAd();
+    } else {
+      player.resume();
     }
-    player.resume();
   }
 
   @Override
@@ -218,10 +216,6 @@ public class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
         default:
           break;
         }
-      }
-      else if (notification.equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
-        Log.d(TAG, "IMA Ad Update: Player Content Complete");
-        completeCallback.onComplete();
       }
     }
   }

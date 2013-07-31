@@ -12,10 +12,9 @@ import com.ooyala.android.Stream;
  * @author michael.len
  *
  */
-public class IMAAdSpot extends AdSpot {
+class IMAAdSpot extends AdSpot {
 
   private Stream stream;
-  static String TAG="IMAAdSpot";
 
   /**
    * Initialize an IMA Ad Spot
@@ -28,7 +27,7 @@ public class IMAAdSpot extends AdSpot {
 
   @Override
   public boolean fetchPlaybackInfo() {
-    return false;
+    return true;
   }
 
   /**

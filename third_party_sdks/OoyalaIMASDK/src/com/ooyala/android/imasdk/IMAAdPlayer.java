@@ -16,7 +16,7 @@ import com.ooyala.android.OoyalaPlayer.State;
  * @author michael.len
  *
  */
-public class IMAAdPlayer extends AdMoviePlayer {
+class IMAAdPlayer extends AdMoviePlayer {
   private static String TAG = "IMAAdPlayer";
   private IMAAdSpot _ad;
 
@@ -48,7 +48,6 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void destroy() {
-    deleteObserver(this);
     super.destroy();
   }
 
@@ -59,14 +58,14 @@ public class IMAAdPlayer extends AdMoviePlayer {
     // This ad is managed by a third party, not OoyalaPlayer's ad manager! That means that this player
     // does not fire a normal "State Changed: Completed". This is so Ooyala's ad manager does not take over
     // and start playing back content.  Ooyala Player expects the ad manager to resume content.
-    if (notification == "stateChanged" && getState() == State.COMPLETED) {
+    if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && getState() == State.COMPLETED) {
       arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
     }
 
     super.update(arg0, arg);
   }
 
-  public IMAAdSpot getAd() {
+  public AdSpot getAd() {
     return _ad;
   }
 
