@@ -14,7 +14,7 @@ import com.ooyala.android.Stream;
  */
 class IMAAdSpot extends AdSpot {
 
-  private Stream stream;
+  private Stream _stream;
 
   /**
    * Initialize an IMA Ad Spot
@@ -22,7 +22,7 @@ class IMAAdSpot extends AdSpot {
    */
   public IMAAdSpot(String url) {
     super();
-    stream = new IMAStream(url);
+    _stream = new IMAStream(url);
   }
 
   @Override
@@ -36,7 +36,7 @@ class IMAAdSpot extends AdSpot {
    */
   public Set<Stream> getStreams() {
     Set<Stream> retVal = new HashSet<Stream>();
-    retVal.add(stream);
+    retVal.add(_stream);
     return retVal;
   }
 

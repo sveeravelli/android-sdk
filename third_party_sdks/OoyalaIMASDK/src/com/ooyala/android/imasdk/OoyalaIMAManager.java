@@ -34,15 +34,15 @@ import com.ooyala.android.Video;
 public class OoyalaIMAManager implements Observer {
   private static String TAG = "OoyalaIMAManager";
 
-  protected AdsLoader adsLoader; //TODO: Underscores
-  protected AdsManager adsManager;
-  protected AdDisplayContainer container;
-  protected ImaSdkFactory sdkFactory;
-  protected ImaSdkSettings sdkSettings;
+  protected AdsLoader _adsLoader;
+  protected AdsManager _adsManager;
+  protected AdDisplayContainer _container;
+  protected ImaSdkFactory _sdkFactory;
+  protected ImaSdkSettings _sdkSettings;
 
-  protected OoyalaPlayerIMAWrapper ooyalaPlayerWrapper;
-  protected List<CompanionAdSlot> companionAdSlots;
-  protected OoyalaPlayer player;
+  protected OoyalaPlayerIMAWrapper _ooyalaPlayerWrapper;
+  protected List<CompanionAdSlot> _companionAdSlots;
+  protected OoyalaPlayer _player;
 
   private class IMAAdErrorListener implements AdErrorListener {
 
@@ -61,27 +61,27 @@ public class OoyalaIMAManager implements Observer {
    * @param layoutController The Ooyala layout controller you initialized
    */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
-    player = ooyalaPlayer;
-    companionAdSlots = new ArrayList<CompanionAdSlot>();
+    _player = ooyalaPlayer;
+    _companionAdSlots = new ArrayList<CompanionAdSlot>();
 
     //Initialize OoyalaPlayer-IMA Bridge
-    ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(player);
-    player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
-    player.addObserver(this);
+    _ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(_player);
+    _player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
+    _player.addObserver(this);
 
     //Initialize IMA classes
-    sdkFactory = ImaSdkFactory.getInstance();
-    adsLoader = sdkFactory.createAdsLoader(player.getLayout().getContext(), sdkFactory.createImaSdkSettings());
+    _sdkFactory = ImaSdkFactory.getInstance();
+    _adsLoader = _sdkFactory.createAdsLoader(_player.getLayout().getContext(), _sdkFactory.createImaSdkSettings());
 
     //Create the listeners for the adsLoader and adsManager
-    adsLoader.addAdErrorListener(new IMAAdErrorListener());
-    adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
+    _adsLoader.addAdErrorListener(new IMAAdErrorListener());
+    _adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         Log.d(TAG, "IMA Ad manager loaded");
-        adsManager = event.getAdsManager();
-        adsManager.addAdErrorListener(new IMAAdErrorListener());
-        adsManager.addAdEventListener(new AdEventListener() {
+        _adsManager = event.getAdsManager();
+        _adsManager.addAdErrorListener(new IMAAdErrorListener());
+        _adsManager.addAdEventListener(new AdEventListener() {
 
           @Override
           public void onAdEvent(AdEvent event) {
@@ -91,13 +91,13 @@ public class OoyalaIMAManager implements Observer {
             switch (event.getType()) {
               case LOADED:
                 Log.d(TAG,"IMA Ad Manager: Starting ad");
-                adsManager.start();
+                _adsManager.start();
                 break;
               case CONTENT_PAUSE_REQUESTED:
-                ooyalaPlayerWrapper.pauseContent();
+                _ooyalaPlayerWrapper.pauseContent();
                 break;
               case CONTENT_RESUME_REQUESTED:
-                ooyalaPlayerWrapper.playContent();
+                _ooyalaPlayerWrapper.playContent();
                 break;
               case STARTED:
                 break;
@@ -113,20 +113,20 @@ public class OoyalaIMAManager implements Observer {
           }
         });
 
-        adsManager.init();
+        _adsManager.init();
       }
     });
   }
 
   /**
    * Specify a list of views that the IMA Manager can use to show companion ads.
-   * @param companionAdSlots
+   * @param _companionAdSlots
    */
   public void addCompanionSlot(ViewGroup companionAdView, int width, int height) {
-    CompanionAdSlot adSlot = sdkFactory.createCompanionAdSlot();
+    CompanionAdSlot adSlot = _sdkFactory.createCompanionAdSlot();
     adSlot.setContainer(companionAdView);
     adSlot.setSize(width, height);
-    companionAdSlots.add(adSlot);
+    _companionAdSlots.add(adSlot);
   }
 
   /**
@@ -137,29 +137,29 @@ public class OoyalaIMAManager implements Observer {
    * @param url VAST url for IMA
    */
   public void loadAds(String url) {
-    if(container != null) {
+    if(_container != null) {
       Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
 
-    container = sdkFactory.createAdDisplayContainer();
-    container.setPlayer(ooyalaPlayerWrapper);
-    container.setAdContainer(player.getLayout());
+    _container = _sdkFactory.createAdDisplayContainer();
+    _container.setPlayer(_ooyalaPlayerWrapper);
+    _container.setAdContainer(_player.getLayout());
     Log.d(TAG, "IMA Managaer: Requesting ads");
-    AdsRequest request = sdkFactory.createAdsRequest();
+    AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
 
-    if (companionAdSlots != null) {
-      container.setCompanionSlots(companionAdSlots);
+    if (_companionAdSlots != null) {
+      _container.setCompanionSlots(_companionAdSlots);
     }
 
-    request.setAdDisplayContainer(container);
-    adsLoader.requestAds(request);
+    request.setAdDisplayContainer(_container);
+    _adsLoader.requestAds(request);
   }
 
   @Override
   public void update(Observable observable, Object data) {
     if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
-      Video currentItem = player.getCurrentItem();
+      Video currentItem = _player.getCurrentItem();
 
       if (currentItem.getModuleData() != null &&
           currentItem.getModuleData().get("google-ima-ads-manager") != null &&
@@ -172,7 +172,7 @@ public class OoyalaIMAManager implements Observer {
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
       Log.d(TAG, "IMA Ad Update: Player Content Complete");
-      adsLoader.contentComplete();
+      _adsLoader.contentComplete();
     }
   }
 
