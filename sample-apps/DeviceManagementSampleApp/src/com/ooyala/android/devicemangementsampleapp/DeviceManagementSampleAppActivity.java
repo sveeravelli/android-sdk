@@ -168,7 +168,7 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 				e.printStackTrace();
 			}
 
-			} else if (player.getError().getMessage().equals(DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED +"")){
+			} else if (player.getError().getMessage().equals(DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION +"")){
 				// regular widevine error
 			}
 			// else if {} ... check the DRMErrorEvent doc for other Widevine errors
