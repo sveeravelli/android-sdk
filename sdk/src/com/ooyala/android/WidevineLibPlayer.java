@@ -22,7 +22,6 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   private WVPlayback _wvplayback = new WVPlayback();
   private Handler _handler = new Handler(this);
-  private OoyalaPlayer parent;
   private Stream _stream = null;
 
   @Override
@@ -38,7 +37,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
       return;
     }
 
-    this.parent = parent;
+    _parent = parent;
 
     initializeWidevine();
   }
@@ -66,7 +65,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
         Set<Stream> newStreams = new HashSet<Stream>();
         _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
         newStreams.add(_stream);
-        super.init(parent, newStreams);
+        super.init(_parent, newStreams);
       case NullEvent:
       case Playing:
       case Stopped:
@@ -103,8 +102,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     HashMap<String, Object> options = new HashMap<String, Object>();
     // this should point to SAS once we get the proxy up
     String path = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
-            parent.getEmbedCode(), "widevine", "ooyala");
+        + String.format(Constants.DRM_TENENT_PATH, _parent.getPlayerAPIClient().getPcode(),
+            _parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
     if(_stream.getWidevineServerPath() != null) {
