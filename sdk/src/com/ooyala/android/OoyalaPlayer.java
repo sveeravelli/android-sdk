@@ -1036,7 +1036,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           if (_queuedSeekTime > 0) {
             seek(_queuedSeekTime);
           }
-          if (player == _adPlayer) break;
         case INIT:
         case LOADING:
         case PAUSED:

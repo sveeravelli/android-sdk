@@ -1,14 +1,8 @@
 package com.ooyala.android.imasampleapp;
 
-import java.util.ArrayList;
 
-import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
-import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.ooyala.android.imasdk.*;
 import com.ooyala.android.imasampleapp.R;
-import com.ooyala.android.imasampleapp.R.id;
-import com.ooyala.android.imasampleapp.R.layout;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,22 +31,31 @@ public class IMASampleAppActivity extends Activity {
     OoyalaPlayer player = playerLayoutController.getPlayer();
 
     //Initialize IMA classes
-    imaManager = new OoyalaIMAManager(this, playerLayoutController);
-
-    ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<CompanionAdSlot>();
+    imaManager = new OoyalaIMAManager(player);
     ViewGroup companionView = (ViewGroup) findViewById(R.id.companionFrame);
-    ImaSdkFactory sdkFactory = ImaSdkFactory.getInstance();
-    CompanionAdSlot companionAdSlot = sdkFactory.createCompanionAdSlot();
-    companionAdSlot.setContainer(companionView);
-    companionAdSlot.setSize(300, 50);
-    companionAdSlots.add(companionAdSlot);
 
-    imaManager.setCompanionAdSlots(companionAdSlots);
+    imaManager.addCompanionSlot(companionView, 300, 50);
 
     if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {
       Log.d(this.getClass().getName(), "Something Went Wrong!");
+    }
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    if (playerLayoutController.getPlayer() != null) {
+      playerLayoutController.getPlayer().suspend();
+    }
+  }
+
+  @Override
+  protected void onRestart() {
+    super.onRestart();
+    if (playerLayoutController.getPlayer() != null) {
+      playerLayoutController.getPlayer().resume();
     }
   }
 

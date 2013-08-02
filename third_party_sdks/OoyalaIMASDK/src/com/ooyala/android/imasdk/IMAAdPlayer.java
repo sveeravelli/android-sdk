@@ -16,7 +16,7 @@ import com.ooyala.android.OoyalaPlayer.State;
  * @author michael.len
  *
  */
-class IMAAdPlayer extends AdMoviePlayer {
+public class IMAAdPlayer extends AdMoviePlayer {
   private static String TAG = "IMAAdPlayer";
   private IMAAdSpot _ad;
 

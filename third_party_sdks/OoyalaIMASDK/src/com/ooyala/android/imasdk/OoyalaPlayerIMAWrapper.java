@@ -182,6 +182,13 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
           for (VideoAdPlayerCallback callback : _adCallbacks) {
             callback.onPause();
           }
+          break;
+        case SUSPENDED:
+          Log.d(TAG, "IMA Ad Update: Player Ad Pause on Suspend");
+          for (VideoAdPlayerCallback callback : _adCallbacks) {
+            callback.onPause();
+          }
+          break;
         default:
           break;
         }
@@ -209,6 +216,12 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
           break;
         case PAUSED:
           Log.d(TAG, "IMA Ad Update: Player Content Pause");
+          for (VideoAdPlayerCallback callback : _adCallbacks) {
+            callback.onPause();
+          }
+          break;
+        case SUSPENDED:
+          Log.d(TAG, "IMA Ad Update: Player Content Pause on Suspend");
           for (VideoAdPlayerCallback callback : _adCallbacks) {
             callback.onPause();
           }
