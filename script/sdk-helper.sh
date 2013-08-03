@@ -304,6 +304,8 @@ function pub {
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip
     echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_NAME}"
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_NAME}
+    echo "  Copying ${IMA_ZIP_NAME} to ${CANDIDATE_DIR}${IMA_ZIP_NAME}"
+    cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -333,6 +335,8 @@ function pub {
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${VERSIONS_SUFFIX}${last_rc}
     echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
+    echo "  Copying ${CANDIDATE_DIR}${IMA_ZIP_NAME} to ${RELEASE_DIR}${IMA_ZIP_NAME}"
+    cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
   fi
   cd "${pub_currdir}"
 }
