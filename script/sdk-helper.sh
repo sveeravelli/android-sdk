@@ -279,7 +279,7 @@ function pub {
 
   if [[ ${rc} = true ]]; then
     # Figure out which release candidate this is.
-    cd "${CANDIDATE_DIR}"
+    cd "${CANDIDATE_DIR}/Versions"
     last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1 | sed "s/^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)\.zip$/\1/"`
     if [[ ! ( ${last_rc} =~ ^[0-9]*$ ) ]]; then
       echo "Error: Could not figure out last release candidate"
