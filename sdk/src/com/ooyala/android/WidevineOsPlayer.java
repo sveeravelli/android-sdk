@@ -45,7 +45,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     //Setup DRM Client
     if (_drmClient == null) {
-      _drmClient = new DrmManagerClient(_parent.getLayout().getContext());
+      _drmClient = new DrmManagerClient(parent.getLayout().getContext());
       _drmClient.setOnErrorListener(this);
       _drmClient.setOnEventListener(this);
       _drmClient.setOnInfoListener(this);
@@ -74,7 +74,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     request.put("WVAssetURIKey", stream.getUrl());
     request.put("WVPortalKey", "ooyala"); // override in SAS
     request.put("WVDeviceIDKey",
-        Secure.getString(_parent.getLayout().getContext().getContentResolver(), Secure.ANDROID_ID));
+        Secure.getString(parent.getLayout().getContext().getContentResolver(), Secure.ANDROID_ID));
     request.put("WVLicenseTypeKey", "3");
 
     _drmClient.acquireRights(request);
@@ -90,7 +90,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   public void onError(DrmManagerClient client, DrmErrorEvent event) {
     Log.d("Widevine", "WidevineError: " + eventToString(event));
 
-    _error = "Widevine Error: " + eventToString(event);
+    _error = Integer.toString(event.getType());
 
     new Handler(Looper.getMainLooper()).post(new Runnable() {
       @Override

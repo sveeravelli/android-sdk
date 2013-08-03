@@ -74,10 +74,10 @@ function custom_gen {
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/OOView/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/AdobePassDemoApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
 
   #update third party sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
-
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource

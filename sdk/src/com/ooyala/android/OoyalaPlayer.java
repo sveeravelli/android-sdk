@@ -167,6 +167,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+
+    Log.i(this.getClass().getName(), "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
   }
 
   /**
@@ -593,6 +595,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public String getEmbedCode() {
     return _rootItem == null ? null : _rootItem.getEmbedCode();
+  }
+
+  /**
+   * Get the authToken for the current player.
+   * @return authToken
+   */
+  public String getAuthToken() {
+	    return _playerAPIClient.getAuthToken();
   }
 
   /**
@@ -1441,5 +1451,13 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void registerAdPlayer(Class<? extends AdSpot> adTypeClass, Class<? extends AdMoviePlayer> adPlayerClass) {
     _adPlayers.put(adTypeClass, adPlayerClass);
+  }
+
+  /**
+   * Get the SDK version and RC number of this Ooyala Player SDK
+   * @return the SDK version as a string
+   */
+  public static String getVersion() {
+    return Constants.SDK_VERSION;
   }
 }
