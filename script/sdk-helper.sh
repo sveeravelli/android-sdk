@@ -253,7 +253,7 @@ function pub {
     version=$(get_version)
   fi
 
-  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ ${version} ) ]]; then
+  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ "`echo ${version} | sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`" ) ]]; then
     echo "ERROR: Please update ReleaseNotes.txt before pushing a version"
     cd "${pub_currdir}"
     usage
