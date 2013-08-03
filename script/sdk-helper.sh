@@ -219,9 +219,9 @@ function gen {
     if [[ ${GIT_CHECK_RESULT} = false && ${push} = true ]]; then
       echo "  Not pushing because your working directory is dirty. Yuck."
     elif [[ ${push} = true ]]; then
-      echo "  Pushing Gen Release v${new_version}_RC${new_rc} commit."
-      git commit -a -m "Gen Release v${new_version}_RC${new_rc}"
-      git tag -a v${new_version}_RC${new_rc} -m "Version ${new_version}_RC${new_rc} (Created On ${DATE})"
+      echo "  Pushing Gen Release v${version}_RC${new_rc} commit."
+      git commit -a -m "Gen Release v${version}_RC${new_rc}"
+      git tag -a v${version}_RC${new_rc} -m "Version ${version}_RC${new_rc} (Created On ${DATE})"
       git push
       git push --tags
     fi
