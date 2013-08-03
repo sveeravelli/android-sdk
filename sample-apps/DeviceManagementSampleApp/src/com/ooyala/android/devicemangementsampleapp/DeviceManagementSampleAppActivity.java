@@ -35,8 +35,6 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 
 	final String EMBED  = "fill me in";
 	final String PCODE  = "fill me in";
-	final String APIKEY = "fill me in";
-	final String SECRET = "fill me in";
 	final String DOMAIN = "www.ooyala.com";
 
 	private OoyalaPlayer player;
@@ -49,8 +47,7 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-		OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-				APIKEY, SECRET, PCODE, DOMAIN, this);
+		OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN, this);
 		player = playerLayoutController.getPlayer();
 		player.addObserver(this);
 		if (player.setEmbedCode(EMBED)) {
@@ -155,7 +152,7 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 				if (result.equals("device limit reached")) {
 					// device management error, device limit reached
 				} else {
-					// regular widevine error
+					// widevine specific error
 				}
 			} catch (ClientProtocolException e) {
 				// TODO Auto-generated catch block
@@ -168,8 +165,8 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 				e.printStackTrace();
 			}
 
-			} else if (player.getError().getMessage().equals(DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED +"")){
-				// regular widevine error
+			} else if (player.getError().getMessage().equals(DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION +"")){
+				// widevine specific error
 			}
 			// else if {} ... check the DRMErrorEvent doc for other Widevine errors
 		}
