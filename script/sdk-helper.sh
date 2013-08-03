@@ -207,7 +207,7 @@ function gen {
 
   #version file
   version=$(get_version)
-  echo "v${version}" >> ${ZIP_BASE}/VERSION
+  echo "v${version}_${new_rc}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #docs
@@ -271,7 +271,7 @@ function pub {
     version=$(get_version)
   fi
 
-  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ "`echo ${version} | sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`" ) ]]; then
+  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ ${version} ) ]]; then
     echo "ERROR: Please update ReleaseNotes.txt before pushing a version"
     cd "${pub_currdir}"
     usage
