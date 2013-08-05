@@ -69,7 +69,7 @@ public class Stream {
     _selector = new DefaultStreamSelector();
   }
 
-  Stream() {}
+  public Stream() {}
 
   Stream(JSONObject data) {
     update(data);

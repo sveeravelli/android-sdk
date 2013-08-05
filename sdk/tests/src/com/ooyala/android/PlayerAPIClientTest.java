@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.ooyala.android.ContentItem;
 import com.ooyala.android.AuthorizableItem.AuthCode;
+import com.ooyala.android.ModuleData;
 
 import android.test.AndroidTestCase;
 
@@ -278,5 +280,22 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     assertTrue(listener.fetched);
     assertEquals(listener.idx, 0);
     assertEquals(listener.cnt, 2);
+  }
+
+  public void testFetchMetadata() throws OoyalaException {
+    ContentItem video = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+        TestConstants.TEST_VIDEO, api);
+    assertTrue(api.fetchMetadata(video));
+
+    //Check Metadata
+    assertEquals(video.getMetadata().get("location"), "boston");
+    assertEquals(video.getMetadata().get("year"), "2011");
+
+    //Check moduleData
+    ModuleData module = video.getModuleData().get("v3-playlists");
+    assertNotNull(module);
+    assertEquals(module.getName(), "v3-playlists");
+    assertEquals(module.getType(), "v3-playlists");
+    assertEquals(module.getMetadata().get("testparam"), "true");
   }
 }

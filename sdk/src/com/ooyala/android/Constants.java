@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 class Constants {
   /** NOTE[jigish] do NOT change the name or location of this variable without changing pub_release.sh */
-  public static final String SDK_VERSION = "2.0.0_RC1";
+  public static final String SDK_VERSION = "2.0.0_RC2";
   public static final String API_VERSION = "1";
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;
@@ -126,6 +126,10 @@ class Constants {
   public static final String KEY_HEARTBEAT_DATA = "heartbeat_data";
   public static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
   public static final String KEY_AUTH_TOKEN = "auth_token";
+  public static final String KEY_METADATA = "metadata";
+  public static final String KEY_METADATA_BASE = "base";
+  public static final String KEY_METADATA_MODULES = "modules";
+  public static final String KEY_METADATA_MODULE_TYPE = "type";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

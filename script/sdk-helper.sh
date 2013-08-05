@@ -15,6 +15,12 @@ SAMPLE_DIR=${BASE_DIR}/sample-apps
 LIB_BASE="OoyalaSDK"
 ZIP_BASE="${LIB_BASE}-${PLATFORM_NAME}"
 ZIP_NAME="${ZIP_BASE}.zip"
+
+IMA_SDK_DIR=${BASE_DIR}/third_party_sdks/OoyalaIMASDK
+THIRD_PARTY_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps
+IMA_LIB_BASE="OoyalaIMASDK"
+IMA_ZIP_BASE="${IMA_LIB_BASE}-${PLATFORM_NAME}"
+IMA_ZIP_NAME="${IMA_ZIP_BASE}.zip"
 USER_DIR=`cd ~; pwd`
 if [[ "${BOX_DIR}" = "" ]]; then
   BOX_DIR="${USER_DIR}/Documents/Box Documents/"
@@ -181,13 +187,16 @@ function gen {
 
   cd ${BASE_DIR}
   rm -rf ${ZIP_BASE}
-
   mkdir ${ZIP_BASE}
+
+  rm -rf ${IMA_ZIP_BASE}
+  mkdir ${IMA_ZIP_BASE}
 
   custom_gen
 
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
+  cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
@@ -204,14 +213,23 @@ function gen {
   #docs
   doc
   cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
+  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
 
-  #zip
+  #zip Base SDK
   cd ${BASE_DIR}
   #verify everything exists
   verify
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
+
+  #zip IMA SDK
+  cd ${BASE_DIR}
+  #verify everything exists
+  #verify
+  rm ${IMA_ZIP_NAME}
+  zip -r ${IMA_ZIP_BASE} ${IMA_ZIP_BASE}/*
+  rm -rf ${IMA_ZIP_BASE}
 
   echo
   echo "Release Generated!"
@@ -283,6 +301,8 @@ function pub {
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip
     echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_NAME}"
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_NAME}
+    echo "  Copying ${IMA_ZIP_NAME} to ${CANDIDATE_DIR}${IMA_ZIP_NAME}"
+    cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -312,6 +332,8 @@ function pub {
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${VERSIONS_SUFFIX}${last_rc}
     echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
+    echo "  Copying ${CANDIDATE_DIR}${IMA_ZIP_NAME} to ${RELEASE_DIR}${IMA_ZIP_NAME}"
+    cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
   fi
   cd "${pub_currdir}"
 }

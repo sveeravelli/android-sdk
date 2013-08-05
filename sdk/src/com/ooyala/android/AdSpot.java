@@ -17,7 +17,7 @@ public abstract class AdSpot {
   protected List<URL> _trackingURLs = null;
   protected PlayerAPIClient _api;
 
-  AdSpot() {}
+  public AdSpot() {}
 
   AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
     _time = time;
@@ -80,7 +80,7 @@ public abstract class AdSpot {
     if (data == null || data.isNull(Constants.KEY_TYPE)) { return null; }
     String type = null;
     try {
-      type = (String) data.getString(Constants.KEY_TYPE);
+      type = data.getString(Constants.KEY_TYPE);
     } catch (JSONException exception) {
       Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
       return null;

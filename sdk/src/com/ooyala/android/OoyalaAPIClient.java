@@ -161,17 +161,6 @@ public class OoyalaAPIClient {
   }
 
   /**
-   * Asynchronously fetch the metadata object associated with the given embed codes.
-   *
-   * @param embedCodes the embed codes to fetch
-   * @param callback the MetadataFetchedCallback to execute when the response is received
-   * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
-   */
-  public Object metadata(List<String> embedCodes, MetadataFetchedCallback callback) {
-    return _playerAPI.metadata(embedCodes, callback);
-  }
-
-  /**
    * Fetch a raw JSONObject from any backlot API (GET requests only). As this method is not asynchronous it
    * should be used within an AsyncTask.
    * @param uri the URI to be fetched from backlot *not* including "/v2". For example, to request

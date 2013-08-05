@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html devsite>
+  <head>
+    <title>AdsLoader</title>
+    <meta name="project_path" value="/interactive-media-ads/_project.yaml" />
+    <meta name="book_path" value="/interactive-media-ads/docs/sdks/android/v3/_book.yaml" />
+    <link rel="stylesheet" href="/+/css/plus.css" />
+  </head>
+
+<body class="">
+<style>
+
+/* Heading for "Parameters", "See Also", etc., in details sections */
+h4.jd-details-title {
+  font-size: 1.15em;
+  margin: 1.5em 0 .6em 0em;
+  padding: 0em 8em 0em 2.5em;
+  text-indent: -2em;
+  background-color: #E9E9E9; /* #DEEAFA */
+}
+h4 .params {
+  font-size:.9em;
+  font-weight:normal;
+}
+h5.jd-tagtitle {
+  margin: 0 0 .25em 1em;
+  font-size: 1em;
+  font-weight: bold;
+}
+/* For the tagdata blocks that make up the detailed description */
+.jd-details-descr {
+  padding: 0;
+  margin: .5em 6px;
+}
+.jd-tagdescr p {
+  margin-bottom: .5em;
+  padding: 0;
+}
+.jd-tagdata {
+  margin-left: .5em 1em .5em .5em;
+}
+/* .jd-typecol should be set to minimum width in place of width="1%" */
+.jd-sumtable, .jd-tagtable {
+  border: none !important;
+  padding: 0px 6px 0px 0px !important;
+  margin-left: 2em !important;
+  margin-bottom: 0.9em;
+}
+.jd-returns {
+  margin-left: 2.1em !important;  /* 0.1em larger than .jd-tagtable */
+}
+.jd-typecol, .jd-linkcol, .jd-enumtype {
+  /* border: none !important; */
+  vertical-align: middle !important;
+  padding: 0px 6px 0px 6px !important;
+}
+.jd-hang {
+  padding-left: 2em;
+  text-indent: -2em;
+}
+.jd-typecol, .jd-paramname, .jd-enumtype {
+  width: 1%;         /* What better way to set min. width? (here and below) */
+}
+.jd-typecol {
+  white-space: nowrap;
+}
+.jd-tagparamname, .jd-tagthrowstype {
+  border: none !important;
+  width: 1%;
+  padding: 0px 6px 0px 0px !important;
+}
+.jd-tagparamname {
+  font-style: italic;
+}
+.jd-tagdescr {
+  border: none !important;
+  padding: 0px 6px 0px 6px !important;
+}
+.jd-sumheading {
+  border: none !important;
+  padding: 0 !important;
+  background-color: #FFF;
+  color: #000;
+}
+#jd-header {
+  margin-bottom: 1em;
+}
+/* extra space between end of method name and open-paren */
+.sympad {
+  margin-right: 2px;
+}
+/* keep method parameter type on the same line with parameter name */
+.nowrap {
+  white-space: nowrap;
+}
+</style>
+
+<div id="api-info-block">
+
+
+
+
+<div class="api-level">
+  
+
+
+  
+  
+
+</div>
+</div><!-- end api-info-block -->
+
+
+<!-- ======== START OF CLASS DATA ======== -->
+
+
+
+<div id="jd-header">
+  public     interface
+  <b>AdsLoader</b>
+</div><!-- end jd-header -->
+
+
+<div id="naMessage"></div>
+
+<div id="jd-content" class="api apilevel-">
+
+
+
+
+
+
+
+<div class="jd-descr">
+
+
+<p>An object which allows publishers to request ads from ad servers. To do so, users must register
+ for the <code><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsManagerLoadedEvent.html">AdsManagerLoadedEvent</a></code> event and then request ads. Finally they should call
+ <code><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#contentComplete()">contentComplete()</a></code> when all content has finished playing.</p>
+
+
+
+</div><!-- jd-descr -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="jd-descr">
+
+
+<section id="xml-attributes">
+
+
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<section>
+  <h3>Nested Class Summary</h3>
+  <table id="nestedclasses" class="jd-sumtable">
+    
+
+  
+    <tr class="alt-color api apilevel-" >
+      <td class="jd-typecol">
+        
+        
+        
+        
+        interface</td>
+      <td class="jd-linkcol" colspan="2"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.AdsLoadedListener.html">AdsLoader.AdsLoadedListener</a></td>
+      <td class="jd-descrcol" width="100%">Listener interface for notification of ad load completion.&nbsp;</td>
+    </tr>
+    
+    
+
+  </table>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+<section>
+  <h3>Public Method Summary</h3>
+  <table id="pubmethods" class="jd-sumtable">
+  
+
+
+    
+    <tr class="alt-color api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#addAdErrorListener(com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener)">addAdErrorListener</a></span>(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdErrorEvent.AdErrorListener.html">AdErrorEvent.AdErrorListener</a> <i>errorListener</i></span>)
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class=" api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#addAdsLoadedListener(com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener)">addAdsLoadedListener</a></span>(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.AdsLoadedListener.html">AdsLoader.AdsLoadedListener</a> <i>loadedListener</i></span>)
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class="alt-color api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#contentComplete()">contentComplete</a></span>()
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class=" api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            <a href="../../../../../../com/google/ads/interactivemedia/v3/api/ImaSdkSettings.html">ImaSdkSettings</a>
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#getSettings()">getSettings</a></span>()
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class="alt-color api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#removeAdErrorListener(com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener)">removeAdErrorListener</a></span>(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdErrorEvent.AdErrorListener.html">AdErrorEvent.AdErrorListener</a> <i>errorListener</i></span>)
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class=" api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#removeAdsLoadedListener(com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener)">removeAdsLoadedListener</a></span>(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.AdsLoadedListener.html">AdsLoader.AdsLoadedListener</a> <i>loadedListener</i></span>)
+            
+          </div>
+      </td>
+    </tr>
+
+
+    
+    <tr class="alt-color api apilevel-" >
+      <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+      </td>
+      <td class="jd-linkcol" width="100%">
+          <div class="jd-hang">
+            <span class="sympad"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.html#requestAds(com.google.ads.interactivemedia.v3.api.AdsRequest)">requestAds</a></span>(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsRequest.html">AdsRequest</a> <i>adsRequest</i></span>)
+            
+          </div>
+      </td>
+    </tr>
+
+
+
+  </table>
+</section>
+
+
+
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+</section><!--xml-attributes-->
+<!--subcount(class.inners) || subcount(class.attrs) || ...-->
+</div><!-- class="jd-descr" (end of Summary) -->
+
+<!-- Details -->
+
+
+
+
+
+
+
+
+<!-- XML Attributes -->
+
+
+<!-- Enum Values -->
+
+
+<!-- Constants -->
+
+
+<!-- Fields -->
+
+
+<!-- Public ctors -->
+
+
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<!-- Protected ctors -->
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+<!-- Public methdos -->
+
+
+<section id="public-methods">
+  <h2>Public Methods</h2>
+  
+
+
+<A NAME="addAdErrorListener(com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener)"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>addAdErrorListener</strong></span>
+      <span class="params">(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdErrorEvent.AdErrorListener.html">AdErrorEvent.AdErrorListener</a> <i>errorListener</i></span>)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Registers a listener for errors that occur during the ads request.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="addAdsLoadedListener(com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener)"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>addAdsLoadedListener</strong></span>
+      <span class="params">(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.AdsLoadedListener.html">AdsLoader.AdsLoadedListener</a> <i>loadedListener</i></span>)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Registers a listener for the ads manager loaded event.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="contentComplete()"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>contentComplete</strong></span>
+      <span class="params">()</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Signals to the SDK that the content is finished. This will allow the SDK to play post-roll ads,
+ if any are loaded via ad rules.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="getSettings()"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        <a href="../../../../../../com/google/ads/interactivemedia/v3/api/ImaSdkSettings.html">ImaSdkSettings</a>
+      </span>
+      <span class="sympad"><strong>getSettings</strong></span>
+      <span class="params">()</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Returns the IMA SDK settings instance. To change the settings, just call the methods on the
+ instance. The changes will apply for all ad requests made with this ads loader.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="removeAdErrorListener(com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener)"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>removeAdErrorListener</strong></span>
+      <span class="params">(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdErrorEvent.AdErrorListener.html">AdErrorEvent.AdErrorListener</a> <i>errorListener</i></span>)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Removes a listener for error events.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="removeAdsLoadedListener(com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener)"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>removeAdsLoadedListener</strong></span>
+      <span class="params">(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsLoader.AdsLoadedListener.html">AdsLoader.AdsLoadedListener</a> <i>loadedListener</i></span>)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Removes a listener for the ads manager loaded event.
+</p></div>
+
+    </div>
+</div>
+
+
+<A NAME="requestAds(com.google.ads.interactivemedia.v3.api.AdsRequest)"></A>
+
+<div class="jd-details api apilevel-">
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public
+        
+        
+        abstract
+        
+        void
+      </span>
+      <span class="sympad"><strong>requestAds</strong></span>
+      <span class="params">(<span class="nowrap"><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdsRequest.html">AdsRequest</a> <i>adsRequest</i></span>)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>Requests ads from a server.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        
+        <tr>
+          <td class="jd-tagparamname">adsRequest</td>
+          <td class="jd-tagdescr">An object containing ads request parameters. This parameter cannot be
+        <code>null</code>, and it must contain a non-null <code><a href="../../../../../../com/google/ads/interactivemedia/v3/api/AdDisplayContainer.html">AdDisplayContainer</a></code> and ad tag URL.
+</td>
+        </tr>
+        
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+</section>
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+
+
+
+<!-- ========= END OF CLASS DATA ========= -->
+<A NAME="navbar_top"></A>
+
+</div> <!-- jd-content -->
+
+</body>
+</html>

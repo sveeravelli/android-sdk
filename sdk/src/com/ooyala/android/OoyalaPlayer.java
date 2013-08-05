@@ -103,6 +103,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     Constants.setEnvironment(e);
   }
 
+  private static final String TAG = OoyalaPlayer.class.getName();
+
   private Handler _handler = new Handler();
   private Video _currentItem = null;
   private ContentItem _rootItem = null;
@@ -131,6 +133,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
   private StreamPlayer _basePlayer = null;
+  private Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -147,6 +150,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public OoyalaPlayer(String pcode, String domain) {
     this(pcode, domain, null);
+
   }
 
   /**
@@ -158,6 +162,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public OoyalaPlayer(String pcode, String domain, EmbedTokenGenerator generator) {
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
+
+    // Initialize Ad Players
+    _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
+    registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
+    registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+
     Log.i(this.getClass().getName(), "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
   }
 
@@ -241,29 +251,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in setEmbedCodes!", error);
+          Log.d(TAG, "Exception in setEmbedCodes!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
         }
         reinitialize(item);
-      }
-    }));
-
-    // request metadata
-    final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
-    taskStarted(taskKey, _playerAPIClient.metadata(embedCodes, new MetadataFetchedCallback() {
-      @Override
-      public void callback(JSONObject metadata, OoyalaException error) {
-        taskCompleted(metadataTaskKey);
-        if (error != null) {
-          _metadata = null;
-          Log.d(this.getClass().getName(), "Exception fetching metadata from setEmbedCodes!", error);
-        } else {
-          _metadata = metadata;
-          Log.d(this.getClass().getName(), "Loaded Metadata: " + _metadata.toString());
-          sendNotification(METADATA_READY_NOTIFICATION);
-        }
       }
     }));
 
@@ -301,7 +294,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in setExternalIds!", error);
+          Log.d(TAG, "Exception in setExternalIds!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -351,12 +344,31 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
+    cancelOpenTasks();
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+
+    // request metadata
+    final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
+    taskStarted(metadataTaskKey, _playerAPIClient.metadata(_rootItem, new MetadataFetchedCallback() {
+      @Override
+      public void callback(boolean result, OoyalaException error) {
+        taskCompleted(metadataTaskKey);
+        if (error != null) {
+          _error = error;
+          Log.d(TAG, "Exception fetching metadata from setEmbedCodes!", error);
+          setState(State.ERROR);
+          sendNotification(ERROR_NOTIFICATION);
+        } else {
+          sendNotification(METADATA_READY_NOTIFICATION);
+          changeCurrentItemAfterAuth();
+        }
+      }
+    }));
+
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo : _player.getBasePlayer().getPlayerInfo();
 
       // Async authorize;
-      cancelOpenTasks();
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
       taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo, new AuthorizeCallback() {
         @Override
@@ -364,17 +376,19 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           taskCompleted(taskKey);
           if (error != null) {
             _error = error;
-            Log.d(this.getClass().getName(), "Exception in changeCurrentVideo!", error);
+            Log.d(TAG, "Exception in changeCurrentVideo!", error);
             setState(State.ERROR);
             sendNotification(ERROR_NOTIFICATION);
             return;
           }
+          sendNotification(AUTHORIZATION_READY_NOTIFICATION);
           changeCurrentItemAfterAuth();
         }
       }));
       return true;
     }
 
+    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
     return changeCurrentItemAfterAuth();
   }
 
@@ -383,13 +397,17 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterAuth() {
+    // wait for metadata and auth to return
+    if (_currentItem.getModuleData() == null || _currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
+      return false;
+    }
+
     if (!_currentItem.isAuthorized()) {
       this._error = getAuthError(_currentItem);
       setState(State.ERROR);
       sendNotification(ERROR_NOTIFICATION);
       return false;
     }
-    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
 
     if (_currentItem.isHeartbeatRequired()) {
       if (_authHeartbeat == null) {
@@ -428,7 +446,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _analytics.reportPlayerLoad();
 
     //Play Pre-Rolls first
-    boolean didAdsPlay = playAdsBeforeTime(0);
+    boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0);
 
     //If there were no ads, initialize the player and play
     if (!didAdsPlay) {
@@ -460,7 +478,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Exception in reinitialize!", error);
+          Log.d(TAG, "Exception in reinitialize!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -485,7 +503,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       } catch(Exception e) {
         _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
             "Could not initialize Widevine Player");
-        Log.d(this.getClass().getName(), "Please include the Widevine Library in your project", _error);
+        Log.d(TAG, "Please include the Widevine Library in your project", _error);
         setState(State.ERROR);
       }
     }
@@ -502,6 +520,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       p.setBasePlayer(_basePlayer);
     }
     p.init(this, streams);
+
+    p.setLive(currentItem.isLive());
 
     addClosedCaptionsView();
 
@@ -645,7 +665,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(this.getClass().getName(), "Error Reauthorizing Video", error);
+              Log.d(TAG, "Error Reauthorizing Video", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -670,8 +690,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     if (currentPlayer() != null) {
       currentPlayer().resume();
+      dequeuePlay();
       addClosedCaptionsView();
       setState(currentPlayer().getState());
+    }
+    else {
+      _player = getCorrectMoviePlayer(_currentItem);
+      initializePlayer(_player, _currentItem);
+      dequeuePlay();
     }
   }
 
@@ -772,14 +798,28 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   public boolean playAd(AdSpot ad) {
+    Log.d(TAG, "Ooyala Player: Playing Ad");
     if(_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
     }
 
-    if (ad instanceof OoyalaAdSpot) {
-      _adPlayer = new OoyalaAdPlayer();
-    } else if (ad instanceof VASTAdSpot) {
-      _adPlayer = new VASTAdPlayer();
+    //If an ad is playing, take it out of playedAds, and save it for playback later
+    if(_adPlayer != null) {
+      AdSpot oldAd = _adPlayer.getAd();
+      _playedAds.remove(oldAd);
+      cleanupPlayer(_adPlayer);
+      _adPlayer = null;
+    }
+
+    try {
+      Class<? extends AdMoviePlayer> adPlayerClass = _adPlayers.get(ad.getClass());
+      if (adPlayerClass != null) {
+        _adPlayer = adPlayerClass.newInstance();
+      }
+    } catch (InstantiationException e) {
+      // do nothing
+    } catch (IllegalAccessException e) {
+      // do nothing
     }
 
     if (_adPlayer == null) { return false; }
@@ -788,15 +828,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
     //The Ad initialization didn't work.  Destroy the _adPlayer and go back to playing the video
     if (_adPlayer == null || _adPlayer.getBasePlayer() == null || _adPlayer.getState() == State.ERROR) {
-      Log.d(this.getClass().getName(), "Ad playback failed.  Continuing to play video");
+      Log.d(TAG, "Ad playback failed.  Continuing to play video");
       _adPlayer = null;
       return false;
     }
     _adPlayer.setSeekable(_adsSeekable);
 
     removeClosedCaptionsView();
-    sendNotification(AD_STARTED_NOTIFICATION);
     if (_adPlayer == null) { return false; }
+
+    sendNotification(AD_STARTED_NOTIFICATION);
     _adPlayer.play();
     return true;
   }
@@ -952,6 +993,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
+
             if (!playAdsBeforeTime(this._lastPlayedTime)) {
 
               // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
@@ -1004,13 +1046,19 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           if (_queuedSeekTime > 0) {
             seek(_queuedSeekTime);
           }
-          if (player == _adPlayer) break;
         case INIT:
         case LOADING:
         case PAUSED:
         default:
           setState(player.getState());
       }
+
+    //AD_COMPLETED_NOTIFICATION can only be seen here if a MoviePlayer or AdPlayer fires the notification.
+    // If it is fired, that means an ad player has completed an ad, but expects an ad manager to resume content
+    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
+      cleanupPlayer(_adPlayer);
+      _adPlayer = null;
+      sendNotification(AD_COMPLETED_NOTIFICATION);
     }
   }
 
@@ -1120,7 +1168,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if currently playing ad, false otherwise
    */
   public boolean isAdPlaying() {
-    return currentPlayer() == _adPlayer;
+    return currentPlayer() == _adPlayer && _adPlayer != null;
   }
 
   /**
@@ -1342,7 +1390,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
         taskCompleted(taskKey);
         if (error != null) {
           _error = error;
-          Log.d(this.getClass().getName(), "Movie is not authorized for this device!", error);
+          Log.d(TAG, "Movie is not authorized for this device!", error);
           setState(State.ERROR);
           sendNotification(ERROR_NOTIFICATION);
           return;
@@ -1394,6 +1442,17 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       return SeekStyle.ENHANCED;
     }
   }
+
+  /**
+   * Register an Ad player
+   *   our players and remember it
+   * @param adTypeClass A type of AdSpot that the player is capable of playing
+   * @param adPlayerClass A player that plays the ad
+   */
+  public void registerAdPlayer(Class<? extends AdSpot> adTypeClass, Class<? extends AdMoviePlayer> adPlayerClass) {
+    _adPlayers.put(adTypeClass, adPlayerClass);
+  }
+
   /**
    * Get the SDK version and RC number of this Ooyala Player SDK
    * @return the SDK version as a string
