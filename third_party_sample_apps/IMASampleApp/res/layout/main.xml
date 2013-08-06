@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello" />
     <FrameLayout
         android:id="@+id/companionFrame"
+        android:layout_gravity="center_horizontal|bottom"
         android:layout_width="300dp"
         android:layout_height="50dp" >
 
@@ -24,8 +21,10 @@
 
     <com.ooyala.android.OoyalaPlayerLayout
       android:id="@+id/ooyalaPlayer"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+      android:layout_gravity="center_horizontal|top"
+      android:layout_width="300dp"
+      android:layout_height="150dp"
+      android:layout_marginTop="20dp">
     </com.ooyala.android.OoyalaPlayerLayout>
 
-</LinearLayout>
+</FrameLayout>

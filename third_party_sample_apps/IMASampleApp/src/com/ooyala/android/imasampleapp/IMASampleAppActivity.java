@@ -10,14 +10,14 @@ import android.view.ViewGroup;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 
 public class IMASampleAppActivity extends Activity {
 
   final String EMBED  = "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M";  //Embed Code, or Content ID
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "ooyala.com";
-  OoyalaPlayerLayoutController playerLayoutController;
+  OptimizedOoyalaPlayerLayoutController playerLayoutController;
   OoyalaIMAManager imaManager;
   /**
    * Called when the activity is first created.
@@ -27,7 +27,7 @@ public class IMASampleAppActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
     OoyalaPlayer player = playerLayoutController.getPlayer();
 
     //Initialize IMA classes

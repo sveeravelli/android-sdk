@@ -28,6 +28,9 @@ import com.ooyala.android.Video;
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
  * automatically be configured, as long as the VAST URL is properly configured in Third Module Metadata.
+ *
+ * The OoyalaIMAManager works most completely with an OptimizedOoyalaPlayerLayoutController.  If you do not
+ * use this layout controller, you will not see IMA's "Learn More" button when in fullscreen mode.
  * @author michael.len
  *
  */
