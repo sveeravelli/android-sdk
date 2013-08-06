@@ -52,7 +52,7 @@ public class IMASampleAppActivity extends Activity {
   }
 
   @Override
-  protected void onStart() {
+  protected void onRestart() {
     super.onRestart();
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().resume();

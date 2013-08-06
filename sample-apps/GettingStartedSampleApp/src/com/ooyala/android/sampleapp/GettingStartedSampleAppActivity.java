@@ -40,7 +40,7 @@ public class GettingStartedSampleAppActivity extends Activity {
   }
 
   @Override
-  protected void onStart() {
+  protected void onRestart() {
     super.onRestart();
     if (player != null) {
       player.resume();
