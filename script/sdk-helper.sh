@@ -192,11 +192,11 @@ function gen {
   rm -rf ${IMA_ZIP_BASE}
   mkdir ${IMA_ZIP_BASE}
 
+  #build everything
   custom_gen
 
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
-  cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
@@ -213,9 +213,8 @@ function gen {
   #docs
   doc
   cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
-  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
 
-  #zip Base SDK
+  #zip
   cd ${BASE_DIR}
   #verify everything exists
   verify
@@ -223,10 +222,21 @@ function gen {
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
 
-  #zip IMA SDK
+  ###IMA SDK Generation###
+
+  #previous custom_gen built everything
+
+  #sampleapp and docs
+  cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
+  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
+
+  #version file
+  version=$(get_version)
+  echo "This was built with OoyalaSDK ${version}_${new_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
+
+  #zip
   cd ${BASE_DIR}
-  #verify everything exists
-  #verify
   rm ${IMA_ZIP_NAME}
   zip -r ${IMA_ZIP_BASE} ${IMA_ZIP_BASE}/*
   rm -rf ${IMA_ZIP_BASE}
