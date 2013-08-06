@@ -207,7 +207,8 @@ function gen {
 
   #version file
   version=$(get_version)
-  echo "v${version}_${new_rc}" >> ${ZIP_BASE}/VERSION
+  saved_rc=$(get_rc)
+  echo "v${version}_RC${saved_rc}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #docs
@@ -231,8 +232,7 @@ function gen {
   cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
 
   #version file
-  version=$(get_version)
-  echo "This was built with OoyalaSDK ${version}_${new_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  echo "This was built with OoyalaSDK ${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
 
   #zip
@@ -247,9 +247,9 @@ function gen {
     if [[ ${GIT_CHECK_RESULT} = false && ${push} = true ]]; then
       echo "  Not pushing because your working directory is dirty. Yuck."
     elif [[ ${push} = true ]]; then
-      echo "  Pushing Gen Release v${version}_RC${new_rc} commit."
-      git commit -a -m "Gen Release v${version}_RC${new_rc}"
-      git tag -a v${version}_RC${new_rc} -m "Version ${version}_RC${new_rc} (Created On ${DATE})"
+      echo "  Pushing Gen Release v${version}_RC${saved_rc} commit."
+      git commit -a -m "Gen Release v${version}_RC${saved_rc}"
+      git tag -a v${version}_RC${saved_rc} -m "Version ${version}_RC${saved_rc} (Created On ${DATE})"
       git push
       git push --tags
     fi
