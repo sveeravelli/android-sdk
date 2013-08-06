@@ -47,6 +47,7 @@ public class OoyalaIMAManager implements Observer {
   protected List<CompanionAdSlot> _companionAdSlots;
   protected OoyalaPlayer _player;
 
+  protected boolean _adsManagerInited;
   private class IMAAdErrorListener implements AdErrorListener {
 
     @Override
@@ -83,6 +84,7 @@ public class OoyalaIMAManager implements Observer {
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         Log.d(TAG, "IMA Ad manager loaded");
         _adsManager = event.getAdsManager();
+        _adsManagerInited = false;
         _adsManager.addAdErrorListener(new IMAAdErrorListener());
         _adsManager.addAdEventListener(new AdEventListener() {
 
@@ -115,8 +117,6 @@ public class OoyalaIMAManager implements Observer {
             }
           }
         });
-
-        _adsManager.init();
       }
     });
   }
@@ -171,6 +171,12 @@ public class OoyalaIMAManager implements Observer {
         if(url != null) {
           loadAds(url);
         }
+      }
+    }
+    else if (data.toString().equals(OoyalaPlayer.PLAY_STARTED_NOTIFICATION)) {
+      if (_adsManager != null && !_adsManagerInited) {
+        _adsManagerInited = true;
+        _adsManager.init();
       }
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
