@@ -14,8 +14,8 @@
             android:id="@+id/companionPlaceholder"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:text="companion placeholder"
-            android:textSize="25dp" />
+            android:text="@string/companion_placeholder"
+            android:textSize="25sp" />
 
     </FrameLayout>
 

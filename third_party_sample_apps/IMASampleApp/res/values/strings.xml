@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, GettingStartedSampleAppActivity!</string>
     <string name="app_name">IMASampleApp</string>
+    <string name="companion_placeholder">Companion Placeholder</string>
 
 </resources>
