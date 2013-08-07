@@ -173,6 +173,13 @@ public class OoyalaIMAManager implements Observer {
         }
       }
     }
+    else if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
+      if (_adsManager != null) {
+        _adsManager.destroy();
+        _adsLoader.contentComplete();
+      }
+      _adsManager = null;
+    }
     else if (data.toString().equals(OoyalaPlayer.PLAY_STARTED_NOTIFICATION)) {
       if (_adsManager != null && !_adsManagerInited) {
         _adsManagerInited = true;

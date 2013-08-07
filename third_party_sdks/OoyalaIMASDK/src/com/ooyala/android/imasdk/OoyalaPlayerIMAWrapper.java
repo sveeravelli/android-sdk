@@ -202,6 +202,11 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
           callback.onEnded();
         }
       }
+      else if(notification.equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
+        for (VideoAdPlayerCallback callback : _adCallbacks) {
+          callback.onEnded();
+        }
+      }
     }
 
     //Notifications from content playback
