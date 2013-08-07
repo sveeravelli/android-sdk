@@ -1,9 +1,12 @@
-Current Version: 2.0.0
+Current Version: 2.0.1
+
+------------ 2.0.1 ------------
+Google IMA Support
+Metadata request changes: We no longer provide the JSON object, but now have provide a map of metadata based on module.
 
 ------------ 2.0.0 ------------
 Removed API key/Secret requirement (Note: if querying Backlot APIs, use a OoyalaApiClient that still has these in its method signature)
 Added support for XTV playback
-Metadata request changes: We no longer provide the JSON object, but now have provide a map of metadata based on module.
 Numerous bugfixes
 
 ------------ 1.2.0 ------------
