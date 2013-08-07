@@ -446,7 +446,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     _analytics.reportPlayerLoad();
 
     //Play Pre-Rolls first
-    boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0);
+    boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0, false);
 
     //If there were no ads, initialize the player and play
     if (!didAdsPlay) {
@@ -628,6 +628,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void play() {
     if (currentPlayer() != null) {
+      if(isAdPlaying()) {
+        sendNotification(AD_STARTED_NOTIFICATION);
+      }
       currentPlayer().play();
     } else {
       queuePlay();
@@ -781,7 +784,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
   }
 
-  private boolean playAdsBeforeTime(int time) {
+  private boolean playAdsBeforeTime(int time, boolean autoplay) {
     this._lastPlayedTime = time;
     for (AdSpot ad : _currentItem.getAds()) {
       int adTime = ad.getTime();
@@ -791,13 +794,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       }
       if (adTime <= time && !this._playedAds.contains(ad)) {
         _playedAds.add(ad);
-        if (playAd(ad)) { return true; }
+        if (!autoplay && initializeAd(ad)) { return true; }
+        else if (autoplay && playAd(ad)) { return true; }
       }
     }
     return false;
   }
 
-  public boolean playAd(AdSpot ad) {
+  private boolean initializeAd(AdSpot ad) {
     Log.d(TAG, "Ooyala Player: Playing Ad");
     if(_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
@@ -837,8 +841,18 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     removeClosedCaptionsView();
     if (_adPlayer == null) { return false; }
 
-    sendNotification(AD_STARTED_NOTIFICATION);
-    _adPlayer.play();
+    dequeuePlay();
+    return true;
+  }
+
+  /**
+   * Manually initiate playback of an AdSpot
+   * @param ad
+   * @return if the ad started playing
+   */
+  public boolean playAd(AdSpot ad) {
+    if (!initializeAd(ad)) { return false; }
+    play();
     return true;
   }
 
@@ -977,8 +991,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 
         // play ads
         _lastPlayedTime = _player.currentTime();
-        playAdsBeforeTime(this._lastPlayedTime);
-
+        playAdsBeforeTime(this._lastPlayedTime, true);
         // closed captions
         displayCurrentClosedCaption();
       }
@@ -986,7 +999,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       switch (player.getState()) {
         case COMPLETED:
           if (player == _player) {
-            if (!playAdsBeforeTime(Integer.MAX_VALUE - 1)) {
+            if (!playAdsBeforeTime(Integer.MAX_VALUE - 1, true)) {
               onComplete();
             }
           } else {
@@ -994,7 +1007,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
 
-            if (!playAdsBeforeTime(this._lastPlayedTime)) {
+            if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
 
               // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
               if (_player == null) {
@@ -1025,7 +1038,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             cleanupPlayer(_adPlayer);
             _adPlayer = null;
             sendNotification(AD_COMPLETED_NOTIFICATION);
-            if (!playAdsBeforeTime(this._lastPlayedTime) && _player != null) {
+            if (!playAdsBeforeTime(this._lastPlayedTime, true) && _player != null) {
               if (_player.getState() == State.COMPLETED) {
                 onComplete();
               } else {
@@ -1250,7 +1263,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       cleanupPlayer(_adPlayer);
       _adPlayer = null;
       sendNotification(AD_SKIPPED_NOTIFICATION);
-      if (!playAdsBeforeTime(this._lastPlayedTime)) {
+      if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
         if (_player.getState() == State.COMPLETED) {
           onComplete();
         } else {
