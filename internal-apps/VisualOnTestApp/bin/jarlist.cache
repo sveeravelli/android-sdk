@@ -1,0 +1,11 @@
+# cache for current jar dependency. DO NOT EDIT.
+# format is <lastModified> <length> <SHA-1> <path>
+# Encoding is UTF-8
+1375826494000 86131 ff6fe6d364ce450d1bd93f79cc860e383de10cbb /Users/michael.len/repos/android-sdk/sdk/libs/voOSUtils.jar
+1375826494000 86131 ff6fe6d364ce450d1bd93f79cc860e383de10cbb /Users/michael.len/repos/android-sdk/internal-apps/VisualOnTestApp/libs/voOSUtils.jar
+1375826494000 28775 e96851e25c2a1abad1b9b7e67321b8a8146006b0 /Users/michael.len/repos/android-sdk/internal-apps/VisualOnTestApp/libs/voOSBasePlayer.jar
+1375826494000 28775 e96851e25c2a1abad1b9b7e67321b8a8146006b0 /Users/michael.len/repos/android-sdk/sdk/libs/voOSBasePlayer.jar
+1375826494000 18437 11236990e39904f650e774153e57a7726f1963ca /Users/michael.len/repos/android-sdk/internal-apps/VisualOnTestApp/libs/voOSDataSource.jar
+1375826494000 18437 11236990e39904f650e774153e57a7726f1963ca /Users/michael.len/repos/android-sdk/sdk/libs/voOSDataSource.jar
+1375826494000 26235 6e2d1c20b2498c5ebf912ecf4f362c772fa2686c /Users/michael.len/repos/android-sdk/internal-apps/VisualOnTestApp/libs/voOSEngine.jar
+1375826494000 26235 6e2d1c20b2498c5ebf912ecf4f362c772fa2686c /Users/michael.len/repos/android-sdk/sdk/libs/voOSEngine.jar
