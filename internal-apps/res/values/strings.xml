@@ -2,9 +2,12 @@
 <resources>
 
     <string name="hello">Hello World, GettingStartedSampleAppActivity!</string>
-    <string name="app_name">GettingStartedSampleApp</string>
+    <string name="app_name">InternalTestApp</string>
     <string-array name="arrIMAEmbeds">
         <item />
     </string-array>
+    <string name="coreItemName">Basic Playback Testing</string>
+    <string name="imaItemName">Google IMA Testing</string>
+    <string name="ooyalaItemName">Ooyala Managed Ad Testing</string>
 
 </resources>

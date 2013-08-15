@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/coreItem" android:title="@string/coreItemName" android:titleCondensed="Core"></item>
+    <item android:id="@+id/imaAdsItem" android:title="@string/imaItemName" android:titleCondensed="IMA"></item>
+    <item android:id="@+id/ooAdsItem" android:title="@string/ooyalaItemName" android:titleCondensed="OO Ads"></item>
+    <item android:id="@+id/ccItem" android:title="Closed Captions" android:titleCondensed="CC"></item>
+    
+
+</menu>
