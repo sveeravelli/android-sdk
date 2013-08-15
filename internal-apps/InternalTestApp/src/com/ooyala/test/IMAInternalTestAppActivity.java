@@ -1,10 +1,10 @@
-package com.ooyala.test.ima;
+package com.ooyala.test;
 
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import com.ooyala.android.imasdk.OoyalaIMAManager;
-import com.ooyala.test.ima.R;
+import com.ooyala.test.R;
 
 public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
 

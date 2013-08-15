@@ -1,4 +1,4 @@
-package com.ooyala.test.ima;
+package com.ooyala.test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.imasdk.OoyalaIMAManager;
-import com.ooyala.test.ima.R;
+import com.ooyala.test.R;
 
 public class BaseInternalTestAppActivity extends Activity {
 
@@ -44,7 +44,7 @@ public class BaseInternalTestAppActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
 
     activityMap = new HashMap<String, Class<? extends Activity>>();
-    activityMap.put(getString(R.string.coreItemName), CoreInternalTestAppActivity.class);
+    activityMap.put(getString(R.string.coreItemName), PlaybackInternalTestAppActivity.class);
     activityMap.put(getString(R.string.imaItemName), IMAInternalTestAppActivity.class);
     activityMap.put(getString(R.string.ooyalaItemName), OoyalaAdsInternalTestAppActivity.class);
     super.onCreate(savedInstanceState);

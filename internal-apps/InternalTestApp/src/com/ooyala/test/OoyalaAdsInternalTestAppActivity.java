@@ -1,10 +1,6 @@
-package com.ooyala.test.ima;
+package com.ooyala.test;
 
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import com.ooyala.android.imasdk.OoyalaIMAManager;
-import com.ooyala.test.ima.R;
 
 public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivity {
 
