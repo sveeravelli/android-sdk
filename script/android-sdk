@@ -66,7 +66,6 @@ function custom_gen {
   ant release
   ant jar
   cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
-  cp -r ${IMA_SDK_DIR}/libs/docs/sdk.jar-doc/com/google/ads/interactivemedia/v3/api  ${BASE_DIR}/${IMA_ZIP_BASE}/GoogleIMADocumentation
   #update IMA Sample App
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
