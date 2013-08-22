@@ -1452,7 +1452,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (getBasePlayer() != null) {
       return getBasePlayer().getSeekStyle();
     } else {
-      return SeekStyle.ENHANCED;
+      return currentPlayer().getSeekStyle();
     }
   }
 

@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleDisplayInfo;
@@ -95,6 +96,11 @@ class VisualOnMoviePlayer extends StreamPlayer implements
       _lastPlayhead = _player.GetPos();
     }
   }
+
+  public SeekStyle getSeekStyle() {
+    return SeekStyle.BASIC;
+  }
+
 
   // This is required because android enjoys making things difficult. talk to
   // jigish if you got issues.
@@ -249,6 +255,7 @@ class VisualOnMoviePlayer extends StreamPlayer implements
     if (_player == null) {
       return;
     }
+    Log.d(TAG, "Seeking to "+timeInMillis);
     _player.SetPos(timeInMillis);
   }
 
