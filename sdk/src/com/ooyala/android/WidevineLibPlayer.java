@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.widevine.drmapi.android.WVEvent;
 import com.widevine.drmapi.android.WVEventListener;
@@ -150,4 +151,9 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     _wvplayback.terminate();
     super.destroy();
   }
+
+  public SeekStyle getSeekStyle() {
+    return SeekStyle.BASIC;
+  }
+
 }
