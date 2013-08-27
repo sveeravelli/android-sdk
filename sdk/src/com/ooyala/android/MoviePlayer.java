@@ -6,6 +6,8 @@ import java.util.Set;
 
 import android.util.Log;
 import android.view.View;
+
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class MoviePlayer extends Player implements Observer {
@@ -178,6 +180,10 @@ public class MoviePlayer extends Player implements Observer {
   public boolean seekable() { return _seekable; }
   public void setSeekable(boolean seekable) { _seekable = seekable; }
   public void seekToTime(int timeInMillis) { if (_seekable) { _basePlayer.seekToTime(timeInMillis); } }
+
+  public SeekStyle getSeekStyle() {
+    return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.ENHANCED;
+  }
 
   public State getState() { return _basePlayer != null ? _basePlayer.getState() : super.getState(); }
   protected void setState(State state) {

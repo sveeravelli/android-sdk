@@ -186,6 +186,10 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
   @Override
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    if (_seeking) {
+      boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
+      _currTime.setText(Utils.timeStringFromMillis((int)(seekBar.getProgress() / (100f)) * _player.getDuration(), includeHours));
+    }
     if (fromUser && _player.getSeekStyle() == SeekStyle.ENHANCED) {
       _player.seekToPercent(progress);
       update(null, null);
@@ -201,12 +205,12 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
+    _player.seekToPercent(seekBar.getProgress());
+    update(null, null);
     _seeking = false;
     if (_wasPlaying) {
       _player.play();
     }
-    _player.seekToPercent(seekBar.getProgress());
-    update(null, null);
   }
 
   @Override

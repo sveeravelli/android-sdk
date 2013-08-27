@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 //the widevine player using the built in libraries, for honeycomb+
@@ -155,4 +156,9 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
         return "";
     }
   }
+
+  public SeekStyle getSeekStyle() {
+    return SeekStyle.BASIC;
+  }
+
 }
