@@ -121,7 +121,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
-  private String _language = Locale.getDefault().getLanguage();
+  private String _language = null;
   private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
