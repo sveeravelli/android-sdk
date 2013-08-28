@@ -32,9 +32,11 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     imaManager.addCompanionSlot(companionView, 300, 50);
 
     //Populate the embed map
-    embedMap.put("Pac-12 BasketBall, with VAST Midroll", "91bThhODokcxQNhlk3ttzNZs3HoTZ12M");
-    embedMap.put("Wolverine",                            "1teWtjOjyk4Bc451kG4Obp1EjjQNWad1");
-    embedMap.put("BMW Ad with IMA Preroll",              "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M");
+    embedMap.put("IMA Preroll", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");
+    embedMap.put("IMA Midroll", "pqaWp0ZDqo17Z-Dn_5YiVhjcbQYs5lhq");
+    embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
+    embedMap.put("IMA Skip Ad", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");
+    embedMap.put("IMA Wrapper", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
