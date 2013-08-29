@@ -260,10 +260,10 @@ class PlayerAPIClient {
       params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
 
     if (playerInfo.getMaxHeight() > 0)
-      params.put("h", Integer.toString(playerInfo.getMaxHeight()));
+      params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
 
     if (playerInfo.getMaxWidth() > 0)
-      params.put("w", Integer.toString(playerInfo.getMaxWidth()));
+      params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
 
     if (playerInfo.getMaxBitrate() > 0) {
       params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
