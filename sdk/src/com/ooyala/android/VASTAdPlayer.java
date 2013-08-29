@@ -6,11 +6,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
+
+import android.util.Log;
+
 import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
+  private static String TAG = VASTAdPlayer.class.getName();
 
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -174,14 +178,14 @@ class VASTAdPlayer extends AdMoviePlayer {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
         sendTrackingEvent(TrackingEvent.START);
-        _firstQSent = true;
-      } else if (!_firstQSent && currentTime() > (currentAd().getDuration() / 4)) {
+        _startSent = true;
+      } else if (!_firstQSent && currentTime() > (currentAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
         _firstQSent = true;
-      } else if (!_midSent && currentTime() > (currentAd().getDuration() / 2)) {
+      } else if (!_midSent && currentTime() > (currentAd().getDuration() * 1000 / 2)) {
         sendTrackingEvent(TrackingEvent.MIDPOINT);
         _midSent = true;
-      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() / 4)) {
+      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         _thirdQSent = true;
       }
@@ -194,6 +198,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
+        Log.i(TAG, "Sending Tracking Ping: " + urlFromAdUrlString(url));
         NetUtils.ping(urlFromAdUrlString(url));
       }
     }
