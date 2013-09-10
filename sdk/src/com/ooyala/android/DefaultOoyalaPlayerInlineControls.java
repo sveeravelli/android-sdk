@@ -174,6 +174,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
     _baseLayout.addView(_bottomBar, bottomBarLP);
 
     _spinner = new ProgressBar(_layout.getContext());
+    _spinner.setVisibility(View.INVISIBLE);
     FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
         FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
     _layout.addView(_spinner, spinnerLP);
@@ -262,7 +263,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
       updateButtonStates();
 
-      if ((currentState == State.INIT || currentState == State.LOADING) && _isVisible) {
+      if (currentState == State.LOADING && _isVisible) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);
