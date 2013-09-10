@@ -18,6 +18,8 @@ sdk/*/gen
 sdk/*/local.properties
 sample-apps/*/bin
 sample-apps/*/gen
+internal-apps/*/bin
+internal-apps/*/gen
 third_party_sample_apps/*/bin
 third_party_sample_apps/*/gen
 third_party_sdks/*/Documentation
