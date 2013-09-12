@@ -3,6 +3,7 @@ package com.ooyala.android;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,6 +29,9 @@ public class VASTAdSpot extends AdSpot {
   /** The actual ads (List of VASTAd) */
   protected List<VASTAd> _ads = new ArrayList<VASTAd>();
 
+  static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
+      "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E", "[timestamp]", "%5Btimestamp%5E");
+
   /**
    * Initialize a VASTAdSpot using the specified data
    * @param time the time at which the VASTAdSpot should play
@@ -37,7 +41,8 @@ public class VASTAdSpot extends AdSpot {
    */
   public VASTAdSpot(int time, URL clickURL, List<URL> trackingURLs, URL vastURL) {
     super(time, clickURL, trackingURLs);
-    _vastURL = vastURL;
+    _vastURL = urlFromAdUrlString(vastURL.toString());
+
   }
 
   /**
@@ -81,10 +86,8 @@ public class VASTAdSpot extends AdSpot {
     try {
       _signature = data.getString(Constants.KEY_SIGNATURE);
       _expires = data.getInt(Constants.KEY_EXPIRES);
-      try {
-        _vastURL = new URL(data.getString(Constants.KEY_URL));
-      } catch (MalformedURLException exception) {
-        Log.d(this.getClass().getName(), "Malformed VAST URL: " + data.getString(Constants.KEY_URL));
+      _vastURL = urlFromAdUrlString(data.getString(Constants.KEY_URL));
+      if (_vastURL == null) {
         return ReturnState.STATE_FAIL;
       }
     } catch (JSONException exception) {
@@ -162,6 +165,20 @@ public class VASTAdSpot extends AdSpot {
 
   public URL getVASTURL() {
     return _vastURL;
+  }
+
+  public static URL urlFromAdUrlString(String url) {
+    String timestamp = "" + (System.currentTimeMillis() / 1000);
+    String newURL = url;
+    for (String replace : URL_STRINGS_TO_REPLACE) {
+      newURL = newURL.replace(replace, timestamp);
+    }
+    try {
+      return new URL(newURL);
+    } catch (MalformedURLException e) {
+      Log.e(VASTAdSpot.class.getName(), "Malformed VAST URL: " + url);
+      return null;
+    }
   }
 
 }

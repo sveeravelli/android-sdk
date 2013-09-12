@@ -33,10 +33,6 @@ class VASTAdPlayer extends AdMoviePlayer {
     public static final String RESUME = "resume";
   }
 
-  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
-      "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
-
-
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof VASTAdSpot)) {
@@ -154,19 +150,6 @@ class VASTAdPlayer extends AdMoviePlayer {
     return _linearAdQueue.isEmpty() ? null : _linearAdQueue.get(0);
   }
 
-  private URL urlFromAdUrlString(String url) {
-    String timestamp = "" + (System.currentTimeMillis() / 1000);
-    String newURL = url;
-    for (String replace : URL_STRINGS_TO_REPLACE) {
-      newURL.replaceAll(replace, timestamp);
-    }
-    try {
-      return new URL(newURL);
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
   private void addQuartileBoundaryObserver() {
     _startSent = false;
     _firstQSent = false;
@@ -198,8 +181,8 @@ class VASTAdPlayer extends AdMoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
-        Log.i(TAG, "Sending Tracking Ping: " + urlFromAdUrlString(url));
-        NetUtils.ping(urlFromAdUrlString(url));
+        Log.i(TAG, "Sending Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+        NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
       }
     }
   }
