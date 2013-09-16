@@ -13,8 +13,9 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
-  private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
+  private final List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
+  private final List<String> _impressionURLs = new ArrayList<String>();
 
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -78,6 +79,9 @@ class VASTAdPlayer extends AdMoviePlayer {
 
   private boolean initAfterFetch(OoyalaPlayer parent) {
     for (VASTAd vastAd : _ad.getAds()) {
+      // Add to the list of impression URLs to be called when player is loaded
+      _impressionURLs.addAll(vastAd.getImpressionURLs());
+
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
           _linearAdQueue.add(seqItem.getLinear());
@@ -93,6 +97,8 @@ class VASTAdPlayer extends AdMoviePlayer {
     super.init(parent, _linearAdQueue.get(0).getStreams());
 
     // TODO[jigish] setup clickthrough
+    Set<String> clickTracking = _linearAdQueue.get(0).getClickTrackingURLs();
+    String clickThrough = _linearAdQueue.get(0).getClickThroughURL();
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
@@ -123,7 +129,7 @@ class VASTAdPlayer extends AdMoviePlayer {
       setState(State.COMPLETED);
       return;
     }
-    if (_state == State.PLAYING) {
+    if (_state != State.PLAYING) {
       sendTrackingEvent(TrackingEvent.PAUSE);
     }
     super.pause();
@@ -131,6 +137,7 @@ class VASTAdPlayer extends AdMoviePlayer {
 
 
 
+  @Override
   public VASTAdSpot getAd() {
     return _ad;
   }
@@ -174,6 +181,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     _thirdQSent = false;
   }
 
+  @Override
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
@@ -190,6 +198,22 @@ class VASTAdPlayer extends AdMoviePlayer {
         _thirdQSent = true;
       }
     }
+    else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+    	try {
+      	BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
+
+      	// If player is ready, send impression tracking event,
+      	// else if player is completed, send completed tracking event
+      	if (tempPlayer.getState() == State.READY) {
+      		sendImpressionTrackingEvent(_impressionURLs);
+      	} else if (tempPlayer.getState() == State.COMPLETED) {
+      		sendTrackingEvent(TrackingEvent.COMPLETE);
+      	}
+    	} catch (Exception e) {
+    		// ERROR: arg0 is not a BaseMoviePlayer as expected
+    		Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
+    	}
+    }
     super.update(arg0,  arg);
   }
 
@@ -202,6 +226,13 @@ class VASTAdPlayer extends AdMoviePlayer {
         NetUtils.ping(urlFromAdUrlString(url));
       }
     }
+  }
+
+  private void sendImpressionTrackingEvent(List<String> impressionURLs) {
+	  for(String url : impressionURLs) {
+	    Log.i(TAG, "Sending Impression Tracking Ping: " + urlFromAdUrlString(url));
+	    NetUtils.ping(urlFromAdUrlString(url));
+	  }
   }
 
   @Override
