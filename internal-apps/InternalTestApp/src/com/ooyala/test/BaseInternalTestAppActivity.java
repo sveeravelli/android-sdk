@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,7 +24,6 @@ import com.ooyala.test.R;
 public class BaseInternalTestAppActivity extends Activity {
 
   Map<String, String> embedMap;
-  Map<String, Class<? extends Activity>> activityMap;
   final String TAG = this.getClass().toString();
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "ooyala.com";
@@ -43,10 +41,6 @@ public class BaseInternalTestAppActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
 
-    activityMap = new HashMap<String, Class<? extends Activity>>();
-    activityMap.put(getString(R.string.coreItemName), PlaybackInternalTestAppActivity.class);
-    activityMap.put(getString(R.string.imaItemName), IMAInternalTestAppActivity.class);
-    activityMap.put(getString(R.string.ooyalaItemName), OoyalaAdsInternalTestAppActivity.class);
     super.onCreate(savedInstanceState);
     setContentView(R.layout.test_set);
 
@@ -90,14 +84,17 @@ public class BaseInternalTestAppActivity extends Activity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-      MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.main_menu, menu);
-      return true;
+    // Inflate the menu; this adds items to the action bar if it is present.
+    for(String key : InternalTestApplication.getActivityMap().keySet()) {
+      MenuItem item = menu.add(key);
+      item.setTitleCondensed(InternalTestApplication.getCondensedActivityNameMap().get(key));
+    }
+    return true;
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    Class<? extends Activity> selectedClass = activityMap.get(item.getTitle().toString());
+    Class<? extends Activity> selectedClass = InternalTestApplication.getActivityMap().get(item.getTitle().toString());
 
     if(selectedClass.equals(this.getClass())){
       Log.d(TAG, "Selected currently showing activity");
