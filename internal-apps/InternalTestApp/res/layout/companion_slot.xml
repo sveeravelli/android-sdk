@@ -5,9 +5,9 @@
     android:layout_height="50dp" >
 
     <TextView
-        android:id="@+id/companionPlaceholder"
+        android:id="@+id/companionPlaceholderTextView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="companion placeholder"
+        android:text="@string/companionPlaceholderText"
         android:textSize="25sp" />
 </FrameLayout>

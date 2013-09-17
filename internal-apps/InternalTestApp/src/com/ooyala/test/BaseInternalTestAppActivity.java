@@ -40,7 +40,7 @@ public class BaseInternalTestAppActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
 
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.test_set);
+    setContentView(R.layout.test_case_layout);
 
     //Initialize the player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);

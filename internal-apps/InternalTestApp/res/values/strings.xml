@@ -6,5 +6,7 @@
     <string name="coreItemName">Basic Playback Testing</string>
     <string name="imaItemName">Google IMA Testing</string>
     <string name="ooyalaItemName">Ooyala Managed Ad Testing</string>
+    <string name="btn_load_case">Load</string>
+    <string name="companionPlaceholderText">companion placeholder</string>
 
 </resources>
