@@ -1,4 +1,6 @@
-package com.ooyala.test;
+package com.ooyala.test.cases;
+
+import com.ooyala.test.BaseInternalTestAppActivity;
 
 import android.os.Bundle;
 

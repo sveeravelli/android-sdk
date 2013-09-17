@@ -1,11 +1,11 @@
-package com.ooyala.test;
+package com.ooyala.test.cases;
 
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import com.ooyala.android.imasdk.OoyalaIMAManager;
+import com.ooyala.test.BaseInternalTestAppActivity;
 import com.ooyala.test.R;
-
 public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
 
 //  //From the BaseInternalTestAppActivity
@@ -26,6 +26,7 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     LinearLayout controlsLayout = (LinearLayout) findViewById(R.id.controlsLayout);
     ViewGroup companionView = (ViewGroup) getLayoutInflater().inflate(R.layout.companion_slot, null);
     controlsLayout.addView(companionView, 0);
+    OoyalaIMAManager imaManager;
 
     //Initialize IMA classes
     imaManager = new OoyalaIMAManager(player);

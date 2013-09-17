@@ -3,6 +3,10 @@ package com.ooyala.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ooyala.test.cases.IMAInternalTestAppActivity;
+import com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity;
+import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
+
 import android.app.Activity;
 import android.app.Application;
 

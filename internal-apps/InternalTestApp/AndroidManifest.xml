@@ -14,16 +14,16 @@
         android:label="@string/app_name"
         android:name="com.ooyala.test.InternalTestApplication">
         <activity
-            android:name="com.ooyala.test.PlaybackInternalTestAppActivity"
+            android:name="com.ooyala.test.cases.PlaybackInternalTestAppActivity"
             android:label="@string/coreItemName" >
 
         </activity>
         <activity
-            android:name="com.ooyala.test.IMAInternalTestAppActivity"
+            android:name="com.ooyala.test.cases.IMAInternalTestAppActivity"
             android:label="@string/imaItemName" >
         </activity>
         <activity
-            android:name="com.ooyala.test.OoyalaAdsInternalTestAppActivity"
+            android:name="com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity"
             android:label="@string/ooyalaItemName" >
         </activity>
         <activity

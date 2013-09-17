@@ -18,22 +18,20 @@ import android.widget.Spinner;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
-import com.ooyala.android.imasdk.OoyalaIMAManager;
 import com.ooyala.test.R;
 
 public class BaseInternalTestAppActivity extends Activity {
 
-  Map<String, String> embedMap;
+  protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "ooyala.com";
 
-  OptimizedOoyalaPlayerLayoutController playerLayoutController;
-  OoyalaIMAManager imaManager;
-  OoyalaPlayer player;
-  Spinner embedSpinner;
-  Button setButton;
-  ArrayAdapter<String> embedAdapter;
+  protected OptimizedOoyalaPlayerLayoutController playerLayoutController;
+  protected OoyalaPlayer player;
+  protected Spinner embedSpinner;
+  protected Button setButton;
+  protected ArrayAdapter<String> embedAdapter;
 
   /**
    * Called when the activity is first created.
