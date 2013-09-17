@@ -115,14 +115,11 @@ public class VASTAd {
                 ad = ad.getNextSibling();
                 continue;
               }
-              if (_adID.equals(((Element) ad).getAttribute(Constants.ATTRIBUTE_ID))) {
-                if (update((Element) ad)) {
-                  break;
-                } else {
-                  return false;
-                }
+              if (update((Element) ad)) {
+              	ad = ad.getNextSibling();
+              } else {
+                return false;
               }
-              ad = ad.getNextSibling();
             }
           } catch (Exception e) {
             System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
