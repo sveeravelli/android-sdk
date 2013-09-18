@@ -46,6 +46,9 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
+
+    EditText embedText = (EditText) findViewById(R.id.embedText);
+    embedText.setText("lsaTl4ZDqr8k8Jw72UwBaUAB_hw4Ogc9");
     setButton.setOnClickListener(new OnClickListener() {
 
       @Override
