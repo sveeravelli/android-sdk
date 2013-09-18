@@ -1,6 +1,9 @@
 package com.ooyala.android.imasampleapp;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ooyala.android.imasdk.*;
 import com.ooyala.android.imasampleapp.R;
 import android.app.Activity;
@@ -33,8 +36,17 @@ public class IMASampleAppActivity extends Activity {
     //Initialize IMA classes
     imaManager = new OoyalaIMAManager(player);
     ViewGroup companionView = (ViewGroup) findViewById(R.id.companionFrame);
-
     imaManager.addCompanionSlot(companionView, 300, 50);
+
+    Map<String, String> adTagParameters = new HashMap<String, String>();
+
+    adTagParameters.put("vid", EMBED);
+    adTagParameters.put("url", "[referrer_url]");
+    adTagParameters.put("pod", "2");
+    adTagParameters.put("ppos", "2");
+    adTagParameters.put("vpos", "preroll");
+    adTagParameters.put("mridx", "2");
+    imaManager.setAdTagParameters(adTagParameters);
 
     if (player.setEmbedCode(EMBED)) {
       player.play();

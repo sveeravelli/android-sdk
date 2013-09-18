@@ -25,6 +25,8 @@ third_party_sample_apps/*/gen
 third_party_sdks/*/Documentation
 third_party_sdks/*/bin
 third_party_sdks/*/gen
+internal-apps/*/bin
+internal-apps/*/gen
 vendor/VisualOn/SamplePlayer/bin
 vendor/VisualOn/SamplePlayer/gen
 .metadata/*
