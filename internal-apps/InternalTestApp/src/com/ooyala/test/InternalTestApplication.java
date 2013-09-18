@@ -14,8 +14,8 @@ import android.app.Application;
  * A global scope of the application.  This allows all activities to use the same list of information.
  * Using this, we can add more test cases by doing the following:
  *
- * 1. Create the test activity
- * 2. Create the string for the activity's name
+ * 1. Create the test activity in com.ooyala.test.cases
+ * 2. Create the string for the activity's name in res/strings
  * 3. Add that activity to these maps, with proper information
  * @author michael.len
  *
@@ -31,7 +31,7 @@ public class InternalTestApplication extends Application {
     condensedActivityNameMap = new HashMap<String, String>();
 
     activityMap.put(getString(R.string.coreItemName), PlaybackInternalTestAppActivity.class);
-    condensedActivityNameMap.put(getString(R.string.coreItemName), "core");
+    condensedActivityNameMap.put(getString(R.string.coreItemName), "Core");
 
     activityMap.put(getString(R.string.imaItemName), IMAInternalTestAppActivity.class);
     condensedActivityNameMap.put(getString(R.string.imaItemName), "IMA");
