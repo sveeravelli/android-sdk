@@ -2,7 +2,6 @@ package com.ooyala.android;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
@@ -213,8 +212,8 @@ class VASTAdPlayer extends AdMoviePlayer {
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
     for(String url : impressionURLs) {
-      Log.i(TAG, "Sending Impression Tracking Ping: " + urlFromAdUrlString(url));
-      NetUtils.ping(urlFromAdUrlString(url));
+      Log.i(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+      NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
     }
   }
 
