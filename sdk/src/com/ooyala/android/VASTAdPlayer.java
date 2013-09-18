@@ -13,9 +13,9 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
-  private final List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
+  private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
-  private final List<String> _impressionURLs = new ArrayList<String>();
+  private List<String> _impressionURLs = new ArrayList<String>();
 
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -199,20 +199,20 @@ class VASTAdPlayer extends AdMoviePlayer {
       }
     }
     else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-    	try {
-      	BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
+      try {
+        BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
 
-      	// If player is ready, send impression tracking event,
-      	// else if player is completed, send completed tracking event
-      	if (tempPlayer.getState() == State.READY) {
-      		sendImpressionTrackingEvent(_impressionURLs);
-      	} else if (tempPlayer.getState() == State.COMPLETED) {
-      		sendTrackingEvent(TrackingEvent.COMPLETE);
-      	}
-    	} catch (Exception e) {
-    		// ERROR: arg0 is not a BaseMoviePlayer as expected
-    		Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
-    	}
+        // If player is ready, send impression tracking event,
+        // else if player is completed, send completed tracking event
+        if (tempPlayer.getState() == State.READY) {
+          sendImpressionTrackingEvent(_impressionURLs);
+        } else if (tempPlayer.getState() == State.COMPLETED) {
+          sendTrackingEvent(TrackingEvent.COMPLETE);
+        }
+      } catch (Exception e) {
+        // ERROR: arg0 is not a BaseMoviePlayer as expected
+        Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
+      }
     }
     super.update(arg0,  arg);
   }
@@ -229,10 +229,10 @@ class VASTAdPlayer extends AdMoviePlayer {
   }
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-	  for(String url : impressionURLs) {
-	    Log.i(TAG, "Sending Impression Tracking Ping: " + urlFromAdUrlString(url));
-	    NetUtils.ping(urlFromAdUrlString(url));
-	  }
+    for(String url : impressionURLs) {
+      Log.i(TAG, "Sending Impression Tracking Ping: " + urlFromAdUrlString(url));
+      NetUtils.ping(urlFromAdUrlString(url));
+    }
   }
 
   @Override
