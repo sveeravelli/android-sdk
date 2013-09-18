@@ -3,6 +3,7 @@ package com.ooyala.android.imasdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -45,6 +46,7 @@ public class OoyalaIMAManager implements Observer {
 
   protected OoyalaPlayerIMAWrapper _ooyalaPlayerWrapper;
   protected List<CompanionAdSlot> _companionAdSlots;
+  protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
 
   protected boolean _adsManagerInited;
@@ -133,6 +135,16 @@ public class OoyalaIMAManager implements Observer {
   }
 
   /**
+   * Specify a map of Ad Tag parameters that will be appended to the ad tag
+   * This will not override already set parameters.  This will not query-string encode parameters.
+   * If you call this method twice, you override the parameters originally sent
+   * @param adTagParameters the keys and values for ad tag parameters to be appended
+   */
+  public void setAdTagParameters(Map<String, String> adTagParameters) {
+    _adTagParameters = adTagParameters;
+  }
+
+  /**
    * Manually load an IMA Vast URL to initialize the IMA Manager.
    * You do not need to do this if a VAST URL is properly configured in Third Party Module Metadata.
    * It is not advised usage to manually load an IMA VAST URL while any IMA URL is configured in Third Party
@@ -140,14 +152,19 @@ public class OoyalaIMAManager implements Observer {
    * @param url VAST url for IMA
    */
   public void loadAds(String url) {
-    if(_container != null) {
+    if (_container != null) {
       Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
 
+    if (_adTagParameters != null) {
+      for(String key : _adTagParameters.keySet()) {
+        url += (url.contains("?") ? "&" : "?") + key + "=" + _adTagParameters.get(key);
+      }
+    }
     _container = _sdkFactory.createAdDisplayContainer();
     _container.setPlayer(_ooyalaPlayerWrapper);
     _container.setAdContainer(_player.getLayout());
-    Log.d(TAG, "IMA Managaer: Requesting ads");
+    Log.d(TAG, "IMA Managaer: Requesting ads: " + url);
     AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
 
