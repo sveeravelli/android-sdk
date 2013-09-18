@@ -2,7 +2,6 @@ package com.ooyala.android;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
@@ -13,9 +12,9 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
-  private final List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
+  private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
-  private final List<String> _impressionURLs = new ArrayList<String>();
+  private List<String> _impressionURLs = new ArrayList<String>();
 
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -33,10 +32,6 @@ class VASTAdPlayer extends AdMoviePlayer {
     public static final String PAUSE = "pause";
     public static final String RESUME = "resume";
   }
-
-  private static final List<String> URL_STRINGS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",
-      "[Place_Random_Number_Here]", "%3Cnow%3E", "%3Crand-num%3E", "[TIMESTAMP]", "%5BTIMESTAMP%5E");
-
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
@@ -161,19 +156,6 @@ class VASTAdPlayer extends AdMoviePlayer {
     return _linearAdQueue.isEmpty() ? null : _linearAdQueue.get(0);
   }
 
-  private URL urlFromAdUrlString(String url) {
-    String timestamp = "" + (System.currentTimeMillis() / 1000);
-    String newURL = url;
-    for (String replace : URL_STRINGS_TO_REPLACE) {
-      newURL.replaceAll(replace, timestamp);
-    }
-    try {
-      return new URL(newURL);
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
   private void addQuartileBoundaryObserver() {
     _startSent = false;
     _firstQSent = false;
@@ -199,20 +181,20 @@ class VASTAdPlayer extends AdMoviePlayer {
       }
     }
     else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-    	try {
-      	BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
+      try {
+        BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
 
-      	// If player is ready, send impression tracking event,
-      	// else if player is completed, send completed tracking event
-      	if (tempPlayer.getState() == State.READY) {
-      		sendImpressionTrackingEvent(_impressionURLs);
-      	} else if (tempPlayer.getState() == State.COMPLETED) {
-      		sendTrackingEvent(TrackingEvent.COMPLETE);
-      	}
-    	} catch (Exception e) {
-    		// ERROR: arg0 is not a BaseMoviePlayer as expected
-    		Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
-    	}
+        // If player is ready, send impression tracking event,
+        // else if player is completed, send completed tracking event
+        if (tempPlayer.getState() == State.READY) {
+          sendImpressionTrackingEvent(_impressionURLs);
+        } else if (tempPlayer.getState() == State.COMPLETED) {
+          sendTrackingEvent(TrackingEvent.COMPLETE);
+        }
+      } catch (Exception e) {
+        // ERROR: arg0 is not a BaseMoviePlayer as expected
+        Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
+      }
     }
     super.update(arg0,  arg);
   }
@@ -222,17 +204,17 @@ class VASTAdPlayer extends AdMoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
-        Log.i(TAG, "Sending Tracking Ping: " + urlFromAdUrlString(url));
-        NetUtils.ping(urlFromAdUrlString(url));
+        Log.i(TAG, "Sending Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+        NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
       }
     }
   }
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-	  for(String url : impressionURLs) {
-	    Log.i(TAG, "Sending Impression Tracking Ping: " + urlFromAdUrlString(url));
-	    NetUtils.ping(urlFromAdUrlString(url));
-	  }
+    for(String url : impressionURLs) {
+      Log.i(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+      NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
+    }
   }
 
   @Override
