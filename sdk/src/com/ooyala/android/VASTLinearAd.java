@@ -154,4 +154,21 @@ public class VASTLinearAd implements PlayableItem {
   public Stream getStream() {
     return Stream.bestStream(_streams);
   }
+  /**
+   * Update the HashMap containing the tracking events by adding to it
+   */
+  public void updateTrackingEvents(HashMap<String, Set<String>> trackingEvents) {
+    for (String event : trackingEvents.keySet()) {
+      Set<String> newUrls = trackingEvents.get(event);
+      Set<String> urls = _trackingEvents.get(event);
+
+      if (urls != null) {
+        urls.addAll(newUrls);
+      } else {
+        urls = new HashSet<String>();
+        urls.addAll(newUrls);
+        _trackingEvents.put(event, urls);
+      }
+    }
+  }
 }

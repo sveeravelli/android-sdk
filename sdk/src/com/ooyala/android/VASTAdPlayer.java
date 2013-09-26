@@ -204,7 +204,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
-        Log.i(TAG, "Sending Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+        Log.i(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
         NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
       }
     }

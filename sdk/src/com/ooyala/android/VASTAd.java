@@ -1,39 +1,37 @@
 package com.ooyala.android;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+
+import android.util.Log;
 
 public class VASTAd {
   /** the ID of the Ad */
   private String _adID;
   /** the System */
-  private String _system;
+  protected String _system;
   /** the System Version */
-  private String _systemVersion;
+  protected String _systemVersion;
   /** the title of the Ad */
-  private String _title;
+  protected String _title;
   /** the description of the Ad */
-  private String _description;
+  protected String _description;
   /** the survey URLs of the Ad */
-  private List<String> _surveyURLs = new ArrayList<String>();
+  protected List<String> _surveyURLs = new ArrayList<String>();
   /** the error URLs of the Ad */
-  private List<String> _errorURLs = new ArrayList<String>();
+  protected List<String> _errorURLs = new ArrayList<String>();
   /** the impression URLs of the Ad */
-  private List<String> _impressionURLs = new ArrayList<String>();
+  protected List<String> _impressionURLs = new ArrayList<String>();
   /** the ordered sequence of the Ad (List of VASTSequenceItem) */
-  private List<VASTSequenceItem> _sequence = new ArrayList<VASTSequenceItem>();
+  protected List<VASTSequenceItem> _sequence = new ArrayList<VASTSequenceItem>();
   /** the extensions of the Ad */
-  private Element _extensions;
+  protected Element _extensions;
+  /** the number of linear creatives without sequence numbers */
+  private int _numOfLinear = 0;
 
   /**
    * Initialize a VASTAd using the specified xml (subclasses should override this)
@@ -47,6 +45,12 @@ public class VASTAd {
 
   /**
    * Update the VASTAd using the specified xml (subclasses should override this)
+   * Assumptions:
+   *  1) There can be multiple wrappers (we set no limit on the redirects).
+   *  2) If the wrapper has multiple linear creatives with sequence numbers AND the child has multiple linear creatives
+   *     with corresponding sequence numbers, we put the right tracking events to the correct linear creatives of the child.
+   *  3) If the wrapper has multiple linear creatives but the child's linear creatives do not have sequence numbers we assume that
+   *     the order that the creatives are given is the order that we want to match with the wrapper's sequence numbers
    * @param xml the TBXMLElement containing the xml to use to update this VASTAd
    * @return YES if the XML was properly formatter, NO if not
    */
@@ -60,9 +64,33 @@ public class VASTAd {
       }
       boolean isInLine = ((Element) type).getTagName().equals(Constants.ELEMENT_IN_LINE);
       boolean isWrapper = ((Element) type).getTagName().equals(Constants.ELEMENT_WRAPPER);
-      if (isInLine || isWrapper) {
+
+      if (isWrapper) {
         found = true;
-        String vastAdTagURI = null;
+
+        //If it is a wrapper ad, create a new wrapper ad with the current xml. This will call the VASTAd() constructor which will in turn
+        //call the overridden update function in VASTWrapperAd subclass. Then get the child ad's xml from the wrapper and call update on it
+        VASTWrapperAd wrapperAd = new VASTWrapperAd(xml);
+        update((Element) wrapperAd.getChildAdXML());
+
+        //Add the impression URLs of the wrapper to the child
+        _impressionURLs.addAll(wrapperAd.getImpressionURLs());
+
+        //Go through the sequence array in the inline ad (the final child of all wrappers)
+        for (VASTSequenceItem item : _sequence) {
+          int currentSequenceNum = item.getNumber();
+          //Loop through the wrapper's sequence to find the matching sequence number
+          for (VASTSequenceItem wrapper : wrapperAd._sequence) {
+            VASTLinearAd wrapperLinear = wrapper.getLinear();
+            int wrapperSequenceNum = wrapper.getNumber();
+            if (wrapperLinear != null && wrapperSequenceNum == currentSequenceNum) {
+              //If the sequence numbers match, update the tracking events of child with the tracking events of the wrapper
+              item.getLinear().updateTrackingEvents(wrapperLinear.getTrackingEvents());
+            }
+          }
+        }
+      } else if (isInLine) {
+      	found = true;
         Node child = type.getFirstChild();
         while (child != null) {
           if (!(child instanceof Element)) {
@@ -86,8 +114,6 @@ public class VASTAd {
             _impressionURLs.add(text);
           } else if (((Element) child).getTagName().equals(Constants.ELEMENT_EXTENSIONS)) {
             _extensions = (Element) child;
-          } else if (isWrapper && ((Element) child).getTagName().equals(Constants.ELEMENT_VAST_AD_TAG_URI)) {
-            vastAdTagURI = text;
           } else if (((Element) child).getTagName().equals(Constants.ELEMENT_CREATIVES)) {
             Node creative = child.getFirstChild();
             while (creative != null) {
@@ -100,32 +126,9 @@ public class VASTAd {
           }
           child = child.getNextSibling();
         }
-        if (vastAdTagURI != null) {
-          try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new InputSource((new URL(vastAdTagURI)).openStream()));
-            Element vast = doc.getDocumentElement();
-            if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) { return false; }
-            String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
-            if (Double.parseDouble(vastVersion) < Constants.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
-            Node ad = vast.getFirstChild();
-            while (ad != null) {
-              if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(Constants.ELEMENT_AD)) {
-                ad = ad.getNextSibling();
-                continue;
-              }
-              if (update((Element) ad)) {
-              	ad = ad.getNextSibling();
-              } else {
-                return false;
-              }
-            }
-          } catch (Exception e) {
-            System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
-            return false;
-          }
-        }
+      } else {
+        //If not inline nor wrapper, error
+        Log.e(VASTAd.class.getName(), "Error ad is not a wrapper or inline ad");
       }
       type = type.getNextSibling();
     }
@@ -136,7 +139,7 @@ public class VASTAd {
    * Add a Creative TBXMLElement NOTE: this assumes that the element is in fact a creative.
    * @param creative the creative to add
    */
-  private void addCreative(Element creative) {
+  protected void addCreative(Element creative) {
     Node type = creative.getFirstChild();
     while (type != null) {
       if (type == null || !(type instanceof Element)) {
@@ -155,11 +158,16 @@ public class VASTAd {
         companions = (Element) type;
       }
       if (ad == null && nonLinears == null && companions == null) { return; }
+
+      //If there is a sequence number, check if we have seen this sequence number before and add to the sequence list
       if (sequenceNumStr != null && sequenceNumStr.length() > 0) {
         int sequenceNum = Integer.parseInt(sequenceNumStr);
         boolean added = false;
         for (VASTSequenceItem item : _sequence) {
           int currentSequenceNum = item.getNumber();
+
+          //If the incoming creative is matched to an already found sequence item,
+          //attach this creative to that sequence item
           if (currentSequenceNum == sequenceNum) {
             if (ad != null) {
               item.setLinear(ad);
@@ -172,6 +180,7 @@ public class VASTAd {
             break;
           }
         }
+        //If we could not find a matching sequence item, it doesn't exist yet so create a new sequence item and add to it
         if (!added) {
           VASTSequenceItem item = new VASTSequenceItem();
           item.setNumber(sequenceNum);
@@ -185,16 +194,45 @@ public class VASTAd {
           _sequence.add(item);
         }
       } else {
+        //If there is no sequence number, start the sequence from 1 and increment every time we see a linear ad
+        //Non-linear and companion ads go into the most recent sequence item
         VASTSequenceItem item = new VASTSequenceItem();
-        item.setNumber(_sequence.size());
         if (ad != null) {
-          item.setLinear(ad);
+
+          //If we have a sequence item that has no linear.
+          if (_sequence.size() > _numOfLinear) {
+            item = _sequence.get(_numOfLinear);
+            item.setLinear(ad);
+            _numOfLinear++;
+          } else {
+            _numOfLinear++;
+            item.setNumber(_numOfLinear);
+            item.setLinear(ad);
+            _sequence.add(item);
+          }
+
+          //If we see a nonlinear before the first linear ad
         } else if (nonLinears != null) {
-          item.setNonLinears(nonLinears);
+          if (_sequence.size() == 0) {
+            item.setNumber(1);
+            item.setNonLinears(nonLinears);
+            _sequence.add(item);
+          } else {
+            item = _sequence.get(_sequence.size() - 1);
+            item.setNonLinears(nonLinears);
+          }
+
+          //If we see a companion before the first linear ad
         } else if (companions != null) {
-          item.setCompanions(companions);
+          if (_sequence.size() == 0) {
+            item.setNumber(1);
+            item.setCompanions(companions);
+            _sequence.add(item);
+          } else {
+            item = _sequence.get(_sequence.size() - 1);
+            item.setCompanions(companions);
+          }
         }
-        _sequence.add(item);
       }
       type = type.getNextSibling();
     }
