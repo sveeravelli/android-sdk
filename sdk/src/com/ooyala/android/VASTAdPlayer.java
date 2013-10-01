@@ -16,6 +16,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   private static String TAG = VASTAdPlayer.class.getName();
   private List<String> _impressionURLs = new ArrayList<String>();
 
+  private boolean _impressionSent = false;
   private boolean _startSent = false;
   private boolean _firstQSent = false;
   private boolean _midSent = false;
@@ -187,9 +188,19 @@ class VASTAdPlayer extends AdMoviePlayer {
         // If player is ready, send impression tracking event,
         // else if player is completed, send completed tracking event
         if (tempPlayer.getState() == State.READY) {
-          sendImpressionTrackingEvent(_impressionURLs);
+          if (!_impressionSent) {
+            sendImpressionTrackingEvent(_impressionURLs);
+          }
         } else if (tempPlayer.getState() == State.COMPLETED) {
           sendTrackingEvent(TrackingEvent.COMPLETE);
+          //If there are more ads to play, play them
+          if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
+          if (!_linearAdQueue.isEmpty()) {
+            super.destroy();
+            addQuartileBoundaryObserver();
+            super.init(_parent, _linearAdQueue.get(0).getStreams());
+            super.play();
+          }
         }
       } catch (Exception e) {
         // ERROR: arg0 is not a BaseMoviePlayer as expected
@@ -215,6 +226,7 @@ class VASTAdPlayer extends AdMoviePlayer {
       Log.i(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
       NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
     }
+    _impressionSent = true;
   }
 
   @Override
