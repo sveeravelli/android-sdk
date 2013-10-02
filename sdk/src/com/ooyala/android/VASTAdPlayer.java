@@ -168,6 +168,9 @@ class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
+        if (!_impressionSent) {
+          sendImpressionTrackingEvent(_impressionURLs);
+        }
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
       } else if (!_firstQSent && currentTime() > (currentAd().getDuration() * 1000 / 4)) {
@@ -185,13 +188,8 @@ class VASTAdPlayer extends AdMoviePlayer {
       try {
         BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
 
-        // If player is ready, send impression tracking event,
-        // else if player is completed, send completed tracking event
-        if (tempPlayer.getState() == State.READY) {
-          if (!_impressionSent) {
-            sendImpressionTrackingEvent(_impressionURLs);
-          }
-        } else if (tempPlayer.getState() == State.COMPLETED) {
+        // If player is completed, send completed tracking event
+        if (tempPlayer.getState() == State.COMPLETED) {
           sendTrackingEvent(TrackingEvent.COMPLETE);
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
