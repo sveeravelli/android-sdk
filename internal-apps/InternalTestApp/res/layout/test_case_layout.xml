@@ -12,7 +12,7 @@
       android:id="@+id/controlsLayout">
 
         <TextView
-            android:id="@+id/caseNameTextView"
+            android:id="@+id/logTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
@@ -43,7 +43,7 @@
       android:layout_width="300dp"
       android:layout_height="150dp"
       android:layout_marginTop="20dp"
-      android:background="#F00">
+      android:background="#666">
     </com.ooyala.android.OoyalaPlayerLayout>
 
 </FrameLayout>
