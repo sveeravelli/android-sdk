@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -697,10 +696,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       addClosedCaptionsView();
       setState(currentPlayer().getState());
     }
-    else {
+    else if (_currentItem != null) {
       _player = getCorrectMoviePlayer(_currentItem);
       initializePlayer(_player, _currentItem);
       dequeuePlay();
+    }
+    else {
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
+          "Resuming video from an invalid state");
+      Log.d(TAG, "Resuming video from an improper state", _error);
+      setState(State.ERROR);
     }
   }
 
