@@ -20,7 +20,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.test.R;
 
-public class BaseInternalTestAppActivity extends Activity {
+public class BaseInternalTestAppActivity extends Activity implements OnClickListener {
 
   protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
@@ -54,12 +54,7 @@ public class BaseInternalTestAppActivity extends Activity {
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
 
-    setButton.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
-      }
-    });
+    setButton.setOnClickListener(this);
   }
 
   @Override
@@ -104,4 +99,11 @@ public class BaseInternalTestAppActivity extends Activity {
     startActivity(intent);
     return true;
   }
+
+  @Override
+  public void onClick(View v) {
+    player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
+    player.play();
+  }
+
 }
