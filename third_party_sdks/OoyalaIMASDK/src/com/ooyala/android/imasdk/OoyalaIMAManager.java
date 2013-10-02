@@ -49,6 +49,7 @@ public class OoyalaIMAManager implements Observer {
   protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
 
+  private boolean _queueAdsManagerInit = false;
   protected boolean _adsManagerInited;
   private class IMAAdErrorListener implements AdErrorListener {
 
@@ -119,6 +120,14 @@ public class OoyalaIMAManager implements Observer {
             }
           }
         });
+
+        //Sometimes the ads manager will be created late, after PLAY_STARTED_NOTIFICATION
+        // We still need to init the manager in this case
+       if(_queueAdsManagerInit && !_adsManagerInited) {
+         _adsManager.init();
+         _adsManagerInited = true;
+         _queueAdsManagerInit = false;
+       }
       }
     });
   }
@@ -198,9 +207,13 @@ public class OoyalaIMAManager implements Observer {
       _adsManager = null;
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_STARTED_NOTIFICATION)) {
-      if (_adsManager != null && !_adsManagerInited) {
-        _adsManagerInited = true;
-        _adsManager.init();
+      if (!_adsManagerInited) {
+        if (_adsManager != null) {
+          _adsManagerInited = true;
+          _adsManager.init();
+        } else {
+          _queueAdsManagerInit = true;
+        }
       }
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
