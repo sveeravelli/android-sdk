@@ -70,6 +70,12 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     //  If SAS included a widevine server path, use that instead
     if(stream.getWidevineServerPath() != null) {
       serverPath = stream.getWidevineServerPath();
+    } else {
+      // If auth token is available, append it to the license path
+      String authToken = parent.getPlayerAPIClient().getAuthToken();
+      if (authToken != null && !authToken.equals("")) {
+    	  serverPath += "?auth_token=" + authToken;
+      }
     }
     request.put("WVDRMServerKey", serverPath);
     request.put("WVAssetURIKey", stream.getUrl());
