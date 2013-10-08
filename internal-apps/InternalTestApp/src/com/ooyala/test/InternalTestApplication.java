@@ -9,6 +9,7 @@ import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.StrictMode;
 
 /**
  * A global scope of the application.  This allows all activities to use the same list of information.
@@ -26,6 +27,14 @@ public class InternalTestApplication extends Application {
   private static Map<String, String> condensedActivityNameMap;
 
   public void onCreate() {
+
+    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+    .detectDiskReads()
+    .detectDiskWrites()
+    .detectNetwork()   // or .detectAll() for all detectable problems
+    .penaltyLog()
+    .build());
+
     super.onCreate();
     activityMap = new HashMap<String, Class<? extends Activity>>();
     condensedActivityNameMap = new HashMap<String, String>();

@@ -1,6 +1,5 @@
 package com.ooyala.android;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
