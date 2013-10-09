@@ -25,6 +25,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   private Object _fetchTask;
 
   private interface TrackingEvent {
+    public static final String CREATIVE_VIEW = "creativeView";
     public static final String START = "start";
     public static final String FIRST_QUARTILE = "firstQuartile";
     public static final String MIDPOINT = "midpoint";
@@ -171,6 +172,7 @@ class VASTAdPlayer extends AdMoviePlayer {
         if (!_impressionSent) {
           sendImpressionTrackingEvent(_impressionURLs);
         }
+        sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
       } else if (!_firstQSent && currentTime() > (currentAd().getDuration() * 1000 / 4)) {
