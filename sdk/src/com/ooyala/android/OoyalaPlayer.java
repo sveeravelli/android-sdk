@@ -344,7 +344,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       _currentItemChangedCallback.callback(_currentItem);
     }
     cancelOpenTasks();
-    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
 
     // request metadata
     final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
@@ -400,6 +399,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_currentItem.getModuleData() == null || _currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       return false;
     }
+
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
 
     if (!_currentItem.isAuthorized()) {
       this._error = getAuthError(_currentItem);

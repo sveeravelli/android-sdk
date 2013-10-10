@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.json.JSONArray;
@@ -34,6 +35,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;
       case STATE_UNMATCHED:
+        //If we didn't match, try updating all other videos in channel
         for (Video video : _videos) {
           video.update(data);
         }
@@ -43,6 +45,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     }
 
     try {
+      //If authorization, check all of the children's authorization.
       JSONObject myData = data.getJSONObject(_embedCode);
       if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED)) {
         for (Video video : _videos) {
@@ -51,6 +54,15 @@ public class Channel extends ContentItem implements PaginatedParentItem {
         return ReturnState.STATE_MATCHED;
       }
 
+      //If metadata, then update children if possible and break out.
+      if (!myData.isNull(Constants.KEY_METADATA_BASE)) {
+        for (Video video : _videos) {
+          video.update(data);
+        }
+        return ReturnState.STATE_MATCHED;
+      }
+
+      //Handle content_tree
       if (!myData.isNull(Constants.KEY_CONTENT_TYPE)
           && !myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL)) {
         System.out.println("ERROR: Attempted to initialize Channel with content_type: "
@@ -222,7 +234,8 @@ public class Channel extends ContentItem implements PaginatedParentItem {
       List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_videos.subList(
           response.firstIndex, response.firstIndex + response.count));
       try {
-        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this)) {
+        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, Channel.this) &&
+            _api.fetchMetadataForEmbedCodes(childEmbedCodesToAuthorize, Channel.this)) {
           _listener.onItemsFetched(response.firstIndex, response.count, null);
         } else {
           _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
@@ -234,6 +247,13 @@ public class Channel extends ContentItem implements PaginatedParentItem {
       _isFetchingMoreChildren = false;
       return;
     }
+  }
+
+  public List<String> embedCodesToAuthorize() {
+    List<String> embedCodes = new ArrayList<String>();
+    embedCodes.add(_embedCode);
+    embedCodes.addAll(_videos.keySet());
+    return embedCodes;
   }
 
   @Override

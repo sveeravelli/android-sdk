@@ -187,7 +187,13 @@ public class OoyalaIMAManager implements Observer {
 
   @Override
   public void update(Observable observable, Object data) {
-    if(data.toString().equals(OoyalaPlayer.METADATA_READY_NOTIFICATION)) {
+    if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
+      if (_adsManager != null) {
+        _adsManager.destroy();
+        _adsLoader.contentComplete();
+      }
+      _adsManager = null;
+
       Video currentItem = _player.getCurrentItem();
 
       if (currentItem.getModuleData() != null &&
@@ -198,13 +204,6 @@ public class OoyalaIMAManager implements Observer {
           loadAds(url);
         }
       }
-    }
-    else if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
-      if (_adsManager != null) {
-        _adsManager.destroy();
-        _adsLoader.contentComplete();
-      }
-      _adsManager = null;
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_STARTED_NOTIFICATION)) {
       if (!_adsManagerInited) {

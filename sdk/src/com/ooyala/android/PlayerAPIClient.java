@@ -594,10 +594,10 @@ class PlayerAPIClient {
   }
 
 
-  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
+  public boolean fetchMetadataForEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException {
     // fetch metadata
     String uri = String.format(Constants.METADATA_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(item.embedCodesToAuthorize(), Constants.SEPARATOR_COMMA));
+        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
     JSONObject root = OoyalaAPIHelper.objectForAPI(Constants.METADATA_HOST, uri, contentTreeParams(null));
 
     // validate the result
@@ -611,7 +611,7 @@ class PlayerAPIClient {
         throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Non-zero metadata response code");
       }
 
-      item.update(root.getJSONObject(Constants.KEY_METADATA));
+      ((ContentItem)parent).update(root.getJSONObject(Constants.KEY_METADATA));
 
     } catch (JSONException je) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Failed to parse metadata");
@@ -619,6 +619,10 @@ class PlayerAPIClient {
 
     // return the JSON data
     return true;
+  }
+
+  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
+    return fetchMetadataForEmbedCodes(item.embedCodesToAuthorize(), item);
   }
 
   private class MetadataFetchTaskParam {
