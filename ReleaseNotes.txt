@@ -1,5 +1,8 @@
 Current Version: 2.0.1
 
+------------ 2.1.0 ------------
+BaseMoviePlayer class renamed to BaseStreamPlayer
+
 ------------ 2.0.1 ------------
 Google IMA Support
 Metadata request changes: We no longer provide the JSON object, but now have provide a map of metadata based on module.

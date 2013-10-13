@@ -41,10 +41,10 @@ public class MoviePlayer extends Player implements Observer {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(Constants.VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
-        player = new BaseMoviePlayer();
+        player = new BaseStreamPlayer();
       }
     } else {
-      player = new BaseMoviePlayer();
+      player = new BaseStreamPlayer();
     }
     return player;
   }

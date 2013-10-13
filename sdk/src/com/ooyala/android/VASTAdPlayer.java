@@ -188,7 +188,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     }
     else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       try {
-        BaseMoviePlayer tempPlayer = (BaseMoviePlayer) arg0;
+        BaseStreamPlayer tempPlayer = (BaseStreamPlayer) arg0;
 
         // If player is completed, send completed tracking event
         if (tempPlayer.getState() == State.COMPLETED) {
@@ -203,8 +203,8 @@ class VASTAdPlayer extends AdMoviePlayer {
           }
         }
       } catch (Exception e) {
-        // ERROR: arg0 is not a BaseMoviePlayer as expected
-        Log.e(TAG, "arg0 should be a BaseMoviePlayer but is not!");
+        // ERROR: arg0 is not a BaseStreamPlayer as expected
+        Log.e(TAG, "arg0 should be a BaseStreamPlayer but is not!");
       }
     }
     super.update(arg0,  arg);

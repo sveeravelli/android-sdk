@@ -32,11 +32,11 @@ import com.ooyala.android.OoyalaPlayer.State;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-public class BaseMoviePlayer extends StreamPlayer implements OnBufferingUpdateListener, OnCompletionListener, OnErrorListener,
+public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateListener, OnCompletionListener, OnErrorListener,
     OnPreparedListener, OnVideoSizeChangedListener, OnInfoListener, OnSeekCompleteListener,
     SurfaceHolder.Callback {
 
-  private static final String TAG = BaseMoviePlayer.class.getName();
+  private static final String TAG = BaseStreamPlayer.class.getName();
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
