@@ -76,6 +76,7 @@ public class OoyalaPlayerLayout extends FrameLayout {
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {
+    if (_controller == null) { return false; }
     return _controller.onTouchEvent(event, this);
   }
 }
