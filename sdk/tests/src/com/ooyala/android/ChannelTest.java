@@ -47,7 +47,7 @@ public class ChannelTest extends AndroidTestCase {
   public void testEmbedCodesToAuthorize() {
     Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
         TestConstants.TEST_CHANNEL, null);
-    assertEquals(1, channel.embedCodesToAuthorize().size());
+    assertEquals(6, channel.embedCodesToAuthorize().size());
     assertEquals(channel.getEmbedCode(), channel.embedCodesToAuthorize().get(0));
   }
 

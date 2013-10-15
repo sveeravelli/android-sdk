@@ -59,7 +59,7 @@ public class ChannelSetTest extends AndroidTestCase {
     ChannelSet channelSet = new ChannelSet(
         ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
-    assertEquals(1, channelSet.embedCodesToAuthorize().size());
+    assertEquals(3, channelSet.embedCodesToAuthorize().size());
     assertEquals(channelSet.getEmbedCode(), channelSet.embedCodesToAuthorize().get(0));
   }
 
