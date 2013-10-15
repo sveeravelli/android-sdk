@@ -18,7 +18,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
-import com.ooyala.android.BaseMoviePlayer;
+import com.ooyala.android.BaseStreamPlayer;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
   private static final String TAG = "OoyalaSampleApp";
@@ -144,7 +144,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     if (player != null && arg0 == setEmbed) {
       setEmbedCode();
     } else if (player != null && arg0 == skipAd) {
-      player.setBasePlayer(new BaseMoviePlayer());
+      player.setBasePlayer(new BaseStreamPlayer());
 
       //player.skipAd();
     } else if (player != null && arg0 == insertAd) {

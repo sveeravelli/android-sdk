@@ -41,10 +41,10 @@ import com.visualon.OSMPUtils.voOSType;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-class VisualOnMoviePlayer extends StreamPlayer implements
+class VisualOnStreamPlayer extends StreamPlayer implements
     voOSBasePlayer.onEventListener, voOSBasePlayer.onRequestListener,
     SurfaceHolder.Callback {
-  private static final String TAG = "VisualOnMoviePlayer";
+  private static final String TAG = "VisualOnStreamPlayer";
 
   protected voOSBasePlayer _player = null;
   protected SurfaceHolder _holder = null;

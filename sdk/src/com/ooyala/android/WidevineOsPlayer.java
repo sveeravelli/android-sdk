@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.net.URL;
 
 import android.annotation.TargetApi;
 import android.drm.DrmErrorEvent;
@@ -54,7 +55,15 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     // replace scheme of widevine assets
     // need to be widevine:// vs http://
-    Uri uri = Uri.parse(stream.decodedURL().toString());
+    URL streamURL = stream.decodedURL();
+    if (streamURL == null) {
+      Log.e("Widevine", "Invalid stream, Malformed URL, Cannot continue");
+      this._error = "Invalid Stream";
+      setState(State.ERROR);
+      return;
+    }
+
+    Uri uri = Uri.parse(streamURL.toString());
     // live check
     if (uri.getLastPathSegment().endsWith(".m3u8")) {
       _live = true;
