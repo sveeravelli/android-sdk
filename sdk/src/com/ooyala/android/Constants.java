@@ -53,6 +53,7 @@ class Constants {
 
   public static final String JS_ANALYTICS_URI = "/reporter.js";
   public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
+  public static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
 
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
@@ -81,6 +82,7 @@ class Constants {
   public static final String KEY_ERRORS = "errors";
   public static final String KEY_CODE = "code";
   public static final String KEY_AUTHORIZATION_DATA = "authorization_data";
+  public static final String KEY_USER_INFO = "user_info";
   public static final String KEY_AUTHORIZED = "authorized";
   public static final String KEY_CONTENT_TREE = "content_tree";
   public static final String KEY_CONTENT_TOKEN = "content_token";
