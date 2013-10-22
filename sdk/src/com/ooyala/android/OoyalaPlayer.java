@@ -442,14 +442,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
+    String accountId = _playerAPIClient.getUserInfo().getAccountId();
 
     //If analytics is uninitialized, OR
-    //If an account ID that was different than before, OR
+    //If has account ID that was different than before, OR
     //If no account ID, but last time there _was_ an account id, we need to re-initialize
-    if ((_analytics == null) ||
-        (_playerAPIClient.getUserInfo().getAccountId() != null &&  !_playerAPIClient.getUserInfo().getAccountId().equals(_lastAccountId)) ||
-        (_lastAccountId != null)
-       ) {
+    boolean needToLoadAnalytics = _analytics == null;
+    needToLoadAnalytics        |=  accountId != null && !accountId.equals(_lastAccountId);
+    needToLoadAnalytics        |=  accountId == null && _lastAccountId != null;
+
+    if (needToLoadAnalytics) {
       _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
     }
 
