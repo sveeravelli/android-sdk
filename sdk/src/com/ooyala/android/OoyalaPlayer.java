@@ -638,6 +638,15 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   /**
+   * Play the current video with an initialTime
+   * @param initialTimeInMillis the time to start the video.
+   */
+  public void play(int initialTimeInMillis) {
+    play();
+    seek(initialTimeInMillis);
+  }
+
+  /**
    * Suspend the current video (can be resumed later by calling resume). This differs from pause in that it
    * completely deconstructs the view so the layout can be changed.
    */
