@@ -125,6 +125,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private boolean _seekable = true;
   private boolean _playQueued = false;
   private int _queuedSeekTime;
+  private String _lastAccountId = null;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
@@ -176,7 +177,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void setLayoutController(LayoutController layoutController) {
     _layoutController = layoutController;
-    _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
     _playerAPIClient.setContext(getLayout().getContext());
   }
 
@@ -442,6 +442,20 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
+
+    //If analytics is uninitialized, OR
+    //If an account ID that was different than before, OR
+    //If no account ID, but last time there _was_ an account id, we need to re-initialize
+    if ((_analytics == null) ||
+        (_playerAPIClient.getUserInfo().getAccountId() != null &&  !_playerAPIClient.getUserInfo().getAccountId().equals(_lastAccountId)) ||
+        (_lastAccountId != null)
+       ) {
+      _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    }
+
+    //last account ID seen. Could be null
+    _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
+
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
 
