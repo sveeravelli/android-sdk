@@ -131,6 +131,15 @@ class Constants {
   public static final String KEY_METADATA_MODULES = "modules";
   public static final String KEY_METADATA_MODULE_TYPE = "type";
 
+  public static final String KEY_USER_ACCOUNT_ID = "account_id";
+  public static final String KEY_USER_CONTINENT = "continent";
+  public static final String KEY_USER_COUNTRY = "country";
+  public static final String KEY_USER_DEVICE = "device";
+  public static final String KEY_USER_DOMAIN = "domain";
+  public static final String KEY_USER_IPADDRESS = "ip_address";
+  public static final String KEY_USER_LANGUAGE = "language";
+  public static final String KEY_USER_TIMEZONE = "timezone";
+
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
   public static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
