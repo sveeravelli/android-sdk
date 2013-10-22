@@ -1,5 +1,8 @@
 package com.ooyala.testapp;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Observable;
 
 import java.util.Observer;
@@ -13,6 +16,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
@@ -20,13 +25,20 @@ import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
 import com.ooyala.android.BaseStreamPlayer;
 
-public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer {
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
 
   private Button skipAd;
   private Button insertAd;
   private Button setEmbed;
+
+  private String APIKEY = "l4cGYxOngWCpNkwu6BKkna3XCPa6.FkFdk";
+  private String SECRET = "gps8XQlMt2Qu5sQ0v7Km0b9sXWLnBB7zGbXiga3o";
+  private String PCODE = "l4cGYxOngWCpNkwu6BKkna3XCPa6";
+  private String EMBEDCODE = "J2MXl4ZjqXrUeKUkvXp8yXcxB6aQewHs";
+  private String ACCOUNT_ID = "playbackDemo";
+  private String PLAYERDOMAIN = "backlot.ooyala.com";
 
   private boolean metadataReady = false;
 
@@ -52,51 +64,25 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com");
+        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, PLAYERDOMAIN, this);
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
     player.addObserver(this);
-    // player.setClosedCaptionsStyle(new ClosedCaptionsStyle(Color.GREEN, Color.BLACK, Typeface.DEFAULT));
-    /*
-     * player.setCurrentItemChangedCallback(new CurrentItemChangedCallback() {
-     *
-     * @Override public void callback(Video currentItem) { currentItem.insertAd(new OoyalaAdSpot(10000, null,
-     * null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B")); } });
-     */
   }
 
   private void setEmbedCode() {
-    // Jigish's account: "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_", "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w",
-    // "l1am06xhbSxa0OtyZsBTshW2DMtp", "www.ooyala.com"
-    // ooyala preroll: g3N2wxMzqxoB84c3dan5xyXTxdrhX1km
-    // ooyala midroll (5 sec): c1d3AxMzo5_lJK08LHYfpzFF02StTtfk
-    // ooyala postroll: 1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p
-    // ooyala ad as normal video: JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B
-    // no ads: UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM
-    // VAST preroll: w2cXAxMzqpwY5HwqSbHMzYgu92Lj6Fer
-    // Channel: NueXAxMzqnfCtqVrgaEoD4-N8sFrt-nt
-    // Chris' account: "Uzbm46asiensk3opIgwfFn5KFemv.vaDEj", "nARMtjWQh4hIprBNK_fJBf9xG_WWbhfr8IUAsxCr",
-    // "Uzbm46asiensk3opIgwfFn5KFemv", "www.ooyala.com"
-    // VAST preroll: JjMXg3MzoVTXb63DlH3AqPBOpE8hmLLR
-    // Greg's account: "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS.aKvTv", "VKhKkuAsJ77YI8DYfBODi6r36GPPr-tj5k8oDdcd",
-    // "0wcnI6LKT5GqU9sQ9MkK5kuhzAAS", "www.ooyala.com"
-    // HLS: "9ydnRhMzq-roTTbvwmG20FIwMEB08xom"
-    // Live Streaming: "d0b206YlI7etqD1HscU4iP3LsVa6.IFGQt", "6J20fobZxUBbXSPF8DVfQURTNTddnHuhuhhE2CZV",
-    // "d0b206YlI7etqD1HscU4iP3LsVa6", "www.tcncountry.com"
-    // Live with 2 prerolls: "RiOWNxMjrf8Gcexqv78Uf9b2w0PsJBzh"
 
-    if (player.setEmbedCode("VvM2RuNzpA4jP_f7RZwlL5gke4hsFqOv")) {
-      Log.d(TAG, "TEST - yay!");
+    if (player.setEmbedCode(EMBEDCODE)) {
+      player.play(60000);
     } else {
-      Log.d(TAG, "TEST - lame :(");
+      Log.d(TAG, "setEmbedCode failed");
     }
   }
 
   @Override
   protected void onStop() {
     super.onStop();
-    Log.d(TAG, "---------------- Stop -----------");
     if (player != null) {
       player.suspend();
     }
@@ -105,7 +91,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   @Override
   protected void onRestart() {
     super.onRestart();
-    Log.d(TAG, "---------------- Restart -----------");
     if (player != null) {
       player.resume();
     }
@@ -115,12 +100,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   protected void onDestroy() {
     super.onDestroy();
     player = null;
-  }
-
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    Log.d(TAG, "TEST - onConfigurationChangedd");
-    super.onConfigurationChanged(newConfig);
   }
 
   private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
@@ -143,16 +122,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   public void onClick(View arg0) {
     if (player != null && arg0 == setEmbed) {
       setEmbedCode();
-    } else if (player != null && arg0 == skipAd) {
-      player.setBasePlayer(new BaseStreamPlayer());
-
-      //player.skipAd();
-    } else if (player != null && arg0 == insertAd) {
-      if (metadataReady) {
-        Log.d(TAG, "AD - INSERTING!");
-        player.getCurrentItem().insertAd(
-            new OoyalaAdSpot(10000, null, null, "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B"));
-      }
     }
   }
 
@@ -165,9 +134,27 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
       Log.d(TAG, "Woot, here is the current metadata: " + player.getMetadata());
     }
-    // if (((String)arg1).equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && ((OoyalaPlayer)arg0).getState()
-    // == State.READY) {
-    // player.play();
-    // }
   }
+
+  @Override
+  public void getTokenForEmbedCodes(List<String> embedCodes,
+      EmbedTokenGeneratorCallback callback) {
+    String embedCodesString = "";
+    for (String ec : embedCodes) {
+      if(ec.equals("")) embedCodesString += ",";
+      embedCodesString += ec;
+    }
+
+    HashMap<String, String> params = new HashMap<String, String>();
+    params.put("account_id", ACCOUNT_ID);
+
+    String uri = "/sas/embed_token/" + PCODE + "/" + embedCodesString;
+    EmbeddedSecureURLGenerator urlGen = new EmbeddedSecureURLGenerator(APIKEY, SECRET);
+
+    URL tokenUrl  = urlGen.secureURL("http://player.ooyala.com", uri, params);
+
+    callback.setEmbedToken(tokenUrl.toString());
+  }
+
+
 }
