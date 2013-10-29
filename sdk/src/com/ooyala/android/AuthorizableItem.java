@@ -48,7 +48,14 @@ public interface AuthorizableItem {
     /** The request's token was expired */
     public static int TOKEN_EXPIRED = 15;
     /** The maximum value for auth codes from the server */
-    public static int MAX_AUTH_CODE = 16;
+    public static int UNAUTHORIZED_MULTI_SYND_GROUP = 16;
+    public static int PROVIDER_DELETED = 17;
+    public static int TOO_MANY_ACTIVE_STREAMS = 18;
+    public static int MISSING_ACCOUNT_ID = 19;
+    public static int NO_ENTITLEMENTS_FOUND = 20;
+    public static int NON_ENTITLED_DEVICE = 21;
+    public static int NON_REGISTERED_DEVICE = 22;
+    public static int MAX_AUTH_CODE = 23;
   }
 
   /*
@@ -71,8 +78,14 @@ public interface AuthorizableItem {
     "unauthorized device",
     "invalid token",
     "movie expired",
+    "unauthorized multi-synd group",
+    "This provider was deleted",
     "Too many open videos. Close other videos on this account and try again in a few minutes",
-    "missing account id"
+    "Missing Account ID",
+    "No Entitlements Found",
+    "Non-entitled Device",
+    "Non-registered Device",
+    "unauthorized",
    };
   /**
    * Whether or not this AuthorizableItem is authorized

@@ -14,7 +14,7 @@ import com.ooyala.android.Constants.ReturnState;
 
 /**
  * Stores the info and metadata for the specified content item.
- * 
+ *
  */
 public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, PlayableItem {
   protected Set<Stream> _streams = new HashSet<Stream>();
@@ -70,11 +70,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
           _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
           if (!myData.isNull(Constants.KEY_CODE)) {
             int theAuthCode = myData.getInt(Constants.KEY_CODE);
-            if (theAuthCode < AuthCode.MIN_AUTH_CODE || theAuthCode > AuthCode.MAX_AUTH_CODE) {
-              _authCode = AuthCode.UNKNOWN;
-            } else {
-              _authCode = theAuthCode;
-            }
+            _authCode = theAuthCode;
           }
           if (_authorized && !myData.isNull(Constants.KEY_STREAMS)) {
             JSONArray streams = myData.getJSONArray(Constants.KEY_STREAMS);
