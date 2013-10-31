@@ -1059,6 +1059,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           break;
         case ERROR:
           if (player == _player) {
+            Log.e(TAG, "Error recieved from content.  Cleaning up everything");
             cleanupPlayers();
             _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
                 player.getError());

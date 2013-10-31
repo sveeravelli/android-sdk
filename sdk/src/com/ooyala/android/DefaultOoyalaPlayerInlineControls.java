@@ -273,7 +273,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
         _isPlayerReady = true;
       }
 
-      if (currentState == State.SUSPENDED) {
+      if (currentState == State.SUSPENDED || currentState == State.ERROR) {
         _isPlayerReady = false;
         hide();
       }
