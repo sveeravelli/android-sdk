@@ -27,6 +27,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   protected static final int SOFT_WHITE_COLOR = Color.argb(245, 240, 240, 240);
 
   protected boolean _isPlayerReady = false;
+  protected boolean _isVisible = true;
 
   protected class HideTimerTask extends TimerTask {
     @Override
@@ -173,6 +174,8 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
   @Override
   public void show() {
+    if (!_isVisible) return;
+
     if (_hideTimer != null) {
       _hideTimer.cancel();
       _hideTimer = null;
@@ -216,6 +219,13 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   @Override
   public int bottomBarOffset() {
     return 0;
+  }
+
+  public void setVisible(boolean visible) {
+    _isVisible = visible;
+    if (!visible) {
+      hide();
+    }
   }
 
   protected abstract void updateButtonStates();

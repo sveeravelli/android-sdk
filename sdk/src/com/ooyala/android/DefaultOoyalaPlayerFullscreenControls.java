@@ -38,7 +38,6 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   private boolean _wasPlaying;
   private boolean _seeking;
   private boolean _fullscreenButtonShowing = true;
-  private boolean _isVisible = true;
 
   private static final float OVERLAY_SCALE = 1.2f;
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) ((float) PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
@@ -323,9 +322,5 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
-  }
-
-  public void setVisible(boolean visible) {
-    _isVisible = visible;
   }
 }
