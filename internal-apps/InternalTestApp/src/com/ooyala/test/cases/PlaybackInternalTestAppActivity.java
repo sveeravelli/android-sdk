@@ -34,6 +34,7 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     embedMap.put("Channel",      "ozNTJ2ZDqvPWyXTriQF_Ovcd1VuKHGdH");
     embedMap.put("Channel with pre-roll",    "FncDB0YTrvdMGK3Sva1NUmeQMuB33wbV");
     embedMap.put("Multiple Google IMA",      "4wbjhoYTp6oRqD6lslRn0xYVTbm2GBzh");
+    embedMap.put("Video with Initial Time",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
@@ -64,7 +65,15 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
           nextVideo = null;
         }
       }
-      super.onClick(v);
+
+      //If test case needs initial time, use that instead of simple play()
+      if (embedSpinner.getSelectedItem().equals("Video with Initial Time"))  {
+        player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
+        player.play(20000);
+      }
+      else {
+        super.onClick(v);
+      }
     }
     else {
       //If nextVideo button was clicked on, play the next video
