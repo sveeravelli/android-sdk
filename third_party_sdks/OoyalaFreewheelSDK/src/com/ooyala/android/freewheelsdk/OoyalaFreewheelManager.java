@@ -88,8 +88,16 @@ public class OoyalaFreewheelManager implements Observer {
    * get all Freewheel ad parameters. Call submitAdRequest() only when all metadata were properly fetched.
    */
   private void setupAdManager() {
+    //Set the Freewheel Network Id. It can be only set once per application.
     String fwNetworkIdStr = getParameter("fw_android_mrm_network_id", "fw_mrm_network_id");
-    _fwNetworkId = (fwNetworkIdStr != null) ? Integer.parseInt(fwNetworkIdStr) : -1;
+    int networkId = (fwNetworkIdStr != null) ? Integer.parseInt(fwNetworkIdStr) : -1;
+    if (_fwNetworkId > 0 && _fwNetworkId != networkId) {
+      Log.e(TAG, "The Freewheel network id can be set only once. Overriding it will not have any effect!!");
+    } else {
+      _fwNetworkId = networkId;
+    }
+
+    //Set other Freewheel parameters
     _fwAdServer = getParameter("fw_android_ad_server", "adServer");
     _fwProfile = getParameter("fw_android_player_profile", "fw_player_profile");
     _fwSiteSectionId = getParameter("fw_android_site_section_id", "fw_site_section_id");

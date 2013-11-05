@@ -1,6 +1,5 @@
 package com.ooyala.android.freewheelsdk;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.util.Log;
@@ -13,7 +12,6 @@ import com.ooyala.android.StreamPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
 import tv.freewheel.ad.interfaces.IAdContext;
-import tv.freewheel.ad.interfaces.IAdInstance;
 import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
@@ -27,7 +25,6 @@ public class FWAdPlayer extends AdMoviePlayer {
   private FWAdSpot _adSpot;
   private List<ISlot> _ads;
   private ISlot _currentAd;
-  private List<IAdInstance> _currentAdInstances;
 
   private IAdContext _fwContext;
   private IConstants _fwConstants;
@@ -59,19 +56,6 @@ public class FWAdPlayer extends AdMoviePlayer {
       setState(State.PLAYING);
     }
   };
-  //This fires when an individual ad instance within an ISlot completes playing
-  //We don't need to call play() since _currentAd.play() in the play() function plays all ad instances
-  private IEventListener _adCompleteEventListener = new IEventListener() {
-    @Override
-    public void run(IEvent e) {
-      Log.d(TAG, "Completed playing ad instance. Play next ad instance if there is.");
-      if (_currentAd != null && _currentAdInstances.size() > 0) {
-        IAdInstance ad = _currentAdInstances.remove(0);
-        ArrayList<String> clickThrough = ad.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK());
-        ArrayList<String> clickTracking = ad.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK_TRACKING());
-      }
-    }
-  };
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
@@ -93,7 +77,6 @@ public class FWAdPlayer extends AdMoviePlayer {
     _fwContext.addEventListener(_fwConstants.EVENT_SLOT_ENDED(), _slotEndedEventListener);
     _fwContext.addEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
     _fwContext.addEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
-    _fwContext.addEventListener(_fwConstants.EVENT_AD_COMPLETE(), _adCompleteEventListener);
     _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false", _fwConstants.PARAMETER_LEVEL_OVERRIDE());
   }
 
@@ -104,13 +87,7 @@ public class FWAdPlayer extends AdMoviePlayer {
       Log.d(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
       _currentAd.play();
 
-      //Get click through and click tracking URLs of the current ad instance
-      _currentAdInstances = _currentAd.getAdInstances();
-      if (_currentAdInstances.size() > 0) {
-        IAdInstance ad = _currentAdInstances.remove(0);
-        ArrayList<String> clickThrough = ad.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK());
-        ArrayList<String> clickTracking = ad.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK_TRACKING());
-      }
+      //TODO: Get the click through and click tracking URLs (see 580ec10aa674f6c5721410e0581a78cad05d6b86)
 
       //Only set state if ad wasn't playing already
       if (this.getState() != State.PLAYING) {
@@ -124,7 +101,6 @@ public class FWAdPlayer extends AdMoviePlayer {
       _fwContext.removeEventListener(_fwConstants.EVENT_SLOT_ENDED(), _slotEndedEventListener);
       _fwContext.removeEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
       _fwContext.removeEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
-      _fwContext.removeEventListener(_fwConstants.EVENT_AD_COMPLETE(), _adCompleteEventListener);
     }
   }
 
@@ -149,5 +125,15 @@ public class FWAdPlayer extends AdMoviePlayer {
   @Override
   public StreamPlayer getBasePlayer() {
     return new BaseStreamPlayer();
+  }
+
+  @Override
+  public void destroy() {
+	Log.d(TAG, "FW Ad Player: Destroying ad player");
+	if (_currentAd != null) {
+	  _currentAd.stop();
+	  _currentAd = null;
+	}
+	super.destroy();
   }
 }
