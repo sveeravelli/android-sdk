@@ -3,7 +3,11 @@ package com.ooyala.android;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,6 +25,7 @@ public class Analytics {
   private String _userAgent = "";
 
   private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad=\"reporter = new Ooyala.Reporter('_PCODE_');\"></body></html>";
+  private static final String EMBED_MODULEPARAMS_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad='reporter = new Ooyala.Reporter(\"_PCODE_\",_MODULE_PARAMS_);'></body></html>";
 
   /**
    * Initialize an Analytics using the specified api
@@ -28,8 +33,27 @@ public class Analytics {
    * @param api the API to initialize this Analytics with
    */
   Analytics(Context context, PlayerAPIClient api) {
-    this(context, EMBED_HTML.replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI).replaceAll("_PCODE_", api.getPcode()), api.getDomain());
+    this(context, generateEmbedHTML(api), api.getDomain());
+  }
+
+  private static String generateEmbedHTML(PlayerAPIClient api) {
+
+    //If there is an account ID, add it to the Reporter.js initializer
+    if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
+      Map<String, String> moduleParams = new HashMap<String, String>();
+      moduleParams.put(Constants.JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
+
+      return EMBED_MODULEPARAMS_HTML
+          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
+          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
+          .replaceAll("_PCODE_", api.getPcode())
+          .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
+    } else {
+      return EMBED_HTML
+          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
+          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
+          .replaceAll("_PCODE_", api.getPcode());
+    }
   }
 
   /**

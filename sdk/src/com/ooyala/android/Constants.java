@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 class Constants {
   /** NOTE[jigish] do NOT change the name or location of this variable without changing pub_release.sh */
-  public static final String SDK_VERSION = "2.0.1_RC7";
+  public static final String SDK_VERSION = "2.1.0_RC4";
   public static final String API_VERSION = "1";
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;
@@ -53,6 +53,7 @@ class Constants {
 
   public static final String JS_ANALYTICS_URI = "/reporter.js";
   public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
+  public static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
 
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
@@ -81,6 +82,7 @@ class Constants {
   public static final String KEY_ERRORS = "errors";
   public static final String KEY_CODE = "code";
   public static final String KEY_AUTHORIZATION_DATA = "authorization_data";
+  public static final String KEY_USER_INFO = "user_info";
   public static final String KEY_AUTHORIZED = "authorized";
   public static final String KEY_CONTENT_TREE = "content_tree";
   public static final String KEY_CONTENT_TOKEN = "content_token";
@@ -130,6 +132,15 @@ class Constants {
   public static final String KEY_METADATA_BASE = "base";
   public static final String KEY_METADATA_MODULES = "modules";
   public static final String KEY_METADATA_MODULE_TYPE = "type";
+
+  public static final String KEY_USER_ACCOUNT_ID = "account_id";
+  public static final String KEY_USER_CONTINENT = "continent";
+  public static final String KEY_USER_COUNTRY = "country";
+  public static final String KEY_USER_DEVICE = "device";
+  public static final String KEY_USER_DOMAIN = "domain";
+  public static final String KEY_USER_IPADDRESS = "ip_address";
+  public static final String KEY_USER_LANGUAGE = "language";
+  public static final String KEY_USER_TIMEZONE = "timezone";
 
   public static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

@@ -12,7 +12,7 @@ import com.ooyala.android.Constants.ReturnState;
 
 /**
  * Stores the info and metadata for the specified content item.
- * 
+ *
  */
 public abstract class ContentItem implements AuthorizableItemInternal, OrderedMapValue<String> {
   protected String _embedCode = null;
@@ -114,11 +114,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
         _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
         if (!myData.isNull(Constants.KEY_CODE)) {
           int authCode = myData.getInt(Constants.KEY_CODE);
-          if (authCode < AuthCode.MIN_AUTH_CODE || authCode > AuthCode.MAX_AUTH_CODE) {
-            _authCode = AuthCode.UNKNOWN;
-          } else {
-            _authCode = authCode;
-          }
+          _authCode = authCode;
         }
         if (!myData.isNull(Constants.KEY_REQUIRE_HEARTBEAT)) {
           _heartbeatRequired = myData.getBoolean(Constants.KEY_REQUIRE_HEARTBEAT);
@@ -183,7 +179,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     try {
       JSONObject myData = data.getJSONObject(embedCode);
       if (myData.isNull(Constants.KEY_CONTENT_TYPE)) { return null; }
-      contentType = (String) myData.getString(Constants.KEY_CONTENT_TYPE);
+      contentType = myData.getString(Constants.KEY_CONTENT_TYPE);
     } catch (JSONException exception) {
       System.out.println("Create failed due to JSONException: " + exception);
       return null;

@@ -1,7 +1,9 @@
-Current Version: 2.0.1
+Current Version: 2.1.0
 
 ------------ 2.1.0 ------------
 BaseMoviePlayer class renamed to BaseStreamPlayer
+Support for Cross Device Resume
+Various Bug Fixes
 
 ------------ 2.0.1 ------------
 Google IMA Support

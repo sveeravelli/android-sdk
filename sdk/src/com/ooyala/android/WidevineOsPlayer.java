@@ -57,7 +57,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     // need to be widevine:// vs http://
     URL streamURL = stream.decodedURL();
     if (streamURL == null) {
-      Log.e("Widevine", "Invalid stream, Malformed URL, Cannot continue");
+      Log.e("Widevine", "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
@@ -69,6 +69,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
       _live = true;
     }
     stream.setUrl(uri.buildUpon().scheme("widevine").build().toString());
+    stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     // this should point to SAS once we get the proxy up
@@ -97,7 +98,6 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     // Update the stream to have the WV authorized stream URL, then super to MoviePlayer to play
     Set<Stream> newStreams = new HashSet<Stream>();
-    stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
     newStreams.add(stream);
     super.init(parent, newStreams);
   }

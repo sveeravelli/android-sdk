@@ -170,6 +170,7 @@ function setup {
   echo "sdk.dir=${ANDROID_SDKS}" > ${BASE_DIR}/sdk/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/test-app/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/tests/local.properties
+  cp ${BASE_DIR}/sdk/local.properties ${IMA_SDK_DIR}/local.properties
 
   if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."

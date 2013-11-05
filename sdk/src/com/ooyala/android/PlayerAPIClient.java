@@ -27,6 +27,7 @@ class PlayerAPIClient {
   private String _authToken = null; // ALWAYS use getters and setters for this
   protected int _heartbeatInterval = 300;
   protected Context _context;
+  private UserInfo _userInfo;
 
   public PlayerAPIClient() {}
 
@@ -48,6 +49,11 @@ class PlayerAPIClient {
                 : errors.getString(Constants.KEY_MESSAGE)); }
       }
 
+      if (authResult.isNull(Constants.KEY_USER_INFO)) {
+        throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
+            "User info data does not exist.");
+      }
+
       if (authResult.isNull(Constants.KEY_AUTHORIZATION_DATA)) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
             "Authorization data does not exist.");
@@ -58,18 +64,6 @@ class PlayerAPIClient {
               || authData.getJSONObject(embedCode).isNull(Constants.KEY_AUTHORIZED)) { throw new OoyalaException(
               OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID, "Authorization invalid for embed code: "
                   + embedCode); }
-        }
-
-        //parse out and save auth token and heartbeat data
-        if (!authResult.isNull(Constants.KEY_AUTH_TOKEN)) {
-          setAuthToken(authResult.getString(Constants.KEY_AUTH_TOKEN));
-        }
-
-        if (!authResult.isNull(Constants.KEY_HEARTBEAT_DATA)) {
-          JSONObject heartbeatData = authResult.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
-          if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
-            _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
-          }
         }
 
         // TODO(mikhail): currently we do not check signature. fix this once we properly implement signatures
@@ -236,10 +230,31 @@ class PlayerAPIClient {
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
+
+      //parse out and save auth token and heartbeat data
+      if (!json.isNull(Constants.KEY_AUTH_TOKEN)) {
+        setAuthToken(json.getString(Constants.KEY_AUTH_TOKEN));
+      }
+
+      if (!json.isNull(Constants.KEY_HEARTBEAT_DATA)) {
+        JSONObject heartbeatData = json.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
+        if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
+          _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
+        }
+      }
+
+      if (!json.isNull(Constants.KEY_USER_INFO)) {
+        _userInfo = new UserInfo(json.getJSONObject(Constants.KEY_USER_INFO));
+      }
     } catch (OoyalaException e) {
       System.out.println("Unable to authorize: " + e);
       throw e;
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
+          "Authorization response invalid (exception).");
     }
+
     if (parent != null) {
       parent.update(authData);
     }
@@ -273,10 +288,30 @@ class PlayerAPIClient {
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
+      //parse out and save auth token and heartbeat data
+      if (!json.isNull(Constants.KEY_AUTH_TOKEN)) {
+        setAuthToken(json.getString(Constants.KEY_AUTH_TOKEN));
+      }
+
+      if (!json.isNull(Constants.KEY_HEARTBEAT_DATA)) {
+        JSONObject heartbeatData = json.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
+        if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
+          _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
+        }
+      }
+
+      if (!json.isNull(Constants.KEY_USER_INFO)) {
+        _userInfo = new UserInfo(json.getJSONObject(Constants.KEY_USER_INFO));
+      }
     } catch (OoyalaException e) {
       System.out.println("Unable to authorize: " + e);
       throw e;
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
+          "Authorization response invalid (exception).");
     }
+
     if (parent != null) {
       parent.update(authData);
     }
@@ -695,6 +730,10 @@ class PlayerAPIClient {
 
   public int getHeartbeatInterval() {
     return _heartbeatInterval;
+  }
+
+  public UserInfo getUserInfo() {
+    return _userInfo;
   }
 
   public void setHook() {

@@ -125,6 +125,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   private boolean _seekable = true;
   private boolean _playQueued = false;
   private int _queuedSeekTime;
+  private String _lastAccountId = null;
   private ClosedCaptionsStyle _closedCaptionsStyle = new ClosedCaptionsStyle(Color.WHITE, Color.BLACK,
       Typeface.DEFAULT);
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
@@ -176,7 +177,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   public void setLayoutController(LayoutController layoutController) {
     _layoutController = layoutController;
-    _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
     _playerAPIClient.setContext(getLayout().getContext());
   }
 
@@ -442,6 +442,22 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
+    String accountId = _playerAPIClient.getUserInfo().getAccountId();
+
+    //If analytics is uninitialized, OR
+    //If has account ID that was different than before, OR
+    //If no account ID, but last time there _was_ an account id, we need to re-initialize
+    boolean needToLoadAnalytics = _analytics == null;
+    needToLoadAnalytics        |=  accountId != null && !accountId.equals(_lastAccountId);
+    needToLoadAnalytics        |=  accountId == null && _lastAccountId != null;
+
+    if (needToLoadAnalytics) {
+      _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    }
+
+    //last account ID seen. Could be null
+    _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
+
     _analytics.initializeVideo(_currentItem.getEmbedCode(), _currentItem.getDuration());
     _analytics.reportPlayerLoad();
 
@@ -635,6 +651,15 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     } else {
       queuePlay();
     }
+  }
+
+  /**
+   * Play the current video with an initialTime
+   * @param initialTimeInMillis the time to start the video.
+   */
+  public void play(int initialTimeInMillis) {
+    play();
+    seek(initialTimeInMillis);
   }
 
   /**
@@ -1034,6 +1059,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
           break;
         case ERROR:
           if (player == _player) {
+            Log.e(TAG, "Error recieved from content.  Cleaning up everything");
             cleanupPlayers();
             _error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
                 player.getError());
