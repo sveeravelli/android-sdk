@@ -3,6 +3,7 @@ package com.ooyala.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ooyala.test.cases.FreewheelInternalTestAppActivity;
 import com.ooyala.test.cases.IMAInternalTestAppActivity;
 import com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity;
 import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
@@ -47,6 +48,9 @@ public class InternalTestApplication extends Application {
 
     activityMap.put(getString(R.string.ooyalaItemName), OoyalaAdsInternalTestAppActivity.class);
     condensedActivityNameMap.put(getString(R.string.ooyalaItemName), "OO Ads");
+
+    activityMap.put(getString(R.string.freewheelItemName), FreewheelInternalTestAppActivity.class);
+    condensedActivityNameMap.put(getString(R.string.freewheelItemName), "Freewheel");
   }
 
   public static Map<String, Class<? extends Activity>> getActivityMap() {
