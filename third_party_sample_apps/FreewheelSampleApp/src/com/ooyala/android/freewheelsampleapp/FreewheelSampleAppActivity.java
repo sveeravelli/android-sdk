@@ -69,5 +69,4 @@ public class FreewheelSampleAppActivity extends Activity {
       playerLayoutController.getPlayer().resume();
     }
   }
-
 }

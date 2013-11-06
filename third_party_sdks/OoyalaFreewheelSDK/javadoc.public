@@ -1,0 +1,10 @@
+-d Documentation/public
+-use
+-windowtitle 'Ooyala Android Freewheel SDK API Documentation'
+-doctitle 'Ooyala Android Freewheel SDK API Documentation'
+-header '<b>Ooyala Android Freewheel SDK</b>'
+-bottom '<font size="-1">Copyright 2013 Ooyala, Inc. All Rights Reserved.</font>'
+-link http://docs.oracle.com/javase/6/docs/api/
+-public
+-sourcepath src
+src/com/ooyala/android/freewheelsdk/OoyalaFreewheelManager.java
