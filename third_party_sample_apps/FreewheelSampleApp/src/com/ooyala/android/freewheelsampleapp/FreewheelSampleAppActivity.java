@@ -37,7 +37,7 @@ public class FreewheelSampleAppActivity extends Activity {
     //Initialize Freewheel Ad Manager
     freewheelManager = new OoyalaFreewheelManager(this, playerLayoutController);
 
-    //Set Freewheel parameters.  Note that these are optional, and override configurations set from Backdoor and Backlot
+    //Set Freewheel parameters. Note that these are optional, and override configurations set in Backlot or in Ooyala internals
     Map<String, String> freewheelParameters = new HashMap<String, String>();
     //freewheelParameters.put("fw_android_mrm_network_id",  "90750");
     freewheelParameters.put("fw_android_ad_server",       "http://demo.v.fwmrm.net/");
