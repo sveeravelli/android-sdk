@@ -6,6 +6,7 @@ PLATFORM_NAME="Android"
 source ${SCRIPT_DIR}/sdk-helper.sh
 JAR_NAME="${LIB_BASE}.jar"
 IMA_JAR_NAME="${IMA_LIB_BASE}.jar"
+FW_JAR_NAME="${FW_LIB_BASE}.jar"
 AVD_NAME="unit_test"
 ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
@@ -31,6 +32,9 @@ function public_docs {
 
   cd ${IMA_SDK_DIR}
   javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
+
+  cd ${FW_SDK_DIR}
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.public -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
 
@@ -40,6 +44,9 @@ function complete_docs {
   javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
 
   cd ${IMA_SDK_DIR}
+  javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
+
+  cd ${FW_SDK_DIR}
   javadoc -linkoffline http://d.android.com/reference file:${ANDROID_SDKS}/docs/reference @javadoc.complete -classpath ${DOCS_CLASSPATH} > /dev/null 2>&1
   cd "${currdir}"
 }
@@ -70,6 +77,17 @@ function custom_gen {
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
+
+  #create Freewheel jar
+  cd ${FW_SDK_DIR}
+  ant clean
+  ant release
+  ant jar
+  cp OoyalaFreewheelSDK.jar ${BASE_DIR}/${FW_ZIP_BASE}/
+  #update Freewheel Sample App
+  cp OoyalaFreewheelSDK.jar ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
+  rm OoyalaFreewheelSDK.jar
 
   #update sample apps
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
@@ -171,6 +189,7 @@ function setup {
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/test-app/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/tests/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${IMA_SDK_DIR}/local.properties
+  cp ${BASE_DIR}/sdk/local.properties ${FW_SDK_DIR}/local.properties
 
   if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."

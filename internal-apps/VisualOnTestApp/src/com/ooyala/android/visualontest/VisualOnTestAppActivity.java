@@ -79,9 +79,9 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
     OoyalaPlayer player = (OoyalaPlayer) observable;
     String notification = data.toString();
     // TODO Auto-generated method stub
-    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
-      TextView urlText = (TextView) findViewById(R.id.urlText);
-      urlText.setText(player.getCurrentItem().getStream().decodedURL().toString());
-    }
+//    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
+//      TextView urlText = (TextView) findViewById(R.id.urlText);
+//      urlText.setText(player.getCurrentItem().getStream().decodedURL().toString());
+//    }
   }
 }

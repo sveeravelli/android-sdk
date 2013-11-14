@@ -21,6 +21,12 @@ THIRD_PARTY_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps
 IMA_LIB_BASE="OoyalaIMASDK"
 IMA_ZIP_BASE="${IMA_LIB_BASE}-${PLATFORM_NAME}"
 IMA_ZIP_NAME="${IMA_ZIP_BASE}.zip"
+
+FW_SDK_DIR=${BASE_DIR}/third_party_sdks/OoyalaFreewheelSDK
+FW_LIB_BASE="OoyalaFreewheelSDK"
+FW_ZIP_BASE="${FW_LIB_BASE}-${PLATFORM_NAME}"
+FW_ZIP_NAME="${FW_ZIP_BASE}.zip"
+
 USER_DIR=`cd ~; pwd`
 if [[ "${BOX_DIR}" = "" ]]; then
   BOX_DIR="${USER_DIR}/Documents/Box Documents/"
@@ -192,6 +198,9 @@ function gen {
   rm -rf ${IMA_ZIP_BASE}
   mkdir ${IMA_ZIP_BASE}
 
+  rm -rf ${FW_ZIP_BASE}
+  mkdir ${FW_ZIP_BASE}
+
   #build everything
   custom_gen
 
@@ -240,6 +249,24 @@ function gen {
   rm ${IMA_ZIP_NAME}
   zip -r ${IMA_ZIP_BASE} ${IMA_ZIP_BASE}/*
   rm -rf ${IMA_ZIP_BASE}
+
+  ###Freewheel SDK Generation###
+
+  #previous custom_gen built everything
+
+  #sampleapp and docs
+  cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
+  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/Documentation
+
+  #version file
+  echo "This was built with OoyalaSDK ${version}_RC${saved_rc}" >> ${FW_ZIP_BASE}/VERSION
+  echo "Created On: ${DATE}" >> ${FW_ZIP_BASE}/VERSION
+
+  #zip
+  cd ${BASE_DIR}
+  rm ${FW_ZIP_NAME}
+  zip -r ${FW_ZIP_BASE} ${FW_ZIP_BASE}/*
+  rm -rf ${FW_ZIP_BASE}
 
   echo
   echo "Release Generated!"
@@ -313,6 +340,8 @@ function pub {
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_NAME}
     echo "  Copying ${IMA_ZIP_NAME} to ${CANDIDATE_DIR}${IMA_ZIP_NAME}"
     cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
+    echo "  Copying ${FW_ZIP_NAME} to ${CANDIDATE_DIR}${FW_ZIP_NAME}"
+    cp ${FW_ZIP_NAME} "${CANDIDATE_DIR}"${FW_ZIP_NAME}
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -344,6 +373,8 @@ function pub {
     cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
     echo "  Copying ${CANDIDATE_DIR}${IMA_ZIP_NAME} to ${RELEASE_DIR}${IMA_ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
+    echo "  Copying ${CANDIDATE_DIR}${FW_ZIP_NAME} to ${RELEASE_DIR}${FW_ZIP_NAME}"
+    cp "${CANDIDATE_DIR}"${FW_ZIP_NAME} "${RELEASE_DIR}"${FW_ZIP_NAME}
   fi
   cd "${pub_currdir}"
 }
