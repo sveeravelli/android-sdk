@@ -229,17 +229,13 @@ public class OoyalaFreewheelManager implements Observer {
   private void checkPlayableAds() {
     double playheadTime = _player.getPlayheadTime() / 1000;
 
-    if (_midrolls != null && _midrolls.size() > 0) {
-      if (playheadTime > _midrolls.get(0).getTimePosition()) {
-        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED()); //let the ad manager know content paused to let the ads play
-        playAds(new ArrayList<ISlot>(Arrays.asList(_midrolls.remove(0))));
-      }
+    if (_midrolls != null && _midrolls.size() > 0 && playheadTime > _midrolls.get(0).getTimePosition()) {
+      _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED()); //let the ad manager know content paused to let the ads play
+      playAds(new ArrayList<ISlot>(Arrays.asList(_midrolls.remove(0))));
     }
-    if (_overlays != null && _overlays.size() > 0) {
-      if (playheadTime > _overlays.get(0).getTimePosition()) {
-        _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
-        _overlays.remove(0).play();
-      }
+    else if (_overlays != null && _overlays.size() > 0 && playheadTime > _overlays.get(0).getTimePosition()) {
+      _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
+      _overlays.remove(0).play();
     }
   }
 
