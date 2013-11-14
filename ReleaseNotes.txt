@@ -1,4 +1,7 @@
-Current Version: 2.1.0
+Current Version: 2.2.0
+
+------------ 2.2.0 ------------
+Freewheel Ad Manager Support
 
 ------------ 2.1.0 ------------
 BaseMoviePlayer class renamed to BaseStreamPlayer
