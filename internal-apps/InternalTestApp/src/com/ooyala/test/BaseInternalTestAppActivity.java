@@ -103,7 +103,6 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   @Override
   public void onClick(View v) {
     player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
-    player.play();
   }
 
 }
