@@ -94,8 +94,8 @@ class VASTAdPlayer extends AdMoviePlayer {
     super.init(parent, _linearAdQueue.get(0).getStreams());
 
     // TODO[jigish] setup clickthrough
-    Set<String> clickTracking = _linearAdQueue.get(0).getClickTrackingURLs();
-    String clickThrough = _linearAdQueue.get(0).getClickThroughURL();
+    // Set<String> clickTracking = _linearAdQueue.get(0).getClickTrackingURLs();
+    // String clickThrough = _linearAdQueue.get(0).getClickThroughURL();
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
