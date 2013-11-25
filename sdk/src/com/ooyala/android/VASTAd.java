@@ -86,6 +86,7 @@ public class VASTAd {
             if (wrapperLinear != null && wrapperSequenceNum == currentSequenceNum) {
               //If the sequence numbers match, update the tracking events of child with the tracking events of the wrapper
               item.getLinear().updateTrackingEvents(wrapperLinear.getTrackingEvents());
+              item.getLinear().updateClickTrackingURLs(wrapperLinear.getClickTrackingURLs());
             }
           }
         }

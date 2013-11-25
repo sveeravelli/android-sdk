@@ -147,6 +147,7 @@ public class VASTLinearAd implements PlayableItem {
   public Set<Stream> getStreams() {
     return _streams;
   }
+
   /**
    * Fetch the best stream for this ad
    * @return a Set of Stream objects
@@ -154,8 +155,10 @@ public class VASTLinearAd implements PlayableItem {
   public Stream getStream() {
     return Stream.bestStream(_streams);
   }
+
   /**
    * Update the HashMap containing the tracking events by adding to it
+   * @param trackingEvents new set of tracking events to add
    */
   public void updateTrackingEvents(HashMap<String, Set<String>> trackingEvents) {
     for (String event : trackingEvents.keySet()) {
@@ -169,6 +172,16 @@ public class VASTLinearAd implements PlayableItem {
         urls.addAll(newUrls);
         _trackingEvents.put(event, urls);
       }
+    }
+  }
+
+  /**
+   * Update the set containing click tracking urls by adding to it
+   * @param newClickTrackingURLs new set of click tracking urls to add
+   */
+  public void updateClickTrackingURLs(Set<String> newClickTrackingURLs) {
+    if (newClickTrackingURLs != null) {
+      _clickTrackingURLs.addAll(newClickTrackingURLs);
     }
   }
 }
