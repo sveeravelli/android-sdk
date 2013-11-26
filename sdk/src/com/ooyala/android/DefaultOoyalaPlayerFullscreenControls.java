@@ -320,6 +320,11 @@ public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyala
   }
 
   @Override
+  public int topBarOffset() {
+    return Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP);
+  }
+
+  @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
   }

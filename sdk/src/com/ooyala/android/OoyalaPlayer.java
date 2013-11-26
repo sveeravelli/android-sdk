@@ -759,7 +759,20 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
       addClosedCaptionsView();
+
+      //Create Learn More button when going in and out of fullscreen
+      if (isShowingAd()) {
+        _adPlayer.updateLearnMoreButton(getLayout(), getTopBarOffset());
+      }
     }
+  }
+
+  /**
+   * Get the absolute pixel of the top bar's distance from the top of the device.
+   * @return pixels to shift the Learn More button down
+   */
+  public int getTopBarOffset() {
+    return ((AbstractOoyalaPlayerLayoutController) _layoutController).getControls().topBarOffset();
   }
 
   /**

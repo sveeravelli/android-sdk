@@ -70,7 +70,7 @@ public class OoyalaFreewheelManager implements Observer {
   }
 
   /**
-   * Sets the Freewheel ad parameters to override values from Backlot and Backdoor.
+   * Sets the Freewheel ad parameters to override values from Backlot or Ooyala Internals.
    * <pre><b> Key                            Example Value</b>
    * "fw_android_mrm_network_id"    "42015"
    * "fw_android_ad_server"         "http://demo.v.fwmrm.net/"
@@ -270,7 +270,7 @@ public class OoyalaFreewheelManager implements Observer {
 
       switch(_player.getState()) {
         case PLAYING:
-          //This boolean is needed in case fwPrerollSlots are not received before content starts playing
+          //This boolean is needed in case pre-rolls are not received before content starts playing
           _playQueued = true;
 
           //If pre-rolls haven't played yet and we're trying to play content, play pre-rolls first

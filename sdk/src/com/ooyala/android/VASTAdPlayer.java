@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
@@ -21,6 +24,10 @@ class VASTAdPlayer extends AdMoviePlayer {
   private boolean _firstQSent = false;
   private boolean _midSent = false;
   private boolean _thirdQSent = false;
+
+  private int _topMargin;
+  private FrameLayout _playerLayout;
+  private AdsLearnMoreButton _learnMore;
 
   private Object _fetchTask;
 
@@ -93,9 +100,15 @@ class VASTAdPlayer extends AdMoviePlayer {
 
     super.init(parent, _linearAdQueue.get(0).getStreams());
 
-    // TODO[jigish] setup clickthrough
-    Set<String> clickTracking = _linearAdQueue.get(0).getClickTrackingURLs();
-    String clickThrough = _linearAdQueue.get(0).getClickThroughURL();
+    //Get the _playerLayout and _topMargin for the Learn More button
+    _playerLayout = parent.getLayout();
+    _topMargin = parent.getTopBarOffset();
+
+    //Add Learn More button if there is a click through URL
+    if (currentAd() != null && currentAd().getClickThroughURL() != null) {
+      _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
+      _playerLayout.addView(_learnMore);
+    }
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
@@ -132,7 +145,15 @@ class VASTAdPlayer extends AdMoviePlayer {
     super.pause();
   }
 
+  @Override
+  public void resume() {
+    super.resume();
 
+    //Bring Learn More button to front when play resumes so it does not get hidden beneath the video view.
+    if (_learnMore != null) {
+      _playerLayout.bringChildToFront(_learnMore);
+    }
+  }
 
   @Override
   public VASTAdSpot getAd() {
@@ -200,6 +221,21 @@ class VASTAdPlayer extends AdMoviePlayer {
             addQuartileBoundaryObserver();
             super.init(_parent, _linearAdQueue.get(0).getStreams());
             super.play();
+
+            //If the next linear ad has a clickThrough URL, create the Learn More button only if it doesn't exist
+            if (currentAd() != null && currentAd().getClickThroughURL() != null) {
+              if (_learnMore == null) {
+                _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
+                _playerLayout.addView(_learnMore);
+              } else {
+                _playerLayout.bringChildToFront(_learnMore);
+              }
+            }
+            //If there is no clickThrough and Learn More button exists from previous ad, remove it
+            else if (_learnMore != null) {
+              _playerLayout.removeView(_learnMore);
+              _learnMore = null;
+            }
           }
         }
       } catch (Exception e) {
@@ -208,6 +244,65 @@ class VASTAdPlayer extends AdMoviePlayer {
       }
     }
     super.update(arg0,  arg);
+  }
+
+  /**
+   * Called by OoyalaPlayer when going in and out of fullscreen using OoyalaPlayerLayoutController
+   * @param layout the new layout to add the Learn More button
+   * @param topMargin the pixels to shift the Learn More button down
+   */
+  @Override
+  public void updateLearnMoreButton(FrameLayout layout, int topMargin) {
+    //If topMargin did not change, return
+    if (_topMargin == topMargin) {
+      return;
+    }
+
+    //If Learn More button exists, add it to the new playerLayout with the topMargin
+    if (_learnMore != null) {
+      //Remove the Learn More button from the old playerLayout and set the new playerLayout and topMargin
+      _playerLayout.removeView(_learnMore);
+      _playerLayout = layout;
+      _topMargin = topMargin;
+
+      //Set the new topMargin and add the Learn More button to new playerLayout
+      _learnMore.setTopMargin(_topMargin);
+      _playerLayout.addView(_learnMore);
+    }
+    //Else, keep track of the new player layout and topMargin for next linear ad
+    else {
+      _playerLayout = layout;
+      _topMargin = topMargin;
+    }
+  }
+
+  /**
+   * Called by the Learn More button's onClick event.
+   * Sends the click tracking pings and opens the browser.
+   */
+  @Override
+  public void processClickThrough() {
+    if (currentAd() != null && currentAd().getClickTrackingURLs() != null) {
+      Set<String> urls = currentAd().getClickTrackingURLs();
+      if (urls != null) {
+        for (String url : urls) {
+          Log.i(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+          NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
+        }
+      }
+    }
+
+    //Open browser to click through URL
+    String url = currentAd().getClickThroughURL();
+    try {
+      url = url.trim(); //strip leading and trailing whitespace
+      Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      _playerLayout.getContext().startActivity(browserIntent);
+      Log.d(TAG, "Opening brower to " + url);
+    } catch (Exception e) {
+      Log.e(TAG, "There was some exception on clickthrough!");
+      e.printStackTrace();
+    }
   }
 
   public void sendTrackingEvent(String event) {
@@ -231,6 +326,13 @@ class VASTAdPlayer extends AdMoviePlayer {
 
   @Override
   public void destroy() {
+    //Remove Learn More button if it exists
+    if (_learnMore != null) {
+      _playerLayout.removeView(_learnMore);
+      _learnMore.destroy();
+      _learnMore = null;
+    }
+
     if (_fetchTask != null && this._parent != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
     deleteObserver(this);
     super.destroy();

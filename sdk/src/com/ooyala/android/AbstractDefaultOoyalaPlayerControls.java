@@ -221,6 +221,11 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     return 0;
   }
 
+  @Override
+  public int topBarOffset() {
+    return 0;
+  }
+
   public void setVisible(boolean visible) {
     _isVisible = visible;
     if (!visible) {

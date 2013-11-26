@@ -38,6 +38,12 @@ public interface OoyalaPlayerControls extends Observer {
   public int bottomBarOffset();
 
   /**
+   * @return Absolute pixel of the top bar's distance from the top of the device.
+   *         Used by Learn More button to determine offset from top.
+   */
+  public int topBarOffset();
+
+  /**
    * Enable or disable the fullscreen button
    */
   public void setFullscreenButtonShowing(boolean showing);
