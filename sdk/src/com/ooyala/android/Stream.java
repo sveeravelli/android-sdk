@@ -253,10 +253,13 @@ public class Stream {
      * NOTE(jigish) Android 3.0+ supports HLS, but we support it only on 4.0+ to simplify secure HLS
      * implementation
      */
-    return type.equals(Constants.DELIVERY_TYPE_MP4) || type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET) ||
-        type.equals(Constants.DELIVERY_TYPE_WV_MP4) || (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS &&
-        (type.equals(Constants.DELIVERY_TYPE_HLS) || type.equals(Constants.DELIVERY_TYPE_WV_WVM) ||
-        type.equals(Constants.DELIVERY_TYPE_WV_HLS)));
+
+    boolean isHLS = type.equals(Constants.DELIVERY_TYPE_HLS) || type.equals (Constants.DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS);
+    boolean isWidevine = type.equals(Constants.DELIVERY_TYPE_WV_WVM) || type.equals(Constants.DELIVERY_TYPE_WV_HLS);
+    return type.equals(Constants.DELIVERY_TYPE_MP4) ||
+           type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET) ||
+           type.equals(Constants.DELIVERY_TYPE_WV_MP4) ||
+           (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS && (isHLS || isWidevine ));
   }
 
   public static boolean isProfilePlayable(Stream stream) {

@@ -5,5 +5,8 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ooyala-android-sdk"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OoyalaAndroidIMASDK"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OoyalaAndroidFreewheelSDK"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

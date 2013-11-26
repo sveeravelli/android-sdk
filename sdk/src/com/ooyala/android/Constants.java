@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 class Constants {
   /** NOTE[jigish] do NOT change the name or location of this variable without changing pub_release.sh */
-  public static final String SDK_VERSION = "2.1.0_RC4";
+  public static final String SDK_VERSION = "2.2.0_RC2";
   public static final String API_VERSION = "1";
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;
@@ -174,6 +174,7 @@ class Constants {
   public static final String DELIVERY_TYPE_WV_MP4 = "wv_mp4";
   public static final String DELIVERY_TYPE_WV_WVM = "wv_wvm";
   public static final String DELIVERY_TYPE_WV_HLS = "wv_hls";
+  public static final String DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS = "akamai_hd2_vod_hls";
 
   public static final String PROFILE_BASELINE = "baseline";
 
