@@ -759,7 +759,20 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
       addClosedCaptionsView();
+
+      //Create Learn More button when going in and out of fullscreen
+      if (isShowingAd()) {
+        _adPlayer.updateLearnMoreButton(getLayout(), getTopBarOffset());
+      }
     }
+  }
+
+  /**
+   * Get the absolute pixel of the top bar's distance from the top of the device.
+   * @return pixels to shift the Learn More button down
+   */
+  public int getTopBarOffset() {
+    return ((AbstractOoyalaPlayerLayoutController) _layoutController).getControls().topBarOffset();
   }
 
   /**
@@ -841,7 +854,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     //If an ad is playing, take it out of playedAds, and save it for playback later
     if(_adPlayer != null) {
       AdSpot oldAd = _adPlayer.getAd();
-      _playedAds.remove(oldAd);
+      if( oldAd.isReusable() ) {
+        _playedAds.remove(oldAd);
+      }
       cleanupPlayer(_adPlayer);
       _adPlayer = null;
     }
@@ -860,13 +875,6 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_adPlayer == null) { return false; }
 
     initializeAdPlayer(_adPlayer, ad);
-
-    //The Ad initialization didn't work.  Destroy the _adPlayer and go back to playing the video
-    if (_adPlayer == null || _adPlayer.getBasePlayer() == null || _adPlayer.getState() == State.ERROR) {
-      Log.d(TAG, "Ad playback failed.  Continuing to play video");
-      _adPlayer = null;
-      return false;
-    }
     _adPlayer.setSeekable(_adsSeekable);
 
     removeClosedCaptionsView();
@@ -1034,27 +1042,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
               onComplete();
             }
           } else {
-            cleanupPlayer(_adPlayer);
-            _adPlayer = null;
-            sendNotification(AD_COMPLETED_NOTIFICATION);
-
-            if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
-
-              // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
-              if (_player == null) {
-                _player = getCorrectMoviePlayer(_currentItem);
-                initializePlayer(_player, _currentItem);
-                play();
-              }
-
-              //If these were post-roll ads, clean up.  Otherwise, resume playback
-              else if (_player.getState() == State.COMPLETED) {
-                onComplete();
-              } else {
-                _player.resume();
-                addClosedCaptionsView();
-              }
-            }
+            adPlayerCompleted();
           }
           break;
         case ERROR:
@@ -1104,6 +1092,30 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       cleanupPlayer(_adPlayer);
       _adPlayer = null;
       sendNotification(AD_COMPLETED_NOTIFICATION);
+    }
+  }
+  
+  public void adPlayerCompleted() {
+    cleanupPlayer(_adPlayer);
+    _adPlayer = null;
+    sendNotification(AD_COMPLETED_NOTIFICATION);
+
+    if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
+
+      // If our may movie player doesn't even exist yet (pre-rolls), initialize and play
+      if (_player == null) {
+        _player = getCorrectMoviePlayer(_currentItem);
+        initializePlayer(_player, _currentItem);
+        play();
+      }
+
+      //If these were post-roll ads, clean up.  Otherwise, resume playback
+      else if (_player.getState() == State.COMPLETED) {
+        onComplete();
+      } else {
+        _player.resume();
+        addClosedCaptionsView();
+      }
     }
   }
 

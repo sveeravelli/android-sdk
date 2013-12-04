@@ -12,21 +12,34 @@ import android.util.Log;
 import com.ooyala.android.Constants.ReturnState;
 
 public abstract class AdSpot {
+  
+  public static final boolean SINGLE_USE = false;
+  public static final boolean REUSABLE = true;
+  
   protected int _time = -1;
   protected URL _clickURL = null;
   protected List<URL> _trackingURLs = null;
   protected PlayerAPIClient _api;
+  protected final boolean _isReusable;
 
-  public AdSpot() {}
+  public AdSpot() {
+    _isReusable = REUSABLE;
+  }
+  
+  public AdSpot( boolean isOneTimeUse ) {
+    _isReusable = isOneTimeUse;
+  }
 
   AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
     _time = time;
     _clickURL = clickURL;
     _trackingURLs = trackingURLs;
+    _isReusable = REUSABLE;
   }
 
   AdSpot(JSONObject data, PlayerAPIClient api) {
     _api = api;
+    _isReusable = REUSABLE;
     update(data);
   }
 
@@ -124,5 +137,13 @@ public abstract class AdSpot {
 
   void setAPI(PlayerAPIClient api) {
     this._api = api;
+  }
+
+  /**
+   * @return false if this ad should not survive being interrupted. true (the default value)
+   * means the ad will get put back into the collection of potential ads when interrupted.
+   */
+  public boolean isReusable() {
+    return _isReusable;
   }
 }

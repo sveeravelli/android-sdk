@@ -21,7 +21,8 @@ import com.ooyala.android.OoyalaPlayer;
 class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   private static String TAG = "OoyalaPlayerIMAWrapper";
 
-  OoyalaPlayer _player;
+  final OoyalaPlayer _player;
+  private final OoyalaIMAManager _imaManager;
   private AdSpot _adSpot;
   private boolean _isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> _adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
@@ -41,8 +42,9 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
    * @param player the OoyalaPlayer to use
    * @param callback a callback for when content is completed
    */
-  public OoyalaPlayerIMAWrapper(OoyalaPlayer player){
-    this._player = player;
+  public OoyalaPlayerIMAWrapper(OoyalaPlayer player, OoyalaIMAManager imaManager){
+    _player = player;
+    _imaManager = imaManager;
     Log.d(TAG, "IMA Ad Wrapper: Initializing");
     _isPlayingIMAAd = false;
     _liveContentTimePlayed = 0;
@@ -72,7 +74,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   @Override
   public void loadAd(String url) {
     Log.d(TAG, "IMA Ad Wrapper: Loading Ad: " + url);
-    _adSpot = new IMAAdSpot(url);
+    _adSpot = new IMAAdSpot(url, _imaManager);
   }
 
   @Override
@@ -123,7 +125,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   /**
    * Only called from the IMAManager when content should be paused. Note: This does not really pause content.
-   * However, it informs the player wrapper that content will be paused.
+   * However, it informs the player wrapper that content will be paused. The Ad player pauses the content.
    */
   public void pauseContent(){
     if(_player.getCurrentItem().isLive()) {
@@ -139,11 +141,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     for (VideoAdPlayerCallback callback : _adCallbacks) {
       callback.onPlay();
     }
-    if(_isPlayingIMAAd) {
-      _player.skipAd();
-    } else {
-      _player.resume();
-    }
+    _player.adPlayerCompleted();
   }
 
   @Override

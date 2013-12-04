@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -22,16 +23,18 @@ public class MoviePlayer extends Player implements Observer {
   /**
    * Check which base player would be best suited for this MoviePlayer
    * @param streams
-   * @return the correct default base player
+   * @return the correct default base player, possibly null.
    */
   private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
     StreamPlayer player = null;
-
+    if( streams == null || streams.size() == 0 ) {
+      player = new EmptyStreamPlayer();
+    }
     // If custom HLS Player is enabled, and one of the following:
     //   1.) Delviery type is HLS
     //   2.) Delviery type is Remote Asset, and the url contains .m3u8
     // use VisualOn
-    if (OoyalaPlayer.enableCustomHLSPlayer &&
+    else if (OoyalaPlayer.enableCustomHLSPlayer &&
         (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS) ||
          (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
           Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).decodedURL()
@@ -49,14 +52,17 @@ public class MoviePlayer extends Player implements Observer {
     return player;
   }
 
-  public void init(OoyalaPlayer parent, Set<Stream> streams) {
-   // super.init(parent, stream);
-    if (streams == null || streams.size() == 0) {
-      _error = "There are no streams to play";
-      Log.e(this.getClass().toString(), _error);
-      return;
+  private void setStreams( Set<Stream> streams ) {
+    if( streams == null ) {
+      _streams = new HashSet<Stream>();
     }
+    else {
+      _streams = streams;
+    }
+  }
 
+  public void init(OoyalaPlayer parent, Set<Stream> streams) {
+    setStreams( streams );
     _parent = parent;
     _streams = streams;
     _suspended = false;
@@ -80,7 +86,7 @@ public class MoviePlayer extends Player implements Observer {
   }
 
   public void setBasePlayer(StreamPlayer basePlayer, Set<Stream> streams) {
-    _streams = streams;
+    setStreams( streams );
     setBasePlayer(basePlayer);
   }
 

@@ -7,16 +7,18 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
+import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener;
+import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener;
-import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
-import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
 import com.google.ads.interactivemedia.v3.api.AdsRequest;
@@ -51,14 +53,6 @@ public class OoyalaIMAManager implements Observer {
 
   private boolean _queueAdsManagerInit = false;
   protected boolean _adsManagerInited;
-  private class IMAAdErrorListener implements AdErrorListener {
-
-    @Override
-    public void onAdError(AdErrorEvent event) {
-      Log.e(TAG, "IMA Manager Error: " + event.getError().getMessage() + "\n");
-
-    }
-  }
 
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
@@ -72,8 +66,9 @@ public class OoyalaIMAManager implements Observer {
     _companionAdSlots = new ArrayList<CompanionAdSlot>();
 
     //Initialize OoyalaPlayer-IMA Bridge
-    _ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(_player);
+    _ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(_player, this);
     _player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
+    _player.registerAdPlayer(IMAEmptyAdSpot.class, IMAAdPlayer.class);
     _player.addObserver(this);
 
     //Initialize IMA classes
@@ -81,20 +76,38 @@ public class OoyalaIMAManager implements Observer {
     _adsLoader = _sdkFactory.createAdsLoader(_player.getLayout().getContext(), _sdkFactory.createImaSdkSettings());
 
     //Create the listeners for the adsLoader and adsManager
-    _adsLoader.addAdErrorListener(new IMAAdErrorListener());
+    _adsLoader.addAdErrorListener(new AdErrorListener() {
+      @Override
+      public void onAdError(AdErrorEvent event) {
+        Log.e(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
+        _player.skipAd();
+        _player.play();
+      }
+    } );
+    
     _adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
+      
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-        Log.d(TAG, "IMA Ad manager loaded");
+        Log.d(TAG, "IMA AdsManager loaded");
         _adsManager = event.getAdsManager();
         _adsManagerInited = false;
-        _adsManager.addAdErrorListener(new IMAAdErrorListener());
+ 
+        _adsManager.addAdErrorListener(new AdErrorListener() {
+          @Override
+          public void onAdError(AdErrorEvent event) {
+            Log.e(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
+            _player.skipAd();
+            _player.play();
+          }
+        } );
+        
         _adsManager.addAdEventListener(new AdEventListener() {
 
           @Override
           public void onAdEvent(AdEvent event) {
 
-            Log.d(TAG,"IMA Ad Event: " + event.getType());
+            Log.d(TAG,"IMA AdsManager Event: " + event.getType());
 
             switch (event.getType()) {
               case LOADED:
@@ -123,6 +136,7 @@ public class OoyalaIMAManager implements Observer {
 
         //Sometimes the ads manager will be created late, after PLAY_STARTED_NOTIFICATION
         // We still need to init the manager in this case
+        // todo: make sure this works still.
        if(_queueAdsManagerInit && !_adsManagerInited) {
          _adsManager.init();
          _adsManagerInited = true;
@@ -184,7 +198,11 @@ public class OoyalaIMAManager implements Observer {
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
   }
-
+  
+  private void addPreRollAdSpotToItem( Video item ) {
+    item.insertAd( new IMAEmptyAdSpot( this ) );
+  }
+  
   @Override
   public void update(Observable observable, Object data) {
     if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
@@ -201,6 +219,7 @@ public class OoyalaIMAManager implements Observer {
           currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null ){
         String url = currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
         if(url != null) {
+          addPreRollAdSpotToItem( currentItem );
           loadAds(url);
         }
       }
@@ -209,7 +228,16 @@ public class OoyalaIMAManager implements Observer {
       if (!_adsManagerInited) {
         if (_adsManager != null) {
           _adsManagerInited = true;
-          _adsManager.init();
+          // todo: remove this testing hack delay...
+          final Handler handler = new Handler( Looper.getMainLooper() );
+          handler.postDelayed( new Runnable() {
+            @Override
+            public void run() {
+              _adsManager.init();
+            }
+          },
+          3000 );
+          // todo: ...remove this testing hack delay.
         } else {
           _queueAdsManagerInit = true;
         }

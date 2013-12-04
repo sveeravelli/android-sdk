@@ -24,8 +24,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
-  final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "ooyala.com";
+  final String PCODE  = "Vpd3E6BNabnn09G72IWye5O2RzN1";
+  final String DOMAIN = "www.ooyala.com";
 
   protected OptimizedOoyalaPlayerLayoutController playerLayoutController;
   protected OoyalaPlayer player;
