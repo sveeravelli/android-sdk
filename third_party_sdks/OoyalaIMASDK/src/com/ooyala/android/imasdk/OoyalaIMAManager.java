@@ -228,16 +228,7 @@ public class OoyalaIMAManager implements Observer {
       if (!_adsManagerInited) {
         if (_adsManager != null) {
           _adsManagerInited = true;
-          // todo: remove this testing hack delay...
-          final Handler handler = new Handler( Looper.getMainLooper() );
-          handler.postDelayed( new Runnable() {
-            @Override
-            public void run() {
-              _adsManager.init();
-            }
-          },
-          3000 );
-          // todo: ...remove this testing hack delay.
+          _adsManager.init();
         } else {
           _queueAdsManagerInit = true;
         }
