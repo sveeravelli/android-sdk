@@ -12,16 +12,22 @@ import com.ooyala.android.Stream;
  * @author michael.len
  *
  */
-class IMAAdSpot extends AdSpot {
+class IMAAdSpot extends AdSpot implements IIMAAdSpot {
 
-  private Stream _stream;
+  private final OoyalaIMAManager _imaManager;
+  private final Stream _stream;
 
   /**
    * Initialize an IMA Ad Spot
    * @param url the URL for the video stream provided by the IMA Ad Manager
    */
-  public IMAAdSpot(String url) {
-    super();
+  public IMAAdSpot( String url, OoyalaIMAManager imaManager ) {
+    this( url, imaManager, AdSpot.REUSABLE ); 
+  }
+  
+  public IMAAdSpot( String url, OoyalaIMAManager imaManager, boolean isOneTimeUse ) {
+    super( isOneTimeUse );
+    _imaManager = imaManager;
     _stream = new IMAStream(url);
   }
 
@@ -30,14 +36,16 @@ class IMAAdSpot extends AdSpot {
     return true;
   }
 
-  /**
-   * Returns the Set of streams for the IMA Ad Spot
-   * @return A set that contains the single IMA stream
-   */
+  @Override
   public Set<Stream> getStreams() {
     Set<Stream> retVal = new HashSet<Stream>();
     retVal.add(_stream);
     return retVal;
+  }
+  
+  @Override
+  public OoyalaIMAManager getImaManager() {
+    return _imaManager;
   }
 
 }

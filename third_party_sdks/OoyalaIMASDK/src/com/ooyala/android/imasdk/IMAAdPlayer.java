@@ -18,20 +18,21 @@ import com.ooyala.android.OoyalaPlayer.State;
  */
 public class IMAAdPlayer extends AdMoviePlayer {
   private static String TAG = "IMAAdPlayer";
-  private IMAAdSpot _ad;
+  private AdSpot _ad;
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     Log.d(TAG, "IMA Ad Player: Initializing");
 
-    if (!(ad instanceof IMAAdSpot)) {
+    if ( ! (ad instanceof IIMAAdSpot) ) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;
-      return;
     }
-    _seekable = false;
-    _ad = (IMAAdSpot) ad;
-    super.init(parent, _ad.getStreams());
+    else {
+      _seekable = false;
+      _ad = ad;
+      super.init(parent, ((IIMAAdSpot)_ad).getStreams());
+    }
   }
 
   @Override
@@ -65,6 +66,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
     super.update(arg0, arg);
   }
 
+  @Override
   public AdSpot getAd() {
     return _ad;
   }

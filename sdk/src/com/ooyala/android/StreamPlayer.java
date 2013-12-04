@@ -1,12 +1,9 @@
 package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 
