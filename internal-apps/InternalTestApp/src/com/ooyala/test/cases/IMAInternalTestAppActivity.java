@@ -39,12 +39,11 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     imaManager.addCompanionSlot(companionView, 300, 50);
 
     //Populate the embed map
-//    embedMap.put("IMA Preroll", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");  //Created by us
-//    embedMap.put("IMA with Custom Ad Tag Parameters", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");
-//    //embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
-//    embedMap.put("IMA Skip Ad (Google Provided)", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");  //Google provided
-//    embedMap.put("IMA Wrapper (Google Provided)", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");  //Google provided
-    embedMap.put("IMA Ad Rules w/ pre, mid, post", "5kZDY5aDrJCf8WrQkvP3CinAigLAI2SS");  //Google provided
+    embedMap.put("IMA Preroll", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");  //Created by us
+    embedMap.put("IMA with Custom Ad Tag Parameters", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");
+    //embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
+    embedMap.put("IMA Skip Ad (Google Provided)", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");  //Google provided
+    embedMap.put("IMA Wrapper (Google Provided)", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");  //Google provided
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
