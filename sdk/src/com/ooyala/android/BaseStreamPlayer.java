@@ -72,7 +72,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void pause() {
-    Log.v(TAG, "pause(): " + new Throwable().getStackTrace()[2].getClassName());
     _playQueued = false;
     switch (_state) {
       case PLAYING:
@@ -86,7 +85,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void play() {
-    Log.v(TAG, "play(): " + new Throwable().getStackTrace()[2].getClassName());
     _playQueued = false;
     switch (_state) {
       case INIT:
@@ -106,7 +104,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void stop() {
-    Log.v(TAG, "stop(): " + new Throwable().getStackTrace()[2].getClassName());
     stopPlayheadTimer();
     _playQueued = false;
     _player.stop();
@@ -115,7 +112,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void reset() {
-    Log.v(TAG, "reset(): " + new Throwable().getStackTrace()[2].getClassName());
     suspend(0, State.PAUSED);
     setState(State.LOADING);
     setupView();
@@ -216,7 +212,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    Log.v(TAG, "onPrepared(): " + new Throwable().getStackTrace()[2].getClassName());
     _view.setBackgroundColor(Color.TRANSPARENT);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
@@ -343,13 +338,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void suspend() {
-    Log.v(TAG, "suspend(): " + new Throwable().getStackTrace()[2].getClassName());
     suspend(_player != null ? _player.getCurrentPosition() : 0, _state);
   }
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    Log.v(TAG, "suspend(m,s): " + new Throwable().getStackTrace()[2].getClassName());
     if (_state == State.SUSPENDED) { return; }
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
@@ -368,13 +361,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void resume() {
-    Log.v(TAG, "resume(): " + new Throwable().getStackTrace()[2].getClassName());
     resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
   @Override
   public void resume(int millisToResume, State stateToResume) {
-    Log.v(TAG, "resume(m,s): " + new Throwable().getStackTrace()[2].getClassName());
     _timeBeforeSuspend = millisToResume;
     if (stateToResume == State.PLAYING) {
       queuePlay();
@@ -453,7 +444,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   protected void setState(State state) {
-    Log.v(TAG, "setState(" + state + "): " + new Throwable().getStackTrace()[2].getClassName());
     super.setState(state);
     dequeueAll();
   }
