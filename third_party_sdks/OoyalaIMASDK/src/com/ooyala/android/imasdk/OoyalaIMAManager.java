@@ -112,7 +112,9 @@ public class OoyalaIMAManager implements Observer {
             switch (event.getType()) {
               case LOADED:
                 Log.d(TAG,"IMA Ad Manager: Starting ad");
-                _adsManager.start();
+                if( _adsManager != null ) {
+                  _adsManager.start();
+                }
                 break;
               case CONTENT_PAUSE_REQUESTED:
                 _ooyalaPlayerWrapper.pauseContent();
@@ -137,7 +139,7 @@ public class OoyalaIMAManager implements Observer {
         //Sometimes the ads manager will be created late, after PLAY_STARTED_NOTIFICATION
         // We still need to init the manager in this case
         // todo: make sure this works still.
-       if(_queueAdsManagerInit && !_adsManagerInited) {
+       if(_queueAdsManagerInit && !_adsManagerInited && _adsManager != null) {
          _adsManager.init();
          _adsManagerInited = true;
          _queueAdsManagerInit = false;
