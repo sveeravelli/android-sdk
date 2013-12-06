@@ -14,8 +14,6 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 public class EmptyStreamPlayer extends StreamPlayer {
 
-  private static final String TAG = "EmptyStreamPlayer";
-  
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     if (parent == null) {
@@ -29,7 +27,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
       setState(State.READY);
     }
   }
-  
+
   @SuppressWarnings("deprecation")
   private void setupView() {
     createView(_parent.getLayout().getContext());
@@ -45,47 +43,49 @@ public class EmptyStreamPlayer extends StreamPlayer {
         ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     _view.setBackgroundColor(Color.BLACK);
   }
-  
+
   @Override
   public void play() {
-    Log.v(TAG, "play()");
     switch (_state) {
-      case PAUSED:
-      case READY:
-      case COMPLETED:
-        setState(State.PLAYING);
-      default:
-        break;
+    case PAUSED:
+    case READY:
+    case COMPLETED:
+      setState(State.PLAYING);
+    default:
+      break;
     }
   }
-      
+
   @Override
   public void reset() {
-    Log.v(TAG, "suspend()");
   }
 
   @Override
   public void suspend() {
-    Log.v(TAG, "suspend()");
   }
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    Log.v(TAG, "resume()");
   }
 
   @Override
   public void resume() {
-    Log.v(TAG, "resume()");
   }
 
   @Override
   public void resume(int millisToResume, State stateToResume) {
-    Log.v(TAG, "resume()");
   }
 
   @Override
   public void destroy() {
-    Log.v(TAG, "destroy()");
+    removeView();
   }
+
+  private void removeView() {
+    if (_parent != null) {
+      _parent.getLayout().removeView(_view);
+    }
+    _view = null;
+  }
+  
 }
