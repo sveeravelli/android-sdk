@@ -1308,7 +1308,13 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       cleanupPlayer(_adPlayer);
       _adPlayer = null;
       sendNotification(AD_SKIPPED_NOTIFICATION);
-      if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
+      if( _player == null ) { // e.g. turns out there were no IMA pre-rolls, or they failed.
+        _player = getCorrectMoviePlayer( _currentItem );
+        if( _player != null ) { 
+          _player.play();
+        }
+      }
+      else if (!playAdsBeforeTime(this._lastPlayedTime, true)) {
         if (_player.getState() == State.COMPLETED) {
           onComplete();
         } else {
