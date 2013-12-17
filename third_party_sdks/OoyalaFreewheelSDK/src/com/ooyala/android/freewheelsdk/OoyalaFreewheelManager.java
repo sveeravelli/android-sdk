@@ -78,6 +78,50 @@ public class OoyalaFreewheelManager implements Observer {
     _fwParameters = fwParameters;
   }
 
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      //Check to play mid-rolls or overlay ads when content is playing
+      if (_fwContext != null && !_player.isShowingAd()) {
+        checkPlayableAds();
+      }
+    }
+    else if (arg1 == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION) {
+      currentItemChanged();
+    }
+    else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
+      //When content has finished playing, play post-rolls
+      if (_fwContext != null) {
+        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
+      }
+    }
+    else if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      //Listen to state changed notification to set correct video states
+      Log.d(TAG, "State changed to: " + _player.getState());
+
+      switch(_player.getState()) {
+        case PLAYING:
+          if (_fwContext != null && !_player.isShowingAd()) {
+            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
+          }
+          break;
+        case PAUSED:
+        case SUSPENDED:
+          if(_fwContext != null && !_player.isShowingAd()) {
+            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    else if (arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION) {
+      //When ads are completed, re-enable the controls
+      //TODO: this fires when any ad is played, not just Freewheel ads.
+      _layoutController.getControls().setVisible(true);
+    }
+  }
+
   private void currentItemChanged() {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
@@ -226,13 +270,18 @@ public class OoyalaFreewheelManager implements Observer {
       }
     }
 
-    List<ISlot> adsToPlay = new ArrayList<ISlot>();
-    //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
-    adsToPlay.addAll(prerolls);
-    adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_MIDROLL()));
-    adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_POSTROLL()));
-    for (ISlot ad : adsToPlay) {
-      _player.getCurrentItem().insertAd(new FWAdSpot(ad, this));
+    try {
+      //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
+      List<ISlot> adsToPlay = new ArrayList<ISlot>();
+      adsToPlay.addAll(prerolls);
+      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_MIDROLL()));
+      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_POSTROLL()));
+      for (ISlot ad : adsToPlay) {
+        _player.getCurrentItem().insertAd(new FWAdSpot(ad, this));
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "Error in adding ad slots to the list of ads to play");
+      e.printStackTrace();
     }
   }
 
@@ -265,49 +314,5 @@ public class OoyalaFreewheelManager implements Observer {
 
   private int random() {
     return (int)Math.floor(Math.random() * Integer.MAX_VALUE);
-  }
-
-  @Override
-  public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      //Check to play mid-rolls or overlay ads when content is playing
-      if (_fwContext != null && !_player.isShowingAd()) {
-        checkPlayableAds();
-      }
-    }
-    else if (arg1 == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION) {
-      currentItemChanged();
-    }
-    else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
-      //When content has finished playing, play post-rolls
-      if (_fwContext != null) {
-        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
-      }
-    }
-    else if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      //Listen to state changed notification to set correct video states
-      Log.d(TAG, "State changed to: " + _player.getState());
-
-      switch(_player.getState()) {
-        case PLAYING:
-          if (_fwContext != null && !_player.isShowingAd()) {
-            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
-          }
-          break;
-        case PAUSED:
-        case SUSPENDED:
-          if(_fwContext != null && !_player.isShowingAd()) {
-            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
-          }
-          break;
-        default:
-          break;
-      }
-    }
-    else if (arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION) {
-      //When ads are completed, re-enable the controls
-      //TODO: this fires when any ad is played, not just Freewheel ads.
-      _layoutController.getControls().setVisible(true);
-    }
   }
 }
