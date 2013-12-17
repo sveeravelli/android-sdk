@@ -1,8 +1,5 @@
 package com.ooyala.android.freewheelsdk;
 
-import java.util.List;
-
-import tv.freewheel.ad.interfaces.IAdContext;
 import tv.freewheel.ad.interfaces.ISlot;
 
 import com.ooyala.android.AdSpot;
@@ -12,28 +9,42 @@ import com.ooyala.android.AdSpot;
  */
 public class FWAdSpot extends AdSpot {
 
-  private List<ISlot> _ads;
-  private IAdContext _fwContext;
+  private ISlot _ad;
+  private OoyalaFreewheelManager _adManager;
 
   /**
    * Initialize a Freewheel Ad Spot. Note that this AdSpot does not actually have a stream like other AdSpots
-   * @param ad an ISlot to be played
+   * @param ad the ISlot to play
+   * @param adManager the Freewheel ad manager
    */
-  public FWAdSpot(List<ISlot> ads, IAdContext fwContext) {
-    _ads = ads;
-    _fwContext = fwContext;
+  public FWAdSpot(ISlot ad, OoyalaFreewheelManager adManager) {
+    _ad = ad;
+    _adManager = adManager;
   }
 
-  public List<ISlot> getAdsList() {
-    return _ads;
+  public ISlot getAd() {
+    return _ad;
   }
 
-  public IAdContext getContext() {
-    return _fwContext;
+  public OoyalaFreewheelManager getAdManager() {
+    return _adManager;
   }
 
   @Override
   public boolean fetchPlaybackInfo() {
     return true;
+  }
+
+  /**
+   * Fetch the time at which this AdSpot should play.
+   * @return The time at which this AdSpot should play in milliseconds.
+   */
+  public int getTime() {
+    //Ad may be null if pre-rolls have not been fetched yet
+    if (_ad != null) {
+      return (int) (_ad.getTimePosition() * 1000);
+    } else {
+      return 0;
+    }
   }
 }

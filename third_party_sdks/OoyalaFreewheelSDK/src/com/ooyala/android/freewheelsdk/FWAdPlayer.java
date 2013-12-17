@@ -24,19 +24,24 @@ import tv.freewheel.ad.interfaces.ISlot;
 /**
  * This class represents the Base Movie Player that plays Freewheel ad spots.
  */
-public class FWAdPlayer extends AdMoviePlayer {
+public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
   private static String TAG = "FWAdPlayer";
-  private FWAdSpot _adSpot;
-  private List<ISlot> _ads;
+  private OoyalaFreewheelManager _adManager;
+  private AdSpot _adSpot;
   private ISlot _currentAd;
   private List<IAdInstance> _adInstances;
   private IAdInstance _currentAdInstance;
 
   private IAdContext _fwContext;
   private IConstants _fwConstants;
-
   private FrameLayout _playerLayout;
   private AdsLearnMoreButton _learnMore;
+
+  //Booleans to keep track of when to play, error out, or set state
+  //to complete so that content doesn't play before it should
+  private boolean _playQueued;
+  private boolean _adError;
+  private boolean _noPrerolls;
 
   //Create event listeners
   private IEventListener _adStartedEventListener = new IEventListener() {
@@ -66,7 +71,8 @@ public class FWAdPlayer extends AdMoviePlayer {
       //      This only happens if an overlay slot starts playing during content playback and ends during ad playback.
       if (!completedSlotID.equals("overlay-slot")) {
         _currentAd = null;
-        play();
+        Log.d(TAG, "Finished ad. Setting state to complete.");
+        setState(State.COMPLETED);
       }
     }
   };
@@ -93,10 +99,16 @@ public class FWAdPlayer extends AdMoviePlayer {
       return;
     }
     _seekable = false;
-    _adSpot = (FWAdSpot) ad;
-    _ads = _adSpot.getAdsList();
+    _playQueued = false;
+    _adError = false;
+    _noPrerolls = false;
 
-    _fwContext = _adSpot.getContext();
+    _adSpot = ad;
+    _currentAd = ((FWAdSpot) _adSpot).getAd();
+    _adManager = ((FWAdSpot) _adSpot).getAdManager();
+    _adManager.setFWAdPlayerListener(this);
+
+    _fwContext = _adManager.getFreewheelContext();
     _fwConstants = _fwContext.getConstants();
 
     //Add event listeners and set parameter to prevent ad click detection
@@ -112,6 +124,34 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   @Override
+  public void adReady(ISlot ad) {
+    setState(State.READY);
+    _currentAd = ad;
+
+    //If there were no pre-rolls fetched, we need to set state to complete only
+    //when play() is called (see play function below)
+    if (_currentAd == null) {
+      _noPrerolls = true;
+    }
+
+    if (_playQueued) {
+      play();
+    }
+  }
+
+  @Override
+  public void onError() {
+    //If play() has already been called, set state to error to resume content. Else, we set state to ready and
+    //wait until play() is called to error out (or else, content may play when we haven't called play() yet).
+    if (_playQueued) {
+      setState(State.ERROR);
+    } else {
+      setState(State.READY);
+      _adError = true;
+    }
+  }
+
+  @Override
   public void processClickThrough() {
     //Use Freewheel's renderer controller to send pings and open browser
     _currentAdInstance.getRendererController().processEvent(_fwConstants.EVENT_AD_CLICK());
@@ -119,26 +159,19 @@ public class FWAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
-    if (_ads != null && _ads.size() > 0) {
-      _currentAd = _ads.remove(0);
+    if (_adError) {
+      setState(State.ERROR);
+    } else if (_noPrerolls) {
+      setState(State.COMPLETED);
+    } else if (_currentAd == null) {
+      _playQueued = true;
+    } else {
+      _adManager.adsPlaying();
       _adInstances = _currentAd.getAdInstances();
 
       Log.d(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
+      setState(State.PLAYING);
       _currentAd.play();
-
-      //Only set state if ad wasn't playing already
-      if (this.getState() != State.PLAYING) {
-        setState(State.PLAYING);
-      }
-    } else {
-      Log.d(TAG, "Finished ad. Setting state to complete.");
-      setState(State.COMPLETED);
-
-      //Remove the event listeners
-      _fwContext.removeEventListener(_fwConstants.EVENT_AD_IMPRESSION(), _adStartedEventListener);
-      _fwContext.removeEventListener(_fwConstants.EVENT_SLOT_ENDED(), _slotEndedEventListener);
-      _fwContext.removeEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
-      _fwContext.removeEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
     }
   }
 
@@ -174,11 +207,18 @@ public class FWAdPlayer extends AdMoviePlayer {
       _learnMore = null;
     }
 
+    //Remove the event listeners
+    _fwContext.removeEventListener(_fwConstants.EVENT_AD_IMPRESSION(), _adStartedEventListener);
+    _fwContext.removeEventListener(_fwConstants.EVENT_SLOT_ENDED(), _slotEndedEventListener);
+    _fwContext.removeEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
+    _fwContext.removeEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
+
     Log.d(TAG, "FW Ad Player: Destroying ad player");
     if (_currentAd != null) {
       _currentAd.stop();
       _currentAd = null;
     }
+    _adManager.setFWAdPlayerListener(null);
     super.destroy();
   }
 }

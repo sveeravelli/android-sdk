@@ -1055,17 +1055,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
             sendNotification(ERROR_NOTIFICATION);
           } else {
             sendNotification(AD_ERROR_NOTIFICATION);
-            cleanupPlayer(_adPlayer);
-            _adPlayer = null;
-            sendNotification(AD_COMPLETED_NOTIFICATION);
-            if (!playAdsBeforeTime(this._lastPlayedTime, true) && _player != null) {
-              if (_player.getState() == State.COMPLETED) {
-                onComplete();
-              } else {
-                _player.resume();
-                addClosedCaptionsView();
-              }
-            }
+            adPlayerCompleted();
           }
           break;
         case PLAYING:
@@ -1094,7 +1084,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       sendNotification(AD_COMPLETED_NOTIFICATION);
     }
   }
-  
+
   public void adPlayerCompleted() {
     cleanupPlayer(_adPlayer);
     _adPlayer = null;
@@ -1310,7 +1300,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
       sendNotification(AD_SKIPPED_NOTIFICATION);
       if( _player == null ) { // e.g. turns out there were no IMA pre-rolls, or they failed.
         _player = getCorrectMoviePlayer( _currentItem );
-        if( _player != null ) { 
+        if( _player != null ) {
           _player.play();
         }
       }
