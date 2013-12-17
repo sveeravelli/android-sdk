@@ -36,8 +36,6 @@ public class OoyalaFreewheelManager implements Observer {
   protected OptimizedOoyalaPlayerLayoutController _layoutController;
   protected Map<String,String> _fwParameters = null;
   protected FWAdPlayerListener _fwAdPlayerListener;
-
-  //List of all ads
   protected List<ISlot> _overlays = null;
 
   //Freewheel ad request parameters
@@ -81,7 +79,7 @@ public class OoyalaFreewheelManager implements Observer {
   @Override
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      //Check to play mid-rolls or overlay ads when content is playing
+      //Check to play overlay ads when content is playing
       if (_fwContext != null && !_player.isShowingAd()) {
         checkPlayableAds();
       }
@@ -90,7 +88,6 @@ public class OoyalaFreewheelManager implements Observer {
       currentItemChanged();
     }
     else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
-      //When content has finished playing, play post-rolls
       if (_fwContext != null) {
         _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
       }
@@ -300,8 +297,8 @@ public class OoyalaFreewheelManager implements Observer {
   }
 
   /**
-   * Check to play mid-rolls or overlays. If the playheadTime passes the ad's time to play,
-   * play only the first item on the list since other items may have different times to be played at.
+   * Check to play overlays. If the playheadTime passes the ad's time to play, play only the
+   * first item on the list since other items may have different times to be played at.
    */
   private void checkPlayableAds() {
     double playheadTime = _player.getPlayheadTime() / 1000;
