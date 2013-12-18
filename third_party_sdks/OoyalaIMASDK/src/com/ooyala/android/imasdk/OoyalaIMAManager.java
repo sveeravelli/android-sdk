@@ -50,7 +50,7 @@ public class OoyalaIMAManager implements Observer {
   protected List<CompanionAdSlot> _companionAdSlots;
   protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
-
+  private String _adUrlOverride;
   private boolean _queueAdsManagerInit = false;
   protected boolean _adsManagerInited;
 
@@ -176,7 +176,11 @@ public class OoyalaIMAManager implements Observer {
    * Module Metadata.
    * @param url VAST url for IMA
    */
-  public void loadAds(String url) {
+  public void setAdUrlOverride( String url ) {
+    _adUrlOverride = url;
+  }
+  
+  private void loadAds(String url) {
     if (_container != null) {
       Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
@@ -216,10 +220,12 @@ public class OoyalaIMAManager implements Observer {
 
       Video currentItem = _player.getCurrentItem();
 
-      if (currentItem.getModuleData() != null &&
+      final boolean isBacklotIMA = currentItem.getModuleData() != null &&
           currentItem.getModuleData().get("google-ima-ads-manager") != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null ){
-        String url = currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
+          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
+      final boolean isOverrideIMA = _adUrlOverride != null;
+      if ( isBacklotIMA || isOverrideIMA ) {
+        String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
         if(url != null) {
           addPreRollAdSpotToItem( currentItem );
           loadAds(url);
