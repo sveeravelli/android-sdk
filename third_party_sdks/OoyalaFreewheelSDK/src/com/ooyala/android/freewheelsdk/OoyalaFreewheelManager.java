@@ -76,6 +76,31 @@ public class OoyalaFreewheelManager implements Observer {
     _fwParameters = fwParameters;
   }
 
+  /**
+   * Gets the Freewheel context
+   * @return the Freewheel context
+   */
+  public IAdContext getFreewheelContext() {
+    return _fwContext;
+  }
+
+  /**
+   * Sets the FWAdPlayerListener
+   * @param adPlayer the FWAdPlayer to be set
+   */
+  public void setFWAdPlayerListener(FWAdPlayerListener adPlayer) {
+    _fwAdPlayerListener = adPlayer;
+  }
+
+  /**
+   * To be called only by the FWAdPlayer. Let the manager know that ads are playing.
+   */
+  public void adsPlaying() {
+    _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED()); //let the ad manager know content paused to let the ads play
+    _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
+    _layoutController.getControls().setVisible(false); //disable our controllers
+  }
+
   @Override
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
@@ -280,20 +305,6 @@ public class OoyalaFreewheelManager implements Observer {
       Log.e(TAG, "Error in adding ad slots to the list of ads to play");
       e.printStackTrace();
     }
-  }
-
-  public IAdContext getFreewheelContext() {
-    return _fwContext;
-  }
-
-  public void setFWAdPlayerListener(FWAdPlayerListener adPlayer) {
-    _fwAdPlayerListener = adPlayer;
-  }
-
-  public void adsPlaying() {
-    _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED()); //let the ad manager know content paused to let the ads play
-    _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
-    _layoutController.getControls().setVisible(false); //disable our controllers
   }
 
   /**
