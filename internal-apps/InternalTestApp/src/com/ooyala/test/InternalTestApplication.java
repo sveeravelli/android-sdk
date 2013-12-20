@@ -7,6 +7,7 @@ import com.ooyala.test.cases.FreewheelInternalTestAppActivity;
 import com.ooyala.test.cases.IMAInternalTestAppActivity;
 import com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity;
 import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
+import com.ooyala.test.cases.CustomEmbedInternalTestAppActivity;
 
 import android.app.Activity;
 import android.app.Application;
@@ -51,6 +52,9 @@ public class InternalTestApplication extends Application {
 
     activityMap.put(getString(R.string.freewheelItemName), FreewheelInternalTestAppActivity.class);
     condensedActivityNameMap.put(getString(R.string.freewheelItemName), "Freewheel");
+
+    activityMap.put(getString(R.string.customItemName), CustomEmbedInternalTestAppActivity.class);
+    condensedActivityNameMap.put(getString(R.string.customItemName), "Custom Embed");
   }
 
   public static Map<String, Class<? extends Activity>> getActivityMap() {

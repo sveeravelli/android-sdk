@@ -21,6 +21,7 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
 //  OoyalaPlayer player;
 //  Spinner embedSpinner;
 
+  private final static String IMA_OVERRIDE_URL_FROM_CODE_LABEL = "IMA override url from code";
   OoyalaIMAManager imaManager;
   /**
    * Called when the activity is first created.
@@ -44,16 +45,16 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     //embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
     embedMap.put("IMA Skip Ad (Google Provided)", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");  //Google provided
     embedMap.put("IMA Wrapper (Google Provided)", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");  //Google provided
+    embedMap.put(IMA_OVERRIDE_URL_FROM_CODE_LABEL, "Q0Y21vaToE56_FVxaLFoXZxJlc0YVoiY"); 
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
     embedAdapter.notifyDataSetChanged();
-
   }
 
   @Override
   public void onClick(View v) {
-    if (embedSpinner.getSelectedItem() == "IMA with Custom Ad Tag Parameters") {
+    if (embedSpinner.getSelectedItem().equals( "IMA with Custom Ad Tag Parameters" )) {
       Map<String, String> adTagParameters = new HashMap<String, String>();
 
       adTagParameters.put("vid", embedMap.get(embedSpinner.getSelectedItem()));
@@ -64,7 +65,12 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
 
       imaManager.setAdTagParameters(adTagParameters);
     }
+    else if (embedSpinner.getSelectedItem().equals( IMA_OVERRIDE_URL_FROM_CODE_LABEL )) {
+      imaManager.setAdUrlOverride("http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/40797597/test_preroll_only&ciu_szs&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]");
+      imaManager.setAdTagParameters(null);
+    }
     else {
+      imaManager.setAdUrlOverride(null);
       imaManager.setAdTagParameters(null);
     }
 
