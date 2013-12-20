@@ -1,8 +1,8 @@
 package com.ooyala.android;
 
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import java.net.URL;
 
 import android.annotation.TargetApi;
 import android.drm.DrmErrorEvent;
@@ -22,11 +22,12 @@ import com.ooyala.android.OoyalaPlayer.State;
 //the widevine player using the built in libraries, for honeycomb+
 @TargetApi(11)
 class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorListener,
-    DrmManagerClient.OnEventListener, DrmManagerClient.OnInfoListener {
+    DrmManagerClient.OnEventListener, DrmManagerClient.OnInfoListener, WidevineStuckMonitor.Listener {
 
+  private static final String TAG = "WidevineOsPlayer";
   private static DrmManagerClient _drmClient;
-
   private boolean _live = false;
+  private WidevineStuckMonitor _stuckMonitor; // prevent GCing it.
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -39,7 +40,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
        stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS);
     }
     if (stream == null) {
-      Log.e("Widevine", "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
+      Log.e(TAG, "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
@@ -57,7 +58,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     // need to be widevine:// vs http://
     URL streamURL = stream.decodedURL();
     if (streamURL == null) {
-      Log.e("Widevine", "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
+      Log.e(TAG, "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
@@ -100,11 +101,33 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     Set<Stream> newStreams = new HashSet<Stream>();
     newStreams.add(stream);
     super.init(parent, newStreams);
+    
+    _stuckMonitor = new WidevineStuckMonitor( parent, this, this );
+  }
+  
+  @Override
+  public void onFrozen() {
+    Log.v( TAG, "onFrozen(): posting the runnable" );
+    new Handler(Looper.getMainLooper()).post(new Runnable() {
+      @Override
+      public void run() {
+        Log.v( TAG, "onFrozen(): running the runnable" );
+        // shouldn't compete with an error state.
+        if( getState() != State.ERROR ) {
+          // per PB-373 not State.ERROR.
+          setState( State.COMPLETED );
+          // todo: does setState() do enough to make this reset() call make sense here?
+          // or will the monitor just immediately send onFrozen() again, and we really
+          // have to put this somewhere 'later'?
+          _stuckMonitor.reset();
+        }
+      }
+    });
   }
 
   @Override
   public void onError(DrmManagerClient client, DrmErrorEvent event) {
-    Log.d("Widevine", "WidevineError: " + eventToString(event));
+    Log.d(TAG, "WidevineError: " + eventToString(event));
 
     _error = Integer.toString(event.getType());
 
@@ -118,12 +141,12 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
   @Override
   public void onEvent(DrmManagerClient client, DrmEvent event) {
-    Log.d("Widevine", "WidevineEvent: " + eventToString(event));
+    Log.d(TAG, "WidevineEvent: " + eventToString(event));
   }
 
   @Override
   public void onInfo(DrmManagerClient client, DrmInfoEvent event) {
-    Log.d("Widevine", "WidevineInfoEvent: " + eventToString(event));
+    Log.d(TAG, "WidevineInfoEvent: " + eventToString(event));
   }
 
   @Override
@@ -175,5 +198,4 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   public SeekStyle getSeekStyle() {
     return SeekStyle.BASIC;
   }
-
 }
