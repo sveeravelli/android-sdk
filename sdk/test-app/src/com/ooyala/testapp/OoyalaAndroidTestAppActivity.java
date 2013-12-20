@@ -39,6 +39,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private String EMBEDCODE = "hhbjJqaTrEIpVo0GAigt0N0YX7LGrN0l";
   private String ACCOUNT_ID = "pbk-373@ooyala.com";
   private String PLAYERDOMAIN = "ooyala.com";
+  private boolean metadataReady = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
