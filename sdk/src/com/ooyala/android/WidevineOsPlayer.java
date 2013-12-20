@@ -106,6 +106,12 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   }
   
   @Override
+  public void destroy() {
+    _stuckMonitor.destroy();
+    super.destroy();
+  }
+  
+  @Override
   public void onFrozen() {
     Log.v( TAG, "onFrozen(): posting the runnable" );
     new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -116,7 +122,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
         if( getState() != State.ERROR ) {
           // per PB-373 not State.ERROR.
           setState( State.COMPLETED );
-          _stuckMonitor.reset();
+          _stuckMonitor = new WidevineStuckMonitor( _parent, WidevineOsPlayer.this, WidevineOsPlayer.this );
         }
       }
     });

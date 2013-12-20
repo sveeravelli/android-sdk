@@ -24,6 +24,7 @@ public final class WidevineStuckMonitor implements Observer {
   private static final int END_TIME_WINDOW_MILLISECONDS = 7000; // empirical heuristic!
   private static final int MAX_FREEZE_MILLISECONDS = 3000; // empirical heuristic!
   private final LogVToFile logger;
+  private final OoyalaPlayer ooyalaPlayer;
   private final Player drmPlayer;
   private final Listener listener;
   private final int monitorAfterMsec;
@@ -32,6 +33,7 @@ public final class WidevineStuckMonitor implements Observer {
   
   public WidevineStuckMonitor( final OoyalaPlayer ooyalaPlayer, final Player drmPlayer, final Listener listener ) {
     this.logger = new LogVToFile();
+    this.ooyalaPlayer = ooyalaPlayer;
     this.drmPlayer = drmPlayer;
     this.listener = listener;
     this.onFrozenSent = new AtomicBoolean();
@@ -39,7 +41,7 @@ public final class WidevineStuckMonitor implements Observer {
     // calculating this only once assumes the duration doesn't change during playback.
     final Integer oi = calculateMonitorAfterMsec( ooyalaPlayer.getCurrentItem() );
     if( oi != null ) {
-      ooyalaPlayer.addObserver( this );
+      this.ooyalaPlayer.addObserver( this );
       this.monitorAfterMsec = oi.intValue();
       logger.logV( TAG, "Constructor(): enabled, monitorAfterMsec=" + monitorAfterMsec );
     }
@@ -49,11 +51,16 @@ public final class WidevineStuckMonitor implements Observer {
     }
   }
   
+  public void destroy() {
+    ooyalaPlayer.deleteObserver( this );
+  }
+  
   // todo: double check / really figure out when the WidevineOsPlayer would best reset us.
   // probably when the player State changes to anything other than
   // the COMPLETE state it goes into onFrozen()?
   public void reset() {
     Log.v( TAG, "reset" );
+    ooyalaPlayer.addObserver( this );
     onFrozenSent.set( false );
   }
   
@@ -121,6 +128,7 @@ public final class WidevineStuckMonitor implements Observer {
   private void sendOnFrozen() {
     if( onFrozenSent.compareAndSet( false, true ) ) {
       logger.logV( TAG, "sendOnFrozen(): sending" );
+      ooyalaPlayer.deleteObserver( this );
       listener.onFrozen();
     }
   }
