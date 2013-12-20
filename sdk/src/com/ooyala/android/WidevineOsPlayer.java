@@ -116,9 +116,6 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
         if( getState() != State.ERROR ) {
           // per PB-373 not State.ERROR.
           setState( State.COMPLETED );
-          // todo: does setState() do enough to make this reset() call make sense here?
-          // or will the monitor just immediately send onFrozen() again, and we really
-          // have to put this somewhere 'later'?
           _stuckMonitor.reset();
         }
       }
