@@ -145,7 +145,7 @@ public final class WidevineStuckMonitor implements Observer {
       if( stream != null ) {
         try {
           stream.write( tag.getBytes() );
-          stream.write( "|".getBytes() );
+          stream.write( ": ".getBytes() );
           stream.write( msg.getBytes() );
           stream.write( System.getProperty("line.separator").getBytes() );
           stream.flush();
