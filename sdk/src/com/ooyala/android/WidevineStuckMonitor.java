@@ -23,8 +23,8 @@ public final class WidevineStuckMonitor implements Observer {
   }
   
   private static final String TAG = "WidevineStuckMonitor";
-  private static final int END_TIME_WINDOW_MILLISECONDS = 7000; // empirical heuristic!
-  private static final int MAX_FREEZE_MILLISECONDS = 3000; // empirical heuristic!
+  private static final int END_TIME_WINDOW_MILLISECONDS = 15*1000; // empirical heuristic!
+  private static final int MAX_FREEZE_MILLISECONDS = 2*1000; // empirical heuristic!
   private final LogVToFile logger;
   private final OoyalaPlayer ooyalaPlayer;
   private final Player drmPlayer;
