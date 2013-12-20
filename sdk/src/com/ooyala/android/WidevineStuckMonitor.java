@@ -96,6 +96,9 @@ public final class WidevineStuckMonitor implements Observer {
     if( drmPlayer.isPlaying() && notification.equals( OoyalaPlayer.TIME_CHANGED_NOTIFICATION ) ) {
       checkWhilePlaying();
     }
+    else if( notification.equals( OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION ) ) {
+      ooyalaPlayer.deleteObserver( this );
+    }
   }
   
   private void checkWhilePlaying() {
