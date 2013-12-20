@@ -13,6 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.view.inputmethod.InputMethodManager;
 
+/**
+ * Use your own custom embed and pcode to test
+ * Note that you will not be able to use assets with IMA or Freewheel ads since we don't load the manager classes.
+ */
 public class CustomEmbedInternalTestAppActivity extends BaseInternalTestAppActivity {
 //  From the BaseInternalTestAppActivity
 //  OptimizedOoyalaPlayerLayoutController playerLayoutController;
