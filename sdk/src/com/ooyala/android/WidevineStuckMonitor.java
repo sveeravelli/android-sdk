@@ -191,9 +191,7 @@ public final class WidevineStuckMonitor implements Observer {
     private static File getFullPath(final String fileName) {
       final File dir = Environment.getExternalStoragePublicDirectory(/*whatever!*/Environment.DIRECTORY_DOWNLOADS);
       final File file = new File(dir, fileName);
-      if (!file.getParentFile().mkdirs()) {
-          Log.e( TAG, "Directory " + dir + "/" + fileName + " not created");
-      }
+      file.getParentFile().mkdirs();
       return file;
     }
   }
