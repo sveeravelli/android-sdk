@@ -36,7 +36,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private String APIKEY = "";
   private String SECRET = "";
   private String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
-  private String EMBEDCODE = "hhbjJqaTrEIpVo0GAigt0N0YX7LGrN0l";
+  private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
   private String ACCOUNT_ID = "pbk-373@ooyala.com";
   private String PLAYERDOMAIN = "ooyala.com";
   private boolean metadataReady = false;
