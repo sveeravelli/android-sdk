@@ -36,6 +36,11 @@
             android:configChanges="keyboardHidden|orientation">
         </activity>
         <activity
+            android:name="com.ooyala.test.cases.CustomEmbedInternalTestAppActivity"
+            android:label="@string/customItemName"
+            android:configChanges="keyboardHidden|orientation">
+        </activity>
+        <activity
             android:name="com.ooyala.test.MainActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/app_name" >
