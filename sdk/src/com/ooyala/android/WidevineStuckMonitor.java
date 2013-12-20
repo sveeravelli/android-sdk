@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -131,7 +132,7 @@ public final class WidevineStuckMonitor implements Observer {
     private OutputStream stream;    
     public LogVToFile() {
       if( isExternalStorageWritable() ) {
-        final File file = getFullPath( "WidevineStuckMonitor.log" );
+        final File file = getFullPath( "WidevineStuckMonitor-" + new Date().getTime() + ".log" );
         try {
           stream = new BufferedOutputStream( new FileOutputStream( file ) );
         }
