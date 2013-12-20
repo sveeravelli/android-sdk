@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 public final class WidevineStuckMonitor implements Observer {
   
@@ -49,9 +51,11 @@ public final class WidevineStuckMonitor implements Observer {
       this.monitorAfterMsec = Integer.MAX_VALUE;
       logger.logV( TAG, "Constructor(): disabled, monitorAfterMsec=" + monitorAfterMsec );
     }
+    showToast( "constructed" );
   }
   
   public void destroy() {
+    showToast( "destroy" );
     ooyalaPlayer.deleteObserver( this );
   }
   
@@ -60,6 +64,7 @@ public final class WidevineStuckMonitor implements Observer {
   // the COMPLETE state it goes into onFrozen()?
   public void reset() {
     Log.v( TAG, "reset" );
+    showToast( "reset" );
     ooyalaPlayer.addObserver( this );
     onFrozenSent.set( false );
   }
@@ -76,6 +81,13 @@ public final class WidevineStuckMonitor implements Observer {
     }
     logger.logV( TAG, "calculaeMonitorAfterMsec(): duration=" + video.getDuration() + ", oi=" + oi );
     return oi;
+  }
+  
+  private void showToast( String msg ) {
+    final View layout = ooyalaPlayer.getLayout();
+    if( layout != null ) {
+      Toast.makeText( layout.getContext(), msg, Toast.LENGTH_SHORT ).show();
+    }
   }
   
   public void update( Observable o, Object arg ) {
@@ -98,6 +110,7 @@ public final class WidevineStuckMonitor implements Observer {
     logger.logV( TAG, "checkInWindow(): videoMsec=" + videoMsec + ", duration=" + drmPlayer.duration() + ", monitorAfterMsec=" + monitorAfterMsec + ", lastRecord=" + lastRecord );
     // regular playing, or ffwd, or rew:
     if( lastRecord == null ) {
+      showToast( "into window" );
       updateLastRecord( videoMsec );
     }
     else if( videoMsec != lastRecord.videoMsec ) {
@@ -128,6 +141,7 @@ public final class WidevineStuckMonitor implements Observer {
   private void sendOnFrozen() {
     if( onFrozenSent.compareAndSet( false, true ) ) {
       logger.logV( TAG, "sendOnFrozen(): sending" );
+      showToast( "FROZEN!" );
       ooyalaPlayer.deleteObserver( this );
       listener.onFrozen();
     }
