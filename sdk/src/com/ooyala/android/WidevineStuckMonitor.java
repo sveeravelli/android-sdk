@@ -52,6 +52,7 @@ public final class WidevineStuckMonitor implements Observer {
   // probably when the player State changes to anything other than
   // the COMPLETE state it goes into onFrozen()?
   public void reset() {
+    Log.v( TAG, "reset" );
     onFrozenSent.set( false );
   }
   
