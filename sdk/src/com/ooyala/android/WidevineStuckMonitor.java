@@ -56,6 +56,7 @@ public final class WidevineStuckMonitor implements Observer {
   
   public void destroy() {
     showToast( "destroy" );
+    logger.close();
     ooyalaPlayer.deleteObserver( this );
   }
   
@@ -164,6 +165,18 @@ public final class WidevineStuckMonitor implements Observer {
         catch( FileNotFoundException fnfe ) {
           stream = null;
         }
+      }
+    }
+    
+    public void close() {
+      if( stream != null ) {
+        try {
+          stream.close();
+        } 
+        catch( IOException ioe ) {
+          // don't care.
+        }
+        stream = null;
       }
     }
 
