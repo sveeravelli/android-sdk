@@ -122,7 +122,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
         if( getState() != State.ERROR ) {
           // per PB-373 not State.ERROR.
           setState( State.COMPLETED );
-          _stuckMonitor = new WidevineStuckMonitor( _parent, WidevineOsPlayer.this, WidevineOsPlayer.this );
+          _stuckMonitor.reset();
         }
       }
     });

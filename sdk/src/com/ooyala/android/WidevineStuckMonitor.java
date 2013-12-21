@@ -13,12 +13,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 public final class WidevineStuckMonitor implements Observer {
   
   public interface Listener {
+    /**
+     * When this Listener callback is invoked, the WidevineStuckMonitor
+     * will not detect any further freezes until reset() is called on it.
+     */
     void onFrozen();
   }
   
@@ -40,7 +42,8 @@ public final class WidevineStuckMonitor implements Observer {
     this.listener = listener;
     this.onFrozenSent = new AtomicBoolean();
     
-    // calculating this only once assumes the duration doesn't change during playback.
+    // note: calculating this only once assumes the duration doesn't change during playback.
+    // note: assumes getCurrentItem() matches the streams being used by the WidevineOsPlayer.
     final Integer oi = calculateMonitorAfterMsec( ooyalaPlayer.getCurrentItem() );
     if( oi != null ) {
       this.ooyalaPlayer.addObserver( this );
@@ -51,23 +54,17 @@ public final class WidevineStuckMonitor implements Observer {
       this.monitorAfterMsec = Integer.MAX_VALUE;
       logger.logV( TAG, "Constructor(): disabled, monitorAfterMsec=" + monitorAfterMsec );
     }
-    showToast( "constructed" );
   }
   
-  public void destroy() {
-    showToast( "destroy" );
-    logger.close();
-    ooyalaPlayer.deleteObserver( this );
-  }
-  
-  // todo: double check / really figure out when the WidevineOsPlayer would best reset us.
-  // probably when the player State changes to anything other than
-  // the COMPLETE state it goes into onFrozen()?
   public void reset() {
     Log.v( TAG, "reset" );
-    showToast( "reset" );
     ooyalaPlayer.addObserver( this );
     onFrozenSent.set( false );
+  }
+
+  public void destroy() {
+    ooyalaPlayer.deleteObserver( this );
+    logger.close();
   }
   
   private Integer calculateMonitorAfterMsec( final Video video ) {
@@ -84,27 +81,17 @@ public final class WidevineStuckMonitor implements Observer {
     return oi;
   }
   
-  private void showToast( String msg ) {
-    final View layout = ooyalaPlayer.getLayout();
-    if( layout != null ) {
-      Toast.makeText( layout.getContext(), msg, Toast.LENGTH_SHORT ).show();
-    }
-  }
-  
   public void update( Observable o, Object arg ) {
     final String notification = arg.toString();
     Log.v( TAG, "update(): isPlaying=" + drmPlayer.isPlaying() + ", notification=" + notification );
     if( drmPlayer.isPlaying() && notification.equals( OoyalaPlayer.TIME_CHANGED_NOTIFICATION ) ) {
       checkWhilePlaying();
     }
-    else if( notification.equals( OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION ) ) {
-      ooyalaPlayer.deleteObserver( this );
-    }
   }
   
   private void checkWhilePlaying() {
-    final int videoMsec = drmPlayer.currentTime();
-    Log.v( TAG, "checkWhilePlaying(): videoMsec=" + videoMsec + ", monitorAfterMsec=" + monitorAfterMsec );
+    final int videoMsec = drmPlayer.currentTime();    
+    Log.v( TAG, "checkWhilePlaying(): videoMsec=" + videoMsec + ", monitorAfterMsec=" + monitorAfterMsec );    
     if( videoMsec >= monitorAfterMsec ) {
       checkInWindow( videoMsec );
     }
@@ -113,11 +100,7 @@ public final class WidevineStuckMonitor implements Observer {
   private void checkInWindow( final int videoMsec ) {
     logger.logV( TAG, "checkInWindow(): videoMsec=" + videoMsec + ", duration=" + drmPlayer.duration() + ", monitorAfterMsec=" + monitorAfterMsec + ", lastRecord=" + lastRecord );
     // regular playing, or ffwd, or rew:
-    if( lastRecord == null ) {
-      showToast( "into window" );
-      updateLastRecord( videoMsec );
-    }
-    else if( videoMsec != lastRecord.videoMsec ) {
+    if( lastRecord == null || videoMsec != lastRecord.videoMsec ) {
       updateLastRecord( videoMsec );
     }
     // video playhead time is stuck:
@@ -145,7 +128,6 @@ public final class WidevineStuckMonitor implements Observer {
   private void sendOnFrozen() {
     if( onFrozenSent.compareAndSet( false, true ) ) {
       logger.logV( TAG, "sendOnFrozen(): sending" );
-      showToast( "FROZEN!" );
       ooyalaPlayer.deleteObserver( this );
       listener.onFrozen();
     }
