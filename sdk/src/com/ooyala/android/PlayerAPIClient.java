@@ -87,9 +87,12 @@ class PlayerAPIClient {
           "response invalid (nil).");
     }
     try {
-      if(!result.getString(Constants.KEY_MESSAGE).equals("OK") || result.getInt(Constants.KEY_EXPIRES) < System.currentTimeMillis()/1000  ) {
+      if(!result.getString(Constants.KEY_MESSAGE).equals("OK")) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
             "response code (" + result.getString(Constants.KEY_MESSAGE) + ").");
+      } else if(result.getInt(Constants.KEY_EXPIRES) < System.currentTimeMillis()/1000  ) {
+    	  throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
+    	          "response expired.");
       }
     } catch (JSONException e) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
