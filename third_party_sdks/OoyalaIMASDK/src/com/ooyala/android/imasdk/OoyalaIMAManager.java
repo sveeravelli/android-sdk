@@ -80,8 +80,8 @@ public class OoyalaIMAManager implements Observer {
       @Override
       public void onAdError(AdErrorEvent event) {
         Log.e(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
-        _player.skipAd();
-        _player.play();
+        Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+        _player.adPlayerCompleted();
       }
     } );
     
@@ -97,8 +97,8 @@ public class OoyalaIMAManager implements Observer {
           @Override
           public void onAdError(AdErrorEvent event) {
             Log.e(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
-            _player.skipAd();
-            _player.play();
+            Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+            _player.adPlayerCompleted();
           }
         } );
         
