@@ -71,11 +71,9 @@ public final class WidevineStuckMonitor implements Observer {
     Integer oi = null;
     if( video != null ) {
       int duration = video.getDuration();
-      if( duration > 0 ) {
-        // debatable: non-zero, even small, durations cause us to have a monitoring window.
+      if( duration > END_TIME_WINDOW_MILLISECONDS ) {
         oi = Math.max( 0, duration - END_TIME_WINDOW_MILLISECONDS );
       }
-      // debatable: non-positive duration means don't have a monitoring window.
     }
     logger.logV( TAG, "calculaeMonitorAfterMsec(): duration=" + video.getDuration() + ", oi=" + oi );
     return oi;
