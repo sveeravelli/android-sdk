@@ -12,6 +12,9 @@ import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class MoviePlayer extends Player implements Observer {
+  
+  private static final String TAG = "MoviePlayer";
+  
   private State _stateToResume = State.INIT;
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
@@ -175,7 +178,7 @@ public class MoviePlayer extends Player implements Observer {
 
   //Delegated to base player
   public void pause() { _basePlayer.pause(); }
-  public void play() { _basePlayer.play(); }
+  public void play() { Log.v( TAG, "play()" ); _basePlayer.play(); }
   public void stop() { _basePlayer.stop(); }
 
   public int currentTime() { return _basePlayer != null ? _basePlayer.currentTime() : 0; }
@@ -201,6 +204,7 @@ public class MoviePlayer extends Player implements Observer {
   }
 
   public String getError() { return _basePlayer != null ? _basePlayer.getError() : _error; }
+  public boolean isPlaying() { return _basePlayer != null ? _basePlayer.isPlaying() : false; }
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
   public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
 }

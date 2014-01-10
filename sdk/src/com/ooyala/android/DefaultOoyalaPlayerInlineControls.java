@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,9 @@ import com.ooyala.android.OoyalaPlayer.State;
 
 public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements
     SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
+  
+  private static final String TAG = "DefaultOoyalaPlayerInlineControls";
+  
   private LinearLayout _bottomBar = null;
   private LinearLayout _seekWrapper = null;
   private LinearLayout _liveWrapper = null;
@@ -205,6 +209,7 @@ public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlay
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
+    Log.v( TAG, "onStopTrackingTouch(): _wasPlaying=" + _wasPlaying + ", " + "percent=" + seekBar.getProgress() );
     _player.seekToPercent(seekBar.getProgress());
     update(null, null);
     _seeking = false;

@@ -796,6 +796,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if the current player is seekable, false if there is no current player or it is not seekable
    */
   public boolean seekable() {
+    Log.v( TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable=" + (currentPlayer() == null ? "false" : currentPlayer().seekable()) ); 
     return currentPlayer() != null && currentPlayer().seekable();
   }
 
@@ -804,12 +805,14 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @param timeInMillis in milliseconds
    */
   public void seek(int timeInMillis) {
+    Log.v( TAG, "seek()...: msec=" + timeInMillis );
     if (seekable()) {
       currentPlayer().seekToTime(timeInMillis);
       _queuedSeekTime = 0;
     } else {
       _queuedSeekTime = timeInMillis;
     }
+    Log.v( TAG, "...seek(): _queuedSeekTime=" + _queuedSeekTime );
   }
 
   private void addClosedCaptionsView() {
@@ -1224,10 +1227,12 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @param percent percent (between 0 and 100) to seek to
    */
   public void seekToPercent(int percent) {
+    Log.v( TAG, "seekToPercent()...: percent=" + percent );
     if (percent < 0 || percent > 100) { return; }
     if (seekable()) {
       seek(percentToMillis(percent));
     }
+    Log.v( TAG, "...seekToPercent()" );
   }
 
   /**
@@ -1333,6 +1338,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   }
 
   private void queuePlay() {
+    Log.v( TAG, "queuePlay()" );
     _playQueued = true;
   }
 

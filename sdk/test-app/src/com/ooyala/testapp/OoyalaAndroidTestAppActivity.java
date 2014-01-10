@@ -33,13 +33,12 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private Button insertAd;
   private Button setEmbed;
 
-  private String APIKEY = "l4cGYxOngWCpNkwu6BKkna3XCPa6.FkFdk";
-  private String SECRET = "gps8XQlMt2Qu5sQ0v7Km0b9sXWLnBB7zGbXiga3o";
-  private String PCODE = "l4cGYxOngWCpNkwu6BKkna3XCPa6";
-  private String EMBEDCODE = "J2MXl4ZjqXrUeKUkvXp8yXcxB6aQewHs";
-  private String ACCOUNT_ID = "playbackDemo";
-  private String PLAYERDOMAIN = "backlot.ooyala.com";
-
+  private String APIKEY = "";
+  private String SECRET = "";
+  private String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
+  private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
+  private String ACCOUNT_ID = "pbk-373@ooyala.com";
+  private String PLAYERDOMAIN = "ooyala.com";
   private boolean metadataReady = false;
 
   @Override
