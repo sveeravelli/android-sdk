@@ -107,7 +107,9 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   
   @Override
   public void destroy() {
-    _stuckMonitor.destroy();
+    if(_stuckMonitor != null) {
+      _stuckMonitor.destroy();
+    }
     super.destroy();
   }
   
