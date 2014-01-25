@@ -40,6 +40,8 @@ import com.ooyala.android.Video;
 public class OoyalaIMAManager implements Observer {
   private static String TAG = "OoyalaIMAManager";
 
+  public boolean _onAdError;
+
   protected AdsLoader _adsLoader;
   protected AdsManager _adsManager;
   protected AdDisplayContainer _container;
@@ -81,6 +83,7 @@ public class OoyalaIMAManager implements Observer {
       public void onAdError(AdErrorEvent event) {
         Log.e(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
         Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+        _onAdError = true;
         _player.adPlayerCompleted();
       }
     } );
@@ -98,6 +101,7 @@ public class OoyalaIMAManager implements Observer {
           public void onAdError(AdErrorEvent event) {
             Log.e(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
             Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+            _onAdError = true;
             _player.adPlayerCompleted();
           }
         } );
@@ -214,6 +218,8 @@ public class OoyalaIMAManager implements Observer {
     if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
       if (_adsManager != null) {
         _adsManager.destroy();
+        // after adsManager destroyed _adsManagerInited should be set to false since there is no adsManager now.
+        _adsManagerInited = false;
         _adsLoader.contentComplete();
       }
       _adsManager = null;

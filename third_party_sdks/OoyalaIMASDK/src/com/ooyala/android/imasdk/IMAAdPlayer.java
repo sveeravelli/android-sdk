@@ -27,8 +27,9 @@ public class IMAAdPlayer extends AdMoviePlayer {
     if ( ! (ad instanceof IIMAAdSpot) ) {
       this._error = "Invalid Ad";
       this._state = State.ERROR;
-    }
-    else {
+    } else if (((IIMAAdSpot)ad).getImaManager()._onAdError) {
+    	this._state = State.COMPLETED;
+    } else {
       _seekable = false;
       _ad = ad;
       super.init(parent, ((IIMAAdSpot)_ad).getStreams());
