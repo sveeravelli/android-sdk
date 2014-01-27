@@ -220,6 +220,7 @@ public class OoyalaIMAManager implements Observer {
         _adsManager.destroy();
         // after adsManager destroyed _adsManagerInited should be set to false since there is no adsManager now.
         _adsManagerInited = false;
+        _onAdError = false;
         _adsLoader.contentComplete();
       }
       _adsManager = null;
