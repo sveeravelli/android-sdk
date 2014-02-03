@@ -1152,9 +1152,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @param language 2 letter country code of the language to display or nil to hide closed captions
    */
   public void setClosedCaptionsLanguage(String language) {
-    if (_player == null) { return; }
     _language = language;
 
+    if (_player == null) { return; }
     //If we're given the "cc" language, we know it's live closed captions
     if(_language == LIVE_CLOSED_CAPIONS_LANGUAGE) {
       _player.setLiveClosedCaptionsEnabled(true);
