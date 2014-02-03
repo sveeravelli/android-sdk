@@ -21,7 +21,7 @@ import android.webkit.WebViewClient;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class Analytics {
-  
+
   private static final String TAG = "Analytics";
   private static final String TMP_PREFIX = "pb2823";
   private static final String TMP_EXT = ".html";
@@ -30,7 +30,7 @@ public class Analytics {
   private static final String EMBED_MODULEPARAMS_HTML =
       "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: reporter='+reporter);};</script></script></head><body onLoad=\"_init();\"></body></html>";
   private static int s_nextTmpId = 0;
-  
+
   private boolean _ready;
   private boolean _failed;
   private WebView _jsAnalytics;
@@ -38,7 +38,7 @@ public class Analytics {
   private String _defaultUserAgent = "";
   private String _userAgent = "";
   private TemporaryInternalStorageFileManager tmpBootHtmlFileManager;
-  
+
   private static String generateEmbedHTML(PlayerAPIClient api) {
 
     //If there is an account ID, add it to the Reporter.js initializer
@@ -78,7 +78,7 @@ public class Analytics {
       }
     }
   }
-  
+
   /**
    * Initialize an Analytics using the specified api
    * @param context the context the initialize the internal WebView with
@@ -97,7 +97,7 @@ public class Analytics {
     //compatible with old behavior.  only used for test..
     this(context, embedHTML, "http://www.ooyala.com/analytics.html");
   }
-  
+
   /**
    * Initialize an Analytics using the specified api and HTML (used internally)
    * @param context the context the initialize the internal WebView with
@@ -106,18 +106,18 @@ public class Analytics {
    */
   @SuppressLint("SetJavaScriptEnabled")
   private Analytics(Context context, String embedHTML, String embedDomain) {
-    
+
     tmpBootHtmlFileManager = new TemporaryInternalStorageFileManager();
-    
+
     _jsAnalytics = new WebView(context);
-    
+
     _defaultUserAgent = String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION,
         _jsAnalytics.getSettings().getUserAgentString());
     _userAgent = _defaultUserAgent;
     _jsAnalytics.getSettings().setUserAgentString(_defaultUserAgent);
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
     setAllowUniversalAccessFromFileURLs( _jsAnalytics.getSettings() );
-    
+
     _jsAnalytics.setWebViewClient( new WebViewClient() {
       @Override
       public void onPageFinished(WebView view, String url) {
@@ -136,13 +136,13 @@ public class Analytics {
         }
       }
     });
-    
+
     bootHtml( context, embedDomain, embedHTML );
 
     Log.d(TAG, "Initialized Analytics with user agent: "
         + _jsAnalytics.getSettings().getUserAgentString());
   }
-  
+
   private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
     // give dummy url to allow for cookie setting
     String url = "http://www.ooyala.com/analytics.html";
@@ -165,7 +165,7 @@ public class Analytics {
       Log.e( TAG, "failed: " + e.getStackTrace() );
     }
   }
-  
+
   private void loadTmpBootHtmlFile( final TemporaryInternalStorageFile tmpBootHtmlFile ) {
     final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
     Log.d( TAG, "trying to load: " + htmlUrlStr );

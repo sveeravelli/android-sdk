@@ -16,14 +16,14 @@ final public class TemporaryInternalStorageFile {
     tmpFile = File.createTempFile( prefix, ext, dir );
     if( tmpFile != null && ! tmpFile.exists() ) {
       tmpFile.createNewFile();
-    }    
-  } 
+    }
+  }
 
   public String getAbsolutePath() {
     return tmpFile == null ? "" : tmpFile.getAbsolutePath();
   }
 
-  public void write( final String body ) throws FileNotFoundException { 
+  public void write( final String body ) throws FileNotFoundException {
     if( tmpFile != null ) {
       final PrintWriter pw = new PrintWriter( tmpFile );
       pw.write( body );

@@ -16,12 +16,12 @@ final public class TemporaryInternalStorageFileManager {
   private static final String TAG = "TemporaryInternalStorageFiles";
   private static final String PRE_PRE_FIX = "OOTISF_";
   private static final long TMP_LIFESPAN_MSEC = 5 * 60 * 1000; // 5 minutes.
-  private static AtomicLong s_nextTmpId = new AtomicLong();  
+  private static AtomicLong s_nextTmpId = new AtomicLong();
 
-  public TemporaryInternalStorageFile next( final Context context, final String prefix, final String ext ) throws IOException {    
+  public TemporaryInternalStorageFile next( final Context context, final String prefix, final String ext ) throws IOException {
     cleanup( context );
     final long id = s_nextTmpId.getAndIncrement();
-    return new TemporaryInternalStorageFile( context, PRE_PRE_FIX + s_nextTmpId + "_" + prefix, ext );
+    return new TemporaryInternalStorageFile( context, PRE_PRE_FIX + s_nextTmpId.get() + "_" + prefix, ext );
   }
 
   public void cleanup( final Context context ) {
