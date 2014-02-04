@@ -7,16 +7,28 @@ import java.io.PrintWriter;
 
 import android.content.Context;
 
+/**
+ * This is a simple helper around a Java File, with the file parent directory always being
+ * the internal cache dir of the given Context.
+ */
 final public class TemporaryInternalStorageFile {
 
   private final File tmpFile;
 
+  /**
+   * Please create these via TemporaryInternalStorageFileManager to avoid file name collisions.
+   * @see TemporaryInternalStorageFileManager#next(Context, String, String)
+   */
   public TemporaryInternalStorageFile( final Context context, final String prefix, final String ext ) throws IOException {
     final File dir = context.getCacheDir();
     tmpFile = File.createTempFile( prefix, ext, dir );
     if( tmpFile != null && ! tmpFile.exists() ) {
       tmpFile.createNewFile();
     }
+  }
+
+  public File getFile() {
+    return tmpFile;
   }
 
   public String getAbsolutePath() {

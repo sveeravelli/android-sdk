@@ -1,20 +1,23 @@
 package com.ooyala.android;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,10 +29,9 @@ public class Analytics {
   private static final String TMP_PREFIX = "pb2823";
   private static final String TMP_EXT = ".html";
   private static final String EMBED_HTML =
-      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_');console.log('...onLoad: reporter='+reporter);};</script></script></head><body onLoad=\"_init();\"></body></html>";
+      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_');console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
   private static final String EMBED_MODULEPARAMS_HTML =
-      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: reporter='+reporter);};</script></script></head><body onLoad=\"_init();\"></body></html>";
-  private static int s_nextTmpId = 0;
+      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
 
   private boolean _ready;
   private boolean _failed;
@@ -65,13 +67,7 @@ public class Analytics {
         try {
           m.invoke( settings, true );
         }
-        catch (IllegalArgumentException e) {
-          Log.d( TAG, "failed: " + e.getStackTrace() );
-        }
-        catch (IllegalAccessException e) {
-          Log.d( TAG, "failed: " + e.getStackTrace() );
-        }
-        catch (InvocationTargetException e) {
+        catch (Exception e) {
           Log.d( TAG, "failed: " + e.getStackTrace() );
         }
         break;
@@ -137,6 +133,18 @@ public class Analytics {
       }
     });
 
+    _jsAnalytics.setWebChromeClient( new WebChromeClient() {
+      @Override
+      public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+        Log.v( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
+      }
+      @Override
+      public boolean onConsoleMessage(ConsoleMessage cm) {
+        onConsoleMessage( cm.message(), cm.lineNumber(), cm.sourceId() );
+        return true;
+      }
+    });
+
     bootHtml( context, embedDomain, embedHTML );
 
     Log.d(TAG, "Initialized Analytics with user agent: "
@@ -144,6 +152,7 @@ public class Analytics {
   }
 
   private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
+    /* TODO: can we remove this, or do we have trouble using file:// vis-a-vie base url and cookie domains?
     // give dummy url to allow for cookie setting
     String url = "http://www.ooyala.com/analytics.html";
 
@@ -153,6 +162,8 @@ public class Analytics {
       Log.v(TAG, "falling back to default analytics URL. " + url);
     }
 
+    _jsAnalytics.loadDataWithBaseURL(url, embedHTML, "text/html", "UTF-8", "");
+    */
     try {
       final TemporaryInternalStorageFile tmpBootHtmlFile = tmpBootHtmlFileManager.next( context, TMP_PREFIX, TMP_EXT );
       tmpBootHtmlFile.write( embedHTML );
@@ -169,6 +180,13 @@ public class Analytics {
   private void loadTmpBootHtmlFile( final TemporaryInternalStorageFile tmpBootHtmlFile ) {
     final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
     Log.d( TAG, "trying to load: " + htmlUrlStr );
+
+    try {
+      final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
+      try { while( true ) { Log.d( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
+    }
+    catch( FileNotFoundException e ) { }
+
     _jsAnalytics.loadUrl( htmlUrlStr );
   }
 
