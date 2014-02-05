@@ -147,6 +147,7 @@ public class OoyalaFreewheelManager implements Observer {
   private void currentItemChanged() {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
+    _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
 
     if (_player.getCurrentItem().getModuleData() != null &&
         _player.getCurrentItem().getModuleData().get("freewheel-ads-manager") != null &&
