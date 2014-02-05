@@ -58,6 +58,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static final String ERROR_NOTIFICATION = "error";
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
+  public static final String SEEK_COMPLETED_NOTIFICATION = "seekCompleted";
   public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
   public static final String AD_STARTED_NOTIFICATION = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
@@ -1498,8 +1499,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public SeekStyle getSeekStyle() {
     if (getBasePlayer() != null) {
       return getBasePlayer().getSeekStyle();
-    } else {
+    } else if (currentPlayer() != null){
       return currentPlayer().getSeekStyle();
+    } else {
+      Log.w(this.getClass().toString(), "We are seeking without a player!");
+      return SeekStyle.NONE;
     }
   }
 

@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Observable;
 import java.util.Set;
 
 import android.annotation.TargetApi;
@@ -28,6 +29,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   private static DrmManagerClient _drmClient;
   private boolean _live = false;
   private WidevineStuckMonitor _stuckMonitor; // prevent GCing it.
+  private boolean isSeeking = false;
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -101,10 +103,20 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     Set<Stream> newStreams = new HashSet<Stream>();
     newStreams.add(stream);
     super.init(parent, newStreams);
-    
+
     _stuckMonitor = new WidevineStuckMonitor( parent, this, this );
   }
-  
+
+  @Override
+  public void update(Observable arg0, Object arg) {
+
+    if(arg == OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION) {
+      isSeeking = false;
+      Log.d(TAG, "Seek completed. Re-enabling seeking");
+    }
+    super.update(arg0, arg);
+  }
+
   @Override
   public void destroy() {
     if(_stuckMonitor != null) {
@@ -112,7 +124,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     }
     super.destroy();
   }
-  
+
   @Override
   public void onFrozen() {
     Log.v( TAG, "onFrozen(): posting the runnable" );
@@ -158,7 +170,16 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   // Disable seeking in Live mode
   public void seekToTime(int timeInMillis) {
     if (_live) return;
-    super.seekToTime(timeInMillis);
+
+    //Widevine has a nasty asynchronous seek that queues up very fast seeks.  We have to make sure Widevine doesn't get overwhelmed by
+    //too many seek calls.
+    if (!isSeeking) {
+      Log.d(TAG, "Seek started. Disabling seeking");
+      super.seekToTime(timeInMillis);
+      isSeeking = true;
+    } else {
+      Log.i(TAG, "Trying to seek while already seeking, dropping the incoming seek");
+    }
   }
 
   private static String eventToString(DrmEvent e) {
