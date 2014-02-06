@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+        <PreferenceCategory
+        android:title="@string/category_title_close_captions">
+        
+        <CheckBoxPreference
+            android:title="@string/title_checkbox_close_captions"
+            android:defaultValue="false"
+            android:key="@string/key_checkbox_close_captions" />
+        
+        <ListPreference android:title="@string/title_list_close_captions"
+			android:key="@string/key_list_close_captions" >				
+			</ListPreference>
+		
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="@string/category_title_subtitles">
+        
+        <CheckBoxPreference
+            android:title="@string/title_checkbox_subtitles"
+            android:defaultValue="false"
+            android:key="@string/key_checkbox_subtitles" />
+        
+        <ListPreference android:title="@string/title_list_subtitles"
+			android:key="@string/key_list_subtitles" >				
+			</ListPreference>
+			
+        <EditTextPreference android:key="@string/key_custom_subtitles" 
+			android:title="@string/title_custom_subtitles"
+			android:dialogTitle="@string/title_custom_subtitles"/>
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="@string/category_title_audio_languages">
+        
+        <ListPreference android:title="@string/title_list_audio_languages"
+			android:key="@string/key_list_audio_languages" >				
+			</ListPreference>
+    </PreferenceCategory>
+    
+    
+</PreferenceScreen>
