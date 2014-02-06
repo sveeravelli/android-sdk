@@ -797,7 +797,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    * @return true if the current player is seekable, false if there is no current player or it is not seekable
    */
   public boolean seekable() {
-    Log.v( TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable=" + (currentPlayer() == null ? "false" : currentPlayer().seekable()) ); 
+    Log.v( TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable=" + (currentPlayer() == null ? "false" : currentPlayer().seekable()) );
     return currentPlayer() != null && currentPlayer().seekable();
   }
 
