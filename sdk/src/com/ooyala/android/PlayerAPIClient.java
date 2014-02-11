@@ -94,6 +94,9 @@ class PlayerAPIClient {
     	  throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
     	          "response expired.");
       }
+      if (!result.isNull(Constants.KEY_AUTH_TOKEN)) {
+          setAuthToken(result.getString(Constants.KEY_AUTH_TOKEN));
+      }
     } catch (JSONException e) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
           "response invalid (error).");
