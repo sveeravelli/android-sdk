@@ -222,9 +222,6 @@ public class Analytics {
     } else {
       _jsAnalytics.loadUrl(action);
     }
-
-    _jsAnalytics.loadUrl( "javascript:console.log( reporter );" );
-    _jsAnalytics.loadUrl( "javascript:console.log( " + time + " );" );
   }
 
   /**
