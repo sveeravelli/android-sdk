@@ -175,6 +175,7 @@ class Constants {
   public static final String DELIVERY_TYPE_WV_MP4 = "wv_mp4";
   public static final String DELIVERY_TYPE_WV_WVM = "wv_wvm";
   public static final String DELIVERY_TYPE_WV_HLS = "wv_hls";
+  public static final String DELIVERY_TYPE_SMOOTH = "smooth";
   public static final String DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS = "akamai_hd2_vod_hls";
 
   public static final String PROFILE_BASELINE = "baseline";

@@ -12,9 +12,9 @@ import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class MoviePlayer extends Player implements Observer {
-  
+
   private static final String TAG = "MoviePlayer";
-  
+
   private State _stateToResume = State.INIT;
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
@@ -30,20 +30,23 @@ public class MoviePlayer extends Player implements Observer {
    */
   private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
     StreamPlayer player = null;
+
+    // If custom HLS Player is enabled, and one of the following:
+    //   1.) Delivery type is HLS
+    //   2.) Delivery type is Remote Asset, and the url contains .m3u8
+    //   3.) Delivery type is Smooth streaming
+    // use VisualOn
+    boolean isHls = Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS);
+    boolean isRemoteHls = Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
+        Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains("m3u8");
+    boolean isSmooth = Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_SMOOTH);
+    boolean isRemoteSmooth = Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
+        Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains(".ism");
+
     if( streams == null || streams.size() == 0 ) {
       player = new EmptyStreamPlayer();
     }
-    // If custom HLS Player is enabled, and one of the following:
-    //   1.) Delviery type is HLS
-    //   2.) Delviery type is Remote Asset, and the url contains .m3u8
-    // use VisualOn
-    else if (OoyalaPlayer.enableCustomHLSPlayer &&
-        (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS) ||
-         (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
-          Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).decodedURL()
-            .toString().contains("m3u8"))
-        )
-       ) {
+    else if (OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls || isSmooth || isRemoteSmooth)) {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(Constants.VISUALON_PLAYER).newInstance();
       } catch(Exception e) {

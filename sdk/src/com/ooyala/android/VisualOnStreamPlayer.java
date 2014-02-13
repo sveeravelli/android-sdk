@@ -1,6 +1,7 @@
 package com.ooyala.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -25,9 +27,29 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.discretix.drmdlc.api.DxDrmDlc;
+import com.discretix.drmdlc.api.DxLogConfig;
+import com.discretix.drmdlc.api.IDxDrmDlc;
+import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
+import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
+import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
+import com.discretix.drmdlc.api.exceptions.DrmNotProtectedException;
+import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
+import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
+import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
+import com.discretix.vodx.VODXPlayer;
+import com.discretix.vodx.VODXPlayerImpl;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.visualon.VisualOnUtils;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
+import com.visualon.OSMPPlayer.VOCommonPlayerListener;
+import com.visualon.OSMPPlayer.VOOSMPInitParam;
+import com.visualon.OSMPPlayer.VOOSMPOpenParam;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_PLAYER_ENGINE;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_RETURN_CODE;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_SRC_FLAG;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_SRC_FORMAT;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleDisplayInfo;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfo;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfoEntry;
@@ -42,11 +64,10 @@ import com.visualon.OSMPUtils.voOSType;
  * http://developer.android.com/guide/appendix/media-formats.html
  */
 class VisualOnStreamPlayer extends StreamPlayer implements
-    voOSBasePlayer.onEventListener, voOSBasePlayer.onRequestListener,
-    SurfaceHolder.Callback {
+  VOCommonPlayerListener, voOSBasePlayer.onRequestListener, SurfaceHolder.Callback {
   private static final String TAG = "VisualOnStreamPlayer";
 
-  protected voOSBasePlayer _player = null;
+  protected VODXPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
   protected int _videoWidth = 16;
@@ -90,10 +111,10 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       if (_player == null)
         return;
 
-      if (_lastPlayhead != _player.GetPos()) {
+      if (_lastPlayhead != _player.getPosition()) {
         _playheadUpdateTimerHandler.sendEmptyMessage(0);
       }
-      _lastPlayhead = _player.GetPos();
+      _lastPlayhead = (int) _player.getPosition();
     }
   }
 
@@ -135,13 +156,21 @@ class VisualOnStreamPlayer extends StreamPlayer implements
 
     setState(State.LOADING);
     _streamUrl = stream.decodedURL().toString();
-    setParent(parent);
 
+    setParent(parent);
 
     // Copy license file,
     copyfile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
     copyfile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
+    //TODO: streamIsProtected doesn't work correctly
+    if (stream.getDeliveryType().equals("smooth") || streamIsProtected(_streamUrl)){
+      boolean success = false;
+      String localFile = downloadFile(_streamUrl);
+      if (localFile != null) success = getPersonalization();
+      if (success) success = acquireRights(localFile);
+      if (!success) Log.e(TAG, "Access Rights failed!");
+    }
 
     setupView();
   }
@@ -152,7 +181,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     switch (_state) {
     case PLAYING:
       stopPlayheadTimer();
-      _player.Pause();
+      _player.pause();
       setState(State.PAUSED);
     default:
       break;
@@ -173,11 +202,11 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     case COMPLETED:
       Log.v(TAG, "Play: ready - about to run");
       if (_timeBeforeSuspend >=0 ) {
-        _player.SetPos(_timeBeforeSuspend);
+        _player.setPosition(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
       }
-      int nRet = _player.Run();
-      if (nRet == voOSType.VOOSMP_ERR_None) {
+      VO_OSMP_RETURN_CODE nRet = _player.start();
+      if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         Log.v(TAG, "MediaPlayer run.");
       } else {
         onError(_player, nRet, 0);
@@ -200,8 +229,8 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     Log.v(TAG, "MediaPlayer stopped.");
     stopPlayheadTimer();
     _playQueued = false;
-    _player.Stop();
-    _player.Close();
+    _player.stop();
+    _player.close();
   }
 
   @Override
@@ -225,7 +254,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       break;
     }
     //Log.v(TAG, "currentTime: " + _player.GetPos());
-    return _player.GetPos();
+    return (int) _player.getPosition();
   }
 
   @Override
@@ -242,12 +271,23 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       break;
     }
     //Log.v(TAG, "currentDuration: " + _player.GetDuration());
-    return _player.GetDuration();
+    return (int) _player.getDuration();
   }
 
   @Override
   public int buffer() {
     return this._buffer;
+  }
+
+  //Sets enablement of live CC, which is checked every time VisualOn recieves CC data on stream
+  @Override
+  public void setLiveClosedCaptionsEnabled(boolean enabled){
+    _isLiveClosedCaptionsEnabled = enabled;
+  }
+
+  @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    return _isLiveClosedCaptionsAvailable;
   }
 
   @Override
@@ -256,17 +296,117 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       return;
     }
     Log.d(TAG, "Seeking to "+timeInMillis);
-    _player.SetPos(timeInMillis);
+    _player.setPosition(timeInMillis);
+  }
+
+  protected String downloadFile(String streamUrl) {
+    String contentDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Ooyala_SecurePlayer";
+    String localFile = String.format("%s/%s", contentDir, _parent.getEmbedCode());
+    try {
+      //Create content directory.
+      if (new File(contentDir).mkdirs() == false){
+        if (new File(contentDir).exists() == false){
+          Log.e(TAG, "Cannot create content directory on SD-CARD");
+        }
+      }
+      VisualOnUtils.DownloadFile(streamUrl, localFile);
+      return localFile;
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  protected boolean getPersonalization() {
+    boolean success = true;
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+
+    String PERSONALIZATION_URL = "172.16.8.137:8000/Personalization";
+    String SESSION_ID = "session";
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+
+      dlc.getDebugInterface().setClientSideTestPersonalization(true);
+      //Check for verification.
+      if (!dlc.personalizationVerify()) {
+        dlc.performPersonalization(OoyalaPlayer.getVersion(), PERSONALIZATION_URL, SESSION_ID);
+      } else {
+        Log.d(TAG, "Device is already personalized");
+      }
+    } catch (DrmGeneralFailureException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmUpdateRequiredException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmNotSupportedException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+      success = false;
+    }
+    return success;
+  }
+
+  protected boolean acquireRights(String localFilename) {
+    boolean success = true;
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+      String customData = "Unlimited";
+      String customUrl = null;
+
+      dlc.acquireRights(localFilename, customData, customUrl);
+      dlc.setCookies(null);
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (IOException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmGeneralFailureException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmNotProtectedException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmInvalidFormatException e) {
+      e.printStackTrace();
+      success = false;
+    } catch (DrmServerSoapErrorException e) {
+      e.printStackTrace();
+      success = false;
+    }
+
+    return success;
+  }
+
+  protected boolean streamIsProtected(String streamUrl) {
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    boolean isDrmContent = false;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+      isDrmContent = dlc.isDrmContent(streamUrl);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+    }
+    return isDrmContent;
   }
 
   protected void createMediaPlayer() {
     try {
       if (_player == null) {
-        _player = new voOSBasePlayer();
+        _player = new VODXPlayerImpl();
       } else {
 
     	  Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
-        _player.Uninit();
+        _player.destroy();
         return;
       }
 
@@ -277,9 +417,11 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
 
       // Initialize SDK player
-      int nRet = _player.Init(_parent.getLayout().getContext(), apkPath, null,
-          nParam, 0, 0);
-      if (nRet == voOSType.VOOSMP_ERR_None) {
+      VOOSMPInitParam initParam = new VOOSMPInitParam();
+      initParam.setLibraryPath(apkPath);
+      initParam.setContext(_parent.getLayout().getContext());
+      VO_OSMP_RETURN_CODE nRet = _player.init(VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER, initParam);
+      if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         Log.v(TAG, "MediaPlayer is created.");
       } else {
         onError(_player, nRet, 0);
@@ -291,18 +433,18 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       Display display = wm.getDefaultDisplay();
       display.getMetrics(dm);
 
-      _player.SetDisplaySize(dm.widthPixels, dm.heightPixels);
-      _player.SetView(_view);
+      _player.setViewSize(dm.widthPixels, dm.heightPixels);
+      _player.setView(_view);
       // Register SDK event listener
-      _player.setEventListener(this);
+      _player.setOnEventListener(this);
 
       /* Configure DRM parameters */
-      _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
-      _player.SetParam(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
+      _player.setParameter(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
+      _player.setParameter(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
 
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
-      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
+      _player.setParameter(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
       //Setup license content, or screen can green flicker.
       InputStream is = null;
       byte[] b = new byte[32*1024];
@@ -313,24 +455,23 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       } catch (IOException e) {
           e.printStackTrace();
       }
-      _player.SetParam(voOSType.VOOSMP_PID_LICENSE_CONTENT, b);
+      _player.setParameter(voOSType.VOOSMP_PID_LICENSE_CONTENT, b);
 
       /* Configure Dolby Audio Effect parameters */
-      _player.SetParam(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
+      _player.setParameter(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
 
       // Enable CC
-      _player.SetParam(voOSType.VOOSMP_PID_CLOSED_CAPTION_OUTPUT, 1);
+      _player.setParameter(voOSType.VOOSMP_PID_CLOSED_CAPTION_OUTPUT, 1);
 
       /* Processor-specific settings */
         String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
         String capFile = cfgPath + "cap.xml";
-        _player.SetParam(voOSType.VOOSMP_SRC_PID_CAP_TABLE_PATH, capFile);
+        _player.setParameter(voOSType.VOOSMP_SRC_PID_CAP_TABLE_PATH, capFile);
 
         //Open then run the player
-        nRet = _player.Open(
-            _streamUrl,
-            voOSType.VOOSMP_FLAG_SOURCE_URL | voOSType.VOOSMP_FLAG_SOURCE_OPEN_ASYNC, 0, 0, 0);
-          if (nRet == voOSType.VOOSMP_ERR_None) {
+        VOOSMPOpenParam openParam = new VOOSMPOpenParam();
+        nRet = _player.open(_streamUrl, VO_OSMP_SRC_FLAG.VO_OSMP_FLAG_SRC_OPEN_ASYNC, VO_OSMP_SRC_FORMAT.VO_OSMP_SRC_AUTO_DETECT, openParam);
+        if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
             Log.v(TAG, "MediaPlayer is Opened.");
           } else {
 
@@ -343,7 +484,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       t.printStackTrace(); }
   }
 
-  public boolean onError(voOSBasePlayer mp, int what, int extra) {
+  public boolean onError(VODXPlayer mp, VO_OSMP_RETURN_CODE what, int extra) {
     this._error = "voOSPBasePlayer Error: " + what + " " + extra;
     setState(State.ERROR);
     return false;
@@ -359,7 +500,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
             ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
     if (_player != null) {
-    	_player.SetParam(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+    	_player.setParameter(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
     }
 
   }
@@ -371,7 +512,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     if (_player !=null)
     {
       // If SDK player already exists, show media controls
-      _player.SetParam(voOSType.VOOSMP_PID_VIEW_ACTIVE, _view);
+      _player.setParameter(voOSType.VOOSMP_PID_VIEW_ACTIVE, _view);
       return;
     }
 
@@ -382,8 +523,8 @@ class VisualOnStreamPlayer extends StreamPlayer implements
   public void surfaceDestroyed(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Destroyed");
     if (_player != null) {
-      _player.Stop();
-      _player.SetView(null);
+      _player.stop();
+      _player.setView(null);
     }
   }
 
@@ -455,7 +596,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
 
   @Override
   public void suspend() {
-    suspend(_player != null ? _player.GetPos() : 0, _state);
+    suspend(_player != null ? (int)_player.getPosition() : 0, _state);
   }
 
   @Override
@@ -468,8 +609,8 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
       stop();
-      _player.SetView(null);
-      _player.Uninit();
+      _player.setView(null);
+      _player.destroy();
       _player = null;
     }
     removeView();
@@ -500,7 +641,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
   public void destroy() {
     if (_player != null) {
       stop();
-      _player.Uninit();
+      _player.destroy();
       _player = null;
     }
     removeView();
@@ -582,141 +723,17 @@ class VisualOnStreamPlayer extends StreamPlayer implements
   }
 
   @Override
-  public int onEvent(int id, int param1, int param2, Object obj) {
+  public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj) {
 
     // After createMediaPlayer
-    if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
+    if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_OPEN_FINISHED ) {
       setState(State.READY);
-    }
-    else if (id == voOSType.VOOSMP_SRC_CB_Adaptive_Streaming_Info) {
-
-        _view.setLayoutParams(new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
-
-        switch (param1) {
-      case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-        Log.v(
-            TAG,
-            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . "
-                + param2);
-
-
-        break;
-      }
-      case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-        Log.v(
-            TAG,
-            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . "
-                + param2);
-
-        switch (param2) {
-        case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-          Log.v(
-              TAG,
-              "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
-          break;
-        }
-        case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-          Log.v(
-              TAG,
-              "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
-          break;
-        }
-        case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-          Log.v(
-              TAG,
-              "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
-          break;
-        }
-        }
-        break;
-      }
-      }
-    } else if (id == voOSType.VOOSMP_CB_Error) // Error
-    {
-      // Display error dialog and stop player
-      Log.e(TAG, "onEvent: Error. " + param1);
-      onError(_player, 1, 0);
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_PlayComplete) {
-      Log.d(TAG, "onEvent: Play Complete");
-      currentItemCompleted();
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_SeekComplete) // Seek (SetPos) complete
-    {
-      Log.d(TAG, "onEvent: Seek Complete");
-      dequeuePlay();
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_BufferStatus) // Updated buffer status
-    {
-      this._buffer = param1;
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoSizeChanged) // Video size changed
-    {
-
-      _videoWidth = param1;
-      _videoHeight = param2;
-      Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
-
-      _view.setLayoutParams(new FrameLayout.LayoutParams(
-              ViewGroup.LayoutParams.MATCH_PARENT,
-              ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoStopBuff) // Video buffering stop
-    {
-      Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
-      return 0;
-    } else if (id == voOSType.VOOSMP_CB_VideoStartBuff) // Video buffering start
-    {
-      Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
-      return 0;
-    } else if (id == voOSType.VOOSMP_SRC_CB_Connection_Fail
-        || id == voOSType.VOOSMP_SRC_CB_Download_Fail
-        || id == voOSType.VOOSMP_SRC_CB_DRM_Fail
-        || id == voOSType.VOOSMP_SRC_CB_Playlist_Parse_Err
-        || id == voOSType.VOOSMP_SRC_CB_Connection_Rejected
-        || id == voOSType.VOOSMP_SRC_CB_DRM_Not_Secure
-        || id == voOSType.VOOSMP_SRC_CB_DRM_AV_Out_Fail) // Errors
-    {
-      // Display error dialog and stop player
-      onError(_player, id, 0);
-
-    } else if (id == voOSType.VOOSMP_SRC_CB_BA_Happened) // Unimplemented
-    {
-      Log.v(TAG, "OnEvent VOOSMP_SRC_CB_BA_Happened, param is %d . " + param1);
-    } else if (id == voOSType.VOOSMP_SRC_CB_Download_Fail_Waiting_Recover) {
-      Log.v(TAG,
-          "OnEvent VOOSMP_SRC_CB_Download_Fail_Waiting_Recover, param is %d . "
-              + param1);
-    } else if (id == voOSType.VOOSMP_SRC_CB_Download_Fail_Recover_Success) {
-      Log.v(TAG,
-          "OnEvent VOOSMP_SRC_CB_Download_Fail_Recover_Success, param is %d . "
-              + param1);
-    } else if (id == voOSType.VOOSMP_SRC_CB_Open_Finished) {
-      Log.d(TAG, "OnEvent VOOSMP_SRC_CB_Open_Finished, param is %d . " + param1);
-    } else if (id == voOSType.VOOSMP_CB_ClosedCaptionData) { //CC data
-
-      // Remember if we have received live closed captions at some point during playback
-      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
-      voSubtitleInfo info = (voSubtitleInfo)obj;
-      String cc = GetCCString(info);
-      if (!cc.equals("")) {
-        _isLiveClosedCaptionsAvailable = true;
-      }
-
-      //Show closed captions if someone enabled them
-      if (_isLiveClosedCaptionsEnabled) {
-        _parent.displayClosedCaptionText(cc);
-      }
     } else {
     Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
           + param1 + ", " + param2);
     }
 
-    return 0;
+    return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
   }
 
 	/* Extract text string from CC data. Does not handle position, color, font type, etc. */
@@ -764,15 +781,11 @@ class VisualOnStreamPlayer extends StreamPlayer implements
 		return strTextAll;
 	}
 
-	//Sets enablement of live CC, which is checked every time VisualOn recieves CC data on stream
-  @Override
-  public void setLiveClosedCaptionsEnabled(boolean enabled){
-    _isLiveClosedCaptionsEnabled = enabled;
-  }
 
-	@Override
-	public boolean isLiveClosedCaptionsAvailable() {
-	  return _isLiveClosedCaptionsAvailable;
-	}
+  @Override
+  public VO_OSMP_RETURN_CODE onVOSyncEvent(VO_OSMP_CB_SYNC_EVENT_ID arg0,
+      int arg1, int arg2, Object arg3) {
+    return null;
+  }
 
 }

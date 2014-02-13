@@ -17,8 +17,13 @@ public class DefaultPlayerInfo implements PlayerInfo {
       supportedFormats.add("mp4");
       supportedFormats.add("wv_mp4");
 
-      if (OoyalaPlayer.enableHLS || OoyalaPlayer.enableCustomHLSPlayer) {
+      if (OoyalaPlayer.enableHLS) {
         supportedFormats.add("m3u8");
+      }
+
+      if (OoyalaPlayer.enableCustomHLSPlayer) {
+        supportedFormats.add("m3u8");
+        supportedFormats.add("smooth");
       }
 
       if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
