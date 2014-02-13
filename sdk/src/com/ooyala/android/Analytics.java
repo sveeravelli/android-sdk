@@ -2,8 +2,9 @@ package com.ooyala.android;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +29,6 @@ public class Analytics {
   private static final String TAG = "Analytics";
   private static final String TMP_PREFIX = "pb2823";
   private static final String TMP_EXT = ".html";
-  private static final String EMBED_HTML =
-      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_');console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
   private static final String EMBED_MODULEPARAMS_HTML =
       "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
 
@@ -43,22 +42,27 @@ public class Analytics {
 
   private static String generateEmbedHTML(PlayerAPIClient api) {
 
+    final Map<String, String> moduleParams = new HashMap<String, String>();
+
+    String url = "http://www.ooyala.com/analytics.html";
+    try {
+      url = new URL("http", api.getDomain(), "/").toString();
+    }
+    catch (MalformedURLException e) {
+      System.out.println("falling back to default analytics URL " + url);
+    }
+    moduleParams.put(Constants.JS_ANALYTICS_DOCUMENT_URL, url);
+
     //If there is an account ID, add it to the Reporter.js initializer
     if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
-      Map<String, String> moduleParams = new HashMap<String, String>();
       moduleParams.put(Constants.JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
-
-      return EMBED_MODULEPARAMS_HTML
-          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
-          .replaceAll("_PCODE_", api.getPcode())
-          .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
-    } else {
-      return EMBED_HTML
-          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
-          .replaceAll("_PCODE_", api.getPcode());
     }
+
+    return EMBED_MODULEPARAMS_HTML
+        .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
+        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
+        .replaceAll("_PCODE_", api.getPcode())
+        .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
   }
 
   private static void setAllowUniversalAccessFromFileURLs( final WebSettings settings ) {
@@ -152,18 +156,6 @@ public class Analytics {
   }
 
   private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
-    /* TODO: can we remove this, or do we have trouble using file:// vis-a-vie base url and cookie domains?
-    // give dummy url to allow for cookie setting
-    String url = "http://www.ooyala.com/analytics.html";
-
-    try {
-      url = new URL("http", embedDomain, "/").toString();
-    } catch (MalformedURLException e) {
-      Log.v(TAG, "falling back to default analytics URL. " + url);
-    }
-
-    _jsAnalytics.loadDataWithBaseURL(url, embedHTML, "text/html", "UTF-8", "");
-    */
     try {
       final TemporaryInternalStorageFile tmpBootHtmlFile = tmpBootHtmlFileManager.next( context, TMP_PREFIX, TMP_EXT );
       tmpBootHtmlFile.write( embedHTML );
@@ -230,6 +222,9 @@ public class Analytics {
     } else {
       _jsAnalytics.loadUrl(action);
     }
+
+    _jsAnalytics.loadUrl( "javascript:console.log( reporter );" );
+    _jsAnalytics.loadUrl( "javascript:console.log( " + time + " );" );
   }
 
   /**
