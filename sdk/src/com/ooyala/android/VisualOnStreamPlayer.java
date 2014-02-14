@@ -63,13 +63,14 @@ import com.visualon.OSMPUtils.voOSType;
  * For a list of Android supported media formats, see:
  * http://developer.android.com/guide/appendix/media-formats.html
  */
-class VisualOnStreamPlayer extends StreamPlayer implements
+public class VisualOnStreamPlayer extends StreamPlayer implements
   VOCommonPlayerListener, voOSBasePlayer.onRequestListener, SurfaceHolder.Callback {
   private static final String TAG = "VisualOnStreamPlayer";
 
   protected VODXPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
+  private String _localFilePath;
   protected int _videoWidth = 16;
   protected int _videoHeight = 9;
 
@@ -166,9 +167,9 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     //TODO: streamIsProtected doesn't work correctly
     if (stream.getDeliveryType().equals("smooth") || streamIsProtected(_streamUrl)){
       boolean success = false;
-      String localFile = downloadFile(_streamUrl);
-      if (localFile != null) success = getPersonalization();
-      if (success) success = acquireRights(localFile);
+      _localFilePath = downloadFile(_streamUrl);
+      if (_localFilePath != null) success = getPersonalization();
+      if (success) success = acquireRights(_localFilePath);
       if (!success) Log.e(TAG, "Access Rights failed!");
     }
 
@@ -200,6 +201,13 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     case PAUSED:
     case READY:
     case COMPLETED:
+      boolean success = acquireRights(_localFilePath);
+      if(!success) {
+        Log.e(TAG, "Rights acquisition failed!");
+        onError(_player, VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE, 0);
+        return;
+      }
+
       Log.v(TAG, "Play: ready - about to run");
       if (_timeBeforeSuspend >=0 ) {
         _player.setPosition(_timeBeforeSuspend);
@@ -358,9 +366,10 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
       String customData = "Unlimited";
       String customUrl = null;
-
-      dlc.acquireRights(localFilename, customData, customUrl);
-      dlc.setCookies(null);
+      if(!dlc.verifyRights(localFilename)){
+        dlc.acquireRights(localFilename, customData, customUrl);
+        dlc.setCookies(null);
+      }
     } catch (DrmClientInitFailureException e) {
       e.printStackTrace();
       success = false;
@@ -401,6 +410,13 @@ class VisualOnStreamPlayer extends StreamPlayer implements
 
   protected void createMediaPlayer() {
     try {
+      boolean success = acquireRights(_localFilePath);
+      if(!success) {
+        Log.e(TAG, "Rights acquisition failed!");
+        onError(_player, VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE, 0);
+        return;
+      }
+
       if (_player == null) {
         _player = new VODXPlayerImpl();
       } else {
@@ -411,7 +427,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       }
 
       // SDK player engine type
-      int nParam = voOSType.VOOSMP_VOME2_PLAYER;
+      VO_OSMP_PLAYER_ENGINE engine = VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER;
 
       // Location of libraries
       String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
@@ -420,7 +436,7 @@ class VisualOnStreamPlayer extends StreamPlayer implements
       VOOSMPInitParam initParam = new VOOSMPInitParam();
       initParam.setLibraryPath(apkPath);
       initParam.setContext(_parent.getLayout().getContext());
-      VO_OSMP_RETURN_CODE nRet = _player.init(VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER, initParam);
+      VO_OSMP_RETURN_CODE nRet = _player.init(engine, initParam);
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         Log.v(TAG, "MediaPlayer is created.");
       } else {
@@ -728,11 +744,94 @@ class VisualOnStreamPlayer extends StreamPlayer implements
     // After createMediaPlayer
     if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_OPEN_FINISHED ) {
       setState(State.READY);
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_PLAY_COMPLETE) {
+      currentItemCompleted();
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_SEEK_COMPLETE)
+    {
+      dequeuePlay();
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_SRC_BUFFER_TIME) // Updated buffer status
+    {
+      this._buffer = param1;
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_SIZE_CHANGED) // Video size changed
+    {
+
+      _videoWidth = param1;
+      _videoHeight = param2;
+      Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+
+      _view.setLayoutParams(new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_STOP_BUFFER) // Video buffering stop
+    {
+      Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_START_BUFFER) // Video buffering start
+    {
+      Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_ERROR) // Error
+    {
+      // Display error dialog and stop player
+      Log.e(TAG, "onEvent: Error. " + param1);
+      onError(_player, null, id.getValue());
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_FAIL
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DOWNLOAD_FAIL
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_FAIL
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_NOT_SECURE
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_REJECTED
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR
+        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL) // Errors
+    {
+      // Display error dialog and stop player
+      onError(_player, null, id.getValue());
+    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE) { //CC data
+
+      // Remember if we have received live closed captions at some point during playback
+      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
+      voSubtitleInfo info = (voSubtitleInfo)obj;
+      String cc = GetCCString(info);
+      if (!cc.equals("")) {
+        _isLiveClosedCaptionsAvailable = true;
+      }
+
+      //Show closed captions if someone enabled them
+      if (_isLiveClosedCaptionsEnabled) {
+        _parent.displayClosedCaptionText(cc);
+      }
+    }
+    else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO) {
+
+      switch (param1) {
+        case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
+          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
+          break;
+        }
+        case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
+          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
+
+          switch (param2) {
+            case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
+              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
+              break;
+            }
+            case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
+              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+              break;
+            }
+            case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
+              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+              break;
+            }
+          }
+          break;
+        }
+      }
+      //Return now to avoid constant messages
+      return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
     } else {
-    Log.v(TAG, "OnEvent UNHANDLED MESSAGE!, id is: " + id + ". param is "
-          + param1 + ", " + param2);
     }
 
+    Log.v(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
   }
 
