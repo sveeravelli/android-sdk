@@ -41,6 +41,12 @@ import com.discretix.vodx.VODXPlayer;
 import com.discretix.vodx.VODXPlayerImpl;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.visualon.AcquireRightsAsyncTask;
+import com.ooyala.android.visualon.AcquireRightsCallback;
+import com.ooyala.android.visualon.FileDownloadAsyncTask;
+import com.ooyala.android.visualon.FileDownloadCallback;
+import com.ooyala.android.visualon.PersonalizationAsyncTask;
+import com.ooyala.android.visualon.PersonalizationCallback;
 import com.ooyala.android.visualon.VisualOnUtils;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
@@ -64,7 +70,8 @@ import com.visualon.OSMPUtils.voOSType;
  * http://developer.android.com/guide/appendix/media-formats.html
  */
 public class VisualOnStreamPlayer extends StreamPlayer implements
-  VOCommonPlayerListener, voOSBasePlayer.onRequestListener, SurfaceHolder.Callback {
+  VOCommonPlayerListener, voOSBasePlayer.onRequestListener, SurfaceHolder.Callback,
+  FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
 
   protected VODXPlayer _player = null;
@@ -123,7 +130,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     return SeekStyle.BASIC;
   }
 
-
   // This is required because android enjoys making things difficult. talk to
   // jigish if you got issues.
   private final Handler _playheadUpdateTimerHandler = new Handler(new Handler.Callback() {
@@ -157,21 +163,14 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     setState(State.LOADING);
     _streamUrl = stream.decodedURL().toString();
-
     setParent(parent);
 
     // Copy license file,
     copyfile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
     copyfile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
-    //TODO: streamIsProtected doesn't work correctly
-    if (stream.getDeliveryType().equals("smooth") || streamIsProtected(_streamUrl)){
-      boolean success = false;
-      _localFilePath = downloadFile(_streamUrl);
-      if (_localFilePath != null) success = getPersonalization();
-      if (success) success = acquireRights(_localFilePath);
-      if (!success) Log.e(TAG, "Access Rights failed!");
-    }
+    FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
+    downloadTask.execute();
 
     setupView();
   }
@@ -201,12 +200,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     case PAUSED:
     case READY:
     case COMPLETED:
-      boolean success = acquireRights(_localFilePath);
-      if(!success) {
-        Log.e(TAG, "Rights acquisition failed!");
-        onError(_player, VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE, 0);
-        return;
-      }
 
       Log.v(TAG, "Play: ready - about to run");
       if (_timeBeforeSuspend >=0 ) {
@@ -393,7 +386,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     return success;
   }
 
-  protected boolean streamIsProtected(String streamUrl) {
+  protected boolean isStreamProtected(String streamUrl) {
     DxLogConfig config = null;
     IDxDrmDlc dlc;
     boolean isDrmContent = false;
@@ -410,12 +403,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
   protected void createMediaPlayer() {
     try {
-      boolean success = acquireRights(_localFilePath);
-      if(!success) {
-        Log.e(TAG, "Rights acquisition failed!");
-        onError(_player, VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE, 0);
-        return;
-      }
 
       if (_player == null) {
         _player = new VODXPlayerImpl();
@@ -521,10 +508,11 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
   }
 
+  boolean surfaceExists = false;
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Created");
-
+    surfaceExists = true;
     if (_player !=null)
     {
       // If SDK player already exists, show media controls
@@ -532,12 +520,15 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       return;
     }
 
-    createMediaPlayer();
+    if(canFileBePlayed(_localFilePath)) {
+      createMediaPlayer();
+    }
   }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Destroyed");
+    surfaceExists = false;
     if (_player != null) {
       _player.stop();
       _player.setView(null);
@@ -642,6 +633,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     Log.v(TAG, "Player Resume");
 
+    tryToAcquireRights();
     if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
       play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
@@ -741,20 +733,25 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   @Override
   public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj) {
 
-    // After createMediaPlayer
-    if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_OPEN_FINISHED ) {
+    switch (id) {
+    case VO_OSMP_SRC_CB_OPEN_FINISHED:
+      // After createMediaPlayer is complete, mark as ready
       setState(State.READY);
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_PLAY_COMPLETE) {
-      currentItemCompleted();
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_SEEK_COMPLETE)
-    {
-      dequeuePlay();
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_SRC_BUFFER_TIME) // Updated buffer status
-    {
-      this._buffer = param1;
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_SIZE_CHANGED) // Video size changed
-    {
+      break;
 
+    case VO_OSMP_CB_PLAY_COMPLETE:
+      currentItemCompleted();
+      break;
+
+    case VO_OSMP_CB_SEEK_COMPLETE:
+      dequeuePlay();
+      break;
+
+    case VO_OSMP_CB_SRC_BUFFER_TIME:
+      this._buffer = param1;
+      break;
+
+    case VO_OSMP_CB_VIDEO_SIZE_CHANGED:
       _videoWidth = param1;
       _videoHeight = param2;
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
@@ -762,30 +759,33 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       _view.setLayoutParams(new FrameLayout.LayoutParams(
               ViewGroup.LayoutParams.MATCH_PARENT,
               ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+      break;
 
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_STOP_BUFFER) // Video buffering stop
-    {
+    case VO_OSMP_CB_VIDEO_STOP_BUFFER:
       Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_START_BUFFER) // Video buffering start
-    {
+      break;
+
+    case VO_OSMP_CB_VIDEO_START_BUFFER:
       Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_ERROR) // Error
-    {
-      // Display error dialog and stop player
+      break;
+
+    case VO_OSMP_CB_ERROR:
       Log.e(TAG, "onEvent: Error. " + param1);
       onError(_player, null, id.getValue());
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_FAIL
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DOWNLOAD_FAIL
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_FAIL
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_NOT_SECURE
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_REJECTED
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR
-        || id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL) // Errors
-    {
+      break;
+
+    case VO_OSMP_SRC_CB_CONNECTION_FAIL:
+    case VO_OSMP_SRC_CB_DOWNLOAD_FAIL:
+    case VO_OSMP_SRC_CB_DRM_FAIL:
+    case VO_OSMP_SRC_CB_DRM_NOT_SECURE:
+    case VO_OSMP_SRC_CB_CONNECTION_REJECTED:
+    case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
+    case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
       // Display error dialog and stop player
       onError(_player, null, id.getValue());
-    } else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE) { //CC data
+      break;
 
+    case VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE:
       // Remember if we have received live closed captions at some point during playback
       // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
       voSubtitleInfo info = (voSubtitleInfo)obj;
@@ -798,41 +798,43 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       if (_isLiveClosedCaptionsEnabled) {
         _parent.displayClosedCaptionText(cc);
       }
-    }
-    else if (id == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO) {
 
+      break;
+    case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
-        case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
-          break;
-        }
-        case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
+      case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
+        Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
+        break;
+      }
+      case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
+        Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
 
-          switch (param2) {
-            case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
-              break;
-            }
-            case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
-              break;
-            }
-            case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-              Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
-              break;
-            }
-          }
+        switch (param2) {
+        case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
+          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
           break;
         }
+        case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
+          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+          break;
+        }
+        case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
+          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+          break;
+        }
+        }
+        break;
+      }
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
-    } else {
-    }
 
+    default:
+      break;
+    }
     Log.v(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
+
   }
 
 	/* Extract text string from CC data. Does not handle position, color, font type, etc. */
@@ -885,6 +887,124 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   public VO_OSMP_RETURN_CODE onVOSyncEvent(VO_OSMP_CB_SYNC_EVENT_ID arg0,
       int arg1, int arg2, Object arg3) {
     return null;
+  }
+/**
+ * After file download on init(), check the file for DRM.
+ * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
+ */
+  @Override
+  public void afterFileDownload(String localFilename) {
+    _localFilePath = localFilename;
+    if (_localFilePath == null) {
+      Log.e(TAG, "File Download failed!");
+    }
+    else {
+      if (isStreamProtected(_localFilePath)) {
+        Log.d(TAG, "File Download Succeeded: Need to acquire rights!");
+        PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext());
+        personalizationTask.execute();
+      }
+      else {
+        Log.d(TAG, "File Download Succeeded: No rights needed");
+        if (surfaceExists && _player == null) {
+          createMediaPlayer();
+       }
+      }
+    }
+  }
+
+  /**
+   * After we personalize, we can try to acquire rights
+   */
+  @Override
+  public void afterPersonalization(boolean success) {
+    if (!isDevicePersonalized()) {
+      Log.e(TAG, "Personalization failed!");
+    }
+    else {
+      Log.d(TAG, "Personalization successful!");
+      tryToAcquireRights();
+    }
+  }
+
+  /**
+   * After we acquire rights, we can begin video playback, as long as the surface was created already
+   */
+  @Override
+  public void afterAcquireRights(boolean success) {
+    if (!success) {
+      Log.e(TAG, "Acquire Rights failed!");
+    }
+    else {
+      Log.d(TAG, "Acquire Rights successful!");
+      if (surfaceExists && _player == null) {
+         createMediaPlayer();
+      }
+    }
+  }
+
+  /**
+   * Ensure that we have enough information to acquire rights (personalization, file download)
+   * then try to acquire rights.
+   */
+  public void tryToAcquireRights() {
+    boolean isdevicePersonalized = isDevicePersonalized();
+    if(!isdevicePersonalized || _localFilePath == null) {
+      Log.i(TAG, "Acquire Rights not available yet: Personalization = " + isdevicePersonalized + ", localFilePath = " + _localFilePath);
+    }
+    else {
+      Log.d(TAG, "Acquiring rights");
+      AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath);
+      acquireRightsTask.execute();
+    }
+  }
+
+  /**
+   * Checks if the device has been personalized
+   * @return true if personalized, false if not
+   */
+  public boolean isDevicePersonalized() {
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+      return dlc.personalizationVerify();
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the file is DRM enabled, and if it is, if the file's DRM rights are valid.
+   * @param localFilename file path to locally downloaded file
+   * @return true if file can now be played, false otherwise.
+   */
+  public boolean canFileBePlayed(String localFilename){
+    if (localFilename == null) return false;
+    if (!isStreamProtected(localFilename)) return true;
+
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    boolean areRightsVerified = false;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+      areRightsVerified = dlc.verifyRights(localFilename);
+
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (DrmGeneralFailureException e) {
+      e.printStackTrace();
+    } catch (DrmInvalidFormatException e) {
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    }
+    return areRightsVerified;
   }
 
 }

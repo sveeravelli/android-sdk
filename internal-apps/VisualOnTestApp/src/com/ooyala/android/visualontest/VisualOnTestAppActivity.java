@@ -30,13 +30,15 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
+//    private String EMBEDCODE = "lsaTl4ZDqr8k8Jw72UwBaUAB_hw4Ogc9"; //Telstra Playback
+    //private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playback
 
 
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("Native Player");
     playerAdapter.add("VisualOn");
+    playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
@@ -48,7 +50,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
     Button setButton = (Button) findViewById(R.id.setButton);
 
     EditText embedText = (EditText) findViewById(R.id.embedText);
-    embedText.setText("lsaTl4ZDqr8k8Jw72UwBaUAB_hw4Ogc9");
+    embedText.setText("5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
     setButton.setOnClickListener(new OnClickListener() {
 
       @Override
