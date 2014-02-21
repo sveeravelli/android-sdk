@@ -31,5 +31,7 @@ internal-apps/*/bin
 internal-apps/*/gen
 vendor/VisualOn/SamplePlayer/bin
 vendor/VisualOn/SamplePlayer/gen
+vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/bin
+vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/gen
 .metadata/*
 .settings

@@ -56,6 +56,7 @@ import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_PLAYER_ENGINE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_RETURN_CODE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_SRC_FLAG;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_SRC_FORMAT;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_STATUS;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleDisplayInfo;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfo;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfoEntry;
@@ -763,10 +764,16 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
       Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
+      if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
+        setState(State.PLAYING);
+      } else {
+        setState(State.READY);
+      }
       break;
 
     case VO_OSMP_CB_VIDEO_START_BUFFER:
       Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
+      setState(State.LOADING);
       break;
 
     case VO_OSMP_CB_ERROR:

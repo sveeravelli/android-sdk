@@ -25,13 +25,14 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
 
+//  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
+  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
+//  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
-
-//    private String EMBEDCODE = "lsaTl4ZDqr8k8Jw72UwBaUAB_hw4Ogc9"; //Telstra Playback
-    //private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playback
 
 
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
@@ -50,7 +51,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
     Button setButton = (Button) findViewById(R.id.setButton);
 
     EditText embedText = (EditText) findViewById(R.id.embedText);
-    embedText.setText("5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
+    embedText.setText(EMBEDCODE);
     setButton.setOnClickListener(new OnClickListener() {
 
       @Override
