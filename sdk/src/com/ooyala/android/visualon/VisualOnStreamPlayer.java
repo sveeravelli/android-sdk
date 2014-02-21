@@ -439,12 +439,11 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       _player.setOnEventListener(this);
 
       /* Configure DRM parameters */
-      _player.setParameter(voOSType.VOOSMP_SRC_PID_DRM_FILE_NAME, "voDRM");
-      _player.setParameter(voOSType.VOOSMP_SRC_PID_DRM_API_NAME, "voGetDRMAPI");
+      _player.setDRMLibrary("voDRM", "voGetDRMAPI");
 
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
-      _player.setParameter(voOSType.VOOSMP_PID_LICENSE_TEXT, licenseText);
+      _player.setPreAgreedLicense(licenseText);
       //Setup license content, or screen can green flicker.
       InputStream is = null;
       byte[] b = new byte[32*1024];
@@ -455,18 +454,15 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       } catch (IOException e) {
           e.printStackTrace();
       }
-      _player.setParameter(voOSType.VOOSMP_PID_LICENSE_CONTENT, b);
+      _player.setLicenseContent(b);
 
       /* Configure Dolby Audio Effect parameters */
-      _player.setParameter(voOSType.VOOSMP_PID_AUDIO_EFFECT_ENABLE, 0);
-
-      // Enable CC
-      _player.setParameter(voOSType.VOOSMP_PID_CLOSED_CAPTION_OUTPUT, 1);
+      _player.enableAudioEffect(false);
 
       /* Processor-specific settings */
         String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
         String capFile = cfgPath + "cap.xml";
-        _player.setParameter(voOSType.VOOSMP_SRC_PID_CAP_TABLE_PATH, capFile);
+        _player.setDeviceCapabilityByFile(capFile);
 
         //Open then run the player
         VOOSMPOpenParam openParam = new VOOSMPOpenParam();
@@ -500,7 +496,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
             ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
     if (_player != null) {
-    	_player.setParameter(voOSType.VOOSMP_PID_SURFACE_CHANGED, 1);
+    	_player.setSurfaceChangeFinished();
     }
 
   }
@@ -513,7 +509,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     if (_player !=null)
     {
       // If SDK player already exists, show media controls
-      _player.setParameter(voOSType.VOOSMP_PID_VIEW_ACTIVE, _view);
+      _player.resume(_view);
       return;
     }
 

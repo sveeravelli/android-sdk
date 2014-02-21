@@ -25,8 +25,8 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
 
-//  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
-  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
+  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
+//  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
 //  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
 
   @Override
