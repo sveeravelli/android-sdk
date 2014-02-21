@@ -7,20 +7,20 @@
 <FONT color="green">004</FONT>    import java.util.ArrayList;<a name="line.4"></a>
 <FONT color="green">005</FONT>    <a name="line.5"></a>
 <FONT color="green">006</FONT>    /**<a name="line.6"></a>
-<FONT color="green">007</FONT>     * ISlot is the base Ad placement unit, which is used to play the Ads<a name="line.7"></a>
+<FONT color="green">007</FONT>     * ISlot is the base Ad placement unit, which is used to play the ads.<a name="line.7"></a>
 <FONT color="green">008</FONT>     */<a name="line.8"></a>
 <FONT color="green">009</FONT>    public interface ISlot {<a name="line.9"></a>
 <FONT color="green">010</FONT>            /**<a name="line.10"></a>
 <FONT color="green">011</FONT>             *      Get custom id of the slot.<a name="line.11"></a>
 <FONT color="green">012</FONT>             *<a name="line.12"></a>
-<FONT color="green">013</FONT>             *      @return Custom id of the slot<a name="line.13"></a>
+<FONT color="green">013</FONT>             *      @return custom id of the slot<a name="line.13"></a>
 <FONT color="green">014</FONT>             */<a name="line.14"></a>
 <FONT color="green">015</FONT>            public String getCustomId();<a name="line.15"></a>
 <FONT color="green">016</FONT>            <a name="line.16"></a>
 <FONT color="green">017</FONT>            /**<a name="line.17"></a>
 <FONT color="green">018</FONT>             *      Get type of the slot.<a name="line.18"></a>
 <FONT color="green">019</FONT>             *<a name="line.19"></a>
-<FONT color="green">020</FONT>             *      @return Type of the slot, the value can be one of:<a name="line.20"></a>
+<FONT color="green">020</FONT>             *      @return type of the slot, the value can be one of:<a name="line.20"></a>
 <FONT color="green">021</FONT>             *              &lt;p&gt;       SLOT_TYPE_TEMPORAL<a name="line.21"></a>
 <FONT color="green">022</FONT>             *              &lt;p&gt;       SLOT_TYPE_VIDEOPLAYER_NONTEMPORAL<a name="line.22"></a>
 <FONT color="green">023</FONT>             *              &lt;p&gt;       SLOT_TYPE_SITESECTION_NONTEMPORAL<a name="line.23"></a>
@@ -30,14 +30,14 @@
 <FONT color="green">027</FONT>            /**<a name="line.27"></a>
 <FONT color="green">028</FONT>             *      Get time position of the slot.<a name="line.28"></a>
 <FONT color="green">029</FONT>             *<a name="line.29"></a>
-<FONT color="green">030</FONT>             *      @return Time position of the slot<a name="line.30"></a>
+<FONT color="green">030</FONT>             *      @return time position of the slot<a name="line.30"></a>
 <FONT color="green">031</FONT>             */<a name="line.31"></a>
 <FONT color="green">032</FONT>            public double getTimePosition();<a name="line.32"></a>
 <FONT color="green">033</FONT>            <a name="line.33"></a>
 <FONT color="green">034</FONT>            /**<a name="line.34"></a>
 <FONT color="green">035</FONT>             *      Get time position class.<a name="line.35"></a>
 <FONT color="green">036</FONT>             *<a name="line.36"></a>
-<FONT color="green">037</FONT>             *      @return Time position class of the slot, the value can be one of:<a name="line.37"></a>
+<FONT color="green">037</FONT>             *      @return time position class of the slot, the value can be one of:<a name="line.37"></a>
 <FONT color="green">038</FONT>             *              &lt;p&gt;       TIME_POSITION_CLASS_PREROLL<a name="line.38"></a>
 <FONT color="green">039</FONT>             *              &lt;p&gt;       TIME_POSITION_CLASS_MIDROLL<a name="line.39"></a>
 <FONT color="green">040</FONT>             *              &lt;p&gt;       TIME_POSITION_CLASS_POSTROLL<a name="line.40"></a>
@@ -49,35 +49,35 @@
 <FONT color="green">046</FONT>            /**<a name="line.46"></a>
 <FONT color="green">047</FONT>             *      Get the duration of the embedded ads.<a name="line.47"></a>
 <FONT color="green">048</FONT>             *<a name="line.48"></a>
-<FONT color="green">049</FONT>             *      @return the duration of embedded ads. -1 if unavailable.<a name="line.49"></a>
+<FONT color="green">049</FONT>             *      @return the duration of embedded ads, -1 if unavailable<a name="line.49"></a>
 <FONT color="green">050</FONT>             */<a name="line.50"></a>
 <FONT color="green">051</FONT>            public double getEmbeddedAdsDuration();<a name="line.51"></a>
 <FONT color="green">052</FONT>    <a name="line.52"></a>
 <FONT color="green">053</FONT>            /**<a name="line.53"></a>
 <FONT color="green">054</FONT>             *  Get the end time position of the slot.<a name="line.54"></a>
 <FONT color="green">055</FONT>             *<a name="line.55"></a>
-<FONT color="green">056</FONT>             *  @return the end time position of the temporal slot. -1 if unavailable.<a name="line.56"></a>
+<FONT color="green">056</FONT>             *  @return the end time position of the temporal slot, -1 if unavailable<a name="line.56"></a>
 <FONT color="green">057</FONT>             */<a name="line.57"></a>
 <FONT color="green">058</FONT>            public double getEndTimePosition();<a name="line.58"></a>
 <FONT color="green">059</FONT>            <a name="line.59"></a>
 <FONT color="green">060</FONT>            /**<a name="line.60"></a>
 <FONT color="green">061</FONT>             *      Get width of the slot.<a name="line.61"></a>
 <FONT color="green">062</FONT>             *<a name="line.62"></a>
-<FONT color="green">063</FONT>             *      @return Width in pixels<a name="line.63"></a>
+<FONT color="green">063</FONT>             *      @return width in pixels<a name="line.63"></a>
 <FONT color="green">064</FONT>             */<a name="line.64"></a>
 <FONT color="green">065</FONT>            public int getWidth();<a name="line.65"></a>
 <FONT color="green">066</FONT>            <a name="line.66"></a>
 <FONT color="green">067</FONT>            /**<a name="line.67"></a>
 <FONT color="green">068</FONT>             *      Get height of the slot.<a name="line.68"></a>
 <FONT color="green">069</FONT>             *<a name="line.69"></a>
-<FONT color="green">070</FONT>             *      @return Height in pixels<a name="line.70"></a>
+<FONT color="green">070</FONT>             *      @return height in pixels<a name="line.70"></a>
 <FONT color="green">071</FONT>             */<a name="line.71"></a>
 <FONT color="green">072</FONT>            public int getHeight();<a name="line.72"></a>
 <FONT color="green">073</FONT>            <a name="line.73"></a>
 <FONT color="green">074</FONT>            /**<a name="line.74"></a>
 <FONT color="green">075</FONT>             *      Get slot display base object, the ad will be drawn on the base. &lt;br/&gt;<a name="line.75"></a>
 <FONT color="green">076</FONT>             *<a name="line.76"></a>
-<FONT color="green">077</FONT>             *      @return the ViewGroup object. for Temporal Slot it is a FrameLayout, for nonTemporal Slot it is a RelativeLayout. If failed to create slotBase will return null.        <a name="line.77"></a>
+<FONT color="green">077</FONT>             *      @return the ViewGroup object. For Temporal Slot it is a FrameLayout, for nonTemporal Slot it is a RelativeLayout. If failed to create slotBase will return null<a name="line.77"></a>
 <FONT color="green">078</FONT>             */<a name="line.78"></a>
 <FONT color="green">079</FONT>            public ViewGroup getBase();<a name="line.79"></a>
 <FONT color="green">080</FONT>            <a name="line.80"></a>
@@ -115,27 +115,26 @@
 <FONT color="green">112</FONT>            public void setParameter(String name, Object value);<a name="line.112"></a>
 <FONT color="green">113</FONT>            <a name="line.113"></a>
 <FONT color="green">114</FONT>            /**<a name="line.114"></a>
-<FONT color="green">115</FONT>             *      Get duration of the slot<a name="line.115"></a>
+<FONT color="green">115</FONT>             *      Get duration of the slot.<a name="line.115"></a>
 <FONT color="green">116</FONT>             *<a name="line.116"></a>
 <FONT color="green">117</FONT>             *      @return a number in seconds, which is greater than or equal to 0<a name="line.117"></a>
 <FONT color="green">118</FONT>             */<a name="line.118"></a>
 <FONT color="green">119</FONT>            public double getTotalDuration();<a name="line.119"></a>
 <FONT color="green">120</FONT>            <a name="line.120"></a>
 <FONT color="green">121</FONT>            /**<a name="line.121"></a>
-<FONT color="green">122</FONT>             *      Get playheadTime of the slot<a name="line.122"></a>
+<FONT color="green">122</FONT>             *      Get playheadTime of the slot.<a name="line.122"></a>
 <FONT color="green">123</FONT>             *<a name="line.123"></a>
 <FONT color="green">124</FONT>             *      @return a number in seconds, which is greater than or equal to 0<a name="line.124"></a>
 <FONT color="green">125</FONT>             */<a name="line.125"></a>
 <FONT color="green">126</FONT>            public double getPlayheadTime();<a name="line.126"></a>
 <FONT color="green">127</FONT>    <a name="line.127"></a>
 <FONT color="green">128</FONT>            /**<a name="line.128"></a>
-<FONT color="green">129</FONT>             * Get all ad instances in the slot.<a name="line.129"></a>
-<FONT color="green">130</FONT>             * Only for player use.<a name="line.130"></a>
-<FONT color="green">131</FONT>             *<a name="line.131"></a>
-<FONT color="green">132</FONT>             * @return ArrayList of ad instances<a name="line.132"></a>
-<FONT color="green">133</FONT>             */<a name="line.133"></a>
-<FONT color="green">134</FONT>            public ArrayList&lt;IAdInstance&gt; getAdInstances();<a name="line.134"></a>
-<FONT color="green">135</FONT>    }<a name="line.135"></a>
+<FONT color="green">129</FONT>             * Get all ad instances in the slot. Only for player use.<a name="line.129"></a>
+<FONT color="green">130</FONT>             *<a name="line.130"></a>
+<FONT color="green">131</FONT>             * @return ArrayList of ad instances<a name="line.131"></a>
+<FONT color="green">132</FONT>             */<a name="line.132"></a>
+<FONT color="green">133</FONT>            public ArrayList&lt;IAdInstance&gt; getAdInstances();<a name="line.133"></a>
+<FONT color="green">134</FONT>    }<a name="line.134"></a>
 
 
 
