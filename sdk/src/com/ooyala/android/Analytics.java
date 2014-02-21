@@ -1,31 +1,83 @@
 package com.ooyala.android;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class Analytics {
-  private boolean _ready = false;
-  private boolean _failed = false;
+
+  private static final String TAG = "Analytics";
+  private static final String TMP_PREFIX = "pb2823";
+  private static final String TMP_EXT = ".html";
+  private static final String EMBED_MODULEPARAMS_HTML =
+      "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
+
+  private boolean _ready;
+  private boolean _failed;
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
   private String _defaultUserAgent = "";
   private String _userAgent = "";
+  private TemporaryInternalStorageFileManager tmpBootHtmlFileManager;
 
-  private static final String EMBED_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad=\"reporter = new Ooyala.Reporter('_PCODE_');\"></body></html>";
-  private static final String EMBED_MODULEPARAMS_HTML = "<html><head><script src=\"_HOST__URI_\"></script></head><body onLoad='reporter = new Ooyala.Reporter(\"_PCODE_\",_MODULE_PARAMS_);'></body></html>";
+  private static String generateEmbedHTML(PlayerAPIClient api) {
+
+    final Map<String, String> moduleParams = new HashMap<String, String>();
+
+    String url = "http://www.ooyala.com/analytics.html";
+    try {
+      url = new URL("http", api.getDomain(), "/").toString();
+    }
+    catch (MalformedURLException e) {
+      System.out.println("falling back to default analytics URL " + url);
+    }
+    moduleParams.put(Constants.JS_ANALYTICS_DOCUMENT_URL, url);
+
+    //If there is an account ID, add it to the Reporter.js initializer
+    if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
+      moduleParams.put(Constants.JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
+    }
+
+    return EMBED_MODULEPARAMS_HTML
+        .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
+        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
+        .replaceAll("_PCODE_", api.getPcode())
+        .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
+  }
+
+  private static void setAllowUniversalAccessFromFileURLs( final WebSettings settings ) {
+    for( Method m : settings.getClass().getMethods() ) {
+      if( m.getName().equals( "setAllowUniversalAccessFromFileURLs" ) ) {
+        try {
+          m.invoke( settings, true );
+        }
+        catch (Exception e) {
+          Log.d( TAG, "failed: " + e.getStackTrace() );
+        }
+        break;
+      }
+    }
+  }
 
   /**
    * Initialize an Analytics using the specified api
@@ -34,26 +86,6 @@ public class Analytics {
    */
   Analytics(Context context, PlayerAPIClient api) {
     this(context, generateEmbedHTML(api), api.getDomain());
-  }
-
-  private static String generateEmbedHTML(PlayerAPIClient api) {
-
-    //If there is an account ID, add it to the Reporter.js initializer
-    if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
-      Map<String, String> moduleParams = new HashMap<String, String>();
-      moduleParams.put(Constants.JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
-
-      return EMBED_MODULEPARAMS_HTML
-          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
-          .replaceAll("_PCODE_", api.getPcode())
-          .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
-    } else {
-      return EMBED_HTML
-          .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-          .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
-          .replaceAll("_PCODE_", api.getPcode());
-    }
   }
 
   /**
@@ -74,13 +106,20 @@ public class Analytics {
    */
   @SuppressLint("SetJavaScriptEnabled")
   private Analytics(Context context, String embedHTML, String embedDomain) {
+
+    tmpBootHtmlFileManager = new TemporaryInternalStorageFileManager();
+
     _jsAnalytics = new WebView(context);
+
     _defaultUserAgent = String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION,
         _jsAnalytics.getSettings().getUserAgentString());
     _userAgent = _defaultUserAgent;
     _jsAnalytics.getSettings().setUserAgentString(_defaultUserAgent);
     _jsAnalytics.getSettings().setJavaScriptEnabled(true);
-    _jsAnalytics.setWebViewClient(new WebViewClient() {
+    setAllowUniversalAccessFromFileURLs( _jsAnalytics.getSettings() );
+
+    _jsAnalytics.setWebViewClient( new WebViewClient() {
+      @Override
       public void onPageFinished(WebView view, String url) {
         if (!_ready && !_failed) {
           _ready = true;
@@ -88,7 +127,7 @@ public class Analytics {
           performQueuedActions();
         }
       }
-
+      @Override
       public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         if (!_failed) {
           _ready = false;
@@ -97,18 +136,50 @@ public class Analytics {
         }
       }
     });
-    // give dummy url to allow for cookie setting
-    String url = "http://www.ooyala.com/analytics.html";
+
+    _jsAnalytics.setWebChromeClient( new WebChromeClient() {
+      @Override
+      public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+        Log.v( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
+      }
+      @Override
+      public boolean onConsoleMessage(ConsoleMessage cm) {
+        onConsoleMessage( cm.message(), cm.lineNumber(), cm.sourceId() );
+        return true;
+      }
+    });
+
+    bootHtml( context, embedDomain, embedHTML );
+
+    Log.d(TAG, "Initialized Analytics with user agent: "
+        + _jsAnalytics.getSettings().getUserAgentString());
+  }
+
+  private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
+    try {
+      final TemporaryInternalStorageFile tmpBootHtmlFile = tmpBootHtmlFileManager.next( context, TMP_PREFIX, TMP_EXT );
+      tmpBootHtmlFile.write( embedHTML );
+      loadTmpBootHtmlFile( tmpBootHtmlFile );
+    }
+    catch (IOException e) {
+      Log.e( TAG, "failed: " + e.getStackTrace() );
+    }
+    catch (IllegalArgumentException e) {
+      Log.e( TAG, "failed: " + e.getStackTrace() );
+    }
+  }
+
+  private void loadTmpBootHtmlFile( final TemporaryInternalStorageFile tmpBootHtmlFile ) {
+    final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
+    Log.d( TAG, "trying to load: " + htmlUrlStr );
 
     try {
-      url = new URL("http", embedDomain, "/").toString();
-    } catch (MalformedURLException e) {
-      System.out.println("falling back to default analytics URL");
+      final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
+      try { while( true ) { Log.d( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
     }
+    catch( FileNotFoundException e ) { }
 
-    _jsAnalytics.loadDataWithBaseURL(url, embedHTML, "text/html", "UTF-8", "");
-    Log.d(this.getClass().getName(), "Initializing Analytics with user agent: "
-        + _jsAnalytics.getSettings().getUserAgentString());
+    _jsAnalytics.loadUrl( htmlUrlStr );
   }
 
   /**

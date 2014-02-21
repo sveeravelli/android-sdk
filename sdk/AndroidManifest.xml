@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <permission android:name="android.permission.INTERNET"></permission>
     <permission android:name="android.permission.WAKE_LOCK"></permission>
+    <permission android:name="android.permission.WRITE_INTERNAL_STORAGE"></permission>
     <uses-sdk android:targetSdkVersion="11" android:minSdkVersion="8"/>
 
 </manifest>

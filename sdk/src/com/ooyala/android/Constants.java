@@ -54,6 +54,7 @@ class Constants {
   public static final String JS_ANALYTICS_URI = "/reporter.js";
   public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
   public static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
+  public static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
 
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
