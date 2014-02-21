@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.visualon;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,15 +39,11 @@ import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
 import com.discretix.vodx.VODXPlayer;
 import com.discretix.vodx.VODXPlayerImpl;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.Stream;
+import com.ooyala.android.StreamPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.visualon.AcquireRightsAsyncTask;
-import com.ooyala.android.visualon.AcquireRightsCallback;
-import com.ooyala.android.visualon.FileDownloadAsyncTask;
-import com.ooyala.android.visualon.FileDownloadCallback;
-import com.ooyala.android.visualon.PersonalizationAsyncTask;
-import com.ooyala.android.visualon.PersonalizationCallback;
-import com.ooyala.android.visualon.VisualOnUtils;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
