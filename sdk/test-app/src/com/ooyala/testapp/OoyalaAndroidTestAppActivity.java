@@ -73,7 +73,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private void setEmbedCode() {
 
     if (player.setEmbedCode(EMBEDCODE)) {
-      player.play(60000);
+      player.play();
     } else {
       Log.d(TAG, "setEmbedCode failed");
     }
