@@ -1389,7 +1389,8 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     if (_closedCaptionsView == null || _currentItem == null) return;
     if (_streamBasedCC) return;
 
-    if (_language != null && _currentItem.hasClosedCaptions()) {
+    //  PB-3090: we currently only support captions for the main content, not also the advertisements.
+    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd()) {
       double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null || currT > _closedCaptionsView.getCaption().getEnd()
           || currT < _closedCaptionsView.getCaption().getBegin()) {
