@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 class Constants {
   /** NOTE[jigish] do NOT change the name or location of this variable without changing pub_release.sh */
-  public static final String SDK_VERSION = "2.2.0_RC10";
+  public static final String SDK_VERSION = "2.2.0_RC11";
   public static final String API_VERSION = "1";
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;
@@ -54,6 +54,7 @@ class Constants {
   public static final String JS_ANALYTICS_URI = "/reporter.js";
   public static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
   public static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
+  public static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
 
   public static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   public static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
