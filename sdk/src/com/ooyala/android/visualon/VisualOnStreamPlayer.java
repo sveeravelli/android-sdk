@@ -1,19 +1,14 @@
 package com.ooyala.android.visualon;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -33,10 +28,6 @@ import com.discretix.drmdlc.api.IDxDrmDlc;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
-import com.discretix.drmdlc.api.exceptions.DrmNotProtectedException;
-import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
-import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
-import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
 import com.discretix.vodx.VODXPlayer;
 import com.discretix.vodx.VODXPlayerImpl;
 import com.ooyala.android.OoyalaPlayer;
@@ -44,7 +35,6 @@ import com.ooyala.android.Stream;
 import com.ooyala.android.StreamPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
@@ -67,7 +57,7 @@ import com.visualon.OSMPUtils.voOSType;
  * http://developer.android.com/guide/appendix/media-formats.html
  */
 public class VisualOnStreamPlayer extends StreamPlayer implements
-  VOCommonPlayerListener, voOSBasePlayer.onRequestListener, SurfaceHolder.Callback,
+  VOCommonPlayerListener, SurfaceHolder.Callback,
   FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
 
@@ -77,6 +67,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   private String _localFilePath;
   protected int _videoWidth = 16;
   protected int _videoHeight = 9;
+  boolean surfaceExists = false;
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
@@ -90,54 +81,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
 
-  /* Copy file from Assets directory to destination. Used for licenses and processor-specific configurations */
-  private static void copyfile(Context context, String filename, String desName)
-  {
-    try {
-      InputStream InputStreamis  = context.getAssets().open(filename);
-      File desFile = new File(context.getFilesDir().getParentFile().getPath() + "/" + desName);
-      desFile.createNewFile();
-      FileOutputStream  fos = new FileOutputStream(desFile);
-      int bytesRead;
-      byte[] buf = new byte[4 * 1024]; //4K buffer
-      while((bytesRead = InputStreamis.read(buf)) != -1) {
-      fos.write(buf, 0, bytesRead);
-      }
-      fos.flush();
-      fos.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  protected class PlayheadUpdateTimerTask extends TimerTask {
-    @Override
-    public void run() {
-      if (_player == null)
-        return;
-
-      if (_lastPlayhead != _player.getPosition()) {
-        _playheadUpdateTimerHandler.sendEmptyMessage(0);
-      }
-      _lastPlayhead = (int) _player.getPosition();
-    }
-  }
-
-  public SeekStyle getSeekStyle() {
-    return SeekStyle.BASIC;
-  }
-
-  // This is required because android enjoys making things difficult. talk to
-  // jigish if you got issues.
-  private final Handler _playheadUpdateTimerHandler = new Handler(new Handler.Callback() {
-
-    @Override
-    public boolean handleMessage(Message msg) {
-      setChanged();
-      notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
-      return false;
-    }
-  });
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -163,26 +106,13 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     setParent(parent);
 
     // Copy license file,
-    copyfile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
-    copyfile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
+    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
+    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
     FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
     downloadTask.execute();
 
     setupView();
-  }
-
-  @Override
-  public void pause() {
-    _playQueued = false;
-    switch (_state) {
-    case PLAYING:
-      stopPlayheadTimer();
-      _player.pause();
-      setState(State.PAUSED);
-    default:
-      break;
-    }
   }
 
   @Override
@@ -223,6 +153,19 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   }
 
   @Override
+  public void pause() {
+    _playQueued = false;
+    switch (_state) {
+    case PLAYING:
+      stopPlayheadTimer();
+      _player.pause();
+      setState(State.PAUSED);
+    default:
+      break;
+    }
+  }
+
+  @Override
   public void stop() {
     Log.v(TAG, "MediaPlayer stopped.");
     stopPlayheadTimer();
@@ -251,7 +194,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     default:
       break;
     }
-    //Log.v(TAG, "currentTime: " + _player.GetPos());
     return (int) _player.getPosition();
   }
 
@@ -268,7 +210,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     default:
       break;
     }
-    //Log.v(TAG, "currentDuration: " + _player.GetDuration());
     return (int) _player.getDuration();
   }
 
@@ -289,6 +230,16 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   }
 
   @Override
+  public SeekStyle getSeekStyle() {
+    return SeekStyle.BASIC;
+  }
+
+  @Override
+  public void setParent(OoyalaPlayer parent) {
+    super.setParent(parent);
+  }
+
+  @Override
   public void seekToTime(int timeInMillis) {
     if (_player == null) {
       return;
@@ -297,110 +248,8 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     _player.setPosition(timeInMillis);
   }
 
-  protected String downloadFile(String streamUrl) {
-    String contentDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Ooyala_SecurePlayer";
-    String localFile = String.format("%s/%s", contentDir, _parent.getEmbedCode());
-    try {
-      //Create content directory.
-      if (new File(contentDir).mkdirs() == false){
-        if (new File(contentDir).exists() == false){
-          Log.e(TAG, "Cannot create content directory on SD-CARD");
-        }
-      }
-      VisualOnUtils.DownloadFile(streamUrl, localFile);
-      return localFile;
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  protected boolean getPersonalization() {
-    boolean success = true;
-    DxLogConfig config = null;
-    IDxDrmDlc dlc;
-
-    String PERSONALIZATION_URL = "172.16.8.137:8000/Personalization";
-    String SESSION_ID = "session";
-    try {
-      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
-
-      dlc.getDebugInterface().setClientSideTestPersonalization(true);
-      //Check for verification.
-      if (!dlc.personalizationVerify()) {
-        dlc.performPersonalization(OoyalaPlayer.getVersion(), PERSONALIZATION_URL, SESSION_ID);
-      } else {
-        Log.d(TAG, "Device is already personalized");
-      }
-    } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmUpdateRequiredException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmNotSupportedException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
-      success = false;
-    }
-    return success;
-  }
-
-  protected boolean acquireRights(String localFilename) {
-    boolean success = true;
-    DxLogConfig config = null;
-    IDxDrmDlc dlc;
-    try {
-      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
-      String customData = "Unlimited";
-      String customUrl = null;
-      if(!dlc.verifyRights(localFilename)){
-        dlc.acquireRights(localFilename, customData, customUrl);
-        dlc.setCookies(null);
-      }
-    } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (IOException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmNotProtectedException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmInvalidFormatException e) {
-      e.printStackTrace();
-      success = false;
-    } catch (DrmServerSoapErrorException e) {
-      e.printStackTrace();
-      success = false;
-    }
-
-    return success;
-  }
-
-  protected boolean isStreamProtected(String streamUrl) {
-    DxLogConfig config = null;
-    IDxDrmDlc dlc;
-    boolean isDrmContent = false;
-    try {
-      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
-      isDrmContent = dlc.isDrmContent(streamUrl);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
-    }
-    return isDrmContent;
-  }
-
   protected void createMediaPlayer() {
     try {
-
       if (_player == null) {
         _player = new VODXPlayerImpl();
       } else {
@@ -501,7 +350,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
   }
 
-  boolean surfaceExists = false;
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Created");
@@ -528,13 +376,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     }
   }
 
-  @Override
-  public void setParent(OoyalaPlayer parent) {
-    super.setParent(parent);
-  }
-
-  @SuppressWarnings("deprecation")
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
   private void setupView() {
     if (_view != null) {
       Log.e(TAG, "DANGER DANGER: setupView while we still have a view");
@@ -549,7 +390,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
     		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-
 
     		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
 
@@ -570,7 +410,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       }
     };
 
-
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
@@ -579,7 +418,6 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     _holder = _view.getHolder();
     _holder.addCallback(this);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     _holder.setFormat(PixelFormat.RGBA_8888);
   }
 
@@ -700,6 +538,30 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     dequeueAll();
   }
 
+/* Playhead Timer Updating methods */
+  protected class PlayheadUpdateTimerTask extends TimerTask {
+    @Override
+    public void run() {
+      if (_player == null)
+        return;
+
+      if (_lastPlayhead != _player.getPosition()) {
+        _playheadUpdateTimerHandler.sendEmptyMessage(0);
+      }
+      _lastPlayhead = (int) _player.getPosition();
+    }
+  }
+
+  // This is required because android enjoys making things difficult. talk to jigish if you got issues.
+  private final Handler _playheadUpdateTimerHandler = new Handler(new Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message msg) {
+      setChanged();
+      notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+      return false;
+    }
+  });
+
   // Timer tasks for playhead updates
   protected void startPlayheadTimer() {
     if (_playheadUpdateTimer != null) {
@@ -717,10 +579,49 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     }
   }
 
-  @Override
-  public int onRequest(int arg0, int arg1, int arg2, Object arg3) {
-    Log.i(TAG, "onRequest arg0 is %d" + arg0);
-    return 0;
+  /** Extract text string from CC data. Does not handle position, color, font type, etc. */
+  public String GetCCString(voSubtitleInfo subtitleInfo)
+  {
+    if(subtitleInfo == null)
+      return "";
+    if(subtitleInfo.getSubtitleEntry() == null)
+      return "";
+
+    String strTextAll = "";
+    for(int i = 0; i<subtitleInfo.getSubtitleEntry().size(); i++)
+    {
+      // Retrieve the display info for each subtitle entry
+      voSubtitleInfoEntry info = subtitleInfo.getSubtitleEntry().get(i);
+      voSubtitleDisplayInfo dispInfo = info.getSubtitleDispInfo();
+      if(dispInfo.getTextRowInfo() != null)
+      {
+        for(int j = 0; j < dispInfo.getTextRowInfo().size() ; j++)
+        {
+          // Retrieve the row info for display
+          voSubtitleTextRowInfo rowInfo = dispInfo.getTextRowInfo().get(j);
+          if( rowInfo == null)
+            continue;
+          if( rowInfo.getTextInfoEntry() == null)
+            continue;
+
+          String strRow = "";
+          for(int k = 0; k < rowInfo.getTextInfoEntry().size() ; k++)
+          {
+            // Get the string for each row
+            strRow+=rowInfo.getTextInfoEntry().get(k).getStringText();//.stringText;
+          }
+          if(strRow.length()>0)
+          {
+            if(strTextAll.length()>0)
+              strTextAll+="\n";
+            strTextAll+=strRow;
+
+          }
+
+        }
+      }
+    }
+    return strTextAll;
   }
 
   @Override
@@ -836,57 +737,12 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
   }
 
-	/* Extract text string from CC data. Does not handle position, color, font type, etc. */
-	public String GetCCString(voSubtitleInfo subtitleInfo)
-	{
-		if(subtitleInfo == null)
-			return "";
-		if(subtitleInfo.getSubtitleEntry() == null)
-			return "";
-
-		String strTextAll = "";
-		for(int i = 0; i<subtitleInfo.getSubtitleEntry().size(); i++)
-		{
-			// Retrieve the display info for each subtitle entry
-			voSubtitleInfoEntry info = subtitleInfo.getSubtitleEntry().get(i);
-			voSubtitleDisplayInfo dispInfo = info.getSubtitleDispInfo();
-			if(dispInfo.getTextRowInfo() != null)
-			{
-				for(int j = 0; j < dispInfo.getTextRowInfo().size() ; j++)
-				{
-					// Retrieve the row info for display
-					voSubtitleTextRowInfo rowInfo = dispInfo.getTextRowInfo().get(j);
-					if( rowInfo == null)
-						continue;
-					if( rowInfo.getTextInfoEntry() == null)
-						continue;
-
-					String strRow = "";
-					for(int k = 0; k < rowInfo.getTextInfoEntry().size() ; k++)
-					{
-						// Get the string for each row
-						strRow+=rowInfo.getTextInfoEntry().get(k).getStringText();//.stringText;
-					}
-					if(strRow.length()>0)
-					{
-						if(strTextAll.length()>0)
-							strTextAll+="\n";
-						strTextAll+=strRow;
-
-					}
-
-				}
-			}
-		}
-		return strTextAll;
-	}
-
-
   @Override
   public VO_OSMP_RETURN_CODE onVOSyncEvent(VO_OSMP_CB_SYNC_EVENT_ID arg0,
       int arg1, int arg2, Object arg3) {
     return null;
   }
+
 /**
  * After file download on init(), check the file for DRM.
  * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
@@ -974,6 +830,22 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       e.printStackTrace();
     }
     return false;
+  }
+
+
+  protected boolean isStreamProtected(String streamUrl) {
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    boolean isDrmContent = false;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
+      isDrmContent = dlc.isDrmContent(streamUrl);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+    }
+    return isDrmContent;
   }
 
   /**

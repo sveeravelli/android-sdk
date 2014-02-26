@@ -28,6 +28,8 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
   private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
 //  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
 //  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
+  final String PCODE  = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
+  final String DOMAIN = "www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-    		"42Zms6h4wdcI1R1uFzepD-KZ0kkk", "Nr9o5l05rnycXeJ3qY699KJzH8PQiSUh51gd0YTq");
+    		PCODE, DOMAIN);
     player = playerLayoutController.getPlayer();
 
     player.addObserver(this);
@@ -59,7 +61,6 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
         EditText embedText = (EditText) findViewById(R.id.embedText);
 
         if (player.setEmbedCode(embedText.getText().toString())) {
-          // The Embed Code works: "l2d291ZDrxW9OMBaqz-0HeEhtLEM8MOa"
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
 

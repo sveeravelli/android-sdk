@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import android.content.Context;
 import android.util.Log;
 
 public class VisualOnUtils {
@@ -99,4 +100,25 @@ public class VisualOnUtils {
     DownloadFile(url, destFileName, -1);
   }
 
+  /**
+   * Copy file from Assets directory to destination. Used for licenses and processor-specific configurations
+   */
+  static public void copyFile(Context context, String filename, String desName)
+  {
+    try {
+      InputStream InputStreamis  = context.getAssets().open(filename);
+      File desFile = new File(context.getFilesDir().getParentFile().getPath() + "/" + desName);
+      desFile.createNewFile();
+      FileOutputStream  fos = new FileOutputStream(desFile);
+      int bytesRead;
+      byte[] buf = new byte[4 * 1024]; //4K buffer
+      while((bytesRead = InputStreamis.read(buf)) != -1) {
+      fos.write(buf, 0, bytesRead);
+      }
+      fos.flush();
+      fos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
