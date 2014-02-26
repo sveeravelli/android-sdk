@@ -57,8 +57,8 @@ import com.visualon.OSMPUtils.voOSType;
  * http://developer.android.com/guide/appendix/media-formats.html
  */
 public class VisualOnStreamPlayer extends StreamPlayer implements
-  VOCommonPlayerListener, SurfaceHolder.Callback,
-  FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
+VOCommonPlayerListener, SurfaceHolder.Callback,
+FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
 
   protected VODXPlayer _player = null;
@@ -67,7 +67,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   private String _localFilePath;
   protected int _videoWidth = 16;
   protected int _videoHeight = 9;
-  boolean surfaceExists = false;
+  boolean _surfaceExists = false;
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
@@ -84,18 +84,19 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-    Log.d(this.getClass().getName(), "Using VOPlayer");
+    Log.d(TAG, "Using VOPlayer");
     Stream stream = null;
     stream = Stream.bestStream(streams);
 
     if (stream == null) {
-      Log.e(this.getClass().getName(),
-          "ERROR: Invalid Stream (no valid stream available)");
+      Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = "Invalid Stream";
       setState(State.ERROR);
       return;
     }
+
     if (parent == null) {
+      Log.e(TAG, "ERROR: Invalid parent (no parent provided to Stream Player)");
       this._error = "Invalid Parent";
       setState(State.ERROR);
       return;
@@ -122,32 +123,32 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     case INIT:
     case LOADING:
       queuePlay();
-      Log.v(TAG, "Play: still laoding, queued");
+      Log.v(TAG, "Play: still loading, queued");
       break;
     case PAUSED:
     case READY:
     case COMPLETED:
-
-      Log.v(TAG, "Play: ready - about to run");
+      Log.v(TAG, "Play: ready - about to start");
       if (_timeBeforeSuspend >=0 ) {
         _player.setPosition(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
       }
+
       VO_OSMP_RETURN_CODE nRet = _player.start();
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
-        Log.v(TAG, "MediaPlayer run.");
+        Log.v(TAG, "MediaPlayer started.");
       } else {
         onError(_player, nRet, 0);
       }
       setState(State.PLAYING);
       startPlayheadTimer();
-    break;
+      break;
     case SUSPENDED:
       queuePlay();
-      Log.v(TAG, "Play: Suspended already. re-queue" + _state);
+      Log.d(TAG, "Play: Suspended already. re-queue: " + _state);
       break;
     default:
-      Log.v(TAG, "Play: invalid status?" + _state);
+      Log.d(TAG, "Play: invalid status? " + _state);
       break;
     }
   }
@@ -218,7 +219,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     return this._buffer;
   }
 
-  //Sets enablement of live CC, which is checked every time VisualOn recieves CC data on stream
+  //Sets enablement of live CC, which is checked every time VisualOn receives CC data on stream
   @Override
   public void setLiveClosedCaptionsEnabled(boolean enabled){
     _isLiveClosedCaptionsEnabled = enabled;
@@ -254,7 +255,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
         _player = new VODXPlayerImpl();
       } else {
 
-    	  Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
+        Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
         _player.destroy();
         return;
       }
@@ -297,11 +298,11 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       InputStream is = null;
       byte[] b = new byte[32*1024];
       try {
-          is = _view.getContext().getAssets().open("voVidDec.dat");
-          is.read(b);
-          is.close();
+        is = _view.getContext().getAssets().open("voVidDec.dat");
+        is.read(b);
+        is.close();
       } catch (IOException e) {
-          e.printStackTrace();
+        e.printStackTrace();
       }
       _player.setLicenseContent(b);
 
@@ -309,21 +310,21 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       _player.enableAudioEffect(false);
 
       /* Processor-specific settings */
-        String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
-        String capFile = cfgPath + "cap.xml";
-        _player.setDeviceCapabilityByFile(capFile);
+      String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
+      String capFile = cfgPath + "cap.xml";
+      _player.setDeviceCapabilityByFile(capFile);
 
-        //Open then run the player
-        VOOSMPOpenParam openParam = new VOOSMPOpenParam();
-        nRet = _player.open(_streamUrl, VO_OSMP_SRC_FLAG.VO_OSMP_FLAG_SRC_OPEN_ASYNC, VO_OSMP_SRC_FORMAT.VO_OSMP_SRC_AUTO_DETECT, openParam);
-        if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
-            Log.v(TAG, "MediaPlayer is Opened.");
-          } else {
+      //Open then run the player
+      VOOSMPOpenParam openParam = new VOOSMPOpenParam();
+      nRet = _player.open(_streamUrl, VO_OSMP_SRC_FLAG.VO_OSMP_FLAG_SRC_OPEN_ASYNC, VO_OSMP_SRC_FORMAT.VO_OSMP_SRC_AUTO_DETECT, openParam);
+      if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+        Log.v(TAG, "MediaPlayer is Opened.");
+      } else {
 
-            Toast.makeText(_parent.getLayout().getContext(), "Could not connect to " + _streamUrl + "!", Toast.LENGTH_LONG).show();
-            //onError(_player, nRet, 0);
-            return;
-          }
+        Toast.makeText(_parent.getLayout().getContext(), "Could not connect to " + _streamUrl + "!", Toast.LENGTH_LONG).show();
+        //onError(_player, nRet, 0);
+        return;
+      }
 
     } catch (Throwable t) {
       t.printStackTrace(); }
@@ -341,11 +342,11 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
 
     if (_view != null) {
       _view.setLayoutParams(new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
     if (_player != null) {
-    	_player.setSurfaceChangeFinished();
+      _player.setSurfaceChangeFinished();
     }
 
   }
@@ -353,7 +354,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Created");
-    surfaceExists = true;
+    _surfaceExists = true;
     if (_player !=null)
     {
       // If SDK player already exists, show media controls
@@ -369,7 +370,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
     Log.i(TAG, "Surface Destroyed");
-    surfaceExists = false;
+    _surfaceExists = false;
     if (_player != null) {
       _player.stop();
       _player.setView(null);
@@ -383,30 +384,27 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     }
 
     _view = new SurfaceView(_parent.getLayout().getContext()) {
-
       @Override
       protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    		Log.v(TAG, "MEASURE SPEC: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
+        Log.v(TAG, "Remeasuring Surface: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
 
-    		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-    		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-    		Log.v(TAG, "MEASURE PARENT: " + _parent.getLayout().getMeasuredWidth() + "," + _parent.getLayout().getMeasuredHeight());
+        // assume to much vertical space, so we need to align vertically
+        int wantedWidth = parentWidth;
+        int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
+        int offset = (parentHeight - wantedHeight) / 2;
 
-     	// assume to much vertical space, so need to align vertically
-  			int wantedWidth = parentWidth;
-  			int wantedHeight = wantedWidth * _videoHeight / _videoWidth;
-  			int offset = (parentHeight - wantedHeight) / 2;
-
-  			if(offset < 0) {
-  				// oops, too much width, let's align horizontally
-  				wantedHeight = parentHeight;
-  				wantedWidth = parentHeight * _videoWidth / _videoHeight;
-  				offset = (parentWidth - wantedWidth) / 2;
-  			}
+        if(offset < 0) {
+          // oops, too much width, let's align horizontally
+          wantedHeight = parentHeight;
+          wantedWidth = parentHeight * _videoWidth / _videoHeight;
+          offset = (parentWidth - wantedWidth) / 2;
+        }
 
         setMeasuredDimension(wantedWidth, wantedHeight);
-        Log.v(TAG, "MEASURED: " + wantedWidth + "," + wantedHeight);
+        Log.v(TAG, "Surface remeasured to: " + wantedWidth + "," + wantedHeight);
       }
     };
 
@@ -538,7 +536,7 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     dequeueAll();
   }
 
-/* Playhead Timer Updating methods */
+  /* Playhead Timer Updating methods */
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
@@ -651,8 +649,8 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
 
       _view.setLayoutParams(new FrameLayout.LayoutParams(
-              ViewGroup.LayoutParams.MATCH_PARENT,
-              ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
@@ -743,10 +741,10 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     return null;
   }
 
-/**
- * After file download on init(), check the file for DRM.
- * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
- */
+  /**
+   * After file download on init(), check the file for DRM.
+   * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
+   */
   @Override
   public void afterFileDownload(String localFilename) {
     _localFilePath = localFilename;
@@ -755,15 +753,15 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
     }
     else {
       if (isStreamProtected(_localFilePath)) {
-        Log.d(TAG, "File Download Succeeded: Need to acquire rights!");
+        Log.d(TAG, "File Download Succeeded: Need to acquire rights");
         PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext());
         personalizationTask.execute();
       }
       else {
         Log.d(TAG, "File Download Succeeded: No rights needed");
-        if (surfaceExists && _player == null) {
+        if (_surfaceExists && _player == null) {
           createMediaPlayer();
-       }
+        }
       }
     }
   }
@@ -774,10 +772,10 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   @Override
   public void afterPersonalization(boolean success) {
     if (!isDevicePersonalized()) {
-      Log.e(TAG, "Personalization failed!");
+      Log.e(TAG, "Personalization failed");
     }
     else {
-      Log.d(TAG, "Personalization successful!");
+      Log.d(TAG, "Personalization successful");
       tryToAcquireRights();
     }
   }
@@ -788,12 +786,12 @@ public class VisualOnStreamPlayer extends StreamPlayer implements
   @Override
   public void afterAcquireRights(boolean success) {
     if (!success) {
-      Log.e(TAG, "Acquire Rights failed!");
+      Log.e(TAG, "Acquire Rights failed");
     }
     else {
-      Log.d(TAG, "Acquire Rights successful!");
-      if (surfaceExists && _player == null) {
-         createMediaPlayer();
+      Log.d(TAG, "Acquire Rights successful");
+      if (_surfaceExists && _player == null) {
+        createMediaPlayer();
       }
     }
   }

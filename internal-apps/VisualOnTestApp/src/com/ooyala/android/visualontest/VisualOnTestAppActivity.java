@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.visualontest.R;
@@ -35,7 +36,6 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
-
 
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
@@ -78,6 +78,23 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
     });
 
   }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    if (player != null && player.getState() != State.SUSPENDED) {
+      player.suspend();
+    }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    if (player != null && player.getState() == State.SUSPENDED) {
+      player.resume();
+    }
+  }
+
   @Override
   public void update(Observable observable, Object data) {
     OoyalaPlayer player = (OoyalaPlayer) observable;
