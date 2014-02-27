@@ -13,7 +13,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Boolean> {
+public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected String TAG = this.getClass().toString();
   protected PersonalizationCallback _callback = null;
   protected Context _context;
@@ -30,8 +30,8 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Boolean> {
   }
 
   @Override
-  protected Boolean doInBackground(Void... input) {
-    boolean success = true;
+  protected Exception doInBackground(Void... input) {
+    Exception returnException = null;
     DxLogConfig config = null;
     IDxDrmDlc dlc;
 
@@ -49,22 +49,22 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Boolean> {
       }
     } catch (DrmGeneralFailureException e) {
       e.printStackTrace();
-      success = false;
+      returnException = e;
     } catch (DrmUpdateRequiredException e) {
       e.printStackTrace();
-      success = false;
+      returnException = e;
     } catch (DrmNotSupportedException e) {
       e.printStackTrace();
-      success = false;
+      returnException = e;
     } catch (DrmClientInitFailureException e) {
       e.printStackTrace();
-      success = false;
+      returnException = e;
     }
-    return success;
+    return returnException;
   }
 
   @Override
-  protected void onPostExecute(Boolean result) {
+  protected void onPostExecute(Exception result) {
     _callback.afterPersonalization(result);
   }
 

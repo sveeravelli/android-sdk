@@ -770,7 +770,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * After we personalize, we can try to acquire rights
    */
   @Override
-  public void afterPersonalization(boolean success) {
+  public void afterPersonalization(Exception returnedException) {
+    if (returnedException != null) {
+      Log.e(TAG, "Personalization resulted in an exception!" + returnedException);
+    }
+
     if (!isDevicePersonalized()) {
       Log.e(TAG, "Personalization failed");
     }
@@ -784,9 +788,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * After we acquire rights, we can begin video playback, as long as the surface was created already
    */
   @Override
-  public void afterAcquireRights(boolean success) {
-    if (!success) {
-      Log.e(TAG, "Acquire Rights failed");
+  public void afterAcquireRights(Exception returnedException) {
+    if (returnedException != null) {
+      Log.e(TAG, "Acquire Rights failed: " + returnedException);
     }
     else {
       Log.d(TAG, "Acquire Rights successful");

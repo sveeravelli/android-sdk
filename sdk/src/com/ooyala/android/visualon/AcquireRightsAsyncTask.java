@@ -18,7 +18,7 @@ import android.os.AsyncTask;
  * @author michael.len
  *
  */
-public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Boolean> {
+public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected String TAG = this.getClass().toString();
   protected AcquireRightsCallback _callback = null;
   protected Context _context;
@@ -38,8 +38,8 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Boolean> {
   }
 
   @Override
-  protected Boolean doInBackground(Void... input) {
-    boolean success = true;
+  protected Exception doInBackground(Void... input) {
+    Exception resultException = null;
     DxLogConfig config = null;
     IDxDrmDlc dlc;
     try {
@@ -52,29 +52,29 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Boolean> {
       }
     } catch (DrmClientInitFailureException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     } catch (IOException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     } catch (DrmGeneralFailureException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     } catch (DrmNotProtectedException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     } catch (DrmInvalidFormatException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     } catch (DrmServerSoapErrorException e) {
       e.printStackTrace();
-      success = false;
+      resultException = e;
     }
 
-    return success;
+    return resultException;
   }
 
   @Override
-  protected void onPostExecute(Boolean result) {
+  protected void onPostExecute(Exception result) {
     _callback.afterAcquireRights(result);
   }
 
