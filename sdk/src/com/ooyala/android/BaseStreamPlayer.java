@@ -157,7 +157,23 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _timeBeforeSuspend = timeInMillis;
       return;
     }
-    _player.seekTo(timeInMillis);
+    
+    if( isSeekAllowed() ) {
+      _player.seekTo(timeInMillis);
+    }
+    else {
+      _timeBeforeSuspend = timeInMillis;
+    }
+  }
+
+  private void seekToTimeOnPrepared( int timeInMillis ) {
+    if (_player != null) {
+      _player.seekTo(timeInMillis);
+    }
+  }
+  
+  private boolean isSeekAllowed() {
+    return _state == State.PAUSED || _state == State.READY || _state == State.COMPLETED || _state == State.PLAYING;
   }
 
   protected void createMediaPlayer() {
@@ -219,7 +235,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       }
     }
     if (_timeBeforeSuspend > 0) {
-      seekToTime(_timeBeforeSuspend);
+      seekToTimeOnPrepared(_timeBeforeSuspend);
     }
     setState(State.READY);
   }
