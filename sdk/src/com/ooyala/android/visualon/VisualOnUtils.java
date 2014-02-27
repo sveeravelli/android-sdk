@@ -12,6 +12,7 @@ import android.util.Log;
 
 public class VisualOnUtils {
   // --- Network constants --------------------------------------------------
+  private static final String TAG = VisualOnUtils.class.getName();
   public static final int CONNECTION_TIMEOUT = 60000;
   public static final int READ_DATA_TIMEOUT = 60000;
   public static final int BUFFER_SIZE = 4096;
@@ -41,7 +42,7 @@ public class VisualOnUtils {
    */
   static public void DownloadFile(String url, String destFileName,
       int bytesToDownload) throws IOException {
-    Log.i("DownloadFile", "Downloading url: " + url + ", dest: " + destFileName);
+    Log.i(TAG, "Downloading url: " + url + ", dest: " + destFileName);
     FileOutputStream fos = null;
 
     try{

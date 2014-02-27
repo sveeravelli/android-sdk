@@ -110,8 +110,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
-    FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
-    downloadTask.execute();
+    if(_localFilePath == null) {
+      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
+      downloadTask.execute();
+    }
 
     setupView();
   }
@@ -189,9 +191,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     switch (_state) {
     case INIT:
-    case LOADING:
     case SUSPENDED:
       return 0;
+    case LOADING:
     default:
       break;
     }
@@ -245,8 +247,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return;
     }
-    Log.d(TAG, "Seeking to "+timeInMillis);
-    _player.setPosition(timeInMillis);
+    Log.d(TAG, "Seeking to " + timeInMillis);
+    if (_player.setPosition(timeInMillis) < 0) {
+      Log.e(TAG, "setPosition failed.");
+    }
   }
 
   protected void createMediaPlayer() {
@@ -636,6 +640,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_SEEK_COMPLETE:
+      if(this.getState() != State.PLAYING) {
+        setState(State.READY);
+      }
       dequeuePlay();
       break;
 
