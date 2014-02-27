@@ -157,7 +157,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _timeBeforeSuspend = timeInMillis;
       return;
     }
-    
+
     if( isSeekAllowed() ) {
       _player.seekTo(timeInMillis);
     }
@@ -171,7 +171,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _player.seekTo(timeInMillis);
     }
   }
-  
+
   private boolean isSeekAllowed() {
     return _state == State.PAUSED || _state == State.READY || _state == State.COMPLETED || _state == State.PLAYING;
   }
