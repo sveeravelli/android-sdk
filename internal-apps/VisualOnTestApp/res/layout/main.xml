@@ -15,12 +15,10 @@
             android:layout_weight="2"
             android:orientation="vertical" >
 
-            <EditText
-                android:id="@+id/embedText"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="Embed Code"
-                android:maxWidth="500dp" />
+            <Spinner
+                android:id="@+id/embedSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <Spinner
                 android:id="@+id/playerSpinner"
