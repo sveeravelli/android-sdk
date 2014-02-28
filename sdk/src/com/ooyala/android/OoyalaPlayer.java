@@ -1199,7 +1199,7 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     Stream currentStream = null;
     if (getCurrentItem() == null || (currentStream = Stream.bestStream(getCurrentItem().getStreams())) == null) { return -1; }
     String deliveryType = currentStream.getDeliveryType();
-    if (deliveryType != null && deliveryType.equals(Constants.DELIVERY_TYPE_HLS)) {
+    if (deliveryType != null && !deliveryType.equals(Constants.DELIVERY_TYPE_MP4)) {
     	return -2;
     }
     if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
