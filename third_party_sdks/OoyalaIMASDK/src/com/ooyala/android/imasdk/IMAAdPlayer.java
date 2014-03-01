@@ -7,7 +7,9 @@ import android.util.Log;
 
 import com.ooyala.android.AdMoviePlayer;
 import com.ooyala.android.AdSpot;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 /**
@@ -25,7 +27,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
     Log.d(TAG, "IMA Ad Player: Initializing");
 
     if ( ! (ad instanceof IIMAAdSpot) ) {
-      this._error = "Invalid Ad";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       this._state = State.ERROR;
     } else if (((IIMAAdSpot)ad).getImaManager()._onAdError) {
     	this._state = State.COMPLETED;
