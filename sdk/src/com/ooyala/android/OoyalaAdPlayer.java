@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
@@ -26,7 +27,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
-      this._error = "Invalid Ad";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       this._state = State.ERROR;
       return;
     }
@@ -35,7 +36,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     //If this ad tried to authorize and failed
     if(!_ad.isAuthorized() && _ad.getAuthCode() > 0) {
-      this._error = "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode());
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode()));
       this._state = State.ERROR;
       return;
     }
@@ -50,7 +51,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
         @Override
         public void callback(boolean result, OoyalaException error) {
           if (error != null || !_ad.isAuthorized()) {
-            _error = "Error fetching VAST XML";
+            _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching VAST XML");
             setState(State.ERROR);
             return;
           } else {

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 class VASTAdPlayer extends AdMoviePlayer {
@@ -45,7 +46,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof VASTAdSpot)) {
-      this._error = "Invalid Ad";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       this._state = State.ERROR;
       return;
     }
@@ -60,12 +61,12 @@ class VASTAdPlayer extends AdMoviePlayer {
         @Override
         public void callback(boolean result) {
           if (!result) {
-            _error = "Could not fetch VAST Ad";
+            _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Could not fetch VAST Ad");
             setState(State.ERROR);
             return;
           }
           if(!initAfterFetch(parent)) {
-            _error = "Bad VAST Ad";
+            _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Bad VAST Ad");
             setState(State.ERROR);
             return;
           }
@@ -75,7 +76,7 @@ class VASTAdPlayer extends AdMoviePlayer {
       return;
     }
     if(!initAfterFetch(parent)) {
-      _error = "Bad VAST Ad";
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Bad VAST Ad");
       setState(State.ERROR);
       return;
     }

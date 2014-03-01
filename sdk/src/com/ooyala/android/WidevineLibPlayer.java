@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.widevine.drmapi.android.WVEvent;
@@ -33,7 +34,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     }
     if (_stream == null) {
       Log.e("Widevine", "No available streams for the WidevineLib Player, Cannot continue." + streams.toString());
-      this._error = "Invalid Stream";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
@@ -48,11 +49,11 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     Log.d("Widevine", event.toString() + ": " + attributes.toString());
     switch (event) {
       case InitializeFailed:
-        if (this._error == null) this._error = "Widevine Initialization Failed";
+        if (this._error == null) this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Widevine Initialization Failed");
       case LicenseRequestFailed:
-        if (this._error == null) this._error = "Widevine License Request Failed";
+        if (this._error == null) this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Widevine License Request Failed");
       case PlayFailed:
-        if (this._error == null) this._error = "Widevine Playback Failed";
+        if (this._error == null) this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Widevine Playback Failed");
         _handler.sendEmptyMessage(ERROR);
         if (attributes.containsKey("WVStatusKey")) return (WVStatus) attributes.get("WVStatusKey");
         else return WVStatus.OK;

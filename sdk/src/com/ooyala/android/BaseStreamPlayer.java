@@ -23,6 +23,7 @@ import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 /**
@@ -53,13 +54,13 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     stream =  Stream.bestStream(streams);
     if (stream == null) {
       Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
-      this._error = "Invalid Stream";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
 
     if (parent == null) {
-      this._error = "Invalid Parent";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Parent");
       setState(State.ERROR);
       return;
     }
@@ -202,7 +203,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public boolean onError(MediaPlayer mp, int what, int extra) {
-    this._error = "MediaPlayer Error: " + what + " " + extra;
+    this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "MediaPlayer Error: " + what + " " + extra);
     if (what == -10 && extra == -10) {  //I think this means unsupported format
       Log.e(TAG, "Unsupported video type given to base media player");
     }

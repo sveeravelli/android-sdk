@@ -22,6 +22,8 @@ public class OoyalaException extends Exception {
     ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
     /** Metadata fetch failed*/
     ERROR_METADATA_FETCH_FAILED,
+    /** DRM-related requests failed */
+    ERROR_DRM_FAILED,
 
   };
 

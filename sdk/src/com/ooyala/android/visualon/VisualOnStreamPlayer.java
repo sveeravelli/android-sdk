@@ -30,9 +30,11 @@ import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.vodx.VODXPlayer;
 import com.discretix.vodx.VODXPlayerImpl;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.Stream;
 import com.ooyala.android.StreamPlayer;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
@@ -90,14 +92,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     if (stream == null) {
       Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
-      this._error = "Invalid Stream";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
 
     if (parent == null) {
       Log.e(TAG, "ERROR: Invalid parent (no parent provided to Stream Player)");
-      this._error = "Invalid Parent";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Parent");
       setState(State.ERROR);
       return;
     }
@@ -335,7 +337,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   public boolean onError(VODXPlayer mp, VO_OSMP_RETURN_CODE what, int extra) {
-    this._error = "voOSPBasePlayer Error: " + what + " " + extra;
+    this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "VisualOn Playback Error: " + what + " " + extra);
     setState(State.ERROR);
     return false;
   }
@@ -798,6 +800,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void afterAcquireRights(Exception returnedException) {
     if (returnedException != null) {
       Log.e(TAG, "Acquire Rights failed: " + returnedException);
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
     }
     else {
       Log.d(TAG, "Acquire Rights successful");

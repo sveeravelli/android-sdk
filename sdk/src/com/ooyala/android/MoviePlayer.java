@@ -206,7 +206,7 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
-  public String getError() { return _error != null ? _error : _basePlayer.getError(); }
+  public OoyalaException getError() { return _error != null ? _error : _basePlayer.getError(); }
   public boolean isPlaying() { return _basePlayer != null ? _basePlayer.isPlaying() : false; }
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
   public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }

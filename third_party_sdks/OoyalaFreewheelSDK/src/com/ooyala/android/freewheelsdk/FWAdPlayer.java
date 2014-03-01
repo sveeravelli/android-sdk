@@ -10,8 +10,10 @@ import com.ooyala.android.AdMoviePlayer;
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.BaseStreamPlayer;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.StreamPlayer;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 import tv.freewheel.ad.interfaces.IAdContext;
@@ -94,7 +96,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
     Log.d(TAG, "FW Ad Player: Initializing");
 
     if (!(ad instanceof FWAdSpot)) {
-      this._error = "Invalid Ad";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       this._state = State.ERROR;
       return;
     }

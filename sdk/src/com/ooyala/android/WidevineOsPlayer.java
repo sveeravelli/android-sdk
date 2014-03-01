@@ -17,6 +17,7 @@ import android.os.Looper;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
@@ -43,7 +44,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     }
     if (stream == null) {
       Log.e(TAG, "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
-      this._error = "Invalid Stream";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
@@ -61,7 +62,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     URL streamURL = stream.decodedURL();
     if (streamURL == null) {
       Log.e(TAG, "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
-      this._error = "Invalid Stream";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
@@ -146,7 +147,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
   public void onError(DrmManagerClient client, DrmErrorEvent event) {
     Log.d(TAG, "WidevineError: " + eventToString(event));
 
-    _error = Integer.toString(event.getType());
+    _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, Integer.toString(event.getType()));
 
     new Handler(Looper.getMainLooper()).post(new Runnable() {
       @Override

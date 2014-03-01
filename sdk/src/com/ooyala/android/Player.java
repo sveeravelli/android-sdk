@@ -14,7 +14,7 @@ abstract class Player extends Observable {
   /** the current state of the player */
   protected State _state = State.INIT;
   /** The Player's current error if it exists */
-  protected String _error = null;
+  protected OoyalaException _error = null;
   protected SurfaceView _view = null;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
@@ -83,7 +83,7 @@ abstract class Player extends Observable {
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
-  public String getError() {
+  public OoyalaException getError() {
     return _error;
   }
 

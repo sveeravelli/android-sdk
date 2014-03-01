@@ -4,12 +4,12 @@ import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class EmptyStreamPlayer extends StreamPlayer {
@@ -17,7 +17,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     if (parent == null) {
-      this._error = "Invalid Parent";
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Parent");
       setState(State.ERROR);
     }
     else {
@@ -87,5 +87,5 @@ public class EmptyStreamPlayer extends StreamPlayer {
     }
     _view = null;
   }
-  
+
 }
