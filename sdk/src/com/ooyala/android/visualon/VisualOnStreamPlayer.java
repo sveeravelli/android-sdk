@@ -782,10 +782,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void afterPersonalization(Exception returnedException) {
     if (returnedException != null) {
       Log.e(TAG, "Personalization resulted in an exception!" + returnedException);
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
+      setState(State.ERROR);
     }
 
     if (!isDevicePersonalized()) {
       Log.e(TAG, "Personalization failed");
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, "Personalization Failed");
+      setState(State.ERROR);
     }
     else {
       Log.d(TAG, "Personalization successful");
@@ -801,6 +805,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (returnedException != null) {
       Log.e(TAG, "Acquire Rights failed: " + returnedException);
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
+      setState(State.ERROR);
     }
     else {
       Log.d(TAG, "Acquire Rights successful");
