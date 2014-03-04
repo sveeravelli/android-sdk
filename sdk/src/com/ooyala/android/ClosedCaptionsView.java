@@ -1,75 +1,301 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.accessibility.CaptioningManager;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
+import android.widget.Scroller;
 import android.widget.TextView;
+
+import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 
 public class ClosedCaptionsView extends TextView {
 
-  private Caption _caption;
+	private Caption caption;
+	private ClosedCaptionsStyle style;
+	private Paint StrokePaint; // Paint for drawing outline
+	private Paint textPaint; // Paint for drawing text
+	private Rect textBounds; // Rect for a text
+	private double textHeight;
 
-  public ClosedCaptionsView(Context context) {
-    super(context);
-    initStyle();
-  }
+	private String text = ""; // Store the closed captions text for Roll-up effect
+	private Scroller scroller;
+	private String currentText = ""; // The closed captions for this period of time
 
-  public ClosedCaptionsView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    initStyle();
-  }
+	// Paint-on variables
+	private CharSequence paintOnText;
+	private int paintOnIndex;
+	private final long paintOnDeplay = 10;
+	private final Handler paintOnHandler = new Handler();
+	private final Runnable charPainter = new Runnable() {
+		@Override
+		public void run() {
+			setText(paintOnText.subSequence(0, paintOnIndex++));
+			if(paintOnIndex <= paintOnText.length()) {
+				paintOnHandler.postDelayed(charPainter, paintOnDeplay);
+			}
+		}
+	};
 
-  public ClosedCaptionsView(Context context, AttributeSet attrs, int defStyle) {
-    super(context, attrs, defStyle);
-    initStyle();
-  }
+	public ClosedCaptionsView(Context context) {
+		super(context);
+		initStyle();
+	}
 
-  public Caption getCaption() {
-    return _caption;
-  }
+	public ClosedCaptionsView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initStyle();
+	}
 
-  public void setCaption(Caption caption) {
-    _caption = caption;
-    if (_caption != null) {
-      setBackgroundColor(Color.BLACK);
-      setText(caption.getText());
-    } else {
-      setBackgroundColor(Color.TRANSPARENT);
-      setText("");
-    }
-  }
+	public ClosedCaptionsView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		initStyle();
+	}
 
-  // Useful for when captions are coming live, not from pre-defined file
-  public void setCaptionText(String text) {
-    if (text != null) {
-      setBackgroundColor(Color.BLACK);
-      setText(text);
-    } else {
-      setBackgroundColor(Color.TRANSPARENT);
-      setText("");
-    }
-  }
+	public Caption getCaption() {
+		return this.caption;
+	}
 
-  public void setStyle(ClosedCaptionsStyle style) {
-    setTextColor(style.getColor());
-    setBackgroundColor(style.getBackgroundColor());
-    setTypeface(style.getFont());
-    MarginLayoutParams params = (MarginLayoutParams) this.getLayoutParams();
-    params.bottomMargin = style.getBottomMargin();
-    this.setLayoutParams(params);
-  }
+	public void setCaption(Caption caption) {
+		this.caption = caption;
+		if (this.caption != null && !this.currentText.equals(this.caption.getText())) {
+			this.currentText = caption.getText();
+			setClosedCaptions(this.caption.getText());
+		} else {
+			setBackgroundColor(Color.TRANSPARENT);
+			setText("");
+		}
+	}
 
-  public void initStyle() {
-    setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
-        Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
-    setMaxLines(5);
-    setTextColor(Color.WHITE);
-    setTextSize(16);
-    setBackgroundColor(Color.TRANSPARENT);
-    setGravity(Gravity.CENTER);
-  }
+	// Set specific text on textview (shared by live streams and normal stream)
+	private void setClosedCaptions(String text) {
+		setBackgroundColor(style.backgroundColor);
+		// With outline edge type we draw text with Paint so we do not need to show original text in textview
+		// However, we still need the original text on textview to figure the position of text for Paint
+		// So we set the textColor to transparent for outline edge type
+		if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_OUTLINE) {
+			this.setTextColor(Color.TRANSPARENT);
+		}
+		if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
+			String splitText = updateFrame(text); // still need to split the text if it is too long even we do not need to change Frame for roll-up
+			setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int)(this.textHeight * 4.5),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			this.setGravity(Gravity.CENTER_HORIZONTAL);
+			this.updateBottomMargin();
+			// Calculate scrolling distance
+			this.setText(this.text);
+			if (this.getLayout() == null) {
+				return;
+			}
+			int prevBottomLine = this.getLayout().getLineTop(this.getLineCount());
+			// When the text has different lines scroll could be not smooth so make up the missing lines up to three lines
+			int lineNum = splitText.split("\n").length;
+			if (lineNum == 1) {
+				splitText = "\n" + splitText + "\n";
+			} else if (lineNum == 2) {
+				splitText = "\n" + splitText;
+			}
+			this.text = this.text + "\n" + splitText + "\n"; // these two \n are for sperating prev and post closed captions
+			this.setText(this.text);
+			if (this.getLayout() == null) {
+				return;
+			}
+			int currentBottomLine = this.getLayout().getLineTop(this.getLineCount());
+			// This magic line make sure scroll will not start from top;
+			this.setMovementMethod(new ScrollingMovementMethod());
+
+			this.scroller = new Scroller(this.getContext(), new LinearInterpolator());
+			setScroller(this.scroller);
+			// TODO: choose duration for live since live does not contain caption object
+			//int currentDuration = (int) (100 * ((caption._end - caption._begin) * 2 / 3));
+			this.scroller.startScroll(0, prevBottomLine -  (currentBottomLine - prevBottomLine), 0, currentBottomLine - prevBottomLine, 800);
+			// Clean the textView before it is too big. When there are too many texts in textView it will scroll really slow and unsmoonthly
+			// We can clean the textview every 100 or 200 lines (the number does not matter that much)
+			if (this.getLineCount() >= 100) {
+				this.text = "\n";
+			}
+		} else if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
+			//TODO: choose paint-on delay for live since live does not contain caption object
+			//paintOnDeplay = Math.min(10, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
+			this.setGravity(Gravity.LEFT | Gravity.TOP);
+			this.setPadding(10, 10, 10, 10);
+			String splitText = updateFrame(text);
+			paintOn(splitText);
+		} else {
+			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+			String splitText = updateFrame(text);
+			setText(splitText);
+		}
+	}
+
+	// Useful for when captions are coming live, not from pre-defined file
+	public void setCaptionText(String text) {
+		if (text != null) {
+			setBackgroundColor(style.backgroundColor);
+			setClosedCaptions(text);
+		} else {
+			setBackgroundColor(Color.TRANSPARENT);
+			setText("");
+		}
+	}
+
+	public void updateEdgeStyle() {
+		if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_OUTLINE) {// Setup storke paint;
+			this.StrokePaint = new Paint();
+			this.StrokePaint.setAntiAlias(true);
+			this.StrokePaint.setTextSize(super.getTextSize());
+			this.StrokePaint.setStyle(Paint.Style.STROKE);
+			this.StrokePaint.setColor(this.style.edgeColor);
+			this.StrokePaint.setTypeface(super.getTypeface());
+			this.StrokePaint.setFlags(super.getPaintFlags());
+			this.StrokePaint.setStrokeWidth(4);
+
+			// Setup text paint
+			this.textPaint = new Paint();
+			this.textPaint.setAntiAlias(true);
+			this.textPaint.setTextSize(super.getTextSize());
+			this.textPaint.setStyle(Paint.Style.FILL);
+			this.textPaint.setColor(this.style.textColor);
+			this.textPaint.setTypeface(super.getTypeface());
+			this.textPaint.setFlags(super.getPaintFlags());
+			setTextColor(Color.TRANSPARENT);
+		} else if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_DROP_SHADOW) {
+			setShadowLayer(4, 4, 4, this.style.edgeColor);
+		}
+	}
+
+	public void setStyle(ClosedCaptionsStyle style) {
+		this.style = style;
+		this.setTextSize(style.textSize);
+		String testString = "just for height"; // any text including "j" and "f" can define the max height for this font size
+		super.getPaint().getTextBounds(testString, 0, testString.length(), this.textBounds);
+		this.textHeight = this.textBounds.height() * 1.5;
+		this.setTextColor(this.style.textColor);
+		this.setTypeface(style.textFont);
+		this.updateEdgeStyle();
+		this.updateBottomMargin();
+	}
+
+	public void updateBottomMargin() {
+		MarginLayoutParams params = (MarginLayoutParams) this.getLayoutParams();
+		params.bottomMargin = style.bottomMargin;
+		this.setLayoutParams(params);
+	}
+
+	public void initStyle() {
+		this.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+		this.textBounds = new Rect();
+		this.setPadding(10, 10, 10, 10);
+	}
+
+	public void paintOn(CharSequence text) {
+		paintOnText = text;
+		paintOnIndex = 0;
+
+		setText("");
+		paintOnHandler.removeCallbacks(charPainter);
+		paintOnHandler.postDelayed(charPainter, paintOnDeplay);
+	}
+
+	// Set frame of text view based on the text size
+	public String updateFrame(String text) {
+		// Current maxWidth of closed caption view in this device
+		int maxWidth = (int)(((View)this.getParent()).getWidth() * 0.9 - this.getPaddingLeft() - this.getPaddingRight());
+		ArrayList<String> lines = new ArrayList<String>(Arrays.asList(text.split("\n")));
+		this.setText(text); // setText temporally to help calculate where those text should be when they are added to textView
+
+		// Find the width of the longest line in currently closed caption
+		// Set width of closed caption to that width if the longest line is shorter than the maxWidth
+		// Otherwise, set width of closed caption to the maxWidth for this device
+		int longestLineWidth = 0;
+		for (String line : lines) {
+			super.getPaint().getTextBounds(line, 0, line.length(), this.textBounds);
+			if (this.textBounds.width() > longestLineWidth) {
+				longestLineWidth = this.textBounds.width();
+				if (this.textBounds.width() >= maxWidth) {
+					break;
+				}
+			}
+		}
+		int width = longestLineWidth;
+		ArrayList<String> splitLines = new ArrayList<String>();
+
+		int lineNum = lines.size();
+		String splitText = text;
+		if (longestLineWidth >= maxWidth) {
+			// LongestLineWidth is greater than maxWidth so we need to split at least one line of this closed caption
+			width = maxWidth;
+			Rect currentBound = new Rect();
+			for (String line : lines) {
+				int prevWhiteSpaceIndex = 0; // The index where the '\n' char should be insert if this line need to be split
+				for (int i = 0; i < line.length(); i++) {
+					String subline = line.substring(0, i + 1);
+					super.getPaint().getTextBounds(subline, 0, subline.length(), currentBound);
+					// This line need to be split
+					if (currentBound.width() > width) {
+						splitLines.add(line.substring(0, prevWhiteSpaceIndex));
+						splitLines.add(line.substring(prevWhiteSpaceIndex + 1, line.length()));
+						lineNum++;
+						break;
+					}
+					// This line does not need to be split
+					if (i == line.length() - 1) {
+						splitLines.add(line);
+					}
+					if (line.charAt(i) == ' ') {
+						prevWhiteSpaceIndex = i;
+					}
+				}
+			}
+			// Construct the new text based on frame width
+			splitText = splitLines.get(0);
+			for (int i = 1; i < splitLines.size(); i++) {
+				splitText = splitText + "\n" + splitLines.get(i);
+			}
+		}
+		if (this.style.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
+			this.setLayoutParams(new FrameLayout.LayoutParams(width + this.textBounds.height(), (int)(lineNum * this.textHeight + 2 * (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			this.updateBottomMargin();
+		}
+		return splitText;
+	}
+
+	// Draw text and stroke for outline edge type
+	@Override
+	public void onDraw(Canvas canvas) {
+		// Only draw outline when the edge type is EDGE_TYPE_OUTLINE
+		if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_OUTLINE) {
+			String[] lines = super.getText().toString().split("\n");
+
+			for (int i = 0; i < lines.length; i++) {
+				String line = lines[i];
+				if (this.getLayout() != null && i < this.getLineCount()) {
+					int currentVeriticalOffset = this.getLayout().getLineTop(i) + this.getBaseline();
+					super.getPaint().getTextBounds(line, 0, line.length(), this.textBounds);
+					int leftPadding = (int) ((this.getWidth() - this.textBounds.width()) * 0.5); // Center the text
+
+					// Paint-on always starts from left
+					if (this.style.presentationStyle == OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
+						leftPadding = 25;
+					}
+					canvas.drawText(line, leftPadding, currentVeriticalOffset, this.StrokePaint);
+					canvas.drawText(line, leftPadding, currentVeriticalOffset, this.textPaint);
+				}
+			}
+		}
+		super.onDraw(canvas);
+	}
 }

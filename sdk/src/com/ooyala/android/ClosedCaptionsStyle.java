@@ -1,49 +1,59 @@
 package com.ooyala.android;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Typeface;
+import android.view.accessibility.CaptioningManager;
 
 public class ClosedCaptionsStyle {
-  private int color;
-  private int backgroundColor;
-  private Typeface font;
-  private int bottomMargin;
+	public int textColor;
+	public float textSize;
+	public float textOpacity;
+	public Typeface textFont;
 
-  public ClosedCaptionsStyle(int color, int backgroundColor, Typeface font) {
-    this.color = color;
-    this.backgroundColor = backgroundColor;
-    this.font = font;
-    this.bottomMargin = 0;
-  }
+	public int backgroundColor;
+	public int backgroundOpacity;
 
-  public int getColor() {
-    return color;
-  }
+	public int bottomMargin;
 
-  public void setColor(int color) {
-    this.color = color;
-  }
+	public OOClosedCaptionPresentation presentationStyle;
 
-  public int getBackgroundColor() {
-    return backgroundColor;
-  }
+	public enum OOClosedCaptionPresentation {
+		/** text that appears all at once */
+		OOClosedCaptionPopOn,
+		/** text that scrolls up as new text appears */
+		OOClosedCaptionRollUp,
+		/** text where each new letter or word is displayed as it arrives */
+		OOClosedCaptionPaintOn
+	};
 
-  public void setBackgroundColor(int backgroundColor) {
-    this.backgroundColor = backgroundColor;
-  }
+	public int edgeType;
+	public int edgeColor;
 
-  public int getBottomMargin() {
-    return bottomMargin;
-  }
+	//	public ClosedCaptionsStyle(int color, int backgroundColor, Typeface font) {
+	//		this.color = color;
+	//		this.backgroundColor = backgroundColor;
+	//		this.font = font;
+	//		this.bottomMargin = 0;
+	//	}
 
-  public void setBottomMargin(int value) {
-    this.bottomMargin = value;
-  }
+	@SuppressLint("NewApi")
+	public ClosedCaptionsStyle(Context context) {
+		CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
 
-  public Typeface getFont() {
-    return font;
-  }
 
-  public void setFont(Typeface font) {
-    this.font = font;
-  }
+
+		CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
+		this.textSize = captioningManager.getFontScale() * 26;
+		this.textFont = captionStyle.getTypeface();
+		this.textColor = captionStyle.foregroundColor;
+
+		this.backgroundColor = captionStyle.backgroundColor;
+
+		this.edgeType = captionStyle.edgeType;
+		this.edgeColor = captionStyle.edgeColor;
+
+		this.presentationStyle = OOClosedCaptionPresentation.OOClosedCaptionPopOn; // default style
+
+	}
 }

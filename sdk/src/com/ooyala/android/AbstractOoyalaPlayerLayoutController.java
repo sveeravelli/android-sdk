@@ -11,11 +11,13 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.TextView;
+
+import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
 	public static enum DefaultControlStyle {
@@ -32,6 +34,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 	protected OoyalaPlayer _player = null;
 	protected boolean _fullscreenButtonShowing = true;
 	protected List<String> optionList;
+	protected ListView listView;
+
+	private int selectedLanagugeIndex;
+	private int selectedPresentationIndex;
 
 	/**
 	 * Instantiate an AbstractOoyalaPlayerLayoutController
@@ -225,30 +231,17 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 			this.optionList.add("Paint-On");
 			this.optionList.add("Pop-On");
 		}
-		ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context, android.R.layout.simple_list_item_1, this.optionList);
 
-		final ListView listView = new ListView(context);
+
+		listView = new ListView(context);
+		ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context, android.R.layout.simple_list_item_checked, this.optionList, this.selectedLanagugeIndex, this.selectedPresentationIndex);
+		optionAdapter.SetController(this);
 		listView.setAdapter(optionAdapter);
-
-		// Listen for click events
-		listView.setOnItemClickListener(new OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long duration) {
-				if (position <= items.length) {
-					String language = !items[position - 1].equals("None") ? items[position - 1] : null;
-					_player.setClosedCaptionsLanguage(language);
-					// Mark the item
-				} else {
-					// Change the presentation
-					//_player.setClosedCaptionsStyle();
-				}
-			}
-		});
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setView(listView);
 		dialog = builder.create();
 		dialog.show();
+
 	}
 
 	/**
@@ -265,14 +258,49 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 		_fullscreenButtonShowing = showing;
 	}
 
+	public void radioButtonClicked(int position) {
+		if (position != this.selectedLanagugeIndex && position != this.selectedPresentationIndex) {
+			if (position < this.optionList.indexOf("Presentation Styles")) {
+				if (this.selectedLanagugeIndex != 0) {
+					((RadioButton)listView.getChildAt(this.selectedLanagugeIndex)).setChecked(false);
+				}
+				this.selectedLanagugeIndex = position;
+				_player.setClosedCaptionsLanguage(this.optionList.get(position));
+			} else {
+				if (this.selectedPresentationIndex != 0) {
+					((RadioButton)listView.getChildAt(this.selectedPresentationIndex)).setChecked(false);
+				}
+				this.selectedPresentationIndex = position;
+				if (this.optionList.get(position).equals("Roll-Up")) {
+					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionRollUp);
+				} else if (this.optionList.get(position).equals("Paint-On")) {
+					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPaintOn);
+				} else {
+					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPopOn);
+				}
+			}
+		}
+	}
+
+
 	class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
 
 		private final List<String> itemList;
+		private final Context context;
+		private AbstractOoyalaPlayerLayoutController controller;
+		private final int selectedLanguageIndex;
+		private final int selectedPresentationIndex;
 
-		public ClosedCaptionArrayAdapter(Context context,
-				int textViewResourceId, List<String> objects) {
+		public ClosedCaptionArrayAdapter(Context context, int textViewResourceId, List<String> objects, int selectedLanguageIndex, int selectedPresentationIndex) {
 			super(context, textViewResourceId, objects);
 			this.itemList = objects;
+			this.context = context;
+			this.selectedLanguageIndex = selectedLanguageIndex;
+			this.selectedPresentationIndex = selectedPresentationIndex;
+		}
+
+		public void SetController(AbstractOoyalaPlayerLayoutController controller) {
+			this.controller = controller;
 		}
 
 		@Override
@@ -282,11 +310,32 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = super.getView(position, convertView, parent);
-			if (position == 0 || position == this.itemList.indexOf("Presentation Styles")) {
-				v.setBackgroundColor(Color.LTGRAY);
+			//View v = super.getView(position, null, parent);
+			if (position == 0 || position == itemList.indexOf("Presentation Styles")) {
+				TextView header = new TextView(this.context);
+				header.setText(itemList.get(position));
+				header.setTextColor(Color.LTGRAY);
+				header.setTextSize(30);
+				header.setPadding(5, 0, 10, 10);
+				header.setBackgroundColor(Color.BLACK);
+				return header;
 			}
-			return v;
+			RadioButton radioButton = new RadioButton(this.context);
+			radioButton.setText(itemList.get(position));
+			radioButton.setPadding(10, 0, 0, 0);
+			final int currentPosition = position;
+			if (currentPosition == this.selectedLanguageIndex || currentPosition == this.selectedPresentationIndex) {
+				radioButton.setChecked(true);
+			}
+			radioButton.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					controller.radioButtonClicked(currentPosition);
+				}
+			});
+			return radioButton;
 		}
 
 	}
