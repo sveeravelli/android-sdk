@@ -826,7 +826,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     else {
       Log.d(TAG, "Acquiring rights");
-      AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath);
+      String authToken = _parent.getAuthToken();
+      AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath, authToken);
       acquireRightsTask.execute();
     }
   }
