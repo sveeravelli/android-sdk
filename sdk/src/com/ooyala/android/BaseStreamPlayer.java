@@ -467,9 +467,9 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     dequeueAll();
   }
 
-
+  @Override
   public SeekStyle getSeekStyle() {
-    if(stream == null  || stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) {
+    if(stream == null || Constants.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
       return SeekStyle.BASIC;
     }
     else {
