@@ -26,7 +26,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.playreadysample.R;
 
-public class VisualOnTestAppActivity extends Activity implements Observer, EmbedTokenGenerator {
+public class PlayreadyDeviceManagementSampleApp extends Activity implements Observer, EmbedTokenGenerator {
   /** Called when the activity is first created. */
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
@@ -36,9 +36,9 @@ public class VisualOnTestAppActivity extends Activity implements Observer, Embed
   ArrayAdapter<String> embedAdapter;
 
 
-  private String APIKEY = "";
-  private String SECRET = "";
-  private String ACCOUNT_ID = "pbk-373@ooyala.com";
+  private String APIKEY = "FoeG863GnBL4IhhlFC1Q2jqbkH9m.-E1Kw";
+  private String SECRET = "J9U-ZbBPlu75YLonkPKukDyRmsaTK2HXfHs9KKQ0";
+  private String ACCOUNT_ID = "sidplayreadytest";
 
 //  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
 //  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
@@ -46,7 +46,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer, Embed
 //  private String EMBEDCODE = "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2"; //Telstra Clear Single Bitrate Live Stream
 //  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
 
-  final String PCODE  = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
+  final String PCODE  = "FoeG863GnBL4IhhlFC1Q2jqbkH9m";
   final String DOMAIN = "www.ooyala.com";
 
   @Override
@@ -65,6 +65,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer, Embed
 
     //Populate the embed map
     embedMap = new HashMap<String, String>();
+    embedMap.put("Sid test ",   "pxY3gwYjrEiFX9bh9_AKCPNbfLH7czoz");
     embedMap.put("Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
     embedMap.put("Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
     embedMap.put("Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
@@ -153,10 +154,10 @@ public class VisualOnTestAppActivity extends Activity implements Observer, Embed
     HashMap<String, String> params = new HashMap<String, String>();
     params.put("account_id", ACCOUNT_ID);
 
-    String uri = "/sas/embed_token/" + PCODE + "/" + "all";
+    String uri = "/sas/embed_token/" + PCODE + "/" + embedCodesString;
     EmbeddedSecureURLGenerator urlGen = new EmbeddedSecureURLGenerator(APIKEY, SECRET);
 
-    URL tokenUrl  = urlGen.secureURL("http://player.ooyala.com", uri, params);
+    URL tokenUrl  = urlGen.secureURL("http://player-staging.ooyala.com", uri, params);
 
     callback.setEmbedToken(tokenUrl.toString());
   }
