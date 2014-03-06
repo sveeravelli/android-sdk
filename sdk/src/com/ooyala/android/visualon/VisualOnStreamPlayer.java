@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SyncStateContract.Constants;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -28,6 +29,7 @@ import com.discretix.drmdlc.api.IDxDrmDlc;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
+import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.discretix.vodx.VODXPlayer;
 import com.discretix.vodx.VODXPlayerImpl;
 import com.ooyala.android.OoyalaException;
@@ -70,6 +72,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected int _videoWidth = 16;
   protected int _videoHeight = 9;
   boolean _surfaceExists = false;
+  Stream _stream = null;
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
@@ -87,10 +90,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     Log.d(TAG, "Using VOPlayer");
-    Stream stream = null;
-    stream = Stream.bestStream(streams);
+    _stream = Stream.bestStream(streams);
 
-    if (stream == null) {
+    if (_stream == null) {
       Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
@@ -105,14 +107,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     setState(State.LOADING);
-    _streamUrl = stream.decodedURL().toString();
+    _streamUrl = _stream.decodedURL().toString();
     setParent(parent);
 
     // Copy license file,
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
-    if(_localFilePath == null) {
+    if(_localFilePath == null && "smooth".equals(_stream.getDeliveryType())) {
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
@@ -271,6 +273,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // Location of libraries
       String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
+
+      //This needs to be called at least once in order to initialize the video player
+      IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), null);
 
       // Initialize SDK player
       VOOSMPInitParam initParam = new VOOSMPInitParam();
@@ -804,6 +809,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void afterAcquireRights(Exception returnedException) {
     if (returnedException != null) {
       Log.e(TAG, "Acquire Rights failed: " + returnedException);
+      if(returnedException.getClass() == DrmServerSoapErrorException.class) {
+        String description =  ((DrmServerSoapErrorException)returnedException).getCustomData();
+
+      }
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
       setState(State.ERROR);
     }
@@ -872,6 +881,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * @return true if file can now be played, false otherwise.
    */
   public boolean canFileBePlayed(String localFilename){
+    if (_stream.getDeliveryType() != "smooth") return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(localFilename)) return true;
 
