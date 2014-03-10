@@ -1197,11 +1197,16 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
    */
   @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
   public double getBitrate() {
-    if (getCurrentItem() == null || Stream.bestStream(getCurrentItem().getStreams()) == null) { return -1; }
+    Stream currentStream = null;
+    if (getCurrentItem() == null || (currentStream = Stream.bestStream(getCurrentItem().getStreams())) == null) { return -1; }
+    String deliveryType = currentStream.getDeliveryType();
+    if (deliveryType != null && !deliveryType.equals(Constants.DELIVERY_TYPE_MP4)) {
+    	return -2;
+    }
     if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
       // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
-      metadataRetreiver.setDataSource(Stream.bestStream(getCurrentItem().getStreams()).getUrl());
+      metadataRetreiver.setDataSource(Stream.bestStream(getCurrentItem().getStreams()).getUrl(), new HashMap<String, String>());
       return Double.parseDouble(metadataRetreiver
           .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
