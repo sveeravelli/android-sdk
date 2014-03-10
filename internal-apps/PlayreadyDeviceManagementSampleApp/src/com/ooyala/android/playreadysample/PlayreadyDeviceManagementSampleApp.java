@@ -11,10 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -132,8 +130,8 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
 
   @Override
   public void update(Observable observable, Object data) {
-    OoyalaPlayer player = (OoyalaPlayer) observable;
-    String notification = data.toString();
+//    OoyalaPlayer player = (OoyalaPlayer) observable;
+//    String notification = data.toString();
     // TODO Auto-generated method stub
 //    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
 //      TextView urlText = (TextView) findViewById(R.id.urlText);
