@@ -11,7 +11,6 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.SyncStateContract.Constants;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -374,7 +373,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     if(canFileBePlayed(_localFilePath)) {
+      Log.d(TAG, "File can be played, surface created. Creating media player");
       createMediaPlayer();
+    }
+    else {
+      Log.e(TAG, "File cannot be played yet, we haven't gotten rights yet");
     }
   }
 
@@ -860,13 +863,18 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
 
-  protected boolean isStreamProtected(String streamUrl) {
+  /**
+   * Checks the given local file path if file is DRM protected
+   * @param streamUrl
+   * @return
+   */
+  protected boolean isStreamProtected(String localFilePath) {
     DxLogConfig config = null;
     IDxDrmDlc dlc;
     boolean isDrmContent = false;
     try {
       dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), config);
-      isDrmContent = dlc.isDrmContent(streamUrl);
+      isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (DrmClientInitFailureException e) {
@@ -881,7 +889,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * @return true if file can now be played, false otherwise.
    */
   public boolean canFileBePlayed(String localFilename){
-    if (_stream.getDeliveryType() != "smooth") return true;
+    if (!"smooth".equals(_stream.getDeliveryType())) return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(localFilename)) return true;
 
