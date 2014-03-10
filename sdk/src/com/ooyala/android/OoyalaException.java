@@ -22,8 +22,24 @@ public class OoyalaException extends Exception {
     ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
     /** Metadata fetch failed*/
     ERROR_METADATA_FETCH_FAILED,
-    /** DRM-related requests failed */
-    ERROR_DRM_FAILED,
+
+    /* Errors from DRM Stream Players */
+    /** DRM Personalization/Device Identification failed */
+    ERROR_DRM_PERSONALIZATION_FAILED,
+    /** DRM File download failed */
+    ERROR_DRM_FILE_DOWNLOAD_FAILED,
+    /** Device check found invalid auth token */
+    ERROR_DEVICE_INVALID_AUTH_TOKEN,
+    /** Device binding failed */
+    ERROR_DEVICE_BINDING_FAILED,
+    /** Device id is too long */
+    ERROR_DEVICE_ID_TOO_LONG,
+    /** Device limit has been reached */
+    ERROR_DEVICE_LIMIT_REACHED,
+    /** DRM Rights Acquisition server error */
+    ERROR_DRM_RIGHTS_SERVER_ERROR,
+    /** General non-Ooyala related DRM failure */
+    ERROR_DRM_GENERAL_FAILURE
 
   };
 

@@ -72,7 +72,6 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
       e.printStackTrace();
       resultException = e;
     } catch (DrmServerSoapErrorException e) {
-      e.printStackTrace();
       resultException = e;
     }
 

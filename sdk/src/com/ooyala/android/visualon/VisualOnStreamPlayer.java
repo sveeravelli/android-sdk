@@ -274,7 +274,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
 
       //This needs to be called at least once in order to initialize the video player
-      IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), null);
+      DxDrmDlc.getDxDrmDlc(_parent.getLayout().getContext(), null);
 
       // Initialize SDK player
       VOOSMPInitParam initParam = new VOOSMPInitParam();
@@ -767,6 +767,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _localFilePath = localFilename;
     if (_localFilePath == null) {
       Log.e(TAG, "File Download failed!");
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FILE_DOWNLOAD_FAILED);
+      setState(State.ERROR);
     }
     else {
       if (isStreamProtected(_localFilePath)) {
@@ -790,13 +792,13 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void afterPersonalization(Exception returnedException) {
     if (returnedException != null) {
       Log.e(TAG, "Personalization resulted in an exception!" + returnedException);
-      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
       setState(State.ERROR);
     }
 
     if (!isDevicePersonalized()) {
       Log.e(TAG, "Personalization failed");
-      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, "Personalization Failed");
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_PERSONALIZATION_FAILED, "Personalization Failed");
       setState(State.ERROR);
     }
     else {
@@ -811,12 +813,36 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void afterAcquireRights(Exception returnedException) {
     if (returnedException != null) {
-      Log.e(TAG, "Acquire Rights failed: " + returnedException);
+      Log.e(TAG, "Acquire Rights failed: " + returnedException.getClass());
       if(returnedException.getClass() == DrmServerSoapErrorException.class) {
-        String description =  ((DrmServerSoapErrorException)returnedException).getCustomData();
+        String description =  ((DrmServerSoapErrorException)returnedException).getCustomData().replaceAll("<[^>]+>", "");
+
+        if ("invalid auth_token".equals(description)) {
+          Log.e(TAG, "VisualOn Rights error: Invalid auth_token");
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
+        }
+        else if ("device limit reached".equals(description)) {
+          Log.e(TAG, "VisualOn Rights error: Device limit reached");
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_LIMIT_REACHED);
+        }
+        else if ("device binding failed".equals(description)) {
+          Log.e(TAG, "VisualOn Rights error: Device binding failed");
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_BINDING_FAILED);
+        }
+        else if ("device id too long".equals(description)) {
+          Log.e(TAG, "VisualOn Rights error: Device ID too long");
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
+        }
+        else {
+          Log.e(TAG, "General SOAP error from DRM server");
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, description);
+        }
 
       }
-      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FAILED, returnedException);
+      else {
+        Log.e(TAG, "Error with VisualOn Acquire Rights code");
+        _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
+      }
       setState(State.ERROR);
     }
     else {
@@ -861,7 +887,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     return false;
   }
-
 
   /**
    * Checks the given local file path if file is DRM protected
