@@ -38,7 +38,7 @@ public class OoyalaException extends Exception {
     ERROR_DEVICE_LIMIT_REACHED,
     /** DRM Rights Acquisition server error */
     ERROR_DRM_RIGHTS_SERVER_ERROR,
-    /** General non-Ooyala related DRM failure */
+    /** General non-Ooyala related DRM failure. stack trace of resulting failure is attached */
     ERROR_DRM_GENERAL_FAILURE
 
   };
