@@ -877,8 +877,9 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
     }
 
     if (_adPlayer == null) { return false; }
-
     initializeAdPlayer(_adPlayer, ad);
+
+    if (_adPlayer == null) { return false; }
     _adPlayer.setSeekable(_adsSeekable);
 
     removeClosedCaptionsView();
