@@ -90,10 +90,7 @@
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
     <target name="jar" depends="clean,release">
-        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="jarjar-1.4.jar" />
-
-        <jarjar destfile="OoyalaFreewheelSDK.jar" basedir="bin/classes">
-            <zipfileset src="libs/FWAdManager.jar" />
-        </jarjar>
+			<unzip src="libs/FWAdManager.jar" dest="bin/classes"/>
+			<jar destfile="OoyalaFreewheelSDK.jar" basedir="bin/classes"/>
     </target>
 </project>

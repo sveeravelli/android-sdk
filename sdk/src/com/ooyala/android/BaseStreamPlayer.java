@@ -23,6 +23,7 @@ import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 /**
@@ -464,5 +465,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   protected void setState(State state) {
     super.setState(state);
     dequeueAll();
+  }
+
+  @Override
+  public SeekStyle getSeekStyle() {
+    if(stream == null || Constants.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
+      return SeekStyle.BASIC;
+    }
+    else {
+      return SeekStyle.ENHANCED;
+    }
   }
 }

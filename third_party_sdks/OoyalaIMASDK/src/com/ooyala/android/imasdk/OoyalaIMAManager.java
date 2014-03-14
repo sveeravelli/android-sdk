@@ -87,15 +87,15 @@ public class OoyalaIMAManager implements Observer {
         _player.adPlayerCompleted();
       }
     } );
-    
+
     _adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
-      
+
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         Log.d(TAG, "IMA AdsManager loaded");
         _adsManager = event.getAdsManager();
         _adsManagerInited = false;
- 
+
         _adsManager.addAdErrorListener(new AdErrorListener() {
           @Override
           public void onAdError(AdErrorEvent event) {
@@ -105,7 +105,7 @@ public class OoyalaIMAManager implements Observer {
             _player.adPlayerCompleted();
           }
         } );
-        
+
         _adsManager.addAdEventListener(new AdEventListener() {
 
           @Override
@@ -183,7 +183,7 @@ public class OoyalaIMAManager implements Observer {
   public void setAdUrlOverride( String url ) {
     _adUrlOverride = url;
   }
-  
+
   private void loadAds(String url) {
     if (_container != null) {
       Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
@@ -208,11 +208,11 @@ public class OoyalaIMAManager implements Observer {
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
   }
-  
+
   private void addPreRollAdSpotToItem( Video item ) {
     item.insertAd( new IMAEmptyAdSpot( this ) );
   }
-  
+
   @Override
   public void update(Observable observable, Object data) {
     if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
@@ -221,9 +221,9 @@ public class OoyalaIMAManager implements Observer {
         // after adsManager destroyed _adsManagerInited should be set to false since there is no adsManager now.
         _adsManagerInited = false;
         _onAdError = false;
-        _adsLoader.contentComplete();
       }
       _adsManager = null;
+      _adsLoader.contentComplete();
 
       Video currentItem = _player.getCurrentItem();
 
