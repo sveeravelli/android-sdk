@@ -44,6 +44,7 @@ public class OoyalaFreewheelManager implements Observer {
   protected String _fwProfile = null;
   protected String _fwSiteSectionId = null;
   protected String _fwVideoAssetId = null;
+  protected String _fwFRMSegment = null;
 
   //Freewheel Ad Manager
   protected IAdContext _fwContext = null;
@@ -176,6 +177,7 @@ public class OoyalaFreewheelManager implements Observer {
     _fwProfile = getParameter("fw_android_player_profile", "fw_player_profile");
     _fwSiteSectionId = getParameter("fw_android_site_section_id", "fw_site_section_id");
     _fwVideoAssetId = getParameter("fw_android_video_asset_id", "fw_video_asset_network_id");
+    _fwFRMSegment = getParameter("FRMSegment", "FRMSegment");
 
     if (_fwNetworkId > 0 && _fwAdServer != null && _fwProfile != null && _fwSiteSectionId != null && _fwVideoAssetId != null) {
       submitAdRequest();
@@ -239,6 +241,20 @@ public class OoyalaFreewheelManager implements Observer {
     _fwContext.setVideoAsset(_fwVideoAssetId, _player.getDuration() / 1000, null, _fwConstants.VIDEO_ASSET_AUTO_PLAY_TYPE_ATTENDED(), random(), 0,
         _fwConstants.ID_TYPE_CUSTOM(), 0, _fwConstants.VIDEO_ASSET_DURATION_TYPE_EXACT());
     _fwContext.setActivity(_parent);
+
+    //parse FRMSegment to put into the context
+    if (_fwFRMSegment != "")
+    {
+      String[] keyValues = _fwFRMSegment.split(";");
+      for (String keyValue : keyValues)
+      {
+        String[] splitKeyValue = keyValue.split("=");
+        if (splitKeyValue.length > 1)
+        {
+          _fwContext.addKeyValue(splitKeyValue[0], splitKeyValue[1]);
+        }
+      }
+    }
 
     //Listen for the request complete event
     _fwContext.addEventListener(_fwConstants.EVENT_REQUEST_COMPLETE(), new IEventListener() {
