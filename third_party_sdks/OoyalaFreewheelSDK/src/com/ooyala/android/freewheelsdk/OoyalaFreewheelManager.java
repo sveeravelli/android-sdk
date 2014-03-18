@@ -243,7 +243,7 @@ public class OoyalaFreewheelManager implements Observer {
     _fwContext.setActivity(_parent);
 
     //parse FRMSegment to put into the context
-    if (_fwFRMSegment != "")
+    if (_fwFRMSegment != "" && _fwFRMSegment != null)
     {
       String[] keyValues = _fwFRMSegment.split(";");
       for (String keyValue : keyValues)
