@@ -1394,6 +1394,20 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
 	}
 
 	/**
+	 * Set the ClosedCaptionsStyle
+	 * @param closedCaptionsStyle the ClosedCaptionsStyle to use
+	 */
+	public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
+		_closedCaptionsStyle = closedCaptionsStyle;
+		if (_closedCaptionsStyle != null) {
+			_closedCaptionsView.setStyle(_closedCaptionsStyle);
+			_closedCaptionsView.setStyle(_closedCaptionsStyle);
+		}
+		displayCurrentClosedCaption();
+	}
+
+
+	/**
 	 * Set the bottomMargin of closedCaptions view
 	 * @param bottomMargin the bottom margin to use
 	 */

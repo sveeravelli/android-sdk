@@ -2,6 +2,7 @@ package com.ooyala.android;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.accessibility.CaptioningManager;
 
@@ -16,8 +17,10 @@ public class ClosedCaptionsStyle {
 
 	public int bottomMargin;
 
-	public OOClosedCaptionPresentation presentationStyle;
+	public int edgeType;
+	public int edgeColor;
 
+	public OOClosedCaptionPresentation presentationStyle;
 	public enum OOClosedCaptionPresentation {
 		/** text that appears all at once */
 		OOClosedCaptionPopOn,
@@ -27,33 +30,29 @@ public class ClosedCaptionsStyle {
 		OOClosedCaptionPaintOn
 	};
 
-	public int edgeType;
-	public int edgeColor;
-
-	//	public ClosedCaptionsStyle(int color, int backgroundColor, Typeface font) {
-	//		this.color = color;
-	//		this.backgroundColor = backgroundColor;
-	//		this.font = font;
-	//		this.bottomMargin = 0;
-	//	}
-
 	@SuppressLint("NewApi")
 	public ClosedCaptionsStyle(Context context) {
-		CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+			CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
+			CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
+			this.textSize = captioningManager.getFontScale() * 26;
+			this.textFont = captionStyle.getTypeface();
+			this.textColor = captionStyle.foregroundColor;
 
+			this.backgroundColor = captionStyle.backgroundColor;
 
+			this.edgeType = captionStyle.edgeType;
+			this.edgeColor = captionStyle.edgeColor;
+		} else {
+			this.textSize = 26;
+			this.textFont = Typeface.DEFAULT;
+			this.textColor = Color.WHITE;
 
-		CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
-		this.textSize = captioningManager.getFontScale() * 26;
-		this.textFont = captionStyle.getTypeface();
-		this.textColor = captionStyle.foregroundColor;
+			this.backgroundColor = Color.BLACK;
 
-		this.backgroundColor = captionStyle.backgroundColor;
-
-		this.edgeType = captionStyle.edgeType;
-		this.edgeColor = captionStyle.edgeColor;
-
+			this.edgeType = CaptioningManager.CaptionStyle.EDGE_TYPE_NONE;
+			this.edgeColor = Color.TRANSPARENT;
+		}
 		this.presentationStyle = OOClosedCaptionPresentation.OOClosedCaptionPopOn; // default style
-
 	}
 }

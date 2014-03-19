@@ -135,7 +135,7 @@ public class ClosedCaptionsView extends TextView {
 			String splitText = updateFrame(text);
 			paintOn(splitText);
 		} else {
-			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
 			String splitText = updateFrame(text);
 			setText(splitText);
 		}
@@ -199,6 +199,7 @@ public class ClosedCaptionsView extends TextView {
 		this.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 		this.textBounds = new Rect();
 		this.setPadding(10, 10, 10, 10);
+		this.setEnabled(false);
 	}
 
 	public void paintOn(CharSequence text) {
@@ -267,7 +268,7 @@ public class ClosedCaptionsView extends TextView {
 			}
 		}
 		if (this.style.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
-			this.setLayoutParams(new FrameLayout.LayoutParams(width + this.textBounds.height(), (int)(lineNum * this.textHeight + 2 * (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			this.setLayoutParams(new FrameLayout.LayoutParams(width * 10 / 9, (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.updateBottomMargin();
 		}
 		return splitText;
