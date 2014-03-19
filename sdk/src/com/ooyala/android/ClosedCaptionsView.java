@@ -32,21 +32,21 @@ public class ClosedCaptionsView extends TextView {
 	private Rect textBounds; // Rect for a text
 	private double textHeight;
 
-	private String text = ""; // Store the closed captions text for Roll-up effect
-	private Scroller scroller;
+	private String existingText = ""; // Store the closed captions text for Roll-up effect
 	private String currentText = ""; // The closed captions for this period of time
+	private Scroller scroller;
 
 	// Paint-on variables
 	private CharSequence paintOnText;
 	private int paintOnIndex;
-	private final long paintOnDeplay = 10;
+	private final long paintOnDelay = 10;
 	private final Handler paintOnHandler = new Handler();
 	private final Runnable charPainter = new Runnable() {
 		@Override
 		public void run() {
 			setText(paintOnText.subSequence(0, paintOnIndex++));
 			if(paintOnIndex <= paintOnText.length()) {
-				paintOnHandler.postDelayed(charPainter, paintOnDeplay);
+				paintOnHandler.postDelayed(charPainter, paintOnDelay);
 			}
 		}
 	};
@@ -91,12 +91,12 @@ public class ClosedCaptionsView extends TextView {
 			this.setTextColor(Color.TRANSPARENT);
 		}
 		if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
-			String splitText = updateFrame(text); // still need to split the text if it is too long even we do not need to change Frame for roll-up
-			setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int)(this.textHeight * 4.5),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			String splitText = getSplitTextAndUpdateFrame(text); // still need to split the text if it is too long even we do not need to change Frame for roll-up
+			setLayoutParams(new FrameLayout.LayoutParams((((View) this.getParent()).getWidth()) * 8 / 10, (int)(this.textHeight * 4.5),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.setGravity(Gravity.CENTER_HORIZONTAL);
 			this.updateBottomMargin();
 			// Calculate scrolling distance
-			this.setText(this.text);
+			this.setText(this.existingText);
 			if (this.getLayout() == null) {
 				return;
 			}
@@ -108,8 +108,8 @@ public class ClosedCaptionsView extends TextView {
 			} else if (lineNum == 2) {
 				splitText = "\n" + splitText;
 			}
-			this.text = this.text + "\n" + splitText + "\n"; // these two \n are for sperating prev and post closed captions
-			this.setText(this.text);
+			this.existingText = this.existingText + "\n" + splitText + "\n"; // these two \n are for sperating prev and post closed captions
+			this.setText(this.existingText);
 			if (this.getLayout() == null) {
 				return;
 			}
@@ -125,18 +125,17 @@ public class ClosedCaptionsView extends TextView {
 			// Clean the textView before it is too big. When there are too many texts in textView it will scroll really slow and unsmoonthly
 			// We can clean the textview every 100 or 200 lines (the number does not matter that much)
 			if (this.getLineCount() >= 100) {
-				this.text = "\n";
+				this.existingText = "\n";
 			}
 		} else if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
 			//TODO: choose paint-on delay for live since live does not contain caption object
 			//paintOnDeplay = Math.min(10, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
 			this.setGravity(Gravity.LEFT | Gravity.TOP);
-			this.setPadding(10, 10, 10, 10);
-			String splitText = updateFrame(text);
+			String splitText = getSplitTextAndUpdateFrame(text);
 			paintOn(splitText);
 		} else {
 			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-			String splitText = updateFrame(text);
+			String splitText = getSplitTextAndUpdateFrame(text);
 			setText(splitText);
 		}
 	}
@@ -153,7 +152,7 @@ public class ClosedCaptionsView extends TextView {
 	}
 
 	public void updateEdgeStyle() {
-		if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_OUTLINE) {// Setup storke paint;
+		if (this.style.edgeType == CaptioningManager.CaptionStyle.EDGE_TYPE_OUTLINE) {// Setup stroke paint;
 			this.StrokePaint = new Paint();
 			this.StrokePaint.setAntiAlias(true);
 			this.StrokePaint.setTextSize(super.getTextSize());
@@ -208,11 +207,11 @@ public class ClosedCaptionsView extends TextView {
 
 		setText("");
 		paintOnHandler.removeCallbacks(charPainter);
-		paintOnHandler.postDelayed(charPainter, paintOnDeplay);
+		paintOnHandler.postDelayed(charPainter, paintOnDelay);
 	}
 
 	// Set frame of text view based on the text size
-	public String updateFrame(String text) {
+	public String getSplitTextAndUpdateFrame(String text) {
 		// Current maxWidth of closed caption view in this device
 		int maxWidth = (int)(((View)this.getParent()).getWidth() * 0.9 - this.getPaddingLeft() - this.getPaddingRight());
 		ArrayList<String> lines = new ArrayList<String>(Arrays.asList(text.split("\n")));
@@ -246,6 +245,8 @@ public class ClosedCaptionsView extends TextView {
 					String subline = line.substring(0, i + 1);
 					super.getPaint().getTextBounds(subline, 0, subline.length(), currentBound);
 					// This line need to be split
+					// Currently we only split once at most per line so if we get a super lone line
+					// some later part of that line could be invisiable
 					if (currentBound.width() > width) {
 						splitLines.add(line.substring(0, prevWhiteSpaceIndex));
 						splitLines.add(line.substring(prevWhiteSpaceIndex + 1, line.length()));
@@ -267,8 +268,11 @@ public class ClosedCaptionsView extends TextView {
 				splitText = splitText + "\n" + splitLines.get(i);
 			}
 		}
+
+		// If we always use fix size frame for roll-up
+		// For paint-on and pop-on we change the frame size based on how long the text is and the font size
 		if (this.style.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
-			this.setLayoutParams(new FrameLayout.LayoutParams(width * 10 / 9, (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			this.setLayoutParams(new FrameLayout.LayoutParams(width * 10 / 9 + this.getPaddingLeft() + this.getPaddingRight(), (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.updateBottomMargin();
 		}
 		return splitText;
