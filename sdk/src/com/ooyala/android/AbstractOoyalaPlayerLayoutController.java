@@ -219,20 +219,19 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 	@Override
 	public void showClosedCaptionsMenu() {
 		Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
-		languageSet.add("None");
+		languageSet.add(LocalizationSupport.localizedStringFor("None"));
 
-		final String[] items = languageSet.toArray(new String[0]);
 		final Context context = _layout.getContext();
 
 		if (this.optionList == null) {
 			this.optionList = new ArrayList<String>();
-			this.optionList.add("Languages");
+			this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
 			this.optionList.addAll(languageSet);
-			this.optionList.add("Presentation Styles");
-			this.optionList.add("Roll-Up");
-			this.optionList.add("Paint-On");
-			this.optionList.add("Pop-On");
-			this.optionList.add("Done");
+			this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
+			this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
+			this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
+			this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
+			this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
 		}
 
 
@@ -263,7 +262,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 		if (position == (this.optionList.size() - 1)) {
 			this.dialog.hide();
 		} else if (position != this.selectedLanagugeIndex && position != this.selectedPresentationIndex) {
-			if (position < this.optionList.indexOf("Presentation Styles")) {
+			if (position < this.optionList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
 				if (this.selectedLanagugeIndex != 0) {
 					((RadioButton)listView.getChildAt(this.selectedLanagugeIndex)).setChecked(false);
 				}
@@ -274,9 +273,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 					((RadioButton)listView.getChildAt(this.selectedPresentationIndex)).setChecked(false);
 				}
 				this.selectedPresentationIndex = position;
-				if (this.optionList.get(position).equals("Roll-Up")) {
+				if (this.optionList.get(position).equals(LocalizationSupport.localizedStringFor("Roll-Up"))) {
 					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionRollUp);
-				} else if (this.optionList.get(position).equals("Paint-On")) {
+				} else if (this.optionList.get(position).equals(LocalizationSupport.localizedStringFor("Paint-On"))) {
 					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPaintOn);
 				} else {
 					_player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPopOn);
@@ -304,12 +303,12 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
 		@Override
 		public boolean isEnabled(int position) {
-			return (position != 0) && (position != this.itemList.indexOf("Presentation Styles"));
+			return (position != 0) && (position != this.itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			if (position == 0 || position == itemList.indexOf("Presentation Styles")) {
+			if (position == 0 || position == itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
 				TextView header = new TextView(this.context);
 				header.setText(itemList.get(position));
 				header.setTextColor(Color.LTGRAY);
@@ -317,7 +316,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 				header.setPadding(5, 0, 10, 10);
 				header.setBackgroundColor(Color.BLACK);
 				return header;
-			} else if (position == itemList.indexOf("Done")) {
+			} else if (position == itemList.indexOf(LocalizationSupport.localizedStringFor("Done"))) {
 				Button doneButton = new Button(this.context);
 				doneButton.setText(itemList.get(position));
 				doneButton.setTextColor(Color.LTGRAY);
