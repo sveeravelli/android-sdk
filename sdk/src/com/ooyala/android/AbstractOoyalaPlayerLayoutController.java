@@ -336,7 +336,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 			}
 			RadioButton radioButton = new RadioButton(this.context);
 			radioButton.setText(itemList.get(position));
-			radioButton.setPadding(10, 0, 0, 0);
+			//radioButton.setPadding(10, 0, 0, 0); If we set the padding for radio button we will have radio button and text overlap
 			final int currentPosition = position;
 			if (currentPosition == this.selectedLanguageIndex || currentPosition == this.selectedPresentationIndex) {
 				radioButton.setChecked(true);
