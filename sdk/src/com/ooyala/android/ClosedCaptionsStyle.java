@@ -1,49 +1,58 @@
 package com.ooyala.android;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.view.accessibility.CaptioningManager;
 
 public class ClosedCaptionsStyle {
-  private int color;
-  private int backgroundColor;
-  private Typeface font;
-  private int bottomMargin;
+	public int textColor;
+	public float textSize;
+	public float textOpacity;
+	public Typeface textFont;
 
-  public ClosedCaptionsStyle(int color, int backgroundColor, Typeface font) {
-    this.color = color;
-    this.backgroundColor = backgroundColor;
-    this.font = font;
-    this.bottomMargin = 0;
-  }
+	public int backgroundColor;
+	public int backgroundOpacity;
 
-  public int getColor() {
-    return color;
-  }
+	public int bottomMargin;
 
-  public void setColor(int color) {
-    this.color = color;
-  }
+	public int edgeType;
+	public int edgeColor;
 
-  public int getBackgroundColor() {
-    return backgroundColor;
-  }
+	public OOClosedCaptionPresentation presentationStyle;
+	public enum OOClosedCaptionPresentation {
+		/** text that appears all at once */
+		OOClosedCaptionPopOn,
+		/** text that scrolls up as new text appears */
+		OOClosedCaptionRollUp,
+		/** text where each new letter or word is displayed as it arrives */
+		OOClosedCaptionPaintOn
+	};
 
-  public void setBackgroundColor(int backgroundColor) {
-    this.backgroundColor = backgroundColor;
-  }
+	@SuppressLint("NewApi")
+	public ClosedCaptionsStyle(Context context) {
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+			CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
+			CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
+			this.textSize = captioningManager.getFontScale() * 26;
+			this.textFont = captionStyle.getTypeface();
+			this.textColor = captionStyle.foregroundColor;
 
-  public int getBottomMargin() {
-    return bottomMargin;
-  }
+			this.backgroundColor = captionStyle.backgroundColor;
 
-  public void setBottomMargin(int value) {
-    this.bottomMargin = value;
-  }
+			this.edgeType = captionStyle.edgeType;
+			this.edgeColor = captionStyle.edgeColor;
+		} else {
+			this.textSize = 26;
+			this.textFont = Typeface.DEFAULT;
+			this.textColor = Color.WHITE;
 
-  public Typeface getFont() {
-    return font;
-  }
+			this.backgroundColor = Color.BLACK;
 
-  public void setFont(Typeface font) {
-    this.font = font;
-  }
+			this.edgeType = CaptioningManager.CaptionStyle.EDGE_TYPE_NONE;
+			this.edgeColor = Color.TRANSPARENT;
+		}
+		this.presentationStyle = OOClosedCaptionPresentation.OOClosedCaptionPopOn; // default style
+	}
 }
