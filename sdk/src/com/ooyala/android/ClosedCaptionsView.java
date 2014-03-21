@@ -39,7 +39,7 @@ public class ClosedCaptionsView extends TextView {
 	// Paint-on variables
 	private CharSequence paintOnText;
 	private int paintOnIndex;
-	private final long paintOnDelay = 10;
+	private long paintOnDelay = 10;
 	private final Handler paintOnHandler = new Handler();
 	private final Runnable charPainter = new Runnable() {
 		@Override
@@ -74,7 +74,7 @@ public class ClosedCaptionsView extends TextView {
 		this.caption = caption;
 		if (this.caption != null && !this.currentText.equals(this.caption.getText())) {
 			this.currentText = caption.getText();
-			setClosedCaptions(this.caption.getText());
+			setClosedCaptions(this.caption.getText(), false);
 		} else {
 			setBackgroundColor(Color.TRANSPARENT);
 			setText("");
@@ -82,7 +82,7 @@ public class ClosedCaptionsView extends TextView {
 	}
 
 	// Set specific text on textview (shared by live streams and normal stream)
-	private void setClosedCaptions(String text) {
+	private void setClosedCaptions(String text, Boolean isLive) {
 		setBackgroundColor(style.backgroundColor);
 		// With outline edge type we draw text with Paint so we do not need to show original text in textview
 		// However, we still need the original text on textview to figure the position of text for Paint
@@ -92,7 +92,7 @@ public class ClosedCaptionsView extends TextView {
 		}
 		if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
 			String splitText = getSplitTextAndUpdateFrame(text); // still need to split the text if it is too long even we do not need to change Frame for roll-up
-			setLayoutParams(new FrameLayout.LayoutParams((((View) this.getParent()).getWidth()) * 8 / 10, (int)(this.textHeight * 4.5),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			setLayoutParams(new FrameLayout.LayoutParams((((View) this.getParent()).getWidth()) * 9 / 10, (int)(this.textHeight * 3.5),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.setGravity(Gravity.CENTER_HORIZONTAL);
 			this.updateBottomMargin();
 			// Calculate scrolling distance
@@ -120,8 +120,11 @@ public class ClosedCaptionsView extends TextView {
 			this.scroller = new Scroller(this.getContext(), new LinearInterpolator());
 			setScroller(this.scroller);
 			// TODO: choose duration for live since live does not contain caption object
-			//int currentDuration = (int) (100 * ((caption._end - caption._begin) * 2 / 3));
-			this.scroller.startScroll(0, prevBottomLine -  (currentBottomLine - prevBottomLine), 0, currentBottomLine - prevBottomLine, 800);
+			int currentDuration = 600;
+			if (!isLive) {
+				currentDuration = (int) (100 * ((caption._end - caption._begin) * 2 / 3));
+			}
+			this.scroller.startScroll(0, prevBottomLine -  (currentBottomLine - prevBottomLine), 0, currentBottomLine - prevBottomLine, currentDuration);
 			// Clean the textView before it is too big. When there are too many texts in textView it will scroll really slow and unsmoonthly
 			// We can clean the textview every 100 or 200 lines (the number does not matter that much)
 			if (this.getLineCount() >= 100) {
@@ -129,7 +132,9 @@ public class ClosedCaptionsView extends TextView {
 			}
 		} else if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
 			//TODO: choose paint-on delay for live since live does not contain caption object
-			//paintOnDeplay = Math.min(10, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
+			if (!isLive) {
+				this.paintOnDelay = Math.min(this.paintOnDelay, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
+			}
 			this.setGravity(Gravity.LEFT | Gravity.TOP);
 			String splitText = getSplitTextAndUpdateFrame(text);
 			paintOn(splitText);
@@ -144,7 +149,7 @@ public class ClosedCaptionsView extends TextView {
 	public void setCaptionText(String text) {
 		if (text != null) {
 			setBackgroundColor(style.backgroundColor);
-			setClosedCaptions(text);
+			setClosedCaptions(text, true);
 		} else {
 			setBackgroundColor(Color.TRANSPARENT);
 			setText("");
@@ -272,7 +277,8 @@ public class ClosedCaptionsView extends TextView {
 		// If we always use fix size frame for roll-up
 		// For paint-on and pop-on we change the frame size based on how long the text is and the font size
 		if (this.style.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
-			this.setLayoutParams(new FrameLayout.LayoutParams(width * 10 / 9 + this.getPaddingLeft() + this.getPaddingRight(), (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+			// Set 150 as the smallest width for shortest text
+			this.setLayoutParams(new FrameLayout.LayoutParams(Math.max(150, width * 10 / 9 + this.getPaddingLeft() + this.getPaddingRight()), (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.updateBottomMargin();
 		}
 		return splitText;
