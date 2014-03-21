@@ -817,8 +817,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if(returnedException.getClass() == DrmServerSoapErrorException.class) {
         String description =  ((DrmServerSoapErrorException)returnedException).getCustomData().replaceAll("<[^>]+>", "");
 
-        if ("invalid auth_token".equals(description)) {
-          Log.e(TAG, "VisualOn Rights error: Invalid auth_token");
+        if ("invalid token".equals(description)) {
+          Log.e(TAG, "VisualOn Rights error: Invalid token");
           _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
         }
         else if ("device limit reached".equals(description)) {
@@ -834,7 +834,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
           _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
         }
         else {
-          Log.e(TAG, "General SOAP error from DRM server");
+          Log.e(TAG, "General SOAP error from DRM server: " + description);
           _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, description);
         }
 
