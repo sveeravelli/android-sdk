@@ -1,4 +1,16 @@
-Current Version: 2.2.0
+Current Version: 2.3.0
+
+------------ 2.3.0 ------------
+Fix OoyalaFreewheelSDK build to not munge the Freewheel class file checksums.
+[PBK-505] call IMA's contentComplete() more appropriately often.
+[PBK-522] more attempts to avoid null dereferencing.
+[PBK-457]fixed getBitrate crash. Still need MP4 file test.
+[PBK-457] Split if condition.
+[PBK-457] Fixed if condition issue in getBitrate()
+[PBK-457] update the bitrate fix. Only return the correct nitrate for MP4 files. Return -2 for others.
+[PBK-531] Add support of FRMSegment to Ooyala Freewheel Manager
+[PBK-504] Disable Enhanced seek style for native HLS playback
+
 
 ------------ 2.2.0 ------------
 Freewheel Ad Manager Support
