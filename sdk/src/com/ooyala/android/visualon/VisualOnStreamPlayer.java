@@ -476,7 +476,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     Log.v(TAG, "Player Resume");
 
-    tryToAcquireRights();
+    if (isStreamProtected(_localFilePath)) {
+      tryToAcquireRights();
+    }
     if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
       play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
