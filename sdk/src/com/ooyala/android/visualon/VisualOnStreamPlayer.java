@@ -210,9 +210,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     switch (_state) {
     case INIT:
-    case LOADING:
     case SUSPENDED:
       return 0;
+    case LOADING:
     default:
       break;
     }
