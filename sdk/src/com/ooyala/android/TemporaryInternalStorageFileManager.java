@@ -2,11 +2,8 @@ package com.ooyala.android;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.Context;
@@ -30,7 +27,6 @@ final public class TemporaryInternalStorageFileManager {
    */
   public TemporaryInternalStorageFile next( final Context context, final String prefix, final String ext ) throws IOException {
     cleanup( context );
-    final long id = s_nextTmpId.getAndIncrement();
     return new TemporaryInternalStorageFile( context, PRE_PRE_FIX + s_nextTmpId.get() + "_" + prefix, ext );
   }
 

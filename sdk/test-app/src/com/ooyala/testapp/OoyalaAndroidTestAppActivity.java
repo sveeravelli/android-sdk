@@ -9,7 +9,6 @@ import java.util.Observer;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,12 +17,10 @@ import android.widget.Button;
 
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
-import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.testapp.R;
-import com.ooyala.android.BaseStreamPlayer;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator {
   private static final String TAG = "OoyalaSampleApp";
@@ -39,7 +36,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
   private String ACCOUNT_ID = "pbk-373@ooyala.com";
   private String PLAYERDOMAIN = "ooyala.com";
-  private boolean metadataReady = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -128,7 +124,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   public void update(Observable arg0, Object arg1) {
     Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
     if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
-      metadataReady = true;
       Log.d(TAG, "AD - metadata true!");
     } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
       Log.d(TAG, "Woot, here is the current metadata: " + player.getMetadata());

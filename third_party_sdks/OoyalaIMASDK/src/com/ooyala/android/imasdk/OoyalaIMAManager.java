@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ViewGroup;
 

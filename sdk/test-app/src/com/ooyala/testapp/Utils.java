@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import android.os.Build;
 import android.text.format.DateUtils;
 import android.util.Log;
 
