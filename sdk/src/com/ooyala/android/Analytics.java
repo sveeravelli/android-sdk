@@ -176,6 +176,7 @@ public class Analytics {
     try {
       final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
       try { while( true ) { Log.d( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
+      scanner.close();
     }
     catch( FileNotFoundException e ) { }
 
