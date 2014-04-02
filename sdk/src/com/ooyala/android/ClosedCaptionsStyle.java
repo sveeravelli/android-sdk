@@ -1,10 +1,8 @@
 package com.ooyala.android;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.view.accessibility.CaptioningManager;
 
 public class ClosedCaptionsStyle {
 	public int textColor;
@@ -30,19 +28,9 @@ public class ClosedCaptionsStyle {
 		OOClosedCaptionPaintOn
 	};
 
-	@SuppressLint("NewApi")
-	public ClosedCaptionsStyle(Context context) {
+  public ClosedCaptionsStyle(Context context) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-			CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
-			CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
-			this.textSize = captioningManager.getFontScale() * 26;
-			this.textFont = captionStyle.getTypeface();
-			this.textColor = captionStyle.foregroundColor;
-
-			this.backgroundColor = captionStyle.backgroundColor;
-
-			this.edgeType = captionStyle.edgeType;
-			this.edgeColor = captionStyle.edgeColor;
+		  CaptioningManagerWrapper.updateClosedCaptionsStyleFromCaptioningManager(this, context);
 		} else {
 			this.textSize = 26;
 			this.textFont = Typeface.DEFAULT;
@@ -50,7 +38,7 @@ public class ClosedCaptionsStyle {
 
 			this.backgroundColor = Color.BLACK;
 
-			this.edgeType = CaptioningManager.CaptionStyle.EDGE_TYPE_NONE;
+			this.edgeType = 0;
 			this.edgeColor = Color.TRANSPARENT;
 		}
 		this.presentationStyle = OOClosedCaptionPresentation.OOClosedCaptionPopOn; // default style
