@@ -132,6 +132,16 @@ public class Video extends ContentItem implements PlayableItem {
     _ads.add(ad);
   }
 
+  public void filterAds( IMatchObjectPredicate<AdSpot> keeper ) {
+    ArrayList<AdSpot> kept = new ArrayList<AdSpot>();
+    for( AdSpot ad : _ads ) {
+      if( keeper.matches( ad ) ) {
+        kept.add( ad );
+      }
+    }
+    _ads = kept;
+  }
+
   public Channel getParent() {
     return _parent;
   }

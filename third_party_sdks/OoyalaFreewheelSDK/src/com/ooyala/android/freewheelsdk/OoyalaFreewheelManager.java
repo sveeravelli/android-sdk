@@ -13,12 +13,13 @@ import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
-
 import android.app.Activity;
 import android.util.Log;
 
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.AdSpot;
+import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
 
 /**
  * The OoyalaFreewheelManager will play back all Freewheel ads affiliated with any playing Ooyala asset. It will
@@ -37,6 +38,7 @@ public class OoyalaFreewheelManager implements Observer {
   protected Map<String,String> _fwParameters = null;
   protected FWAdPlayerListener _fwAdPlayerListener;
   protected List<ISlot> _overlays = null;
+  protected boolean didUpdateRollsAndDelegate;
 
   //Freewheel ad request parameters
   protected int _fwNetworkId = -1;
@@ -91,6 +93,7 @@ public class OoyalaFreewheelManager implements Observer {
    */
   public void setFWAdPlayerListener(FWAdPlayerListener adPlayer) {
     _fwAdPlayerListener = adPlayer;
+    updateRollsAndDelegate();
   }
 
   /**
@@ -154,6 +157,7 @@ public class OoyalaFreewheelManager implements Observer {
         _player.getCurrentItem().getModuleData().get("freewheel-ads-manager") != null &&
         setupAdManager()) {
       _player.getCurrentItem().insertAd(new FWAdSpot(null, this));
+      submitAdRequest();
     }
   }
 
@@ -180,7 +184,6 @@ public class OoyalaFreewheelManager implements Observer {
     _fwFRMSegment = getParameter("FRMSegment", "FRMSegment");
 
     if (_fwNetworkId > 0 && _fwAdServer != null && _fwProfile != null && _fwSiteSectionId != null && _fwVideoAssetId != null) {
-      submitAdRequest();
       return true;
     } else {
       Log.e(TAG, "Could not fetch all metadata for the Freewheel ad");
@@ -226,7 +229,7 @@ public class OoyalaFreewheelManager implements Observer {
 
   /**
    * Sets up the ad manager and submits the ad request
-   * If the ad request was successful, it will call handleAdManagerRequestComplete()
+   * If the ad request was successful, it will call updateRollsAndDelegate()
    */
   private void submitAdRequest() {
     IAdManager fwAdManager = AdManager.getInstance(_parent.getApplicationContext());
@@ -265,12 +268,11 @@ public class OoyalaFreewheelManager implements Observer {
         if (_fwConstants != null) {
           if (_fwConstants.EVENT_REQUEST_COMPLETE().equals(eType) && Boolean.valueOf(eSuccess)) {
             Log.d(TAG, "Request completed successfully");
-            handleAdManagerRequestComplete();
+            didUpdateRollsAndDelegate = false;
+            updateRollsAndDelegate();
           } else {
             Log.e(TAG, "Request failed");
-            if (_fwAdPlayerListener != null) {
-              _fwAdPlayerListener.onError();
-            }
+            cleanupOnError();
           }
         }
       }
@@ -281,32 +283,54 @@ public class OoyalaFreewheelManager implements Observer {
         Log.e(TAG, "There was an error in the Freewheel Ad Manager!");
         //Set overlay ads to null so they don't affect playback
         _overlays = null;
-
-        if (_fwAdPlayerListener != null) {
-          _fwAdPlayerListener.onError();
-        }
+        cleanupOnError();
       }
     });
     //Submit request with 3s timeout
     _fwContext.submitRequest(3.0);
   }
 
+  private void cleanupOnError() {
+    if (_fwAdPlayerListener != null) {
+      _fwAdPlayerListener.onError();
+    }
+    removeAds();
+  }
+
+  private void removeAds() {
+    _player.getCurrentItem().filterAds( new IMatchObjectPredicate<AdSpot>() {
+      @Override
+      public boolean matches( AdSpot ad ) {
+        return ! (ad instanceof FWAdSpot);
+      }
+    } );
+  }
+
   /**
    * Gets the pre, mid, and post-rolls when ad request is complete
-   * Play pre-rolls if _player.play() was called
+   * Play pre-rolls if _player.play() was called.
+   * If no listener has been set yet, this does nothing; we'll be called again when the listener is set to a non-null value.
    */
-  private void handleAdManagerRequestComplete() {
+  private void updateRollsAndDelegate() {
+    if( _fwAdPlayerListener != null && ! didUpdateRollsAndDelegate ) {
+      updatePreMidPost();
+      didUpdateRollsAndDelegate = true;
+    }
+  }
+
+  /**
+   * Call this only via updateRollsAndDelegate() to ensure proper state.
+   */
+  private void updatePreMidPost() {
     List<ISlot> prerolls = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_PREROLL());
     _overlays = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_OVERLAY());
 
-    if (_fwAdPlayerListener != null) {
-      //If there are pre-rolls, pop the first pre-roll off and call adReady. The rest of the pre-rolls will be added below.
-      //Else, make sure to pass nil to the listener so that FWAdPlayer can fire ad complete and resume content.
-      if (prerolls != null && prerolls.size() > 0) {
-        _fwAdPlayerListener.adReady(prerolls.remove(0));
-      } else {
-        _fwAdPlayerListener.adReady(null);
-      }
+    //If there are pre-rolls, pop the first pre-roll off and call adReady. The rest of the pre-rolls will be added below.
+    //Else, make sure to pass nil to the listener so that FWAdPlayer can fire ad complete and resume content.
+    if (prerolls != null && prerolls.size() > 0) {
+      _fwAdPlayerListener.adReady(prerolls.remove(0));
+    } else {
+      _fwAdPlayerListener.adReady(null);
     }
 
     try {
