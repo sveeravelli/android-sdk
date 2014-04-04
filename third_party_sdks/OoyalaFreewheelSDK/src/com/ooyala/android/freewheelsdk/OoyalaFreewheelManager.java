@@ -38,6 +38,7 @@ public class OoyalaFreewheelManager implements Observer {
   protected Map<String,String> _fwParameters = null;
   protected FWAdPlayerListener _fwAdPlayerListener;
   protected List<ISlot> _overlays = null;
+  protected boolean haveDataToUpdate;
   protected boolean didUpdateRollsAndDelegate;
 
   //Freewheel ad request parameters
@@ -268,6 +269,7 @@ public class OoyalaFreewheelManager implements Observer {
         if (_fwConstants != null) {
           if (_fwConstants.EVENT_REQUEST_COMPLETE().equals(eType) && Boolean.valueOf(eSuccess)) {
             Log.d(TAG, "Request completed successfully");
+            haveDataToUpdate = true;
             didUpdateRollsAndDelegate = false;
             updateRollsAndDelegate();
           } else {
@@ -312,8 +314,9 @@ public class OoyalaFreewheelManager implements Observer {
    * If no listener has been set yet, this does nothing; we'll be called again when the listener is set to a non-null value.
    */
   private void updateRollsAndDelegate() {
-    if( _fwAdPlayerListener != null && ! didUpdateRollsAndDelegate ) {
+    if( _fwAdPlayerListener != null && haveDataToUpdate && ! didUpdateRollsAndDelegate ) {
       updatePreMidPost();
+      haveDataToUpdate = false;
       didUpdateRollsAndDelegate = true;
     }
   }
