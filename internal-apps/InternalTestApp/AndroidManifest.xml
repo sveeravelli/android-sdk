@@ -17,7 +17,7 @@
         android:name="com.ooyala.test.InternalTestApplication">
         <activity
             android:name="com.ooyala.test.cases.PlaybackInternalTestAppActivity"
-            android:configChanges="keyboardHidden|orientation"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/coreItemName" >
 
         </activity>
