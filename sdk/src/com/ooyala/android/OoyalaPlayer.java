@@ -143,7 +143,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param ooyalaAPIClient
    *          an initialized OoyalaApiClient
    */
@@ -153,7 +153,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -166,7 +166,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -190,7 +190,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Set the layout controller from which the OoyalaPlayer should fetch the
    * layout to display to
-   * 
+   *
    * @param layoutController
    *          the layoutController to use.
    */
@@ -205,7 +205,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current OoyalaPlayerLayout
-   * 
+   *
    * @return the current OoyalaPlayerLayout
    */
   public FrameLayout getLayout() {
@@ -215,7 +215,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Reinitializes the player with a new embed code. If embedCode is null, this
    * method has no effect and just returns false.
-   * 
+   *
    * @param embedCode
    * @return true if the embed code was successfully set, false if not.
    */
@@ -226,7 +226,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Reinitializes the player with a new set of embed codes. If embedCodes is
    * null, this method has no effect and just returns false.
-   * 
+   *
    * @param embedCodes
    * @return true if the embed codes were successfully set, false if not.
    */
@@ -238,7 +238,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Reinitializes the player with a new embed code. If embedCode is null, this
    * method has no effect and just returns false. An ad set can be dynamically
    * associated using the adSetCode param.
-   * 
+   *
    * @param embedCode
    * @param adSetCode
    * @return true if the embed code was successfully set, false if not.
@@ -256,7 +256,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Reinitializes the player with a new set of embed codes. If embedCodes is
    * null, this method has no effect and just returns false. An ad set can be
    * dynamically associated using the adSetCode param.
-   * 
+   *
    * @param embedCodes
    * @param adSetCode
    * @return true if the embed codes were successfully set, false if not.
@@ -296,7 +296,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Reinitializes the player with a new external ID. If externalId is null,
    * this method has no effect and just returns false.
-   * 
+   *
    * @param externalId
    * @return true if the external ID was successfully set, false if not.
    */
@@ -312,7 +312,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Reinitializes the player with a new set of external IDs. If externalIds is
    * null, this method has no effect and just returns false.
-   * 
+   *
    * @param externalIds
    * @return true if the external IDs were successfully set, false if not.
    */
@@ -344,7 +344,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Reinitializes the player with the rootItem specified.
-   * 
+   *
    * @param rootItem
    *          the ContentItem to reinitialize the player with
    * @return true if the change was successful, false if not
@@ -358,7 +358,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set the current video in a channel if the video is present.
-   * 
+   *
    * @param embedCode
    * @return true if the change was successful, false if not
    */
@@ -369,7 +369,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set the current video in a channel if the video is present.
-   * 
+   *
    * @param video
    * @return true if the change was successful, false if not
    */
@@ -439,7 +439,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * This is a helper function ONLY to be used with changeCurrentItem.
-   * 
+   *
    * @return
    */
   private boolean changeCurrentItemAfterAuth() {
@@ -493,7 +493,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * This is a helper function ONLY to be used with changeCurrentItem (in
    * changeCurrentItemAfterAuth).
-   * 
+   *
    * @return
    */
   private boolean changeCurrentItemAfterFetch() {
@@ -644,7 +644,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * The current movie.
-   * 
+   *
    * @return movie
    */
   public Video getCurrentItem() {
@@ -653,7 +653,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * The embedded item (movie, channel, or channel set).
-   * 
+   *
    * @return movie
    */
   public ContentItem getRootItem() {
@@ -662,7 +662,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * The metadata for current root item
-   * 
+   *
    * @return metadata
    */
   public JSONObject getMetadata() {
@@ -671,7 +671,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current error code, if one exists
-   * 
+   *
    * @return error code
    */
   public OoyalaException getError() {
@@ -680,7 +680,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the embedCode for the current player.
-   * 
+   *
    * @return embedCode
    */
   public String getEmbedCode() {
@@ -689,7 +689,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the authToken for the current player.
-   * 
+   *
    * @return authToken
    */
   public String getAuthToken() {
@@ -699,7 +699,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Get current player state. One of playing, paused, buffering, channel, or
    * error
-   * 
+   *
    * @return state
    */
   public State getState() {
@@ -732,7 +732,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Play the current video with an initialTime
-   * 
+   *
    * @param initialTimeInMillis
    *          the time to start the video.
    */
@@ -820,7 +820,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Returns true if in fullscreen mode, false if not. Fullscreen currently does
    * not work due to limitations in Android.
-   * 
+   *
    * @return fullscreen mode
    */
   public boolean isFullscreen() {
@@ -836,7 +836,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * OoyalaPlayer.suspend() before doing so and call OoyalaPlayer.resume() after
    * doing so. <li>If the setFullscreen method of your LayoutController uses the
    * same OoyalaPlayerLayout, you do not need to do any special handling.
-   * 
+   *
    * @param fullscreen
    *          true to switch to fullscreen, false to switch out of fullscreen
    */
@@ -858,7 +858,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Get the absolute pixel of the top bar's distance from the top of the
    * device.
-   * 
+   *
    * @return pixels to shift the Learn More button down
    */
   public int getTopBarOffset() {
@@ -868,7 +868,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Find where the playhead is with millisecond accuracy
-   * 
+   *
    * @return time in milliseconds
    */
   public int getPlayheadTime() {
@@ -880,7 +880,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Synonym for seek.
-   * 
+   *
    * @param timeInMillis
    *          in milliseconds
    */
@@ -900,7 +900,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Move the playhead to a new location in seconds with millisecond accuracy
-   * 
+   *
    * @param timeInMillis
    *          in milliseconds
    */
@@ -1016,7 +1016,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Manually initiate playback of an AdSpot
-   * 
+   *
    * @param ad
    * @return if the ad started playing
    */
@@ -1049,7 +1049,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Change the current video to the previous video in the Channel or
    * ChannelSet. If there is no previous video, this will seek to the beginning
    * of the video.
-   * 
+   *
    * @param what
    *          OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE
    *          depending on what to do after the video is set.
@@ -1074,7 +1074,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * there is no next video, nothing will happen. Note that this will trigger a
    * fetch of additional children if the Channel or ChannelSet is paginated. If
    * so, it may take some time before the video is actually set.
-   * 
+   *
    * @param what
    *          OoyalaPlayerControl.DO_PLAY or OoyalaPlayerControl.DO_PAUSE
    *          depending on what to do after the video is set.
@@ -1266,7 +1266,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get what the player will do at the end of playback.
-   * 
+   *
    * @return the OoyalaPlayer.OoyalaPlayerActionAtEnd to use
    */
   public ActionAtEnd getActionAtEnd() {
@@ -1275,7 +1275,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set what the player should do at the end of playback.
-   * 
+   *
    * @param actionAtEnd
    */
   public void setActionAtEnd(ActionAtEnd actionAtEnd) {
@@ -1303,7 +1303,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set the displayed closed captions language
-   * 
+   *
    * @param language
    *          2 letter country code of the language to display or nil to hide
    *          closed captions
@@ -1330,9 +1330,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setClosedCaptionsPresentationStyle(
       OOClosedCaptionPresentation presentationStyle) {
     removeClosedCaptionsView();
-    _closedCaptionsStyle.presentationStyle = presentationStyle;
     _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
-    _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsStyle.presentationStyle = presentationStyle;
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    }
     getLayout().addView(_closedCaptionsView);
     _closedCaptionsView.setCaption(null);
     displayCurrentClosedCaption();
@@ -1340,7 +1342,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current closed caption language
-   * 
+   *
    * @return the current closed caption language
    */
   public String getClosedCaptionsLanguage() {
@@ -1349,7 +1351,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the available closed captions languages
-   * 
+   *
    * @return a Set of Strings containing the available closed captions languages
    */
   public Set<String> getAvailableClosedCaptionsLanguages() {
@@ -1410,7 +1412,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Seek to the given percentage
-   * 
+   *
    * @param percent
    *          percent (between 0 and 100) to seek to
    */
@@ -1427,7 +1429,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current item's duration
-   * 
+   *
    * @return the duration in milliseconds
    */
   public int getDuration() {
@@ -1444,7 +1446,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current item's buffer percentage
-   * 
+   *
    * @return the buffer percentage (between 0 and 100 inclusive)
    */
   public int getBufferPercentage() {
@@ -1456,7 +1458,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current item's playhead time as a percentage
-   * 
+   *
    * @return the playhead time percentage (between 0 and 100 inclusive)
    */
   public int getPlayheadPercentage() {
@@ -1468,7 +1470,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set whether ads played by this OoyalaPlayer are seekable (default is false)
-   * 
+   *
    * @param seekable
    *          true if seekable, false if not.
    */
@@ -1482,7 +1484,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Set whether videos played by this OoyalaPlayer are seekable (default is
    * true)
-   * 
+   *
    * @param seekable
    *          true if seekable, false if not.
    */
@@ -1581,28 +1583,34 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set the ClosedCaptionsStyle
-   * 
+   *
    * @param closedCaptionsStyle
    *          the ClosedCaptionsStyle to use
    */
   public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
     _closedCaptionsStyle = closedCaptionsStyle;
     if (_closedCaptionsStyle != null) {
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
     }
     displayCurrentClosedCaption();
   }
 
   /**
    * Set the bottomMargin of closedCaptions view
-   * 
+   *
    * @param bottomMargin
    *          the bottom margin to use
    */
   public void setClosedCaptionsBottomMargin(int bottomMargin) {
-    _closedCaptionsStyle.bottomMargin = bottomMargin;
-    _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsStyle.bottomMargin = bottomMargin;
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
+    }
   }
 
   private void displayCurrentClosedCaption() {
@@ -1646,7 +1654,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Set the callback that will be called every time the current item changes
-   * 
+   *
    * @param callback
    *          the CurrentItemChangedCallback that should be called every time
    *          the current item changes
@@ -1662,7 +1670,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Check to ensure the BasePlayer is authorized to play streams. If it is, set
    * this base player onto our players and remember it
-   * 
+   *
    * @param basePlayer
    */
   public void setBasePlayer(StreamPlayer basePlayer) {
@@ -1722,7 +1730,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Generate the authorization error of a video item.
-   * 
+   *
    * @param currentItem
    * @return a properly described OoyalaException
    */
@@ -1749,7 +1757,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Register an Ad player our players and remember it
-   * 
+   *
    * @param adTypeClass
    *          A type of AdSpot that the player is capable of playing
    * @param adPlayerClass
@@ -1762,7 +1770,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the SDK version and RC number of this Ooyala Player SDK
-   * 
+   *
    * @return the SDK version as a string
    */
   public static String getVersion() {
