@@ -170,7 +170,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 	@Override
 	public boolean onTouchEvent(MotionEvent event, OoyalaPlayerLayout source) {
 		// the MediaController will hide after 3 seconds - tap the screen to make it appear again
-		if (_player != null) {
+		if (_player != null && event.getAction() == MotionEvent.ACTION_DOWN) {
 			switch (_player.getState()) {
 			case INIT:
 			case LOADING:
@@ -191,7 +191,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 						getOverlay().show();
 					}
 				}
-				return false;
+				return true;
 			}
 		}
 		return false;
