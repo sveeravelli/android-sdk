@@ -59,7 +59,10 @@ class AuthHeartbeat {
       _handler.post(new Runnable() {
         @Override
         public void run() {
-          _authHeartbeatErrorListener.onAuthHeartbeatError(e);
+          final OnAuthHeartbeatErrorListener listener = _authHeartbeatErrorListener;
+          if( listener != null ) {
+            listener.onAuthHeartbeatError(e);
+          }
         }
       });
     }
