@@ -355,6 +355,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
     Log.v(TAG, "Surface Changed: " + width + ","+ height);
+
+    _view.setLayoutParams(new FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
     if (_player != null) {
       _player.setSurfaceChangeFinished();
     }
@@ -671,6 +676,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _videoWidth = param1;
       _videoHeight = param2;
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+
+      _view.setLayoutParams(new FrameLayout.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
