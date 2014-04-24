@@ -52,11 +52,8 @@ import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleTextRowInfo;
 import com.visualon.OSMPUtils.voOSType;
 
 /**
- * A wrapper around android.media.MediaPlayer
- * http://developer.android.com/reference/android/media/MediaPlayer.html
- *
- * For a list of Android supported media formats, see:
- * http://developer.android.com/guide/appendix/media-formats.html
+ * A StreamPlayer which wraps around VisualOn's OSMP Player
+ * Provides consistent HLS and Smooth/Playready playback
  */
 public class VisualOnStreamPlayer extends StreamPlayer implements
 VOCommonPlayerListener, SurfaceHolder.Callback,
@@ -254,10 +251,23 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player.setPosition(timeInMillis) < 0) {
       Log.e(TAG, "setPosition failed.");
     }
+    setState(State.LOADING);
   }
 
   protected void createMediaPlayer() {
     try {
+      if (!_surfaceExists) {
+        Log.e(TAG, "Trying to create a player without a valid surface");
+        return;
+      }
+
+      if (!canFileBePlayed(_localFilePath)) {
+        Log.e(TAG, "File cannot be played yet, we haven't gotten rights yet");
+        return;
+      }
+
+      Log.d(TAG, "File can be played, surface created. Creating media player");
+
       if (_player == null) {
         _player = new VODXPlayerImpl();
       } else {
@@ -361,13 +371,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
-    if(canFileBePlayed(_localFilePath)) {
-      Log.d(TAG, "File can be played, surface created. Creating media player");
       createMediaPlayer();
-    }
-    else {
-      Log.e(TAG, "File cannot be played yet, we haven't gotten rights yet");
-    }
+
   }
 
   @Override
@@ -648,12 +653,16 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_SEEK_COMPLETE:
-      if(this.getState() != State.PLAYING) {
-        setState(State.READY);
+      // If first param is 0, seek is actaully complete
+      if (param1 <= 0) {
+        if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
+          setState(State.PLAYING);
+        } else {
+          setState(State.READY);
+          dequeuePlay();
+        }
       }
-      dequeuePlay();
       break;
-
     case VO_OSMP_CB_SRC_BUFFER_TIME:
       this._buffer = param1;
       break;
@@ -670,6 +679,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         setState(State.PLAYING);
       } else {
         setState(State.READY);
+        dequeuePlay();
       }
       break;
 
@@ -768,9 +778,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       else {
         Log.d(TAG, "File Download Succeeded: No rights needed");
-        if (_surfaceExists && _player == null) {
-          createMediaPlayer();
-        }
+        createMediaPlayer();
       }
     }
   }
@@ -814,11 +822,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     else {
       Log.d(TAG, "Acquire Rights successful");
-      if (_surfaceExists && _player == null) {
-        createMediaPlayer();
-      }
+      createMediaPlayer();
     }
   }
+  
+  /**
+   *  TODO: update this
+   * @param exception
+   * @return
+   */
   private OoyalaException handleSoapError(DrmServerSoapErrorException exception) {
 	  String description =  exception.getCustomData().replaceAll("<[^>]+>", "");
 	  OoyalaException error = null;
