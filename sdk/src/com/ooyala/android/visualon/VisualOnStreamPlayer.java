@@ -20,7 +20,6 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
@@ -84,6 +83,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
+  private static final String DELIVERY_TYPE_SMOOTH = "smooth";  //TODO: Unify with ooyala.Constants class
 
 
   @Override
@@ -134,19 +134,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case READY:
     case COMPLETED:
       Log.v(TAG, "Play: ready - about to start");
-      if (_timeBeforeSuspend >=0 ) {
-        _player.setPosition(_timeBeforeSuspend);
+      if (_timeBeforeSuspend >= 0 ) {
+      	  seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
       }
 
       VO_OSMP_RETURN_CODE nRet = _player.start();
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         Log.v(TAG, "MediaPlayer started.");
+        setState(State.PLAYING);
+        startPlayheadTimer();
       } else {
         onError(_player, nRet, 0);
       }
-      setState(State.PLAYING);
-      startPlayheadTimer();
       break;
     case SUSPENDED:
       queuePlay();
@@ -226,7 +226,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   //Sets enablement of live CC, which is checked every time VisualOn receives CC data on stream
   @Override
-  public void setLiveClosedCaptionsEnabled(boolean enabled){
+  public void setLiveClosedCaptionsEnabled(boolean enabled) {
     _isLiveClosedCaptionsEnabled = enabled;
   }
 
@@ -261,10 +261,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player == null) {
         _player = new VODXPlayerImpl();
       } else {
-
         Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
-        _player.destroy();
-        return;
       }
 
       // SDK player engine type
@@ -330,9 +327,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         Log.v(TAG, "MediaPlayer is Opened.");
       } else {
-
-        Toast.makeText(_parent.getLayout().getContext(), "Could not connect to " + _streamUrl + "!", Toast.LENGTH_LONG).show();
-        //onError(_player, nRet, 0);
+      	Log.e(TAG, "Could not open VisualOn Player");
+      	onError(_player, nRet, 0);
         return;
       }
 
@@ -349,16 +345,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
     Log.v(TAG, "Surface Changed: " + width + ","+ height);
-
-    if (_view != null) {
-      _view.setLayoutParams(new FrameLayout.LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-    }
     if (_player != null) {
       _player.setSurfaceChangeFinished();
     }
-
   }
 
   @Override
@@ -458,15 +447,18 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
-      stop();
-      _player.setView(null);
-      _player.destroy();
-      _player = null;
+      destroyBasePlayer();
     }
+
     removeView();
     _buffer = 0;
     _playQueued = false;
     setState(State.SUSPENDED);
+  }
+
+  @Override
+  public void resume() {
+    resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
   @Override
@@ -479,6 +471,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (isStreamProtected(_localFilePath)) {
       tryToAcquireRights();
     }
+
     if (_stateBeforeSuspend == State.PLAYING || _stateBeforeSuspend == State.LOADING) {
       play();
     } else if (_stateBeforeSuspend == State.COMPLETED) {
@@ -486,17 +479,18 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
   }
 
-  public void resume() {
-    resume(_timeBeforeSuspend, _stateBeforeSuspend);
+  public void destroyBasePlayer() {
+    if (_player != null) {
+      stop();
+      _player.setView(null);
+      _player.destroy();
+      _player = null;
+    }
   }
 
   @Override
   public void destroy() {
-    if (_player != null) {
-      stop();
-      _player.destroy();
-      _player = null;
-    }
+    destroyBasePlayer();
     removeView();
     _buffer = 0;
     _playQueued = false;
@@ -504,7 +498,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _state = State.INIT;
   }
 
-  protected void currentItemCompleted() {
+  private void currentItemCompleted() {
     stopPlayheadTimer();
     setState(State.COMPLETED);
   }
@@ -534,6 +528,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       case COMPLETED:
         _playQueued = false;
         play();
+        break;
       default:
         break;
       }
@@ -556,8 +551,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if (_player == null)
+      if (_player == null) {
         return;
+      }
 
       if (_lastPlayhead != _player.getPosition()) {
         _playheadUpdateTimerHandler.sendEmptyMessage(0);
@@ -602,7 +598,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return "";
 
     String strTextAll = "";
-    for(int i = 0; i<subtitleInfo.getSubtitleEntry().size(); i++)
+    for(int i = 0; i < subtitleInfo.getSubtitleEntry().size(); i++)
     {
       // Retrieve the display info for each subtitle entry
       voSubtitleInfoEntry info = subtitleInfo.getSubtitleEntry().get(i);
@@ -666,10 +662,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _videoWidth = param1;
       _videoHeight = param2;
       Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
-
-      _view.setLayoutParams(new FrameLayout.LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
@@ -687,10 +679,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_ERROR:
-      Log.e(TAG, "onEvent: Error. " + param1);
-      onError(_player, null, id.getValue());
-      break;
-
     case VO_OSMP_SRC_CB_CONNECTION_FAIL:
     case VO_OSMP_SRC_CB_DOWNLOAD_FAIL:
     case VO_OSMP_SRC_CB_DRM_FAIL:
@@ -699,6 +687,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
     case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
       // Display error dialog and stop player
+      Log.e(TAG, "onEvent: Error. " + param1);
       onError(_player, null, id.getValue());
       break;
 
@@ -711,7 +700,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         _isLiveClosedCaptionsAvailable = true;
       }
 
-      //Show closed captions if someone enabled them
+      // Show closed captions if someone enabled them
       if (_isLiveClosedCaptionsEnabled) {
         _parent.displayClosedCaptionText(cc);
       }
@@ -751,13 +740,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
     Log.v(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
-
   }
 
   @Override
   public VO_OSMP_RETURN_CODE onVOSyncEvent(VO_OSMP_CB_SYNC_EVENT_ID arg0,
       int arg1, int arg2, Object arg3) {
-    return null;
+    return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
   }
 
   /**
@@ -797,8 +785,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
       setState(State.ERROR);
     }
-
-    if (!isDevicePersonalized()) {
+    else if (!isDevicePersonalized()) {
       Log.e(TAG, "Personalization failed");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_PERSONALIZATION_FAILED, "Personalization Failed");
       setState(State.ERROR);
@@ -817,29 +804,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (returnedException != null) {
       Log.e(TAG, "Acquire Rights failed: " + returnedException.getClass());
       if(returnedException.getClass() == DrmServerSoapErrorException.class) {
-        String description =  ((DrmServerSoapErrorException)returnedException).getCustomData().replaceAll("<[^>]+>", "");
-
-        if ("invalid token".equals(description)) {
-          Log.e(TAG, "VisualOn Rights error: Invalid token");
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
-        }
-        else if ("device limit reached".equals(description)) {
-          Log.e(TAG, "VisualOn Rights error: Device limit reached");
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_LIMIT_REACHED);
-        }
-        else if ("device binding failed".equals(description)) {
-          Log.e(TAG, "VisualOn Rights error: Device binding failed");
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_BINDING_FAILED);
-        }
-        else if ("device id too long".equals(description)) {
-          Log.e(TAG, "VisualOn Rights error: Device ID too long");
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
-        }
-        else {
-          Log.e(TAG, "General SOAP error from DRM server: " + description);
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, description);
-        }
-
+         _error = handleSoapError((DrmServerSoapErrorException)returnedException);
       }
       else {
         Log.e(TAG, "Error with VisualOn Acquire Rights code");
@@ -854,6 +819,33 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
     }
   }
+  private OoyalaException handleSoapError(DrmServerSoapErrorException exception) {
+	  String description =  exception.getCustomData().replaceAll("<[^>]+>", "");
+	  OoyalaException error = null;
+
+	  if ("invalid token".equals(description)) {
+		  Log.e(TAG, "VisualOn Rights error: Invalid token");
+		  error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
+	  }
+	  else if ("device limit reached".equals(description)) {
+		  Log.e(TAG, "VisualOn Rights error: Device limit reached");
+		  error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_LIMIT_REACHED);
+	  }
+	  else if ("device binding failed".equals(description)) {
+		  Log.e(TAG, "VisualOn Rights error: Device binding failed");
+		  error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_BINDING_FAILED);
+	  }
+	  else if ("device id too long".equals(description)) {
+		  Log.e(TAG, "VisualOn Rights error: Device ID too long");
+		  error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
+	  }
+	  else {
+		  Log.e(TAG, "General SOAP error from DRM server: " + description);
+		  error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, description);
+	  }
+
+	  return error;
+  }
 
   /**
    * Ensure that we have enough information to acquire rights (personalization, file download)
@@ -862,7 +854,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void tryToAcquireRights() {
     boolean isdevicePersonalized = isDevicePersonalized();
     if(!isdevicePersonalized || _localFilePath == null) {
-      Log.i(TAG, "Acquire Rights not available yet: Personalization = " + isdevicePersonalized + ", localFilePath = " + _localFilePath);
+      Log.e(TAG, "We are not able to acquire rights: We are either not personalized or no file: Personalization = " + isdevicePersonalized + ", localFilePath = " + _localFilePath);
+      _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, "Acquire Rights being called when personalization/download did not happen");
+      setState(State.ERROR);
     }
     else {
       Log.d(TAG, "Acquiring rights");
@@ -915,8 +909,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * @param localFilename file path to locally downloaded file
    * @return true if file can now be played, false otherwise.
    */
-  public boolean canFileBePlayed(String localFilename){
-    if (!"smooth".equals(_stream.getDeliveryType())) return true;
+  private boolean canFileBePlayed(String localFilename) {
+    if (!DELIVERY_TYPE_SMOOTH.equals(_stream.getDeliveryType())) return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(localFilename)) return true;
 

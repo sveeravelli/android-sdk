@@ -59,6 +59,10 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     } catch (DrmClientInitFailureException e) {
       e.printStackTrace();
       returnException = e;
+    } catch (Exception e) {
+      Log.e(TAG, "Unknown exception thrown in Personalization Async Task");
+      e.printStackTrace();
+      returnException = e;
     }
     return returnException;
   }

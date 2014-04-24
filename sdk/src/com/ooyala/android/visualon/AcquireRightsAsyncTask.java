@@ -13,6 +13,7 @@ import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 /**
  * Perform DRM rights acquisition on a provided local file
  * @author michael.len
@@ -72,6 +73,10 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
       e.printStackTrace();
       resultException = e;
     } catch (DrmServerSoapErrorException e) {
+      resultException = e;
+    } catch (Exception e) {
+    	Log.e(TAG, "Unknown exception caught in Acquire Rights");
+    	e.printStackTrace();
       resultException = e;
     }
 
