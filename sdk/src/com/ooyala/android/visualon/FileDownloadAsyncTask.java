@@ -2,8 +2,9 @@ package com.ooyala.android.visualon;
 
 import java.io.File;
 import java.io.IOException;
+
+import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
 public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
@@ -19,9 +20,9 @@ public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
    * @param filename the destination filename for the file
    * @param streamUrl the source url for the file
    */
-  public FileDownloadAsyncTask(FileDownloadCallback callback, String filename, String streamUrl) {
+  public FileDownloadAsyncTask(Context context, FileDownloadCallback callback, String filename, String streamUrl) {
     super();
-    _contentDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Ooyala_SecurePlayer";
+    _contentDir = VisualOnUtils.getLocalFileDir(context);
     _localFilePath = String.format("%s/%s", _contentDir, filename);
     _callback = callback;
     _streamUrl = streamUrl;
@@ -34,7 +35,7 @@ public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
       //Create content directory.
       if (new File(_contentDir).mkdirs() == false){
         if (new File(_contentDir).exists() == false){
-          Log.e(TAG, "Cannot create content directory on SD-CARD");
+          Log.e(TAG, "Cannot create content directory on internal storage");
         }
       }
       VisualOnUtils.DownloadFile(_streamUrl, _localFilePath);

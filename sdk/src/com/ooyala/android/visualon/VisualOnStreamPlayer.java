@@ -58,6 +58,7 @@ import com.visualon.OSMPUtils.voOSType;
 public class VisualOnStreamPlayer extends StreamPlayer implements
 VOCommonPlayerListener, SurfaceHolder.Callback,
 FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
+  private static boolean didCleanupLocalFiles = false;
   private static final String TAG = "VisualOnStreamPlayer";
 
   protected VODXPlayer _player = null;
@@ -110,8 +111,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
     VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
 
+    // Do a cleanup of all saved manifests first open of the app
+    if (!didCleanupLocalFiles) {
+      didCleanupLocalFiles = true;
+      VisualOnUtils.cleanupLocalFiles(_parent.getLayout().getContext());
+    }
+
     if(_localFilePath == null && "smooth".equals(_stream.getDeliveryType())) {
-      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(this, parent.getEmbedCode(), _streamUrl);
+      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
 
@@ -271,7 +278,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player == null) {
         _player = new VODXPlayerImpl();
       } else {
-        Log.e(TAG, "DANGER DANGER: Creating a Media player when one already exists");
+        Log.e(TAG, "DANGER: Creating a Media player when one already exists");
       }
 
       // SDK player engine type
@@ -478,7 +485,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     Log.v(TAG, "Player Resume");
 
-    if (isStreamProtected(_localFilePath)) {
+    if (isStreamProtected(_localFilePath) && !canFileBePlayed(_localFilePath)) {
       tryToAcquireRights();
     }
 

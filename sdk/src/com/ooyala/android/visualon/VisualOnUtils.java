@@ -122,4 +122,17 @@ public class VisualOnUtils {
       e.printStackTrace();
     }
   }
+
+  static public void cleanupLocalFiles(Context context) {
+    File dir = new File(getLocalFileDir(context));
+    if (dir.listFiles() != null) {
+      for (File file : dir.listFiles()) {
+        file.delete();
+      }
+    }
+  }
+
+  static public String getLocalFileDir(Context context) {
+    return context.getFilesDir().getAbsolutePath() + "/Ooyala_VO";
+  }
 }
