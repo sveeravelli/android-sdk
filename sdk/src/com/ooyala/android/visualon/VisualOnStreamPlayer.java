@@ -843,9 +843,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
   
   /**
-   *  TODO: update this
-   * @param exception
-   * @return
+   * Parse SOAP from Playready license server to see if there is a known Playready error
+   * @param exception The exception that is passed from the Playready license server
+   * @return An OoyalaException with the intended error for the application
    */
   private OoyalaException handleSoapError(DrmServerSoapErrorException exception) {
 	  String description =  exception.getCustomData().replaceAll("<[^>]+>", "");
