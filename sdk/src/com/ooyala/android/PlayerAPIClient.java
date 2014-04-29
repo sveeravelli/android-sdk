@@ -18,7 +18,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 class PlayerAPIClient {
   protected String _pcode = null;
-  protected String _domain = null;
+  protected PlayerDomain _domain = null;
   protected int _width = -1;
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
@@ -31,7 +31,7 @@ class PlayerAPIClient {
 
   public PlayerAPIClient() {}
 
-  public PlayerAPIClient(String pcode, String domain, EmbedTokenGenerator embedTokenGenerator) {
+  public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator) {
     _pcode = pcode;
     _domain = domain;
     _embedTokenGenerator = embedTokenGenerator;
@@ -181,7 +181,7 @@ class PlayerAPIClient {
   private Map<String, String> authorizeParams(List<String> embedCodes) {
     final Map<String, String> params = new HashMap<String, String>();
     params.put(Constants.KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
-    params.put(Constants.KEY_DOMAIN, _domain);
+    params.put(Constants.KEY_DOMAIN, _domain.toString());
 
     if (getAuthToken().length() > 0) {
       params.put(Constants.KEY_AUTH_TOKEN, getAuthToken());
@@ -708,7 +708,7 @@ class PlayerAPIClient {
     return _pcode;
   }
 
-  public String getDomain() {
+  public PlayerDomain getDomain() {
     return _domain;
   }
 

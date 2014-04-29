@@ -159,7 +159,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param domain
    *          Your Embed Domain
    */
-  public OoyalaPlayer(String pcode, String domain) {
+  public OoyalaPlayer(String pcode, PlayerDomain domain) {
     this(pcode, domain, null);
 
   }
@@ -174,7 +174,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param generator
    *          An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayer(String pcode, String domain, EmbedTokenGenerator generator) {
+  public OoyalaPlayer(String pcode, PlayerDomain domain, EmbedTokenGenerator generator) {
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
 
