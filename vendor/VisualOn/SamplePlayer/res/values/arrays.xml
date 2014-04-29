@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="engineType">
+        <item>Software</item>
+        <item>OpenMaxAL</item>
+    </string-array>
+    
+    <string-array name="videoDecoderType">
+        <item>Software</item>
+        <item>IOMX</item>
+        <item>MediaCodec</item>
+    </string-array>
+    
+    <string-array name="audioDecoderType">
+        <item>Software</item>
+        <item>MediaCodec</item>
+    </string-array>
+    
+    
+</resources>

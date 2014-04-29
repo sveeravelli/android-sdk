@@ -1,0 +1,27 @@
+Build time: 2014-04-04 11:57
+voAbout> libvoAACDec - x86 - NDKr9 - V3.11 - r64964 - 17:44:30 Mar 26 2014 - V3.11.0
+voAbout> libvoAdaptiveStreamController - x86 - NDKr9 - V3.11 - r64964 - 17:47:58 Mar 26 2014 - V3.11.0
+voAbout> voAdaptiveStreamHLS - x86 - NDKr9 - V3.11 - r64964 - 17:48:04 Mar 26 2014 - V3.11.0
+voAbout> libvoAMediaCodec - x86 - NDKr9 - V3.11 - r64964 - 17:47:53 Mar 26 2014 - V3.11.0
+voAbout> libvoAndroidVR_S41 - X86pc - linux - V3.11 - r64964 - 17:48:07 Mar 26 2014 - V3.11.0
+voAbout> libvoAudioFR - x86 - NDKr9 - V3.11 - r64964 - 17:48:15 Mar 26 2014 - V3.11.0
+voAbout> libvoAudioMCDec - x86 - NDKr9 - V3.11 - r64964 - 17:44:27 Mar 26 2014 - V3.11.0
+voAbout> libvoCaptionParser - x86 - NDKr9 - V3.11 - r64964 - 17:48:22 Mar 26 2014 - V3.11.0
+voAbout> libvodl - x86 - NDKr9 - V3.11 - r64964 - 17:48:23 Mar 26 2014 - V3.11.0
+voAbout> voDRM_VisualOn_AES128 - x86 - NDKr9 - V3.11 - r64964 - 17:48:24 Mar 26 2014 - V3.11.0
+voAbout> libvoDVBSubtitleParser - x86 - NDKr9 - V3.11 - r64964 - 17:48:25 Mar 26 2014 - V3.11.0
+voAbout> libvoH264Dec - x86 - NDKr9 - V3.11 - r65384 - 11:51:35 Apr  4 2014 - V3.11.2
+voAbout> libvoH264Dec - x86 - NDKr9 - V3.11 - r65384 - 11:51:41 Apr  4 2014 - V3.11.2
+voAbout> libvoIOMXDec_ics - X86pc - linux - V3.11 - r64964 - 17:44:54 Mar 26 2014 - V3.11.0
+voAbout> voLogSys - x86 - NDKr9 - V3.11 - r64964 - 17:49:29 Mar 26 2014 - V3.11.0
+voAbout> libvoMMCCRRS - x86 - NDKr9 - V3.11 - r65384 - 11:51:47 Apr  4 2014 - V3.11.2
+voAbout> libvoMMCCRRS - x86 - NDKr9 - V3.11 - r65384 - 11:51:50 Apr  4 2014 - V3.11.2
+voAbout> libvompEngn - x86 - NDKr9 - V3.11 - r64964 - 17:48:37 Mar 26 2014 - V3.11.0
+voAbout> voOSEng - x86 - NDKr9 - V3.11 - r64964 - 17:48:41 Mar 26 2014 - V3.11.0
+voAbout> voOSSource - x86 - NDKr9 - V3.11 - r65265 - 17:35:23 Apr  2 2014 - V3.11.1
+voAbout> libvoSourceIO - x86 - NDKr9 - V3.11 - r64964 - 17:48:52 Mar 26 2014 - V3.11.0
+voAbout> libvossl - x86 - NDKr9 - V3.11 - r64964 - 17:49:17 Mar 26 2014 - V3.11.0
+voAbout> libvoSubtitleParser - x86 - NDKr9 - V3.11 - r64964 - 17:49:19 Mar 26 2014 - V3.11.0
+voAbout> libvoTsParser - x86 - NDKr9 - V3.11 - r64964 - 17:49:23 Mar 26 2014 - V3.11.0
+voAbout> voVersion - x86 - NDKr9 - V3.11 - r65384 - 11:54:38 Apr  4 2014 - V3.11.2
+voAbout> voVidDec - x86 - NDKr9 - V3.11 - r64964 - 17:45:15 Mar 26 2014 - V3.11.0

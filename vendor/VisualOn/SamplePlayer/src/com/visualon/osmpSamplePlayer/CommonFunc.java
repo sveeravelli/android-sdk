@@ -1,6 +1,6 @@
 /************************************************************************
 VisualOn Proprietary
-Copyright (c) 2013, VisualOn Incorporated. All Rights Reserved
+Copyright (c) 2013, VisualOn Incorporated. All rights Reserved
 
 VisualOn, Inc., 4675 Stevens Creek Blvd, Santa Clara, CA 95051, USA
 
@@ -24,14 +24,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 
 public class CommonFunc {
    
     public static String getUserPath(Context context) {
-       
+        
         String path = context.getPackageName();
         String userPath = "/data/data/" + path;
       
@@ -39,6 +41,29 @@ public class CommonFunc {
             PackageInfo p = context.getPackageManager().getPackageInfo(path, 0);
             userPath = p.applicationInfo.dataDir;
         } catch (NameNotFoundException e) {
+        }
+        
+        return userPath;
+    }
+
+	public static String getUserNativeLibPath(Context context) {
+        
+        String path = context.getPackageName();
+        String userPath = "/data/data/" + path+ "/lib";
+        if(Build.VERSION.SDK_INT<10){
+            try {
+                PackageInfo p = context.getPackageManager().getPackageInfo(path, 0);
+                userPath = p.applicationInfo.dataDir+ "/lib";
+            } catch (NameNotFoundException e) {
+            }
+        }
+        else{
+	        try {
+	        	//for version below android 2.3.3, please remove codes below.
+	            PackageInfo p = context.getPackageManager().getPackageInfo(path, 0);
+	            userPath = p.applicationInfo.nativeLibraryDir;//dataDir;
+	        } catch (NameNotFoundException e) {
+	        }
         }
         
         return userPath;

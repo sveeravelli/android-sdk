@@ -1,0 +1,1773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppConfig>
+    <OSMPEvent>
+        <Event>
+            <EventId>0X00000001</EventId><!-- VO_OSMP_CB_PLAY_COMPLETE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received playback completed event</Description>
+        </Event>
+        <Event>
+            <EventId>0X00000003</EventId><!-- VO_OSMP_CB_VIDEO_START_BUFFER -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received video start buffering event</Description>
+        </Event>
+        <Event>
+            <EventId>0X00000004</EventId><!-- VO_OSMP_CB_VIDEO_STOP_BUFFER -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received video stop buffering event</Description>
+        </Event>
+        <Event>
+            <EventId>0X00000005</EventId><!-- VO_OSMP_CB_AUDIO_START_BUFFER -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received audio start buffering event</Description>
+        </Event>
+        <Event>
+            <EventId>0X00000006</EventId><!-- VO_OSMP_CB_AUDIO_STOP_BUFFER -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received audio stop buffering event</Description>
+        </Event>
+        <Event>
+            <EventId>0X0000000D</EventId><!-- VO_OSMP_CB_SEEK_COMPLETE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received seek completed event</Description>
+        </Event>
+        <Event>
+            <EventId>0X0000000E</EventId><!-- VO_OSMP_CB_VIDEO_ASPECT_RATIO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received video aspect ratio event, param1 is %s</Description>
+            <Param1>
+                <item value="0">0, original</item>
+                <item value="1">1, 1:1</item>
+                <item value="2">2, 4:3</item>
+                <item value="3">3, 16:9</item>
+                <item value="4">4, 2:1</item>
+                <item value="5">5, 2.33:1</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0X0000000F</EventId><!-- VO_OSMP_CB_VIDEO_SIZE_CHANGED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received video size changed event, param1 is %d, param2 is %d</Description>
+            <Param1></Param1>
+            <Param2></Param2>
+        </Event>
+        <Event>
+            <EventId>0X80000010</EventId><!-- VO_OSMP_CB_CODEC_NOT_SUPPORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>3</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Codec not supported, need switch to SW</Description>
+        </Event>
+        <Event>
+            <EventId>0X00000011</EventId><!-- VO_OSMP_CB_DEBLOCK -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received deblock event, param1 is %s</Description>
+            <Param1>
+                <item value="0">0, disable</item>
+                <item value="1">1, enable</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0X00000013</EventId><!-- VO_OSMP_CB_HW_DECODER_STATUS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>4</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received HW decoder status event, param1 is %s</Description>
+            <Param1>
+                <item value="0">0, error</item>
+                <item value="1">1, available</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0x00001021</EventId><!-- VO_OSMP_CB_ANALYTICS_INFO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>
+			[APP][EVENT]Received analytics info event, AverageDecodeTime is %d, AverageRender is %d, CodecDropNum is %d, CodecErrorsNum is %d, CodecTimeNum is %d, CPULoad is %d, DecodedNum is %d, Frequency is %d, JitterNum is %d, LastTime is %d, MaxFrequency is %d, RenderDropNum is %d, RenderNum is %d, RenderTimeNum is %d, SourceDropNum is %d, SourceTimeNum is %d, TotalCPULoad is %d, WorstDecodeTime is %d, WorstRenderTime is %d.
+			</Description>
+        </Event>
+        <Event>
+            <EventId>0x00000024</EventId><!-- VO_OSMP_CB_OUTPUT_CONTROL_BLOCK_PLAYBACK -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Playback blocked</Description>
+        </Event>
+        <Event>
+            <EventId>0x00000025</EventId><!-- VO_OSMP_CB_OUTPUT_CONTROL_BLOCK_OUTPUT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Output blocked, type %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0x00000026</EventId><!-- VO_OSMP_CB_OUTPUT_CONTROL_DOWNGRADE_RESOLUTION -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Resolution downgraded</Description>
+        </Event>
+        <Event>
+            <EventId>0X02000001</EventId><!-- VO_OSMP_SRC_CB_CONNECTING -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received source connecting event</Description>
+        </Event>
+        <Event>
+            <EventId>0X02000002</EventId><!-- VO_OSMP_SRC_CB_CONNECTION_FINISHED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received source connection finished event</Description>
+        </Event>
+        <Event>
+            <EventId>0X02000005</EventId><!-- VO_OSMP_SRC_CB_DOWNLOAD_STATUS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received source download status event, param1 is %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X0200000B</EventId><!-- VO_OSMP_SRC_CB_BA_HAPPENED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received source bitrate adaptation occured event, param1 is %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X0200000C</EventId><!-- VO_OSMP_SRC_CB_DRM_NOT_SECURE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received DRM not secure event</Description>
+        </Event>
+        <Event>
+            <EventId>0X0200000F</EventId><!-- VO_OSMP_SRC_CB_DOWNLOAD_FAIL_RECOVER_SUCCESS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download failed, recovery successful event</Description>
+        </Event>
+        <Event>
+            <EventId>0X02000010</EventId><!-- VO_OSMP_SRC_CB_OPEN_FINISHED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>4</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received open finished event, param1 is %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000060</EventId><!-- VO_OSMP_SRC_CB_RTSP_ERROR -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received RTSP error event, param1 is %s</Description>
+            <Param1>
+                <item value="1">1, connection failed</item>
+                <item value="2">2, description failed</item>
+                <item value="3">3, setup failed</item>
+                <item value="4">4, play failed</item>
+                <item value="5">5, pause failed</item>
+                <item value="6">6, option failed</item>
+                <item value="7">7, socket error in RTP channel</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000070</EventId><!-- VO_OSMP_SRC_CB_SEEK_COMPLETE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>5</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received source seek completed event, param1 is %d, param2 is %s</Description>
+            <Param1></Param1>
+            <Param2>
+                <item value="0">0, seek success</item>
+                <item value="2164260869">0X81000005, seek failed</item>
+            </Param2>
+        </Event>
+        <Event>
+            <EventId>0X02000071</EventId><!-- VO_OSMP_SRC_CB_PROGRAM_CHANGED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received program changed event</Description>
+        </Event>
+        <Event>
+            <EventId>0x02000072</EventId><!-- VO_OSMP_SRC_CB_PROGRAM_RESET -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received program reset event</Description>
+        </Event>
+        <Event>
+            <EventId>0x02000075</EventId><!-- VO_OSMP_SRC_CB_PD_DOWNLOAD_POSITION -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download position event, param1 is %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0x02000076</EventId><!-- VO_OSMP_SRC_CB_PD_BUFFERING_PERCENT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received buffering percent event, param1 is %d</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000078</EventId><!-- VO_OSMP_SRC_CB_PREFERRED_AUDIO_LANGUAGE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received the preferred audio language, language is %s</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000079</EventId><!-- VO_OSMP_SRC_CB_PREFERRED_SUBTITLE_LANGUAGE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received the preferred subtitle language, language is %s</Description>
+            <Param1></Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000030</EventId><!-- VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received adaptive streaming info event, param1 is %d, param2 is %d</Description>
+			<Param1></Param1>
+			<Param2></Param2>
+        </Event>
+        <Event>
+            <EventId>0X02000040</EventId><!-- VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received adaptive streaming error event, param1 is %s</Description>
+            <Param1>
+                <item value="1">1, playlist parsing failed</item>
+                <item value="2">2, playlist not supported</item>
+                <item value="3">3, stream not supported</item>
+                <item value="4">4, download failed</item>
+                <item value="5">5, DRM error</item>
+                <item value="6">6, license error</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0X02000050</EventId><!-- VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received adaptive streaming warning event, param1 is %s</Description>
+            <Param1>
+                <item value="1">1, chunk download failed</item>
+                <item value="2">2, chunk format not supported</item>
+                <item value="3">3, DRM error</item>
+                <item value="4">4, playlist download failed</item>
+            </Param1>
+        </Event>
+        <Event>
+            <EventId>0X8000000C</EventId><!-- VO_OSMP_CB_ERROR -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received CB error event</Description>
+        </Event>
+        <Event>
+            <EventId>0X8000001D</EventId><!-- VO_OSMP_CB_LICENSE_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received license failed event</Description>
+        </Event>
+        <Event>
+            <EventId>0X82000003</EventId><!-- VO_OSMP_SRC_CB_CONNECTION_TIMEOUT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received connection timeout event</Description>
+        </Event>
+        <Event>
+            <EventId>0X82000004</EventId><!-- VO_OSMP_SRC_CB_CONNECTION_LOSS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received connection loss event</Description>
+        </Event>
+        <Event>
+            <EventId>0X82000007</EventId><!-- VO_OSMP_SRC_CB_DOWNLOAD_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download failed event</Description>
+        </Event>
+        <Event>
+            <EventId>0X82000008</EventId><!-- VO_OSMP_SRC_CB_DRM_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received DRM failed event</Description>
+        </Event>
+        <Event>
+            <EventId>0X82000009</EventId><!-- VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received playlist parse error event</Description>
+        </Event>
+        <Event>
+            <EventId>0X8200000A</EventId><!-- VO_OSMP_SRC_CB_CONNECTION_REJECTED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received connection rejected event</Description>
+        </Event>
+        <Event>
+            <EventId>0X8200000D</EventId><!-- VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received DRM AV out failed event</Description>
+        </Event>
+    </OSMPEvent>
+    <DownloadEvent>
+        <DLEvent>
+            <EventId>0X10000001</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_OPEN_COMPLETE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download open completed event</Description>
+        </DLEvent>
+        <DLEvent>
+            <EventId>0X10000002</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_MANIFEST_OK -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download manifest OK event</Description>
+        </DLEvent>
+        <DLEvent>
+            <EventId>0X10000004</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_END -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download end event</Description>
+        </DLEvent>
+        <DLEvent>
+            <EventId>0X10000005</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_PROGRAM_INFO_CHANGE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download program info changed event</Description>
+        </DLEvent>
+        <DLEvent>
+            <EventId>0X10000006</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_MANIFEST_UPDATE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download manifest updated event</Description>
+        </DLEvent>
+        <DLEvent>
+            <EventId>0X90000001</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_DOWNLOAD_MANIFEST_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download manifest failed event</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000002</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_WRITE_MANIFEST_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download write manifest failed event</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000003</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_DOWNLOAD_CHUNK_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download chunk failed event</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000004</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_WRITE_CHUNK_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download write chunk failed</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000005</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_DISK_FULL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download disk is full event</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000006</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_LIVE_STREAM_NOT_SUPPORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download live stream not supported event</Description>
+        </DLEvent> 
+        <DLEvent>
+            <EventId>0X90000007</EventId><!-- VO_OSMP_CB_STREAMING_DOWNLOADER_LOCAL_STREAM_NOT_SUPPORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Received download local stream not supported event</Description>
+        </DLEvent>         
+    </DownloadEvent>
+    <AppEvent>
+        <UIEvent>
+            <EventId>0X8A000001</EventId><!-- APP_SWITCH_ENGINE_FAILED -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][EVENT]Switch to other engine type failed</Description>
+        </UIEvent>
+    </AppEvent>
+    <ReturnCode>
+        <RC>
+            <ErrorCode>0X00000000</ErrorCode><!-- VO_OSMP_ERR_NONE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned success</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000001</ErrorCode><!-- VO_OSMP_ERR_EOS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned reached the end of source</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000002</ErrorCode><!-- VO_OSMP_ERR_RETRY -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned buffer was empty, retry</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000003</ErrorCode><!-- VO_OSMP_ERR_FORMAT_CHANGE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned format was changed</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000004</ErrorCode><!-- VO_OSMP_ERR_VIDEO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned video codec error</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000005</ErrorCode><!-- VO_OSMP_ERR_AUDIO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned audio codec error</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000006</ErrorCode><!-- VO_OSMP_ERR_OUTMEMORY -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned out of memory</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000007</ErrorCode><!-- VO_OSMP_ERR_POINTER -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned the pointer is invalid</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000008</ErrorCode><!-- VO_OSMP_ERR_PARAMID -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned the parameter ID is not supported</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000009</ErrorCode><!-- VO_OSMP_ERR_STATUS -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned the status is wrong</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000A</ErrorCode><!-- VO_OSMP_ERR_IMPLEMENT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned the function is not implemented</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000B</ErrorCode><!-- VO_OSMP_ERR_SMALLSIZE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned the input buffer is too small</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000C</ErrorCode><!-- VO_OSMP_ERR_OUT_OF_TIME -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned out of time</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000D</ErrorCode><!-- VO_OSMP_ERR_WAIT_TIME -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned DRM AV out failed</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000E</ErrorCode><!-- VO_OSMP_ERR_UNKNOWN -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned unknown error</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8000000F</ErrorCode><!-- VO_OSMP_ERR_JNI -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned JNI error</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X80000011</ErrorCode><!-- VO_OSMP_ERR_LICENSE_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned license failed</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000012</ErrorCode><!-- VO_OSMP_ERR_HTTPS_CA_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned HTTPS certification authority error</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80000101</ErrorCode><!-- VO_OSMP_ERR_UNINITIALIZE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned object not initialized</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X81000001</ErrorCode><!-- VO_OSMP_SRC_ERR_OPEN_SRC_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned open source failed</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X81000002</ErrorCode><!-- VO_OSMP_SRC_ERR_CONTENT_ENCRYPT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned content is encrypted</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X81000003</ErrorCode><!-- VO_OSMP_SRC_ERR_PLAYMODE_UNSUPPORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned play mode not supported</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X81000004</ErrorCode><!-- VO_OSMP_SRC_ERR_ERROR_DATA -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned source file data error</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X81000005</ErrorCode><!-- VO_OSMP_SRC_ERR_SEEK_FAIL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned seek failed</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X81000006</ErrorCode><!-- VO_OSMP_SRC_ERR_FORMAT_UNSUPPORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned source file format not supported</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X81000007</ErrorCode><!-- VO_OSMP_SRC_ERR_TRACK_NOTFOUND -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned track cannot be found</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X81000008</ErrorCode><!-- VO_OSMP_SRC_ERR_NO_DOWNLOAD_OP -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned no download pointer set</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X81000009</ErrorCode><!-- VO_OSMP_SRC_ERR_NO_LIB_OP -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned no lib function pointer set</Description>
+        </RC>
+		<RC>
+            <ErrorCode>0X8100000A</ErrorCode><!-- VO_OSMP_SRC_ERR_OUTPUT_NOTFOUND -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned output type not found</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X8100000B</ErrorCode><!-- VO_OSMP_SRC_ERR_CHUNK_SKIP -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned chunk must be dropped/skipped</Description>
+        </RC>
+        <RC>
+            <ErrorCode>0X80001001</ErrorCode><!-- VO_OSMP_SRC_ERR_SRC_UNINITIALIZE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Action>2</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <AppBehavior>1</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
+            <Description>[APP][RC]%s returned source object not initialized</Description>
+        </RC>
+    </ReturnCode>
+    
+    <Option>
+        <Optionitem>
+            <OptionId>0</OptionId><!-- PREFERENCE_KEY_ENGINETYPE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Engine Type</Title>
+            <Description>Select the engine type</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>VOME2</ItemTitle>
+                    <Value>0</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>OpenMAX AL</ItemTitle>
+                    <Value>1</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+				<item>
+                    <ItemTitle>AVPlayer</ItemTitle>
+                    <Value>2</Value>
+                    <Platform>2</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>1</OptionId><!-- PREFERENCE_KEY_RENDERTYPE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Video Render Type</Title>
+            <Description>Select the video render type</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Canvas Data</ItemTitle>
+                    <Value>0</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>Native Window</ItemTitle>
+                    <Value>1</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>Native C</ItemTitle>
+                    <Value>4</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>2</OptionId><!-- PREFERENCE_KEY_AUDIODECODERTYPE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Audio Decoder Type</Title>
+            <Description>Select the audio decoder type</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Software</ItemTitle>
+                    <Value>1048576</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>MediaCodec</ItemTitle>
+                    <Value>2097152</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>3</OptionId><!-- PREFERENCE_KEY_VIDEODECODERTYPE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Video Decoder Type</Title>
+            <Description>Select the video decoder type</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Software</ItemTitle>
+                    <Value>1</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>IOMX</ItemTitle>
+                    <Value>2</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>MediaCodec</ItemTitle>
+                    <Value>4</Value>
+                    <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>4</OptionId><!-- PREFERENCE_KEY_DOLBYEFFECT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Dolby Surround Module</Title>
+            <Description>Set to load Dolby Surround module</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>5</OptionId><!-- PREFERENCE_KEY_DEBLOCK -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Deblock</Title>
+            <Description>Enable or disable deblock function</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>6</OptionId><!-- PREFERENCE_KEY_VIDEO_PERFORMANCE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Performance Data Statistics</Title>
+            <Description>Enable or disable video performance data statistics</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>7</OptionId><!-- PREFERENCE_KEY_TT_URL -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Subtitle URL</Title>
+            <Description>Select subtitle URL to be presented</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Select External Subtitle File or URL</ItemTitle>
+                    <Value>0</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>8</OptionId><!-- PREFERENCE_KEY_COLOR_TYPE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>5</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Color Type</Title>
+            <Description>Enable to use RGB32, disable to use RGB565</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>9</OptionId><!-- PREFERENCE_KEY_ASYNC_OPEN -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Asynchronous/Synchronous Open</Title>
+            <Description>Set to open source asynchronously</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>10</OptionId><!-- PREFERENCE_KEY_MAX_BUFFER_SIZE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Max Buffer Time</Title>
+            <Description>Set the maximum length of the source input buffer (ms)</Description>
+            <UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Enter Max Buffer Time (ms)</ItemTitle>
+                    <Value>20000</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>11</OptionId><!-- PREFERENCE_KEY_PANSCAN -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>5</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Pan and Scan Mode</Title>
+            <Description>Set pan and scan mode when switching to full screen</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>12</OptionId><!-- PREFERENCE_KEY_DOWNLOAD -->
+            <Enable>0</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>3</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Download</Title>
+            <Description>Download the video locally while playing</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+            <Optionitem>
+                <OptionId>1201</OptionId><!-- Set Font Color List -->
+                <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+                <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                <Title>Delete Downloader File</Title>
+                <Description>Delete downloader file list</Description>
+                <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+                <ValueList></ValueList>
+                <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+            </Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>13</OptionId><!-- PREFERENCE_KEY_CPUADAPTATION -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>CPU Adaptation</Title>
+            <Description>Enable CPU adaptation</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>1</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>14</OptionId><!-- PREFERENCE_KEY_RTSPCONNECTION -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>RTSP Connection Type</Title>
+            <Description>Select the RTSP connection type</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList>
+                <item>
+                    <ItemTitle>Automatic(UDP is priority)</ItemTitle>
+                    <Value>0</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>TCP</ItemTitle>
+                    <Value>1</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+                <item>
+                    <ItemTitle>UDP</ItemTitle>
+                    <Value>2</Value>
+                    <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+                </item>
+            </ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>23</OptionId><!-- PREFERENCE_KEY_RTSP_HTTP_PORT -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Enable RTSP HTTP Port</Title>
+            <Description>Set to enable RTSP HTTP port</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>2301</OptionId><!-- PREFERENCE_KEY_RTSP_HTTP_PORT -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>RTSP HTTP Port</Title>
+				<Description>Set RTSP HTTP port</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set RTSP HTTP port</ItemTitle>
+						<Value>0</Value>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>15</OptionId><!-- PREFERENCE_KEY_SINGLELOOP -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Playback Looping</Title>
+            <Description>Set to make video play repeatedly</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>16</OptionId><!-- PREFERENCE_KEY_CC_SETTING -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Subtitle Settings</Title>
+            <Description>Set subtitle presentation</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+            <Optionitem>
+	            <OptionId>1601</OptionId><!-- PREFERENCE_KEY_CC -->
+	            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+	            <Title>Subtitle</Title>
+	            <Description>Set to enable subtitle presentation</Description>
+	            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+	            <ValueList></ValueList>
+	            <Selected>0</Selected>
+	        </Optionitem>
+            <Optionitem>
+			    <OptionId>1616</OptionId><!-- Italic Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Default Settings</Title>
+			    <Description>Using subtitle settings from stream</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>1</Selected>
+			</Optionitem>
+            <Optionitem>
+			    <OptionId>1617</OptionId><!-- Italic Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Reset Subtitle Settings</Title>
+			    <Description>Reset to default settings</Description>
+			    <UIType>4</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+			</Optionitem>
+            <Optionitem>
+			    <OptionId>1618</OptionId><!-- Italic Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Preview Subtitle</Title>
+			    <Description> </Description>
+			    <UIType>5</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button 5:Preview view -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1602</OptionId><!-- Font Size -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Font size</Title>
+			    <Description>Set to enable font size</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+				<Optionitem>
+					<OptionId>160201</OptionId><!-- Set Font Size -->
+					<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					<Title>Set Font Size</Title>
+					<Description>Set font size, range is from 50 to 200</Description>
+					<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+					<ValueList>
+						<item>
+							<ItemTitle>Set Font Size</ItemTitle>
+							<Value>100</Value>
+                            <DefaultValue>100</DefaultValue>
+							<MinValue>50</MinValue>
+							<MaxValue>200</MaxValue>
+							<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+						</item>
+					</ValueList>
+					<Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1603</OptionId><!-- Font Color -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Font Color Opacity</Title>
+			    <Description>Set to enable font color</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+				<Optionitem>
+				    <OptionId>160301</OptionId><!-- Set Color Opacity -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Font Color Opacity</Title>
+				    <Description>Change color opacity, range is from 50 (semi-transparent) to 100 (opaque)</Description>
+				    <UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>Set Font Color Opacity</ItemTitle>
+				            <Value>100</Value>
+                            <DefaultValue>100</DefaultValue>
+				            <MinValue>50</MinValue>
+							<MaxValue>100</MaxValue>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1604</OptionId><!-- Color List-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Color List</Title>
+			    <Description>Set to enable color list</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160401</OptionId><!-- Set Font Color List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Font Color List</Title>
+				    <Description>Change font color</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>White</ItemTitle>
+				            <Value>16777215</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Black</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Red</ItemTitle>
+				            <Value>255</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Green</ItemTitle>
+				            <Value>65280</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Blue</ItemTitle>
+				            <Value>16711680</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Yellow</ItemTitle>
+				            <Value>65535</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Magenta</ItemTitle>
+				            <Value>16711935</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Cyan</ItemTitle>
+				            <Value>16776960</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+			    </Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1605</OptionId><!-- Background Color -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Background Color Opacity</Title>
+			    <Description>Set to enable background color Opacity</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160501</OptionId><!-- Set Background Color Opacity -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Background Color Opacity</Title>
+				    <Description>Change background color opacity, range is from 0 (transparent) to 100 (opaque)</Description>
+				    <UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>Set Background Color Opacity</ItemTitle>
+				            <Value>100</Value>
+                            <DefaultValue>100</DefaultValue>
+				            <MinValue>0</MinValue>
+							<MaxValue>100</MaxValue>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1606</OptionId><!-- Background Color List-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Background Color List</Title>
+			    <Description>Set to enable background color list</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160601</OptionId><!-- Set Background Color List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Background Color List</Title>
+				    <Description>Change background color</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>White</ItemTitle>
+				            <Value>16777215</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Black</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Red</ItemTitle>
+				            <Value>255</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Green</ItemTitle>
+				            <Value>65280</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Blue</ItemTitle>
+				            <Value>16711680</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Yellow</ItemTitle>
+				            <Value>65535</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Magenta</ItemTitle>
+				            <Value>16711935</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Cyan</ItemTitle>
+				            <Value>16776960</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>1</Selected>
+                    <DefaultSelected>1</DefaultSelected>
+			    </Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1607</OptionId><!-- Edge Color Opacity-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Edge Color Opacity</Title>
+			    <Description>Set to enable edge color opacity</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160701</OptionId><!-- Set Edge Color Opacity -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Edge Color Opacity</Title>
+				    <Description>Change edge color opacity, range is from 0 (transparent) to 100 (opaque)</Description>
+				    <UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>Set Edge Color Opacity</ItemTitle>
+				            <Value>100</Value>
+                            <DefaultValue>100</DefaultValue>
+				            <MinValue>0</MinValue>
+							<MaxValue>100</MaxValue>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1608</OptionId><!-- Edge Color List-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Edge Color List</Title>
+			    <Description>Set to enable edge color list</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160801</OptionId><!-- Set Edge Color List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Edge Color List</Title>
+				    <Description>Change edge color</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>White</ItemTitle>
+				            <Value>16777215</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Black</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Red</ItemTitle>
+				            <Value>255</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Green</ItemTitle>
+				            <Value>65280</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Blue</ItemTitle>
+				            <Value>16711680</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Yellow</ItemTitle>
+				            <Value>65535</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Magenta</ItemTitle>
+				            <Value>16711935</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Cyan</ItemTitle>
+				            <Value>16776960</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>4</Selected>
+                    <DefaultSelected>4</DefaultSelected>
+			    </Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1609</OptionId><!-- Edge Type List-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Edge Type List</Title>
+			    <Description>Set to enable edge type list</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>160901</OptionId><!-- Edge Type List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Edge Type List</Title>
+				    <Description>Change edge type</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>None</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Raised</ItemTitle>
+				            <Value>1</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Depressed</ItemTitle>
+				            <Value>2</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Uniform</ItemTitle>
+				            <Value>3</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Left Drop Shadow</ItemTitle>
+				            <Value>4</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+                        <item>
+				            <ItemTitle>Right Drop Shadow</ItemTitle>
+				            <Value>5</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>1</Selected>
+                    <DefaultSelected>1</DefaultSelected>
+			    </Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1610</OptionId><!-- Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Font List</Title>
+			    <Description>Set to enable Font</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161001</OptionId><!-- Set Font List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Font List</Title>
+				    <Description>Change font</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>Default</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Courier</ItemTitle>
+				            <Value>1</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Times New Roman</ItemTitle>
+				            <Value>2</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Helvetica</ItemTitle>
+				            <Value>3</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Arial</ItemTitle>
+				            <Value>4</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Dom</ItemTitle>
+				            <Value>5</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Coronet</ItemTitle>
+				            <Value>6</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Gothic</ItemTitle>
+				            <Value>7</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>4</Selected>
+                    <DefaultSelected>4</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1611</OptionId><!-- Enable Window Background Color Opacity-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Window Background Color Opacity</Title>
+			    <Description>Set to enable window background color opacity</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161101</OptionId><!-- Window Background Color Opacity -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Window Background Color Opacity</Title>
+				    <Description>Change window background color opacity, range is from 0 (transparent) to 100 (opaque)</Description>
+				    <UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>Set Window Background Color Opacity</ItemTitle>
+				            <Value>100</Value>
+                            <DefaultValue>100</DefaultValue>
+				            <MinValue>0</MinValue>
+							<MaxValue>100</MaxValue>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1612</OptionId><!-- Enable Window Background Color List-->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Window Background Color List</Title>
+			    <Description>Set to enable window background color list</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161201</OptionId><!-- Window Background Color List -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Window Background Color List</Title>
+				    <Description>Window background color list</Description>
+				    <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList>
+				        <item>
+				            <ItemTitle>White</ItemTitle>
+				            <Value>16777215</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Black</ItemTitle>
+				            <Value>0</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Red</ItemTitle>
+				            <Value>255</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Green</ItemTitle>
+				            <Value>65280</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Blue</ItemTitle>
+				            <Value>16711680</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Yellow</ItemTitle>
+				            <Value>65535</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Magenta</ItemTitle>
+				            <Value>16711935</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				        <item>
+				            <ItemTitle>Cyan</ItemTitle>
+				            <Value>16776960</Value>
+				            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				        </item>
+				    </ValueList>
+				    <Selected>1</Selected>
+                    <DefaultSelected>1</DefaultSelected>
+			    </Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1613</OptionId><!-- Underline Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Underline Font</Title>
+			    <Description>Set to enable underline font</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161301</OptionId><!-- Set Underline Font -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Underline Font</Title>
+				    <Description>Set underline font</Description>
+				    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList></ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1614</OptionId><!-- Bold Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Bold Font</Title>
+			    <Description>Set to enable bold font</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161401</OptionId><!-- Set Bold Font -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Bold Font</Title>
+				    <Description>Set bold font</Description>
+				    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList></ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+			<Optionitem>
+			    <OptionId>1615</OptionId><!-- Italic Font -->
+			    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+			    <Title>Enable Italic Font</Title>
+			    <Description>Set to enable italic font</Description>
+			    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+			    <ValueList></ValueList>
+			    <Selected>0</Selected>
+                <DefaultSelected>0</DefaultSelected>
+			    <Optionitem>
+				    <OptionId>161501</OptionId><!-- Set Italic Font -->
+				    <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            		<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				    <Title>Set Italic Font</Title>
+				    <Description>Set italic font</Description>
+				    <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				    <ValueList></ValueList>
+				    <Selected>0</Selected>
+                    <DefaultSelected>0</DefaultSelected>
+				</Optionitem>
+			</Optionitem>
+		</Optionitem>
+        <Optionitem>
+            <OptionId>17</OptionId><!-- PREFERENCE_KEY_LOG -->
+            <Enable>0</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>6</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Log</Title>
+            <Description>Set to enable log display</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+		<Optionitem>
+            <OptionId>18</OptionId><!-- PREFERENCE_KEY_BITRATE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Enable Initial Bitrate</Title>
+            <Description>Set to enable initial bitrate</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>1801</OptionId><!-- PREFERENCE_KEY_BITRATE -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>Initial Bitrate</Title>
+				<Description>Set initial bitrate (kbps)</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set Initial Bitrate</ItemTitle>
+						<Value>0</Value>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+		<Optionitem>
+            <OptionId>19</OptionId><!-- PREFERENCE_KEY_BITRATE_RANGE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Set Bitrate Range</Title>
+            <Description>Set bitrate range (kbps)</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>1901</OptionId><!-- PREFERENCE_KEY_BITRATE_RANGE_LOWER -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>Lower Bound Bitrate Range</Title>
+				<Description>Set lower bound of bitrate range lower bound</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set Lower Bound of Bitrate Range</ItemTitle>
+						<Value>0</Value>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+			<Optionitem>
+				<OptionId>1902</OptionId><!-- PREFERENCE_KEY_BITRATE_RANGE_UPPER -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>Upper Bound Bitrate Range</Title>
+				<Description>Set upper bound of bitrate range</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set Upper Bound of Bitrate Range</ItemTitle>
+						<Value>0</Value>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>20</OptionId><!-- PREFERENCE_KEY_BITRATE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Enable HTTP Retry Timeout</Title>
+            <Description>Enable set HTTP connection retry timeout.</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>2001</OptionId><!-- PREFERENCE_KEY_BITRATE -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>HTTP Retry Timeout</Title>
+				<Description>Set HTTP connection retry timeout.</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>HTTP Retry Timeout</ItemTitle>
+						<Value>120</Value>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>21</OptionId><!-- PREFERENCE_DEFAULE_AUDIO -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Default Audio</Title>
+            <Description>Select default audio language</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>2101</OptionId><!-- PREFERENCE_KEY_RTSP_HTTP_PORT -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>Default Audio</Title>
+				<Description>Set default audio</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set Default Audio</ItemTitle>
+						<Text>eng</Text>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>22</OptionId><!-- PREFERENCE_KEY_DEFAULT_SUBTITLE -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Default Subtitle</Title>
+            <Description>Select default subtitle language</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+			<Optionitem>
+				<OptionId>2201</OptionId><!-- PREFERENCE_KEY_RTSP_HTTP_PORT -->
+				<Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            	<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+				<Title>Default Subtitle</Title>
+				<Description>Set default subtitle</Description>
+				<UIType>3</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+				<ValueList>
+					<item>
+						<ItemTitle>Set Default Subtitle</ItemTitle>
+						<Text>eng</Text>
+						<Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+					</item>
+				</ValueList>
+				<Selected>0</Selected>
+			</Optionitem>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>24</OptionId><!-- PREFERENCE_KEY_RENDER_OPTIMIZATION_FOR_BA -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>1</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Render optimization for BA</Title>
+            <Description>Adding second surface optimize video render when BA</Description>
+            <UIType>1</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+        <Optionitem>
+            <OptionId>99</OptionId><!-- PREFERENCE_KEY_VERSION -->
+            <Enable>1</Enable><!-- 0:disable; 1:enable  -->
+            <Platform>7</Platform><!-- XOR operation. 1:Android; 2:iOS 4:Plugin -->
+            <Title>Version</Title>
+            <Description>Version</Description>
+            <UIType>2</UIType><!-- 1:Check box; 2:Radio button; 3:Edit box 4:Button -->
+            <ValueList></ValueList>
+            <Selected>0</Selected>
+        </Optionitem>
+    </Option>
+</AppConfig>

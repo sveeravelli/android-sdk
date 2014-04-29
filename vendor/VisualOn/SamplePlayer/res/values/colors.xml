@@ -2,7 +2,10 @@
   <resources>
     <color name="white">#ffffffff</color>
     <color name="black">#ff000000</color>
-    <color name="darkgray">#FF808080</color>  
+    <color name="darkgray">#FF808080</color> 
+    <color name="blue">#FF00BAFF</color>
+    <color name="orange">#FFFF9000</color>
+    <color name="orange_transparent">#33FF9000</color>
       
     <drawable name="darkgray">#FF808080</drawable>
     <drawable name="black">#FF000000</drawable>
