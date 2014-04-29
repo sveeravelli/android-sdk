@@ -63,6 +63,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
 
     //Populate the embed map
     embedMap = new HashMap<String, String>();
+    embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("Sid test ",   "pxY3gwYjrEiFX9bh9_AKCPNbfLH7czoz");
     embedMap.put("Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
     embedMap.put("Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
