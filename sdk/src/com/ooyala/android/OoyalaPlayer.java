@@ -161,7 +161,6 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public OoyalaPlayer(String pcode, PlayerDomain domain) {
     this(pcode, domain, null);
-
   }
 
   /**

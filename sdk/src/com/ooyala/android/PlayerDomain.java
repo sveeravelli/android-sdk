@@ -8,7 +8,6 @@ public class PlayerDomain {
   private URL _domainUrl = null;
 
   public static boolean isValid(final String domain) {
-     // DEFAULT schemes = "http", "https", "ftp"
     for (String scheme : PlayerDomain.schemes) {
       if (domain.startsWith(scheme)) {
         return true;
@@ -21,19 +20,18 @@ public class PlayerDomain {
    * Construct a PlayerDomain
    * @param domainString a valid domain string starts with http: or https:
    */
-  public PlayerDomain(String domainString) throws Exception {
+  public PlayerDomain(String domainString) {
     if (!PlayerDomain.isValid(domainString)) {
-      throw new Exception("Invalid Domain String: " + domainString);
+      throw new RuntimeException("Invalid Domain String: " + domainString);
     }
     
     try {
       _domainUrl = new URL(domainString);
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      throw new RuntimeException ("Domain is malformed:" + domainString);
     }
-    
   }
-  
+
   public URL url() {
     return _domainUrl;
   }

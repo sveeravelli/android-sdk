@@ -44,13 +44,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
    * Test fetchPlaybackInfo and getStream
    */
   public void testStreamsInfo() {
-    PlayerDomain domain = null;
-    try {
-      domain = new PlayerDomain("http://www.ooyala.com");
-    } catch (Exception e) {
-      assertTrue(false);
-      e.printStackTrace();
-    }
+    PlayerDomain domain = new PlayerDomain("http://www.ooyala.com");
     PlayerAPIClient api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
         ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), api);

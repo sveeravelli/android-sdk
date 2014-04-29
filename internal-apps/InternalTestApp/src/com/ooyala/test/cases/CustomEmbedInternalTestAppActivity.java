@@ -66,13 +66,7 @@ public class CustomEmbedInternalTestAppActivity extends BaseInternalTestAppActiv
 
       //Set the pcode and embed code
       Log.i(TAG, "Pcode: " + pcodeText.getText().toString() + "" + "Embed Code: " + embedCodeText.getText().toString());
-      PlayerDomain domain = null;
-      try {
-        domain = new PlayerDomain(DOMAIN);
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+      PlayerDomain domain = new PlayerDomain(DOMAIN);
       playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, pcodeText.getText().toString(), domain);
       player = playerLayoutController.getPlayer();
       player.setEmbedCode(embedCodeText.getText().toString());

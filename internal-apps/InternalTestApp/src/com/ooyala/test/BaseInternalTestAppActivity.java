@@ -44,13 +44,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
     //Initialize the player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    PlayerDomain domain = null;
-    try {
-      domain = new PlayerDomain(DOMAIN);
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    PlayerDomain domain = new PlayerDomain(DOMAIN);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain);
     player = playerLayoutController.getPlayer();
 
