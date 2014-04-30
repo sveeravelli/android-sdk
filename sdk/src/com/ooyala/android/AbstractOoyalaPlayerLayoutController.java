@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -196,6 +197,46 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 		}
 		return false;
 	}
+	
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (_player != null) {
+      switch (_player.getState()) {
+      case PLAYING:
+        switch (keyCode) {
+        case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+          _player.pause();
+          break;
+        case KeyEvent.KEYCODE_MEDIA_REWIND:
+          _player.previousVideo(OoyalaPlayer.DO_PLAY);
+          break;
+        case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+          _player.nextVideo(OoyalaPlayer.DO_PLAY);
+        default:
+          break;
+        }
+        break;
+      case READY:
+      case PAUSED:
+        switch (keyCode) {
+        case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+          _player.play();
+          break;
+        case KeyEvent.KEYCODE_MEDIA_REWIND:
+          _player.previousVideo(OoyalaPlayer.DO_PAUSE);
+          break;
+        case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+          _player.nextVideo(OoyalaPlayer.DO_PAUSE);
+        default:
+          break;
+        }
+        break;
+      default:
+        break;
+      }
+    }
+    return false;
+  }
 
 	@Override
 	public void setFullscreen(boolean fullscreen) {}

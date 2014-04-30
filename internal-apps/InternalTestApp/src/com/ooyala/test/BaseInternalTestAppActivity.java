@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +19,6 @@ import android.widget.Spinner;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
-import com.ooyala.test.R;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener {
 
@@ -105,4 +105,11 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
   }
 
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (playerLayoutController.onKeyUp(keyCode, event)) {
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
+  }
 }

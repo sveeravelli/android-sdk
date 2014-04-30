@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
@@ -35,4 +36,12 @@ public interface LayoutController {
    * @return
    */
   public boolean onTouchEvent(MotionEvent event, OoyalaPlayerLayout source);
+  
+  /**
+   * Handle the keydown events from OoyalaPlayerLayout
+   * @param keyCode the keycode
+   * @param event the event
+   * @return
+   */
+  public boolean onKeyUp(int keyCode, KeyEvent event);
 }
