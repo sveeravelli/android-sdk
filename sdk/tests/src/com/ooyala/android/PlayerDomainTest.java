@@ -1,62 +1,56 @@
 package com.ooyala.android;
 
+import java.util.ArrayList;
+
 import android.test.AndroidTestCase;
 
 public class PlayerDomainTest extends AndroidTestCase {
-  private final String validDomain1 = "http://ooyala.com";
-  private final String validDomain2 = "https://www.ooyala.com";
-  private final String invalidDomain1 = "ooyala.com";
-  private final String invalidDomain2 = "ftp://ooyala.com";
+  private ArrayList<String> validDomains;
+  private ArrayList<String> invalidDomains;
 
   public PlayerDomainTest() {
     super();
   }
 
   protected void setUp() {
+    validDomains = new ArrayList<String>();
+    validDomains.add("http://ooyala.com");
+    validDomains.add("https://www.ooyala.com");
+
+    invalidDomains = new ArrayList<String>();
+    invalidDomains.add("");
+    invalidDomains.add("ooyala.com");
+    invalidDomains.add("ftp://ooyala.com");
+    invalidDomains.add("ht");
+    invalidDomains.add("http s://ooyala.com");
+    invalidDomains.add("http:/ /ooyala.com");
   }
 
   protected void tearDown() {
   }
 
   /**
-   * Tests Valid PlayerDomains strings
+   * Tests Valid PlayerDomain Strings
    */
-  public void testValidDomainss() {
-    PlayerDomain domain;
-    try {
-      domain = new PlayerDomain(validDomain1);
-      assertEquals(domain.toString(), validDomain1);
-    } catch (RuntimeException e) {
-      assertTrue(e.toString(), false);
-    }
-    
-    try {
-      domain = new PlayerDomain(validDomain2);
-      assertEquals(domain.toString(), validDomain2);
-    } catch (RuntimeException e) {
-      assertTrue(e.toString(), false);
+  public void testValidDomainStrings() {
+    for (String s : validDomains) {
+      PlayerDomain domain = new PlayerDomain(s);
+      assertEquals(domain.toString(), s);
     }
   }
 
   /**
-   * Tests invalid PlayerDomain strings
+   * Tests invalid PlayerDomain Strings
    */
-  public void testInvalidDomains() {
-    PlayerDomain domain = null;
-    try {
-      domain = new PlayerDomain(invalidDomain1);
-      
-    } catch (RuntimeException e) {
-      assertTrue(e.toString().endsWith("Invalid Domain String: " + invalidDomain1));
+  public void testInvalidDomainStrings() {
+    for (String s : invalidDomains) {
+      try {
+        @SuppressWarnings("unused")
+        PlayerDomain domain = new PlayerDomain(s);
+        fail("RuntimeExceptions should be thrown for " + s);
+      } catch (RuntimeException ex) {
+        assertTrue(ex.toString().endsWith(s));
+      }
     }
-    assertNull(domain);
-    
-    try {
-      domain = new PlayerDomain(invalidDomain2);
-    } catch (RuntimeException e) {
-      assertTrue(e.toString().endsWith("Invalid Domain String: " + invalidDomain2));
-    }
-    assertNull(domain);
   }
 }
-
