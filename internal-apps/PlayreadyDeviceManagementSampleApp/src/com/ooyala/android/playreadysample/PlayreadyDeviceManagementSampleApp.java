@@ -104,6 +104,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
             OoyalaPlayer.enableCustomHLSPlayer = false;
           } else {
             OoyalaPlayer.enableCustomHLSPlayer = true;
+            OoyalaPlayer.enableDebugDRMPlayback = true;
           }
 
           player.play();

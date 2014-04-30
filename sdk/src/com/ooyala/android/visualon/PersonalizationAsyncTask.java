@@ -17,6 +17,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected String TAG = this.getClass().toString();
   protected PersonalizationCallback _callback = null;
   protected Context _context;
+  protected boolean _enableDebugDRMPlayback;
 
   /**
    * An executable task which will perform Discredix Personalization for this device
@@ -27,6 +28,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     super();
     _context = context;
     _callback = callback;
+    _enableDebugDRMPlayback = OoyalaPlayer.enableDebugDRMPlayback;
   }
 
   @Override
@@ -40,7 +42,9 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     try {
       dlc = DxDrmDlc.getDxDrmDlc(_context, config);
 
-      dlc.getDebugInterface().setClientSideTestPersonalization(true);
+      if (_enableDebugDRMPlayback) {
+        dlc.getDebugInterface().setClientSideTestPersonalization(true);
+      }
       //Check for verification.
       if (!dlc.personalizationVerify()) {
         dlc.performPersonalization(OoyalaPlayer.getVersion(), PERSONALIZATION_URL, SESSION_ID);

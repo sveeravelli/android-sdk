@@ -90,6 +90,11 @@ public class OoyalaPlayer extends Observable implements Observer, OnAuthHeartbea
   public static boolean enableCustomHLSPlayer = false;
 
   /**
+   * If set to true, DRM enabled players will perform DRM requests in a debug environment if available
+   */
+  public static boolean enableDebugDRMPlayback = false;
+
+  /**
    * For internal use only
    */
   public static enum Environment {
