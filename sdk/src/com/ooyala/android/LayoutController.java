@@ -36,7 +36,7 @@ public interface LayoutController {
    * @return
    */
   public boolean onTouchEvent(MotionEvent event, OoyalaPlayerLayout source);
-  
+
   /**
    * Handle the keydown events from OoyalaPlayerLayout
    * @param keyCode the keycode
