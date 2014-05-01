@@ -82,7 +82,7 @@ function custom_gen {
   cd ${FW_SDK_DIR}
   ant clean
   ant release
-  ant jar
+  cp bin/classes.jar OoyalaFreewheelSDK.jar
   cp OoyalaFreewheelSDK.jar ${BASE_DIR}/${FW_ZIP_BASE}/
   #update Freewheel Sample App
   cp OoyalaFreewheelSDK.jar ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/

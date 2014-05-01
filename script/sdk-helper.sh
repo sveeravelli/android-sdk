@@ -8,6 +8,7 @@ RETURN_SUCCESS=0
 
 VERSION_REGEX='^-v[0-9]+.[0-9]+.[0-9]+$'
 RC_REGEX='^-rc[0-9]+$'
+FW_VERSION_REGEX='^[0-9]+.[0-9]+.[0-9]+-r[0-9]+-[0-9]+$'
 
 BASE_DIR=${SCRIPT_DIR}/../
 SDK_DIR=${BASE_DIR}/sdk
@@ -35,6 +36,10 @@ fi
 CANDIDATE_DIR="${BOX_DIR}X-Device/SDKs/${PLATFORM_NAME}/Candidate/"
 RELEASE_DIR="${BOX_DIR}X-Device/SDKs/${PLATFORM_NAME}/Release/"
 VERSIONS_SUFFIX=Versions/
+
+function get_fw_version {
+  echo `cat ${BASE_DIR}/vendor/Freewheel/Android_AdManagerDistribution/freewheel.properties | grep "FW_SDK_VERSION" | cut -d'=' -f2`
+}
 
 function usage {
   echo "$0 <task> <options>"
@@ -191,6 +196,12 @@ function gen {
     tests
   fi
 
+  fw_version=$(get_fw_version)
+  if ! [[ "${fw_version}" =~ ${FW_VERSION_REGEX} ]]; then
+    echo "Freewheel version ${fw_version} format incorrect"
+    exit 1
+  fi
+
   cd ${BASE_DIR}
   rm -rf ${ZIP_BASE}
   mkdir ${ZIP_BASE}
@@ -201,11 +212,13 @@ function gen {
   rm -rf ${FW_ZIP_BASE}
   mkdir ${FW_ZIP_BASE}
 
-  #build everything
-  custom_gen
+  custom_gen #also moves the jars into zip folder
 
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
+  cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
+  cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
+  rm -rf ${FW_ZIP_BASE}/FreewheelSampleApp/libs/FWAdManager.jar
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
@@ -220,11 +233,22 @@ function gen {
   echo "v${version}_RC${saved_rc}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
+  #IMA version file
+  echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
+
+  #Freewheel version file
+  echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${FW_ZIP_BASE}/VERSION
+  echo "Tested with Freewheel SDK version ${fw_version}" >> ${FW_ZIP_BASE}/VERSION
+  echo "Created On: ${DATE}" >> ${FW_ZIP_BASE}/VERSION
+
   #docs
   doc
   cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
+  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
+  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/Documentation
 
-  #zip
+  #zip Base SDK
   cd ${BASE_DIR}
   #verify everything exists
   verify
@@ -232,37 +256,13 @@ function gen {
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
 
-  ###IMA SDK Generation###
-
-  #previous custom_gen built everything
-
-  #sampleapp and docs
-  cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
-  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
-
-  #version file
-  echo "This was built with OoyalaSDK ${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
-  echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
-
-  #zip
+  #zip IMA SDK
   cd ${BASE_DIR}
   rm ${IMA_ZIP_NAME}
   zip -r ${IMA_ZIP_BASE} ${IMA_ZIP_BASE}/*
   rm -rf ${IMA_ZIP_BASE}
 
-  ###Freewheel SDK Generation###
-
-  #previous custom_gen built everything
-
-  #sampleapp and docs
-  cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
-  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/Documentation
-
-  #version file
-  echo "This was built with OoyalaSDK ${version}_RC${saved_rc}" >> ${FW_ZIP_BASE}/VERSION
-  echo "Created On: ${DATE}" >> ${FW_ZIP_BASE}/VERSION
-
-  #zip
+  #zip FW SDK
   cd ${BASE_DIR}
   rm ${FW_ZIP_NAME}
   zip -r ${FW_ZIP_BASE} ${FW_ZIP_BASE}/*
@@ -326,6 +326,7 @@ function pub {
     new_rc=$((last_rc+1))
     gen -v${version} -rc${new_rc} ${push}
     version_with_rc=${version}_RC${new_rc}
+
     if [[ "`ls \"${CANDIDATE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
       echo "  Removing Existing Release Candidate"
       rm "${CANDIDATE_DIR}"${ZIP_BASE}-*
