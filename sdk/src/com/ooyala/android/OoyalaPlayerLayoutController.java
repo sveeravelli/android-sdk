@@ -22,7 +22,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain) {
     this(l, pcode, domain, DefaultControlStyle.AUTO);
   }
 
@@ -33,7 +33,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param domain the embed domain to use
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, EmbedTokenGenerator generator) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, EmbedTokenGenerator generator) {
     this(l, pcode, domain, DefaultControlStyle.AUTO, generator);
   }
 
@@ -53,7 +53,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
     this(l, pcode, domain, dcs, null);
   }
 
@@ -65,7 +65,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
     this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
   }
 

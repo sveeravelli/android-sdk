@@ -20,7 +20,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain) {
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain) {
     this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
   }
 
@@ -31,7 +31,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
+  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, PlayerDomain domain) {
     this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
   }
 
@@ -41,7 +41,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
+  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, PlayerDomain domain) {
     this(pcode, domain);
     _secureUrlGenerator = secureURLGenerator;
   }
@@ -51,7 +51,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String pcode, String domain) {
+  public OoyalaAPIClient(String pcode, PlayerDomain domain) {
     this(new PlayerAPIClient(pcode, domain, null));
   }
 
@@ -241,7 +241,7 @@ public class OoyalaAPIClient {
   /**
    * @return the domain this OoyalaAPIClient uses
    */
-  String getDomain() {
+  PlayerDomain getDomain() {
     return _playerAPI.getDomain();
   }
 }

@@ -19,7 +19,14 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   }
 
   protected void setUp() {
-    api = new PlayerAPIClient(TestConstants.TEST_PCODE, "www.ooyala.com", null);
+    PlayerDomain domain = null;
+    try {
+      domain = new PlayerDomain("http://www.ooyala.com");
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
   }
 
   protected void tearDown() {}

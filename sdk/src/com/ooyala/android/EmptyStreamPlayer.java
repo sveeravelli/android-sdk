@@ -4,7 +4,6 @@ import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;

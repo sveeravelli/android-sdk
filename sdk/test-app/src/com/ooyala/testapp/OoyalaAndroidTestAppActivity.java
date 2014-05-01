@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
-
 import java.util.Observer;
 
 import android.app.Activity;
@@ -20,6 +19,7 @@ import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.testapp.R;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator {
@@ -57,9 +57,16 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
     // optional localization
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
-
+    PlayerDomain domain = null;
+    try {
+      domain = new PlayerDomain(PLAYERDOMAIN);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, PLAYERDOMAIN, this);
+        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, domain, this);
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);

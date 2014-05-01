@@ -19,13 +19,14 @@ import android.widget.Spinner;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener {
 
   protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "ooyala.com";
+  final String DOMAIN = "http://ooyala.com";
 
   protected OptimizedOoyalaPlayerLayoutController playerLayoutController;
   protected OoyalaPlayer player;
@@ -44,7 +45,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
     //Initialize the player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    PlayerDomain domain = new PlayerDomain(DOMAIN);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain);
     player = playerLayoutController.getPlayer();
 
     //Initialize the bottom controls
