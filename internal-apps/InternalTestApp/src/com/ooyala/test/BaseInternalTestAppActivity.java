@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,4 +107,11 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
   }
 
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (playerLayoutController.onKeyUp(keyCode, event)) {
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
+  }
 }
