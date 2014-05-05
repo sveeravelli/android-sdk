@@ -1,8 +1,8 @@
 package com.ooyala.android;
 
 public class TestConstants {
-  public static final String TEST_API_KEY = "l1am06xhbSxa0OtyZsBTshW2DMtp.qDW-_";
-  public static final String TEST_SECRET = "GkUqcxL-5aeVBYG71aYQmlkMh62iBRgq8O-d6Y5w";
+  public static final String TEST_API_KEY = "l1am06xhbSxa0OtyZsBTshW2DMtp.6Le2A";
+  public static final String TEST_SECRET = "M1kKrxsGenjOJ--O2dDh8_XQ5C4nB3NeX6aFS4U4";
   public static final String TEST_PCODE = "l1am06xhbSxa0OtyZsBTshW2DMtp";
   public static final String TEST_VIDEO = "UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM";
   public static final String TEST_VIDEO_EXTERNAL_ID = "jigish:4570720";

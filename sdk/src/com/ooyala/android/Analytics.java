@@ -46,7 +46,7 @@ public class Analytics {
 
     String url = "http://www.ooyala.com/analytics.html";
     try {
-      url = new URL("http", api.getDomain(), "/").toString();
+      url = new URL("http", api.getDomain().toString(), "/").toString();
     }
     catch (MalformedURLException e) {
       System.out.println("falling back to default analytics URL " + url);
@@ -85,7 +85,7 @@ public class Analytics {
    * @param api the API to initialize this Analytics with
    */
   Analytics(Context context, PlayerAPIClient api) {
-    this(context, generateEmbedHTML(api), api.getDomain());
+    this(context, generateEmbedHTML(api), api.getDomain().toString());
   }
 
   /**

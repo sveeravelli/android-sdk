@@ -1,4 +1,33 @@
-Current Version: 2.2.0
+Current Version: 2.4.0
+
+------------ 2.4.0 ------------
+Freewheel/IMA Bug fixes
+[PBK-553] Updated Freewheel Binaries to 5.13.0
+[PBK-572] fix issue of running update before we had data.
+[PBK-572] address race conditions with FW ads (moral equivalent for Android of iOS changes for [PBK-566]).
+[PBK-627] Pass current item duration into Freewheel instead of Stream Player duration
+[PBK-613] Sync SDK helper with iOS, remove Freewheel jar from OO+FW SDK
+
+API Changes
+[PBK-455] Major Closed Captions UI overhaul to adhere to FCC Regulations
+[ANA-3407]extract 'player domain' as a concrete type, and put validation enforcement in there, and update (break on purpose) APIs using such.
+[PBK-659] introduce onKeyUp event handler to show how Fire TV remote control (and other controls) can interact with OoyalaPlayer.
+
+Other Changes
+[PBK-643] fix use of _closedCaptionsView and _closedCaptionsStyle to avoid NPEs.
+          Use AsyncTask and Thread to respect thread requirements.
+[PBK-588] Fixed bugs with OptimizedOoyalaPlayerLayoutController
+
+------------ 2.3.0 ------------
+          Fix OoyalaFreewheelSDK build to not munge the Freewheel class file checksums.
+[PBK-505] call IMA's contentComplete() more appropriately often.
+[PBK-522] more attempts to avoid null dereferencing.
+[PBK-457] fixed getBitrate crash. Still need MP4 file test.
+[PBK-457] Split if condition.
+[PBK-457] Fixed if condition issue in getBitrate()
+[PBK-457] update the bitrate fix. Only return the correct nitrate for MP4 files. Return -2 for others.
+[PBK-531] Add support of FRMSegment to Ooyala Freewheel Manager
+[PBK-504] Disable Enhanced seek style for native HLS playback
 
 ------------ 2.2.0 ------------
 Freewheel Ad Manager Support

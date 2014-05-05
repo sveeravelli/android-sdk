@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 /**
@@ -158,7 +159,23 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _timeBeforeSuspend = timeInMillis;
       return;
     }
-    _player.seekTo(timeInMillis);
+
+    if( isSeekAllowed() ) {
+      _player.seekTo(timeInMillis);
+    }
+    else {
+      _timeBeforeSuspend = timeInMillis;
+    }
+  }
+
+  private void seekToTimeOnPrepared( int timeInMillis ) {
+    if (_player != null) {
+      _player.seekTo(timeInMillis);
+    }
+  }
+
+  private boolean isSeekAllowed() {
+    return _state == State.PAUSED || _state == State.READY || _state == State.COMPLETED || _state == State.PLAYING;
   }
 
   protected void createMediaPlayer() {
@@ -220,7 +237,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       }
     }
     if (_timeBeforeSuspend > 0) {
-      seekToTime(_timeBeforeSuspend);
+      seekToTimeOnPrepared(_timeBeforeSuspend);
     }
     setState(State.READY);
   }
@@ -449,5 +466,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   protected void setState(State state) {
     super.setState(state);
     dequeueAll();
+  }
+
+  @Override
+  public SeekStyle getSeekStyle() {
+    if(stream == null || Constants.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
+      return SeekStyle.BASIC;
+    }
+    else {
+      return SeekStyle.ENHANCED;
+    }
   }
 }

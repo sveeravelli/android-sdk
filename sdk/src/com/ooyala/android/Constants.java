@@ -2,7 +2,8 @@ package com.ooyala.android;
 
 class Constants {
   /** NOTE[jigish] do NOT change the name or location of this variable without changing pub_release.sh */
-  public static final String SDK_VERSION = "2.2.0_RC11_Playready_Delta";
+
+  public static final String SDK_VERSION = "2.4.0_RC2";
   public static final String API_VERSION = "1";
 
   public static final int RESPONSE_LIFE_SECONDS = 5 * 60;

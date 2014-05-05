@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,14 +19,14 @@ import android.widget.Spinner;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
-import com.ooyala.test.R;
+import com.ooyala.android.PlayerDomain;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener {
 
   protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "ooyala.com";
+  final String DOMAIN = "http://ooyala.com";
 
   protected OptimizedOoyalaPlayerLayoutController playerLayoutController;
   protected OoyalaPlayer player;
@@ -44,7 +45,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
     //Initialize the player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    PlayerDomain domain = new PlayerDomain(DOMAIN);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain);
     player = playerLayoutController.getPlayer();
 
     //Initialize the bottom controls
@@ -105,4 +107,11 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
   }
 
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (playerLayoutController.onKeyUp(keyCode, event)) {
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
+  }
 }

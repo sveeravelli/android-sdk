@@ -23,7 +23,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param pcode the provider code to use
    * @param domain the embed domain to use
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain) {
     this(l, pcode, domain, DefaultControlStyle.AUTO);
   }
 
@@ -34,7 +34,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param domain the embed domain to use
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, EmbedTokenGenerator generator) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, EmbedTokenGenerator generator) {
     this(l, pcode, domain, DefaultControlStyle.AUTO, generator);
   }
 
@@ -54,7 +54,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param domain the embed domain to use
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
     this(l, pcode, domain, dcs, null);
   }
 
@@ -66,7 +66,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
-  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, String domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
     this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
   }
 

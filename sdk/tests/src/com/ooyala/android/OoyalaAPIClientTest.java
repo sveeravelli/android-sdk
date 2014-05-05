@@ -13,8 +13,15 @@ public class OoyalaAPIClientTest extends AndroidTestCase {
   }
 
   protected void setUp() {
+    PlayerDomain domain = null;
+    try {
+      domain = new PlayerDomain("http://www.ooyala.com");
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     api = new OoyalaAPIClient(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET,
-        TestConstants.TEST_PCODE, "www.ooyala.com");
+        TestConstants.TEST_PCODE, domain);
   }
 
   protected void tearDown() {}
