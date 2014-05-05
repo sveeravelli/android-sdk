@@ -74,10 +74,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 250;
 
-  protected static boolean _hasDiscredix = true;
+  protected boolean _hasDiscredix = false;
 
   private boolean isDiscredixLoaded() {
     return _hasDiscredix;
+  }
+
+  private boolean isDiscredixNeeded() {
+    return "smooth".equals(_stream.getDeliveryType());
   }
 
   @Override
@@ -99,19 +103,21 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
-    // If Discredix resolves, that means we're using the secure player. Otherwise, we're using VO's HLS-only libraries.
-    try {
-      getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
-    } catch(Exception e) {
-      Log.d(TAG, "Discredix doesn't exist");
-      _hasDiscredix = false;
-    }
-
-    if (!isDiscredixLoaded() && "smooth".equals(_stream.getDeliveryType())) {
-      Log.e(TAG, "ERROR: Trying to play a smooth asset in VisualOn, without Discredix support");
-      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to play a smooth asset in VisualOn, without Discredix support");
-      setState(State.ERROR);
-      return;
+    //Don't bother loading discredix if we aren't playing a smooth stream
+    _hasDiscredix = false;
+    if (isDiscredixNeeded()) {
+      // If Discredix resolves, that means we have DRM playback available
+      try {
+        getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
+        Log.d(TAG, "This asset needs Discredix, which was loaded successfully");
+      } catch(Exception e) {
+        _hasDiscredix = false;
+        Log.e(TAG, "ERROR: Trying to play a smooth asset in VisualOn, without Discredix support");
+        this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to play a smooth asset in VisualOn, without Discredix support");
+        setState(State.ERROR);
+        return;
+      }
+      _hasDiscredix = true;
     }
 
     setState(State.LOADING);
@@ -128,7 +134,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       VisualOnUtils.cleanupLocalFiles(_parent.getLayout().getContext());
     }
 
-    if(isDiscredixLoaded() && _localFilePath == null && "smooth".equals(_stream.getDeliveryType())) {
+    if(isDiscredixLoaded() && _localFilePath == null) {
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
