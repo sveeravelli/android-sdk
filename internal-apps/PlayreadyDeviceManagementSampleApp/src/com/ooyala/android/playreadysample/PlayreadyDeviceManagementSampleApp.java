@@ -22,6 +22,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.playreadysample.R;
 
 public class PlayreadyDeviceManagementSampleApp extends Activity implements Observer, EmbedTokenGenerator {
@@ -45,7 +46,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
 //  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
 
   final String PCODE  = "FoeG863GnBL4IhhlFC1Q2jqbkH9m";
-  final String DOMAIN = "www.ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +83,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-    		PCODE, DOMAIN, this);
+    		PCODE, new PlayerDomain(DOMAIN), this);
     player = playerLayoutController.getPlayer();
 
     player.addObserver(this);
