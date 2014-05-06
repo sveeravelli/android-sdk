@@ -1,10 +1,13 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import com.ooyala.android.StreamSelector;
+import com.ooyala.android.TestConstants;
 
 import android.test.AndroidTestCase;
 

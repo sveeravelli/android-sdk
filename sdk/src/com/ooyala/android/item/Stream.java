@@ -1,13 +1,16 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.Build;
 import android.util.Base64;
+
+import com.ooyala.android.StreamSelector;
 
 public class Stream implements JSONUpdatableItem {
   static final String KEY_VIDEO_BITRATE = "video_bitrate";
@@ -97,7 +100,7 @@ public class Stream implements JSONUpdatableItem {
 
   public Stream() {}
 
-  Stream(JSONObject data) {
+  public Stream(JSONObject data) {
     update(data);
   }
 

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Stream;
 import com.widevine.drmapi.android.WVEvent;
 import com.widevine.drmapi.android.WVEventListener;
 import com.widevine.drmapi.android.WVPlayback;

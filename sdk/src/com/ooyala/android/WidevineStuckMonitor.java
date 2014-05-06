@@ -4,6 +4,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ooyala.android.item.Video;
+
 import android.util.Log;
 
 public final class WidevineStuckMonitor implements Observer {

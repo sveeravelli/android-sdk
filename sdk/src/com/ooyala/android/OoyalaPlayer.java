@@ -19,10 +19,17 @@ import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
-import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.Caption;
+import com.ooyala.android.item.Channel;
+import com.ooyala.android.item.ChannelSet;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.Video;
+import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 

@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import org.w3c.dom.Element;
 
@@ -16,13 +16,13 @@ public class Caption {
     String durationStr = element.getAttribute(ClosedCaptions.ATTRIBUTE_DUR);
     String endStr = element.getAttribute(ClosedCaptions.ATTRIBUTE_END);
 
-    if (Utils.isNullOrEmpty(beginStr)) { return; }
-    _begin = Utils.secondsFromTimeString(beginStr);
+    if (ItemUtils.isNullOrEmpty(beginStr)) { return; }
+    _begin = ItemUtils.secondsFromTimeString(beginStr);
 
-    if (!Utils.isNullOrEmpty(endStr)) {
-      _end = Utils.secondsFromTimeString(endStr);
-    } else if (!Utils.isNullOrEmpty(durationStr)) {
-      _end = _begin + Utils.secondsFromTimeString(durationStr);
+    if (!ItemUtils.isNullOrEmpty(endStr)) {
+      _end = ItemUtils.secondsFromTimeString(endStr);
+    } else if (!ItemUtils.isNullOrEmpty(durationStr)) {
+      _end = _begin + ItemUtils.secondsFromTimeString(durationStr);
     } else {
       return;
     }

@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.item.ContentItemTest;
+
 import android.test.AndroidTestCase;
 
 public class OoyalaAdSpotTest extends AndroidTestCase {

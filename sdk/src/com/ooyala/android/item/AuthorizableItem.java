@@ -1,10 +1,14 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
+
+import java.util.List;
+
+import org.json.JSONObject;
 
 /**
  * Stores the info and metatdata for the specified movie.
  *
  */
-public interface AuthorizableItem {
+public interface AuthorizableItem extends JSONUpdatableItem {
   /**
    * Authorize response codes
    */
@@ -98,4 +102,24 @@ public interface AuthorizableItem {
    * @return an int with the status of the authorization request
    */
   public int getAuthCode();
+
+  /**
+   * Update the AuthorizableItem using the specified data
+   *
+   * @param data
+   *          the data to use to update this AuthorizableItem
+   * @return a ReturnState based on if the data matched or not (or parsing
+   *         failed)
+   */
+  public ReturnState update(JSONObject data);
+
+  /**
+   * For internal use only. The embed codes to authorize for the
+   * AuthorizableItemInternal
+   *
+   * @return the embed codes to authorize as a List
+   */
+  public List<String> embedCodesToAuthorize();
+
+  public boolean isHeartbeatRequired();
 }

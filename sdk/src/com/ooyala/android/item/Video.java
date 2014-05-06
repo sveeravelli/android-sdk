@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +11,10 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.ooyala.android.FetchPlaybackInfoCallback;
+import com.ooyala.android.IMatchObjectPredicate;
+import com.ooyala.android.OoyalaAPIClient;
 
 /**
  * Stores the info and metatdata for the specified movie.
@@ -25,11 +29,11 @@ public class Video extends ContentItem implements PlayableItem {
 
   Video() {}
 
-  Video(JSONObject data, String embedCode, PlayerAPIClient api) {
+  Video(JSONObject data, String embedCode, OoyalaAPIClient api) {
     this(data, embedCode, null, api);
   }
 
-  Video(JSONObject data, String embedCode, Channel parent, PlayerAPIClient api) {
+  Video(JSONObject data, String embedCode, Channel parent, OoyalaAPIClient api) {
     _embedCode = embedCode;
     _api = api;
     _parent = parent;
@@ -62,7 +66,7 @@ public class Video extends ContentItem implements PlayableItem {
           _streams.clear();
           for (int i = 0; i < streams.length(); i++) {
             Stream stream = new Stream(streams.getJSONObject(i));
-            _live = _live || stream._isLiveStream;	// live stream means the video is live
+            _live = _live || stream.isLiveStream();	// live stream means the video is live
             if (stream != null) {
               _streams.add(stream);
             }

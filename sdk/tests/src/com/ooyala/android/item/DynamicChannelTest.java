@@ -1,8 +1,10 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.ooyala.android.TestConstants;
 
 import android.test.AndroidTestCase;
 

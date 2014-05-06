@@ -1,16 +1,24 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.OrderedMap;
+import com.ooyala.android.TestConstants;
+import com.ooyala.android.item.Channel;
+import com.ooyala.android.item.ChannelSet;
+import com.ooyala.android.item.Video;
 
 public class ChannelTest extends AndroidTestCase {
   public ChannelTest() {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }

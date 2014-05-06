@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.item.AdSpot;
+
 import android.widget.FrameLayout;
 
 public abstract class AdMoviePlayer extends MoviePlayer {

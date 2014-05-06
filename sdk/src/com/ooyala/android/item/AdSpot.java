@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.VASTAdSpot;
 
 public abstract class AdSpot implements JSONUpdatableItem {
   protected static final String KEY_TYPE = "type";  //AdSpot
@@ -30,22 +34,27 @@ public abstract class AdSpot implements JSONUpdatableItem {
   protected List<URL> _trackingURLs = null;
   protected final boolean _isReusable;
 
-  public AdSpot() {
+  protected AdSpot() {
     _isReusable = REUSABLE;
   }
 
-  public AdSpot( boolean isOneTimeUse ) {
+  protected AdSpot( boolean isOneTimeUse ) {
     _isReusable = isOneTimeUse;
   }
 
-  AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
+  protected AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
     _time = time;
     _clickURL = clickURL;
     _trackingURLs = trackingURLs;
     _isReusable = REUSABLE;
   }
 
-  ReturnState update(JSONObject data) {
+  protected AdSpot(JSONObject data) {
+    _isReusable = REUSABLE;
+    update(data);
+  }
+
+  protected ReturnState update(JSONObject data) {
     if (data == null) { return ReturnState.STATE_FAIL; }
 
     try {
@@ -91,7 +100,7 @@ public abstract class AdSpot implements JSONUpdatableItem {
    */
   public abstract boolean fetchPlaybackInfo();
 
-  static AdSpot create(JSONObject data, PlayerAPIClient api) {
+  public static AdSpot create(JSONObject data, OoyalaAPIClient api) {
     if (data == null || data.isNull(KEY_TYPE)) { return null; }
     String type = null;
     try {
@@ -104,7 +113,7 @@ public abstract class AdSpot implements JSONUpdatableItem {
     if (type == null) {
       return null;
     } else if (type.equals(AD_TYPE_OOYALA)) {
-      return new OoyalaAdSpot(data, new OoyalaAPIClient(api));
+      return new OoyalaAdSpot(data, api);
     } else if (type.equals(AD_TYPE_VAST)) {
       return new VASTAdSpot(data);
     } else {

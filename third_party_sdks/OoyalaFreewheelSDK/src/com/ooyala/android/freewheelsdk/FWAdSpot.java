@@ -2,7 +2,7 @@ package com.ooyala.android.freewheelsdk;
 
 import tv.freewheel.ad.interfaces.ISlot;
 
-import com.ooyala.android.AdSpot;
+import com.ooyala.android.item.AdSpot;
 
 /**
  * The ad spot that holds a list of ISlots (ads) and the Freewheel context

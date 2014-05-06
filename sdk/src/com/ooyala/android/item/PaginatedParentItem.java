@@ -1,8 +1,11 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import org.json.JSONObject;
 
+import com.ooyala.android.OrderedMap;
+
 public interface PaginatedParentItem extends JSONUpdatableItem {
+
   public String getEmbedCode();
 
   /**

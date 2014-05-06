@@ -2,7 +2,7 @@ package com.ooyala.android.imasdk;
 
 import java.util.Set;
 
-import com.ooyala.android.Stream;
+import com.ooyala.android.item.Stream;
 
 interface IIMAAdSpot {
 

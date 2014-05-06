@@ -8,6 +8,8 @@ import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.ContentItem;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
   private static String TAG = OoyalaAdPlayer.class.getName();
@@ -99,6 +101,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     final StreamPlayer player = basePlayer;
 
     _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
+
       @Override
       public void callback(boolean result) {
         if (!_ad.isAuthorized()) {

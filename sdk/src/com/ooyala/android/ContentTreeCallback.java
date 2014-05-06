@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.item.ContentItem;
+
 public interface ContentTreeCallback {
   /**
    * This callback is used for asynchronous contentTree calls

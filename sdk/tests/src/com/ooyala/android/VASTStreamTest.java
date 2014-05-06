@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 
 import android.test.AndroidTestCase;
 
+import com.ooyala.android.item.Stream;
+
 public class VASTStreamTest extends AndroidTestCase {
   public VASTStreamTest() {
     super();

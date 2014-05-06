@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.AdSpot;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;

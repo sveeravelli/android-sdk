@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Stream;
 
 public class EmptyStreamPlayer extends StreamPlayer {
 

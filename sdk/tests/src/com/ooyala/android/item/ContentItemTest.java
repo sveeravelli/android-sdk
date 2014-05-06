@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.json.*;
+
+import com.ooyala.android.OrderedMap;
+import com.ooyala.android.TestConstants;
 
 import android.test.AndroidTestCase;
 

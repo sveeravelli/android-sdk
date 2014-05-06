@@ -15,9 +15,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.PaginatedParentItem;
 
 class PlayerAPIClient {
-  private static String TAG = PlayerAPIClient.class.getName();
+  //private static String TAG = PlayerAPIClient.class.getName();
 
   protected static final String KEY_DOMAIN = "domain";
   protected static final String KEY_AUTHORIZATION_DATA = "authorization_data";
@@ -227,13 +230,13 @@ class PlayerAPIClient {
     @SuppressWarnings("unchecked")
     @Override
     protected Boolean doInBackground(Object... params) { // List<String> embedCodes
-                                                         // AuthorizableItemInternal parent
+                                                         // AuthorizableItem parent
       if (params.length < 2) { return false; }
       if (!(params[0] instanceof List<?>)) { return false; }
 
       List<String> embedCodes = (List<String>)params[0];
-      AuthorizableItemInternal parent = params[1] instanceof AuthorizableItemInternal ?
-          (AuthorizableItemInternal) params[1] : null;
+      AuthorizableItem parent = params[1] instanceof AuthorizableItem ?
+          (AuthorizableItem) params[1] : null;
 
       switch (params.length) {
         case 2:
@@ -262,25 +265,25 @@ class PlayerAPIClient {
     }
   }
 
-  public boolean authorize(AuthorizableItemInternal item) throws OoyalaException {
+  public boolean authorize(AuthorizableItem item) throws OoyalaException {
     List<String> embedCodes = item.embedCodesToAuthorize();
     return authorizeEmbedCodes(embedCodes, item);
   }
 
-  public boolean authorize(AuthorizableItemInternal item, PlayerInfo playerInfo) throws OoyalaException {
+  public boolean authorize(AuthorizableItem item, PlayerInfo playerInfo) throws OoyalaException {
     List<String> embedCodes = item.embedCodesToAuthorize();
     return authorizeEmbedCodes(embedCodes, item, playerInfo);
   }
 
-  public Object authorize(AuthorizableItemInternal item, AuthorizeCallback callback) {
+  public Object authorize(AuthorizableItem item, AuthorizeCallback callback) {
     return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, callback);
   }
 
-  public Object authorize(AuthorizableItemInternal item, PlayerInfo playerInfo, AuthorizeCallback callback) {
+  public Object authorize(AuthorizableItem item, PlayerInfo playerInfo, AuthorizeCallback callback) {
     return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, playerInfo, callback);
   }
 
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent)
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
       throws OoyalaException {
     String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(embedCodes, SEPARATOR_URL_IDS));
@@ -319,7 +322,7 @@ class PlayerAPIClient {
     return true;
   }
 
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent, PlayerInfo playerInfo)
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent, PlayerInfo playerInfo)
       throws OoyalaException {
     String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(embedCodes, SEPARATOR_URL_IDS));
@@ -376,14 +379,14 @@ class PlayerAPIClient {
     return true;
   }
 
-  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent,
       AuthorizeCallback callback) {
     AuthorizeTask task = new AuthorizeTask(callback);
     task.execute(embedCodes, parent);
     return task;
   }
 
-  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent,
       PlayerInfo playerInfo, AuthorizeCallback callback) {
     AuthorizeTask task = new AuthorizeTask(callback);
     task.execute(embedCodes, parent, playerInfo);
@@ -574,7 +577,7 @@ class PlayerAPIClient {
       System.out.println("Unable to create objects: " + e);
       throw e;
     }
-    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
+    ContentItem item = ContentItem.create(contentTree, embedCodes, new OoyalaAPIClient(this));
     if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
         "Unknown Content Type"); }
     return item;
@@ -608,7 +611,7 @@ class PlayerAPIClient {
       throw e;
     }
 
-    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
+    ContentItem item = ContentItem.create(contentTree, embedCodes, new OoyalaAPIClient(this));
     if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
         "Unknown Content Type"); }
     return item;

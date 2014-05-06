@@ -16,9 +16,9 @@ import tv.freewheel.ad.interfaces.ISlot;
 import android.app.Activity;
 import android.util.Log;
 
-import com.ooyala.android.AdSpot;
 import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 /**

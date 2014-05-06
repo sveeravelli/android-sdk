@@ -12,11 +12,16 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.PlayableItem;
+import com.ooyala.android.item.Stream;
+
 /**
- * Stores the info and metadata for the specified content item.
+ * Stores the info and metadata for an Ooyala Managed Adspot.
  *
  */
-public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, PlayableItem {
+public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableItem {
   static final String KEY_AUTHORIZED = "authorized";
   static final String KEY_CODE = "code";
   static final String KEY_STREAMS = "streams";  //OoyalaAdSpot, Video
@@ -45,7 +50,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
    * @param data the metadata needed to update the Ooyala Ad
    * @param api the API to authorize the ad spot at a later time
    */
-  OoyalaAdSpot(JSONObject data, OoyalaAPIClient api) {
+  public OoyalaAdSpot(JSONObject data, OoyalaAPIClient api) {
     _api = api;
     update(data);
   }

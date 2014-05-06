@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Stream;
 
 public class MoviePlayer extends Player implements Observer {
 

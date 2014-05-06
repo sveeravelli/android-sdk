@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Stream;
 
 //the widevine player using the built in libraries, for honeycomb+
 @TargetApi(11)

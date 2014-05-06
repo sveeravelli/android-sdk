@@ -24,7 +24,7 @@ import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.Video;
+import com.ooyala.android.item.Video;
 
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will

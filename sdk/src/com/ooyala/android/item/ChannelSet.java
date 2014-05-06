@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.OrderedMap;
+
 public class ChannelSet extends ContentItem implements PaginatedParentItem {
   protected OrderedMap<String, Channel> _channels = new OrderedMap<String, Channel>();
   protected String _nextChildren = null;
@@ -15,11 +18,11 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
 
   ChannelSet() {}
 
-  ChannelSet(JSONObject data, String embedCode, PlayerAPIClient api) {
+  ChannelSet(JSONObject data, String embedCode, OoyalaAPIClient api) {
     this(data, embedCode, null, api);
   }
 
-  ChannelSet(JSONObject data, String embedCode, ChannelSet parent, PlayerAPIClient api) {
+  ChannelSet(JSONObject data, String embedCode, ChannelSet parent, OoyalaAPIClient api) {
     _embedCode = embedCode;
     _api = api;
     update(data);

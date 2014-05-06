@@ -1,16 +1,23 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.TestConstants;
+import com.ooyala.android.VASTAdSpot;
+import com.ooyala.android.item.AdSpot;
 
 public class AdSpotTest extends AndroidTestCase {
   public AdSpotTest() {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }

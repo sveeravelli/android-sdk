@@ -18,6 +18,8 @@ import org.w3c.dom.Node;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.ooyala.android.item.AdSpot;
+
 public class VASTAdSpot extends AdSpot {
   static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
   static final String KEY_SIGNATURE = "signature"; // embedded, VAST
@@ -52,7 +54,7 @@ public class VASTAdSpot extends AdSpot {
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
    */
-  VASTAdSpot(JSONObject data) {
+  public VASTAdSpot(JSONObject data) {
     update(data);
   }
 
@@ -62,7 +64,8 @@ public class VASTAdSpot extends AdSpot {
    * @return ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
    */
   @Override
-  ReturnState update(JSONObject data) {
+
+  public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
         return ReturnState.STATE_FAIL;

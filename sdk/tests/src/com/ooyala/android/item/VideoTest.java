@@ -1,4 +1,7 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
+
+import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.TestConstants;
 
 import android.test.AndroidTestCase;
 

@@ -22,6 +22,7 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
+import com.ooyala.android.item.Caption;
 
 public class ClosedCaptionsView extends TextView {
 
@@ -122,7 +123,7 @@ public class ClosedCaptionsView extends TextView {
 			// TODO: choose duration for live since live does not contain caption object
 			int currentDuration = 600;
 			if (!isLive) {
-				currentDuration = (int) (100 * ((caption._end - caption._begin) * 2 / 3));
+				currentDuration = (int) (100 * ((caption.getEnd() - caption.getBegin()) * 2 / 3));
 			}
 			this.scroller.startScroll(0, prevBottomLine -  (currentBottomLine - prevBottomLine), 0, currentBottomLine - prevBottomLine, currentDuration);
 			// Clean the textView before it is too big. When there are too many texts in textView it will scroll really slow and unsmoonthly
@@ -133,7 +134,7 @@ public class ClosedCaptionsView extends TextView {
 		} else if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
 			//TODO: choose paint-on delay for live since live does not contain caption object
 			if (!isLive) {
-				this.paintOnDelay = Math.min(this.paintOnDelay, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
+				this.paintOnDelay = Math.min(this.paintOnDelay, (long)(caption.getEnd() - caption.getBegin()) * 2 / (caption.getText().length() * 3));
 			}
 			this.setGravity(Gravity.LEFT | Gravity.TOP);
 			String splitText = getSplitTextAndUpdateFrame(text);

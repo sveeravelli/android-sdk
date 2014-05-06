@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +9,15 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ooyala.android.ModuleData;
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.OrderedMapValue;
+
 /**
  * Stores the info and metadata for the specified content item.
  *
  */
-public abstract class ContentItem implements AuthorizableItemInternal, OrderedMapValue<String>, JSONUpdatableItem {
+public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<String>, JSONUpdatableItem {
 
   //Item
   protected static final String KEY_EMBED_CODE = "embed_code";
@@ -49,7 +53,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
   protected String _contentToken = null;
   protected String _title = null;
   protected String _description = null;
-  protected PlayerAPIClient _api;
+  protected OoyalaAPIClient _api;
   protected String _promoImageURL = null;
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
@@ -70,7 +74,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     _description = description;
   }
 
-  ContentItem(JSONObject data, String embedCode, PlayerAPIClient api) {
+  ContentItem(JSONObject data, String embedCode, OoyalaAPIClient api) {
     _embedCode = embedCode;
     _api = api;
     update(data);
@@ -173,7 +177,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
         _promoImageURL = myData.getString(KEY_PROMO_IMAGE);
       }
       if (myData.has(KEY_METADATA_BASE)) {
-        _metadata = Utils.mapFromJSONObject(myData.getJSONObject(KEY_METADATA_BASE));
+        _metadata = ItemUtils.mapFromJSONObject(myData.getJSONObject(KEY_METADATA_BASE));
       }
       if (myData.has(KEY_METADATA_MODULES)) {
         _moduleData = new HashMap<String, ModuleData>();
@@ -184,7 +188,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
           String key = (String)itr.next();
           JSONObject module = modules.getJSONObject(key);
           String type = module.optString(KEY_METADATA_MODULE_TYPE);
-          Map<String, String> metadata = Utils.mapFromJSONObject(module.getJSONObject(KEY_METADATA));
+          Map<String, String> metadata = ItemUtils.mapFromJSONObject(module.getJSONObject(KEY_METADATA));
 
           _moduleData.put(key, new ModuleData(key, type, metadata));
         }
@@ -196,13 +200,13 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     return ReturnState.STATE_MATCHED;
   }
 
-  static ContentItem create(JSONObject data, List<String> embedCodes, PlayerAPIClient api) {
+  public static ContentItem create(JSONObject data, List<String> embedCodes, OoyalaAPIClient api) {
     if (data == null || embedCodes == null || embedCodes.size() == 0) { return null; }
     if (embedCodes.size() == 1) { return create(data, embedCodes.get(0), api); }
     return new DynamicChannel(data, embedCodes, api);
   }
 
-  static ContentItem create(JSONObject data, String embedCode, PlayerAPIClient api) {
+  public static ContentItem create(JSONObject data, String embedCode, OoyalaAPIClient api) {
     if (data == null || embedCode == null || data.isNull(embedCode)) { return null; }
     String contentType = null;
     try {
@@ -301,7 +305,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     }
 
     // Out of bounds of authCodes
-    if(authCode < 0 || authCode >= ContentItem.authCodeDescription.length) {
+    if (authCode < 0 || authCode >= AuthorizableItem.authCodeDescription.length) {
       return "Invalid Authorization Error Code";
     }
 

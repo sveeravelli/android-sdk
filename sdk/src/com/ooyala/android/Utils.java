@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +26,7 @@ class Utils {
   static final String DEVICE_IPAD = "ipad"; // hack for Washington Post - See PB-279
 
   static final String SEPARATOR_AMPERSAND = "&";
-  static final String SEPARATOR_COLON = ":";
+  static final String SEPARATOR_TIME = ":";
 
   public static String device() {
     // temporarily disable HLS
@@ -133,28 +132,9 @@ class Utils {
     }
   }
 
-  public static Map<String, String> mapFromJSONObject(JSONObject obj) {
-    Map<String, String> map = new HashMap<String, String>();
-
-    if (obj == null) {
-      return map;
-    }
-
-    Iterator<?> itr = obj.keys();
-    while (itr.hasNext()) {
-      String key = (String)itr.next();
-      try {
-        map.put(key, obj.getString(key));
-      } catch (JSONException e) {
-        //do nothing
-      }
-    }
-
-    return map;
-  }
 
   public static double secondsFromTimeString(String time) {
-    String[] hms = time.split(SEPARATOR_COLON);
+    String[] hms = time.split(SEPARATOR_TIME);
     double multiplier = 1.0;
     double milliseconds = 0.0;
     for (int i = hms.length - 1; i >= 0; i--) {

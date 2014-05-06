@@ -7,6 +7,9 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ooyala.android.item.PlayableItem;
+import com.ooyala.android.item.Stream;
+
 public class VASTLinearAd implements PlayableItem {
   /** The duration of the ad in seconds */
   private double _duration;

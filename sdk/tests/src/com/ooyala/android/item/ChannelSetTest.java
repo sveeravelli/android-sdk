@@ -1,6 +1,9 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.OrderedMap;
+import com.ooyala.android.TestConstants;
 
 public class ChannelSetTest extends AndroidTestCase {
   public ChannelSetTest() {

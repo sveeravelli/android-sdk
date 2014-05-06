@@ -9,6 +9,10 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.PaginatedParentItem;
+
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
   private SecureURLGenerator _secureUrlGenerator = null;
@@ -72,7 +76,7 @@ public class OoyalaAPIClient {
    * @return success if authorization was successful (not if the item is authorized)
    * @throws OoyalaException
    */
-  public boolean authorize(AuthorizableItemInternal item, PlayerInfo playerInfo) throws OoyalaException {
+  public boolean authorize(AuthorizableItem item, PlayerInfo playerInfo) throws OoyalaException {
     return _playerAPI.authorize(item, playerInfo);
   }
 

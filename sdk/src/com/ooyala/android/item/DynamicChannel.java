@@ -1,20 +1,22 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ooyala.android.OoyalaAPIClient;
+
 public class DynamicChannel extends Channel {
   protected List<String> _embedCodes = null;
 
   DynamicChannel() {}
 
-  DynamicChannel(JSONObject data, List<String> embedCodes, PlayerAPIClient api) {
+  DynamicChannel(JSONObject data, List<String> embedCodes, OoyalaAPIClient api) {
     this(data, embedCodes, null, api);
   }
 
-  DynamicChannel(JSONObject data, List<String> embedCodes, ChannelSet parent, PlayerAPIClient api) {
+  DynamicChannel(JSONObject data, List<String> embedCodes, ChannelSet parent, OoyalaAPIClient api) {
     _authorized = true;
     _authCode = AuthCode.AUTHORIZED;
     _parent = parent;

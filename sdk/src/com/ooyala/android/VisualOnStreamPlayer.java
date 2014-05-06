@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Stream;
 import com.visualon.OSMPBasePlayer.voOSBasePlayer;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleDisplayInfo;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfo;

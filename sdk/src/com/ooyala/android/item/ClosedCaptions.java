@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.item;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,12 +12,14 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import org.json.*;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
@@ -135,9 +137,9 @@ public class ClosedCaptions implements JSONUpdatableItem {
     for (int i = 0; i < divs.getLength(); i++) {
       Element div = (Element) divs.item(i);
       String lang = div.getAttribute(ATTRIBUTE_XML_LANG);
-      List<Caption> captionsForLang = Utils.isNullOrEmpty(lang) ? null : _captions.get(lang);
+      List<Caption> captionsForLang = ItemUtils.isNullOrEmpty(lang) ? null : _captions.get(lang);
       String begin = div.getAttribute(ATTRIBUTE_BEGIN);
-      if (!Utils.isNullOrEmpty(begin) || captionsForLang == null) {
+      if (!ItemUtils.isNullOrEmpty(begin) || captionsForLang == null) {
         continue;
       }
 
