@@ -138,7 +138,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
-
     setupView();
   }
 
@@ -406,9 +405,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _player.resume(_view);
       return;
     }
-
-      createMediaPlayer();
-
+    createMediaPlayer();
   }
 
   @Override
@@ -667,9 +664,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
             if(strTextAll.length()>0)
               strTextAll+="\n";
             strTextAll+=strRow;
-
           }
-
         }
       }
     }
@@ -891,7 +886,5 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
     }
   }
-
-
 
 }
