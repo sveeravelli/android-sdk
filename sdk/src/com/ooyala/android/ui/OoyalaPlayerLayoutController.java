@@ -1,4 +1,9 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
+
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.PlayerDomain;
 
 import android.app.Dialog;
 import android.view.Gravity;

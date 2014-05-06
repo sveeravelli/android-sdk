@@ -17,7 +17,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 class Utils {
@@ -156,7 +155,4 @@ class Utils {
     return milliseconds;
   }
 
-  public static String timeStringFromMillis(int millis, boolean includeHours) {
-    return DateUtils.formatElapsedTime(millis / 1000);
-  }
 }

@@ -6,13 +6,15 @@ import java.util.Map;
 
 import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
 import com.ooyala.android.freewheelsampleapp.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class FreewheelSampleAppActivity extends Activity {
 

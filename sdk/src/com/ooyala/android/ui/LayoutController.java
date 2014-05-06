@@ -1,4 +1,6 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
+
+import com.ooyala.android.OoyalaPlayerLayout;
 
 import android.view.KeyEvent;
 import android.view.MotionEvent;

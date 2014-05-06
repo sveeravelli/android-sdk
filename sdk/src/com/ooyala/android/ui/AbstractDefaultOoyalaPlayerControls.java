@@ -1,7 +1,11 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.ooyala.android.ClosedCaptionsStyle;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -19,7 +19,7 @@ import android.util.Log;
 import com.ooyala.android.AdSpot;
 import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 /**
  * The OoyalaFreewheelManager will play back all Freewheel ads affiliated with any playing Ooyala asset. It will

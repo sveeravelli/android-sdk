@@ -18,7 +18,7 @@ import android.widget.Spinner;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener {

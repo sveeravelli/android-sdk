@@ -22,6 +22,8 @@ import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener {

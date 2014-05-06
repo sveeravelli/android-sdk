@@ -16,7 +16,8 @@ import android.widget.TextView;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.visualontest.R;
 
 public class VisualOnTestAppActivity extends Activity implements Observer {
@@ -41,7 +42,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-    		"42Zms6h4wdcI1R1uFzepD-KZ0kkk", "Nr9o5l05rnycXeJ3qY699KJzH8PQiSUh51gd0YTq");
+    		"42Zms6h4wdcI1R1uFzepD-KZ0kkk", new PlayerDomain("http://www.ooyala.com") );
     player = playerLayoutController.getPlayer();
 
     player.addObserver(this);

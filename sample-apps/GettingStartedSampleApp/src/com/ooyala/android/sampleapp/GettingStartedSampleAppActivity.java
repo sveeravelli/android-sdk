@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
 
 public class GettingStartedSampleAppActivity extends Activity {
