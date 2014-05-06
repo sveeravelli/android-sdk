@@ -1,6 +1,7 @@
 package com.ooyala.android;
 
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class UtilsTest extends AndroidTestCase {
     paramDictionary.put("domain", TestConstants.TEST_DOMAIN);
     paramDictionary.put("expires", "1322007460");
     String expectedParamString = "api_key=" + TestConstants.TEST_API_KEY + "&device=android&domain="
-        + TestConstants.TEST_DOMAIN + "&expires=1322007460";
+        + URLEncoder.encode(TestConstants.TEST_DOMAIN) + "&expires=1322007460";
     String paramString = Utils.getParamsString(paramDictionary, "&", true);
     assertEquals(paramString, expectedParamString);
   }
