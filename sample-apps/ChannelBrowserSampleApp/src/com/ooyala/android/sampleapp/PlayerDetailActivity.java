@@ -9,6 +9,7 @@ import android.util.Log;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 
 public class PlayerDetailActivity extends Activity {
   private static final String TAG = "PlayerDetailActivity";
@@ -30,7 +31,7 @@ public class PlayerDetailActivity extends Activity {
     }
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player), ChannelBrowserSampleAppActivity.PCODE,
-        ChannelBrowserSampleAppActivity.PLAYERDOMAIN);
+        new PlayerDomain(ChannelBrowserSampleAppActivity.PLAYERDOMAIN));
     player = layoutController.getPlayer();
     if (player.setEmbedCode(embedCode)) {
       Log.d(TAG, "TEST - yay!");

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 
 public class IMASampleAppActivity extends Activity {
 
@@ -30,7 +31,7 @@ public class IMASampleAppActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
     OoyalaPlayer player = playerLayoutController.getPlayer();
 
     //Initialize IMA classes
