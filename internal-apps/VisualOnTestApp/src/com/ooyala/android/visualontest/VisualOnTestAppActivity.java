@@ -9,18 +9,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
-import com.ooyala.android.visualontest.R;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class VisualOnTestAppActivity extends Activity implements Observer {
   /** Called when the activity is first created. */
@@ -71,7 +69,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-    		PCODE, DOMAIN);
+        PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
     player.addObserver(this);

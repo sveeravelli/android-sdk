@@ -6,19 +6,21 @@ import java.util.Map;
 
 import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
 import com.ooyala.android.freewheelsampleapp.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class FreewheelSampleAppActivity extends Activity {
 
   final String EMBED  = "RlODZyZDr93PAbk-a9fY7Phq93pA-Uwt";
   final String PCODE  = "5idHc6Pt1kJ18w4u9Q5jEwAQDYCH";
-  final String DOMAIN = "www.ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
 
   OptimizedOoyalaPlayerLayoutController playerLayoutController;
   OoyalaFreewheelManager freewheelManager;
@@ -31,7 +33,7 @@ public class FreewheelSampleAppActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
     OoyalaPlayer player = playerLayoutController.getPlayer();
 
     //Initialize Freewheel Ad Manager

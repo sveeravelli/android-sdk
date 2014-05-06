@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ViewAnimator;
+
 import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.demo.Constants;
 import com.ooyala.demo.adapter.ChannelAdapter;
 import com.ooyala.demo.vo.VideoInfoVO;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +57,7 @@ public class ChanelLoadTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(final Void... voids) {
-        final OoyalaAPIClient api = new OoyalaAPIClient(Constants.OOYALA_API_KEY, Constants.OOYALA_SECRET_KEY, Constants.OOYALA_P_CODE, Constants.OOYALA_PLAYER_DOMAIN);
+        final OoyalaAPIClient api = new OoyalaAPIClient(Constants.OOYALA_API_KEY, Constants.OOYALA_SECRET_KEY, Constants.OOYALA_P_CODE, new PlayerDomain(Constants.OOYALA_PLAYER_DOMAIN));
 
         final JSONArray videos;
         JSONObject jsonObject = null;

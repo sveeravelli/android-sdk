@@ -1,6 +1,9 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
 
 import java.util.Observer;
+
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public interface OoyalaPlayerControls extends Observer {
   /**

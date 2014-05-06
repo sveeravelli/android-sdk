@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;

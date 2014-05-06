@@ -18,7 +18,7 @@ import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.testapp.R;
 
@@ -35,7 +35,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
   private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
   private String ACCOUNT_ID = "pbk-373@ooyala.com";
-  private String PLAYERDOMAIN = "ooyala.com";
+  private String PLAYERDOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {

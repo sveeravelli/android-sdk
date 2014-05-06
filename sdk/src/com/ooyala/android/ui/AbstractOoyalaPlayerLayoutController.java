@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,11 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
@@ -267,7 +272,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 		if (fullscreen) {
 			return new DefaultOoyalaPlayerFullscreenControls(_player, layout);
 		} else {
-			return new DefaultOoyalaPlayerInlineControls(_player, layout);
+          return new DefaultOoyalaPlayerInlineControls(_player, layout);
 		}
 	}
 

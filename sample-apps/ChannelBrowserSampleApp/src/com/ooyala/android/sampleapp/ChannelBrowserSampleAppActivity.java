@@ -11,7 +11,7 @@ import com.ooyala.android.ContentItem;
 import com.ooyala.android.ContentTreeCallback;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaException;
-
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.Video;
 
 import android.app.ListActivity;
@@ -28,11 +28,11 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   public static final String PCODE = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   public static final String APIKEY = "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd";
   public static final String SECRETKEY = "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN";
-  public static final String PLAYERDOMAIN = "www.ooyala.com";
+  public static final String PLAYERDOMAIN = "http://www.ooyala.com";
 
   public static final String CHANNEL_CODE = "txaGRiMzqQZSmFpMML92QczdIYUrcYVe";
 
-  public static OoyalaAPIClient api = new OoyalaAPIClient(APIKEY, SECRETKEY, PCODE, PLAYERDOMAIN);
+  public static OoyalaAPIClient api = new OoyalaAPIClient(APIKEY, SECRETKEY, PCODE, new PlayerDomain(PLAYERDOMAIN));
 
   private String[] embedCodes = { CHANNEL_CODE };
   private Channel rootItem = null;

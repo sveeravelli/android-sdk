@@ -101,15 +101,7 @@ function custom_gen {
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/AbstractDefaultOoyalaPlayerControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/AbstractOoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerFullscreenControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerInlineControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/Images.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/LayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OptimizedOoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/ui/* ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
 
   cd "${currdir}"
 }
