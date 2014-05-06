@@ -14,9 +14,11 @@ import java.util.Observer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 
 public class OmnitureSampleAppActivity extends Activity implements Observer {
   private static final String TAG = "OmnitureSampleApp";
@@ -42,7 +44,7 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
     // Initialized omniture App Measurement
     TrackingHelper.configureAppMeasurement(this);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, DOMAIN);
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
     OoyalaPlayer player = playerLayoutController.getPlayer();
     if (player.setEmbedCode(EMBED)) {
       // Initialized Omniture media Measurement
