@@ -15,7 +15,7 @@ public class TestConstants {
   public static final String TEST_CHANNEL = "B0eHAxMzqsbVRm0ZJROXw1Yaj73roQu6";
   public static final String TEST_CHANNEL_SET = "N1ZmszMzoWGX7wpenTZoWEpfjV5RMQQc";
   public static final String TEST_CONTENT_ID = "1-UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM";
-  public static final String TEST_DOMAIN = "www.ooyala.com";
+  public static final String TEST_DOMAIN = "http://www.ooyala.com";
   public static final String TEST_AD_OOYALA = "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B";
 
   public static final String TEST_DICTIONARY_VIDEO = "resources/test_video.json";

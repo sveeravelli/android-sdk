@@ -20,7 +20,7 @@ public class IMASampleAppActivity extends Activity {
 
   final String EMBED  = "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M";  //Embed Code, or Content ID
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
   OptimizedOoyalaPlayerLayoutController playerLayoutController;
   OoyalaIMAManager imaManager;
   /**

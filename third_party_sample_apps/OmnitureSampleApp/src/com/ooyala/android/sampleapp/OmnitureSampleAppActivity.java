@@ -31,7 +31,7 @@ public class OmnitureSampleAppActivity extends Activity implements Observer {
   final String PCODE  = "Uzbm46asiensk3opIgwfFn5KFemv";
   final String APIKEY = "";
   final String SECRET = "";
-  final String DOMAIN = "www.ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
 
   /**
    * Called when the activity is first created.

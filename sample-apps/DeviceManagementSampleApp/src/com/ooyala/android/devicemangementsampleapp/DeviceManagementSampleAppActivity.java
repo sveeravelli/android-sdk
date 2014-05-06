@@ -37,7 +37,7 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
 
   final String EMBED    = "fill me in";
   final String PCODE    = "fill me in";
-  final String DOMAIN   = "www.ooyala.com";
+  final String DOMAIN   = "http://www.ooyala.com";
   final String SAS      = "player.ooyala.com/sas";
   final String HTTP_SAS = "http://" + SAS;
 

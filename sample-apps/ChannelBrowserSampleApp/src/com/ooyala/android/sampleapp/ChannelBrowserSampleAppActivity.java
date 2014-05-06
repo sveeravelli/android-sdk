@@ -28,7 +28,7 @@ public class ChannelBrowserSampleAppActivity extends ListActivity {
   public static final String PCODE = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   public static final String APIKEY = "R2d3I6s06RyB712DN0_2GsQS-R-Y.nCFrd";
   public static final String SECRETKEY = "UpmPCeDJspTKqLHO5IyZSRbsSiC7AM_rAqGztDRN";
-  public static final String PLAYERDOMAIN = "www.ooyala.com";
+  public static final String PLAYERDOMAIN = "http://www.ooyala.com";
 
   public static final String CHANNEL_CODE = "txaGRiMzqQZSmFpMML92QczdIYUrcYVe";
 
