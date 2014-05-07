@@ -17,24 +17,19 @@ public interface PaginatedParentItem {
 
   /**
    * Find out it this PaginatedParentItem has more children
-   * 
+   *
    * @return true if it does, false if it doesn't
    */
   public boolean hasMoreChildren();
 
   /**
-   * Fetch the additional children if they exist. This will happen in the background and callback will be
-   * called when the fetch is complete.
-   * 
-   * @param paginatedItemListener the PaginatedItemListener to execute when the children are fetched
-   * @return true if more children exist, false if they don't or they are already in the process of being
-   *         fetched
+   * Returns all of the children that were already retrieved from the server
+   * @return an ordered map that contains all retrieved content items
    */
-  public boolean fetchMoreChildren(PaginatedItemListener paginatedItemListener);
-
+  public OrderedMap<String, ? extends ContentItem> getAllAvailableChildren();
   /**
    * The number of children this PaginatedParentItem has.
-   * 
+   *
    * @return an int with the number of children
    */
   public int childrenCount();

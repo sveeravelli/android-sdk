@@ -3,12 +3,12 @@ package com.ooyala.android;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ooyala.android.Constants.ReturnState;
-import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 public class ChannelSet extends ContentItem implements PaginatedParentItem {
   protected OrderedMap<String, Channel> _channels = new OrderedMap<String, Channel>();
@@ -115,6 +115,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
    * Get the first Video for this ChannelSet
    * @return the first Video this ChannelSet represents
    */
+  @Override
   public Video firstVideo() {
     if (_channels == null || _channels.size() == 0) { return null; }
     return _channels.get(0).firstVideo();
@@ -151,6 +152,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     return _channels.size();
   }
 
+  @Override
   public List<String> embedCodesToAuthorize() {
     List<String> embedCodes = new ArrayList<String>();
     embedCodes.add(_embedCode);
@@ -158,7 +160,8 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     return embedCodes;
   }
 
-  public OrderedMap<String, Channel> getChannels() {
+  @Override
+  public OrderedMap<String, Channel> getAllAvailableChildren() {
     return _channels;
   }
 
@@ -166,6 +169,7 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
    * The total duration (not including Ads) of this ChannelSet. This only accounts for currently loaded channels.
    * @return an int with the total duration in seconds
    */
+  @Override
   public int getDuration() {
     int totalDuration = 0;
     for (Channel channel : _channels) {
@@ -184,67 +188,13 @@ public class ChannelSet extends ContentItem implements PaginatedParentItem {
     return _nextChildren;
   }
 
-  @Override
-  public boolean fetchMoreChildren(PaginatedItemListener listener) {
-    // The two lines below aren't within a synchronized block because we assume single thread
-    // of execution except for the threads we explicitly spawn below, but those set
-    // _isFetchingMoreChildren = false at the very end of their execution.
-    if (!hasMoreChildren() || _isFetchingMoreChildren) { return false; }
-    _isFetchingMoreChildren = true;
-
-    Thread thread = new Thread(new NextChildrenRunner(listener));
-    thread.start();
-    return true;
-  }
-
-  private class NextChildrenRunner implements Runnable {
-    private PaginatedItemListener _listener = null;
-
-    public NextChildrenRunner(PaginatedItemListener listener) {
-      _listener = listener;
-    }
-
-    public void run() {
-      PaginatedItemResponse response = _api.contentTreeNext(ChannelSet.this);
-      if (response == null) {
-        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED,
-            "Null response"));
-        _isFetchingMoreChildren = false;
-        return;
-      }
-
-      if (response.firstIndex < 0) {
-        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
-            OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
-        _isFetchingMoreChildren = false;
-        return;
-      }
-
-      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_channels.subList(
-          response.firstIndex, response.firstIndex + response.count));
-      try {
-        if (_api.authorizeEmbedCodes(childEmbedCodesToAuthorize, ChannelSet.this) &&
-            _api.fetchMetadataForEmbedCodes(childEmbedCodesToAuthorize, ChannelSet.this)) {
-          _listener.onItemsFetched(response.firstIndex, response.count, null);
-        } else {
-          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
-              OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
-        }
-      } catch (OoyalaException e) {
-        _listener.onItemsFetched(response.firstIndex, response.count, e);
-      }
-      _isFetchingMoreChildren = false;
-      return;
-    }
-  }
-
-  @Override
   /**
    * Get the Video in this ChannelSet with the specified embed code
    * @param embedCode the embed code to look up
    * @param currentItem the current Video
    * @return the video in this ChannelSet with the specified embed code
    */
+  @Override
   public Video videoFromEmbedCode(String embedCode, Video currentItem) {
     // search through channelset starting with currentItem's channel
     // get first channels index

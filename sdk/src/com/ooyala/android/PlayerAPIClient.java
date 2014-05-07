@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 class PlayerAPIClient {
+  private static String TAG = PlayerAPIClient.class.getName();
   protected String _pcode = null;
   protected PlayerDomain _domain = null;
   protected int _width = -1;
@@ -702,6 +703,65 @@ class PlayerAPIClient {
     taskParam.item = item;
     task.execute(taskParam);
     return task;
+  }
+
+  private boolean _isFetchingMoreChildren = false;
+  public boolean fetchMoreChildrenForPaginatedParentItem(PaginatedParentItem parent, PaginatedItemListener listener) {
+    // The two lines below aren't within a synchronized block because we assume
+    // single thread
+    // of execution except for the threads we explicitly spawn below, but those
+    // set
+    // _isFetchingMoreChildren = false at the very end of their execution.
+    if (!parent.hasMoreChildren() || _isFetchingMoreChildren) { return false; }
+    _isFetchingMoreChildren = true;
+
+    Thread thread = new Thread(new NextChildrenRunner(parent, listener));
+    thread.start();
+    return true;
+  }
+
+  private class NextChildrenRunner implements Runnable {
+    private PaginatedItemListener _listener = null;
+    private PaginatedParentItem _parent = null;
+
+    public NextChildrenRunner(PaginatedParentItem parent, PaginatedItemListener listener) {
+      _parent = parent;
+      _listener = listener;
+    }
+
+    @Override
+    public void run() {
+      PaginatedItemResponse response = contentTreeNext(_parent);
+      if (response == null) {
+        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED,
+            "Null response"));
+        _isFetchingMoreChildren = false;
+        return;
+      }
+
+      if (response.firstIndex < 0) {
+        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+            OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
+        _isFetchingMoreChildren = false;
+        return;
+      }
+
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_parent.getAllAvailableChildren().subList(
+          response.firstIndex, response.firstIndex + response.count));
+      try {
+        if (authorizeEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent) &&
+            fetchMetadataForEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent)) {
+          _listener.onItemsFetched(response.firstIndex, response.count, null);
+        } else {
+          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+              OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        }
+      } catch (OoyalaException e) {
+        _listener.onItemsFetched(response.firstIndex, response.count, e);
+      }
+      _isFetchingMoreChildren = false;
+      return;
+    }
   }
 
   public String getPcode() {

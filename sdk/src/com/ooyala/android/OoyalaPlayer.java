@@ -1038,9 +1038,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (parent != null) {
       ChannelSet parentOfParent = parent.getParent();
       if (parent.hasMoreChildren()) {
-        return parent.fetchMoreChildren(listener);
+        return _playerAPIClient.fetchMoreChildrenForPaginatedParentItem(parent, listener);
       } else if (parentOfParent != null && parentOfParent.hasMoreChildren()) {
-        return parentOfParent.fetchMoreChildren(listener);
+        return _playerAPIClient.fetchMoreChildrenForPaginatedParentItem(parentOfParent, listener);
       }
     }
     return false;
