@@ -64,6 +64,19 @@ public class OoyalaAPIClient {
   }
 
   /**
+   * Perform a SAS Authorization on an authorizable item
+   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos. As this
+   * method is not asynchronous it should be used within an AsyncTask.
+   * @param item the content item to authorize
+   * @param playerInfo a PlayerInfo object to determine what can be returned
+   * @return success if authorization was successful (not if the item is authorized)
+   * @throws OoyalaException
+   */
+  public boolean authorize(AuthorizableItemInternal item, PlayerInfo playerInfo) throws OoyalaException {
+    return _playerAPI.authorize(item, playerInfo);
+  }
+
+  /**
    * Fetch the root ContentItem associated with the given embed codes. If multiple embed codes are given, the
    * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos. As this
    * method is not asynchronous it should be used within an AsyncTask.

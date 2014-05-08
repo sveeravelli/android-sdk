@@ -20,6 +20,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected String _embedCode = null;
   protected boolean _authorized = false;
+  protected OoyalaAPIClient _api;
   protected int _authCode = AuthCode.NOT_REQUESTED;
 
   /**
@@ -34,7 +35,12 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     _embedCode = embedCode;
   }
 
-  OoyalaAdSpot(JSONObject data, PlayerAPIClient api) {
+  /**
+   * Initialize the Ooyala Ad Spot
+   * @param data the metadata needed to update the Ooyala Ad
+   * @param api the API to authorize the ad spot at a later time
+   */
+  OoyalaAdSpot(JSONObject data, OoyalaAPIClient api) {
     _api = api;
     update(data);
   }
@@ -101,9 +107,13 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   }
 
   public boolean fetchPlaybackInfo() {
+   return fetchPlaybackInfo(StreamPlayer.defaultPlayerInfo);
+  }
+
+  public boolean fetchPlaybackInfo(PlayerInfo info) {
     if (_authCode != AuthCode.NOT_REQUESTED) { return true; }
     try {
-      return _api.authorize(this, StreamPlayer.defaultPlayerInfo);
+      return _api.authorize(this, info);
     } catch (OoyalaException e) {
       System.out.println("Unable to fetch playback info: " + e.getMessage());
       return false;
@@ -112,15 +122,17 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
 
   private class FetchPlaybackInfoTask extends AsyncTask<Void, Integer, Boolean> {
     protected FetchPlaybackInfoCallback _callback = null;
+    protected PlayerInfo _info = null;
 
-    public FetchPlaybackInfoTask(FetchPlaybackInfoCallback callback) {
+    public FetchPlaybackInfoTask(PlayerInfo info, FetchPlaybackInfoCallback callback) {
       super();
       _callback = callback;
+      _info = info;
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-      return fetchPlaybackInfo();
+      return fetchPlaybackInfo(_info);
     }
 
     @Override
@@ -129,8 +141,8 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     }
   }
 
-  public Object fetchPlaybackInfo(FetchPlaybackInfoCallback callback) {
-    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(callback);
+  public Object fetchPlaybackInfo(PlayerInfo info, FetchPlaybackInfoCallback callback) {
+    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(info, callback);
     task.execute();
     return task;
   }

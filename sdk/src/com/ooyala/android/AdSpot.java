@@ -19,7 +19,6 @@ public abstract class AdSpot {
   protected int _time = -1;
   protected URL _clickURL = null;
   protected List<URL> _trackingURLs = null;
-  protected PlayerAPIClient _api;
   protected final boolean _isReusable;
 
   public AdSpot() {
@@ -35,12 +34,6 @@ public abstract class AdSpot {
     _clickURL = clickURL;
     _trackingURLs = trackingURLs;
     _isReusable = REUSABLE;
-  }
-
-  AdSpot(JSONObject data, PlayerAPIClient api) {
-    _api = api;
-    _isReusable = REUSABLE;
-    update(data);
   }
 
   ReturnState update(JSONObject data) {
@@ -102,9 +95,9 @@ public abstract class AdSpot {
     if (type == null) {
       return null;
     } else if (type.equals(Constants.AD_TYPE_OOYALA)) {
-      return new OoyalaAdSpot(data, api);
+      return new OoyalaAdSpot(data, new OoyalaAPIClient(api));
     } else if (type.equals(Constants.AD_TYPE_VAST)) {
-      return new VASTAdSpot(data, api);
+      return new VASTAdSpot(data);
     } else {
       Log.d(AdSpot.class.getName(), "Unknown ad type: " + type);
       return null;
@@ -133,10 +126,6 @@ public abstract class AdSpot {
    */
   public List<URL> getTrackingURLs() {
     return _trackingURLs;
-  }
-
-  void setAPI(PlayerAPIClient api) {
-    this._api = api;
   }
 
   /**

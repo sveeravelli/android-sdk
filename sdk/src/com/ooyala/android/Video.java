@@ -117,7 +117,6 @@ public class Video extends ContentItem implements PlayableItem {
    * @param ad the AdSpot to play during this video
    */
   public void insertAd(AdSpot ad) {
-    ad.setAPI(_api);
     if (_ads == null) {
       _ads = new ArrayList<AdSpot>();
       _ads.add(ad);

@@ -48,10 +48,8 @@ public class VASTAdSpot extends AdSpot {
   /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
-   * @param api the PlayerAPIClient that was used to fetch this VASTAd
    */
-  VASTAdSpot(JSONObject data, PlayerAPIClient api) {
-    _api = api;
+  VASTAdSpot(JSONObject data) {
     update(data);
   }
 

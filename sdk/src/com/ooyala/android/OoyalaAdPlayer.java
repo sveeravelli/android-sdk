@@ -47,12 +47,12 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       }
       PlayerInfo info = getBasePlayer() != null ? getBasePlayer().getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
 
-      _fetchTask = _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+      _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
         @Override
-        public void callback(boolean result, OoyalaException error) {
-          if (error != null || !_ad.isAuthorized()) {
-            _error = "Error fetching VAST XML";
+        public void callback(boolean result) {
+          if (!_ad.isAuthorized()) {
+            _error = "Error fetching playback info on init";
             setState(State.ERROR);
             return;
           } else {
@@ -98,11 +98,12 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     PlayerInfo info = basePlayer != null ? basePlayer.getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
     final StreamPlayer player = basePlayer;
 
-    _ad._api.authorize(_ad, info, new AuthorizeCallback() {
-
+    _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
       @Override
-      public void callback(boolean result, OoyalaException error) {
-        if (error != null || !_ad.isAuthorized()) {
+      public void callback(boolean result) {
+        if (!_ad.isAuthorized()) {
+          _error = "Error fetching playback info on setBasePlayer";
+          setState(State.ERROR);
           return;
         } else {
           setBasePlayer2(player);
