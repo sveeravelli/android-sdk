@@ -21,9 +21,9 @@ import android.widget.TextView;
 
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements
 SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
@@ -249,7 +249,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 		if (_duration != null && _currTime != null) {
 			//boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
 			_duration.setText(DateUtils.formatElapsedTime(_player.getDuration() / 1000));
-			_currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()));
+			_currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime() / 1000));
 		}
 
 		// update UI on adStarted/adCompleted

@@ -30,6 +30,8 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       this._state = State.ERROR;
       return;
     }
+    Log.d(TAG, "Ooyala Ad Player Loaded");
+
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
 
@@ -81,6 +83,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     }
   }
 
+  @Override
   public OoyalaAdSpot getAd() {
     return _ad;
   }

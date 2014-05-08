@@ -49,6 +49,8 @@ class VASTAdPlayer extends AdMoviePlayer {
       this._state = State.ERROR;
       return;
     }
+    Log.d(TAG, "VAST Ad Player Loaded");
+
     _seekable = false;
     _ad = (VASTAdSpot) ad;
     if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
