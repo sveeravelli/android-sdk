@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -36,6 +38,7 @@ public class Video extends ContentItem implements PlayableItem {
     update(data);
   }
 
+  @Override
   public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
@@ -145,10 +148,12 @@ public class Video extends ContentItem implements PlayableItem {
     return _parent;
   }
 
+  @Override
   public int getDuration() {
     return _duration;
   }
 
+  @Override
   public Video firstVideo() {
     return this;
   }

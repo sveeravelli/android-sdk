@@ -5,17 +5,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.util.Log;
 
 import com.ooyala.android.Constants.ReturnState;
 
 public abstract class AdSpot {
-  
+
   public static final boolean SINGLE_USE = false;
   public static final boolean REUSABLE = true;
-  
+
   protected int _time = -1;
   protected URL _clickURL = null;
   protected List<URL> _trackingURLs = null;
@@ -24,7 +26,7 @@ public abstract class AdSpot {
   public AdSpot() {
     _isReusable = REUSABLE;
   }
-  
+
   public AdSpot( boolean isOneTimeUse ) {
     _isReusable = isOneTimeUse;
   }

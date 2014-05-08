@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
@@ -59,6 +61,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
    * @param data the data to use to update this AuthorizableItem
    * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
+  @Override
   public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
@@ -106,6 +109,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     }
   }
 
+  @Override
   public boolean fetchPlaybackInfo() {
    return fetchPlaybackInfo(StreamPlayer.defaultPlayerInfo);
   }
@@ -155,23 +159,28 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
    * For internal use only. The embed codes to authorize for the AuthorizableItem
    * @return the embed codes to authorize as a List
    */
+  @Override
   public List<String> embedCodesToAuthorize() {
     List<String> embedCodes = new ArrayList<String>();
     embedCodes.add(_embedCode);
     return embedCodes;
   }
 
+  @Override
   public boolean isAuthorized() {
     return _authorized;
   }
 
+  @Override
   public int getAuthCode() {
     return _authCode;
   }
 
+  @Override
   public boolean isHeartbeatRequired() {
     return false;
   }
+  @Override
   public Set<Stream> getStreams() {
     return _streams;
   }
