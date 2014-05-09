@@ -80,9 +80,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 		}
 
 		// Show Closed Captions only if there is a language to select
-		if (_closedCaptions != null && _player.getCurrentItem() != null) {
+		if (_closedCaptions != null && _player.getCurrentItem() != null && !_player.isShowingAd()) {
 			_closedCaptions.setVisibility(_player.getAvailableClosedCaptionsLanguages().isEmpty() ?
 					View.GONE : View.VISIBLE);
+		}
+		else {
+		  _closedCaptions.setVisibility(View.GONE);
 		}
 	}
 
