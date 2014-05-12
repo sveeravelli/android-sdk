@@ -17,13 +17,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
-import com.ooyala.android.playreadysample.R;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class PlayreadyDeviceManagementSampleApp extends Activity implements Observer, EmbedTokenGenerator {
   /** Called when the activity is first created. */
@@ -105,7 +104,6 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
             OoyalaPlayer.enableCustomHLSPlayer = false;
           } else {
             OoyalaPlayer.enableCustomHLSPlayer = true;
-            OoyalaPlayer.enableDebugDRMPlayback = true;
           }
 
           player.play();

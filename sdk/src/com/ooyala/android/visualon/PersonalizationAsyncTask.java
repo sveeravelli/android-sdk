@@ -1,5 +1,9 @@
 package com.ooyala.android.visualon;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
@@ -9,25 +13,27 @@ import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
 import com.ooyala.android.OoyalaPlayer;
 
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
-
 public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
-  protected String TAG = this.getClass().toString();
+  private static final String TAG = PersonalizationAsyncTask.class.getClass().toString();
+  protected static final String PERSONALIZATION_SERVER = "http://player.ooyala.com"; // TODO: replace with Constants server
+  protected static final String PERSONALIZATION_URI = "/discretix/personalization.svc/personalize/%s";
+  protected static final String SESSION_ID = "session";
+
   protected PersonalizationCallback _callback = null;
   protected Context _context;
   protected boolean _enableDebugDRMPlayback;
+  protected String _pcode;
 
   /**
    * An executable task which will perform Discredix Personalization for this device
    * @param callback the object which should be used as a callback
    * @param context the context in which this should run
    */
-  public PersonalizationAsyncTask(PersonalizationCallback callback, Context context) {
+  public PersonalizationAsyncTask(PersonalizationCallback callback, Context context, String pcode) {
     super();
     _context = context;
     _callback = callback;
+    _pcode = pcode;
     _enableDebugDRMPlayback = OoyalaPlayer.enableDebugDRMPlayback;
   }
 
@@ -37,8 +43,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     DxLogConfig config = null;
     IDxDrmDlc dlc;
 
-    String PERSONALIZATION_URL = "172.16.8.137:8000/Personalization";
-    String SESSION_ID = "session";
+    String personalizationUrl = PERSONALIZATION_SERVER + String.format(PERSONALIZATION_URI, _pcode);
     try {
       dlc = DxDrmDlc.getDxDrmDlc(_context, config);
 
@@ -47,7 +52,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
       }
       //Check for verification.
       if (!dlc.personalizationVerify()) {
-        dlc.performPersonalization(OoyalaPlayer.getVersion(), PERSONALIZATION_URL, SESSION_ID);
+        dlc.performPersonalization(OoyalaPlayer.getVersion(), personalizationUrl, SESSION_ID);
       } else {
         Log.d(TAG, "Device is already personalized");
       }

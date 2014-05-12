@@ -21,12 +21,12 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.Stream;
-import com.ooyala.android.StreamPlayer;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.Stream;
+import com.ooyala.android.StreamPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
@@ -612,6 +612,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   });
 
   // Timer tasks for playhead updates
+  @Override
   protected void startPlayheadTimer() {
     if (_playheadUpdateTimer != null) {
       stopPlayheadTimer();
@@ -621,6 +622,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         TIMER_DELAY, TIMER_PERIOD);
   }
 
+  @Override
   protected void stopPlayheadTimer() {
     if (_playheadUpdateTimer != null) {
       _playheadUpdateTimer.cancel();
@@ -809,7 +811,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     else {
       if (isDiscredixLoaded() && DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
         Log.d(TAG, "File Download Succeeded: Need to acquire rights");
-        PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext());
+        PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode());
         personalizationTask.execute();
       }
       else {
