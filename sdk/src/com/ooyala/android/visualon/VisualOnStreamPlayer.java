@@ -103,21 +103,18 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
-    //Don't bother loading discredix if we aren't playing a smooth stream
-    _hasDiscredix = false;
-    if (isDiscredixNeeded()) {
-      // If Discredix resolves, that means we have DRM playback available
-      try {
-        getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
-        Log.d(TAG, "This asset needs Discredix, which was loaded successfully");
-      } catch(Exception e) {
-        _hasDiscredix = false;
-        Log.e(TAG, "ERROR: Trying to play a smooth asset in VisualOn, without Discredix support");
-        this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to play a smooth asset in VisualOn, without Discredix support");
-        setState(State.ERROR);
-        return;
-      }
+    if (!isDiscredixNeeded()) {
+      Log.d(TAG, "This asset doesn't need Discredix");
+    }
+
+    try {
+      getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
+      Log.d(TAG, "This app has the ability to play protected content");
       _hasDiscredix = true;
+    } catch(Exception e) {
+      Log.d(TAG, "This app cannot play protected content");
+      _hasDiscredix = false;
+      return;
     }
 
     setState(State.LOADING);
@@ -134,7 +131,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       VisualOnUtils.cleanupLocalFiles(_parent.getLayout().getContext());
     }
 
-    if(isDiscredixLoaded() && _localFilePath == null) {
+    if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
@@ -284,7 +281,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         return;
       }
 
-      if (isDiscredixLoaded() && !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
+      if (isDiscredixNeeded() && isDiscredixLoaded() &&
+          !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
         Log.e(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
       }
@@ -294,7 +292,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player != null) {
         Log.e(TAG, "DANGER: Creating a Media player when one already exists");
       }
-      else if (isDiscredixLoaded()) {
+      else if (isDiscredixNeeded() && isDiscredixLoaded()) {
         _player = DiscredixDrmUtils.getVODXPlayerImpl();
       }
       else {
@@ -334,10 +332,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       // Register SDK event listener
       _player.setOnEventListener(this);
 
-      /* Configure DRM parameters */
-      if (isDiscredixLoaded()) {
-        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
-      }
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
       _player.setPreAgreedLicense(licenseText);
@@ -506,7 +500,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     Log.v(TAG, "Player Resume");
 
-    if (isDiscredixLoaded() && DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath) &&
+    if (isDiscredixNeeded() && isDiscredixLoaded() &&
+        DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath) &&
         !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
       tryToAcquireRights();
     }
@@ -809,7 +804,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       setState(State.ERROR);
     }
     else {
-      if (isDiscredixLoaded() && DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
+      if (isDiscredixNeeded() && isDiscredixLoaded() &&
+          DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
         Log.d(TAG, "File Download Succeeded: Need to acquire rights");
         PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode());
         personalizationTask.execute();
