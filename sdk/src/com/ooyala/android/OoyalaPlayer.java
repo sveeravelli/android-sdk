@@ -21,14 +21,19 @@ import android.widget.FrameLayout;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.AuthorizableItem.AuthCode;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
+import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener {
-  public static final String PLAYER_VISUALON = "VisualOn";
-  public static final String PLAYER_ANDROID = "Android Default";
+  /**
+   * NOTE[jigish] do NOT change the name or location of this variable without
+   * changing pub_release.sh
+   */
+  static final String SDK_VERSION = "2.4.0_RC2";
+  static final String API_VERSION = "1";
 
   public static enum ActionAtEnd {
     CONTINUE, PAUSE, STOP, RESET
@@ -69,6 +74,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
 
+  static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
+
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
   /**
    * If set to true, this will allow HLS streams regardless of the Android
@@ -97,18 +104,9 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public static boolean enableCustomHLSPlayer = false;
 
-  /**
-   * For internal use only
-   */
-  public static enum Environment {
-    PRODUCTION, STAGING, LOCAL
-  };
 
-  /**
-   * For internal use only
-   */
-  public static void setEnvironment(Environment e) {
-    Constants.setEnvironment(e);
+  public static void setEnvironment(EnvironmentType e) {
+    Environment.setEnvironment(e);
   }
 
   private static final String TAG = OoyalaPlayer.class.getName();
@@ -572,15 +570,15 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // Get correct type of Movie Player
     if (Stream.streamSetContainsDeliveryType(streams,
-        Constants.DELIVERY_TYPE_WV_WVM)
+        Stream.DELIVERY_TYPE_WV_WVM)
         || Stream.streamSetContainsDeliveryType(streams,
-            Constants.DELIVERY_TYPE_WV_HLS)) {
+            Stream.DELIVERY_TYPE_WV_HLS)) {
       return new WidevineOsPlayer();
     } else if (Stream.streamSetContainsDeliveryType(streams,
-        Constants.DELIVERY_TYPE_WV_MP4)) {
+        Stream.DELIVERY_TYPE_WV_MP4)) {
       try {
         return (MoviePlayer) getClass().getClassLoader()
-            .loadClass(Constants.WIDEVINE_LIB_PLAYER).newInstance();
+            .loadClass(WIDEVINE_LIB_PLAYER).newInstance();
       } catch (Exception e) {
         _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
             "Could not initialize Widevine Player");
@@ -952,7 +950,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       int adTime = ad.getTime();
       // Align ad times to 10 second (HLS chunk length) boundaries
       if (Stream.streamSetContainsDeliveryType(getCurrentItem().getStreams(),
-          Constants.DELIVERY_TYPE_HLS)) {
+          Stream.DELIVERY_TYPE_HLS)) {
         adTime = ((adTime + 5000) / 10000) * 10000;
       }
       if (adTime <= time && !this._playedAds.contains(ad)) {
@@ -1381,10 +1379,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     String deliveryType = currentStream.getDeliveryType();
     if (deliveryType != null
-        && !deliveryType.equals(Constants.DELIVERY_TYPE_MP4)) {
+        && !deliveryType.equals(Stream.DELIVERY_TYPE_MP4)) {
       return -2;
     }
-    if (android.os.Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
       // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
       metadataRetreiver.setDataSource(
@@ -1775,6 +1773,6 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the SDK version as a string
    */
   public static String getVersion() {
-    return Constants.SDK_VERSION;
+    return SDK_VERSION;
   }
 }

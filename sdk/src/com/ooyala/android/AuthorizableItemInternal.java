@@ -4,9 +4,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import com.ooyala.android.Constants.ReturnState;
-
-interface AuthorizableItemInternal extends AuthorizableItem {
+interface AuthorizableItemInternal extends AuthorizableItem, JSONUpdatableItem {
   /**
    * For internal use only. Update the AuthorizableItemInternal using the specified data (subclasses should
    * override and call this)

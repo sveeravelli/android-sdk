@@ -9,9 +9,35 @@ import org.json.*;
 import android.os.Build;
 import android.util.Base64;
 
-import com.ooyala.android.Constants.ReturnState;
+public class Stream implements JSONUpdatableItem {
+  static final String KEY_VIDEO_BITRATE = "video_bitrate";
+  static final String KEY_AUDIO_BITRATE = "audio_bitrate";
+  static final String KEY_VIDEO_CODEC = "video_codec";
+  static final String KEY_FRAMERATE = "framerate";
+  static final String KEY_DELIVERY_TYPE = "delivery_type";
+  static final String KEY_DATA = "data";
+  static final String KEY_FORMAT = "format";
+  static final String KEY_IS_LIVE_STREAM = "is_live_stream";
+  static final String KEY_ASPECT_RATIO = "aspect_ratio";
+  static final String KEY_PROFILE = "profile";
+  static final String KEY_WIDEVINE_SERVER_PATH = "widevine_server_path";
+  static final String KEY_HEIGHT = "height";
+  static final String KEY_WIDTH = "width";
+  static final String KEY_URL = "url";
 
-public class Stream {
+  static final String PROFILE_BASELINE = "baseline";
+
+  public static final String DELIVERY_TYPE_HLS = "hls";
+  public static final String DELIVERY_TYPE_MP4 = "mp4";
+  public static final String DELIVERY_TYPE_REMOTE_ASSET = "remote_asset";
+  public static final String DELIVERY_TYPE_WV_MP4 = "wv_mp4";
+  public static final String DELIVERY_TYPE_WV_WVM = "wv_wvm";
+  public static final String DELIVERY_TYPE_WV_HLS = "wv_hls";
+  public static final String DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS = "akamai_hd2_vod_hls";
+
+  public static final String STREAM_URL_FORMAT_TEXT = "text";
+  public static final String STREAM_URL_FORMAT_B64 = "encoded";
+
   protected String _deliveryType = null;
   protected String _videoCodec = null;
   protected String _urlFormat = null;
@@ -36,8 +62,8 @@ public class Stream {
       Stream lowestBitrateStream = null;
       for (Stream stream : streams) {
         // for remote assets, just pick the first stream
-        if (stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_REMOTE_ASSET)
-            || stream.getDeliveryType().equals(Constants.DELIVERY_TYPE_HLS)) { return stream; }
+        if (stream.getDeliveryType().equals(DELIVERY_TYPE_REMOTE_ASSET)
+            || stream.getDeliveryType().equals(DELIVERY_TYPE_HLS)) { return stream; }
         if (Stream.isDeliveryTypePlayable(stream)
             && Stream.isProfilePlayable(stream)
             && (lowestBitrateStream == null
@@ -76,54 +102,54 @@ public class Stream {
   }
 
   ReturnState update(JSONObject data) {
-    if (data.isNull(Constants.KEY_DELIVERY_TYPE)) {
+    if (data.isNull(KEY_DELIVERY_TYPE)) {
       System.out.println("ERROR: Fail to update stream with dictionary because no delivery_type exists!");
       return ReturnState.STATE_FAIL;
     }
-    if (data.isNull(Constants.KEY_URL)) {
+    if (data.isNull(KEY_URL)) {
       System.out.println("ERROR: Fail to update stream with dictionary because no url element exists!");
       return ReturnState.STATE_FAIL;
     }
 
     JSONObject urlData = null;
     try {
-      urlData = data.getJSONObject(Constants.KEY_URL);
+      urlData = data.getJSONObject(KEY_URL);
     } catch (JSONException exception) {
       System.out.println("ERROR: Fail to update stream with dictionary because url element is invalid.");
       return ReturnState.STATE_FAIL;
     }
 
-    if (urlData.isNull(Constants.KEY_DATA)) {
+    if (urlData.isNull(KEY_DATA)) {
       System.out.println("ERROR: Fail to update stream with dictionary because no url.data exists!");
       return ReturnState.STATE_FAIL;
     }
-    if (urlData.isNull(Constants.KEY_FORMAT)) {
+    if (urlData.isNull(KEY_FORMAT)) {
       System.out.println("ERROR: Fail to update stream with dictionary because no url.format exists!");
       return ReturnState.STATE_FAIL;
     }
 
     try {
-      if (!data.isNull(Constants.KEY_WIDEVINE_SERVER_PATH)) {
-        _widevineServerPath =  data.getString(Constants.KEY_WIDEVINE_SERVER_PATH);
+      if (!data.isNull(KEY_WIDEVINE_SERVER_PATH)) {
+        _widevineServerPath =  data.getString(KEY_WIDEVINE_SERVER_PATH);
       }
-      _deliveryType = data.getString(Constants.KEY_DELIVERY_TYPE);
-      _url = urlData.getString(Constants.KEY_DATA);
-      _urlFormat = urlData.getString(Constants.KEY_FORMAT);
-      _videoBitrate = data.isNull(Constants.KEY_VIDEO_BITRATE) ? _videoBitrate : data
-          .getInt(Constants.KEY_VIDEO_BITRATE);
-      _audioBitrate = data.isNull(Constants.KEY_AUDIO_BITRATE) ? _audioBitrate : data
-          .getInt(Constants.KEY_AUDIO_BITRATE);
-      _videoCodec = data.isNull(Constants.KEY_VIDEO_CODEC) ? _videoCodec : data
-          .getString(Constants.KEY_VIDEO_CODEC);
-      _height = data.isNull(Constants.KEY_HEIGHT) ? _height : data.getInt(Constants.KEY_HEIGHT);
-      _width = data.isNull(Constants.KEY_WIDTH) ? _width : data.getInt(Constants.KEY_WIDTH);
-      _framerate = data.isNull(Constants.KEY_FRAMERATE) ? _framerate : data
-          .getString(Constants.KEY_FRAMERATE);
-      _aspectRatio = data.isNull(Constants.KEY_ASPECT_RATIO) ? _aspectRatio : data
-          .getString(Constants.KEY_ASPECT_RATIO);
-      _isLiveStream = data.isNull(Constants.KEY_IS_LIVE_STREAM) ? _isLiveStream : data
-          .getBoolean(Constants.KEY_IS_LIVE_STREAM);
-      _profile = data.isNull(Constants.KEY_PROFILE) ? _profile : data.getString(Constants.KEY_PROFILE);
+      _deliveryType = data.getString(KEY_DELIVERY_TYPE);
+      _url = urlData.getString(KEY_DATA);
+      _urlFormat = urlData.getString(KEY_FORMAT);
+      _videoBitrate = data.isNull(KEY_VIDEO_BITRATE) ? _videoBitrate : data
+          .getInt(KEY_VIDEO_BITRATE);
+      _audioBitrate = data.isNull(KEY_AUDIO_BITRATE) ? _audioBitrate : data
+          .getInt(KEY_AUDIO_BITRATE);
+      _videoCodec = data.isNull(KEY_VIDEO_CODEC) ? _videoCodec : data
+          .getString(KEY_VIDEO_CODEC);
+      _height = data.isNull(KEY_HEIGHT) ? _height : data.getInt(KEY_HEIGHT);
+      _width = data.isNull(KEY_WIDTH) ? _width : data.getInt(KEY_WIDTH);
+      _framerate = data.isNull(KEY_FRAMERATE) ? _framerate : data
+          .getString(KEY_FRAMERATE);
+      _aspectRatio = data.isNull(KEY_ASPECT_RATIO) ? _aspectRatio : data
+          .getString(KEY_ASPECT_RATIO);
+      _isLiveStream = data.isNull(KEY_IS_LIVE_STREAM) ? _isLiveStream : data
+          .getBoolean(KEY_IS_LIVE_STREAM);
+      _profile = data.isNull(KEY_PROFILE) ? _profile : data.getString(KEY_PROFILE);
     } catch (JSONException jsonException) {
       System.out.println("ERROR: Fail to update stream with dictionary because of invalid JSON: "
           + jsonException);
@@ -238,7 +264,7 @@ public class Stream {
 
   public URL decodedURL() {
     try {
-      if (_urlFormat.equals(Constants.STREAM_URL_FORMAT_B64)) { return new URL(new String(Base64.decode(_url,
+      if (_urlFormat.equals(STREAM_URL_FORMAT_B64)) { return new URL(new String(Base64.decode(_url,
           Base64.DEFAULT))); }
       return new URL(_url); // Otherwise assume plain text
     } catch (MalformedURLException exception) {
@@ -254,17 +280,17 @@ public class Stream {
      * implementation
      */
 
-    boolean isHLS = type.equals(Constants.DELIVERY_TYPE_HLS) || type.equals (Constants.DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS);
-    boolean isWidevine = type.equals(Constants.DELIVERY_TYPE_WV_WVM) || type.equals(Constants.DELIVERY_TYPE_WV_HLS);
-    return type.equals(Constants.DELIVERY_TYPE_MP4) ||
-           type.equals(Constants.DELIVERY_TYPE_REMOTE_ASSET) ||
-           type.equals(Constants.DELIVERY_TYPE_WV_MP4) ||
-           (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS && (isHLS || isWidevine ));
+    boolean isHLS = type.equals(DELIVERY_TYPE_HLS) || type.equals (DELIVERY_TYPE_AKAMAI_HD2_VOD_HLS);
+    boolean isWidevine = type.equals(DELIVERY_TYPE_WV_WVM) || type.equals(DELIVERY_TYPE_WV_HLS);
+    return type.equals(DELIVERY_TYPE_MP4) ||
+           type.equals(DELIVERY_TYPE_REMOTE_ASSET) ||
+           type.equals(DELIVERY_TYPE_WV_MP4) ||
+           (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && (isHLS || isWidevine ));
   }
 
   public static boolean isProfilePlayable(Stream stream) {
-    if (!Constants.DELIVERY_TYPE_MP4.equals(stream.getDeliveryType())) { return true; }
-    return stream.getProfile() == null || Constants.PROFILE_BASELINE.equals(stream.getProfile());
+    if (!DELIVERY_TYPE_MP4.equals(stream.getDeliveryType())) { return true; }
+    return stream.getProfile() == null || PROFILE_BASELINE.equals(stream.getProfile());
   }
 
   public static Stream bestStream(Set<Stream> streams) {

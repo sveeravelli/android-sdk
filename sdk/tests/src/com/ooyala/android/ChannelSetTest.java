@@ -7,10 +7,12 @@ public class ChannelSetTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }

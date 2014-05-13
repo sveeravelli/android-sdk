@@ -18,9 +18,11 @@ import org.w3c.dom.Node;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.ooyala.android.Constants.ReturnState;
-
 public class VASTAdSpot extends AdSpot {
+  static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
+  static final String KEY_SIGNATURE = "signature"; // embedded, VAST
+  static final String KEY_URL = "url";  // CC, Stream, VAST
+
   /** The signature for the vast request */
   protected String _signature;
   /** The expires for the vast request */
@@ -69,24 +71,24 @@ public class VASTAdSpot extends AdSpot {
       default:
         break;
     }
-    if (data.isNull(Constants.KEY_SIGNATURE)) {
+    if (data.isNull(VASTAd.KEY_SIGNATURE)) {
       Log.e(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
     }
-    if (data.isNull(Constants.KEY_EXPIRES)) {
+    if (data.isNull(KEY_EXPIRES)) {
       Log.e(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
       return ReturnState.STATE_FAIL;
     }
-    if (data.isNull(Constants.KEY_URL)) {
+    if (data.isNull(KEY_URL)) {
       Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no url exists!");
       return ReturnState.STATE_FAIL;
     }
     try {
-      _signature = data.getString(Constants.KEY_SIGNATURE);
-      _expires = data.getInt(Constants.KEY_EXPIRES);
-      _vastURL = urlFromAdUrlString(data.getString(Constants.KEY_URL));
+      _signature = data.getString(VASTAd.KEY_SIGNATURE);
+      _expires = data.getInt(KEY_EXPIRES);
+      _vastURL = urlFromAdUrlString(data.getString(VASTAd.KEY_URL));
       if (_vastURL == null) {
         return ReturnState.STATE_FAIL;
       }
@@ -112,12 +114,12 @@ public class VASTAdSpot extends AdSpot {
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(_vastURL.toString());
       Element vast = doc.getDocumentElement();
-      if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) { return false; }
-      String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
-      if (Double.parseDouble(vastVersion) < Constants.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
+      if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) { return false; }
+      String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
+      if (Double.parseDouble(vastVersion) < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
       Node ad = vast.getFirstChild();
       while (ad != null) {
-        if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(Constants.ELEMENT_AD)) {
+        if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(VASTAd.ELEMENT_AD)) {
           ad = ad.getNextSibling();
           continue;
         }

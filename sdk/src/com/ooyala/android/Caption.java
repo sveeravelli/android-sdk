@@ -10,11 +10,11 @@ public class Caption {
   Caption() {}
 
   Caption(Element element) {
-    if (!element.getTagName().equals(Constants.ELEMENT_P)) { return; }
+    if (!element.getTagName().equals(ClosedCaptions.ELEMENT_P)) { return; }
 
-    String beginStr = element.getAttribute(Constants.ATTRIBUTE_BEGIN);
-    String durationStr = element.getAttribute(Constants.ATTRIBUTE_DUR);
-    String endStr = element.getAttribute(Constants.ATTRIBUTE_END);
+    String beginStr = element.getAttribute(ClosedCaptions.ATTRIBUTE_BEGIN);
+    String durationStr = element.getAttribute(ClosedCaptions.ATTRIBUTE_DUR);
+    String endStr = element.getAttribute(ClosedCaptions.ATTRIBUTE_END);
 
     if (Utils.isNullOrEmpty(beginStr)) { return; }
     _begin = Utils.secondsFromTimeString(beginStr);

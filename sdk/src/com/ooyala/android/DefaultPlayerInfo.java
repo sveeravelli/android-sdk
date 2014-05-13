@@ -21,7 +21,7 @@ public class DefaultPlayerInfo implements PlayerInfo {
         supportedFormats.add("m3u8");
       }
 
-      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
         supportedFormats.add("m3u8");
         supportedFormats.add("wv_wvm");
         supportedFormats.add("wv_hls");

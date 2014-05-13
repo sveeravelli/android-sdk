@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ooyala.android.Constants.ReturnState;
 
 public class Channel extends ContentItem implements PaginatedParentItem {
   protected OrderedMap<String, Video> _videos = new OrderedMap<String, Video>();
@@ -47,7 +46,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
     try {
       //If authorization, check all of the children's authorization.
       JSONObject myData = data.getJSONObject(_embedCode);
-      if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED)) {
+      if (!myData.isNull(ContentItem.KEY_AUTHORIZED) && myData.getBoolean(ContentItem.KEY_AUTHORIZED)) {
         for (Video video : _videos) {
           video.update(data);
         }
@@ -55,7 +54,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
       }
 
       //If metadata, then update children if possible and break out.
-      if (!myData.isNull(Constants.KEY_METADATA_BASE)) {
+      if (!myData.isNull(ContentItem.KEY_METADATA_BASE)) {
         for (Video video : _videos) {
           video.update(data);
         }
@@ -63,17 +62,17 @@ public class Channel extends ContentItem implements PaginatedParentItem {
       }
 
       //Handle content_tree
-      if (!myData.isNull(Constants.KEY_CONTENT_TYPE)
-          && !myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_CHANNEL)) {
+      if (!myData.isNull(ContentItem.KEY_CONTENT_TYPE)
+          && !myData.getString(ContentItem.KEY_CONTENT_TYPE).equals(ContentItem.CONTENT_TYPE_CHANNEL)) {
         System.out.println("ERROR: Attempted to initialize Channel with content_type: "
-            + myData.getString(Constants.KEY_CONTENT_TYPE));
+            + myData.getString(ContentItem.KEY_CONTENT_TYPE));
         return ReturnState.STATE_FAIL;
       }
 
-      _nextChildren = myData.isNull(Constants.KEY_NEXT_CHILDREN) ? null : myData
-          .getString(Constants.KEY_NEXT_CHILDREN);
+      _nextChildren = myData.isNull(ContentItem.KEY_NEXT_CHILDREN) ? null : myData
+          .getString(ContentItem.KEY_NEXT_CHILDREN);
 
-      if (myData.isNull(Constants.KEY_CHILDREN)) {
+      if (myData.isNull(ContentItem.KEY_CHILDREN)) {
         if (_nextChildren == null) {
           System.out
               .println("ERROR: Attempted to initialize Channel with children == nil and next_children == nil: "
@@ -83,14 +82,14 @@ public class Channel extends ContentItem implements PaginatedParentItem {
         return ReturnState.STATE_MATCHED;
       }
 
-      JSONArray children = myData.getJSONArray(Constants.KEY_CHILDREN);
+      JSONArray children = myData.getJSONArray(ContentItem.KEY_CHILDREN);
       if (children.length() > 0) {
         for (int i = 0; i < children.length(); i++) {
           JSONObject child = children.getJSONObject(i);
-          if (!child.isNull(Constants.KEY_CONTENT_TYPE)
-              && child.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_VIDEO)) {
+          if (!child.isNull(ContentItem.KEY_CONTENT_TYPE)
+              && child.getString(ContentItem.KEY_CONTENT_TYPE).equals(ContentItem.CONTENT_TYPE_VIDEO)) {
             HashMap<String, JSONObject> childMap = new HashMap<String, JSONObject>();
-            String childEmbedCode = child.getString(Constants.KEY_EMBED_CODE);
+            String childEmbedCode = child.getString(ContentItem.KEY_EMBED_CODE);
             childMap.put(childEmbedCode, child);
             JSONObject childData = new JSONObject(childMap);
             Video existingChild = _videos.get(childEmbedCode);
@@ -101,7 +100,7 @@ public class Channel extends ContentItem implements PaginatedParentItem {
             }
           } else {
             System.out.println("ERROR: Invalid Video content_type: "
-                + child.getString(Constants.KEY_CONTENT_TYPE));
+                + child.getString(ContentItem.KEY_CONTENT_TYPE));
           }
         }
       }
@@ -170,6 +169,10 @@ public class Channel extends ContentItem implements PaginatedParentItem {
   @Override
   public OrderedMap<String, Video> getAllAvailableChildren() {
     return _videos;
+  }
+
+  public OrderedMap<String, Video> getVideos() {
+    return getAllAvailableChildren();
   }
 
   /**

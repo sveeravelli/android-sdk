@@ -12,13 +12,16 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
-import com.ooyala.android.Constants.ReturnState;
-
 /**
  * Stores the info and metadata for the specified content item.
  *
  */
 public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, PlayableItem {
+  static final String KEY_AUTHORIZED = "authorized";
+  static final String KEY_CODE = "code";
+  static final String KEY_STREAMS = "streams";  //OoyalaAdSpot, Video
+  static final String KEY_AD_EMBED_CODE = "ad_embed_code"; //OoyalaAdSpot
+
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected String _embedCode = null;
   protected boolean _authorized = false;
@@ -75,14 +78,14 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     try {
       if (_embedCode != null && !data.isNull(_embedCode)) {
         JSONObject myData = data.getJSONObject(_embedCode);
-        if (!myData.isNull(Constants.KEY_AUTHORIZED)) {
-          _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
-          if (!myData.isNull(Constants.KEY_CODE)) {
-            int theAuthCode = myData.getInt(Constants.KEY_CODE);
+        if (!myData.isNull(KEY_AUTHORIZED)) {
+          _authorized = myData.getBoolean(KEY_AUTHORIZED);
+          if (!myData.isNull(KEY_CODE)) {
+            int theAuthCode = myData.getInt(KEY_CODE);
             _authCode = theAuthCode;
           }
-          if (_authorized && !myData.isNull(Constants.KEY_STREAMS)) {
-            JSONArray streams = myData.getJSONArray(Constants.KEY_STREAMS);
+          if (_authorized && !myData.isNull(KEY_STREAMS)) {
+            JSONArray streams = myData.getJSONArray(KEY_STREAMS);
             if (streams.length() > 0) {
               _streams.clear();
               for (int i = 0; i < streams.length(); i++) {
@@ -96,12 +99,12 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
         }
         return ReturnState.STATE_MATCHED;
       }
-      if (data.isNull(Constants.KEY_AD_EMBED_CODE)) {
+      if (data.isNull(KEY_AD_EMBED_CODE)) {
         System.out
             .println("ERROR: Fail to update OoyalaAdSpot with dictionary because no ad embed code exists!");
         return ReturnState.STATE_FAIL;
       }
-      _embedCode = data.getString(Constants.KEY_AD_EMBED_CODE);
+      _embedCode = data.getString(KEY_AD_EMBED_CODE);
       return ReturnState.STATE_MATCHED;
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);

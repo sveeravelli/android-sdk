@@ -38,24 +38,24 @@ public class VASTWrapperAd extends VASTAd {
         }
         String text = child.getTextContent().trim();
         boolean textExists = text != null;
-        if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_AD_SYSTEM)) {
+        if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_AD_SYSTEM)) {
           _system = text;
-          _systemVersion = ((Element) child).getAttribute(Constants.ATTRIBUTE_VERSION);
-        } else if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_AD_TITLE)) {
+          _systemVersion = ((Element) child).getAttribute(VASTAd.ATTRIBUTE_VERSION);
+        } else if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_AD_TITLE)) {
           _title = text;
-        } else if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_DESCRIPTION)) {
+        } else if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_DESCRIPTION)) {
           _description = text;
-        } else if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_SURVEY)) {
+        } else if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_SURVEY)) {
           _surveyURLs.add(text);
-        } else if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_ERROR)) {
+        } else if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_ERROR)) {
           _errorURLs.add(text);
-        } else if (textExists && ((Element) child).getTagName().equals(Constants.ELEMENT_IMPRESSION)) {
+        } else if (textExists && ((Element) child).getTagName().equals(VASTAd.ELEMENT_IMPRESSION)) {
           _impressionURLs.add(text);
-        } else if (((Element) child).getTagName().equals(Constants.ELEMENT_EXTENSIONS)) {
+        } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_EXTENSIONS)) {
           _extensions = (Element) child;
-        } else if (((Element) child).getTagName().equals(Constants.ELEMENT_VAST_AD_TAG_URI)) {
+        } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_VAST_AD_TAG_URI)) {
           vastAdTagURI = text;
-        } else if (((Element) child).getTagName().equals(Constants.ELEMENT_CREATIVES)) {
+        } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_CREATIVES)) {
           Node creative = child.getFirstChild();
           while (creative != null) {
             if (creative instanceof Element) {
@@ -73,12 +73,12 @@ public class VASTWrapperAd extends VASTAd {
           DocumentBuilder db = dbf.newDocumentBuilder();
           Document doc = db.parse(new InputSource((new URL(vastAdTagURI)).openStream()));
           Element vast = doc.getDocumentElement();
-          if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) { return false; }
-          String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
-          if (Double.parseDouble(vastVersion) < Constants.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
+          if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) { return false; }
+          String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
+          if (Double.parseDouble(vastVersion) < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
           Node ad = vast.getFirstChild();
           while (ad != null) {
-            if ((ad instanceof Element) && ((Element) ad).getTagName().equals(Constants.ELEMENT_AD)) {
+            if ((ad instanceof Element) && ((Element) ad).getTagName().equals(VASTAd.ELEMENT_AD)) {
             	//Set the childAdXML to be the correct ad node instance to be called in VASTAd
               _childAdXML = ad;
             }

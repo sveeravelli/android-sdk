@@ -12,8 +12,6 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.ooyala.android.Constants.ReturnState;
-
 /**
  * Stores the info and metatdata for the specified movie.
  */
@@ -51,15 +49,15 @@ public class Video extends ContentItem implements PlayableItem {
 
     try {
       JSONObject myData = data.getJSONObject(_embedCode);
-      if (!myData.isNull(Constants.KEY_DURATION)) {
-        _duration = myData.getInt(Constants.KEY_DURATION);
+      if (!myData.isNull(ContentItem.KEY_DURATION)) {
+        _duration = myData.getInt(ContentItem.KEY_DURATION);
       }
-      if (!myData.isNull(Constants.KEY_CONTENT_TYPE)) {
-        _live = myData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_LIVE_STREAM);
+      if (!myData.isNull(ContentItem.KEY_CONTENT_TYPE)) {
+        _live = myData.getString(ContentItem.KEY_CONTENT_TYPE).equals(ContentItem.CONTENT_TYPE_LIVE_STREAM);
       }
-      if (!myData.isNull(Constants.KEY_AUTHORIZED) && myData.getBoolean(Constants.KEY_AUTHORIZED)
-          && !myData.isNull(Constants.KEY_STREAMS)) {
-        JSONArray streams = myData.getJSONArray(Constants.KEY_STREAMS);
+      if (!myData.isNull(ContentItem.KEY_AUTHORIZED) && myData.getBoolean(ContentItem.KEY_AUTHORIZED)
+          && !myData.isNull(ContentItem.KEY_STREAMS)) {
+        JSONArray streams = myData.getJSONArray(ContentItem.KEY_STREAMS);
         if (streams.length() > 0) {
           _streams.clear();
           for (int i = 0; i < streams.length(); i++) {
@@ -73,8 +71,8 @@ public class Video extends ContentItem implements PlayableItem {
         return ReturnState.STATE_MATCHED;
       }
 
-      if (!myData.isNull(Constants.KEY_ADS)) {
-        JSONArray ads = myData.getJSONArray(Constants.KEY_ADS);
+      if (!myData.isNull(ContentItem.KEY_ADS)) {
+        JSONArray ads = myData.getJSONArray(ContentItem.KEY_ADS);
         if (ads.length() > 0) {
           _ads.clear();
           for (int i = 0; i < ads.length(); i++) {
@@ -88,9 +86,9 @@ public class Video extends ContentItem implements PlayableItem {
         }
       }
 
-      if (!myData.isNull(Constants.KEY_CLOSED_CAPTIONS)) {
+      if (!myData.isNull(ContentItem.KEY_CLOSED_CAPTIONS)) {
         _closedCaptions = null;
-        JSONArray array = myData.getJSONArray(Constants.KEY_CLOSED_CAPTIONS);
+        JSONArray array = myData.getJSONArray(ContentItem.KEY_CLOSED_CAPTIONS);
         if (array.length() > 0) {
           /*
            * NOTE [jigish]: here we only select the first closed caption returned. according to rui it is

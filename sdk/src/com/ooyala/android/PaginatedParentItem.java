@@ -2,9 +2,7 @@ package com.ooyala.android;
 
 import org.json.JSONObject;
 
-import com.ooyala.android.Constants.ReturnState;
-
-public interface PaginatedParentItem {
+public interface PaginatedParentItem extends JSONUpdatableItem {
   public String getEmbedCode();
 
   /**

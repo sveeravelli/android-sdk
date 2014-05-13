@@ -7,15 +7,17 @@ public class VASTAdSpotTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {}
 
+  @Override
   protected void tearDown() {}
 
   /**
    * @test Test VASTAdSpot.initWithDictionary:api: and VASTAdSpot.updateWithDictionary:
    */
   public void testInitializer() {
-    VASTAdSpot vast = new VASTAdSpot(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST), null);
+    VASTAdSpot vast = new VASTAdSpot(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST));
     assertEquals(
         vast.getVASTURL().toString(),
         "http://www.daveproxy.co.uk/browse.php/Oi8vYWZlMi5zcGVjaWZpY2NsaWNrLm5ldC9hZHNlcnZlLz9sPTIwNTE3JnQ9eCZybmQ9YkFvcnJxSyxiaGxhZnNvaGRsQXg_3D/b13/fnorefer/");

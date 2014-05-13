@@ -1,6 +1,7 @@
 package com.ooyala.android;
 
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -14,8 +15,10 @@ public class VASTStreamTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {}
 
+  @Override
   protected void tearDown() {}
 
   public void testInitializers() {
@@ -36,7 +39,7 @@ public class VASTStreamTest extends AndroidTestCase {
           stream.decodedURL().toString(),
           "http://vindicoasset.edgesuite.net/Repository/CampaignCreative/Campaign_8759/INSTREAMAD/93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4");
       assertEquals(stream.getVastDeliveryType(), "progressive");
-      assertEquals(stream.getDeliveryType(), Constants.DELIVERY_TYPE_MP4);
+      assertEquals(stream.getDeliveryType(), Stream.DELIVERY_TYPE_MP4);
       assertEquals(stream.getWidth(), 400);
       assertEquals(stream.getHeight(), 300);
       assertEquals(stream.getVideoBitrate(), 400);

@@ -186,7 +186,7 @@ public class OoyalaAPIClient {
       Log.d(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
       return null;
     }
-    URL url = _secureUrlGenerator.secureURL(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
+    URL url = _secureUrlGenerator.secureURL(Environment.BACKLOT_HOST, PlayerAPIClient.BACKLOT_URI_PREFIX + uri, params);
     return OoyalaAPIHelper.objectForAPI(url);
   }
 

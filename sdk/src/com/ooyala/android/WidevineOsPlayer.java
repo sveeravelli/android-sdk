@@ -36,10 +36,10 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
 
     // Get the correct (presumably only) stream to play widevine
     Stream stream = null;
-    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM)) {
-       stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_WVM);
-    } else if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS)) {
-       stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_HLS);
+    if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_WV_WVM)) {
+       stream = Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_WV_WVM);
+    } else if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_WV_HLS)) {
+       stream = Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_WV_HLS);
     }
     if (stream == null) {
       Log.e(TAG, "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
@@ -72,12 +72,12 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
       _live = true;
     }
     stream.setUrl(uri.buildUpon().scheme("widevine").build().toString());
-    stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
+    stream.setUrlFormat(Stream.STREAM_URL_FORMAT_TEXT);
 
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     // this should point to SAS once we get the proxy up
-    String serverPath = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
+    String serverPath = Environment.DRM_HOST
+        + String.format(DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
                         parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
@@ -221,6 +221,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     }
   }
 
+  @Override
   public SeekStyle getSeekStyle() {
     return SeekStyle.BASIC;
   }

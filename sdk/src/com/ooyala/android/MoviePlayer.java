@@ -12,9 +12,11 @@ import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 
 public class MoviePlayer extends Player implements Observer {
-  
+
   private static final String TAG = "MoviePlayer";
-  
+  static final String VISUALON_PLAYER = "com.ooyala.android.VisualOnStreamPlayer";
+  protected static final String DRM_TENENT_PATH = "/sas/drm2/%s/%s/%s/%s"; // '/drm2/:pcode/:embed_code/:drm_type/:tenant'
+
   private State _stateToResume = State.INIT;
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
@@ -38,14 +40,14 @@ public class MoviePlayer extends Player implements Observer {
     //   2.) Delviery type is Remote Asset, and the url contains .m3u8
     // use VisualOn
     else if (OoyalaPlayer.enableCustomHLSPlayer &&
-        (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_HLS) ||
-         (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET) &&
-          Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_REMOTE_ASSET).decodedURL()
+        (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_HLS) ||
+         (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET) &&
+          Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET).decodedURL()
             .toString().contains("m3u8"))
         )
        ) {
       try {
-        player = (StreamPlayer)getClass().getClassLoader().loadClass(Constants.VISUALON_PLAYER).newInstance();
+        player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
         player = new BaseStreamPlayer();
       }
@@ -64,6 +66,7 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
+  @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     setStreams( streams );
     _parent = parent;
@@ -167,34 +170,47 @@ public class MoviePlayer extends Player implements Observer {
     notifyObservers(arg);
   }
 
+  @Override
   public View getView() {
     return _basePlayer.getView();
   }
 
+  @Override
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
     _basePlayer.setParent(parent);
   }
 
   //Delegated to base player
+  @Override
   public void pause() { _basePlayer.pause(); }
+  @Override
   public void play() { Log.v( TAG, "play()" ); _basePlayer.play(); }
+  @Override
   public void stop() { _basePlayer.stop(); }
 
+  @Override
   public int currentTime() { return _basePlayer != null ? _basePlayer.currentTime() : 0; }
+  @Override
   public int duration() { return _basePlayer != null ? _basePlayer.duration() : 0; }
+  @Override
   public int buffer() { return _basePlayer != null ? _basePlayer.buffer() : 0; }
+  @Override
   public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
 
   public boolean seekable() { return _seekable; }
   public void setSeekable(boolean seekable) { _seekable = seekable; }
+  @Override
   public void seekToTime(int timeInMillis) { if (_seekable) { _basePlayer.seekToTime(timeInMillis); } }
 
+  @Override
   public SeekStyle getSeekStyle() {
     return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.ENHANCED;
   }
 
+  @Override
   public State getState() { return _basePlayer != null ? _basePlayer.getState() : super.getState(); }
+  @Override
   protected void setState(State state) {
     if (_basePlayer != null) {
       _basePlayer.setState(state);
@@ -203,8 +219,12 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
+  @Override
   public String getError() { return _error != null ? _error : _basePlayer.getError(); }
+  @Override
   public boolean isPlaying() { return _basePlayer != null ? _basePlayer.isPlaying() : false; }
+  @Override
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
+  @Override
   public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
 }

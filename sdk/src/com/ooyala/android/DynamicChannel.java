@@ -5,8 +5,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ooyala.android.Constants.ReturnState;
-
 public class DynamicChannel extends Channel {
   protected List<String> _embedCodes = null;
 
@@ -26,6 +24,7 @@ public class DynamicChannel extends Channel {
     update(data);
   }
 
+  @Override
   public synchronized ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
@@ -45,10 +44,10 @@ public class DynamicChannel extends Channel {
           _embedCodes.remove(videoEmbedCode);
         } else {
           JSONObject videoData = data.getJSONObject(videoEmbedCode);
-          if (videoData.isNull(Constants.KEY_CONTENT_TYPE)) {
+          if (videoData.isNull(ContentItem.KEY_CONTENT_TYPE)) {
             // do nothing, this is most likely an authorization response and if so, was handled in the
             // previous loop
-          } else if (videoData.getString(Constants.KEY_CONTENT_TYPE).equals(Constants.CONTENT_TYPE_VIDEO)) {
+          } else if (videoData.getString(ContentItem.KEY_CONTENT_TYPE).equals(ContentItem.CONTENT_TYPE_VIDEO)) {
             Video existingChild = _videos.get(videoEmbedCode);
             if (existingChild == null) {
               addVideo(new Video(data, videoEmbedCode, this, _api));
@@ -57,7 +56,7 @@ public class DynamicChannel extends Channel {
             }
           } else {
             System.out.println("ERROR: Invalid Video(DynamicChannel) content_type: "
-                + videoData.getString(Constants.KEY_CONTENT_TYPE));
+                + videoData.getString(ContentItem.KEY_CONTENT_TYPE));
           }
         }
       }
@@ -73,6 +72,7 @@ public class DynamicChannel extends Channel {
     return _embedCodes;
   }
 
+  @Override
   public List<String> embedCodesToAuthorize() {
     return _embedCodes;
   }

@@ -28,8 +28,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     _stream = null;
-    if (Stream.streamSetContainsDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4)) {
-      _stream = Stream.getStreamWithDeliveryType(streams, Constants.DELIVERY_TYPE_WV_MP4);
+    if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_WV_MP4)) {
+      _stream = Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_WV_MP4);
     }
     if (_stream == null) {
       Log.e("Widevine", "No available streams for the WidevineLib Player, Cannot continue." + streams.toString());
@@ -63,7 +63,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
         _wvplayback.registerAsset(_stream.decodedURL().toString());
         _wvplayback.requestLicense(_stream.decodedURL().toString());
         _stream.setUrl(_wvplayback.play(_stream.decodedURL().toString()));
-        _stream.setUrlFormat(Constants.STREAM_URL_FORMAT_TEXT);
+        _stream.setUrlFormat(Stream.STREAM_URL_FORMAT_TEXT);
         Set<Stream> newStreams = new HashSet<Stream>();
         newStreams.add(_stream);
         super.init(_parent, newStreams);
@@ -102,8 +102,8 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
   private void initializeWidevine() {
     HashMap<String, Object> options = new HashMap<String, Object>();
     // this should point to SAS once we get the proxy up
-    String path = Constants.DRM_HOST
-        + String.format(Constants.DRM_TENENT_PATH, _parent.getPlayerAPIClient().getPcode(),
+    String path = Environment.DRM_HOST
+        + String.format(DRM_TENENT_PATH, _parent.getPlayerAPIClient().getPcode(),
             _parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
@@ -152,6 +152,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     super.destroy();
   }
 
+  @Override
   public SeekStyle getSeekStyle() {
     return SeekStyle.BASIC;
   }

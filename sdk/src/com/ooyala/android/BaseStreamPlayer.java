@@ -1,7 +1,5 @@
 package com.ooyala.android;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import android.content.Context;
@@ -65,7 +63,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       return;
     }
     setState(State.LOADING);
-    _streamUrl = stream.getUrlFormat().equals(Constants.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
+    _streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
     setParent(parent);
     setupView();
     if (_player != null) { _player.reset(); }
@@ -187,17 +185,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
         _player.reset();
       }
       // Set cookies if they exist for 4.0+ Secure HLS Support
-      if (Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-        String cookieHeaderStr = null;
-        for (String cookieName : OoyalaAPIHelper.cookies.keySet()) {
-          if (cookieHeaderStr == null) {
-            cookieHeaderStr = (cookieName + "=" + OoyalaAPIHelper.cookies.get(cookieName));
-          } else {
-            cookieHeaderStr += ("; " + cookieName + "=" + OoyalaAPIHelper.cookies.get(cookieName));
-          }
-        }
-        Map<String, String> cookieHeader = new HashMap<String, String>();
-        cookieHeader.put(Constants.HTML_COOKIE_HEADER_NAME, cookieHeaderStr);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
         _player.setDataSource(_parent.getLayout().getContext(), Uri.parse(_streamUrl));
       } else {
         _player.setDataSource(_streamUrl);
@@ -265,6 +253,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     currentItemCompleted();
   }
 
+  @Override
   public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
     setVideoSize(width, height);
   }
@@ -469,7 +458,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public SeekStyle getSeekStyle() {
-    if(stream == null || Constants.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
+    if(stream == null || Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
       return SeekStyle.BASIC;
     }
     else {

@@ -11,9 +11,16 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.ooyala.android.Constants.ReturnState;
+public abstract class AdSpot implements JSONUpdatableItem {
+  protected static final String KEY_TYPE = "type";  //AdSpot
+  protected static final String KEY_TIME = "time";  //AdSpot
+  protected static final String KEY_CLICK_URL = "click_url";
+  protected static final String KEY_TRACKING_URL = "tracking_url";
 
-public abstract class AdSpot {
+  protected static final String AD_TYPE_OOYALA = "ooyala";
+  protected static final String AD_TYPE_VAST = "vast";
+
+  static final int DEFAULT_AD_TIME_SECONDS = 0;
 
   public static final boolean SINGLE_USE = false;
   public static final boolean REUSABLE = true;
@@ -42,31 +49,31 @@ public abstract class AdSpot {
     if (data == null) { return ReturnState.STATE_FAIL; }
 
     try {
-      if (!data.isNull(Constants.KEY_TIME)) {
-        _time = data.getInt(Constants.KEY_TIME);
+      if (!data.isNull(KEY_TIME)) {
+        _time = data.getInt(KEY_TIME);
       } else if (_time < 0) {
-        _time = Constants.DEFAULT_AD_TIME_SECONDS;
+        _time = DEFAULT_AD_TIME_SECONDS;
       }
 
-      if (!data.isNull(Constants.KEY_CLICK_URL)) {
+      if (!data.isNull(KEY_CLICK_URL)) {
         try {
-          _clickURL = new URL(data.getString(Constants.KEY_CLICK_URL));
+          _clickURL = new URL(data.getString(KEY_CLICK_URL));
         } catch (MalformedURLException exception) {
           Log.d(this.getClass().getName(),
-              "Malformed Ad Click URL: " + data.getString(Constants.KEY_CLICK_URL));
+              "Malformed Ad Click URL: " + data.getString(KEY_CLICK_URL));
           _clickURL = null;
         }
       }
 
-      if (!data.isNull(Constants.KEY_TRACKING_URL)) {
-        JSONArray pixels = data.getJSONArray(Constants.KEY_TRACKING_URL);
+      if (!data.isNull(KEY_TRACKING_URL)) {
+        JSONArray pixels = data.getJSONArray(KEY_TRACKING_URL);
         _trackingURLs = new ArrayList<URL>(pixels.length());
         for (int i = 0; i < pixels.length(); i++) {
           try {
             _trackingURLs.add(new URL(pixels.getString(i)));
           } catch (MalformedURLException exception) {
             Log.d(this.getClass().getName(),
-                "Malformed Ad Tracking URL: " + data.getString(Constants.KEY_TRACKING_URL));
+                "Malformed Ad Tracking URL: " + data.getString(KEY_TRACKING_URL));
           }
         }
       }
@@ -85,10 +92,10 @@ public abstract class AdSpot {
   public abstract boolean fetchPlaybackInfo();
 
   static AdSpot create(JSONObject data, PlayerAPIClient api) {
-    if (data == null || data.isNull(Constants.KEY_TYPE)) { return null; }
+    if (data == null || data.isNull(KEY_TYPE)) { return null; }
     String type = null;
     try {
-      type = data.getString(Constants.KEY_TYPE);
+      type = data.getString(KEY_TYPE);
     } catch (JSONException exception) {
       Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
       return null;
@@ -96,9 +103,9 @@ public abstract class AdSpot {
 
     if (type == null) {
       return null;
-    } else if (type.equals(Constants.AD_TYPE_OOYALA)) {
+    } else if (type.equals(AD_TYPE_OOYALA)) {
       return new OoyalaAdSpot(data, new OoyalaAPIClient(api));
-    } else if (type.equals(Constants.AD_TYPE_VAST)) {
+    } else if (type.equals(AD_TYPE_VAST)) {
       return new VASTAdSpot(data);
     } else {
       Log.d(AdSpot.class.getName(), "Unknown ad type: " + type);

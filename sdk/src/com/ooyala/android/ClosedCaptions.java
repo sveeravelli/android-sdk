@@ -3,10 +3,10 @@ package com.ooyala.android;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,13 +18,30 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import org.json.*;
-
 import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.ooyala.android.Constants.ReturnState;
+public class ClosedCaptions implements JSONUpdatableItem {
+  static final String KEY_LANGUAGES = "languages";
+  static final String KEY_DEFAULT_LANGUAGE = "default_language";
 
-public class ClosedCaptions {
+  static final String ELEMENT_TT = "tt";
+  static final String ELEMENT_HEAD = "head";
+  static final String ELEMENT_BODY = "body";
+  static final String ELEMENT_STYLING = "styling";
+  static final String ELEMENT_STYLE = "style";
+  static final String ELEMENT_DIV = "div";
+  static final String ELEMENT_P = "p";
+  static final String ELEMENT_SPAN = "span";
+  static final String ELEMENT_BR = "br";
+
+  static final String ATTRIBUTE_BEGIN = "begin";
+  static final String ATTRIBUTE_END = "end";
+  static final String ATTRIBUTE_DUR = "dur";
+  static final String ATTRIBUTE_XML_LANG = "xml:lang";
+
+  static final String KEY_URL = "url";
+
   protected Set<String> _languages = new HashSet<String>();
   protected String _defaultLanguage = null;
   protected URL _url = null;
@@ -41,17 +58,17 @@ public class ClosedCaptions {
     if (data == null) { return ReturnState.STATE_FAIL; }
 
     try {
-      if (data.isNull(Constants.KEY_LANGUAGES)) {
+      if (data.isNull(KEY_LANGUAGES)) {
         System.out.println("ERROR: Fail to update closed captions because no languages exist!");
         return ReturnState.STATE_FAIL;
       }
-      JSONArray theLanguages = data.getJSONArray(Constants.KEY_LANGUAGES);
+      JSONArray theLanguages = data.getJSONArray(KEY_LANGUAGES);
 
-      if (data.isNull(Constants.KEY_URL)) {
+      if (data.isNull(KEY_URL)) {
         System.out.println("ERROR: Fail to update closed captions because no url exists!");
         return ReturnState.STATE_FAIL;
       }
-      String theURL = data.getString(Constants.KEY_URL);
+      String theURL = data.getString(KEY_URL);
 
       _languages.clear();
       for (int i = 0; i < theLanguages.length(); i++) {
@@ -66,8 +83,8 @@ public class ClosedCaptions {
         return ReturnState.STATE_FAIL;
       }
 
-      if (!data.isNull(Constants.KEY_DEFAULT_LANGUAGE)) {
-        _defaultLanguage = data.getString(Constants.KEY_DEFAULT_LANGUAGE);
+      if (!data.isNull(KEY_DEFAULT_LANGUAGE)) {
+        _defaultLanguage = data.getString(KEY_DEFAULT_LANGUAGE);
       }
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);
@@ -101,30 +118,30 @@ public class ClosedCaptions {
   }
 
   private boolean parseHeadXML(Element head) {
-    if (!head.getTagName().equals(Constants.ELEMENT_HEAD)) { return false; }
+    if (!head.getTagName().equals(ELEMENT_HEAD)) { return false; }
     // TODO: support the same DFXP that we do in flash (no layout, basic styling)
     return true;
   }
 
   private boolean parseBodyXML(Element body) {
-    if (!body.getTagName().equals(Constants.ELEMENT_BODY)) { return false; }
+    if (!body.getTagName().equals(ELEMENT_BODY)) { return false; }
 
     /**
      * NOTE: we do not support div tags with temporal elements. we only support one div per language, each
      * with a set of p elements inside. this comes from the flash player's ClosedCaptionParser.parseBody. see
      * rui's comment there for more information.
      */
-    NodeList divs = body.getElementsByTagName(Constants.ELEMENT_DIV);
+    NodeList divs = body.getElementsByTagName(ELEMENT_DIV);
     for (int i = 0; i < divs.getLength(); i++) {
       Element div = (Element) divs.item(i);
-      String lang = div.getAttribute(Constants.ATTRIBUTE_XML_LANG);
+      String lang = div.getAttribute(ATTRIBUTE_XML_LANG);
       List<Caption> captionsForLang = Utils.isNullOrEmpty(lang) ? null : _captions.get(lang);
-      String begin = div.getAttribute(Constants.ATTRIBUTE_BEGIN);
+      String begin = div.getAttribute(ATTRIBUTE_BEGIN);
       if (!Utils.isNullOrEmpty(begin) || captionsForLang == null) {
         continue;
       }
 
-      NodeList ps = div.getElementsByTagName(Constants.ELEMENT_P);
+      NodeList ps = div.getElementsByTagName(ELEMENT_P);
       for (int j = 0; j < ps.getLength(); j++) {
         Element p = (Element) ps.item(j);
         Caption caption = new Caption(p);
@@ -138,14 +155,14 @@ public class ClosedCaptions {
   }
 
   private boolean update(Element xml) {
-    if (!xml.getTagName().equals(Constants.ELEMENT_TT)) { return false; }
+    if (!xml.getTagName().equals(ELEMENT_TT)) { return false; }
 
-    NodeList headList = xml.getElementsByTagName(Constants.ELEMENT_HEAD);
+    NodeList headList = xml.getElementsByTagName(ELEMENT_HEAD);
     if (headList != null && headList.getLength() > 0) {
       if (!parseHeadXML((Element) headList.item(0))) { return false; }
     }
 
-    NodeList bodyList = xml.getElementsByTagName(Constants.ELEMENT_BODY);
+    NodeList bodyList = xml.getElementsByTagName(ELEMENT_BODY);
     if (bodyList != null && bodyList.getLength() > 0) {
       if (!parseBodyXML((Element) bodyList.item(0))) { return false; }
     }

@@ -6,15 +6,44 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.*;
-
-import com.ooyala.android.Constants.ReturnState;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Stores the info and metadata for the specified content item.
  *
  */
-public abstract class ContentItem implements AuthorizableItemInternal, OrderedMapValue<String> {
+public abstract class ContentItem implements AuthorizableItemInternal, OrderedMapValue<String>, JSONUpdatableItem {
+
+  //Item
+  protected static final String KEY_EMBED_CODE = "embed_code";
+  protected static final String KEY_EXTERNAL_ID = "external_id";
+  protected static final String KEY_CONTENT_TOKEN = "content_token";
+  protected static final String KEY_TITLE = "title";
+  protected static final String KEY_DESCRIPTION = "description";
+  protected static final String KEY_PROMO_IMAGE = "promo_image";
+  protected static final String KEY_THUMBNAIL_IMAGE = "thumbnail_image";
+  protected static final String KEY_CONTENT_TYPE = "content_type";
+  protected static final String KEY_ADS = "ads";
+  protected static final String KEY_NEXT_CHILDREN = "next_children";
+  protected static final String KEY_DURATION = "duration";
+  protected static final String KEY_CLOSED_CAPTIONS = "closed_captions";
+  protected static final String KEY_REQUIRE_HEARTBEAT = "require_heartbeat";
+  protected static final String KEY_CODE = "code"; //Item, OoyalaAd, PAPI
+  protected static final String KEY_AUTHORIZED = "authorized";//AuthorizableItem, PAPI
+  protected static final String KEY_CHILDREN = "children";  //Channel, PAPI
+  protected static final String KEY_STREAMS = "streams";  //OoyalaAdSpot, Video
+  protected static final String KEY_METADATA = "metadata";  //Content Item, PAPI
+  protected static final String KEY_METADATA_BASE = "base";
+  protected static final String KEY_METADATA_MODULES = "modules";
+  protected static final String KEY_METADATA_MODULE_TYPE = "type";
+
+  protected static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
+  protected static final String CONTENT_TYPE_CHANNEL = "Channel";
+  protected static final String CONTENT_TYPE_VIDEO = "Video";
+  protected static final String CONTENT_TYPE_LIVE_STREAM = "LiveStream";
+
+
   protected String _embedCode = null;
   protected String _externalId = null;
   protected String _contentToken = null;
@@ -110,52 +139,52 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
 
     try {
       JSONObject myData = data.getJSONObject(_embedCode);
-      if (!myData.isNull(Constants.KEY_AUTHORIZED)) {
-        _authorized = myData.getBoolean(Constants.KEY_AUTHORIZED);
-        if (!myData.isNull(Constants.KEY_CODE)) {
-          int authCode = myData.getInt(Constants.KEY_CODE);
+      if (!myData.isNull(KEY_AUTHORIZED)) {
+        _authorized = myData.getBoolean(KEY_AUTHORIZED);
+        if (!myData.isNull(KEY_CODE)) {
+          int authCode = myData.getInt(KEY_CODE);
           _authCode = authCode;
         }
-        if (!myData.isNull(Constants.KEY_REQUIRE_HEARTBEAT)) {
-          _heartbeatRequired = myData.getBoolean(Constants.KEY_REQUIRE_HEARTBEAT);
+        if (!myData.isNull(KEY_REQUIRE_HEARTBEAT)) {
+          _heartbeatRequired = myData.getBoolean(KEY_REQUIRE_HEARTBEAT);
         }
         return ReturnState.STATE_MATCHED;
       }
 
-      if (_embedCode != null && !myData.isNull(Constants.KEY_EMBED_CODE)
-          && !_embedCode.equals(myData.getString(Constants.KEY_EMBED_CODE))) { return ReturnState.STATE_FAIL; }
+      if (_embedCode != null && !myData.isNull(KEY_EMBED_CODE)
+          && !_embedCode.equals(myData.getString(KEY_EMBED_CODE))) { return ReturnState.STATE_FAIL; }
 
-      if (!myData.isNull(Constants.KEY_EMBED_CODE)) {
-        _embedCode = myData.getString(Constants.KEY_EMBED_CODE);
+      if (!myData.isNull(KEY_EMBED_CODE)) {
+        _embedCode = myData.getString(KEY_EMBED_CODE);
       }
-      if (!myData.isNull(Constants.KEY_EXTERNAL_ID)) {
-        _externalId = myData.getString(Constants.KEY_EXTERNAL_ID);
+      if (!myData.isNull(KEY_EXTERNAL_ID)) {
+        _externalId = myData.getString(KEY_EXTERNAL_ID);
       }
-      if (!myData.isNull(Constants.KEY_CONTENT_TOKEN)) {
-        _contentToken = myData.getString(Constants.KEY_CONTENT_TOKEN);
+      if (!myData.isNull(KEY_CONTENT_TOKEN)) {
+        _contentToken = myData.getString(KEY_CONTENT_TOKEN);
       }
-      if (!myData.isNull(Constants.KEY_TITLE)) {
-        _title = myData.getString(Constants.KEY_TITLE);
+      if (!myData.isNull(KEY_TITLE)) {
+        _title = myData.getString(KEY_TITLE);
       }
-      if (!myData.isNull(Constants.KEY_DESCRIPTION)) {
-        _description = myData.getString(Constants.KEY_DESCRIPTION);
+      if (!myData.isNull(KEY_DESCRIPTION)) {
+        _description = myData.getString(KEY_DESCRIPTION);
       }
-      if (!myData.isNull(Constants.KEY_PROMO_IMAGE)) {
-        _promoImageURL = myData.getString(Constants.KEY_PROMO_IMAGE);
+      if (!myData.isNull(KEY_PROMO_IMAGE)) {
+        _promoImageURL = myData.getString(KEY_PROMO_IMAGE);
       }
-      if (myData.has(Constants.KEY_METADATA_BASE)) {
-        _metadata = Utils.mapFromJSONObject(myData.getJSONObject(Constants.KEY_METADATA_BASE));
+      if (myData.has(KEY_METADATA_BASE)) {
+        _metadata = Utils.mapFromJSONObject(myData.getJSONObject(KEY_METADATA_BASE));
       }
-      if (myData.has(Constants.KEY_METADATA_MODULES)) {
+      if (myData.has(KEY_METADATA_MODULES)) {
         _moduleData = new HashMap<String, ModuleData>();
-        JSONObject modules = myData.getJSONObject(Constants.KEY_METADATA_MODULES);
+        JSONObject modules = myData.getJSONObject(KEY_METADATA_MODULES);
 
         Iterator<?> itr = modules.keys();
         while (itr.hasNext()) {
           String key = (String)itr.next();
           JSONObject module = modules.getJSONObject(key);
-          String type = module.optString(Constants.KEY_METADATA_MODULE_TYPE);
-          Map<String, String> metadata = Utils.mapFromJSONObject(module.getJSONObject(Constants.KEY_METADATA));
+          String type = module.optString(KEY_METADATA_MODULE_TYPE);
+          Map<String, String> metadata = Utils.mapFromJSONObject(module.getJSONObject(KEY_METADATA));
 
           _moduleData.put(key, new ModuleData(key, type, metadata));
         }
@@ -178,8 +207,8 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     String contentType = null;
     try {
       JSONObject myData = data.getJSONObject(embedCode);
-      if (myData.isNull(Constants.KEY_CONTENT_TYPE)) { return null; }
-      contentType = myData.getString(Constants.KEY_CONTENT_TYPE);
+      if (myData.isNull(KEY_CONTENT_TYPE)) { return null; }
+      contentType = myData.getString(KEY_CONTENT_TYPE);
     } catch (JSONException exception) {
       System.out.println("Create failed due to JSONException: " + exception);
       return null;
@@ -187,12 +216,12 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
 
     if (contentType == null) {
       return null;
-    } else if (contentType.equals(Constants.CONTENT_TYPE_VIDEO)
-        || contentType.equals(Constants.CONTENT_TYPE_LIVE_STREAM)) {
+    } else if (contentType.equals(CONTENT_TYPE_VIDEO)
+        || contentType.equals(CONTENT_TYPE_LIVE_STREAM)) {
       return new Video(data, embedCode, api);
-    } else if (contentType.equals(Constants.CONTENT_TYPE_CHANNEL)) {
+    } else if (contentType.equals(CONTENT_TYPE_CHANNEL)) {
       return new Channel(data, embedCode, api);
-    } else if (contentType.equals(Constants.CONTENT_TYPE_CHANNEL_SET)) {
+    } else if (contentType.equals(CONTENT_TYPE_CHANNEL_SET)) {
       return new ChannelSet(data, embedCode, api);
     } else {
       System.out.println("Unknown content_type: " + contentType);
@@ -242,6 +271,7 @@ public abstract class ContentItem implements AuthorizableItemInternal, OrderedMa
     return _authCode;
   }
 
+  @Override
   public String getKey() {
     return _embedCode;
   }

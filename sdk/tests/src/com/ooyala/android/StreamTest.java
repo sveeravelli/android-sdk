@@ -13,10 +13,12 @@ public class StreamTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }
@@ -26,15 +28,15 @@ public class StreamTest extends AndroidTestCase {
    */
   public void testInitializers() {
     Stream stream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
-    assertEquals(Constants.DELIVERY_TYPE_HLS, stream.getDeliveryType());
+    assertEquals(Stream.DELIVERY_TYPE_HLS, stream.getDeliveryType());
     assertNull(stream.getVideoCodec());
-    assertEquals(Constants.STREAM_URL_FORMAT_B64, stream.getUrlFormat());
+    assertEquals(Stream.STREAM_URL_FORMAT_B64, stream.getUrlFormat());
     assertNull(stream.getFramerate());
     assertEquals("http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8", stream
         .decodedURL().toString());
 
     stream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_MP4));
-    assertEquals(Constants.DELIVERY_TYPE_MP4, stream.getDeliveryType());
+    assertEquals(Stream.DELIVERY_TYPE_MP4, stream.getDeliveryType());
     assertEquals("h264", stream.getVideoCodec());
     assertEquals("text", stream.getUrlFormat());
     assertEquals("30.0", stream.getFramerate());

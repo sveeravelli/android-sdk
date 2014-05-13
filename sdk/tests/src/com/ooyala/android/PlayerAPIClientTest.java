@@ -16,6 +16,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {
     PlayerDomain domain = null;
     try {
@@ -27,6 +28,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
   }
 
+  @Override
   protected void tearDown() {}
 
   public void testAuthorizeVideo() throws OoyalaException {
@@ -227,8 +229,8 @@ public class PlayerAPIClientTest extends AndroidTestCase {
       }
     };
     TestPaginatedItemListener listener = new TestPaginatedItemListener();
-    assertTrue(second.fetchMoreChildren(listener));
-    assertFalse(second.fetchMoreChildren(listener));
+    assertTrue(api.fetchMoreChildrenForPaginatedParentItem(second, listener));
+    assertFalse(api.fetchMoreChildrenForPaginatedParentItem(second, listener));
     while (!listener.fetched && !listener.error) {
       try {
         Thread.sleep(1000);

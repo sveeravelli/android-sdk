@@ -7,10 +7,12 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }
@@ -47,7 +49,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
     PlayerDomain domain = new PlayerDomain("http://www.ooyala.com");
     PlayerAPIClient api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), api);
+        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), new OoyalaAPIClient(api));
     assertTrue(adSpot.fetchPlaybackInfo());
     // FIXME: This test asset has multiple streams with the same resolution and bitrate...
     String url = adSpot.getStream().decodedURL().toString();
