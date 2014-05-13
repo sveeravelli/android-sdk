@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
@@ -20,6 +22,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected String _embedCode = null;
   protected boolean _authorized = false;
+  protected OoyalaAPIClient _api;
   protected int _authCode = AuthCode.NOT_REQUESTED;
 
   /**
@@ -34,7 +37,12 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     _embedCode = embedCode;
   }
 
-  OoyalaAdSpot(JSONObject data, PlayerAPIClient api) {
+  /**
+   * Initialize the Ooyala Ad Spot
+   * @param data the metadata needed to update the Ooyala Ad
+   * @param api the API to authorize the ad spot at a later time
+   */
+  OoyalaAdSpot(JSONObject data, OoyalaAPIClient api) {
     _api = api;
     update(data);
   }
@@ -53,6 +61,7 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
    * @param data the data to use to update this AuthorizableItem
    * @return a ReturnState based on if the data matched or not (or parsing failed)
    */
+  @Override
   public ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
@@ -100,10 +109,15 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     }
   }
 
+  @Override
   public boolean fetchPlaybackInfo() {
+   return fetchPlaybackInfo(StreamPlayer.defaultPlayerInfo);
+  }
+
+  public boolean fetchPlaybackInfo(PlayerInfo info) {
     if (_authCode != AuthCode.NOT_REQUESTED) { return true; }
     try {
-      return _api.authorize(this, StreamPlayer.defaultPlayerInfo);
+      return _api.authorize(this, info);
     } catch (OoyalaException e) {
       System.out.println("Unable to fetch playback info: " + e.getMessage());
       return false;
@@ -112,15 +126,17 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
 
   private class FetchPlaybackInfoTask extends AsyncTask<Void, Integer, Boolean> {
     protected FetchPlaybackInfoCallback _callback = null;
+    protected PlayerInfo _info = null;
 
-    public FetchPlaybackInfoTask(FetchPlaybackInfoCallback callback) {
+    public FetchPlaybackInfoTask(PlayerInfo info, FetchPlaybackInfoCallback callback) {
       super();
       _callback = callback;
+      _info = info;
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-      return fetchPlaybackInfo();
+      return fetchPlaybackInfo(_info);
     }
 
     @Override
@@ -129,8 +145,8 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
     }
   }
 
-  public Object fetchPlaybackInfo(FetchPlaybackInfoCallback callback) {
-    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(callback);
+  public Object fetchPlaybackInfo(PlayerInfo info, FetchPlaybackInfoCallback callback) {
+    FetchPlaybackInfoTask task = new FetchPlaybackInfoTask(info, callback);
     task.execute();
     return task;
   }
@@ -143,23 +159,28 @@ public class OoyalaAdSpot extends AdSpot implements AuthorizableItemInternal, Pl
    * For internal use only. The embed codes to authorize for the AuthorizableItem
    * @return the embed codes to authorize as a List
    */
+  @Override
   public List<String> embedCodesToAuthorize() {
     List<String> embedCodes = new ArrayList<String>();
     embedCodes.add(_embedCode);
     return embedCodes;
   }
 
+  @Override
   public boolean isAuthorized() {
     return _authorized;
   }
 
+  @Override
   public int getAuthCode() {
     return _authCode;
   }
 
+  @Override
   public boolean isHeartbeatRequired() {
     return false;
   }
+  @Override
   public Set<Stream> getStreams() {
     return _streams;
   }

@@ -9,7 +9,8 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,10 +49,8 @@ public class VASTAdSpot extends AdSpot {
   /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
-   * @param api the PlayerAPIClient that was used to fetch this VASTAd
    */
-  VASTAdSpot(JSONObject data, PlayerAPIClient api) {
-    _api = api;
+  VASTAdSpot(JSONObject data) {
     update(data);
   }
 
@@ -60,6 +59,7 @@ public class VASTAdSpot extends AdSpot {
    * @param data the NSDictionary containing the data to use to update this VASTAdSpot
    * @return ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
    */
+  @Override
   ReturnState update(JSONObject data) {
     switch (super.update(data)) {
       case STATE_FAIL:
