@@ -13,6 +13,8 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.BaseStreamPlayer;
 
 class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;

@@ -251,7 +251,7 @@ public class OoyalaAPIClient {
   /**
    * @return the pcode this OoyalaAPIClient uses
    */
-  String getPcode() {
+  public String getPcode() {
     return _playerAPI.getPcode();
   }
 

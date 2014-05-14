@@ -1,5 +1,6 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.AdSpot;
 
 import android.widget.FrameLayout;

@@ -6,13 +6,13 @@ import java.util.List;
 import android.util.Log;
 import android.widget.FrameLayout;
 
-import com.ooyala.android.AdMoviePlayer;
 import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.BaseStreamPlayer;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.StreamPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.BaseStreamPlayer;
+import com.ooyala.android.player.StreamPlayer;
 
 import tv.freewheel.ad.interfaces.IAdContext;
 import tv.freewheel.ad.interfaces.IAdInstance;

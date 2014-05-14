@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.ooyala.android.Environment;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
@@ -104,7 +106,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
     HashMap<String, Object> options = new HashMap<String, Object>();
     // this should point to SAS once we get the proxy up
     String path = Environment.DRM_HOST
-        + String.format(DRM_TENENT_PATH, _parent.getPlayerAPIClient().getPcode(),
+        + String.format(DRM_TENENT_PATH, _parent.getOoyalaAPIClient().getPcode(),
             _parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead

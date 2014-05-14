@@ -1,8 +1,12 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.ooyala.android.DefaultPlayerInfo;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.PlayerInfo;
 
 import android.os.Handler;
 import android.os.Message;

@@ -1,16 +1,17 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.util.Observable;
 import java.util.Set;
 
+import android.view.SurfaceView;
+import android.view.View;
+
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
 
-import android.view.SurfaceView;
-import android.view.View;
-
-abstract class Player extends Observable {
+public abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
   /** the current state of the player */
   protected State _state = State.INIT;

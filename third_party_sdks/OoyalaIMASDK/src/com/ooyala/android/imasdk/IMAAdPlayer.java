@@ -5,10 +5,10 @@ import java.util.Observable;
 
 import android.util.Log;
 
-import com.ooyala.android.AdMoviePlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.player.AdMoviePlayer;
 
 /**
  * This class represents the Base Movie Player that plays IMA Ad spots.

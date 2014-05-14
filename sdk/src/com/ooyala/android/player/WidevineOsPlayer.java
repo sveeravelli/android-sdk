@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -17,13 +17,16 @@ import android.os.Looper;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.ooyala.android.Environment;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.WidevineStuckMonitor;
 import com.ooyala.android.item.Stream;
 
 //the widevine player using the built in libraries, for honeycomb+
 @TargetApi(11)
-class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorListener,
+public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorListener,
     DrmManagerClient.OnEventListener, DrmManagerClient.OnInfoListener, WidevineStuckMonitor.Listener {
 
   private static final String TAG = "WidevineOsPlayer";
@@ -78,7 +81,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
     DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO, "video/wvm");
     // this should point to SAS once we get the proxy up
     String serverPath = Environment.DRM_HOST
-        + String.format(DRM_TENENT_PATH, parent.getPlayerAPIClient().getPcode(),
+        + String.format(DRM_TENENT_PATH, parent.getOoyalaAPIClient().getPcode(),
                         parent.getEmbedCode(), "widevine", "ooyala");
 
     //  If SAS included a widevine server path, use that instead
@@ -86,7 +89,7 @@ class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.OnErrorLi
       serverPath = stream.getWidevineServerPath();
     } else {
       // If auth token is available, append it to the license path
-      String authToken = parent.getPlayerAPIClient().getAuthToken();
+      String authToken = parent.getAuthToken();
       if (authToken != null && !authToken.equals("")) {
     	  serverPath += "?auth_token=" + authToken;
       }

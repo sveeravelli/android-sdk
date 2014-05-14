@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.util.Set;
 
@@ -21,6 +21,7 @@ import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;

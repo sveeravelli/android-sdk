@@ -5,6 +5,7 @@ import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ooyala.android.item.Video;
+import com.ooyala.android.player.Player;
 
 import android.util.Log;
 
