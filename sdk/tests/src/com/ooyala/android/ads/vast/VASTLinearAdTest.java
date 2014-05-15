@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import java.io.InputStream;
 
@@ -7,6 +7,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.ooyala.android.TestConstants;
 
 import android.test.AndroidTestCase;
 

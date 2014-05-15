@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 
 public class VASTAdSpot extends AdSpot {

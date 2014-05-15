@@ -4,7 +4,7 @@ import android.test.AndroidTestCase;
 
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.TestConstants;
-import com.ooyala.android.VASTAdSpot;
+import com.ooyala.android.ads.vast.VASTAdSpot;
 import com.ooyala.android.item.AdSpot;
 
 public class AdSpotTest extends AndroidTestCase {

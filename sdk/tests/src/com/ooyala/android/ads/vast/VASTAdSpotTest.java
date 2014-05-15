@@ -1,5 +1,6 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
+import com.ooyala.android.TestConstants;
 import com.ooyala.android.item.ContentItemTest;
 
 import android.test.AndroidTestCase;

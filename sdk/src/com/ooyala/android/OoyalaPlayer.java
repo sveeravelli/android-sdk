@@ -22,6 +22,8 @@ import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.ads.vast.VASTAdPlayer;
+import com.ooyala.android.ads.vast.VASTAdSpot;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;

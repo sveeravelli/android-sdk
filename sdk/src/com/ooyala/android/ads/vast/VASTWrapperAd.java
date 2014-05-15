@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import java.net.URL;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,12 +11,15 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.FetchPlaybackInfoCallback;
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
 
-class VASTAdPlayer extends AdMoviePlayer {
+public class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
@@ -58,7 +61,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     _ad = (VASTAdSpot) ad;
     if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
       if (_fetchTask != null) {
-        this._parent.getPlayerAPIClient().cancel(_fetchTask);
+        this._parent.getOoyalaAPIClient().cancel(_fetchTask);
       }
       _fetchTask = _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
 
@@ -117,7 +120,7 @@ class VASTAdPlayer extends AdMoviePlayer {
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
-        NetUtils.ping(url);
+        ping(url);
       }
     }
 
@@ -292,7 +295,7 @@ class VASTAdPlayer extends AdMoviePlayer {
       if (urls != null) {
         for (String url : urls) {
           Log.i(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-          NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
+          ping(VASTAdSpot.urlFromAdUrlString(url));
         }
       }
     }
@@ -316,7 +319,7 @@ class VASTAdPlayer extends AdMoviePlayer {
     if (urls != null) {
       for (String url : urls) {
         Log.i(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-        NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
+        ping(VASTAdSpot.urlFromAdUrlString(url));
       }
     }
   }
@@ -324,7 +327,7 @@ class VASTAdPlayer extends AdMoviePlayer {
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
     for(String url : impressionURLs) {
       Log.i(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-      NetUtils.ping(VASTAdSpot.urlFromAdUrlString(url));
+      ping(VASTAdSpot.urlFromAdUrlString(url));
     }
     _impressionSent = true;
   }
@@ -338,7 +341,7 @@ class VASTAdPlayer extends AdMoviePlayer {
       _learnMore = null;
     }
 
-    if (_fetchTask != null && this._parent != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
+    if (_fetchTask != null && this._parent != null) this._parent.getOoyalaAPIClient().cancel(_fetchTask);
     deleteObserver(this);
     super.destroy();
   }

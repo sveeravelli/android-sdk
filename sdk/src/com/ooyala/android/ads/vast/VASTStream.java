@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import org.w3c.dom.Element;
 
@@ -23,7 +23,7 @@ public class VASTStream extends Stream {
     this._vastDeliveryType = data.getAttribute(VASTAd.ATTRIBUTE_DELIVERY);
     this._apiFramework = data.getAttribute(VASTAd.ATTRIBUTE_API_FRAMEWORK);
     String scalableStr = data.getAttribute(VASTAd.ATTRIBUTE_SCALABLE);
-    if (!Utils.isNullOrEmpty(scalableStr)) {
+    if (!VASTUtils.isNullOrEmpty(scalableStr)) {
       this._scalable = Boolean.getBoolean(scalableStr);
     }
     String maintainAspectRatioStr = data.getAttribute(VASTAd.ATTRIBUTE_MAINTAIN_ASPECT_RATIO);
@@ -42,15 +42,15 @@ public class VASTStream extends Stream {
       }
     }
     String bitrate = data.getAttribute(VASTAd.ATTRIBUTE_BITRATE);
-    if (!Utils.isNullOrEmpty(bitrate)) {
+    if (!VASTUtils.isNullOrEmpty(bitrate)) {
       this._videoBitrate = Integer.parseInt(bitrate);
     }
     String theWidth = data.getAttribute(VASTAd.ATTRIBUTE_WIDTH);
-    if (!Utils.isNullOrEmpty(theWidth)) {
+    if (!VASTUtils.isNullOrEmpty(theWidth)) {
       this._width = Integer.parseInt(theWidth);
     }
     String theHeight = data.getAttribute(VASTAd.ATTRIBUTE_HEIGHT);
-    if (!Utils.isNullOrEmpty(theHeight)) {
+    if (!VASTUtils.isNullOrEmpty(theHeight)) {
       this._height = Integer.parseInt(theHeight);
     }
     this._urlFormat = "text";

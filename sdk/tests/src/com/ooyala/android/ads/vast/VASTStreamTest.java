@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.ads.vast;
 
 import java.io.InputStream;
 
@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 
 import android.test.AndroidTestCase;
 
+import com.ooyala.android.TestConstants;
 import com.ooyala.android.item.Stream;
 
 public class VASTStreamTest extends AndroidTestCase {

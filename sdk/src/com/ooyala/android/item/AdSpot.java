@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
-import com.ooyala.android.VASTAdSpot;
+import com.ooyala.android.ads.vast.VASTAdSpot;
 
 public abstract class AdSpot implements JSONUpdatableItem {
   protected static final String KEY_TYPE = "type";  //AdSpot
