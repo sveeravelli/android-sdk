@@ -6,10 +6,10 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.test.AndroidTestCase;
+
 import com.ooyala.android.StreamSelector;
 import com.ooyala.android.TestConstants;
-
-import android.test.AndroidTestCase;
 
 public class StreamTest extends AndroidTestCase {
   public StreamTest() {
@@ -30,7 +30,7 @@ public class StreamTest extends AndroidTestCase {
    * Tests Stream constructor, update, and combinedBitrate
    */
   public void testInitializers() {
-    Stream stream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
+    Stream stream = new Stream(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
     assertEquals(Stream.DELIVERY_TYPE_HLS, stream.getDeliveryType());
     assertNull(stream.getVideoCodec());
     assertEquals(Stream.STREAM_URL_FORMAT_B64, stream.getUrlFormat());
@@ -38,7 +38,7 @@ public class StreamTest extends AndroidTestCase {
     assertEquals("http://player.ooyala.com/player/iphone/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM.m3u8", stream
         .decodedURL().toString());
 
-    stream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_MP4));
+    stream = new Stream(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_MP4));
     assertEquals(Stream.DELIVERY_TYPE_MP4, stream.getDeliveryType());
     assertEquals("h264", stream.getVideoCodec());
     assertEquals("text", stream.getUrlFormat());
@@ -56,7 +56,7 @@ public class StreamTest extends AndroidTestCase {
    * Tests bestStream and decodeURL, as well as the constructor as a side effect.
    */
   public void testBestStreamFromArray() {
-    JSONArray streamsData = ContentItemTest.getTestJSONArray(TestConstants.TEST_DICTIONARY_STREAMS_MP4);
+    JSONArray streamsData = TestConstants.getTestJSONArray(TestConstants.TEST_DICTIONARY_STREAMS_MP4);
     Set<Stream> mp4s = new HashSet<Stream>();
     if (streamsData.length() > 0) {
       for (int i = 0; i < streamsData.length(); i++) {
@@ -77,7 +77,7 @@ public class StreamTest extends AndroidTestCase {
     assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
         Stream.bestStream(mp4s).decodedURL().toString());
 
-    Stream hlsStream = new Stream(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
+    Stream hlsStream = new Stream(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_STREAM_HLS));
     Set<Stream> hls = new HashSet<Stream>();
     hls.add(hlsStream);
     assertEquals(Stream.bestStream(hls), hlsStream);

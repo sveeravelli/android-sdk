@@ -1,18 +1,20 @@
 package com.ooyala.android.item;
 
-import com.ooyala.android.TestConstants;
-
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.TestConstants;
 
 public class ClosedCaptionsTest extends AndroidTestCase {
   public ClosedCaptionsTest() {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }
@@ -22,7 +24,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
    */
   public void testInitializers() {
     ClosedCaptions cc = new ClosedCaptions(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
     assertEquals("http://ak.c.ooyala.com/1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p/cc/148094784", cc.getURL()
         .toString());
     assertEquals("", cc.getDefaultLanguage());
@@ -34,7 +36,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
    */
   public void testFetchAndGet() {
     ClosedCaptions cc = new ClosedCaptions(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
     assertEquals("http://ak.c.ooyala.com/1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p/cc/148094784", cc.getURL()
         .toString());
     assertEquals("", cc.getDefaultLanguage());

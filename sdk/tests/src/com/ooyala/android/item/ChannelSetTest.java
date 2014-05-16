@@ -25,7 +25,7 @@ public class ChannelSetTest extends AndroidTestCase {
    */
   public void testConstructor() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     assertNotNull(channelSet);
     assertEquals(TestConstants.TEST_CHANNEL_SET, channelSet.getEmbedCode());
@@ -62,7 +62,7 @@ public class ChannelSetTest extends AndroidTestCase {
    */
   public void testEmbedCodesToAuthorize() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     assertEquals(3, channelSet.embedCodesToAuthorize().size());
     assertEquals(channelSet.getEmbedCode(), channelSet.embedCodesToAuthorize().get(0));
@@ -73,7 +73,7 @@ public class ChannelSetTest extends AndroidTestCase {
    */
   public void testFirstVideo() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     Video video = channelSet.getChannels().get(0).getVideos().get(0);
     assertEquals(video, channelSet.firstVideo());
@@ -84,7 +84,7 @@ public class ChannelSetTest extends AndroidTestCase {
    */
   public void testNextVideo() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().get(0);
     Channel channel2 = channelSet.getChannels().get(1);
@@ -100,7 +100,7 @@ public class ChannelSetTest extends AndroidTestCase {
    */
   public void testPreviousVideo() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().get(0);
     Channel channel2 = channelSet.getChannels().get(1);

@@ -11,7 +11,6 @@ import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Channel;
 import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
-import com.ooyala.android.item.ContentItemTest;
 import com.ooyala.android.item.DynamicChannel;
 import com.ooyala.android.item.Video;
 
@@ -38,7 +37,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   protected void tearDown() {}
 
   public void testAuthorizeVideo() throws OoyalaException {
-    ContentItem video = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+    ContentItem video = ContentItem.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
         TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
     assertTrue(api.authorize(video));
     assertTrue(video.isAuthorized());
@@ -49,7 +48,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
 
     OoyalaPlayer.enableHLS = true;
     ContentItem videoHLS = ContentItem.create(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO), TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO), TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
     assertTrue(api.authorize(videoHLS));
     assertTrue(videoHLS.isAuthorized());
     assertEquals(videoHLS.getAuthCode(), AuthCode.AUTHORIZED);
@@ -59,7 +58,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
 
     OoyalaPlayer.enableHLS = false;
     OoyalaPlayer.enableHighResHLS = true;
-    videoHLS = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+    videoHLS = ContentItem.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
         TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
     assertTrue(api.authorize(videoHLS));
     assertTrue(videoHLS.isAuthorized());
@@ -70,7 +69,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     OoyalaPlayer.enableHighResHLS = false;
 
     video = ContentItem.create(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA),
         TestConstants.TEST_VIDEO_WITH_AD_OOYALA, new OoyalaAPIClient(api));
     assertTrue(api.authorize(video));
     assertTrue(video.isAuthorized());
@@ -105,7 +104,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
 
   public void testAuthorizeChannel() throws OoyalaException {
     ContentItem channel = ContentItem.create(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, new OoyalaAPIClient(api));
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), TestConstants.TEST_CHANNEL, new OoyalaAPIClient(api));
     assertTrue(api.authorize(channel));
     assertTrue(channel.isAuthorized());
     assertEquals(channel.getAuthCode(), AuthCode.AUTHORIZED);
@@ -117,7 +116,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
 
   public void testAuthorizeChannelSet() throws OoyalaException {
     ContentItem channelSet = ContentItem.create(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, new OoyalaAPIClient(api));
     assertTrue(api.authorize(channelSet));
     assertTrue(channelSet.isAuthorized());
@@ -133,7 +132,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     ContentItem dynamicChannel = ContentItem.create(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, new OoyalaAPIClient(api));
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, new OoyalaAPIClient(api));
     assertTrue(api.authorize(dynamicChannel));
     assertTrue(dynamicChannel.isAuthorized());
     assertEquals(dynamicChannel.getAuthCode(), AuthCode.AUTHORIZED);
@@ -250,7 +249,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   }
 
   public void testFetchMetadata() throws OoyalaException {
-    ContentItem video = ContentItem.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+    ContentItem video = ContentItem.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
         TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
     assertTrue(api.fetchMetadata(video));
 

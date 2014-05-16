@@ -5,7 +5,6 @@ import android.test.AndroidTestCase;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.TestConstants;
 import com.ooyala.android.ads.vast.VASTAdSpot;
-import com.ooyala.android.item.AdSpot;
 
 public class AdSpotTest extends AndroidTestCase {
   public AdSpotTest() {
@@ -26,7 +25,7 @@ public class AdSpotTest extends AndroidTestCase {
    * Test create. Also tests update. Cannot test the constructor since AdSpot is an abstract class.
    */
   public void testCreate() {
-    AdSpot ad = AdSpot.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
+    AdSpot ad = AdSpot.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
     assertNotNull(ad);
     assertEquals(OoyalaAdSpot.class, ad.getClass());
     OoyalaAdSpot adSpot = (OoyalaAdSpot) ad;
@@ -36,7 +35,7 @@ public class AdSpotTest extends AndroidTestCase {
     assertEquals(1, adSpot.getTrackingURLs().size());
     assertEquals("http://www.ooyala.com/track", adSpot.getTrackingURLs().get(0).toString());
 
-    ad = AdSpot.create(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST), null);
+    ad = AdSpot.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST), null);
     assertEquals(VASTAdSpot.class, ad.getClass());
     assertEquals(
         "http://www.daveproxy.co.uk/browse.php/Oi8vYWZlMi5zcGVjaWZpY2NsaWNrLm5ldC9hZHNlcnZlLz9sPTIwNTE3JnQ9eCZybmQ9YkFvcnJxSyxiaGxhZnNvaGRsQXg_3D/b13/fnorefer/",

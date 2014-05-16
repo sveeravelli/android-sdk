@@ -1,9 +1,8 @@
 package com.ooyala.android.ads.vast;
 
-import com.ooyala.android.TestConstants;
-import com.ooyala.android.item.ContentItemTest;
-
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.TestConstants;
 
 public class VASTAdSpotTest extends AndroidTestCase {
   public VASTAdSpotTest() {
@@ -20,7 +19,7 @@ public class VASTAdSpotTest extends AndroidTestCase {
    * @test Test VASTAdSpot.initWithDictionary:api: and VASTAdSpot.updateWithDictionary:
    */
   public void testInitializer() {
-    VASTAdSpot vast = new VASTAdSpot(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST));
+    VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST));
     assertEquals(
         vast.getVASTURL().toString(),
         "http://www.daveproxy.co.uk/browse.php/Oi8vYWZlMi5zcGVjaWZpY2NsaWNrLm5ldC9hZHNlcnZlLz9sPTIwNTE3JnQ9eCZybmQ9YkFvcnJxSyxiaGxhZnNvaGRsQXg_3D/b13/fnorefer/");

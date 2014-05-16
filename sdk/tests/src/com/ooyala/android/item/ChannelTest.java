@@ -4,9 +4,6 @@ import android.test.AndroidTestCase;
 
 import com.ooyala.android.OrderedMap;
 import com.ooyala.android.TestConstants;
-import com.ooyala.android.item.Channel;
-import com.ooyala.android.item.ChannelSet;
-import com.ooyala.android.item.Video;
 
 public class ChannelTest extends AndroidTestCase {
   public ChannelTest() {
@@ -27,7 +24,7 @@ public class ChannelTest extends AndroidTestCase {
    * Test the Channel constructor.
    */
   public void testConstructor() {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+    Channel channel = new Channel(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
         TestConstants.TEST_CHANNEL, null);
     assertNotNull(channel);
     assertEquals(TestConstants.TEST_CHANNEL, channel.getEmbedCode());
@@ -53,7 +50,7 @@ public class ChannelTest extends AndroidTestCase {
    * Test embedCodesToAuthorize.
    */
   public void testEmbedCodesToAuthorize() {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+    Channel channel = new Channel(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
         TestConstants.TEST_CHANNEL, null);
     assertEquals(6, channel.embedCodesToAuthorize().size());
     assertEquals(channel.getEmbedCode(), channel.embedCodesToAuthorize().get(0));
@@ -63,7 +60,7 @@ public class ChannelTest extends AndroidTestCase {
    * Test firstVideo
    */
   public void testFirstVideo() {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+    Channel channel = new Channel(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
         TestConstants.TEST_CHANNEL, null);
     Video video = channel.getVideos().get(0);
     assertEquals(video, channel.firstVideo());
@@ -73,7 +70,7 @@ public class ChannelTest extends AndroidTestCase {
    * Test lastVideo
    */
   public void testLastVideo() {
-    Channel channel = new Channel(ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
+    Channel channel = new Channel(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL),
         TestConstants.TEST_CHANNEL, null);
     Video video = channel.getVideos().get(channel.getVideos().size() - 1);
     assertEquals(video, channel.lastVideo());
@@ -84,7 +81,7 @@ public class ChannelTest extends AndroidTestCase {
    */
   public void testNextVideo() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().values().iterator().next();
     Video video = channelSet.firstVideo();
@@ -106,7 +103,7 @@ public class ChannelTest extends AndroidTestCase {
    */
   public void testPreviousVideo() {
     ChannelSet channelSet = new ChannelSet(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET),
         TestConstants.TEST_CHANNEL_SET, null);
     Channel channel = channelSet.getChannels().get(0);
     Video video = channel.getVideos().get(1);

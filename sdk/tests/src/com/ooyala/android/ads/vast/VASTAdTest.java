@@ -17,15 +17,17 @@ public class VASTAdTest extends AndroidTestCase {
     super();
   }
 
+  @Override
   protected void setUp() {}
 
+  @Override
   protected void tearDown() {}
 
   public void testInitializers() {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      InputStream is = this.getClass().getResourceAsStream(TestConstants.TEST_XML_VAST_AD);
+      InputStream is = TestConstants.getTestResourceAsStream(TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
       VASTAd ad = new VASTAd(adXML);

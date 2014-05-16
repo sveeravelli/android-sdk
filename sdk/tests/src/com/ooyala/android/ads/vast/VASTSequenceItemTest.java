@@ -8,17 +8,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.ooyala.android.TestConstants;
-
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.TestConstants;
 
 public class VASTSequenceItemTest extends AndroidTestCase {
   public VASTSequenceItemTest() {
     super();
   }
 
+  @Override
   protected void setUp() {}
 
+  @Override
   protected void tearDown() {}
 
   public void testHasLinear() {
@@ -27,7 +29,7 @@ public class VASTSequenceItemTest extends AndroidTestCase {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      InputStream is = this.getClass().getResourceAsStream(TestConstants.TEST_XML_VAST_AD);
+      InputStream is = TestConstants.getTestResourceAsStream(TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
       Element il = (Element) adXML.getElementsByTagName("InLine").item(0);

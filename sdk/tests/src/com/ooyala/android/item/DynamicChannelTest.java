@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.ooyala.android.TestConstants;
-
 import android.test.AndroidTestCase;
+
+import com.ooyala.android.TestConstants;
 
 public class DynamicChannelTest extends AndroidTestCase {
   public DynamicChannelTest() {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }
@@ -29,7 +31,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     assertNotNull(dynamicChannel);
     assertNull(dynamicChannel.getEmbedCode());
     assertNull(dynamicChannel.getTitle());
@@ -37,8 +39,8 @@ public class DynamicChannelTest extends AndroidTestCase {
     assertNull(dynamicChannel.getDescription());
     assertEquals(DynamicChannel.class, dynamicChannel.getClass());
 
-    assertEquals(2, ((DynamicChannel) dynamicChannel).getVideos().size());
-    Iterator<Video> iter = ((DynamicChannel) dynamicChannel).getVideos().values().iterator();
+    assertEquals(2, dynamicChannel.getVideos().size());
+    Iterator<Video> iter = dynamicChannel.getVideos().values().iterator();
     assertEquals(TestConstants.TEST_VIDEO, iter.next().getEmbedCode());
     assertEquals(TestConstants.TEST_VIDEO_WITH_AD_OOYALA, iter.next().getEmbedCode());
   }
@@ -51,7 +53,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     assertEquals(dynamicChannel.getEmbedCodes(), dynamicChannel.embedCodesToAuthorize());
   }
 
@@ -63,7 +65,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     Video video = dynamicChannel.getVideos().values().iterator().next();
     assertEquals(video, dynamicChannel.firstVideo());
   }
@@ -76,7 +78,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     Iterator<Video> iter = dynamicChannel.getVideos().values().iterator();
     iter.next(); // skip 1st video
     Video video = iter.next();
@@ -91,7 +93,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     Video video = dynamicChannel.firstVideo();
     Iterator<Video> iter = dynamicChannel.getVideos().values().iterator();
     iter.next(); // skip 1st video
@@ -111,7 +113,7 @@ public class DynamicChannelTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     DynamicChannel dynamicChannel = new DynamicChannel(
-        ContentItemTest.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     Video video = dynamicChannel.lastVideo();
     Video expectedPrevious = dynamicChannel.getVideos().values().iterator().next();
     Video previous = dynamicChannel.previousVideo(video);
