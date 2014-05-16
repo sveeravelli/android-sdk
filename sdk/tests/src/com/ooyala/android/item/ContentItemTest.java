@@ -5,22 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import android.test.AndroidTestCase;
 
 import com.ooyala.android.OrderedMap;
 import com.ooyala.android.TestConstants;
-
-import android.test.AndroidTestCase;
 
 public class ContentItemTest extends AndroidTestCase {
   public ContentItemTest() {
     super();
   }
 
+  @Override
   protected void setUp() {
 
   }
 
+  @Override
   protected void tearDown() {
 
   }
@@ -152,7 +157,7 @@ public class ContentItemTest extends AndroidTestCase {
     InputStream inputStream = ContentItemTest.class.getResourceAsStream(file);
     String json = new Scanner(inputStream).useDelimiter("\\A").next();
     try {
-      return (JSONArray) new JSONArray(json);
+      return new JSONArray(json);
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);
       return null;
