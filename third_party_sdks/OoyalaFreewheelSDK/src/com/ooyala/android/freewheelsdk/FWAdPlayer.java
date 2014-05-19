@@ -3,25 +3,24 @@ package com.ooyala.android.freewheelsdk;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-import android.widget.FrameLayout;
-
-import com.ooyala.android.AdMoviePlayer;
-import com.ooyala.android.AdSpot;
-import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.BaseStreamPlayer;
-import com.ooyala.android.OoyalaException;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.StreamPlayer;
-import com.ooyala.android.OoyalaException.OoyalaErrorCode;
-import com.ooyala.android.OoyalaPlayer.State;
-
 import tv.freewheel.ad.interfaces.IAdContext;
 import tv.freewheel.ad.interfaces.IAdInstance;
 import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
+import android.util.Log;
+import android.widget.FrameLayout;
+
+import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.BaseStreamPlayer;
+import com.ooyala.android.player.StreamPlayer;
 
 /**
  * This class represents the Base Movie Player that plays Freewheel ad spots.

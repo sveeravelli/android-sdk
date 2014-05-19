@@ -3,10 +3,6 @@ package com.ooyala.android.ui;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ooyala.android.ClosedCaptionsStyle;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayerLayout;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +11,10 @@ import android.os.Message;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+
+import com.ooyala.android.ClosedCaptionsStyle;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlayerControls {
 	protected OoyalaPlayerLayout _layout = null;

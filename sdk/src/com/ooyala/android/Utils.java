@@ -6,12 +6,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -20,17 +20,25 @@ import android.os.Build;
 import android.util.Log;
 
 class Utils {
+  static final String DEVICE_ANDROID_SDK = "android_sdk";
+  /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
+  static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
+  static final String DEVICE_IPAD = "ipad"; // hack for Washington Post - See PB-279
+
+  static final String SEPARATOR_AMPERSAND = "&";
+  static final String SEPARATOR_TIME = ":";
+
   public static String device() {
     // temporarily disable HLS
     if (OoyalaPlayer.enableHighResHLS) { // hack for Washington Post - See PB-279
-      return Constants.DEVICE_IPAD;
-    } else if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-      return Constants.DEVICE_ANDROID_HLS_SDK;
-    } else return Constants.DEVICE_ANDROID_SDK;
+      return DEVICE_IPAD;
+    } else if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+      return DEVICE_ANDROID_HLS_SDK;
+    } else return DEVICE_ANDROID_SDK;
   }
 
   public static URL makeURL(String host, String uri, Map<String, String> params) {
-    return makeURL(host, uri, getParamsString(params, Constants.SEPARATOR_AMPERSAND, true));
+    return makeURL(host, uri, getParamsString(params, SEPARATOR_AMPERSAND, true));
   }
 
   public static URL makeURL(String host, String uri, String params) {
@@ -109,7 +117,7 @@ class Utils {
   }
 
   public static boolean isNullOrEmpty(String string) {
-    return string == null || string.equals(Constants.SEPARATOR_EMPTY);
+    return string == null || string.equals("");
   }
 
   public static JSONObject objectFromJSON(String json) {
@@ -124,28 +132,9 @@ class Utils {
     }
   }
 
-  public static Map<String, String> mapFromJSONObject(JSONObject obj) {
-    Map<String, String> map = new HashMap<String, String>();
-
-    if (obj == null) {
-      return map;
-    }
-
-    Iterator<?> itr = obj.keys();
-    while (itr.hasNext()) {
-      String key = (String)itr.next();
-      try {
-        map.put(key, obj.getString(key));
-      } catch (JSONException e) {
-        //do nothing
-      }
-    }
-
-    return map;
-  }
 
   public static double secondsFromTimeString(String time) {
-    String[] hms = time.split(Constants.SEPARATOR_COLON);
+    String[] hms = time.split(SEPARATOR_TIME);
     double multiplier = 1.0;
     double milliseconds = 0.0;
     for (int i = hms.length - 1; i >= 0; i--) {

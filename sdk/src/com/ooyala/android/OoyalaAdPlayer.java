@@ -9,6 +9,10 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.StreamPlayer;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
   private static String TAG = OoyalaAdPlayer.class.getName();
@@ -31,6 +35,8 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       this._state = State.ERROR;
       return;
     }
+    Log.d(TAG, "Ooyala Ad Player Loaded");
+
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
 
@@ -46,11 +52,11 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       }
       PlayerInfo info = getBasePlayer() != null ? getBasePlayer().getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
 
-      _fetchTask = _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+      _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
         @Override
-        public void callback(boolean result, OoyalaException error) {
-          if (error != null || !_ad.isAuthorized()) {
+        public void callback(boolean result) {
+          if (!_ad.isAuthorized()) {
             _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching VAST XML");
             setState(State.ERROR);
             return;
@@ -77,11 +83,12 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
-        NetUtils.ping(url);
+        ping(url);
       }
     }
   }
 
+  @Override
   public OoyalaAdSpot getAd() {
     return _ad;
   }
@@ -96,11 +103,13 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     PlayerInfo info = basePlayer != null ? basePlayer.getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
     final StreamPlayer player = basePlayer;
 
-    _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+    _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
       @Override
-      public void callback(boolean result, OoyalaException error) {
-        if (error != null || !_ad.isAuthorized()) {
+      public void callback(boolean result) {
+        if (!_ad.isAuthorized()) {
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching playback info on setBasePlayer");
+          setState(State.ERROR);
           return;
         } else {
           setBasePlayer2(player);

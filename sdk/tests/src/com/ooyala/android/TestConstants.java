@@ -1,5 +1,13 @@
 package com.ooyala.android;
 
+import java.io.InputStream;
+import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 public class TestConstants {
   public static final String TEST_API_KEY = "l1am06xhbSxa0OtyZsBTshW2DMtp.6Le2A";
   public static final String TEST_SECRET = "M1kKrxsGenjOJ--O2dDh8_XQ5C4nB3NeX6aFS4U4";
@@ -37,4 +45,30 @@ public class TestConstants {
   public static final String TEST_ANALYTICS_HTML_FAIL = "resources/test_analytics_fail.html";
 
   public static final String TEST_XML_VAST_AD = "resources/test_vast_ad.xml";
+
+  public static InputStream getTestResourceAsStream(String res) {
+    return TestConstants.class.getResourceAsStream(res);
+  }
+
+  public static JSONObject getTestJSON(String file) {
+    InputStream inputStream = getTestResourceAsStream(file);
+    String json = new Scanner(inputStream).useDelimiter("\\A").next();
+    try {
+      return (JSONObject) new JSONTokener(json).nextValue();
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      return null;
+    }
+  }
+
+  public static JSONArray getTestJSONArray(String file) {
+    InputStream inputStream = getTestResourceAsStream(file);
+    String json = new Scanner(inputStream).useDelimiter("\\A").next();
+    try {
+      return new JSONArray(json);
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      return null;
+    }
+  }
 }

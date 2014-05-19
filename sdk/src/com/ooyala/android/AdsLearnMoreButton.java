@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.player.AdMoviePlayer;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;

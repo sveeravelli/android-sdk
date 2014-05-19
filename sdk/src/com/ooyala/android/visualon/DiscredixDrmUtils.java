@@ -15,8 +15,8 @@ import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.discretix.vodx.VODXPlayerImpl;
 import com.ooyala.android.OoyalaException;
-import com.ooyala.android.Stream;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.item.Stream;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
 
 /**

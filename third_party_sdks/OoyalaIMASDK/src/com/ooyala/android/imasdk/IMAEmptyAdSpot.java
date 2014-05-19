@@ -3,8 +3,8 @@ package com.ooyala.android.imasdk;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ooyala.android.AdSpot;
-import com.ooyala.android.Stream;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.Stream;
 
 public class IMAEmptyAdSpot extends AdSpot implements IIMAAdSpot {
 

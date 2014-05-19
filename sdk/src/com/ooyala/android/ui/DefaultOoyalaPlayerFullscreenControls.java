@@ -20,9 +20,9 @@ import android.widget.TextView;
 
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
 SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
@@ -273,8 +273,8 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 			_seek.setSecondaryProgress(_player.getBufferPercentage());
 		}
 		//boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
-		_duration.setText(DateUtils.formatElapsedTime(_player.getDuration()));
-		_currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()));
+		_duration.setText(DateUtils.formatElapsedTime(_player.getDuration()/ 1000));
+		_currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()/ 1000));
 
 		// update UI on adStarted/adCompleted
 		if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {

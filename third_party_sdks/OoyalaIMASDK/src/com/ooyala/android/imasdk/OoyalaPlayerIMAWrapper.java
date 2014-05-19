@@ -9,8 +9,8 @@ import android.util.Log;
 
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
-import com.ooyala.android.AdSpot;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.item.AdSpot;
 
 /**
  * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.

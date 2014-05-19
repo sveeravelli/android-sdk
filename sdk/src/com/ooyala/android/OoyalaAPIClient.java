@@ -9,6 +9,10 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.PaginatedParentItem;
+
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
   private SecureURLGenerator _secureUrlGenerator = null;
@@ -61,6 +65,19 @@ public class OoyalaAPIClient {
    */
   OoyalaAPIClient(PlayerAPIClient apiClient) {
     _playerAPI = apiClient;
+  }
+
+  /**
+   * Perform a SAS Authorization on an authorizable item
+   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos. As this
+   * method is not asynchronous it should be used within an AsyncTask.
+   * @param item the content item to authorize
+   * @param playerInfo a PlayerInfo object to determine what can be returned
+   * @return success if authorization was successful (not if the item is authorized)
+   * @throws OoyalaException
+   */
+  public boolean authorize(AuthorizableItem item, PlayerInfo playerInfo) throws OoyalaException {
+    return _playerAPI.authorize(item, playerInfo);
   }
 
   /**
@@ -173,7 +190,7 @@ public class OoyalaAPIClient {
       Log.d(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
       return null;
     }
-    URL url = _secureUrlGenerator.secureURL(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
+    URL url = _secureUrlGenerator.secureURL(Environment.BACKLOT_HOST, PlayerAPIClient.BACKLOT_URI_PREFIX + uri, params);
     return OoyalaAPIHelper.objectForAPI(url);
   }
 
