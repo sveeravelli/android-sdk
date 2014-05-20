@@ -36,7 +36,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 //  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
 
   final String PCODE  = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
-  final String DOMAIN = "www.ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +54,7 @@ public class VisualOnTestAppActivity extends Activity implements Observer {
 
     //Populate the embed map
     embedMap = new HashMap<String, String>();
+    embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
     embedMap.put("Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
     embedMap.put("Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
