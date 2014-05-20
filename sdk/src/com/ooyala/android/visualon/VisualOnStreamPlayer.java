@@ -114,7 +114,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     } catch(Exception e) {
       Log.d(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
-      return;
     }
 
     setState(State.LOADING);
@@ -134,6 +133,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
+    }
+    if(isDiscredixNeeded() && !isDiscredixLoaded()) {
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to play protected content without DRM-capable Libraries");
+      setState(State.ERROR);
+      return;
     }
     setupView();
   }
