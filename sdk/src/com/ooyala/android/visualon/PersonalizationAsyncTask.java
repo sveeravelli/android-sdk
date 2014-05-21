@@ -11,11 +11,11 @@ import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
+import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaPlayer;
 
 public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   private static final String TAG = PersonalizationAsyncTask.class.getClass().toString();
-  protected static final String PERSONALIZATION_SERVER = "http://player.ooyala.com"; // TODO: replace with Constants server
   protected static final String PERSONALIZATION_URI = "/discretix/personalization.svc/personalize/%s";
   protected static final String SESSION_ID = "session";
 
@@ -43,7 +43,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     DxLogConfig config = null;
     IDxDrmDlc dlc;
 
-    String personalizationUrl = PERSONALIZATION_SERVER + String.format(PERSONALIZATION_URI, _pcode);
+    String personalizationUrl = Environment.AUTHORIZE_HOST + String.format(PERSONALIZATION_URI, _pcode);
     try {
       dlc = DxDrmDlc.getDxDrmDlc(_context, config);
 

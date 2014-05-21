@@ -12,7 +12,6 @@ public class PlayreadyLicenseAcquisitionAsyncTask extends
 
     @Override
     public String call() throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
@@ -26,7 +25,6 @@ public class PlayreadyLicenseAcquisitionAsyncTask extends
     try {
       downloadThread.join();
     } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;
