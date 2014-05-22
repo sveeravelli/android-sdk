@@ -460,7 +460,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public SeekStyle getSeekStyle() {
-    if(stream == null || Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType())) {
+    if(stream == null || Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType()) || stream.decodedURL().toString().contains("m3u8")) {
       return SeekStyle.BASIC;
     }
     else {
