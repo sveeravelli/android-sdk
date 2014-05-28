@@ -209,28 +209,28 @@ class Images {
     p.setStyle(Paint.Style.FILL);
     int marginPixels = dpToPixels(ct, marginDP);
     switch (i) {
-      case PLAY:
-        double playIconWidth = Math.sqrt(3) / 2 * height;
-        Images.play(c, p, (int) playIconWidth, height, marginPixels);
-        break;
-      case PAUSE:
-        Images.pause(c, p, width, height, marginPixels);
-        break;
-      case FULLSCREEN:
-        Images.fullscreen(c, p, width, height, marginPixels);
-        break;
-      case SMALLSCREEN:
-        Images.smallscreen(c, p, width, height, marginPixels);
-        break;
-      case NEXT:
-        Images.next(c, p, width, height, marginPixels);
-        break;
-      case PREVIOUS:
-        Images.previous(c, p, width, height, marginPixels);
-        break;
-      case CLOSED_CAPTIONS:
-        Images.closedCaptions(c, p, width, height, marginPixels);
-        break;
+    case PLAY:
+      double playIconWidth = Math.sqrt(3) / 2 * height;
+      Images.play(c, p, (int) playIconWidth, height, marginPixels);
+      break;
+    case PAUSE:
+      Images.pause(c, p, width, height, marginPixels);
+      break;
+    case FULLSCREEN:
+      Images.fullscreen(c, p, width, height, marginPixels);
+      break;
+    case SMALLSCREEN:
+      Images.smallscreen(c, p, width, height, marginPixels);
+      break;
+    case NEXT:
+      Images.next(c, p, width, height, marginPixels);
+      break;
+    case PREVIOUS:
+      Images.previous(c, p, width, height, marginPixels);
+      break;
+    case CLOSED_CAPTIONS:
+      Images.closedCaptions(c, p, width, height, marginPixels);
+      break;
     }
     if (glow) {
       GradientDrawable glowDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
