@@ -65,11 +65,11 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
     embedMap = new HashMap<String, String>();
     embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("Sid test ",   "pxY3gwYjrEiFX9bh9_AKCPNbfLH7czoz");
-    embedMap.put("Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
-    embedMap.put("Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
-    embedMap.put("Telstra #2 Encrypted Live Stream",    "xxcnlhbDpmfRV1Zd7so0ONNoFW0NeYYC");
-    embedMap.put("Telstra #2 Clear Live Stream", "ZpcnlhbDqRGBSCaRAJbbID3TcerNmRnm");
-    embedMap.put("Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
+//    embedMap.put("(Dead)Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
+//    embedMap.put("(Dead)Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
+//    embedMap.put("(Dead)Telstra #2 Encrypted Live Stream",    "xxcnlhbDpmfRV1Zd7so0ONNoFW0NeYYC");
+//    embedMap.put("(Dead)Telstra #2 Clear Live Stream", "ZpcnlhbDqRGBSCaRAJbbID3TcerNmRnm");
+//    embedMap.put("(Dead)Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
     embedMap.put("Ooyala Playready Sample VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
     embedMap.put("Playready-Provided Sample VOD",      "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY");
 
