@@ -1,4 +1,4 @@
-Current Version: 2.4.0
+Current Version: 2.4.0_RC2_Playready_Epsilon
 
 ------------ 2.4.0 ------------
 Freewheel/IMA Bug fixes

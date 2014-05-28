@@ -46,7 +46,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "2.4.0_RC2";
+  static final String SDK_VERSION = "2.4.0_RC2_Playready_Epsilon";
   static final String API_VERSION = "1";
 
   public static enum ActionAtEnd {
