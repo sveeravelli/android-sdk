@@ -9,7 +9,7 @@ ZIP_NAME=${ZIP_NAME}.zip
 cd ${BASE_DIR}
 mkdir ${ZIP_BASE}
 cp -r ${BASE_DIR}/vendor/SecurePlayer/assets ${BASE_DIR}/${ZIP_BASE}/
-cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB_RC_02_00_188_0411/SecurePlayerSDK/libs ${BASE_DIR}/${ZIP_BASE}/
+cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${ZIP_BASE}/
 cp -r ${BASE_DIR}/vendor/SecurePlayer/HOW_TO_INTEGRATE_WITH_VISUALON.txt ${BASE_DIR}/${ZIP_BASE}/
 cp -r ${BASE_DIR}/internal-apps/PlayreadyDeviceManagementSampleApp ${BASE_DIR}/${ZIP_BASE}/
 
