@@ -823,7 +823,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       dequeuePlay();
       addClosedCaptionsView();
       setState(currentPlayer().getState());
-    } else if (_currentItem != null) {
+    } else if (_currentItem != null && _currentItem.isAuthorized()) {
       _player = getCorrectMoviePlayer(_currentItem);
       initializePlayer(_player, _currentItem);
       dequeuePlay();
@@ -1228,7 +1228,11 @@ public class OoyalaPlayer extends Observable implements Observer,
           break;
         case PLAYING:
           if (_lastPlayedTime == 0) {
-            _analytics.reportPlayStarted();
+            if (_analytics != null) {
+              _analytics.reportPlayStarted();
+            } else {
+              Log.e(TAG, "analytics is null when playing");
+            }
             sendNotification(PLAY_STARTED_NOTIFICATION);
           }
           setState(State.PLAYING);

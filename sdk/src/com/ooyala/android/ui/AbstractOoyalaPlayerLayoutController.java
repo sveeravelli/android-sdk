@@ -131,22 +131,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     _inlineOverlay.setOoyalaPlayer(_player);
   }
 
-  public void setInlineControls(OoyalaPlayerControls controls) {
-    if(_inlineControls != null) _inlineControls.hide();
-    _player.deleteObserver(_inlineControls);
-    _inlineControls = controls;
-    _player.addObserver(_inlineControls);
-    _inlineControls.setFullscreenButtonShowing(_fullscreenButtonShowing);
-  }
-
-  public void setFullscreenControls(OoyalaPlayerControls controls) {
-    if(_fullscreenControls != null) _fullscreenControls.hide();
-    _player.deleteObserver(_fullscreenControls);
-    _fullscreenControls = controls;
-    _player.addObserver(_fullscreenControls);
-    _fullscreenControls.setFullscreenButtonShowing(_fullscreenButtonShowing);
-  }
-
   public void setFullscreenOverlay(OoyalaPlayerControls controlsOverlay) {
     _fullscreenOverlay = controlsOverlay;
     _fullscreenOverlay.setOoyalaPlayer(_player);
