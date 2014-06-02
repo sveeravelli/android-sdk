@@ -35,3 +35,7 @@ vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/bin
 vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/gen
 .metadata/*
 .settings
+**/OoyalaSDK.jar
+**/Documentation
+**/OoyalaFreewheelSDK.jar
+**/OoyalaIMASDK.jar
