@@ -7,7 +7,6 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.ContentItem;
@@ -187,7 +186,7 @@ public class OoyalaAPIClient {
    */
   public JSONObject objectFromBacklotAPI(String uri, Map<String, String> params) {
     if (_secureUrlGenerator == null) {
-      Log.d(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
+      DebugMode.logD(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
       return null;
     }
     URL url = _secureUrlGenerator.secureURL(Environment.BACKLOT_HOST, PlayerAPIClient.BACKLOT_URI_PREFIX + uri, params);

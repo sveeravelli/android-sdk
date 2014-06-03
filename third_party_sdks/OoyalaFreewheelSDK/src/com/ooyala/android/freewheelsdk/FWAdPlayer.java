@@ -9,10 +9,10 @@ import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -66,13 +66,13 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
     @Override
     public void run(IEvent e) {
       String completedSlotID = (String)e.getData().get(_fwConstants.INFO_KEY_CUSTOM_ID());
-      Log.d(TAG, "Completed playing slot: " + completedSlotID);
+      DebugMode.logD(TAG, "Completed playing slot: " + completedSlotID);
       //Every time we complete playing a linear slot, play the next slot until we're done with the stack.
       //NOTE: Overlay ad (non-linear) slots also fire EVENT_SLOT_ENDED so make sure not to call play() when overlay ads are complete.
       //      This only happens if an overlay slot starts playing during content playback and ends during ad playback.
       if (!completedSlotID.equals("overlay-slot")) {
         _currentAd = null;
-        Log.d(TAG, "Finished ad. Setting state to complete.");
+        DebugMode.logD(TAG, "Finished ad. Setting state to complete.");
         setState(State.COMPLETED);
       }
     }
@@ -92,7 +92,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
-    Log.d(TAG, "FW Ad Player: Initializing");
+    DebugMode.logD(TAG, "FW Ad Player: Initializing");
 
     if (!(ad instanceof FWAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
@@ -170,7 +170,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
       _adManager.adsPlaying();
       _adInstances = _currentAd.getAdInstances();
 
-      Log.d(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
+      DebugMode.logD(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
       setState(State.PLAYING);
       _currentAd.play();
     }
@@ -178,13 +178,13 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
 
   @Override
   public void resume() {
-    Log.d(TAG, "FW Ad Player: Resuming activity");
+    DebugMode.logD(TAG, "FW Ad Player: Resuming activity");
     _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_RESUME());
   }
 
   @Override
   public void suspend() {
-    Log.d(TAG, "FW Ad Player: Suspending activity");
+    DebugMode.logD(TAG, "FW Ad Player: Suspending activity");
     _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_PAUSE());
     setState(State.SUSPENDED);
   }
@@ -214,7 +214,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
     _fwContext.removeEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
     _fwContext.removeEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
 
-    Log.d(TAG, "FW Ad Player: Destroying ad player");
+    DebugMode.logD(TAG, "FW Ad Player: Destroying ad player");
     if (_currentAd != null) {
       _currentAd.stop();
       _currentAd = null;

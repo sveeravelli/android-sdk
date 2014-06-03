@@ -5,9 +5,9 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import android.util.Log;
 import android.view.View;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
@@ -55,7 +55,7 @@ public class MoviePlayer extends Player implements Observer {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
-        Log.e(TAG, "Tried to load VisualOn Player but failed");
+        DebugMode.logE(TAG, "Tried to load VisualOn Player but failed");
         player = new BaseStreamPlayer();
       }
     } else {
@@ -136,10 +136,10 @@ public class MoviePlayer extends Player implements Observer {
   public void suspend(int millisToResume, State stateToResume) {
     // If we're already suspended, we don't need to do it again
     if (stateToResume == State.SUSPENDED) {
-      Log.i(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
+      DebugMode.logI(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
       return;
     }
-    Log.d(this.getClass().toString(), "Movie Player Suspending. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
+    DebugMode.logD(this.getClass().toString(), "Movie Player Suspending. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
@@ -162,7 +162,7 @@ public class MoviePlayer extends Player implements Observer {
 
     if(_live) millisToResume = 0;
 
-    Log.d(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
+    DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
   }
 
@@ -192,7 +192,7 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public void pause() { _basePlayer.pause(); }
   @Override
-  public void play() { Log.v( TAG, "play()" ); _basePlayer.play(); }
+  public void play() { DebugMode.logV( TAG, "play()" ); _basePlayer.play(); }
   @Override
   public void stop() { _basePlayer.stop(); }
 

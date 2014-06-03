@@ -5,7 +5,8 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.ooyala.android.DebugMode;
 
 public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
   protected String TAG = this.getClass().toString();
@@ -35,7 +36,7 @@ public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
       //Create content directory.
       if (new File(_contentDir).mkdirs() == false){
         if (new File(_contentDir).exists() == false){
-          Log.e(TAG, "Cannot create content directory on internal storage");
+          DebugMode.logE(TAG, "Cannot create content directory on internal storage");
         }
       }
       VisualOnUtils.DownloadFile(_streamUrl, _localFilePath);

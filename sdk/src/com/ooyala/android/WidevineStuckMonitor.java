@@ -7,8 +7,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.Player;
 
-import android.util.Log;
-
 public final class WidevineStuckMonitor implements Observer {
 
   public interface Listener {
@@ -41,16 +39,16 @@ public final class WidevineStuckMonitor implements Observer {
     if( oi != null ) {
       this.ooyalaPlayer.addObserver( this );
       this.monitorAfterMsec = oi.intValue();
-      Log.v( TAG, "Constructor(): enabled, monitorAfterMsec=" + monitorAfterMsec );
+      DebugMode.logV( TAG, "Constructor(): enabled, monitorAfterMsec=" + monitorAfterMsec );
     }
     else {
       this.monitorAfterMsec = Integer.MAX_VALUE;
-      Log.v( TAG, "Constructor(): disabled, monitorAfterMsec=" + monitorAfterMsec );
+      DebugMode.logV( TAG, "Constructor(): disabled, monitorAfterMsec=" + monitorAfterMsec );
     }
   }
 
   public void reset() {
-    Log.v( TAG, "reset" );
+    DebugMode.logV( TAG, "reset" );
     ooyalaPlayer.addObserver( this );
     onFrozenSent.set( false );
   }
@@ -67,7 +65,7 @@ public final class WidevineStuckMonitor implements Observer {
         oi = Math.max( 0, duration - END_TIME_WINDOW_MILLISECONDS );
       }
     }
-    Log.v( TAG, "calculaeMonitorAfterMsec(): duration=" + video.getDuration() + ", oi=" + oi );
+    DebugMode.logV( TAG, "calculaeMonitorAfterMsec(): duration=" + video.getDuration() + ", oi=" + oi );
     return oi;
   }
 
@@ -105,7 +103,7 @@ public final class WidevineStuckMonitor implements Observer {
       final long wallNow = System.currentTimeMillis();
       final long wallDelta = wallNow - lastRecord.wallMsec;
       if( wallDelta >= MAX_FREEZE_MILLISECONDS ) {
-        Log.v( TAG, "doFreezeCheck(): looks frozen to me!" );
+        DebugMode.logV( TAG, "doFreezeCheck(): looks frozen to me!" );
         sendOnFrozen();
       }
     }
@@ -113,7 +111,7 @@ public final class WidevineStuckMonitor implements Observer {
 
   private void sendOnFrozen() {
     if( onFrozenSent.compareAndSet( false, true ) ) {
-      Log.v( TAG, "sendOnFrozen(): sending" );
+      DebugMode.logV( TAG, "sendOnFrozen(): sending" );
       ooyalaPlayer.deleteObserver( this );
       listener.onFrozen();
     }

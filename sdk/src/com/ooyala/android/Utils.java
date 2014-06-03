@@ -17,7 +17,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
-import android.util.Log;
 
 class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
@@ -74,7 +73,7 @@ class Utils {
         try {
           result.append(URLEncoder.encode(params.get(key), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-          Log.e(Utils.class.getName(), "ERROR while trying to encode parameter", e);
+          DebugMode.logE(Utils.class.getName(), "ERROR while trying to encode parameter", e);
           result.append(params.get(key));
         }
       } else {

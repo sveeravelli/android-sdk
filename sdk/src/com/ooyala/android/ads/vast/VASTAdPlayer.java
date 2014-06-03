@@ -8,10 +8,10 @@ import java.util.Set;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -57,7 +57,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       this._state = State.ERROR;
       return;
     }
-    Log.d(TAG, "VAST Ad Player Loaded");
+    DebugMode.logD(TAG, "VAST Ad Player Loaded");
 
     _seekable = false;
     _ad = (VASTAdSpot) ad;
@@ -250,7 +250,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         }
       } catch (Exception e) {
         // ERROR: arg0 is not a BaseStreamPlayer as expected
-        Log.e(TAG, "arg0 should be a BaseStreamPlayer but is not!");
+        DebugMode.logE(TAG, "arg0 should be a BaseStreamPlayer but is not!");
       }
     }
     super.update(arg0,  arg);
@@ -296,7 +296,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       Set<String> urls = currentAd().getClickTrackingURLs();
       if (urls != null) {
         for (String url : urls) {
-          Log.i(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
           ping(VASTAdSpot.urlFromAdUrlString(url));
         }
       }
@@ -308,9 +308,9 @@ public class VASTAdPlayer extends AdMoviePlayer {
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
       _playerLayout.getContext().startActivity(browserIntent);
-      Log.d(TAG, "Opening brower to " + url);
+      DebugMode.logD(TAG, "Opening brower to " + url);
     } catch (Exception e) {
-      Log.e(TAG, "There was some exception on clickthrough!");
+      DebugMode.logE(TAG, "There was some exception on clickthrough!");
       e.printStackTrace();
     }
   }
@@ -320,7 +320,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String url : urls) {
-        Log.i(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+        DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
         ping(VASTAdSpot.urlFromAdUrlString(url));
       }
     }
@@ -328,7 +328,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
     for(String url : impressionURLs) {
-      Log.i(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
+      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
       ping(VASTAdSpot.urlFromAdUrlString(url));
     }
     _impressionSent = true;

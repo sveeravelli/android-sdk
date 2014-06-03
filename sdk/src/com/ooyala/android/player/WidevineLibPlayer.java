@@ -6,8 +6,8 @@ import java.util.Set;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -37,7 +37,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
       _stream = Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_WV_MP4);
     }
     if (_stream == null) {
-      Log.e("Widevine", "No available streams for the WidevineLib Player, Cannot continue." + streams.toString());
+      DebugMode.logE("Widevine", "No available streams for the WidevineLib Player, Cannot continue." + streams.toString());
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
@@ -50,7 +50,7 @@ public class WidevineLibPlayer extends MoviePlayer implements WVEventListener, H
 
   @Override
   public WVStatus onEvent(WVEvent event, HashMap<String, Object> attributes) {
-    Log.d("Widevine", event.toString() + ": " + attributes.toString());
+    DebugMode.logD("Widevine", event.toString() + ": " + attributes.toString());
     switch (event) {
       case InitializeFailed:
         if (this._error == null) this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Widevine Initialization Failed");

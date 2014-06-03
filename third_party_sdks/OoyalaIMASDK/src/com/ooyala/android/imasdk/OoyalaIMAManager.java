@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -23,6 +22,7 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Video;
 
@@ -79,8 +79,8 @@ public class OoyalaIMAManager implements Observer {
     _adsLoader.addAdErrorListener(new AdErrorListener() {
       @Override
       public void onAdError(AdErrorEvent event) {
-        Log.e(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
-        Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+        DebugMode.logE(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
+        DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
         _onAdError = true;
         _player.adPlayerCompleted();
       }
@@ -90,15 +90,15 @@ public class OoyalaIMAManager implements Observer {
 
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-        Log.d(TAG, "IMA AdsManager loaded");
+        DebugMode.logD(TAG, "IMA AdsManager loaded");
         _adsManager = event.getAdsManager();
         _adsManagerInited = false;
 
         _adsManager.addAdErrorListener(new AdErrorListener() {
           @Override
           public void onAdError(AdErrorEvent event) {
-            Log.e(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
-            Log.e(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
+            DebugMode.logE(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
+            DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
             _onAdError = true;
             _player.adPlayerCompleted();
           }
@@ -109,11 +109,11 @@ public class OoyalaIMAManager implements Observer {
           @Override
           public void onAdEvent(AdEvent event) {
 
-            Log.d(TAG,"IMA AdsManager Event: " + event.getType());
+            DebugMode.logD(TAG,"IMA AdsManager Event: " + event.getType());
 
             switch (event.getType()) {
               case LOADED:
-                Log.d(TAG,"IMA Ad Manager: Starting ad");
+                DebugMode.logD(TAG,"IMA Ad Manager: Starting ad");
                 if( _adsManager != null ) {
                   _adsManager.start();
                 }
@@ -184,7 +184,7 @@ public class OoyalaIMAManager implements Observer {
 
   private void loadAds(String url) {
     if (_container != null) {
-      Log.d(TAG, "IMA Managaer: The customer is loading ads a second time!");
+      DebugMode.logD(TAG, "IMA Managaer: The customer is loading ads a second time!");
     }
 
     if (_adTagParameters != null) {
@@ -195,7 +195,7 @@ public class OoyalaIMAManager implements Observer {
     _container = _sdkFactory.createAdDisplayContainer();
     _container.setPlayer(_ooyalaPlayerWrapper);
     _container.setAdContainer(_player.getLayout());
-    Log.d(TAG, "IMA Managaer: Requesting ads: " + url);
+    DebugMode.logD(TAG, "IMA Managaer: Requesting ads: " + url);
     AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
 
@@ -248,7 +248,7 @@ public class OoyalaIMAManager implements Observer {
       }
     }
     else if (data.toString().equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
-      Log.d(TAG, "IMA Ad Update: Player Content Complete");
+      DebugMode.logD(TAG, "IMA Ad Update: Player Content Complete");
       _adsLoader.contentComplete();
     }
   }

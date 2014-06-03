@@ -1,7 +1,5 @@
 package com.ooyala.android;
 
-import com.ooyala.android.player.AdMoviePlayer;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
@@ -9,6 +7,8 @@ import android.os.Build;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.ooyala.android.player.AdMoviePlayer;
 
 public class AdsLearnMoreButton extends RelativeLayout {
 

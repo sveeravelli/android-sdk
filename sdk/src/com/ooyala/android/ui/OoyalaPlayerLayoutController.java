@@ -1,14 +1,14 @@
 package com.ooyala.android.ui;
 
-import com.ooyala.android.EmbedTokenGenerator;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.PlayerDomain;
-
 import android.app.Dialog;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.PlayerDomain;
 
 /**
  * This LayoutController is a generic LayoutController that will work in most cases (regardless of the

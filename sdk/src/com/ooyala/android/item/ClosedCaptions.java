@@ -21,7 +21,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
+
+import com.ooyala.android.DebugMode;
 
 public class ClosedCaptions implements JSONUpdatableItem {
   static final String KEY_LANGUAGES = "languages";
@@ -184,7 +185,7 @@ public class ClosedCaptions implements JSONUpdatableItem {
       Element element = doc.getDocumentElement();
       return update(element);
     } catch (Exception e) {
-      Log.e(this.getClass().getName(), "ERROR: Unable to fetch closed captions info: " + e);
+      DebugMode.logE(this.getClass().getName(), "ERROR: Unable to fetch closed captions info: " + e);
       return false;
     }
   }

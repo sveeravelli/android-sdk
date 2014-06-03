@@ -2,8 +2,9 @@ package com.ooyala.android.player;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceView;
+
+import com.ooyala.android.DebugMode;
 
 class MovieView extends SurfaceView {
   private float _aspectRatio = -1;
@@ -35,7 +36,7 @@ class MovieView extends SurfaceView {
       int newWidth = 0;
       int newHeight = 0;
       if (pWidth == 0 || pHeight == 0) {
-        Log.e(this.getClass().getName(), "ERROR: cannot set MovieView size");
+        DebugMode.logE(this.getClass().getName(), "ERROR: cannot set MovieView size");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         return;
       }

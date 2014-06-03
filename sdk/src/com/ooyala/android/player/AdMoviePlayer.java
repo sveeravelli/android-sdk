@@ -4,9 +4,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.AdSpot;
 
@@ -24,7 +24,7 @@ class PingTask extends AsyncTask<URL, Void, Void> {
         conn.connect();
         conn.getInputStream();
       } catch (Exception e) {
-        Log.e(PingTask.class.getName(), "Ping failed!!!");
+        DebugMode.logE(PingTask.class.getName(), "Ping failed!!!");
       }
     }
     return null;

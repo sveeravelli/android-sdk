@@ -15,8 +15,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings.Secure;
-import android.util.Log;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -48,7 +48,7 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
        stream = Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_WV_HLS);
     }
     if (stream == null) {
-      Log.e(TAG, "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
+      DebugMode.logE(TAG, "No available streams for the Widevine Lib Player, Cannot continue. " + streams.toString());
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
@@ -66,7 +66,7 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
     // need to be widevine:// vs http://
     URL streamURL = stream.decodedURL();
     if (streamURL == null) {
-      Log.e(TAG, "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
+      DebugMode.logE(TAG, "Invalid stream, Malformed URL, Cannot continue. URL: " + stream.getUrl());
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
@@ -118,7 +118,7 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
 
     if(arg == OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION) {
       isSeeking = false;
-      Log.d(TAG, "Seek completed. Re-enabling seeking");
+      DebugMode.logD(TAG, "Seek completed. Re-enabling seeking");
     }
     super.update(arg0, arg);
   }
@@ -133,11 +133,11 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
 
   @Override
   public void onFrozen() {
-    Log.v( TAG, "onFrozen(): posting the runnable" );
+    DebugMode.logV( TAG, "onFrozen(): posting the runnable" );
     new Handler(Looper.getMainLooper()).post(new Runnable() {
       @Override
       public void run() {
-        Log.v( TAG, "onFrozen(): running the runnable" );
+        DebugMode.logV( TAG, "onFrozen(): running the runnable" );
         // shouldn't compete with an error state.
         if( getState() != State.ERROR ) {
           // per PB-373 not State.ERROR.
@@ -150,7 +150,7 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
 
   @Override
   public void onError(DrmManagerClient client, DrmErrorEvent event) {
-    Log.d(TAG, "WidevineError: " + eventToString(event));
+    DebugMode.logD(TAG, "WidevineError: " + eventToString(event));
 
     _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, Integer.toString(event.getType()));
 
@@ -164,12 +164,12 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
 
   @Override
   public void onEvent(DrmManagerClient client, DrmEvent event) {
-    Log.d(TAG, "WidevineEvent: " + eventToString(event));
+    DebugMode.logD(TAG, "WidevineEvent: " + eventToString(event));
   }
 
   @Override
   public void onInfo(DrmManagerClient client, DrmInfoEvent event) {
-    Log.d(TAG, "WidevineInfoEvent: " + eventToString(event));
+    DebugMode.logD(TAG, "WidevineInfoEvent: " + eventToString(event));
   }
 
   @Override
@@ -180,11 +180,11 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
     //Widevine has a nasty asynchronous seek that queues up very fast seeks.  We have to make sure Widevine doesn't get overwhelmed by
     //too many seek calls.
     if (!isSeeking) {
-      Log.d(TAG, "Seek started. Disabling seeking");
+      DebugMode.logD(TAG, "Seek started. Disabling seeking");
       super.seekToTime(timeInMillis);
       isSeeking = true;
     } else {
-      Log.i(TAG, "Trying to seek while already seeking, dropping the incoming seek");
+      DebugMode.logI(TAG, "Trying to seek while already seeking, dropping the incoming seek");
     }
   }
 

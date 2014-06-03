@@ -4,7 +4,6 @@ import java.net.URL;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -35,7 +34,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       this._state = State.ERROR;
       return;
     }
-    Log.d(TAG, "Ooyala Ad Player Loaded");
+    DebugMode.logD(TAG, "Ooyala Ad Player Loaded");
 
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
@@ -157,9 +156,9 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
       _playerLayout.getContext().startActivity(browserIntent);
-      Log.d(TAG, "Opening brower to " + url);
+      DebugMode.logD(TAG, "Opening brower to " + url);
     } catch (Exception e) {
-      Log.e(TAG, "There was some exception on clickthrough!");
+      DebugMode.logE(TAG, "There was some exception on clickthrough!");
       e.printStackTrace();
     }
   }

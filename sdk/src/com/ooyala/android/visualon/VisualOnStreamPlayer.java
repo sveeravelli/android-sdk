@@ -11,7 +11,6 @@ import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -20,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -86,33 +86,33 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-    Log.d(TAG, "Using VOPlayer");
+    DebugMode.logD(TAG, "Using VOPlayer");
     _stream = Stream.bestStream(streams);
 
     if (_stream == null) {
-      Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
+      DebugMode.logE(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
     }
 
     if (parent == null) {
-      Log.e(TAG, "ERROR: Invalid parent (no parent provided to Stream Player)");
+      DebugMode.logE(TAG, "ERROR: Invalid parent (no parent provided to Stream Player)");
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Parent");
       setState(State.ERROR);
       return;
     }
 
     if (!isDiscredixNeeded()) {
-      Log.d(TAG, "This asset doesn't need Discredix");
+      DebugMode.logD(TAG, "This asset doesn't need Discredix");
     }
 
     try {
       getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
-      Log.d(TAG, "This app has the ability to play protected content");
+      DebugMode.logD(TAG, "This app has the ability to play protected content");
       _hasDiscredix = true;
     } catch(Exception e) {
-      Log.d(TAG, "This app cannot play protected content");
+      DebugMode.logD(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
     }
 
@@ -149,12 +149,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case INIT:
     case LOADING:
       queuePlay();
-      Log.v(TAG, "Play: still loading, queued");
+      DebugMode.logV(TAG, "Play: still loading, queued");
       break;
     case PAUSED:
     case READY:
     case COMPLETED:
-      Log.v(TAG, "Play: ready - about to start");
+      DebugMode.logV(TAG, "Play: ready - about to start");
       if (_timeBeforeSuspend >= 0 ) {
       	  seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
@@ -162,7 +162,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       VO_OSMP_RETURN_CODE nRet = _player.start();
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
-        Log.v(TAG, "MediaPlayer started.");
+        DebugMode.logV(TAG, "MediaPlayer started.");
         setState(State.PLAYING);
         startPlayheadTimer();
       } else {
@@ -171,10 +171,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
     case SUSPENDED:
       queuePlay();
-      Log.d(TAG, "Play: Suspended already. re-queue: " + _state);
+      DebugMode.logD(TAG, "Play: Suspended already. re-queue: " + _state);
       break;
     default:
-      Log.d(TAG, "Play: invalid status? " + _state);
+      DebugMode.logD(TAG, "Play: invalid status? " + _state);
       break;
     }
   }
@@ -194,7 +194,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void stop() {
-    Log.v(TAG, "MediaPlayer stopped.");
+    DebugMode.logV(TAG, "MediaPlayer stopped.");
     stopPlayheadTimer();
     _playQueued = false;
     _player.stop();
@@ -271,9 +271,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return;
     }
-    Log.d(TAG, "Seeking to " + timeInMillis);
+    DebugMode.logD(TAG, "Seeking to " + timeInMillis);
     if (_player.setPosition(timeInMillis) < 0) {
-      Log.e(TAG, "setPosition failed.");
+      DebugMode.logE(TAG, "setPosition failed.");
     }
     setState(State.LOADING);
   }
@@ -281,20 +281,20 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected void createMediaPlayer() {
     try {
       if (!_surfaceExists) {
-        Log.e(TAG, "Trying to create a player without a valid surface");
+        DebugMode.logE(TAG, "Trying to create a player without a valid surface");
         return;
       }
 
       if (isDiscredixNeeded() && isDiscredixLoaded() &&
           !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
-        Log.e(TAG, "File cannot be played yet, we haven't gotten rights yet");
+        DebugMode.logE(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
       }
 
-      Log.d(TAG, "File can be played, surface created. Creating media player");
+      DebugMode.logD(TAG, "File can be played, surface created. Creating media player");
 
       if (_player != null) {
-        Log.e(TAG, "DANGER: Creating a Media player when one already exists");
+        DebugMode.logE(TAG, "DANGER: Creating a Media player when one already exists");
       }
       else if (isDiscredixNeeded() && isDiscredixLoaded()) {
         _player = DiscredixDrmUtils.getVODXPlayerImpl();
@@ -320,7 +320,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       initParam.setContext(_parent.getLayout().getContext());
       VO_OSMP_RETURN_CODE nRet = _player.init(engine, initParam);
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
-        Log.v(TAG, "MediaPlayer is created.");
+        DebugMode.logV(TAG, "MediaPlayer is created.");
       } else {
         onError(_player, nRet, 0);
         return;
@@ -363,9 +363,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       VOOSMPOpenParam openParam = new VOOSMPOpenParam();
       nRet = _player.open(_streamUrl, VO_OSMP_SRC_FLAG.VO_OSMP_FLAG_SRC_OPEN_ASYNC, VO_OSMP_SRC_FORMAT.VO_OSMP_SRC_AUTO_DETECT, openParam);
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
-        Log.v(TAG, "MediaPlayer is Opened.");
+        DebugMode.logV(TAG, "MediaPlayer is Opened.");
       } else {
-      	Log.e(TAG, "Could not open VisualOn Player");
+      	DebugMode.logE(TAG, "Could not open VisualOn Player");
       	onError(_player, nRet, 0);
         return;
       }
@@ -382,7 +382,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    Log.v(TAG, "Surface Changed: " + width + ","+ height);
+    DebugMode.logV(TAG, "Surface Changed: " + width + ","+ height);
 
     _view.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -395,7 +395,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    Log.i(TAG, "Surface Created");
+    DebugMode.logI(TAG, "Surface Created");
     _surfaceExists = true;
     if (_player !=null)
     {
@@ -408,7 +408,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    Log.i(TAG, "Surface Destroyed");
+    DebugMode.logI(TAG, "Surface Destroyed");
     _surfaceExists = false;
     if (_player != null) {
       _player.stop();
@@ -418,14 +418,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private void setupView() {
     if (_view != null) {
-      Log.e(TAG, "DANGER DANGER: setupView while we still have a view");
+      DebugMode.logE(TAG, "DANGER DANGER: setupView while we still have a view");
       return;
     }
 
     _view = new SurfaceView(_parent.getLayout().getContext()) {
       @Override
       protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.v(TAG, "Remeasuring Surface: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
+        DebugMode.logV(TAG, "Remeasuring Surface: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
 
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
@@ -443,7 +443,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         }
 
         setMeasuredDimension(wantedWidth, wantedHeight);
-        Log.v(TAG, "Surface remeasured to: " + wantedWidth + "," + wantedHeight);
+        DebugMode.logV(TAG, "Surface remeasured to: " + wantedWidth + "," + wantedHeight);
       }
     };
 
@@ -476,7 +476,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    Log.v(TAG, "Player Suspend");
+    DebugMode.logV(TAG, "Player Suspend");
     if (_state == State.SUSPENDED) {
       return;
     }
@@ -502,7 +502,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _timeBeforeSuspend = millisToResume;
     _stateBeforeSuspend = stateToResume;
 
-    Log.v(TAG, "Player Resume");
+    DebugMode.logV(TAG, "Player Resume");
 
     if (isDiscredixNeeded() && isDiscredixLoaded() &&
         DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath) &&
@@ -580,7 +580,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   protected void setState(State state) {
-    Log.v(TAG, "Set State: " + state.name());
+    DebugMode.logV(TAG, "Set State: " + state.name());
     super.setState(state);
     dequeueAll();
   }
@@ -703,7 +703,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_VIDEO_SIZE_CHANGED:
       _videoWidth = param1;
       _videoHeight = param2;
-      Log.v(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+      DebugMode.logV(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
 
       _view.setLayoutParams(new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
@@ -711,7 +711,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
-      Log.d(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
+      DebugMode.logD(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
@@ -721,7 +721,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_VIDEO_START_BUFFER:
-      Log.d(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
+      DebugMode.logD(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
       setState(State.LOADING);
       break;
 
@@ -734,7 +734,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
     case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
       // Display error dialog and stop player
-      Log.e(TAG, "onEvent: Error. " + param1);
+      DebugMode.logE(TAG, "onEvent: Error. " + param1);
       onError(_player, null, id.getValue());
       break;
 
@@ -756,23 +756,23 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-        Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
+        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
         break;
       }
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-        Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
+        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
 
         switch (param2) {
         case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
+          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-          Log.v(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
           break;
         }
         }
@@ -785,7 +785,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     default:
       break;
     }
-    Log.v(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
+    DebugMode.logV(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
   }
 
@@ -803,19 +803,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void afterFileDownload(String localFilename) {
     _localFilePath = localFilename;
     if (_localFilePath == null) {
-      Log.e(TAG, "File Download failed!");
+      DebugMode.logE(TAG, "File Download failed!");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_FILE_DOWNLOAD_FAILED);
       setState(State.ERROR);
     }
     else {
       if (isDiscredixNeeded() && isDiscredixLoaded() &&
           DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
-        Log.d(TAG, "File Download Succeeded: Need to acquire rights");
+        DebugMode.logD(TAG, "File Download Succeeded: Need to acquire rights");
         PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode());
         personalizationTask.execute();
       }
       else {
-        Log.d(TAG, "File Download Succeeded: No rights needed");
+        DebugMode.logD(TAG, "File Download Succeeded: No rights needed");
         createMediaPlayer();
       }
     }
@@ -827,22 +827,22 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void afterPersonalization(Exception returnedException) {
     if (!isDiscredixLoaded()) {
-      Log.e(TAG, "Personalzied without Discredix loaded");
+      DebugMode.logE(TAG, "Personalzied without Discredix loaded");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Personalzied without Discredix loaded");
       setState(State.ERROR);
     }
     else if (returnedException != null) {
-      Log.e(TAG, "Personalization resulted in an exception!" + returnedException);
+      DebugMode.logE(TAG, "Personalization resulted in an exception!" + returnedException);
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
       setState(State.ERROR);
     }
     else if (!DiscredixDrmUtils.isDevicePersonalized(_parent.getLayout().getContext())) {
-      Log.e(TAG, "Personalization failed");
+      DebugMode.logE(TAG, "Personalization failed");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_PERSONALIZATION_FAILED, "Personalization Failed");
       setState(State.ERROR);
     }
     else {
-      Log.d(TAG, "Personalization successful");
+      DebugMode.logD(TAG, "Personalization successful");
       tryToAcquireRights();
     }
   }
@@ -853,12 +853,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void afterAcquireRights(Exception returnedException) {
     if (returnedException != null) {
-      Log.e(TAG, "Acquire Rights failed: " + returnedException.getClass());
+      DebugMode.logE(TAG, "Acquire Rights failed: " + returnedException.getClass());
       _error = DiscredixDrmUtils.handleDRMError(returnedException);
       setState(State.ERROR);
     }
     else {
-      Log.d(TAG, "Acquire Rights successful");
+      DebugMode.logD(TAG, "Acquire Rights successful");
       createMediaPlayer();
     }
   }
@@ -869,19 +869,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    */
   public void tryToAcquireRights() {
     if (!isDiscredixLoaded()) {
-      Log.e(TAG, "Trying to acquire rights when Discredix doesn't exist");
+      DebugMode.logE(TAG, "Trying to acquire rights when Discredix doesn't exist");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to acquire rights when Discredix doesn't exist");
       setState(State.ERROR);
     }
     else {
       boolean isdevicePersonalized = DiscredixDrmUtils.isDevicePersonalized(_parent.getLayout().getContext());
       if(!isdevicePersonalized || _localFilePath == null) {
-        Log.e(TAG, "We are not able to acquire rights: We are either not personalized or no file: Personalization = " + isdevicePersonalized + ", localFilePath = " + _localFilePath);
+        DebugMode.logE(TAG, "We are not able to acquire rights: We are either not personalized or no file: Personalization = " + isdevicePersonalized + ", localFilePath = " + _localFilePath);
         _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, "Acquire Rights being called when personalization/download did not happen");
         setState(State.ERROR);
       }
       else {
-        Log.d(TAG, "Acquiring rights");
+        DebugMode.logD(TAG, "Acquiring rights");
         String authToken = _parent.getAuthToken();
         AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath, authToken);
         acquireRightsTask.execute();

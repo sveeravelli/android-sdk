@@ -7,7 +7,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import android.util.Log;
+import com.ooyala.android.DebugMode;
 
 public class VASTAd {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
@@ -178,7 +178,7 @@ public class VASTAd {
         }
       } else {
         //If not inline nor wrapper, error
-        Log.e(VASTAd.class.getName(), "Error ad is not a wrapper or inline ad");
+        DebugMode.logE(VASTAd.class.getName(), "Error ad is not a wrapper or inline ad");
       }
       type = type.getNextSibling();
     }

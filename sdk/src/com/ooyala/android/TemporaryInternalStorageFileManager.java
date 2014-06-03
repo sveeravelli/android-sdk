@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.Context;
-import android.util.Log;
 
 /**
  * Help create and cleanup automatically uniquely named files in the given Context's internal cache directory.
@@ -35,7 +34,7 @@ final public class TemporaryInternalStorageFileManager {
    */
   public void cleanup( final Context context ) {
     final File dir = context.getCacheDir();
-    Log.d( TAG, "cleanup(): dir=" + dir );
+    DebugMode.logD( TAG, "cleanup(): dir=" + dir );
     if( dir != null && dir.isDirectory() ) {
       final long now = new Date().getTime();
       for( final File f : dir.listFiles( new FileFilter() {
@@ -44,11 +43,11 @@ final public class TemporaryInternalStorageFileManager {
           final boolean isFile = f.isFile();
           final boolean nameMatches = f.getName().startsWith( PRE_PRE_FIX );
           final boolean isOld = now - f.lastModified() >= TMP_LIFESPAN_MSEC;
-          Log.d( TAG, "cleanup(): f=" + f.getAbsolutePath() + ", isFile=" + isFile + ", nameMatches=" + nameMatches + ", isOld=" + isOld );
+          DebugMode.logD( TAG, "cleanup(): f=" + f.getAbsolutePath() + ", isFile=" + isFile + ", nameMatches=" + nameMatches + ", isOld=" + isOld );
           return isFile && nameMatches && isOld;
         }
       } ) ) {
-        Log.d( TAG, "cleanup(): deleting f=" + f.getAbsolutePath() + ", name=" + f.getName() );
+        DebugMode.logD( TAG, "cleanup(): deleting f=" + f.getAbsolutePath() + ", name=" + f.getName() );
         f.delete(); // in Android Java, File.delete() doesn't throw exceptions.
       }
     }

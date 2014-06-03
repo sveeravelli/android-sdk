@@ -4,12 +4,12 @@ import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.os.Handler;
+import android.os.Message;
+
 import com.ooyala.android.DefaultPlayerInfo;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.PlayerInfo;
-
-import android.os.Handler;
-import android.os.Message;
 
 public abstract class StreamPlayer extends Player {
   public static PlayerInfo defaultPlayerInfo = new DefaultPlayerInfo();
