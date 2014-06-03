@@ -25,29 +25,29 @@ public final class DebugMode {
   public static void logI( String tag, String message ) {
     if( DebugMode.mode != Mode.None ) { Log.i( tag, message ); }
   }
-  public static void logI( String tag, String message, Throwable t ) {
-    if( DebugMode.mode != Mode.None ) { Log.i( tag, message + ", exception=" + t.getMessage() ); }
+  public static void logI( String tag, String message, Throwable throwable ) {
+    if( DebugMode.mode != Mode.None ) { Log.i( tag, message, throwable ); }
   }
 
   public static void logD( String tag, String message ) {
     if( DebugMode.mode != Mode.None ) { Log.d( tag, message ); }
   }
-  public static void logD( String tag, String message, Throwable t ) {
-    if( DebugMode.mode != Mode.None ) { Log.d( tag, message + ", exception=" + t.getMessage() ); }
+  public static void logD( String tag, String message, Throwable throwable ) {
+    if( DebugMode.mode != Mode.None ) { Log.d( tag, message, throwable ); }
   }
 
   public static void logV( String tag, String message ) {
     if( DebugMode.mode != Mode.None ) { Log.v( tag, message ); }
   }
-  public static void logV( String tag, String message, Throwable t ) {
-    if( DebugMode.mode != Mode.None ) { Log.v( tag, message + ", exception=" + t.getMessage() ); }
+  public static void logV( String tag, String message, Throwable throwable ) {
+    if( DebugMode.mode != Mode.None ) { Log.v( tag, message, throwable ); }
   }
 
   public static void logE( String tag, String message ) {
     if( DebugMode.mode != Mode.None ) { Log.e( tag, message ); }
   }
-  public static void logE( String tag, String message, Throwable t ) {
-    if( DebugMode.mode != Mode.None ) { Log.e( tag, message + ", exception=" + t.getMessage() ); }
+  public static void logE( String tag, String message, Throwable throwable ) {
+    if( DebugMode.mode != Mode.None ) { Log.e( tag, message, throwable ); }
   }
 
   public static void assertCondition( boolean condition, String tag, String message ) {
