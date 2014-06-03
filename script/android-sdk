@@ -74,6 +74,7 @@ function custom_gen {
   ant jar
   cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
   #update IMA Sample App
+  mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
@@ -85,11 +86,17 @@ function custom_gen {
   cp bin/classes.jar OoyalaFreewheelSDK.jar
   cp OoyalaFreewheelSDK.jar ${BASE_DIR}/${FW_ZIP_BASE}/
   #update Freewheel Sample App
+  mkdir  ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   cp OoyalaFreewheelSDK.jar ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   rm OoyalaFreewheelSDK.jar
 
   #update sample apps
+  mkdir ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
+  mkdir ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
+  mkdir ${SAMPLE_DIR}/OOView/libs/
+  mkdir ${SAMPLE_DIR}/AdobePassDemoApp/libs/
+  mkdir ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/OOView/libs/
@@ -97,6 +104,7 @@ function custom_gen {
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
 
   #update third party sample apps
+  mkdir ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
 
   #default controls
