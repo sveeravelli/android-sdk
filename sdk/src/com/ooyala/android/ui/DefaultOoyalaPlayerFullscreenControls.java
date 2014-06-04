@@ -34,6 +34,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private NextButton _next = null;
   private PreviousButton _previous = null;
   private FullscreenButton _fullscreen = null;
+  private ClosedCaptionsButton _closedCaptions = null;
   private SeekBar _seek = null;
   private TextView _currTime = null;
   private TextView _duration = null;
@@ -81,6 +82,15 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
+    }
+
+    // Show Closed Captions only if there is a language to select
+    if (_closedCaptions != null && _player.getCurrentItem() != null && !_player.isShowingAd()) {
+      _closedCaptions.setVisibility(_player.getAvailableClosedCaptionsLanguages().isEmpty() ?
+          View.GONE : View.VISIBLE);
+    }
+    else {
+      _closedCaptions.setVisibility(View.GONE);
     }
   }
 
@@ -203,8 +213,15 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _fullscreen.setLayoutParams(fsLP);
     _fullscreen.setOnClickListener(this);
 
+    _closedCaptions = new ClosedCaptionsButton(_topBar.getContext());
+    ViewGroup.LayoutParams ccLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(),
+        PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
+    _closedCaptions.setLayoutParams(ccLP);
+    _closedCaptions.setOnClickListener(this);
+
     _topBar.addView(_seekWrapper);
     _topBar.addView(_liveWrapper);
+    _topBar.addView(_closedCaptions);
     _topBar.addView(_fullscreen);
     FrameLayout.LayoutParams topBarLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
@@ -263,6 +280,8 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       _player.setFullscreen(!_player.isFullscreen());
       updateButtonStates();
       hide();
+    } else if (v == _closedCaptions) {
+        _layout.getLayoutController().showClosedCaptionsMenu();
     }
   }
 
