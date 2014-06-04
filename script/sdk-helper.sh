@@ -156,6 +156,12 @@ function verify {
   cd ${verify_currdir}
 }
 
+function verify_final_zips {
+	echo "Verifying the final .zip files..."
+	custom_verify_final_zips
+	echo "... done verifying the final .zip files."
+}
+
 # Generate the release
 function gen {
   gen_currdir=`pwd`
@@ -276,6 +282,8 @@ function gen {
   rm ${FW_ZIP_NAME}
   zip -r ${FW_ZIP_BASE} ${FW_ZIP_BASE}/*
   rm -rf ${FW_ZIP_BASE}
+
+  verify_final_zips
 
   echo
   echo "Release Generated!"

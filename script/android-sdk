@@ -12,6 +12,7 @@ ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
 ANDROID=${ANDROID_SDKS}/tools/android
 DOCS_CLASSPATH=${ANDROID_SDKS}/tools/support/annotations.jar
+TMP_UNZIPPED="tmp_unzipped"
 
 function get_version {
   echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`
@@ -56,6 +57,52 @@ function custom_verify {
     echo "ERROR: jar not included"
     exit 1
   fi
+}
+
+function init_custom_verify_final_zip {
+	cd ${BASE_DIR}
+	rm -rf ${TMP_UNZIPPED}
+	mkdir ${TMP_UNZIPPED}
+	cd ${TMP_UNZIPPED}
+}
+
+function cleanup_custom_verify_final_zip {
+	cd ${BASE_DIR}
+	rm -rf ${TMP_UNZIPPED}
+}
+
+function custom_verify_final_zip_documentation {
+	if [[ ! ( -f ${1}/Documentation/index.html ) ]]; then
+			echo "ERROR: no docs found when unzipping ../${ZIP_NAME}"
+			exit 1
+	fi
+}
+
+function custom_verify_final_sdk_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${ZIP_NAME}
+	custom_verify_final_zip_documentation ${ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_ima_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${IMA_ZIP_NAME}
+	custom_verify_final_zip_documentation ${IMA_ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_freewheel_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${FW_ZIP_NAME}
+	custom_verify_final_zip_documentation ${FW_ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_zips {
+	custom_verify_final_sdk_zip
+	custom_verify_final_ima_zip	
+	custom_verify_final_freewheel_zip	
 }
 
 function custom_gen {
