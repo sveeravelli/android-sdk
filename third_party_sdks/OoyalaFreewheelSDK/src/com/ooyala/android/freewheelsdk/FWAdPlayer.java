@@ -96,7 +96,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
 
     if (!(ad instanceof FWAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     _seekable = false;

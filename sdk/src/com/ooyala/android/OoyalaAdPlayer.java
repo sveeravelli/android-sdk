@@ -31,7 +31,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     DebugMode.logD(TAG, "Ooyala Ad Player Loaded");

@@ -76,7 +76,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public void pause() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
       case PLAYING:
         stopPlayheadTimer();
         _player.pause();
@@ -89,7 +89,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public void play() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
       case INIT:
       case LOADING:
         queuePlay();
@@ -124,7 +124,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public int currentTime() {
     if (_player == null) { return 0; }
-    switch (_state) {
+    switch (getState()) {
       case INIT:
       case LOADING:
       case SUSPENDED:
@@ -138,7 +138,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public int duration() {
     if (_player == null) { return 0; }
-    switch (_state) {
+    switch (getState()) {
       case INIT:
       case LOADING:
       case SUSPENDED:
@@ -176,7 +176,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   }
 
   private boolean isSeekAllowed() {
-    return _state == State.PAUSED || _state == State.READY || _state == State.COMPLETED || _state == State.PLAYING;
+    return getState() == State.PAUSED || getState() == State.READY
+        || getState() == State.COMPLETED || getState() == State.PLAYING;
   }
 
   protected void createMediaPlayer() {
@@ -350,12 +351,14 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void suspend() {
-    suspend(_player != null ? _player.getCurrentPosition() : 0, _state);
+    suspend(_player != null ? _player.getCurrentPosition() : 0, getState());
   }
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
-    if (_state == State.SUSPENDED) { return; }
+    if (getState() == State.SUSPENDED) {
+      return;
+    }
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
@@ -399,7 +402,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
-    _state = State.INIT;
+    setState(State.INIT);
   }
 
   private void setVideoSize(int width, int height) {
@@ -432,7 +435,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void dequeuePlay() {
     if (_playQueued) {
-      switch (_state) {
+      switch (getState()) {
         case PAUSED:
         case READY:
         case COMPLETED:
