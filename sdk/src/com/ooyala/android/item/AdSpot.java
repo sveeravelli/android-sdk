@@ -9,8 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.ads.vast.VASTAdSpot;
@@ -68,7 +67,7 @@ public abstract class AdSpot implements JSONUpdatableItem {
         try {
           _clickURL = new URL(data.getString(KEY_CLICK_URL));
         } catch (MalformedURLException exception) {
-          Log.d(this.getClass().getName(),
+          DebugMode.logD(this.getClass().getName(),
               "Malformed Ad Click URL: " + data.getString(KEY_CLICK_URL));
           _clickURL = null;
         }
@@ -81,13 +80,13 @@ public abstract class AdSpot implements JSONUpdatableItem {
           try {
             _trackingURLs.add(new URL(pixels.getString(i)));
           } catch (MalformedURLException exception) {
-            Log.d(this.getClass().getName(),
+            DebugMode.logD(this.getClass().getName(),
                 "Malformed Ad Tracking URL: " + data.getString(KEY_TRACKING_URL));
           }
         }
       }
     } catch (JSONException exception) {
-      Log.d(this.getClass().getName(), "JSONException: " + exception);
+      DebugMode.logD(this.getClass().getName(), "JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
     return ReturnState.STATE_MATCHED;
@@ -106,7 +105,7 @@ public abstract class AdSpot implements JSONUpdatableItem {
     try {
       type = data.getString(KEY_TYPE);
     } catch (JSONException exception) {
-      Log.d(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
+      DebugMode.logD(AdSpot.class.getName(), "Ad create failed due to JSONException: " + exception);
       return null;
     }
 
@@ -117,7 +116,7 @@ public abstract class AdSpot implements JSONUpdatableItem {
     } else if (type.equals(AD_TYPE_VAST)) {
       return new VASTAdSpot(data);
     } else {
-      Log.d(AdSpot.class.getName(), "Unknown ad type: " + type);
+      DebugMode.logD(AdSpot.class.getName(), "Unknown ad type: " + type);
       return null;
     }
   }

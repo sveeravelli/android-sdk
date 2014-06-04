@@ -16,8 +16,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 
@@ -76,17 +76,17 @@ public class VASTAdSpot extends AdSpot {
         break;
     }
     if (data.isNull(VASTAd.KEY_SIGNATURE)) {
-      Log.e(this.getClass().getName(),
+      DebugMode.logE(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(KEY_EXPIRES)) {
-      Log.e(this.getClass().getName(),
+      DebugMode.logE(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(KEY_URL)) {
-      Log.e(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no url exists!");
+      DebugMode.logE(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no url exists!");
       return ReturnState.STATE_FAIL;
     }
     try {
@@ -97,7 +97,7 @@ public class VASTAdSpot extends AdSpot {
         return ReturnState.STATE_FAIL;
       }
     } catch (JSONException exception) {
-      Log.d(this.getClass().getName(), "JSONException: " + exception);
+      DebugMode.logD(this.getClass().getName(), "JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
 
@@ -182,7 +182,7 @@ public class VASTAdSpot extends AdSpot {
     try {
       return new URL(newURL);
     } catch (MalformedURLException e) {
-      Log.e(VASTAdSpot.class.getName(), "Malformed VAST URL: " + url);
+      DebugMode.logE(VASTAdSpot.class.getName(), "Malformed VAST URL: " + url);
       return null;
     }
   }

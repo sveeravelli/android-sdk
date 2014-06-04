@@ -10,8 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaAPIClient;
@@ -84,7 +84,7 @@ public class Video extends ContentItem implements PlayableItem {
             if (ad != null) {
               _ads.add(ad);
             } else {
-              Log.e(this.getClass().getName(), "Unable to create ad.");
+              DebugMode.logE(this.getClass().getName(), "Unable to create ad.");
             }
           }
         }
@@ -106,7 +106,7 @@ public class Video extends ContentItem implements PlayableItem {
         }
       }
     } catch (JSONException exception) {
-      Log.e(this.getClass().getName(), "JSONException: " + exception);
+      DebugMode.logE(this.getClass().getName(), "JSONException: " + exception);
       return ReturnState.STATE_FAIL;
     }
 

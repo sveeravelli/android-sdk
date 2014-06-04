@@ -3,8 +3,7 @@ package com.ooyala.android.imasdk;
 
 import java.util.Observable;
 
-import android.util.Log;
-
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -24,7 +23,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
-    Log.d(TAG, "IMA Ad Player: Initializing");
+    DebugMode.logD(TAG, "IMA Ad Player: Initializing");
 
     if ( ! (ad instanceof IIMAAdSpot) ) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
@@ -40,13 +39,13 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
-    Log.d(TAG, "IMA Ad Player: Playing");
+    DebugMode.logD(TAG, "IMA Ad Player: Playing");
     super.play();
   }
 
   @Override
   public void pause() {
-    Log.d(TAG, "IMA Ad Player: Pausing");
+    DebugMode.logD(TAG, "IMA Ad Player: Pausing");
     super.pause();
   }
 

@@ -2,6 +2,9 @@ package com.ooyala.android.visualon;
 
 import java.io.IOException;
 
+import android.content.Context;
+import android.os.AsyncTask;
+
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
@@ -10,10 +13,8 @@ import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmNotProtectedException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
+import com.ooyala.android.DebugMode;
 
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
 /**
  * Perform DRM rights acquisition on a provided local file
  * @author michael.len
@@ -75,7 +76,7 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
     } catch (DrmServerSoapErrorException e) {
       resultException = e;
     } catch (Exception e) {
-    	Log.e(TAG, "Unknown exception caught in Acquire Rights");
+    	DebugMode.logE(TAG, "Unknown exception caught in Acquire Rights");
     	e.printStackTrace();
       resultException = e;
     }

@@ -114,6 +114,25 @@ function custom_gen {
   cd "${currdir}"
 }
 
+function custom_sanity_check_dir {
+	if ! [ -e $1 ]; then
+		echo "couldn't find $1"
+		exit 1
+	fi
+	for me in `find $1 -name \*.java -and -not -name DebugMode.java`; do
+			if [[ `grep "Log.[ivde]" $me` ]]; then
+				echo $me
+				echo "(see PBA-297) Use DebugMode.log{ivde} instead of directly calling Android's Log.{ivde}."
+				exit 1
+			fi
+	done
+}
+
+function custom_sanity_checks {
+	custom_sanity_check_dir ${SDK_DIR}/src/com/ooyala/android
+	custom_sanity_check_dir ${BASE_DIR}/third_party_sdks
+}
+
 function custom_tests {
   currdir=`pwd`
 

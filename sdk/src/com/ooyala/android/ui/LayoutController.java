@@ -1,10 +1,10 @@
 package com.ooyala.android.ui;
 
-import com.ooyala.android.OoyalaPlayerLayout;
-
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
+
+import com.ooyala.android.OoyalaPlayerLayout;
 
 public interface LayoutController {
   /**

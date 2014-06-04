@@ -15,12 +15,12 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -55,7 +55,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     stream =  Stream.bestStream(streams);
     if (stream == null) {
-      Log.e(TAG, "ERROR: Invalid Stream (no valid stream available)");
+      DebugMode.logE(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
       setState(State.ERROR);
       return;
@@ -213,7 +213,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public boolean onError(MediaPlayer mp, int what, int extra) {
     this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "MediaPlayer Error: " + what + " " + extra);
     if (what == -10 && extra == -10) {  //I think this means unsupported format
-      Log.e(TAG, "Unsupported video type given to base media player");
+      DebugMode.logE(TAG, "Unsupported video type given to base media player");
     }
     setState(State.ERROR);
     return false;
@@ -245,9 +245,9 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
     //These refer to when mid-playback buffering happens.  This doesn't apply to initial buffer
     if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-      Log.d(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
+      DebugMode.logD(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
     } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-      Log.d(TAG, "onInfo: Buffering Done! " + what + ", extra: " + extra);
+      DebugMode.logD(TAG, "onInfo: Buffering Done! " + what + ", extra: " + extra);
     }
     return true;
   }
@@ -268,14 +268,14 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void surfaceCreated(SurfaceHolder arg0) {
-    Log.i(TAG, "Surface Created");
+    DebugMode.logI(TAG, "Surface Created");
 
     createMediaPlayer();
   }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder arg0) {
-    Log.i(TAG, "Surface Destroyed");
+    DebugMode.logI(TAG, "Surface Destroyed");
   }
 
   @Override
@@ -328,7 +328,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION);
     // If we're resuming, and we're not near the desired seek position, try again
     if(_timeBeforeSuspend >= 0 && Math.abs(_player.getCurrentPosition() - _timeBeforeSuspend) > 3000) {
-      Log.i(this.getClass().getName(), "Seek failed. currentPos: " + _player.getCurrentPosition() +
+      DebugMode.logI(this.getClass().getName(), "Seek failed. currentPos: " + _player.getCurrentPosition() +
           ", timeBefore" + _timeBeforeSuspend + "duration: " + _player.getDuration());
 
       // This looks pretty nasty, but it's a very specific case of HLS videos during the race condition of

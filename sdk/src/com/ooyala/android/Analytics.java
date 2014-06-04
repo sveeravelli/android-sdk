@@ -16,7 +16,6 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -77,7 +76,7 @@ public class Analytics {
           m.invoke( settings, true );
         }
         catch (Exception e) {
-          Log.d( TAG, "failed: " + e.getStackTrace() );
+          DebugMode.logD( TAG, "failed: " + e.getStackTrace() );
         }
         break;
       }
@@ -128,7 +127,7 @@ public class Analytics {
       public void onPageFinished(WebView view, String url) {
         if (!_ready && !_failed) {
           _ready = true;
-          Log.d(this.getClass().getName(), "Initialized Analytics.");
+          DebugMode.logD(this.getClass().getName(), "Initialized Analytics.");
           performQueuedActions();
         }
       }
@@ -137,7 +136,7 @@ public class Analytics {
         if (!_failed) {
           _ready = false;
           _failed = true;
-          Log.e(this.getClass().getName(), "ERROR: Failed to load js Analytics!");
+          DebugMode.logE(this.getClass().getName(), "ERROR: Failed to load js Analytics!");
         }
       }
     });
@@ -145,7 +144,7 @@ public class Analytics {
     _jsAnalytics.setWebChromeClient( new WebChromeClient() {
       @Override
       public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-        Log.v( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
+        DebugMode.logV( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
       }
       @Override
       public boolean onConsoleMessage(ConsoleMessage cm) {
@@ -156,7 +155,7 @@ public class Analytics {
 
     bootHtml( context, embedDomain, embedHTML );
 
-    Log.d(TAG, "Initialized Analytics with user agent: "
+    DebugMode.logD(TAG, "Initialized Analytics with user agent: "
         + _jsAnalytics.getSettings().getUserAgentString());
   }
 
@@ -167,20 +166,20 @@ public class Analytics {
       loadTmpBootHtmlFile( tmpBootHtmlFile );
     }
     catch (IOException e) {
-      Log.e( TAG, "failed: " + e.getStackTrace() );
+      DebugMode.logE( TAG, "failed: " + e.getStackTrace() );
     }
     catch (IllegalArgumentException e) {
-      Log.e( TAG, "failed: " + e.getStackTrace() );
+      DebugMode.logE( TAG, "failed: " + e.getStackTrace() );
     }
   }
 
   private void loadTmpBootHtmlFile( final TemporaryInternalStorageFile tmpBootHtmlFile ) {
     final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
-    Log.d( TAG, "trying to load: " + htmlUrlStr );
+    DebugMode.logD( TAG, "trying to load: " + htmlUrlStr );
 
     try {
       final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
-      try { while( true ) { Log.d( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
+      try { while( true ) { DebugMode.logD( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
     }
     catch( FileNotFoundException e ) { }
 

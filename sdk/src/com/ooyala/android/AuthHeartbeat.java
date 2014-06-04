@@ -2,9 +2,9 @@ package com.ooyala.android;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ooyala.android.OoyalaException.OoyalaErrorCode;
-
 import android.os.Handler;
+
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
 class AuthHeartbeat {
   private Timer _timer = new Timer("AuthHeartbeat");

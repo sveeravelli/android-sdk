@@ -2,7 +2,6 @@ package com.ooyala.android.visualon;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
@@ -11,6 +10,7 @@ import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaPlayer;
 
@@ -54,7 +54,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
       if (!dlc.personalizationVerify()) {
         dlc.performPersonalization(OoyalaPlayer.getVersion(), personalizationUrl, SESSION_ID);
       } else {
-        Log.d(TAG, "Device is already personalized");
+        DebugMode.logD(TAG, "Device is already personalized");
       }
     } catch (DrmGeneralFailureException e) {
       e.printStackTrace();
@@ -69,7 +69,7 @@ public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
       e.printStackTrace();
       returnException = e;
     } catch (Exception e) {
-      Log.e(TAG, "Unknown exception thrown in Personalization Async Task");
+      DebugMode.logE(TAG, "Unknown exception thrown in Personalization Async Task");
       e.printStackTrace();
       returnException = e;
     }

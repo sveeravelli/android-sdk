@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
@@ -216,7 +216,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
-    Log.v( TAG, "onStopTrackingTouch(): _wasPlaying=" + _wasPlaying + ", " + "percent=" + seekBar.getProgress() );
+    DebugMode.logV( TAG, "onStopTrackingTouch(): _wasPlaying=" + _wasPlaying + ", " + "percent=" + seekBar.getProgress() );
     _player.seekToPercent(seekBar.getProgress());
     update(null, null);
     _seeking = false;

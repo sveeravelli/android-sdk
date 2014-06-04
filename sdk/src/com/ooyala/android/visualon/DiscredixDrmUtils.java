@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
@@ -14,6 +13,7 @@ import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.discretix.vodx.VODXPlayerImpl;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.item.Stream;
@@ -107,30 +107,30 @@ class DiscredixDrmUtils {
 
     // If this is not a SOAP error, just bubble it up as a general failure
     if(exception.getClass() != DrmServerSoapErrorException.class) {
-      Log.e(TAG, "Error with VisualOn Acquire Rights code");
+      DebugMode.logE(TAG, "Error with VisualOn Acquire Rights code");
       error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, exception);
     }
     else {
       String description =  ((DrmServerSoapErrorException)exception).getCustomData().replaceAll("<[^>]+>", "");
 
       if ("invalid token".equals(description)) {
-        Log.e(TAG, "VisualOn Rights error: Invalid token");
+        DebugMode.logE(TAG, "VisualOn Rights error: Invalid token");
         error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
       }
       else if ("device limit reached".equals(description)) {
-        Log.e(TAG, "VisualOn Rights error: Device limit reached");
+        DebugMode.logE(TAG, "VisualOn Rights error: Device limit reached");
         error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_LIMIT_REACHED);
       }
       else if ("device binding failed".equals(description)) {
-        Log.e(TAG, "VisualOn Rights error: Device binding failed");
+        DebugMode.logE(TAG, "VisualOn Rights error: Device binding failed");
         error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_BINDING_FAILED);
       }
       else if ("device id too long".equals(description)) {
-        Log.e(TAG, "VisualOn Rights error: Device ID too long");
+        DebugMode.logE(TAG, "VisualOn Rights error: Device ID too long");
         error = new OoyalaException(OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
       }
       else {
-        Log.e(TAG, "General SOAP error from DRM server: " + description);
+        DebugMode.logE(TAG, "General SOAP error from DRM server: " + description);
         error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, description);
       }
     }
@@ -143,7 +143,7 @@ class DiscredixDrmUtils {
    * @param context
    */
   public static void warmDxDrmDlc(Context context){
-    Log.d(TAG, "Warming DxDrmDlc");
+    DebugMode.logD(TAG, "Warming DxDrmDlc");
     try {
       DxDrmDlc.getDxDrmDlc(context, null);
     } catch (DrmClientInitFailureException e) {

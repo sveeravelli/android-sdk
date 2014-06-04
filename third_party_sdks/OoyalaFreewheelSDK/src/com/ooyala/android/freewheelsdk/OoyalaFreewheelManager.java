@@ -14,8 +14,8 @@ import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
 import android.app.Activity;
-import android.util.Log;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.AdSpot;
@@ -124,7 +124,7 @@ public class OoyalaFreewheelManager implements Observer {
     }
     else if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       //Listen to state changed notification to set correct video states
-      Log.d(TAG, "State changed to: " + _player.getState());
+      DebugMode.logD(TAG, "State changed to: " + _player.getState());
 
       switch(_player.getState()) {
         case PLAYING:
@@ -172,7 +172,7 @@ public class OoyalaFreewheelManager implements Observer {
     String fwNetworkIdStr = getParameter("fw_android_mrm_network_id", "fw_mrm_network_id");
     int networkId = (fwNetworkIdStr != null) ? Integer.parseInt(fwNetworkIdStr) : -1;
     if (_fwNetworkId > 0 && _fwNetworkId != networkId) {
-      Log.e(TAG, "The Freewheel network id can be set only once. Overriding it will not have any effect!");
+      DebugMode.logE(TAG, "The Freewheel network id can be set only once. Overriding it will not have any effect!");
     } else {
       _fwNetworkId = networkId;
     }
@@ -187,7 +187,7 @@ public class OoyalaFreewheelManager implements Observer {
     if (_fwNetworkId > 0 && _fwAdServer != null && _fwProfile != null && _fwSiteSectionId != null && _fwVideoAssetId != null) {
       return true;
     } else {
-      Log.e(TAG, "Could not fetch all metadata for the Freewheel ad");
+      DebugMode.logE(TAG, "Could not fetch all metadata for the Freewheel ad");
       return false;
     }
   }
@@ -214,16 +214,16 @@ public class OoyalaFreewheelManager implements Observer {
 
         //If value is null, try using the backlotKey
         if (value == null) {
-          Log.i(TAG, "Tried to get " + overrideKey + " but received a null value. Trying Backlot key: " + backlotKey);
+          DebugMode.logI(TAG, "Tried to get " + overrideKey + " but received a null value. Trying Backlot key: " + backlotKey);
           value = _player.getCurrentItem().getModuleData().get("freewheel-ads-manager").getMetadata().get(backlotKey);
         }
       } catch (Exception e) {
-        Log.e(TAG, e + " exception in parsing Freewheel metadata for key " + overrideKey);
+        DebugMode.logE(TAG, e + " exception in parsing Freewheel metadata for key " + overrideKey);
         return value; //short circuit when there's an error
       }
     }
     if (value == null) {
-      Log.e(TAG, "Was not able to fetch value using Backlot key: " + backlotKey + "!");
+      DebugMode.logE(TAG, "Was not able to fetch value using Backlot key: " + backlotKey + "!");
     }
     return value;
   }
@@ -268,12 +268,12 @@ public class OoyalaFreewheelManager implements Observer {
 
         if (_fwConstants != null) {
           if (_fwConstants.EVENT_REQUEST_COMPLETE().equals(eType) && Boolean.valueOf(eSuccess)) {
-            Log.d(TAG, "Request completed successfully");
+            DebugMode.logD(TAG, "Request completed successfully");
             haveDataToUpdate = true;
             didUpdateRollsAndDelegate = false;
             updateRollsAndDelegate();
           } else {
-            Log.e(TAG, "Request failed");
+            DebugMode.logE(TAG, "Request failed");
             cleanupOnError();
           }
         }
@@ -282,7 +282,7 @@ public class OoyalaFreewheelManager implements Observer {
     //Listen for any errors that may happen
     _fwContext.addEventListener(_fwConstants.EVENT_ERROR(), new IEventListener() {
       public void run(IEvent e) {
-        Log.e(TAG, "There was an error in the Freewheel Ad Manager!");
+        DebugMode.logE(TAG, "There was an error in the Freewheel Ad Manager!");
         //Set overlay ads to null so they don't affect playback
         _overlays = null;
         cleanupOnError();
@@ -346,7 +346,7 @@ public class OoyalaFreewheelManager implements Observer {
         _player.getCurrentItem().insertAd(new FWAdSpot(ad, this));
       }
     } catch (Exception e) {
-      Log.e(TAG, "Error in adding ad slots to the list of ads to play");
+      DebugMode.logE(TAG, "Error in adding ad slots to the list of ads to play");
       e.printStackTrace();
     }
   }

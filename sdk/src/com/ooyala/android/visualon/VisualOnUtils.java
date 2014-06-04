@@ -8,7 +8,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.ooyala.android.DebugMode;
 
 public class VisualOnUtils {
   // --- Network constants --------------------------------------------------
@@ -42,7 +43,7 @@ public class VisualOnUtils {
    */
   static public void DownloadFile(String url, String destFileName,
       int bytesToDownload) throws IOException {
-    Log.i(TAG, "Downloading url: " + url + ", dest: " + destFileName);
+    DebugMode.logI(TAG, "Downloading url: " + url + ", dest: " + destFileName);
     FileOutputStream fos = null;
 
     try{
@@ -79,7 +80,7 @@ public class VisualOnUtils {
         bytesReadSoFar += bytesRead;
         fos.write(buffer, 0, bytesRead);
       }
-      Log.i("DownloadFile", "Downloading complete: " + bytesReadSoFar + " bytes downloaded");
+      DebugMode.logI("DownloadFile", "Downloading complete: " + bytesReadSoFar + " bytes downloaded");
     } finally {
       if (null != fos){
         fos.close();

@@ -46,7 +46,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "2.4.0_RC2_Playready_Epsilon";
+  static final String SDK_VERSION = "2.4.0_RC2";
   static final String API_VERSION = "1";
 
   public static enum ActionAtEnd {
@@ -201,7 +201,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
 
-    Log.i(this.getClass().getName(),
+    DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
   }
 
@@ -299,7 +299,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(TAG, "Exception in setEmbedCodes!", error);
+              DebugMode.logD(TAG, "Exception in setEmbedCodes!", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -349,7 +349,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(TAG, "Exception in setExternalIds!", error);
+              DebugMode.logD(TAG, "Exception in setExternalIds!", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -415,7 +415,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             taskCompleted(metadataTaskKey);
             if (error != null) {
               _error = error;
-              Log.d(TAG, "Exception fetching metadata from setEmbedCodes!",
+              DebugMode.logD(TAG, "Exception fetching metadata from setEmbedCodes!",
                   error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
@@ -439,7 +439,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               taskCompleted(taskKey);
               if (error != null) {
                 _error = error;
-                Log.d(TAG, "Exception in changeCurrentVideo!", error);
+                DebugMode.logD(TAG, "Exception in changeCurrentVideo!", error);
                 setState(State.ERROR);
                 sendNotification(ERROR_NOTIFICATION);
                 return;
@@ -573,7 +573,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(TAG, "Exception in reinitialize!", error);
+              DebugMode.logD(TAG, "Exception in reinitialize!", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -601,7 +601,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       } catch (Exception e) {
         _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
             "Could not initialize Widevine Player");
-        Log.d(TAG, "Please include the Widevine Library in your project",
+        DebugMode.logD(TAG, "Please include the Widevine Library in your project",
             _error);
         setState(State.ERROR);
       }
@@ -794,7 +794,7 @@ public class OoyalaPlayer extends Observable implements Observer,
                 taskCompleted(taskKey);
                 if (error != null) {
                   _error = error;
-                  Log.d(TAG, "Error Reauthorizing Video", error);
+                  DebugMode.logD(TAG, "Error Reauthorizing Video", error);
                   setState(State.ERROR);
                   sendNotification(ERROR_NOTIFICATION);
                   return;
@@ -830,7 +830,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else {
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
           "Resuming video from an invalid state");
-      Log.d(TAG, "Resuming video from an improper state", _error);
+      DebugMode.logD(TAG, "Resuming video from an improper state", _error);
       setState(State.ERROR);
     }
   }
@@ -911,7 +911,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *         current player or it is not seekable
    */
   public boolean seekable() {
-    Log.v(TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable="
+    DebugMode.logV(TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable="
         + (currentPlayer() == null ? "false" : currentPlayer().seekable()));
     return currentPlayer() != null && currentPlayer().seekable();
   }
@@ -923,14 +923,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          in milliseconds
    */
   public void seek(int timeInMillis) {
-    Log.v(TAG, "seek()...: msec=" + timeInMillis);
+    DebugMode.logV(TAG, "seek()...: msec=" + timeInMillis);
     if (seekable()) {
       currentPlayer().seekToTime(timeInMillis);
       _queuedSeekTime = 0;
     } else {
       _queuedSeekTime = timeInMillis;
     }
-    Log.v(TAG, "...seek(): _queuedSeekTime=" + _queuedSeekTime);
+    DebugMode.logV(TAG, "...seek(): _queuedSeekTime=" + _queuedSeekTime);
   }
 
   private void addClosedCaptionsView() {
@@ -985,7 +985,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private boolean initializeAd(AdSpot ad) {
-    Log.d(TAG, "Ooyala Player: Playing Ad");
+    DebugMode.logD(TAG, "Ooyala Player: Playing Ad");
     if (_player != null && _player.getBasePlayer() != null) {
       _player.suspend();
     }
@@ -1216,7 +1216,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         break;
         case ERROR:
           if (player == _player) {
-            Log.e(TAG, "Error recieved from content.  Cleaning up everything");
+            DebugMode.logE(TAG, "Error recieved from content.  Cleaning up everything");
             _error = player.getError();
             cleanupPlayers();
             setState(State.ERROR);
@@ -1231,7 +1231,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             if (_analytics != null) {
               _analytics.reportPlayStarted();
             } else {
-              Log.e(TAG, "analytics is null when playing");
+              DebugMode.logE(TAG, "analytics is null when playing");
             }
             sendNotification(PLAY_STARTED_NOTIFICATION);
           }
@@ -1437,14 +1437,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          percent (between 0 and 100) to seek to
    */
   public void seekToPercent(int percent) {
-    Log.v(TAG, "seekToPercent()...: percent=" + percent);
+    DebugMode.logV(TAG, "seekToPercent()...: percent=" + percent);
     if (percent < 0 || percent > 100) {
       return;
     }
     if (seekable()) {
       seek(percentToMillis(percent));
     }
-    Log.v(TAG, "...seekToPercent()");
+    DebugMode.logV(TAG, "...seekToPercent()");
   }
 
   /**
@@ -1567,7 +1567,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void queuePlay() {
-    Log.v(TAG, "queuePlay()");
+    DebugMode.logV(TAG, "queuePlay()");
     _playQueued = true;
   }
 
@@ -1715,7 +1715,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             taskCompleted(taskKey);
             if (error != null) {
               _error = error;
-              Log.d(TAG, "Movie is not authorized for this device!", error);
+              DebugMode.logD(TAG, "Movie is not authorized for this device!", error);
               setState(State.ERROR);
               sendNotification(ERROR_NOTIFICATION);
               return;
@@ -1758,7 +1758,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // Get description and make the exception
     String description = "Authorization Error: "
         + ContentItem.getAuthError(currentItem.getAuthCode());
-    Log.e(this.getClass().toString(), "This video was not authorized! "
+    DebugMode.logE(this.getClass().toString(), "This video was not authorized! "
         + description);
     return new OoyalaException(
         OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, description);

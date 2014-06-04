@@ -104,6 +104,12 @@ function git_check {
   cd "${git_currdir}"
 }
 
+function sanity_checks {
+  echo "Running Sanity Checks..."
+  custom_sanity_checks
+	echo "... done running sanity checks"
+}
+
 function tests {
   tests_currdir=`pwd`
   echo "Running Unit Tests..."
@@ -190,6 +196,9 @@ function gen {
   if [[ ${set_version} = true ]]; then
     set_version ${new_version}_RC${new_rc}
   fi
+
+	# Run any sanity checks.
+	sanity_checks
 
   # Run tests before doing anything to make sure we are passing.
   if [[ ${tests} = true ]]; then
