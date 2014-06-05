@@ -135,6 +135,12 @@ function verify {
     echo "ERROR: docs not included"
     exit 1
   fi
+
+  if [[ ! ( -f "${ZIP_BASE}/Documentation/index.html" ) ]]; then 
+      echo "ERROR: docs are empty"
+      exit 1
+  fi
+
   if [[ ! ( -d "${ZIP_BASE}/SampleApps" ) ]]; then
     echo "ERROR: sample apps not included"
     exit 1
