@@ -30,12 +30,12 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private Button insertAd;
   private Button setEmbed;
 
-  private String APIKEY = "";
-  private String SECRET = "";
-  private String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
-  private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
-  private String ACCOUNT_ID = "pbk-373@ooyala.com";
-  private String PLAYERDOMAIN = "http://www.ooyala.com";
+  private final String APIKEY = "";
+  private final String SECRET = "";
+  private final String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
+  private final String EMBEDCODE = "EyMmRwODrAfvav2W8y6NAxHShxi3pjup";
+  private final String ACCOUNT_ID = "pbk-373@ooyala.com";
+  private final String PLAYERDOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
+
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, domain, this);
     player = layoutController.getPlayer();
@@ -104,7 +104,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player = null;
   }
 
-  private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+  private final Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+    @Override
     public void uncaughtException(Thread thread, Throwable ex) {
       Log.e(TAG, "Uncaught exception", ex);
       showErrorDialog(ex);
