@@ -22,7 +22,7 @@ public class AdobePassDemoAppActivity extends Activity implements OnAuthorizatio
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    adobePassController = new AdobePassLoginController(this, "fbc-fox",
+    adobePassController = new AdobePassLoginController(this, "ooyala",
         getResources().openRawResource(R.raw.adobepass), "adobepass", this);
     adobePassController.checkAuth();
 
