@@ -15,7 +15,7 @@ import com.ooyala.android.item.Stream;
 public abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
   /** the current state of the player */
-  protected State _state = State.INIT;
+  private State _state = State.INIT;
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
   protected SurfaceView _view = null;

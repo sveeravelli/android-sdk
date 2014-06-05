@@ -27,9 +27,9 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
     if ( ! (ad instanceof IIMAAdSpot) ) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
     } else if (((IIMAAdSpot)ad).getImaManager()._onAdError) {
-    	this._state = State.COMPLETED;
+      setState(State.COMPLETED);
     } else {
       _seekable = false;
       _ad = ad;
