@@ -54,7 +54,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void init(final OoyalaPlayer parent, AdSpot ad) {
     if (!(ad instanceof VASTAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     DebugMode.logD(TAG, "VAST Ad Player Loaded");
@@ -149,7 +149,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       setState(State.COMPLETED);
       return;
     }
-    if (_state != State.PLAYING) {
+    if (getState() != State.PLAYING) {
       sendTrackingEvent(TrackingEvent.PAUSE);
     }
     super.pause();

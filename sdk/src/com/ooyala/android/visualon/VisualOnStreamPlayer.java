@@ -145,7 +145,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void play() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case LOADING:
       queuePlay();
@@ -171,10 +171,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
     case SUSPENDED:
       queuePlay();
-      DebugMode.logD(TAG, "Play: Suspended already. re-queue: " + _state);
+      DebugMode.logD(TAG, "Play: Suspended already. re-queue: " + getState());
       break;
     default:
-      DebugMode.logD(TAG, "Play: invalid status? " + _state);
+      DebugMode.logD(TAG, "Play: invalid status? " + getState());
       break;
     }
   }
@@ -182,7 +182,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void pause() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
     case PLAYING:
       stopPlayheadTimer();
       _player.pause();
@@ -213,7 +213,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return 0;
     }
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case SUSPENDED:
       return 0;
@@ -229,7 +229,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return 0;
     }
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case SUSPENDED:
       return 0;
@@ -471,13 +471,13 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void suspend() {
-    suspend(_player != null ? (int)_player.getPosition() : 0, _state);
+    suspend(_player != null ? (int) _player.getPosition() : 0, getState());
   }
 
   @Override
   public void suspend(int millisToResume, State stateToResume) {
     DebugMode.logV(TAG, "Player Suspend");
-    if (_state == State.SUSPENDED) {
+    if (getState() == State.SUSPENDED) {
       return;
     }
     if (_player != null) {
@@ -533,7 +533,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
-    _state = State.INIT;
+    setState(State.INIT);
   }
 
   private void currentItemCompleted() {
@@ -560,7 +560,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private void dequeuePlay() {
     if (_playQueued) {
-      switch (_state) {
+      switch (getState()) {
       case PAUSED:
       case READY:
       case COMPLETED:
