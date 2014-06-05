@@ -26,11 +26,14 @@ class Images {
 
   public static void play(Canvas c, Paint p, int width, int height, int marginPixels) {
     Path path = new Path();
-    path.moveTo(marginPixels, marginPixels);
-    path.lineTo((float) width - (float) marginPixels, marginPixels
-        + (height - 2f * marginPixels) / 2f);
-    path.lineTo(marginPixels, (float) height - (float) marginPixels);
-    path.lineTo(marginPixels, marginPixels);
+    float heightMinusMargins = height - 2f * marginPixels;
+    float widthMinusMargins = width - 2f * marginPixels;
+    float playButtonWidth = (float) (Math.sqrt(3) / 2f * heightMinusMargins);
+    float widthStartPoint = marginPixels + (widthMinusMargins - playButtonWidth) / 2f;
+    path.moveTo(widthStartPoint, marginPixels);
+    path.lineTo(widthStartPoint + playButtonWidth, marginPixels + heightMinusMargins / 2f);
+    path.lineTo(widthStartPoint, (float) height - (float) marginPixels);
+    path.lineTo(widthStartPoint, marginPixels);
     c.drawPath(path, p);
   }
 
@@ -41,8 +44,10 @@ class Images {
     // Left rectangle
     path.moveTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels);
     path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, marginPixels);
-    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
-    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels + heightMinusMargins);
+    path.lineTo(marginPixels + 3.5f * widthMinusMargins / 8f, marginPixels
+        + heightMinusMargins);
+    path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels
+        + heightMinusMargins);
     path.lineTo(marginPixels + 1.5f * widthMinusMargins / 8f, marginPixels);
     // Right rectangle
     path.moveTo(marginPixels + 4.5f * widthMinusMargins / 8f, marginPixels);
@@ -210,8 +215,8 @@ class Images {
     int marginPixels = dpToPixels(ct, marginDP);
     switch (i) {
     case PLAY:
-      double playIconWidth = Math.sqrt(3) / 2 * height;
-      Images.play(c, p, (int) playIconWidth, height, marginPixels);
+      //double playIconWidth = Math.sqrt(3) / 2 * height;
+      Images.play(c, p, width, height, marginPixels);
       break;
     case PAUSE:
       Images.pause(c, p, width, height, marginPixels);
