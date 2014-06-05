@@ -72,10 +72,12 @@ function cleanup_custom_verify_final_zip {
 }
 
 function custom_verify_final_zip_documentation {
+	echo "Verifying documentation in zip of ${1}..."
 	if [[ ! ( -f ${1}/Documentation/index.html ) ]]; then
-			echo "ERROR: no docs found when unzipping ../${ZIP_NAME}"
+			echo "ERROR: no docs found in zip of ${1}"
 			exit 1
 	fi
+	echo "...done verifying documentation in zip of ${1}"
 }
 
 function custom_verify_final_sdk_zip {
