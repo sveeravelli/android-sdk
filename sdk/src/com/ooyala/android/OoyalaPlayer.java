@@ -536,7 +536,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    _analytics.reportPlayerLoad();
 
     // Play Pre-Rolls first
     boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0, false);
@@ -758,6 +757,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void play() {
     if (currentPlayer() != null) {
+      _analytics.reportPlayRequested();
       if (isAdPlaying()) {
         sendNotification(AD_STARTED_NOTIFICATION);
       }

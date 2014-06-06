@@ -38,6 +38,7 @@ public class Analytics {
 
   private boolean _ready;
   private boolean _failed;
+  private boolean _initialPlay = true;
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
   private String _defaultUserAgent = "";
@@ -157,6 +158,7 @@ public class Analytics {
 
     DebugMode.logD(TAG, "Initialized Analytics with user agent: "
         + _jsAnalytics.getSettings().getUserAgentString());
+    reportPlayerLoad();
   }
 
   private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
@@ -187,31 +189,33 @@ public class Analytics {
   }
 
   /**
-   * Report a new video being initialized with the given embed code and duration
-   * @param embedCode the embed code of the new video
-   * @param duration the duration (in seconds) of the new video
+   * Helper function to report a player load
    */
-  void initializeVideo(String embedCode, double duration) {
+  private void report(String action) {
     if (_failed) { return; }
-    String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
     if (!_ready) {
       queue(action);
     } else {
+      DebugMode.logD(TAG, "report:" + action);
       _jsAnalytics.loadUrl(action);
     }
   }
 
   /**
+   * Report a new video being initialized with the given embed code and duration
+   * @param embedCode the embed code of the new video
+   * @param duration the duration (in seconds) of the new video
+   */
+  void initializeVideo(String embedCode, double duration) {
+    String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
+    report(action);
+  }
+
+  /**
    * Report a player load
    */
-  void reportPlayerLoad() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportPlayerLoad();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+  private void reportPlayerLoad() {
+    report("javascript:reporter.reportPlayerLoad();");
   }
 
   /**
@@ -219,49 +223,34 @@ public class Analytics {
    * @param time the new playhead time (in seconds)
    */
   void reportPlayheadUpdate(double time) {
-    if (_failed) { return; }
     String action = "javascript:reporter.reportPlayheadUpdate(" + time * 1000 + ");";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report(action);
   }
 
   /**
    * Report that the player has started playing
    */
   void reportPlayStarted() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportPlayStarted();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report("javascript:reporter.reportPlayStarted();");
   }
 
   /**
    * Report that the player was asked to replay
    */
   void reportReplay() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportReplay();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report("javascript:reporter.reportReplay();");
+  }
+
+  void reportPlayRequested() {
+    String action = "javascript:reporter.reportPlay("
+        + String.valueOf(_initialPlay) + ");";
+    _initialPlay = false;
+    report(action);
   }
 
   void setTags(List<String> tags) {
-    if (_failed) { return; }
     String action = "javascript:reporter.setTags([\"" + Utils.join(tags, "\",\"") + "\"]);";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report(action);
   }
 
   private void queue(String action) {
@@ -270,8 +259,10 @@ public class Analytics {
 
   private void performQueuedActions() {
     for (String action : _queue) {
+      DebugMode.logI(TAG, "reporting:" + action);
       _jsAnalytics.loadUrl(action);
     }
+    _queue.clear();
   }
 
   public void setUserAgent(String userAgent) {
