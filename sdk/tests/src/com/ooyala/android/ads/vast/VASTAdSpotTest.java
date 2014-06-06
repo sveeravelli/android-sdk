@@ -1,8 +1,12 @@
 package com.ooyala.android.ads.vast;
 
+import java.util.UUID;
+
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
+import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.ads.vast.VASTUtils;
 
 public class VASTAdSpotTest extends AndroidTestCase {
   public VASTAdSpotTest() {
@@ -46,4 +50,22 @@ public class VASTAdSpotTest extends AndroidTestCase {
      * assertTrue(item.getLinear().getStream() == null);
      */
   }
+  
+  public void testTimestampMacro() {
+    final VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST_TIMESTAMP));
+    assertFalse( vast.getVASTURL().toExternalForm().contains("[TIMESTAMP]") );
+  }
+  
+  public void testLrDeviceIdMacro() {
+    VASTUtils.IAdIdSource source = new VASTUtils.IAdIdSource() {
+      @Override
+      public String getAdId() {
+        return UUID.randomUUID().toString();
+      }
+    };
+    VASTUtils.initAdId(source);
+    final VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST_LR_DEVICEID));
+    assertFalse( vast.getVASTURL().toExternalForm().contains("[LR_DEVICEID]") );
+  }
+
 }
