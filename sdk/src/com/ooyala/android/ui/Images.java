@@ -215,7 +215,6 @@ class Images {
     int marginPixels = dpToPixels(ct, marginDP);
     switch (i) {
     case PLAY:
-      //double playIconWidth = Math.sqrt(3) / 2 * height;
       Images.play(c, p, width, height, marginPixels);
       break;
     case PAUSE:
