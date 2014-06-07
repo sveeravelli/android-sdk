@@ -57,13 +57,7 @@ public class VASTAdSpotTest extends AndroidTestCase {
   }
   
   public void testLrDeviceIdMacro() {
-    VASTUtils.IAdIdSource source = new VASTUtils.IAdIdSource() {
-      @Override
-      public String getAdId() {
-        return UUID.randomUUID().toString();
-      }
-    };
-    VASTUtils.initAdId(source);
+    VASTUtils.setAdvertisingId( UUID.randomUUID().toString() );
     final VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST_LR_DEVICEID));
     assertFalse( vast.getVASTURL().toExternalForm().contains("[LR_DEVICEID]") );
   }
