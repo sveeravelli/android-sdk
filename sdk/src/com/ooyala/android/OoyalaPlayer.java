@@ -756,8 +756,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Play the current video
    */
   public void play() {
-    if (currentPlayer() != null) {
+    if (_analytics != null) {
       _analytics.reportPlayRequested();
+    }
+    if (currentPlayer() != null) {
       if (isAdPlaying()) {
         sendNotification(AD_STARTED_NOTIFICATION);
       }
@@ -1246,7 +1248,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
           break;
         case PLAYING:
-          if (_lastPlayedTime == 0) {
+          if (!isShowingAd() && getState() == State.READY) {
             if (_analytics != null) {
               _analytics.reportPlayStarted();
             } else {

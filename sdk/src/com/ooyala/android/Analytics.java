@@ -39,6 +39,8 @@ public class Analytics {
   private boolean _ready;
   private boolean _failed;
   private boolean _initialPlay = true;
+  private boolean _shouldReportPlayRequest = false;
+  private boolean _shouldReportPlayStart = false;
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
   private String _defaultUserAgent = "";
@@ -208,6 +210,8 @@ public class Analytics {
    */
   void initializeVideo(String embedCode, double duration) {
     String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
+    _shouldReportPlayRequest = true;
+    _shouldReportPlayStart = true;
     report(action);
   }
 
@@ -231,6 +235,10 @@ public class Analytics {
    * Report that the player has started playing
    */
   void reportPlayStarted() {
+    if (!_shouldReportPlayStart) {
+      return;
+    }
+    _shouldReportPlayStart = false;
     report("javascript:reporter.reportPlayStarted();");
   }
 
@@ -242,9 +250,13 @@ public class Analytics {
   }
 
   void reportPlayRequested() {
+    if (!_shouldReportPlayRequest) {
+      return;
+    }
     String action = "javascript:reporter.reportPlay("
         + String.valueOf(_initialPlay) + ");";
     _initialPlay = false;
+    _shouldReportPlayRequest = false;
     report(action);
   }
 
