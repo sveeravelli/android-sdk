@@ -159,6 +159,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private long _suspendTime = System.currentTimeMillis();
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
+  private String _customDrmData = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -712,6 +713,24 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public String getAuthToken() {
     return _playerAPIClient.getAuthToken();
+  }
+
+  /**
+   * Get the customDrmData for the current player.
+   *
+   * @return _customDrmData
+   */
+  public String getCustomDRMData() {
+    return _customDrmData;
+  }
+
+  /**
+   * Set the customDrmData for the current player.
+   *
+   * @return _customDrmData
+   */
+  public void setCustomDrmData(String data) {
+    _customDrmData = data;
   }
 
   /**
