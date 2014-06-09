@@ -253,11 +253,12 @@ public class Analytics {
     if (!_shouldReportPlayRequest) {
       return;
     }
-    String action = "javascript:reporter.reportPlay("
-        + String.valueOf(_initialPlay) + ");";
+    // TODO: Enable this after reporter.js implement this method.
+    // String param = _initialPlay ? "1" : "0";
+    // String action = "javascript:reporter.reportPlay(" + param + ");";
     _initialPlay = false;
     _shouldReportPlayRequest = false;
-    report(action);
+    // report(action);
   }
 
   void setTags(List<String> tags) {
