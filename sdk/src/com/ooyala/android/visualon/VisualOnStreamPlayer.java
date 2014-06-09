@@ -883,9 +883,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       else {
         DebugMode.logD(TAG, "Acquiring rights");
         String authToken = _parent.getAuthToken();
-        String customDrmData = _parent.getCustomDRMData();
+        String customDRMData = _parent.getCustomDRMData();
         AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath,
-            authToken, customDrmData);
+            authToken, customDRMData);
         acquireRightsTask.execute();
       }
     }

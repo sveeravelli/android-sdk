@@ -26,7 +26,7 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected Context _context;
   protected String _localFilename;
   protected String _authToken;
-  protected String _customDrmData;
+  protected String _customDRMData;
 
 /**
  * An executable task which will call Discredix rights acquisition on a locally downloaded file
@@ -35,13 +35,13 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
  * @param localFilename locally downloaded media file
  */
   public AcquireRightsAsyncTask(AcquireRightsCallback callback, Context context, String localFilename,
-      String authToken, String customDrmData) {
+      String authToken, String customDRMData) {
     super();
     _context = context;
     _callback = callback;
     _localFilename = localFilename;
     _authToken = authToken;
-    _customDrmData = customDrmData;
+    _customDRMData = customDRMData;
   }
 
   @Override
@@ -53,8 +53,8 @@ public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
       dlc = DxDrmDlc.getDxDrmDlc(_context, config);
       String customData = "";
 
-      if (_customDrmData != null){
-        customData = _customDrmData;
+      if (_customDRMData != null){
+        customData = _customDRMData;
       }
       else if (!"".equals(_authToken)) {
         customData = "auth_token=" + _authToken;
