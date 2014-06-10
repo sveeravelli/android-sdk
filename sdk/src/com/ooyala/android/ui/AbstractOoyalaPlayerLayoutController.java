@@ -52,7 +52,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   public int getSelectedLanguageIndex() {
     return this.selectedLanguageIndex;
-
   }
 
   public int getSelectedPresentationIndex() {
@@ -398,7 +397,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     public View getView(int position, View convertView, ViewGroup parent) {
       // If "Language Styles" or "Presentation Styles", do NOT add a radio
       // button
-      if (position == 0
+      if (position == itemList.indexOf(LocalizationSupport.localizedStringFor("Language Styles"))
           || position == itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
         TextView header = new TextView(this.context);
         header.setText(itemList.get(position));
