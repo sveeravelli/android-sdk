@@ -156,7 +156,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case COMPLETED:
       DebugMode.logV(TAG, "Play: ready - about to start");
       if (_timeBeforeSuspend >= 0 ) {
-      	  seekToTime(_timeBeforeSuspend);
+        seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
       }
 
@@ -275,7 +275,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player.setPosition(timeInMillis) < 0) {
       DebugMode.logE(TAG, "setPosition failed.");
     }
-    setState(State.LOADING);
+//    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
+//    setState(State.LOADING);
   }
 
   protected void createMediaPlayer() {
@@ -520,8 +521,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void destroyBasePlayer() {
     if (_player != null) {
       stop();
-      _player.setView(null);
       _player.destroy();
+      _player.setView(null);
       _player = null;
     }
   }
