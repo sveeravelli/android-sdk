@@ -33,6 +33,8 @@ vendor/VisualOn/SamplePlayer/bin
 vendor/VisualOn/SamplePlayer/gen
 vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/bin
 vendor/SecurePlayer/GENERAL_ANDR_*/SecurePlayerSDK/DxApiDemos/gen
+vendor/google_play_services/libproject/google-play-services_lib/bin
+vendor/google_play_services/libproject/google-play-services_lib/gen
 .metadata/*
 .settings
 **/OoyalaSDK.jar
