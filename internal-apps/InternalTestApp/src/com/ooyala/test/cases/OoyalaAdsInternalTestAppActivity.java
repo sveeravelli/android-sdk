@@ -1,10 +1,14 @@
 package com.ooyala.test.cases;
 
-import com.ooyala.test.BaseInternalTestAppActivity;
-
 import android.os.Bundle;
 
+import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
+import com.ooyala.android.DebugMode;
+import com.ooyala.android.OoyalaException;
+import com.ooyala.test.BaseInternalTestAppActivity;
+
 public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivity {
+  final String TAG = this.getClass().toString();
 
 //  //From the BaseInternalTestAppActivity
 //  Map<String, String> embedMap;
@@ -33,7 +37,17 @@ public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivit
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
     embedAdapter.notifyDataSetChanged();
+    player.beingFetchingAdvertisingId(this, new IAdvertisingIdListener() {
+      @Override
+      public void onAdvertisingIdSuccess(String advertisingId) {
+        DebugMode.logD(TAG, "adId succeeded : " + advertisingId);
+      }
 
+      @Override
+      public void onAdvertisingIdError(OoyalaException oe) {
+        DebugMode.logD(TAG, "advertising error", oe);
+      }
+    });
   }
 
 }
