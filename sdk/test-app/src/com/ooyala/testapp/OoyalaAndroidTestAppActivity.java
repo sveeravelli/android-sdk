@@ -73,7 +73,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
     player.addObserver(this);
-    int r = player.beingFetchingAdvertisingId(this, this);
+    int r = player.beginFetchingAdvertisingId(this, this);
     Log.d( TAG, "initAdvertisingId: " + r );
   }
 
