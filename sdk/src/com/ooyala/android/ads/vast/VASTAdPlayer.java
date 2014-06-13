@@ -26,7 +26,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
   private List<String> _impressionURLs = new ArrayList<String>();
-
   private boolean _impressionSent = false;
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -295,9 +294,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (currentAd() != null && currentAd().getClickTrackingURLs() != null) {
       Set<String> urls = currentAd().getClickTrackingURLs();
       if (urls != null) {
-        for (String url : urls) {
-          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-          ping(VASTAdSpot.urlFromAdUrlString(url));
+        for (String urlStr : urls) {
+          final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + url);
+          ping(url);
         }
       }
     }
@@ -319,17 +319,19 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
-      for (String url : urls) {
-        DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-        ping(VASTAdSpot.urlFromAdUrlString(url));
+      for (String urlStr : urls) {
+        final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+        DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + url);
+        ping(url);
       }
     }
   }
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-    for(String url : impressionURLs) {
-      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-      ping(VASTAdSpot.urlFromAdUrlString(url));
+    for(String urlStr : impressionURLs) {
+      final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
+      ping(url);
     }
     _impressionSent = true;
   }

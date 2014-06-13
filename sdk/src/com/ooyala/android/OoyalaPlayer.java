@@ -12,12 +12,16 @@ import java.util.Set;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.Environment.EnvironmentType;
@@ -229,6 +233,47 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public FrameLayout getLayout() {
     return _layoutController.getLayout();
+  }
+
+  /**
+   * Start obtaining the Advertising Id, which internally is then used in e.g. VAST Ad URL 'device id' macro expansion.
+   * This method will: 1st check that the Google Play Services are available, which may fail and return a non-SUCCESS code.
+   * If they are available (code SUCCESS) then: 2nd an attempt will be made to load the Advertising Id from those Google Play Services.
+   * If the 2nd step fails an OoyalaException will be thrown, wrapping the original exception.
+   * Callers of this method should:
+   * 1) update AndroidManifest.xml to include meta-data tag per Google Play Services docs.
+   * 2) obtain and pass in a valid Android Context;
+   * 3) check the return code and decide if the App should prompt the user to install Google Play Services.
+   * 4) handle subsequent asynchronous onAdvertisingIdSuccess() and onAdvertisingIdError() callbacks: due to the asynchronous nature of the Google Play Services call used,
+   * there can be a long delay either before the Advertising Id is successfully obtained, or a long delay before a failure happens.
+   * An invocation of onAdvertisingIdSuccess() means the Ooyala SDK now has an advertising id for using with e.g. 'device id' macros. Nothing further must be done by the App.
+   * An invocation of onAdvertisingIdError() means the App might try this whole process again since fetching failed.
+   * These callbacks will be invoked on the main thread.
+   * @param context must be non-null.
+   * @param listener must be non-null.
+   * @see http://developer.android.com/google/play-services/setup.html
+   * @see http://developer.android.com/reference/com/google/android/gms/common/GooglePlayServicesUtil.html#isGooglePlayServicesAvailable(android.content.Context)
+   * @see com.ooyala.android.OoyalaException#getCode()
+   * @return status code, can be one of following in ConnectionResult: SUCCESS, SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED, SERVICE_DISABLED, SERVICE_INVALID, DATE_INVALID.
+   */
+  public int beginFetchingAdvertisingId(final Context context,
+      final IAdvertisingIdListener listener) {
+    final int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable( context );
+    if( status == ConnectionResult.SUCCESS ) {
+      final IAdvertisingIdListener listenerWrapper = new IAdvertisingIdListener() {
+        @Override
+        public void onAdvertisingIdSuccess(String advertisingId) {
+          AdvertisingIdUtils.setAdvertisingId(advertisingId);
+          listener.onAdvertisingIdSuccess(advertisingId);
+        }
+        @Override
+        public void onAdvertisingIdError(OoyalaException oe) {
+          listener.onAdvertisingIdError(oe);
+        }
+      };
+      AdvertisingIdUtils.getAndSetAdvertisingId( context, listenerWrapper );
+    }
+    return status;
   }
 
   /**

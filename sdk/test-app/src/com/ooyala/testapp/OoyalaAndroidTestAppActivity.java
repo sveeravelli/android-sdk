@@ -14,15 +14,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.AdvertisingIdUtils;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.testapp.R;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
-public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator {
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator, AdvertisingIdUtils.IAdvertisingIdListener {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
 
@@ -71,6 +73,16 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
     player.addObserver(this);
+    int r = player.beginFetchingAdvertisingId(this, this);
+    Log.d( TAG, "initAdvertisingId: " + r );
+  }
+
+  public void onAdvertisingIdSuccess( String adId ) {
+    Log.d( TAG, "onAdvertisingIdSuccess: " + adId );
+  }
+
+  public void onAdvertisingIdError( OoyalaException oe ) {
+    Log.e( TAG, "onAdvertisingIdError", oe );
   }
 
   private void setEmbedCode() {

@@ -36,6 +36,8 @@ public class TestConstants {
   public static final String TEST_DICTIONARY_DYNAMIC_CHANNEL = "resources/test_dynamic_channel.json";
   public static final String TEST_DICTIONARY_AD_OOYALA = "resources/test_ooyala_ad.json";
   public static final String TEST_DICTIONARY_AD_VAST = "resources/test_vast_ad.json";
+  public static final String TEST_DICTIONARY_AD_VAST_LR_DEVICEID = "resources/test_vast_ad_lr_deviceid.json";
+  public static final String TEST_DICTIONARY_AD_VAST_TIMESTAMP = "resources/test_vast_ad_timestamp.json";
   public static final String TEST_DICTIONARY_STREAM_HLS = "resources/test_stream_hls.json";
   public static final String TEST_DICTIONARY_STREAM_MP4 = "resources/test_stream_mp4.json";
   public static final String TEST_DICTIONARY_STREAMS_MP4 = "resources/test_streams_mp4.json";
