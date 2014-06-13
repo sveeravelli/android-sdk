@@ -41,11 +41,14 @@ import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
+import com.ooyala.android.plugin.ControlManagerInterface;
+import com.ooyala.android.plugin.ControlRequesterInterface;
+import com.ooyala.android.plugin.PluginManager;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayer extends Observable implements Observer,
-    OnAuthHeartbeatErrorListener {
+    OnAuthHeartbeatErrorListener, ControlManagerInterface {
   /**
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
@@ -164,6 +167,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
+  private List<ControlRequesterInterface> _controlRequesters = new ArrayList<ControlRequesterInterface>();
+  private boolean _controlSuspended;
+  private PluginManager _pluginManager = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -205,6 +211,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+
+    // Initialize third party plugin managers
+    _pluginManager = PluginManager.createInstance(this);
+    _controlSuspended = false;
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -840,6 +850,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _authHeartbeat.stop();
     }
     setState(State.SUSPENDED);
+    for (ControlRequesterInterface requester : _controlRequesters) {
+      requester.onSuspend();
+    }
   }
 
   /**
@@ -898,6 +911,11 @@ public class OoyalaPlayer extends Observable implements Observer,
           "Resuming video from an invalid state");
       DebugMode.logD(TAG, "Resuming video from an improper state", _error);
       setState(State.ERROR);
+      return;
+    }
+
+    for (ControlRequesterInterface requester : _controlRequesters) {
+      requester.onResume();
     }
   }
 
@@ -1862,4 +1880,96 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static String getVersion() {
     return SDK_VERSION;
   }
+
+  private boolean canGrantControl() {
+    return getState() != State.SUSPENDED && getState() != State.ERROR
+        && getState() != State.COMPLETED;
+  }
+
+  private void suspendControl() {
+    // TODO: implement suspend control
+    _controlSuspended = true;
+  }
+
+  private void resumeControl() {
+    // TODO: implement resume control
+    _controlSuspended = false;
+  }
+
+  /**
+   * request control from a control requester, e.g. third-part plug-in or
+   * chromecast
+   * 
+   * @param adTypeClass
+   *          A type of AdSpot that the player is capable of playing
+   * @param adPlayerClass
+   *          A player that plays the ad
+   */
+  @Override
+  public boolean requestControl(final ControlRequesterInterface requester) {
+    DebugMode.assertCondition(requester != null, TAG, "requester is null");
+
+    if (!canGrantControl()) {
+      DebugMode.assertCondition(canGrantControl(), TAG, requester.toString()
+          + " is requesting control when it cannot be granted");
+    }
+    if (_controlRequesters.contains(requester)) {
+      return false;
+    }
+
+    _controlRequesters.add(requester);
+    if (_controlRequesters.size() == 1) {
+      _handler.post(new Runnable() {
+        @Override
+        public void run() {
+          suspendControl();
+          requester.onControlGranted();
+        }
+      });
+    }
+    return true;
+  }
+
+  /**
+   * Register an Ad player our players and remember it
+   * 
+   * @param adTypeClass
+   *          A type of AdSpot that the player is capable of playing
+   * @param adPlayerClass
+   *          A player that plays the ad
+   */
+  @Override
+  public boolean returnControl(final ControlRequesterInterface requester) {
+    DebugMode.assertCondition(requester != null, TAG, "requester is null");
+    if (!_controlRequesters.contains(requester)) {
+      DebugMode.assertFail(TAG, requester.toString()
+          + " is return control but it does not have one");
+      return false;
+    }
+
+    _controlRequesters.remove(requester);
+    if (_controlRequesters.size() > 0) {
+      final ControlRequesterInterface req = _controlRequesters.get(0);
+      _handler.post(new Runnable() {
+        @Override
+        public void run() {
+          req.onControlGranted();
+        }
+      });
+    } else {
+      _handler.post(new Runnable() {
+        @Override
+        public void run() {
+          resumeControl();
+        }
+      });
+    }
+
+    return true;
+  }
+
+  public PluginManager getPluginManager() {
+    return _pluginManager;
+  }
 }
+
