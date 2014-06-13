@@ -28,7 +28,6 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
-import com.ooyala.android.ads.vast.VASTUtils;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;
@@ -256,7 +255,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @see com.ooyala.android.OoyalaException#getCode()
    * @return status code, can be one of following in ConnectionResult: SUCCESS, SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED, SERVICE_DISABLED, SERVICE_INVALID, DATE_INVALID.
    */
-  public int beingFetchingAdvertisingId( final Context context, final IAdvertisingIdListener listener ) {
+  public int beginFetchingAdvertisingId(final Context context,
+      final IAdvertisingIdListener listener) {
     final int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable( context );
     if( status == ConnectionResult.SUCCESS ) {
       final IAdvertisingIdListener listenerWrapper = new IAdvertisingIdListener() {

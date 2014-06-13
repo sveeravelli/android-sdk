@@ -37,7 +37,7 @@ public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivit
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
     embedAdapter.notifyDataSetChanged();
-    player.beingFetchingAdvertisingId(this, new IAdvertisingIdListener() {
+    player.beginFetchingAdvertisingId(this, new IAdvertisingIdListener() {
       @Override
       public void onAdvertisingIdSuccess(String advertisingId) {
         DebugMode.logD(TAG, "adId succeeded : " + advertisingId);
@@ -45,7 +45,7 @@ public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivit
 
       @Override
       public void onAdvertisingIdError(OoyalaException oe) {
-        DebugMode.logD(TAG, "advertising error", oe);
+        DebugMode.logD(TAG, "adId error", oe);
       }
     });
   }
