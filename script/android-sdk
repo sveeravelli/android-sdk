@@ -15,11 +15,11 @@ DOCS_CLASSPATH=${ANDROID_SDKS}/tools/support/annotations.jar
 TMP_UNZIPPED="tmp_unzipped"
 
 function get_version {
-  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`
+  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $6}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`
 }
 
 function get_rc {
-  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)";/\1/'`
+  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $6}' |sed 's/"[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)";/\1/'`
 }
 function set_version {
   new_version=$1
