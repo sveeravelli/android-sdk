@@ -12,6 +12,11 @@ import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
 
+/**
+ * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
+ * @author michael.len
+ *
+ */
 public abstract class Player extends Observable {
   protected OoyalaPlayer _parent = null;
   /** the current state of the player */

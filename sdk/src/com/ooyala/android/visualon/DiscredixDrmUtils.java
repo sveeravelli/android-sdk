@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
@@ -58,7 +57,7 @@ class DiscredixDrmUtils {
     boolean isDrmContent = false;
     try {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
-      Log.d(TAG, "isStreamProtected. Discredix Version: " + dlc.getDrmVersion());
+      DebugMode.logD(TAG, "isStreamProtected. Discredix Version: " + dlc.getDrmVersion());
       isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -151,9 +150,9 @@ class DiscredixDrmUtils {
     try {
       IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, null);
       try {
-        Log.d(TAG, "Discredix Version: " + dlc.getDrmVersion());
+        DebugMode.logD(TAG, "Discredix Version: " + dlc.getDrmVersion());
       } catch (DrmGeneralFailureException e) {
-        Log.e(TAG, "Failed trying to get discredix version");
+        DebugMode.logE(TAG, "Failed trying to get discredix version");
         e.printStackTrace();
       }
     } catch (DrmClientInitFailureException e) {
