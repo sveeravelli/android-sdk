@@ -1,4 +1,22 @@
-Current Version: 2.4.0_RC2_Playready_Epsilon
+Current Version: 2.5.0
+
+------------ 2.5.0 ------------
+API/Class Package Changes
+[PBA-320] Add setCustomDrmData for third party authentication tokens
+[PBA-297] Add DebugMode class for consistent logging and runtime assertions
+[PBA-18]  Add closed captions to full screen controller
+[PBK-680] Move UI classes to new package, update all sample apps as such
+[PBK-683] Move Data Model classes into their own package
+[PBK-688] Move Player classes to their own package
+[PBK-703] Move VAST classes into their own package
+[PBK-404] Support for Playready DRM
+
+Bug Fixes
+[PBK-691] Fix showing closed captions during advertisements
+[PB-3451] Fix Null Pointer when resuming a unauthorized video.
+[PBA-262] Fix app crash when ad is unauthorized
+[PBA-301] fix analytics logic by only report play request and play started once after each currentItemChange.
+[PBA-309] Updated javadocs to have more relevant classes
 
 ------------ 2.4.0 ------------
 Freewheel/IMA Bug fixes
