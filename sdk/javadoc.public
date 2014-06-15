@@ -8,10 +8,12 @@
 -public
 -sourcepath src
 src/com/ooyala/android/Analytics.java
+src/com/ooyala/android/AdvertisingIdUtils.java
 src/com/ooyala/android/CurrentItemChangedCallback.java
+src/com/ooyala/android/DebugMode.java
 src/com/ooyala/android/EmbeddedSecureURLGenerator.java
 src/com/ooyala/android/EmbeddedSignatureGenerator.java
-src/com/ooyala/android/FetchPlaybackInfoCallback.java
+src/com/ooyala/android/EmbedTokenGenerator.java
 src/com/ooyala/android/LocalizationSupport.java
 src/com/ooyala/android/OoyalaAdSpot.java
 src/com/ooyala/android/OoyalaAPIClient.java
@@ -19,10 +21,8 @@ src/com/ooyala/android/OoyalaException.java
 src/com/ooyala/android/OoyalaPlayer.java
 src/com/ooyala/android/OoyalaPlayerLayout.java
 src/com/ooyala/android/OrderedMap.java
-src/com/ooyala/android/PaginatedItemListener.java
-src/com/ooyala/android/PaginatedItemResponse.java
-src/com/ooyala/android/SecureURLGenerator.java
-src/com/ooyala/android/SignatureGenerator.java
+src/com/ooyala/android/PlayerDomain.java
+src/com/ooyala/android/PlayerInfo.java
 src/com/ooyala/android/StreamSelector.java
 src/com/ooyala/android/ads/vast/VASTAd.java
 src/com/ooyala/android/ads/vast/VASTAdSpot.java
@@ -41,9 +41,8 @@ src/com/ooyala/android/item/PaginatedParentItem.java
 src/com/ooyala/android/item/PlayableItem.java
 src/com/ooyala/android/item/Stream.java
 src/com/ooyala/android/item/Video.java
+src/com/ooyala/android/player/Player.java
 src/com/ooyala/android/ui/LayoutController.java
 src/com/ooyala/android/ui/OoyalaPlayerControls.java
 src/com/ooyala/android/ui/OoyalaPlayerLayoutController.java
 src/com/ooyala/android/ui/OptimizedOoyalaPlayerLayoutController.java
-
-
