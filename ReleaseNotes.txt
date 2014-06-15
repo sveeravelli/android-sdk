@@ -2,6 +2,7 @@ Current Version: 2.5.0
 
 ------------ 2.5.0 ------------
 API/Class Package Changes
+[PBA-243] added beginFetchingAdvertisingId for replacement of LR_DEVICEID in VAST ads. Requires Google Play Services Library
 [PBA-320] Add setCustomDrmData for third party authentication tokens
 [PBA-297] Add DebugMode class for consistent logging and runtime assertions
 [PBA-18]  Add closed captions to full screen controller
