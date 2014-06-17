@@ -13,6 +13,8 @@ API/Class Package Changes
 [PBK-404] Support for Playready DRM
 
 Bug Fixes
+[PBA-315] Fixed crash with closed captions menu
+[PBA-311] re-aligned play button with pause button
 [PBK-691] Fix showing closed captions during advertisements
 [PB-3451] Fix Null Pointer when resuming a unauthorized video.
 [PBA-262] Fix app crash when ad is unauthorized
