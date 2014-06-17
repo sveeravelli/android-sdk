@@ -199,7 +199,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     if (_seeking) {
       //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
-      _currTime.setText(DateUtils.formatElapsedTime((int)((seekBar.getProgress() / (100f)) * _player.getDuration())));
+      _currTime.setText(DateUtils.formatElapsedTime((int)((seekBar.getProgress() / (100f)) * _player.getDuration() / 1000)));
     }
     if (fromUser && _player.getSeekStyle() == SeekStyle.ENHANCED) {
       _player.seekToPercent(progress);
