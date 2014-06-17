@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -22,6 +21,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
@@ -342,7 +342,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           // check if listView is trying to unCheck Language Index that is
           // out of screen
           if (langIndexOnScreen < 0 || this.selectedLanguageIndex > listView.getLastVisiblePosition()) {
-            Log.d(TAG, "previous selected language index out of screen");
+            DebugMode.logD(TAG, "previous selected language index out of screen");
           } else {
             ((RadioButton) listView.getChildAt(langIndexOnScreen)).setChecked(false);
           }
@@ -355,7 +355,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           // check if listView is trying to unCheck Presentation Index that is
           // out of screen
           if (presIndexOnScreen < 0 || this.selectedPresentationIndex > listView.getLastVisiblePosition()) {
-            Log.d(TAG, "previous selected language index out of screen");
+            DebugMode.logD(TAG, "previous selected language index out of screen");
           } else {
             ((RadioButton) listView.getChildAt(presIndexOnScreen)).setChecked(false);
           }
