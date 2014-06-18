@@ -395,10 +395,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      // If "Language Styles" or "Presentation Styles", do NOT add a radio
-      // button
-      if (position == itemList.indexOf(LocalizationSupport.localizedStringFor("Language Styles"))
-          || position == itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
+      // If "Languages" or "Presentation Styles", do NOT add a radio button
+      if (position == this.itemList.indexOf(LocalizationSupport.localizedStringFor("Languages"))
+          || position == this.itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
         TextView header = new TextView(this.context);
         header.setText(itemList.get(position));
         header.setTextColor(Color.LTGRAY);
