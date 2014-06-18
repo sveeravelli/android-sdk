@@ -41,14 +41,12 @@ import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
-import com.ooyala.android.plugin.ControlManagerInterface;
-import com.ooyala.android.plugin.ControlRequesterInterface;
-import com.ooyala.android.plugin.PluginManager;
+import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayer extends Observable implements Observer,
-    OnAuthHeartbeatErrorListener, ControlManagerInterface {
+    OnAuthHeartbeatErrorListener, ActiveSwitchInterface {
   /**
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
@@ -167,8 +165,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
-  private List<ControlRequesterInterface> _controlRequesters = new ArrayList<ControlRequesterInterface>();
-  private boolean _controlSuspended;
   private PluginManager _pluginManager = null;
 
   /**
@@ -214,7 +210,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // Initialize third party plugin managers
     _pluginManager = PluginManager.createInstance(this);
-    _controlSuspended = false;
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -849,9 +844,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _suspendTime = System.currentTimeMillis();
       _authHeartbeat.stop();
     }
-    setState(State.SUSPENDED);
-    for (ControlRequesterInterface requester : _controlRequesters) {
-      requester.onSuspend();
+
+    if (_pluginManager != null) {
+      _pluginManager.onSuspend();
     }
   }
 
@@ -914,9 +909,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       return;
     }
 
-    for (ControlRequesterInterface requester : _controlRequesters) {
-      requester.onResume();
-    }
   }
 
   /**
@@ -1881,95 +1873,20 @@ public class OoyalaPlayer extends Observable implements Observer,
     return SDK_VERSION;
   }
 
-  private boolean canGrantControl() {
-    return getState() != State.SUSPENDED && getState() != State.ERROR
-        && getState() != State.COMPLETED;
-  }
-
-  private void suspendControl() {
-    // TODO: implement suspend control
-    _controlSuspended = true;
-  }
-
-  private void resumeControl() {
-    // TODO: implement resume control
-    _controlSuspended = false;
-  }
-
-  /**
-   * request control from a control requester, e.g. third-part plug-in or
-   * chromecast
-   * 
-   * @param adTypeClass
-   *          A type of AdSpot that the player is capable of playing
-   * @param adPlayerClass
-   *          A player that plays the ad
-   */
   @Override
-  public boolean requestControl(final ControlRequesterInterface requester) {
-    DebugMode.assertCondition(requester != null, TAG, "requester is null");
+  public void enterActive() {
+    // TODO Auto-generated method stub
 
-    if (!canGrantControl()) {
-      DebugMode.assertCondition(canGrantControl(), TAG, requester.toString()
-          + " is requesting control when it cannot be granted");
-    }
-    if (_controlRequesters.contains(requester)) {
-      return false;
-    }
-
-    _controlRequesters.add(requester);
-    if (_controlRequesters.size() == 1) {
-      _handler.post(new Runnable() {
-        @Override
-        public void run() {
-          suspendControl();
-          requester.onControlGranted();
-        }
-      });
-    }
-    return true;
   }
 
-  /**
-   * Register an Ad player our players and remember it
-   * 
-   * @param adTypeClass
-   *          A type of AdSpot that the player is capable of playing
-   * @param adPlayerClass
-   *          A player that plays the ad
-   */
   @Override
-  public boolean returnControl(final ControlRequesterInterface requester) {
-    DebugMode.assertCondition(requester != null, TAG, "requester is null");
-    if (!_controlRequesters.contains(requester)) {
-      DebugMode.assertFail(TAG, requester.toString()
-          + " is return control but it does not have one");
-      return false;
-    }
+  public void exitActive() {
+    // TODO Auto-generated method stub
 
-    _controlRequesters.remove(requester);
-    if (_controlRequesters.size() > 0) {
-      final ControlRequesterInterface req = _controlRequesters.get(0);
-      _handler.post(new Runnable() {
-        @Override
-        public void run() {
-          req.onControlGranted();
-        }
-      });
-    } else {
-      _handler.post(new Runnable() {
-        @Override
-        public void run() {
-          resumeControl();
-        }
-      });
-    }
-
-    return true;
   }
-
-  public PluginManager getPluginManager() {
-    return _pluginManager;
+  
+  public boolean registerPlugin(final AdPluginInterface plugin) {
+    return _pluginManager.registerPlugin(plugin);
   }
 }
 

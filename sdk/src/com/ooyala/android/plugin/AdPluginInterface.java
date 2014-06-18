@@ -1,6 +1,8 @@
 package com.ooyala.android.plugin;
 
-public interface AdPluginInterface {
+import com.ooyala.android.player.PlayerInterface;
+
+public interface AdPluginInterface extends PlayerInterface {
   public boolean onContentChanged(/* Metadata Object, currentItem Object */);
 
   public boolean onInitialPlay();
@@ -14,7 +16,7 @@ public interface AdPluginInterface {
   public boolean onContentError(int errorCode);
 
   public enum AdMode {
-    Preroll, Midroll, Postroll
+    None, Preroll, Midroll, Postroll
   };
 
   public boolean onAdModeEntered(AdMode mode);

@@ -17,7 +17,7 @@ import com.ooyala.android.item.Stream;
  * @author michael.len
  *
  */
-public abstract class Player extends Observable {
+public class Player extends Observable implements PlayerInterface {
   protected OoyalaPlayer _parent = null;
   /** the current state of the player */
   private State _state = State.INIT;
@@ -35,51 +35,6 @@ public abstract class Player extends Observable {
   protected Player() {}
 
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
-
-  /**
-   * Pause the current video
-   */
-  public void pause() {}
-
-  /**
-   * Play the current video
-   */
-  public void play() {}
-
-  /**
-   * Stop playback, remove listeners
-   */
-  public void stop() {}
-
-  /**
-   * Get the current playhead time
-   * @return the current playhead time in milliseconds as an int
-   */
-  public int currentTime() {
-    return 0;
-  }
-
-  /**
-   * Get the current item's duration
-   * @return duration in milliseconds as an int
-   */
-  public int duration() {
-    return 0;
-  }
-
-  /**
-   * Get the current item's buffer
-   * @return buffer+played percentage as an int
-   */
-  public int buffer() {
-    return 0;
-  }
-
-  /**
-   * Set the current playhead time of the player
-   * @param timeInMillis int millis to set the playhead time to
-   */
-  public void seekToTime(int timeInMillis) {}
 
   public State getState() {
     return _state;
@@ -129,15 +84,81 @@ public abstract class Player extends Observable {
     return SeekStyle.ENHANCED;
   }
 
-  public abstract void reset();
+  @Override
+  public void reset() {
+    // TODO Auto-generated method stub
 
-  public abstract void suspend();
+  }
 
-  public abstract void suspend(int millisToResume, State stateToResume);
+  @Override
+  public void suspend() {
+    // TODO Auto-generated method stub
 
-  public abstract void resume();
+  }
 
-  public abstract void resume(int millisToResume, State stateToResume);
+  @Override
+  public void suspend(int millisToResume, State stateToResume) {
+    // TODO Auto-generated method stub
 
-  public abstract void destroy();
+  }
+
+  @Override
+  public void resume() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void resume(int millisToResume, State stateToResume) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void destroy() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void pause() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void play() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void stop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public int currentTime() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int duration() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int buffer() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToTime(int timeInMillis) {
+    // TODO Auto-generated method stub
+
+  }
 }

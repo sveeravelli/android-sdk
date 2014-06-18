@@ -23,6 +23,6 @@ public class PluginManagerTest extends AndroidTestCase {
   public void testRegisterPlugin() {
     OoyalaPlayer player = new OoyalaPlayer("PCODE", new PlayerDomain("http://www.ooyala.com"));
     TestPlugin plugin = new TestPlugin();
-    assertTrue(player.getPluginManager().registerPlugin(plugin));
+    assertTrue(player.registerPlugin(plugin));
   }
 }
