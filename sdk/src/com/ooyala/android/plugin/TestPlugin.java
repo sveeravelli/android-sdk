@@ -124,4 +124,10 @@ class TestPlugin implements AdPluginInterface {
 
   }
 
+  @Override
+  public boolean seekable() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }

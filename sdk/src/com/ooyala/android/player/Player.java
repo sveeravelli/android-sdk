@@ -161,4 +161,10 @@ public class Player extends Observable implements PlayerInterface {
     // TODO Auto-generated method stub
 
   }
+
+  @Override
+  public boolean seekable() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }

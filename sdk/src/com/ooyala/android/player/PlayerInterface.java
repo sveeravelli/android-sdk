@@ -16,7 +16,7 @@ public interface PlayerInterface {
   public int duration();
 
   public int buffer();
-  
+
   public void reset();
 
   public void suspend();
@@ -29,4 +29,5 @@ public interface PlayerInterface {
 
   public void destroy();
 
+  public boolean seekable();
 }

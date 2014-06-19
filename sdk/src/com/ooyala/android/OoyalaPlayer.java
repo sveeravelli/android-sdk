@@ -39,6 +39,7 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
+import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
@@ -166,6 +167,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
   private PluginManager _pluginManager = null;
+  private PlayerInterface _pluginPlayer = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -896,7 +898,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       currentPlayer().resume();
       dequeuePlay();
       addClosedCaptionsView();
-      setState(currentPlayer().getState());
+      if(currentPlayer() instanceof MoviePlayer) setState(((MoviePlayer)currentPlayer()).getState());
     } else if (_currentItem != null && _currentItem.isAuthorized()) {
       _player = getCorrectMoviePlayer(_currentItem);
       initializePlayer(_player, _currentItem);
@@ -1122,7 +1124,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private MoviePlayer currentPlayer() {
+  private PlayerInterface currentPlayer() {
+    if (_pluginPlayer != null) {
+      return _pluginPlayer;
+    }
     return (_adPlayer != null) ? _adPlayer : _player;
   }
 
@@ -1843,10 +1848,13 @@ public class OoyalaPlayer extends Observable implements Observer,
   public SeekStyle getSeekStyle() {
     if (getBasePlayer() != null) {
       return getBasePlayer().getSeekStyle();
+    } else if (currentPlayer() != null && currentPlayer() instanceof MoviePlayer) {
+      return ((MoviePlayer)currentPlayer()).getSeekStyle();
     } else if (currentPlayer() != null) {
-      return currentPlayer().getSeekStyle();
+      //TODO: the PlayerInterface may need getSeekStyle();
+      return SeekStyle.BASIC;
     } else {
-      Log.w(this.getClass().toString(), "We are seeking without a player!");
+      Log.w(this.getClass().toString(), "We are seeking without a MoviePlayer!");
       return SeekStyle.NONE;
     }
   }
@@ -1884,9 +1892,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     // TODO Auto-generated method stub
 
   }
-  
+
   public boolean registerPlugin(final AdPluginInterface plugin) {
     return _pluginManager.registerPlugin(plugin);
+  }
+
+
+  //TODO: this is to get Lisa unblocked.  This setPluginPlayer will be private, and called if PluginManager needs active mode.
+  public void setPluginPlayer(PlayerInterface player) {
+    _pluginPlayer = player;
   }
 }
 
