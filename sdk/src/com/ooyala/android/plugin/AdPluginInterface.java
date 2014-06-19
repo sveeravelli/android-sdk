@@ -3,21 +3,53 @@ package com.ooyala.android.plugin;
 import com.ooyala.android.player.PlayerInterface;
 
 public interface AdPluginInterface extends PlayerInterface {
-  public boolean onContentChanged(/* Metadata Object, currentItem Object */);
+  /**
+   * This is called when content changed
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onContentChanged();
 
-  public boolean onInitialPlay();
+  /**
+   * This is called before start playing content so plugin can play preroll
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onInitialPlay();
 
-  public boolean onPlayheadUpdate(int playhead);
+  /**
+   * This is called when playhead is updated so plugin can play midroll
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onPlayheadUpdate(int playhead);
 
-  public boolean onContentFinished(); // put your postrolls here
+  /**
+   * This is called before finishing playing content so plugin can play postroll
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onContentFinished(); // put your postrolls here
 
-  public boolean onCuePoint(int cuePointIndex);
+  /**
+   * This is called when a cue point is reached so plugin can play midroll
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onCuePoint(int cuePointIndex);
 
-  public boolean onContentError(int errorCode);
+  /**
+   * This is called when an error occured when playing back content
+   * 
+   * @return a token string if plugin wants take control, null otherwise
+   */
+  public String onContentError(int errorCode);
 
-  public enum AdMode {
-    None, Preroll, Midroll, Postroll
-  };
-
-  public boolean onAdModeEntered(AdMode mode);
+  /**
+   * This is called when control is handed over to the plugin
+   * 
+   * @param token
+   *          passed from plugin in previous calls.
+   */
+  public void onAdModeEntered(String token);
 }

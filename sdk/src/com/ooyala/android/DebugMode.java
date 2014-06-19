@@ -55,11 +55,15 @@ public final class DebugMode {
     case None:
       break;
     case LogOnly:
-      Log.e( tag, message );
+      if (!condition) {
+        Log.e(tag, message);
+      }
       break;
     case LogAndAbort:
-      Log.e( tag, message );
-      System.exit( -1 );
+      if (!condition) {
+        Log.e(tag, message);
+        System.exit(-1);
+      }
       break;
     }
   }

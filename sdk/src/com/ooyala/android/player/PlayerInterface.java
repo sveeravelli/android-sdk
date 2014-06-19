@@ -1,6 +1,5 @@
 package com.ooyala.android.player;
 
-import com.ooyala.android.OoyalaPlayer.State;
 
 public interface PlayerInterface {
   public void pause();
@@ -21,11 +20,7 @@ public interface PlayerInterface {
 
   public void suspend();
 
-  public void suspend(int millisToResume, State stateToResume);
-
   public void resume();
-
-  public void resume(int millisToResume, State stateToResume);
 
   public void destroy();
 

@@ -1,73 +1,26 @@
 package com.ooyala.android.plugin;
 
-import com.ooyala.android.OoyalaPlayer.State;
 
 class TestPlugin implements AdPluginInterface {
 
   @Override
-  public boolean onContentChanged() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onInitialPlay() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onPlayheadUpdate(int playhead) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onContentFinished() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onCuePoint(int cuePointIndex) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onContentError(int errorCode) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean onAdModeEntered(AdMode mode) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public void pause() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void play() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void stop() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void seekToTime(int timeInMillis) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -91,37 +44,21 @@ class TestPlugin implements AdPluginInterface {
   @Override
   public void reset() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void suspend() {
     // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void suspend(int millisToResume, State stateToResume) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void resume() {
     // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void resume(int millisToResume, State stateToResume) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void destroy() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -130,4 +67,44 @@ class TestPlugin implements AdPluginInterface {
     return false;
   }
 
+  @Override
+  public String onContentChanged() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String onInitialPlay() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String onPlayheadUpdate(int playhead) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String onContentFinished() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String onCuePoint(int cuePointIndex) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String onContentError(int errorCode) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void onAdModeEntered(String token) {
+    // TODO Auto-generated method stub
+  }
 }

@@ -97,19 +97,7 @@ public class Player extends Observable implements PlayerInterface {
   }
 
   @Override
-  public void suspend(int millisToResume, State stateToResume) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public void resume() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void resume(int millisToResume, State stateToResume) {
     // TODO Auto-generated method stub
 
   }

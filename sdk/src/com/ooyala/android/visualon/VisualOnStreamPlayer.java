@@ -475,8 +475,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     suspend(_player != null ? (int) _player.getPosition() : 0, getState());
   }
 
-  @Override
-  public void suspend(int millisToResume, State stateToResume) {
+  private void suspend(int millisToResume, State stateToResume) {
     DebugMode.logV(TAG, "Player Suspend");
     if (getState() == State.SUSPENDED) {
       return;
@@ -498,8 +497,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
-  @Override
-  public void resume(int millisToResume, State stateToResume) {
+  private void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
     _stateBeforeSuspend = stateToResume;
 

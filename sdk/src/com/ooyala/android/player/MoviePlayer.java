@@ -132,7 +132,6 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
-  @Override
   public void suspend(int millisToResume, State stateToResume) {
     // If we're already suspended, we don't need to do it again
     if (stateToResume == State.SUSPENDED) {
@@ -145,7 +144,7 @@ public class MoviePlayer extends Player implements Observer {
     _stateToResume = stateToResume;
     if (_basePlayer != null) {
       _basePlayer.deleteObserver(this);
-      _basePlayer.suspend(millisToResume, stateToResume);
+      _basePlayer.suspend();
     }
   }
 
@@ -154,7 +153,6 @@ public class MoviePlayer extends Player implements Observer {
     resume(_millisToResume, _stateToResume);
   }
 
-  @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
     _basePlayer.init(_parent, _streams);
@@ -163,10 +161,9 @@ public class MoviePlayer extends Player implements Observer {
     if(_live) millisToResume = 0;
 
     DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
-    _basePlayer.resume(millisToResume, stateToResume);
+    _basePlayer.resume();
   }
 
-  @Override
   public void destroy() {
     if (_basePlayer != null) _basePlayer.destroy();
   }
