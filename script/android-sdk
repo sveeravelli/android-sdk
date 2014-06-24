@@ -120,7 +120,7 @@ function custom_gen {
   cd ${IMA_SDK_DIR}
   ant clean
   ant release
-  ant jar
+  cp bin/classes.jar OoyalaIMASDK.jar
   cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
   #update IMA Sample App
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
