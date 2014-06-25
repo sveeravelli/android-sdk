@@ -1,49 +1,54 @@
 package com.ooyala.android.plugin;
 
-import com.ooyala.android.player.PlayerInterface;
-
-public interface AdPluginInterface extends PlayerInterface {
+/**
+ * The interface that must be implemented in order to plug into OoyalaPlayer to
+ * play ads.
+ * 
+ * @author michael.len
+ * 
+ */
+public interface AdPluginInterface extends LifeCycleInterface {
   /**
    * This is called when content changed
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onContentChanged();
+  public boolean onContentChanged();
 
   /**
    * This is called before start playing content so plugin can play preroll
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onInitialPlay();
+  public boolean onInitialPlay();
 
   /**
    * This is called when playhead is updated so plugin can play midroll
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onPlayheadUpdate(int playhead);
+  public boolean onPlayheadUpdate(int playhead);
 
   /**
    * This is called before finishing playing content so plugin can play postroll
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onContentFinished(); // put your postrolls here
+  public boolean onContentFinished(); // put your postrolls here
 
   /**
    * This is called when a cue point is reached so plugin can play midroll
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onCuePoint(int cuePointIndex);
+  public boolean onCuePoint(int cuePointIndex);
 
   /**
    * This is called when an error occured when playing back content
    * 
    * @return a token string if plugin wants take control, null otherwise
    */
-  public String onContentError(int errorCode);
+  public boolean onContentError(int errorCode);
 
   /**
    * This is called when control is handed over to the plugin
@@ -51,5 +56,5 @@ public interface AdPluginInterface extends PlayerInterface {
    * @param token
    *          passed from plugin in previous calls.
    */
-  public void onAdModeEntered(String token);
+  public void onAdModeEntered();
 }

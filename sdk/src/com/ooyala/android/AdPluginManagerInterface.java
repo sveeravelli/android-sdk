@@ -12,6 +12,8 @@ public interface AdPluginManagerInterface {
    */
   public boolean registerPlugin(final AdPluginInterface plugin);
 
+  public boolean deregisterPlugin(final AdPluginInterface plugin);
+
   /**
    * called when plugin exits ad mode
    * 
@@ -20,4 +22,8 @@ public interface AdPluginManagerInterface {
    * @return true on success, false otherwise
    */
   public boolean exitAdMode(final AdPluginInterface plugin);
+
+  public void resetAds();
+
+  public void skipAd();
 }

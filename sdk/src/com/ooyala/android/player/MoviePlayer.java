@@ -151,6 +151,7 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public void resume() {
     resume(_millisToResume, _stateToResume);
+    setState(getState());
   }
 
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?

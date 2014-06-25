@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.ooyala.android.AdPluginManager.AdMode;
 import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
@@ -43,12 +44,13 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.StateNotifier;
+import com.ooyala.android.plugin.VastPlugin;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayer extends Observable implements Observer,
-    OnAuthHeartbeatErrorListener, ActiveSwitchInterface,
-    AdPluginManagerInterface {
+    OnAuthHeartbeatErrorListener, AdPluginManagerInterface {
   /**
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
@@ -145,14 +147,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   private ActionAtEnd _actionAtEnd;
   private PlayerAPIClient _playerAPIClient = null;
   private State _state = State.INIT;
-  private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
-  private int _lastPlayedTime = 0;
   private LayoutController _layoutController = null;
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
   private String _language = null;
-  private boolean _adsSeekable = false;
   private boolean _seekable = true;
   private boolean _playQueued = false;
   private int _queuedSeekTime;
@@ -165,9 +164,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
-  private AdPluginManager _pluginManager = null;
-  private PlayerInterface _player = null;
-  private PlayerInterface _cachedPlayer = null;
+  private AdPluginManager _adManager = null;
+  private MoviePlayer _player = null;
+  private VastPlugin _vastPlugin = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -211,7 +210,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
 
     // Initialize third party plugin managers
-    _pluginManager = AdPluginManager.createInstance(this);
+    _adManager = AdPluginManager.createInstance(this);
+    _adManager.getStateNotifier().addObserver(this);
+    _vastPlugin = new VastPlugin(this);
+    _adManager.registerPlugin(_vastPlugin);
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -451,8 +453,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     setState(State.LOADING);
     cleanupPlayers();
-    _playedAds.clear();
-    _lastPlayedTime = 0;
+
     _currentItem = video;
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
@@ -505,6 +506,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+    processAdModes(AdMode.ContentChanged);
     return changeCurrentItemAfterAuth();
   }
 
@@ -588,19 +590,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-
-    // Play Pre-Rolls first
-    boolean didAdsPlay = isShowingAd() || playAdsBeforeTime(0, false);
-
-    // If there were no ads, initialize the player and play
-    if (!didAdsPlay) {
-      MoviePlayer mp = getCorrectMoviePlayer(_currentItem);
-      if (!initializePlayer(mp)) {
-        return false;
-      }
-      _player = mp;
-      dequeuePlay();
-    }
+    processAdModes(AdMode.InitialPlay);
     return true;
   }
 
@@ -664,16 +654,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     return new MoviePlayer();
   }
 
-  private boolean initializePlayer(MoviePlayer p) {
-    if (p == null) {
-      DebugMode.assertFail(TAG, "movie player is null when initialze player");
-      return false;
+  private MoviePlayer createAndInitPlayer(Video item) {
+    if (item == null) {
+      DebugMode.assertFail(TAG, "current item is null when initialze player");
+      return null;
     }
 
-    if (_currentItem == null) {
-      DebugMode.assertFail(TAG, "current item is null when initialze player");
-      return false;
+    MoviePlayer p = getCorrectMoviePlayer(item);
+    if (p == null) {
+      DebugMode.assertFail(TAG, "movie player is null when initialze player");
+      return null;
     }
+
     Set<Stream> streams = _currentItem.getStreams();
 
     // Initialize this player
@@ -692,31 +684,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (p == null || p.getError() != null) {
       DebugMode.assertFail(TAG,
           "movie player has an error when initialze player");
-      return false;
+      return null;
     }
     p.setSeekable(_seekable);
-    return true;
-  }
-
-  private boolean initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
-    if (p == null) {
-      DebugMode.assertFail(TAG, "initializeAdPlayer when adPlayer is null");
-      return false;
-    }
-    if (ad == null) {
-      DebugMode.assertFail(TAG, "initializeAdPlayer when ad is null");
-      return false;
-    }
-    p.addObserver(this);
-    if (_basePlayer != null) {
-      p.setBasePlayer(_basePlayer);
-    }
-    p.init(this, ad);
-    if (p.getError() != null) {
-      return false;
-    }
-    p.setSeekable(_adsSeekable);
-    return true;
+    return p;
   }
 
   private void cleanupPlayers() {
@@ -726,16 +697,13 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     cleanupPlayer(_player);
     _player = null;
-    cleanupPlayer(_cachedPlayer);
-    _cachedPlayer = null;
+
     removeClosedCaptionsView();
   }
 
-  private void cleanupPlayer(PlayerInterface p) {
+  private void cleanupPlayer(Player p) {
     if (p != null) {
-      if (p instanceof Observable) {
-      ((Observable) p).deleteObserver(this);
-      }
+      p.deleteObserver(this);
       p.destroy();
     }
   }
@@ -866,10 +834,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * layout can be changed.
    */
   public void suspend() {
-    if (currentPlayer() != null) {
-      currentPlayer().suspend();
-      removeClosedCaptionsView();
-    }
+    suspendCurrentPlayer();
+
     if (_authHeartbeat != null) {
       _suspendTime = System.currentTimeMillis();
       _authHeartbeat.stop();
@@ -921,16 +887,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     if (currentPlayer() != null) {
-      currentPlayer().resume();
-      dequeuePlay();
-      addClosedCaptionsView();
-      if(currentPlayer() instanceof MoviePlayer) setState(((MoviePlayer)currentPlayer()).getState());
+      resumeCurrentPlayer();
     } else if (_currentItem != null && _currentItem.isAuthorized()) {
-      MoviePlayer mp = getCorrectMoviePlayer(_currentItem);
-      if (initializePlayer(mp)) {
-        _player = mp;
-        dequeuePlay();
-      }
+      prepareContent(false);
     } else {
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
           "Resuming video from an invalid state");
@@ -1070,93 +1029,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private boolean playAdsBeforeTime(int time, boolean autoplay) {
-    this._lastPlayedTime = time;
-    for (AdSpot ad : _currentItem.getAds()) {
-      int adTime = ad.getTime();
-      // Align ad times to 10 second (HLS chunk length) boundaries
-      if (Stream.streamSetContainsDeliveryType(getCurrentItem().getStreams(),
-          Stream.DELIVERY_TYPE_HLS)) {
-        adTime = ((adTime + 5000) / 10000) * 10000;
-      }
-      if (adTime <= time && !this._playedAds.contains(ad)) {
-        _playedAds.add(ad);
-        if (!autoplay && initializeAd(ad)) {
-          return true;
-        } else if (autoplay && playAd(ad)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private void cleanupExistingAdPlayer() {
-    // If an ad is playing, take it out of playedAds, and save it for playback
-    // later
-    if (_player != null) {
-      if (_player instanceof AdMoviePlayer) {
-        AdMoviePlayer adPlayer = (AdMoviePlayer) _player;
-        AdSpot oldAd = adPlayer.getAd();
-        if (oldAd.isReusable()) {
-          _playedAds.remove(oldAd);
-        }
-        cleanupPlayer(_player);
-        _player = null;
-      }
-    }
-  }
-
-  private boolean initializeAd(AdSpot ad) {
-    DebugMode.logD(TAG, "Ooyala Player: Playing Ad");
-
-    cleanupExistingAdPlayer();
-
-    AdMoviePlayer adPlayer = null;
-    try {
-      Class<? extends AdMoviePlayer> adPlayerClass = _adPlayers.get(ad
-          .getClass());
-      if (adPlayerClass != null) {
-        adPlayer = adPlayerClass.newInstance();
-      }
-    } catch (InstantiationException e) {
-      DebugMode.assertFail(TAG, e.toString());
-    } catch (IllegalAccessException e) {
-      DebugMode.assertFail(TAG, e.toString());
-    }
-
-    if (adPlayer == null) {
-      return false;
-    }
-
-    if (!initializeAdPlayer(adPlayer, ad)) {
-      return false;
-    }
-
-    if (_player != null) {
-      pushPlayer();
-    }
-    _player = adPlayer;
-    dequeuePlay();
-    return true;
-  }
-
-  /**
-   * Manually initiate playback of an AdSpot
-   *
-   * @param ad
-   * @return if the ad started playing
-   */
-  public boolean playAd(AdSpot ad) {
-    if (!initializeAd(ad)) {
-      return false;
-    }
-    play();
-    return true;
-  }
-
   private PlayerInterface currentPlayer() {
-    return _player;
+    return _adManager.inAdMode() ? _adManager : _player;
   }
 
   private boolean fetchMoreChildren(PaginatedItemListener listener) {
@@ -1292,53 +1166,42 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    Player player = (Player) arg0;
+
     String notification = arg1.toString();
+    DebugMode.logD(TAG, "update from" + arg0.toString() + " notification "
+        + notification);
 
-    if (currentPlayer() != null && currentPlayer() != player) {
-      return;
+    if (arg0 instanceof Player) {
+      processContentNotifications((Player) arg0, notification);
+    } else {
+      processAdNotifications((StateNotifier) arg0, notification);
     }
+  }
 
+  public void processContentNotifications(Player player, String notification) {
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
-
-      if (!isShowingAd()) {
         // send analytics ping
-        _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
-
-        // play ads
-        _lastPlayedTime = _player.currentTime();
-        playAdsBeforeTime(this._lastPlayedTime, true);
-        // closed captions
-        displayCurrentClosedCaption();
-      }
+      _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+      processAdModes(AdMode.Playhead);
+      // closed captions
+      displayCurrentClosedCaption();
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      switch (player.getState()) {
+      State state = player.getState();
+      switch (state) {
       case COMPLETED:
-        if (!isShowingAd()) {
-          if (!playAdsBeforeTime(Integer.MAX_VALUE - 1, true)) {
-            onComplete();
-          }
-        } else {
-          adPlayerCompleted();
-        }
+        processAdModes(AdMode.ContentFinished);
         break;
-        case ERROR:
-        if (!isShowingAd()) {
-            DebugMode.logE(TAG, "Error recieved from content.  Cleaning up everything");
-            _error = player.getError();
-            cleanupPlayers();
-            setState(State.ERROR);
-            sendNotification(ERROR_NOTIFICATION);
-          } else {
-            sendNotification(AD_ERROR_NOTIFICATION);
-            adPlayerCompleted();
-          }
-          break;
-        case PLAYING:
-          if (!isShowingAd() && getState() == State.READY) {
-            if (_analytics != null) {
-              _analytics.reportPlayStarted();
+      case ERROR:
+        DebugMode.logE(TAG,
+            "Error recieved from content.  Cleaning up everything");
+        _error = player.getError();
+        processAdModes(AdMode.ContentError);
+        break;
+      case PLAYING:
+        if (getState() == State.READY) {
+          if (_analytics != null) {
+            _analytics.reportPlayStarted();
             } else {
               DebugMode.logE(TAG, "analytics is null when playing");
             }
@@ -1346,44 +1209,35 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
           setState(State.PLAYING);
           break;
-        case READY:
-          if (_queuedSeekTime > 0) {
-            seek(_queuedSeekTime);
-          }
-        case INIT:
-        case LOADING:
-        case PAUSED:
-        default:
-          setState(player.getState());
+      case READY:
+        if (_queuedSeekTime > 0) {
+          seek(_queuedSeekTime);
+        }
+        setState(State.READY);
+        break;
+      case INIT:
+      case LOADING:
+      case PAUSED:
+      default:
+        setState(player.getState());
+        break;
       }
-
-      // AD_COMPLETED_NOTIFICATION can only be seen here if a MoviePlayer or
-      // AdPlayer fires the notification.
-      // If it is fired, that means an ad player has completed an ad, but
-      // expects an ad manager to resume content
-    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
-      adPlayerCompleted();
     }
   }
 
-  public void adPlayerCompleted() {
-    DebugMode.logD(TAG, "adPlayerCompleted");
-    sendNotification(AD_COMPLETED_NOTIFICATION);
-    proceedToNextAd();
-  }
+  private void processAdNotifications(StateNotifier player, String notification) {
+    DebugMode.logD(TAG, "processAdNotification " + notification);
+    if (!isShowingAd()) {
+      DebugMode.logD(TAG, "not in ad mode, skipping");
+      return;
+    }
 
-  private void proceedToNextAd() {
-    if (!playAdsBeforeTime(_lastPlayedTime, true)) {
-      popPlayer();
-      // If our may movie player doesn't even exist yet (pre-rolls), initialize
-      // and play
-      if (_player == null) {
-        MoviePlayer mp = getCorrectMoviePlayer(_currentItem);
-        if (initializePlayer(mp)) {
-          _player = mp;
-          play();
-        }
-      }
+    if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
+      setState(player.getState());
+    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
+      sendNotification(AD_COMPLETED_NOTIFICATION);
+    } else if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
+      sendNotification(TIME_CHANGED_NOTIFICATION);
     }
   }
 
@@ -1601,10 +1455,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          true if seekable, false if not.
    */
   public void setAdsSeekable(boolean seekable) {
-    _adsSeekable = seekable;
-    if (isShowingAd()) {
-      ((AdMoviePlayer) _player).setSeekable(_adsSeekable);
-    }
+    _vastPlugin.setSeekable(seekable);
   }
 
   /**
@@ -1616,8 +1467,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void setSeekable(boolean seekable) {
     _seekable = seekable;
-    if (_player != null && (_player instanceof MoviePlayer)) {
-      ((MoviePlayer) _player).setSeekable(_seekable);
+    if (_player != null) {
+      _player.setSeekable(_seekable);
     }
   }
 
@@ -1626,7 +1477,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * has already played to play again.
    */
   public void resetAds() {
-    _playedAds.clear();
+    _adManager.resetAds();
   }
 
   /**
@@ -1635,7 +1486,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void skipAd() {
     if (isShowingAd()) {
       sendNotification(AD_SKIPPED_NOTIFICATION);
-      proceedToNextAd();
+      _adManager.skipAd();
     }
   }
 
@@ -1644,7 +1495,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *         false if not.
    */
   public boolean isShowingAd() {
-    return (_player != null) && (_player instanceof AdMoviePlayer);
+    return (_adManager.inAdMode());
   }
 
   private int percentToMillis(int percent) {
@@ -1876,6 +1727,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers.put(adTypeClass, adPlayerClass);
   }
 
+  public Class<? extends AdMoviePlayer> getAdPlayerClass(AdSpot ad) {
+    return _adPlayers.get(ad.getClass());
+  }
+
   /**
    * Get the SDK version and RC number of this Ooyala Player SDK
    *
@@ -1886,61 +1741,169 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   @Override
-  public void exitActive() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public boolean registerPlugin(final AdPluginInterface plugin) {
-    return _pluginManager.registerPlugin(plugin);
+    return _adManager.registerPlugin(plugin);
   }
 
   @Override
-  public boolean exitAdMode(AdPluginInterface plugin) {
-    if (_pluginManager == null) {
-      return false;
-    }
-    return _pluginManager.exitAdMode(plugin);
+  public boolean deregisterPlugin(final AdPluginInterface plugin) {
+    return _adManager.deregisterPlugin(plugin);
   }
-  
-  private void pushPlayer() {
+
+  private void switchToAdMode() {
     DebugMode.logD(TAG, "push player");
-    DebugMode.assertCondition(_cachedPlayer == null, TAG,
-        "pushPlayer: cachedPlayer is not null and will be overwitten");
+
     if (_player != null) {
       _player.suspend();
-      _cachedPlayer = _player;
-      _player = null;
     }
     removeClosedCaptionsView();
+    _adManager.onAdModeEntered();
   }
 
-  private void popPlayer() {
-    DebugMode.logD(TAG, "pop player");
-    if (_player != null) {
-      cleanupPlayer(_player);
-      _player = null;
-    }
-
-    if (_cachedPlayer == null) {
-      return;
-    }
-
-    _player = _cachedPlayer;
-    _cachedPlayer = null;
-
-    if (_player instanceof MoviePlayer) {
-      MoviePlayer mp = (MoviePlayer) _player;
-      if (mp.getState() == State.COMPLETED) {
-        onComplete();
-      } else {
-        mp.resume();
-        addClosedCaptionsView();
-      }
-    } else {
-      DebugMode.assertFail(TAG, "poped player " + _player.toString()
-          + " is not movie player");
+  private void switchToContent(boolean forcePlay) {
+    if (_player == null) {
+      prepareContent(forcePlay);
+    } else if (_player.getState() == State.SUSPENDED) {
       _player.resume();
+      addClosedCaptionsView();
     }
+  }
+
+  @Override
+  public boolean exitAdMode(final AdPluginInterface plugin) {
+    if (plugin != _adManager) {
+      return _adManager.exitAdMode(plugin);
+    }
+
+    processExitAdModes(_adManager.adMode(), true);
+    return true;
+  }
+
+  private boolean prepareContent(boolean forcePlay) {
+    if (_player != null) {
+      DebugMode.assertFail(TAG,
+          "try to allocate player while player already exist");
+      return false;
+    }
+
+    MoviePlayer mp = createAndInitPlayer(_currentItem);
+    if (mp == null) {
+      return false;
+    }
+
+    _player = mp;
+    if (forcePlay) {
+      play();
+    } else {
+      dequeuePlay();
+    }
+    return true;
+  }
+
+  private void processExitAdModes(AdMode mode, boolean fromAdManager) {
+    switch (mode) {
+    case ContentChanged:
+      break;
+    case InitialPlay:
+    case Playhead:
+    case CuePoint:
+      if (fromAdManager) {
+        _handler.post(new Runnable() {
+          @Override
+          public void run() {
+            switchToContent(true);
+          }
+        });
+
+      }
+      break;
+    case ContentFinished:
+      onComplete();
+      break;
+    case ContentError:
+      onContentError();
+      break;
+    default:
+      DebugMode.assertFail(TAG,
+          "exitAdMode with unknown mode " + mode.toString()
+              + "from ad " + String.valueOf(fromAdManager));
+      break;
+    }
+  }
+
+  private void onContentError() {
+    cleanupPlayers();
+    setState(State.ERROR);
+    sendNotification(ERROR_NOTIFICATION);
+  }
+
+  /*
+   * process adMode event
+   * 
+   * @return true if adManager require ad mode, false otherwise
+   */
+  private void processAdModes(AdMode mode) {
+    boolean result = false;
+    switch (mode) {
+    case ContentChanged:
+      result = _adManager.onContentChanged();
+      break;
+    case InitialPlay:
+      result = _adManager.onInitialPlay();
+      break;
+    case Playhead:
+      result = _adManager.onPlayheadUpdate(_player.currentTime());
+      break;
+    case CuePoint:
+      result = _adManager.onCuePoint(0);
+      break;
+    case ContentFinished:
+      result = _adManager.onContentFinished();
+      break;
+    case ContentError:
+      int errorCode = 0;
+      if (_player != null && _player.getError() != null) {
+        errorCode = _player.getError().getCode().ordinal();
+      }
+      result = _adManager.onContentError(errorCode);
+      break;
+    default:
+      DebugMode.assertFail(TAG,
+          "processAdModes with unknown mode " + mode.toString());
+      break;
+    }
+
+    if (result) {
+      switchToAdMode();
+    } else {
+      processExitAdModes(mode, false);
+    }
+  }
+
+  private void suspendCurrentPlayer() {
+    if (_adManager.inAdMode()) {
+      _adManager.suspend();
+    } else if (_player != null) {
+      _player.suspend();
+      removeClosedCaptionsView();
+    }
+  }
+
+  private void resumeCurrentPlayer() {
+    if (_adManager.inAdMode()) {
+      _adManager.resume();
+    } else if (_player != null) {
+      _player.resume();
+      dequeuePlay();
+      this.addClosedCaptionsView();
+    }
+  }
+
+  public void adPlayerCompleted() {
+    // TODO: remove this after implement IMA plugin.
+  }
+
+  public void playAd(AdSpot ad) {
+    // TODO: remove this after implement IMA plugin.
   }
 }

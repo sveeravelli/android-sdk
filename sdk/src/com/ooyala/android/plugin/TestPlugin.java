@@ -1,26 +1,49 @@
 package com.ooyala.android.plugin;
 
+import com.ooyala.android.player.PlayerInterface;
 
-class TestPlugin implements AdPluginInterface {
+class TestPlugin implements AdPluginInterface, PlayerInterface {
+
+  @Override
+  public void reset() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void suspend() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void resume() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void destroy() {
+    // TODO Auto-generated method stub
+
+  }
 
   @Override
   public void pause() {
     // TODO Auto-generated method stub
+
   }
 
   @Override
   public void play() {
     // TODO Auto-generated method stub
+
   }
 
   @Override
   public void stop() {
     // TODO Auto-generated method stub
-  }
 
-  @Override
-  public void seekToTime(int timeInMillis) {
-    // TODO Auto-generated method stub
   }
 
   @Override
@@ -42,69 +65,62 @@ class TestPlugin implements AdPluginInterface {
   }
 
   @Override
-  public void reset() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void suspend() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void resume() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void destroy() {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
   }
 
   @Override
-  public String onContentChanged() {
+  public void seekToTime(int timeInMillis) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public StateNotifier getStateNotifier() {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public String onInitialPlay() {
+  public boolean onContentChanged() {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public String onPlayheadUpdate(int playhead) {
+  public boolean onInitialPlay() {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public String onContentFinished() {
+  public boolean onPlayheadUpdate(int playhead) {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public String onCuePoint(int cuePointIndex) {
+  public boolean onContentFinished() {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public String onContentError(int errorCode) {
+  public boolean onCuePoint(int cuePointIndex) {
     // TODO Auto-generated method stub
-    return null;
+    return false;
   }
 
   @Override
-  public void onAdModeEntered(String token) {
+  public boolean onContentError(int errorCode) {
     // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void onAdModeEntered() {
+    // TODO Auto-generated method stub
+
   }
 }

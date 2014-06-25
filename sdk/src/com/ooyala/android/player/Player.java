@@ -1,6 +1,5 @@
 package com.ooyala.android.player;
 
-import java.util.Observable;
 import java.util.Set;
 
 import android.view.SurfaceView;
@@ -11,16 +10,17 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.plugin.LifeCycleInterface;
+import com.ooyala.android.plugin.StateNotifier;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
  * @author michael.len
  *
  */
-public class Player extends Observable implements PlayerInterface {
+public class Player extends StateNotifier implements PlayerInterface,
+    LifeCycleInterface {
   protected OoyalaPlayer _parent = null;
-  /** the current state of the player */
-  private State _state = State.INIT;
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
   protected SurfaceView _view = null;
@@ -36,14 +36,9 @@ public class Player extends Observable implements PlayerInterface {
 
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
 
-  public State getState() {
-    return _state;
-  }
-
+  @Override
   protected void setState(State state) {
-    this._state = state;
-    setChanged();
-    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    super.setState(state);
   }
 
   public OoyalaException getError() {
@@ -154,5 +149,10 @@ public class Player extends Observable implements PlayerInterface {
   public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  public StateNotifier getStateNotifier() {
+    return this;
   }
 }
