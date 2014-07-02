@@ -251,16 +251,20 @@ function gen {
   #version file
   version=$(get_version)
   saved_rc=$(get_rc)
+  git_rev=`git rev-parse HEAD`
   echo "v${version}_RC${saved_rc}" >> ${ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #IMA version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
 
   #Freewheel version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${FW_ZIP_BASE}/VERSION
   echo "Tested with Freewheel SDK version ${fw_version}" >> ${FW_ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${FW_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${FW_ZIP_BASE}/VERSION
 
   #docs
