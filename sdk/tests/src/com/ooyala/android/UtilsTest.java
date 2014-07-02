@@ -143,6 +143,13 @@ public class UtilsTest extends AndroidTestCase {
     assertEquals(milisecond, expected);
   }
 
+  public void testClosedCaptionTimeStringHourMinuteSecondFrame() {
+    String timeString = "07:20:12:24";
+    double milisecond = Utils.secondsFromTimeString(timeString);
+    double expected = 7 * 3600 + 20 * 60 + 12 + 24.0/30;
+    assertEquals(milisecond, expected);
+  }
+
   public void testClosedCaptionTimeStringHourMinuteSecond() {
     String timeString = "07:20:12.24";
     double milisecond = Utils.secondsFromTimeString(timeString);
