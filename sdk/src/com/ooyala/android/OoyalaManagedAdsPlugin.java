@@ -1,4 +1,4 @@
-package com.ooyala.android.plugin;
+package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.ooyala.android.DebugMode;
-import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.ChangeNotifierInterface;
+import com.ooyala.android.plugin.DefaultChangeNotifier;
 
 public class OoyalaManagedAdsPlugin extends DefaultChangeNotifier implements
     Observer, AdPluginInterface {
