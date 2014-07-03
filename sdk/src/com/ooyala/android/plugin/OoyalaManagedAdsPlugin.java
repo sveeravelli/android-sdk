@@ -14,16 +14,16 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 
-public class VastPlugin extends StateNotifier implements Observer,
-    AdPluginInterface, PlayerInterface {
-  private static final String TAG = VastPlugin.class.getName();
+public class OoyalaManagedAdsPlugin extends DefaultChangeNotifier implements
+    Observer, AdPluginInterface {
+  private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
   private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime;
 
-  public VastPlugin(OoyalaPlayer player) {
+  public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
   }
 
@@ -52,71 +52,6 @@ public class VastPlugin extends StateNotifier implements Observer,
     if (_adPlayer != null) {
       _adPlayer.destroy();
     }
-  }
-
-  @Override
-  public void pause() {
-    if (_adPlayer != null) {
-      _adPlayer.resume();
-    }
-  }
-
-  @Override
-  public void play() {
-    if (_adPlayer != null) {
-      _adPlayer.play();
-    }
-  }
-
-  @Override
-  public void stop() {
-    if (_adPlayer != null) {
-      _adPlayer.stop();
-    }
-  }
-
-  @Override
-  public int currentTime() {
-    if (_adPlayer != null) {
-      return _adPlayer.currentTime();
-    }
-    return 0;
-  }
-
-  @Override
-  public int duration() {
-    if (_adPlayer != null) {
-      return _adPlayer.duration();
-    }
-    return 0;
-  }
-
-  @Override
-  public int buffer() {
-    if (_adPlayer != null) {
-      return _adPlayer.buffer();
-    }
-    return 0;
-  }
-
-  @Override
-  public boolean seekable() {
-    if (_adPlayer != null) {
-      return _adPlayer.seekable();
-    }
-    return false;
-  }
-
-  @Override
-  public void seekToTime(int timeInMillis) {
-    if (_adPlayer != null) {
-      _adPlayer.seekToTime(timeInMillis);
-    }
-  }
-
-  @Override
-  public StateNotifier getStateNotifier() {
-    return this;
   }
 
   @Override
@@ -202,11 +137,12 @@ public class VastPlugin extends StateNotifier implements Observer,
       return false;
     }
 
+    _adPlayer = adPlayer;
     if (!initializeAdPlayer(adPlayer, ad)) {
+      _adPlayer = null;
       return false;
     }
 
-    _adPlayer = adPlayer;
     return true;
   }
 
@@ -290,9 +226,13 @@ public class VastPlugin extends StateNotifier implements Observer,
         _player.get().exitAdMode(this);
         break;
       default:
-        setState(player.getState());
         break;
       }
+      super.notifyStateChange();
+    } else if (notification.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION)) {
+      super.notifyTimeChange();
+    } else if (notification.equals(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION)) {
+      super.notifyBufferChange();
     }
   }
 
@@ -320,7 +260,17 @@ public class VastPlugin extends StateNotifier implements Observer,
     if (!initializeAd(ad)) {
       return false;
     }
-    play();
+    _adPlayer.play();
     return true;
+  }
+
+  @Override
+  public PlayerInterface getPlayerInterface() {
+    return _adPlayer;
+  }
+
+  @Override
+  public ChangeNotifierInterface getChangeNotifier() {
+    return this;
   }
 }

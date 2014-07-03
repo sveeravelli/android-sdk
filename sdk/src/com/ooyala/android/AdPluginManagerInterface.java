@@ -10,6 +10,10 @@ public interface AdPluginManagerInterface {
    *          the plugin to be registered
    * @return true on success, false otherwise
    */
+  enum AdMode {
+    None, ContentChanged, InitialPlay, Playhead, CuePoint, ContentFinished, ContentError
+  };
+
   public boolean registerPlugin(final AdPluginInterface plugin);
 
   public boolean deregisterPlugin(final AdPluginInterface plugin);
@@ -22,8 +26,4 @@ public interface AdPluginManagerInterface {
    * @return true on success, false otherwise
    */
   public boolean exitAdMode(final AdPluginInterface plugin);
-
-  public void resetAds();
-
-  public void skipAd();
 }

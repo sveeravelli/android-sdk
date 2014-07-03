@@ -1,5 +1,7 @@
 package com.ooyala.android.plugin;
 
+import com.ooyala.android.player.PlayerInterface;
+
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer to
  * play ads.
@@ -57,4 +59,32 @@ public interface AdPluginInterface extends LifeCycleInterface {
    *          passed from plugin in previous calls.
    */
   public void onAdModeEntered();
+
+  /**
+   * This is called ooyala UI pass down UI related events.
+   * 
+   * @return an object that implements PlayerInterface if plugin needs to
+   *         process ui events, null if these events should be ignored.
+   */
+  public PlayerInterface getPlayerInterface();
+
+  /**
+   * This is called to reset all ads to unplayed.
+   */
+  public void resetAds();
+
+  /**
+   * This is called to skip the current ad.
+   * 
+   */
+  public void skipAd();
+
+  /**
+   * This returns a state notifier object. Ooyala will listen to state changes
+   * on this object to update UI controls correspondingly
+   * 
+   * @return the object to be listened. null if plug-in does not want to send
+   *         notifications
+   */
+  public ChangeNotifierInterface getChangeNotifier();
 }

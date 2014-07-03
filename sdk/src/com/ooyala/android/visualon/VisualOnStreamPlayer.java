@@ -578,7 +578,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   @Override
-  public void setState(State state) {
+  protected void setState(State state) {
     DebugMode.logV(TAG, "Set State: " + state.name());
     super.setState(state);
     dequeueAll();

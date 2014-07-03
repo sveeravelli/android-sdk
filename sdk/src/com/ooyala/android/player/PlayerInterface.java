@@ -1,6 +1,6 @@
 package com.ooyala.android.player;
 
-import com.ooyala.android.plugin.StateNotifier;
+import com.ooyala.android.OoyalaPlayer.State;
 
 /**
  * The interface that must be implemented in order to receive control events
@@ -55,11 +55,9 @@ public interface PlayerInterface {
   public void seekToTime(int timeInMillis);
 
   /**
-   * This returns a state notifier object. Ooyala will listen to state changes
-   * on this object to update UI controls correspondingly
+   * This returns the player state
    * 
-   * @return the object to be listened. null if plug-in does not want to send
-   *         notifications
+   * @return the state
    */
-  public StateNotifier getStateNotifier();
+  public State getState();
 }

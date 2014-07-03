@@ -10,15 +10,15 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.plugin.DefaultChangeNotifier;
 import com.ooyala.android.plugin.LifeCycleInterface;
-import com.ooyala.android.plugin.StateNotifier;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
  * @author michael.len
  *
  */
-public class Player extends StateNotifier implements PlayerInterface,
+public class Player extends DefaultChangeNotifier implements PlayerInterface,
     LifeCycleInterface {
   protected OoyalaPlayer _parent = null;
   /** The Player's current error if it exists */
@@ -28,6 +28,7 @@ public class Player extends StateNotifier implements PlayerInterface,
   protected int _buffer = 0;
   protected boolean _fullscreen = false;
   protected boolean _pausable = true;
+  protected State _state = State.INIT;
 
   /**
    * Init the player
@@ -37,8 +38,13 @@ public class Player extends StateNotifier implements PlayerInterface,
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
 
   @Override
+  public State getState() {
+    return _state;
+  }
+
   protected void setState(State state) {
-    super.setState(state);
+    _state = state;
+    super.notifyStateChange();
   }
 
   public OoyalaException getError() {
@@ -149,10 +155,5 @@ public class Player extends StateNotifier implements PlayerInterface,
   public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
-  }
-
-  @Override
-  public StateNotifier getStateNotifier() {
-    return this;
   }
 }

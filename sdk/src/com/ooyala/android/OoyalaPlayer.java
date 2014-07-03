@@ -21,7 +21,6 @@ import android.widget.FrameLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.ooyala.android.AdPluginManager.AdMode;
 import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
@@ -44,8 +43,7 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.StateNotifier;
-import com.ooyala.android.plugin.VastPlugin;
+import com.ooyala.android.plugin.OoyalaManagedAdsPlugin;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 
@@ -166,7 +164,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private String _customDRMData = null;
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
-  private VastPlugin _vastPlugin = null;
+  private OoyalaManagedAdsPlugin _vastPlugin = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -210,9 +208,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
 
     // Initialize third party plugin managers
-    _adManager = AdPluginManager.createInstance(this);
-    _adManager.getStateNotifier().addObserver(this);
-    _vastPlugin = new VastPlugin(this);
+    _adManager = new AdPluginManager(this);
+    _adManager.addObserver(this);
+    _vastPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_vastPlugin);
 
     DebugMode.logI(this.getClass().getName(),
@@ -506,7 +504,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     sendNotification(AUTHORIZATION_READY_NOTIFICATION);
-    processAdModes(AdMode.ContentChanged);
+    processAdModes(AdMode.ContentChanged, 0);
     return changeCurrentItemAfterAuth();
   }
 
@@ -590,7 +588,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    processAdModes(AdMode.InitialPlay);
+    if (!processAdModes(AdMode.InitialPlay, 0)) {
+      switchToContent(false);
+    }
     return true;
   }
 
@@ -787,7 +787,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return state
    */
   public State getState() {
-    return _state;
+    PlayerInterface p = currentPlayer();
+    return p == null ? _state : p.getState();
   }
 
   /**
@@ -1030,7 +1031,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private PlayerInterface currentPlayer() {
-    return _adManager.inAdMode() ? _adManager : _player;
+    return _adManager.inAdMode() ? _adManager.getPlayerInterface() : _player;
   }
 
   private boolean fetchMoreChildren(PaginatedItemListener listener) {
@@ -1166,7 +1167,6 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-
     String notification = arg1.toString();
     DebugMode.logD(TAG, "update from" + arg0.toString() + " notification "
         + notification);
@@ -1174,7 +1174,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (arg0 instanceof Player) {
       processContentNotifications((Player) arg0, notification);
     } else {
-      processAdNotifications((StateNotifier) arg0, notification);
+      processAdNotifications(arg0, notification);
     }
   }
 
@@ -1183,20 +1183,21 @@ public class OoyalaPlayer extends Observable implements Observer,
       sendNotification(TIME_CHANGED_NOTIFICATION);
         // send analytics ping
       _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
-      processAdModes(AdMode.Playhead);
+      processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
       switch (state) {
       case COMPLETED:
-        processAdModes(AdMode.ContentFinished);
+        processAdModes(AdMode.ContentFinished, 0);
         break;
       case ERROR:
         DebugMode.logE(TAG,
             "Error recieved from content.  Cleaning up everything");
         _error = player.getError();
-        processAdModes(AdMode.ContentError);
+        int errorCode = _error == null ? 0 : _error.getCode().ordinal();
+        processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
         if (getState() == State.READY) {
@@ -1225,20 +1226,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void processAdNotifications(StateNotifier player, String notification) {
+  private void processAdNotifications(Observable o, String notification) {
     DebugMode.logD(TAG, "processAdNotification " + notification);
     if (!isShowingAd()) {
-      DebugMode.logD(TAG, "not in ad mode, skipping");
+      DebugMode.logE(TAG, "not in ad mode, skipping notification "
+          + notification + " from " + o.toString());
       return;
     }
 
-    if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      setState(player.getState());
-    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
-      sendNotification(AD_COMPLETED_NOTIFICATION);
-    } else if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
-      sendNotification(TIME_CHANGED_NOTIFICATION);
-    }
+    sendNotification(notification);
   }
 
   /**
@@ -1751,7 +1747,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void switchToAdMode() {
-    DebugMode.logD(TAG, "push player");
+    DebugMode.logD(TAG, "switchToAdMode");
 
     if (_player != null) {
       _player.suspend();
@@ -1771,12 +1767,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public boolean exitAdMode(final AdPluginInterface plugin) {
-    if (plugin != _adManager) {
-      return _adManager.exitAdMode(plugin);
-    }
-
-    processExitAdModes(_adManager.adMode(), true);
-    return true;
+    return _adManager.exitAdMode(plugin);
   }
 
   private boolean prepareContent(boolean forcePlay) {
@@ -1800,7 +1791,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private void processExitAdModes(AdMode mode, boolean fromAdManager) {
+  void processExitAdModes(AdMode mode, boolean fromAdManager) {
+    DebugMode.logD(TAG, "exit admode from mode " + mode.toString()
+        + "frome adManager " + String.valueOf(fromAdManager));
     switch (mode) {
     case ContentChanged:
       break;
@@ -1814,7 +1807,6 @@ public class OoyalaPlayer extends Observable implements Observer,
             switchToContent(true);
           }
         });
-
       }
       break;
     case ContentFinished:
@@ -1842,42 +1834,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    * 
    * @return true if adManager require ad mode, false otherwise
    */
-  private void processAdModes(AdMode mode) {
-    boolean result = false;
-    switch (mode) {
-    case ContentChanged:
-      result = _adManager.onContentChanged();
-      break;
-    case InitialPlay:
-      result = _adManager.onInitialPlay();
-      break;
-    case Playhead:
-      result = _adManager.onPlayheadUpdate(_player.currentTime());
-      break;
-    case CuePoint:
-      result = _adManager.onCuePoint(0);
-      break;
-    case ContentFinished:
-      result = _adManager.onContentFinished();
-      break;
-    case ContentError:
-      int errorCode = 0;
-      if (_player != null && _player.getError() != null) {
-        errorCode = _player.getError().getCode().ordinal();
-      }
-      result = _adManager.onContentError(errorCode);
-      break;
-    default:
-      DebugMode.assertFail(TAG,
-          "processAdModes with unknown mode " + mode.toString());
-      break;
-    }
-
+  private boolean processAdModes(AdMode mode, int parameter) {
+    boolean result = _adManager.onAdMode(mode, parameter);
     if (result) {
       switchToAdMode();
     } else {
       processExitAdModes(mode, false);
     }
+    return result;
   }
 
   private void suspendCurrentPlayer() {

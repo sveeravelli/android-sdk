@@ -6,50 +6,40 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.os.Handler;
-
-import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.StateNotifier;
-import com.ooyala.android.plugin.VastPlugin;
+import com.ooyala.android.plugin.ChangeNotifierInterface;
+import com.ooyala.android.plugin.DefaultChangeNotifier;
+import com.ooyala.android.plugin.LifeCycleInterface;
 
-class AdPluginManager extends StateNotifier implements Observer,
-    AdPluginInterface,
-    AdPluginManagerInterface, PlayerInterface {
-  enum AdMode {
-    None, ContentChanged, InitialPlay, Playhead, CuePoint, ContentFinished, ContentError
-  };
+class AdPluginManager extends DefaultChangeNotifier implements Observer,
+    LifeCycleInterface, AdPluginManagerInterface {
   private static final String TAG = AdPluginManager.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private List<AdPluginInterface> _plugins = new ArrayList<AdPluginInterface>();
   private AdPluginInterface _activePlugin = null;
   private AdMode _admode = AdMode.None;
   private int _parameter = 0;
-  private Handler _handler = null;
 
-  protected AdPluginManager(OoyalaPlayer player) {
+  public AdPluginManager(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
-    _handler = new Handler();
-  }
-
-  public static AdPluginManager createInstance(OoyalaPlayer player) {
-    AdPluginManager manager = new AdPluginManager(player);
-    return manager;
   }
   
   @Override
   public boolean registerPlugin(final AdPluginInterface plugin) {
     if (_plugins.contains(plugin)) {
+      DebugMode.logD(TAG, "plugin " + plugin.toString() + "already exist");
       return false;
     }
 
-    StateNotifier notifier = getNotifierFromPlugin(plugin);
-    if (notifier != null) {
-      DebugMode.logD(TAG, "add observer to " + plugin.toString());
-      notifier.addObserver(this);
+    for (AdPluginInterface p : _plugins) {
+      if (plugin.getClass() == p.getClass()) {
+        DebugMode.logD(TAG, "plugin " + p.toString() + " is same class as "
+            + plugin.toString());
+      }
     }
 
+    DebugMode.logD(TAG, "register ad plugin" + plugin.toString());
     _plugins.add(plugin);
     return true;
   }
@@ -57,17 +47,19 @@ class AdPluginManager extends StateNotifier implements Observer,
   @Override
   public boolean deregisterPlugin(final AdPluginInterface plugin) {
     if (!_plugins.contains(plugin)) {
+      DebugMode.logD(TAG, plugin.toString()
+          + "is not registered or has been removed");
       return false;
     }
 
-    StateNotifier notifier = getNotifierFromPlugin(plugin);
-    if (notifier != null) {
-      DebugMode.logD(TAG, "delete observer from " + plugin.toString());
-      notifier.deleteObserver(this);
+    if (_activePlugin == plugin) {
+      DebugMode.assertFail(TAG,
+          "try to deregister when the plugin is still active");
+      return false;
     }
 
     _plugins.remove(plugin);
-
+    DebugMode.logD(TAG, "deregister ad plugin" + plugin.toString());
     return true;
   }
 
@@ -89,25 +81,19 @@ class AdPluginManager extends StateNotifier implements Observer,
       return false;
     }
 
-    do {
-      _activePlugin = getNextPlugin(_activePlugin);
-    } while (_activePlugin != null && !pluginRequestAdMode(_admode));
+    AdPluginInterface nextPlugin = getNextPlugin(_plugins, plugin);
+    while (nextPlugin != null && !pluginNeedsAdMode(plugin, _admode)) {
+      nextPlugin = getNextPlugin(_plugins, plugin);
+    }
     
-    if (_activePlugin == null) {
-      final AdPluginInterface self = this;
-      _handler.post(new Runnable() {
-        @Override
-        public void run() {
-          OoyalaPlayer p = _player.get();
-          if (p != null) {
-            _player.get().exitAdMode(self);
-          } else {
-            DebugMode.assertFail(TAG, "player is null when exiting admode");
-          }
-          _admode = AdMode.None;
-        }
-      });
+    if (nextPlugin == null) {
+      AdMode mode = _admode;
+      _admode = AdMode.None;
+      setActivePlugin(null);
+      // Need to set _admode to none before calling process exit admode.
+      _player.get().processExitAdModes(mode, true);
     } else {
+      setActivePlugin(nextPlugin);
       _activePlugin.onAdModeEntered();
     }
     return true;
@@ -115,58 +101,6 @@ class AdPluginManager extends StateNotifier implements Observer,
 
   // boolean Manager.insertPluginView()
   // boolean Manager.removePluginView()
-
-  @Override
-  public void pause() {
-    if (_activePlugin instanceof PlayerInterface) {
-      ((PlayerInterface) _activePlugin).pause();
-    }
-  }
-
-  @Override
-  public void play() {
-    if (_activePlugin instanceof PlayerInterface) {
-      ((PlayerInterface) _activePlugin).play();
-    }
-  }
-
-  @Override
-  public void stop() {
-    if (_activePlugin instanceof PlayerInterface) {
-      ((PlayerInterface) _activePlugin).stop();
-    }
-  }
-
-  @Override
-  public void seekToTime(int timeInMillis) {
-    if (_activePlugin instanceof PlayerInterface) {
-      ((PlayerInterface) _activePlugin).seekToTime(timeInMillis);
-    }
-  }
-
-  @Override
-  public int currentTime() {
-    if (_activePlugin instanceof PlayerInterface) {
-      return ((PlayerInterface) _activePlugin).currentTime();
-    }
-    return 0;
-  }
-
-  @Override
-  public int duration() {
-    if (_activePlugin instanceof PlayerInterface) {
-      return ((PlayerInterface) _activePlugin).duration();
-    }
-    return 0;
-  }
-
-  @Override
-  public int buffer() {
-    if (_activePlugin instanceof PlayerInterface) {
-      return ((PlayerInterface) _activePlugin).buffer();
-    }
-    return 0;
-  }
 
   @Override
   public void reset() {
@@ -196,48 +130,6 @@ class AdPluginManager extends StateNotifier implements Observer,
     }
   }
 
-  @Override
-  public boolean seekable() {
-    if (_activePlugin instanceof PlayerInterface) {
-      return ((PlayerInterface) _activePlugin).seekable();
-    }
-    return false;
-  }
-
-  @Override
-  public boolean onContentChanged() {
-    return onAdMode(AdMode.ContentChanged);
-  }
-
-  @Override
-  public boolean onInitialPlay() {
-    return onAdMode(AdMode.InitialPlay);
-  }
-
-  @Override
-  public boolean onPlayheadUpdate(int playhead) {
-    _parameter = playhead;
-    return onAdMode(AdMode.Playhead);
-  }
-
-  @Override
-  public boolean onContentFinished() {
-    return onAdMode(AdMode.ContentFinished);
-  }
-
-  @Override
-  public boolean onCuePoint(int cuePointIndex) {
-    _parameter = cuePointIndex;
-    return onAdMode(AdMode.CuePoint);
-  }
-
-  @Override
-  public boolean onContentError(int errorCode) {
-    _parameter = errorCode;
-    return onAdMode(AdMode.ContentError);
-  }
-
-  @Override
   public void onAdModeEntered() {
     if (_activePlugin == null) {
       DebugMode.assertFail(TAG, "enter ad mode when active plugin is null");
@@ -247,20 +139,23 @@ class AdPluginManager extends StateNotifier implements Observer,
   }
 
   // helper functions
-  private AdPluginInterface getNextPlugin(final AdPluginInterface plugin) {
-    if (_plugins.size() == 0) {
+  private static AdPluginInterface getNextPlugin(
+      List<AdPluginInterface> plugins, final AdPluginInterface plugin) {
+    if (plugins.size() == 0) {
       return null;
     }
 
     if (plugin == null) {
-      return _plugins.get(0);
+      return plugins.get(0);
     }
 
-    int index = _plugins.indexOf(plugin);
-    if (index < 0 || index >= _plugins.size() - 1) {
+    DebugMode.assertCondition(plugins.contains(plugin), TAG,
+        "the list does not contain plugin " + plugin.toString());
+    int index = plugins.indexOf(plugin);
+    if (index < 0 || index >= plugins.size() - 1) {
       return null;
     }
-    return _plugins.get(index + 1);
+    return plugins.get(index + 1);
   }
 
   /**
@@ -271,16 +166,19 @@ class AdPluginManager extends StateNotifier implements Observer,
    *         needs control
    * 
    */
-  private boolean onAdMode(AdMode mode) {
+  boolean onAdMode(AdMode mode, int parameter) {
+    _parameter = parameter;
     if (_plugins.size() <= 0) {
       return false;
     }
 
-    do {
-      _activePlugin = getNextPlugin(_activePlugin);
-    } while (_activePlugin != null && !pluginRequestAdMode(mode));
+    AdPluginInterface plugin = _plugins.get(0);
+    while (plugin != null && !pluginNeedsAdMode(plugin, mode)) {
+      plugin = getNextPlugin(_plugins, plugin);
+    }
 
-    if (_activePlugin != null) {
+    if (plugin != null) {
+      setActivePlugin(plugin);
       _admode = mode;
       return true;
     }
@@ -289,48 +187,32 @@ class AdPluginManager extends StateNotifier implements Observer,
   }
 
   /**
-   * ad manager queries plugin whether it requires control
+   * ad manager queries plugin whether it needs ad mode
    */
-  private boolean pluginRequestAdMode(AdMode mode) {
-    if (_activePlugin == null) {
+  private boolean pluginNeedsAdMode(AdPluginInterface plugin, AdMode mode) {
+    if (plugin == null) {
       DebugMode.assertFail(TAG,
           "plugin method is called when active plugin is null");
       return false;
     }
 
-    boolean result = false;
     switch (mode) {
     case ContentChanged:
-      result = _activePlugin.onContentChanged();
-      break;
+      return plugin.onContentChanged();
     case InitialPlay:
-      result = _activePlugin.onInitialPlay();
-      break;
+      return plugin.onInitialPlay();
     case Playhead:
-      result = _activePlugin.onPlayheadUpdate(_parameter);
-      break;
+      return plugin.onPlayheadUpdate(_parameter);
     case CuePoint:
-      result = _activePlugin.onCuePoint(_parameter);
-      break;
+      return plugin.onCuePoint(_parameter);
     case ContentFinished:
-      result = _activePlugin.onContentFinished();
-      break;
+      return plugin.onContentFinished();
     case ContentError:
-      result = _activePlugin.onContentError(_parameter);
-      break;
+      return plugin.onContentError(_parameter);
     default:
       DebugMode.assertFail(TAG, "request admode when admode is not defined");
-      break;
+      return false;
     }
-    if (result) {
-      _admode = mode;
-    }
-    return result;
-  }
-
-  @Override
-  public StateNotifier getStateNotifier() {
-    return this;
   }
 
   public AdMode adMode() {
@@ -338,48 +220,77 @@ class AdPluginManager extends StateNotifier implements Observer,
   }
 
   public boolean inAdMode() {
-    return _admode != AdMode.None;
+    return _activePlugin != null;
   }
 
-  @Override
   public void resetAds() {
-    if (_activePlugin instanceof VastPlugin) {
-      ((VastPlugin) _activePlugin).resetAds();
+    for (AdPluginInterface p : _plugins) {
+      p.resetAds();
     }
   }
 
-  @Override
   public void skipAd() {
-    if (_activePlugin instanceof VastPlugin) {
-      ((VastPlugin) _activePlugin).skipAd();
+    for (AdPluginInterface p : _plugins) {
+      p.skipAd();
     }
   }
 
   @Override
-  public void update(Observable observable, Object data) {
-    StateNotifier notifier = (StateNotifier) observable;
-    if (notifier != getNotifierFromPlugin(_activePlugin)) {
+  public void update(Observable o, Object data) {
+    // only listen to the notifications from active plugin
+    DebugMode.logD(TAG, "receive notification " + data.toString() + " from "
+        + o.toString());
+    DebugMode.assertCondition(o == _activePlugin.getChangeNotifier(), TAG,
+        "getting notification from " + o.toString()
+        + " which is not active plugin");
+
+    setChanged();
+    super.notifyObservers(data);
+  }
+
+  /*
+   * observe a observable plugin
+   * 
+   * @param plugin the plugin to be observed
+   * 
+   * @param isAdd true to add observer, false to delete observer
+   */
+  private void observePlugin(final AdPluginInterface plugin, boolean isAdd) {
+    if (plugin == null) {
       return;
     }
 
-    String notification = data.toString();
-    processNotification(notifier, notification);
-  }
+    ChangeNotifierInterface notifier = plugin.getChangeNotifier();
+    if (notifier == null) {
+      return;
+    }
 
-  private void processNotification(StateNotifier notifier, String notification) {
-    DebugMode.logD(TAG, "receive notification " + notification + " from "
-        + notifier.toString());
-    if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
-      State state = notifier.getState();
-      setState(state);
+    if (isAdd) {
+      notifier.addObserver(this);
+    } else {
+      notifier.deleteObserver(this);
     }
   }
 
-  private StateNotifier getNotifierFromPlugin(final AdPluginInterface plugin) {
-    if (!(plugin instanceof PlayerInterface)) {
-      return null;
+  public PlayerInterface getPlayerInterface() {
+    if (_activePlugin != null) {
+      return _activePlugin.getPlayerInterface();
     }
-    return ((PlayerInterface) plugin).getStateNotifier();
+    return null;
+  }
+
+  public AdPluginInterface getActivePlugin() {
+    return _activePlugin;
+  }
+
+  protected void setActivePlugin(AdPluginInterface plugin) {
+    if (plugin == _activePlugin) {
+      return;
+    }
+
+    observePlugin(_activePlugin, false);
+    _activePlugin = plugin;
+    observePlugin(_activePlugin, true);
   }
 
 }
