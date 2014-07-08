@@ -1809,7 +1809,16 @@ public class OoyalaPlayer extends Observable implements Observer,
       }
       break;
     case ContentFinished:
-      onComplete();
+      if (fromAdManager) {
+        _handler.post(new Runnable() {
+          @Override
+          public void run() {
+            switchToContent(true);
+          }
+        });
+      } else {
+        onComplete();
+      }
       break;
     case ContentError:
       onContentError();
