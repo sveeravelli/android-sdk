@@ -1519,15 +1519,16 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the duration in milliseconds
    */
   public int getDuration() {
-    if (currentPlayer() == null) {
-      return 0;
+    if (currentPlayer() != null) {
+      int playerDuration = currentPlayer().duration();
+      if (playerDuration > 0) {
+        return playerDuration;
+      }
     }
-    int playerDuration = currentPlayer().duration();
-    if (playerDuration > 0)
-      return playerDuration;
-    if (getCurrentItem() == null)
-      return 0;
-    return getCurrentItem().getDuration();
+    if (getCurrentItem() != null) {
+      return getCurrentItem().getDuration();
+    }
+    return 0;
   }
 
   /**
