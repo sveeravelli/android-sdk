@@ -12,11 +12,8 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.ChangeNotifierInterface;
-import com.ooyala.android.plugin.DefaultChangeNotifier;
 
-public class OoyalaManagedAdsPlugin extends DefaultChangeNotifier implements
-    Observer, AdPluginInterface {
+public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
@@ -229,11 +226,11 @@ public class OoyalaManagedAdsPlugin extends DefaultChangeNotifier implements
       default:
         break;
       }
-      super.notifyStateChange();
+      OoyalaPlayer.notifyStateChange(player);
     } else if (notification.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION)) {
-      super.notifyTimeChange();
+      OoyalaPlayer.notifyTimeChange(player);
     } else if (notification.equals(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION)) {
-      super.notifyBufferChange();
+      OoyalaPlayer.notifyBufferChange(player);
     }
   }
 
@@ -268,10 +265,5 @@ public class OoyalaManagedAdsPlugin extends DefaultChangeNotifier implements
   @Override
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
-  }
-
-  @Override
-  public ChangeNotifierInterface getChangeNotifier() {
-    return this;
   }
 }

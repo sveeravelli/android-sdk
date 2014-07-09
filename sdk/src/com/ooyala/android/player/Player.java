@@ -1,5 +1,6 @@
 package com.ooyala.android.player;
 
+import java.util.Observable;
 import java.util.Set;
 
 import android.view.SurfaceView;
@@ -10,7 +11,6 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.plugin.DefaultChangeNotifier;
 import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
@@ -18,7 +18,7 @@ import com.ooyala.android.plugin.LifeCycleInterface;
  * @author michael.len
  *
  */
-public class Player extends DefaultChangeNotifier implements PlayerInterface,
+public class Player extends Observable implements PlayerInterface,
     LifeCycleInterface {
   protected OoyalaPlayer _parent = null;
   /** The Player's current error if it exists */
@@ -44,7 +44,8 @@ public class Player extends DefaultChangeNotifier implements PlayerInterface,
 
   protected void setState(State state) {
     _state = state;
-    super.notifyStateChange();
+    super.setChanged();
+    super.notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
   public OoyalaException getError() {

@@ -3,17 +3,12 @@ package com.ooyala.android;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.ChangeNotifierInterface;
-import com.ooyala.android.plugin.DefaultChangeNotifier;
 import com.ooyala.android.plugin.LifeCycleInterface;
 
-class AdPluginManager extends DefaultChangeNotifier implements Observer,
-    LifeCycleInterface, AdPluginManagerInterface {
+class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   private static final String TAG = AdPluginManager.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private List<AdPluginInterface> _plugins = new ArrayList<AdPluginInterface>();
@@ -235,43 +230,6 @@ class AdPluginManager extends DefaultChangeNotifier implements Observer,
     }
   }
 
-  @Override
-  public void update(Observable o, Object data) {
-    // only listen to the notifications from active plugin
-    DebugMode.logD(TAG, "receive notification " + data.toString() + " from "
-        + o.toString());
-    DebugMode.assertCondition(o == _activePlugin.getChangeNotifier(), TAG,
-        "getting notification from " + o.toString()
-        + " which is not active plugin");
-
-    setChanged();
-    super.notifyObservers(data);
-  }
-
-  /*
-   * observe a observable plugin
-   * 
-   * @param plugin the plugin to be observed
-   * 
-   * @param isAdd true to add observer, false to delete observer
-   */
-  private void observePlugin(final AdPluginInterface plugin, boolean isAdd) {
-    if (plugin == null) {
-      return;
-    }
-
-    ChangeNotifierInterface notifier = plugin.getChangeNotifier();
-    if (notifier == null) {
-      return;
-    }
-
-    if (isAdd) {
-      notifier.addObserver(this);
-    } else {
-      notifier.deleteObserver(this);
-    }
-  }
-
   public PlayerInterface getPlayerInterface() {
     if (_activePlugin != null) {
       return _activePlugin.getPlayerInterface();
@@ -284,13 +242,7 @@ class AdPluginManager extends DefaultChangeNotifier implements Observer,
   }
 
   protected void setActivePlugin(AdPluginInterface plugin) {
-    if (plugin == _activePlugin) {
-      return;
-    }
-
-    observePlugin(_activePlugin, false);
     _activePlugin = plugin;
-    observePlugin(_activePlugin, true);
   }
 
 }

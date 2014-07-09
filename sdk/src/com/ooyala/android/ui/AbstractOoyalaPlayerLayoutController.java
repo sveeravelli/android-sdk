@@ -100,7 +100,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
-    this(l, new OoyalaPlayer(pcode,domain), dcs);
+    OoyalaPlayer.setContext(l.getContext());
+    OoyalaPlayer p = new OoyalaPlayer(pcode, domain);
+    this.initialize(l, p, dcs);
   }
 
   /**
@@ -114,7 +116,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain,
       DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    OoyalaPlayer.setContext(l.getContext());
+    OoyalaPlayer p = new OoyalaPlayer(pcode, domain, generator);
+    this.initialize(l, p, dcs);
   }
 
   /**
@@ -125,8 +129,13 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
-    _player = p;
+    this.initialize(l, p, dcs);
+  }
+
+  private void initialize(OoyalaPlayerLayout l, OoyalaPlayer p,
+      DefaultControlStyle dcs) {
     _layout = l;
+    _player = p;
     _player.setLayoutController(this);
     _layout.setLayoutController(this);
     if (dcs == DefaultControlStyle.AUTO) {

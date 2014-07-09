@@ -78,13 +78,4 @@ public interface AdPluginInterface extends LifeCycleInterface {
    * 
    */
   public void skipAd();
-
-  /**
-   * This returns a state notifier object. Ooyala will listen to state changes
-   * on this object to update UI controls correspondingly
-   * 
-   * @return the object to be listened. null if plug-in does not want to send
-   *         notifications
-   */
-  public ChangeNotifierInterface getChangeNotifier();
 }

@@ -87,11 +87,4 @@ class TestPlugin implements AdPluginInterface {
     // TODO Auto-generated method stub
 
   }
-
-  @Override
-  public ChangeNotifierInterface getChangeNotifier() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

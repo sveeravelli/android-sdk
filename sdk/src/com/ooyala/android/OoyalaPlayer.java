@@ -12,10 +12,14 @@ import java.util.Set;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.FrameLayout;
 
@@ -164,6 +168,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _vastPlugin = null;
+  private BroadcastReceiver _receiver = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -205,10 +210,23 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+    _receiver = new BroadcastReceiver() {
+
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        Integer sender = intent.getIntExtra("sender", 0);
+        PlayerInterface p = currentPlayer();
+        if (p == null || sender != currentPlayer().hashCode()) {
+          return;
+        }
+        processAdNotifications(action);
+      }
+    };
+    registerReceiver(_receiver);
 
     // Initialize third party plugin managers
     _adManager = new AdPluginManager(this);
-    _adManager.addObserver(this);
     _vastPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_vastPlugin);
 
@@ -1172,8 +1190,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (arg0 instanceof Player) {
       processContentNotifications((Player) arg0, notification);
-    } else {
-      processAdNotifications(arg0, notification);
     }
   }
 
@@ -1225,11 +1241,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void processAdNotifications(Observable o, String notification) {
+  private void processAdNotifications(String notification) {
     DebugMode.logD(TAG, "processAdNotification " + notification);
     if (!isShowingAd()) {
-      DebugMode.logE(TAG, "not in ad mode, skipping notification "
-          + notification + " from " + o.toString());
+      DebugMode.assertFail(TAG, "not in ad mode, skipping");
       return;
     }
 
@@ -1877,5 +1892,56 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void playAd(AdSpot ad) {
     // TODO: remove this after implement IMA plugin.
+  }
+
+  private static Context _context;
+
+  public static void notifyBufferChange(PlayerInterface sender) {
+    if (_context == null) {
+      DebugMode.assertFail(TAG, "notify buffer change when context is null");
+      return;
+    }
+    Intent intent = new Intent(BUFFER_CHANGED_NOTIFICATION);
+    intent.putExtra("sender", sender.hashCode());
+    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
+  }
+
+  public static void notifyStateChange(PlayerInterface sender) {
+    if (_context == null) {
+      DebugMode.assertFail(TAG, "notify state change when context is null");
+      return;
+    }
+    Intent intent = new Intent(STATE_CHANGED_NOTIFICATION);
+    intent.putExtra("sender", sender.hashCode());
+    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
+  }
+
+  public static void notifyTimeChange(PlayerInterface sender) {
+    if (_context == null) {
+      DebugMode.assertFail(TAG, "notify time change when context is null");
+      return;
+    }
+    Intent intent = new Intent(TIME_CHANGED_NOTIFICATION);
+    intent.putExtra("sender", sender.hashCode());
+    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
+  }
+
+  private static void registerReceiver(BroadcastReceiver receiver) {
+    if (_context == null) {
+      DebugMode.logE(TAG, "context is null");
+    }
+    IntentFilter filter = new IntentFilter(TIME_CHANGED_NOTIFICATION);
+    filter.addAction(BUFFER_CHANGED_NOTIFICATION);
+    filter.addAction(STATE_CHANGED_NOTIFICATION);
+    LocalBroadcastManager.getInstance(_context).registerReceiver(receiver,
+        filter);
+  }
+
+  private static void unregisterReceiver(BroadcastReceiver receiver) {
+    LocalBroadcastManager.getInstance(_context).unregisterReceiver(receiver);
+  }
+
+  public static void setContext(Context c) {
+    _context = c;
   }
 }
