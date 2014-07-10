@@ -53,7 +53,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
-
     //Populate the embed map
     embedMap = new HashMap<String, String>();
     embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
@@ -75,8 +74,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
 
-//    EditText embedText = (EditText) findViewById(R.id.embedText);
-//    embedText.setText(EMBEDCODE);
     setButton.setOnClickListener(new OnClickListener() {
 
       @Override
@@ -119,16 +116,11 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
 
   @Override
   public void update(Observable observable, Object data) {
-//    OoyalaPlayer player = (OoyalaPlayer) observable;
-//    String notification = data.toString();
-
-//    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
-//      TextView urlText = (TextView) findViewById(R.id.urlText);
-//      urlText.setText(player.getCurrentItem().getStream().decodedURL().toString());
-//    }
+    // TODO Implement to listen to Ooyala Notifications
   }
 
-
+  // This is a local method of generating an embed token for debugging.
+  // It is unsafe to have your key and secrets in a production application
   @Override
   public void getTokenForEmbedCodes(List<String> embedCodes,
       EmbedTokenGeneratorCallback callback) {
@@ -141,8 +133,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     HashMap<String, String> params = new HashMap<String, String>();
     params.put("account_id", ACCOUNT_ID);
 
-    // This is a local method of generating an embed token. It is unsafe to have
-    // your key and secrets in a production application
     String uri = "/sas/embed_token/" + PCODE + "/" + embedCodesString;
     EmbeddedSecureURLGenerator urlGen = new EmbeddedSecureURLGenerator(APIKEY, SECRET);
 

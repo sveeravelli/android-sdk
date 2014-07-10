@@ -21,19 +21,12 @@ import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class VisualOnSampleAppActivity extends Activity implements Observer {
-  /** Called when the activity is first created. */
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
   Spinner embedSpinner;
   HashMap<String, String> embedMap;
   ArrayAdapter<String> embedAdapter;
-
-//  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
-  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
-//  private String EMBEDCODE = "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T"; //Telstra Clear Live Stream
-//  private String EMBEDCODE = "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2"; //Telstra Clear Single Bitrate Live Stream
-//  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
 
   final String PCODE  = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
   final String DOMAIN = "http://www.ooyala.com";
@@ -54,12 +47,7 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
 
     //Populate the embed map
     embedMap = new HashMap<String, String>();
-    embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
-    embedMap.put("Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
-    embedMap.put("Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
-    embedMap.put("Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
-    embedMap.put("Ooyala Playready Sample VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
-    embedMap.put("Playready-Provided Sample VOD",      "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY");
+    embedMap.put("Ooyala Sample HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
@@ -76,14 +64,10 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
 
-//    EditText embedText = (EditText) findViewById(R.id.embedText);
-//    embedText.setText(EMBEDCODE);
     setButton.setOnClickListener(new OnClickListener() {
 
       @Override
       public void onClick(View v) {
-//        EditText embedText = (EditText) findViewById(R.id.embedText);
-
         if (player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()))) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
@@ -121,12 +105,6 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
 
   @Override
   public void update(Observable observable, Object data) {
-    OoyalaPlayer player = (OoyalaPlayer) observable;
-    String notification = data.toString();
-    // TODO Auto-generated method stub
-//    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
-//      TextView urlText = (TextView) findViewById(R.id.urlText);
-//      urlText.setText(player.getCurrentItem().getStream().decodedURL().toString());
-//    }
+    // TODO Implement to listen to Ooyala Notifications
   }
 }
