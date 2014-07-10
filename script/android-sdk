@@ -5,6 +5,7 @@ SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLATFORM_NAME="Android"
 source ${SCRIPT_DIR}/sdk-helper.sh
 source ${SCRIPT_DIR}/secureplayer-build.sh
+source ${SCRIPT_DIR}/visualon-build.sh
 JAR_NAME="${LIB_BASE}.jar"
 IMA_JAR_NAME="${IMA_LIB_BASE}.jar"
 FW_JAR_NAME="${FW_LIB_BASE}.jar"

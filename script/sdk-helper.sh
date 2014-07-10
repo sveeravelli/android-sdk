@@ -236,6 +236,7 @@ function gen {
   custom_gen #also moves the jars into zip folder
 
   gen_secureplayer
+  gen_vo
 
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
@@ -374,6 +375,7 @@ function pub {
     cp ${FW_ZIP_NAME} "${CANDIDATE_DIR}"${FW_ZIP_NAME}
 
     pub_rc_secureplayer
+    pub_rc_vo
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -409,6 +411,7 @@ function pub {
     cp "${CANDIDATE_DIR}"${FW_ZIP_NAME} "${RELEASE_DIR}"${FW_ZIP_NAME}
 
     pub_release_secureplayer
+    pub_release_vo
   fi
   cd "${pub_currdir}"
 }

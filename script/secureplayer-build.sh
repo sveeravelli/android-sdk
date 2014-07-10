@@ -3,7 +3,7 @@
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
 SP_ZIP_BASE='OoyalaSecurePlayerIntegration'
-SP_ZIP_NAME=${SP_ZIP_NAME}.zip
+SP_ZIP_NAME=${SP_ZIP_BASE}.zip
 
 
 function gen_secureplayer {
