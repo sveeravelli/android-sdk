@@ -1,4 +1,12 @@
-Current Version: 2.5.0
+Current Version: 2.6.0
+
+------------ 2.6.0 ------------
+API/Package Changes
+[PBA-358] Ooyala no longer provides Google IMA libraries alongside our integration. Please download these libraries from Google IMA directly
+
+Bug Fixes
+[PBA-405] Fix bug where current item duration was not available on Current Item Changed Notification
+[PBA-387] Add support of hh:mm:ss:ff timestamp format for Closed Captions
 
 ------------ 2.5.0 ------------
 API/Class Package Changes
