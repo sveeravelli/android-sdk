@@ -1,4 +1,4 @@
-package com.ooyala.android.visualontest;
+package com.ooyala.android.visualonsample;
 
 import java.util.HashMap;
 import java.util.Observable;
@@ -20,7 +20,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
-public class VisualOnTestAppActivity extends Activity implements Observer {
+public class VisualOnSampleAppActivity extends Activity implements Observer {
   /** Called when the activity is first created. */
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
