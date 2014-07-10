@@ -167,42 +167,49 @@ public class OoyalaPlayer extends Observable implements Observer,
   private String _customDRMData = null;
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
-  private OoyalaManagedAdsPlugin _vastPlugin = null;
+  private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private BroadcastReceiver _receiver = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   *
+   * 
    * @param ooyalaAPIClient
    *          an initialized OoyalaApiClient
+   * @param an
+   *          android context
    */
-  public OoyalaPlayer(OoyalaAPIClient apiClient) {
-    this(apiClient.getPcode(), apiClient.getDomain(), null);
+  public OoyalaPlayer(OoyalaAPIClient apiClient, Context context) {
+    this(apiClient.getPcode(), apiClient.getDomain(), null, context);
   }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   *
+   * 
    * @param pcode
    *          Your Provider Code
    * @param domain
    *          Your Embed Domain
+   * @param an
+   *          android context
    */
-  public OoyalaPlayer(String pcode, PlayerDomain domain) {
-    this(pcode, domain, null);
+  public OoyalaPlayer(String pcode, PlayerDomain domain, Context context) {
+    this(pcode, domain, null, context);
   }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   *
+   * 
    * @param pcode
    *          Your Provider Code
    * @param domain
    *          Your Embed Domain
    * @param generator
    *          An embedTokenGenerator used to sign SAS requests
+   * @param an
+   *          android context
    */
-  public OoyalaPlayer(String pcode, PlayerDomain domain, EmbedTokenGenerator generator) {
+  public OoyalaPlayer(String pcode, PlayerDomain domain,
+      EmbedTokenGenerator generator, Context context) {
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
 
@@ -210,25 +217,27 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
-    _receiver = new BroadcastReceiver() {
-
-      @Override
-      public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        Integer sender = intent.getIntExtra("sender", 0);
-        PlayerInterface p = currentPlayer();
-        if (p == null || sender != currentPlayer().hashCode()) {
-          return;
+    if (context != null) {
+      setContext(context);
+      _receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+          String action = intent.getAction();
+          Integer sender = intent.getIntExtra("sender", 0);
+          PlayerInterface p = currentPlayer();
+          if (p == null || sender != currentPlayer().hashCode()) {
+            return;
+          }
+          processAdNotifications(action);
         }
-        processAdNotifications(action);
-      }
-    };
-    registerReceiver(_receiver);
+      };
+      registerReceiver(_receiver);
+    }
 
     // Initialize third party plugin managers
     _adManager = new AdPluginManager(this);
-    _vastPlugin = new OoyalaManagedAdsPlugin(this);
-    _adManager.registerPlugin(_vastPlugin);
+    _managedAdsPlugin = new OoyalaManagedAdsPlugin(this);
+    _adManager.registerPlugin(_managedAdsPlugin);
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -860,12 +869,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     setState(State.SUSPENDED);
+    if (_receiver != null) {
+      unregisterReceiver(_receiver);
+    }
   }
 
   /**
    * Resume the current video from a suspended state
    */
   public void resume() {
+    if (_receiver != null) {
+      registerReceiver(_receiver);
+    }
     if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
@@ -1465,7 +1480,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          true if seekable, false if not.
    */
   public void setAdsSeekable(boolean seekable) {
-    _vastPlugin.setSeekable(seekable);
+    _managedAdsPlugin.setSeekable(seekable);
   }
 
   /**
@@ -1760,10 +1775,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     return _adManager.deregisterPlugin(plugin);
   }
 
-  private void switchToAdMode() {
+  private void switchToAdMode(AdMode mode) {
     DebugMode.logD(TAG, "switchToAdMode");
 
-    if (_player != null) {
+    if (_player != null && mode != AdMode.ContentFinished) {
       _player.suspend();
     }
     removeClosedCaptionsView();
@@ -1805,16 +1820,16 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  void processExitAdModes(AdMode mode, boolean fromAdManager) {
+  void processExitAdModes(AdMode mode, boolean adsDidPlay) {
     DebugMode.logD(TAG, "exit admode from mode " + mode.toString()
-        + "frome adManager " + String.valueOf(fromAdManager));
+        + "ads did play " + String.valueOf(adsDidPlay));
     switch (mode) {
     case ContentChanged:
       break;
     case InitialPlay:
     case Playhead:
     case CuePoint:
-      if (fromAdManager) {
+      if (adsDidPlay) {
         _handler.post(new Runnable() {
           @Override
           public void run() {
@@ -1824,16 +1839,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       }
       break;
     case ContentFinished:
-      if (fromAdManager) {
-        _handler.post(new Runnable() {
-          @Override
-          public void run() {
-            switchToContent(true);
-          }
-        });
-      } else {
-        onComplete();
-      }
+      onComplete();
       break;
     case ContentError:
       onContentError();
@@ -1841,7 +1847,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     default:
       DebugMode.assertFail(TAG,
           "exitAdMode with unknown mode " + mode.toString()
-              + "from ad " + String.valueOf(fromAdManager));
+ + "adsDidPlay "
+              + String.valueOf(adsDidPlay));
       break;
     }
   }
@@ -1860,7 +1867,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private boolean processAdModes(AdMode mode, int parameter) {
     boolean result = _adManager.onAdMode(mode, parameter);
     if (result) {
-      switchToAdMode();
+      switchToAdMode(mode);
     } else {
       processExitAdModes(mode, false);
     }
@@ -1942,6 +1949,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   public static void setContext(Context c) {
-    _context = c;
+    if (_context == null) {
+      _context = c;
+    }
   }
 }
