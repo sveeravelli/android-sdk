@@ -1,4 +1,4 @@
-package com.ooyala.android.playreadysample;
+package com.ooyala.android.secureplayersample;
 
 import java.security.MessageDigest;
 

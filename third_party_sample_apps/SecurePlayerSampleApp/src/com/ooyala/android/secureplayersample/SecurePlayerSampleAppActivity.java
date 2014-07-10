@@ -1,4 +1,4 @@
-package com.ooyala.android.playreadysample;
+package com.ooyala.android.secureplayersample;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -24,8 +24,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
-public class PlayreadyDeviceManagementSampleApp extends Activity implements Observer, EmbedTokenGenerator {
-  /** Called when the activity is first created. */
+public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
@@ -34,16 +33,9 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
   ArrayAdapter<String> embedAdapter;
 
 
-  private String APIKEY = "FoeG863GnBL4IhhlFC1Q2jqbkH9m.-E1Kw";
-  private String SECRET = "J9U-ZbBPlu75YLonkPKukDyRmsaTK2HXfHs9KKQ0";
-  private String ACCOUNT_ID = "sidplayreadytest";
-
-//  private String EMBEDCODE = "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"; //Ooyala Playready Sample VOD
-//  private String EMBEDCODE = "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68"; // Telstra Playready Live Stream
-//  private String EMBEDCODE = "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T"; //Telstra Clear Live Stream
-//  private String EMBEDCODE = "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2"; //Telstra Clear Single Bitrate Live Stream
-//  private String EMBEDCODE = "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY"; //Playready-Provided Sample VOD
-
+  private String APIKEY = "Use this for testing, don't keep your secret in the application";
+  private String SECRET = "Use this for testing, don't keep your secret in the application";
+  private String ACCOUNT_ID = "accountID";
   final String PCODE  = "FoeG863GnBL4IhhlFC1Q2jqbkH9m";
   final String DOMAIN = "http://www.ooyala.com";
 
@@ -51,12 +43,13 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("VisualOn");
+    playerAdapter.add("VisualOn/SecurePlayer");
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
@@ -64,13 +57,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
     //Populate the embed map
     embedMap = new HashMap<String, String>();
     embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
-    embedMap.put("Sid test ",   "pxY3gwYjrEiFX9bh9_AKCPNbfLH7czoz");
-//    embedMap.put("(Dead)Telstra Encrypted Multi Bitrate Playready Live Stream",    "dqZGhyazpuZePSDwyVR2AxtuLFzqRB68");
-//    embedMap.put("(Dead)Telstra Clear Multi Bitrate Live Stream", "N0dXJ3azp-cKR8gG_SxAGVi3im8O0c8T");
-//    embedMap.put("(Dead)Telstra #2 Encrypted Live Stream",    "xxcnlhbDpmfRV1Zd7so0ONNoFW0NeYYC");
-//    embedMap.put("(Dead)Telstra #2 Clear Live Stream", "ZpcnlhbDqRGBSCaRAJbbID3TcerNmRnm");
-//    embedMap.put("(Dead)Telstra Clear Single Bitrate Live Stream",       "A1MXN3azpsp0sPbGTsIZLknwSFsFPnL2");
-    embedMap.put("Ooyala Playready Sample VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
+    embedMap.put("Ooyala-Ingested Playready Sample VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
     embedMap.put("Playready-Provided Sample VOD",      "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
@@ -94,7 +81,6 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
 
       @Override
       public void onClick(View v) {
-//        EditText embedText = (EditText) findViewById(R.id.embedText);
 
         if (player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()))) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
@@ -135,7 +121,7 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
   public void update(Observable observable, Object data) {
 //    OoyalaPlayer player = (OoyalaPlayer) observable;
 //    String notification = data.toString();
-    // TODO Auto-generated method stub
+
 //    if (notification.equals(OoyalaPlayer.AUTHORIZATION_READY_NOTIFICATION)) {
 //      TextView urlText = (TextView) findViewById(R.id.urlText);
 //      urlText.setText(player.getCurrentItem().getStream().decodedURL().toString());
@@ -155,6 +141,8 @@ public class PlayreadyDeviceManagementSampleApp extends Activity implements Obse
     HashMap<String, String> params = new HashMap<String, String>();
     params.put("account_id", ACCOUNT_ID);
 
+    // This is a local method of generating an embed token. It is unsafe to have
+    // your key and secrets in a production application
     String uri = "/sas/embed_token/" + PCODE + "/" + embedCodesString;
     EmbeddedSecureURLGenerator urlGen = new EmbeddedSecureURLGenerator(APIKEY, SECRET);
 

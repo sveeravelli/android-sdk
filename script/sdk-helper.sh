@@ -235,6 +235,8 @@ function gen {
 
   custom_gen #also moves the jars into zip folder
 
+  gen_secureplayer
+
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
@@ -370,6 +372,8 @@ function pub {
     cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${FW_ZIP_NAME} to ${CANDIDATE_DIR}${FW_ZIP_NAME}"
     cp ${FW_ZIP_NAME} "${CANDIDATE_DIR}"${FW_ZIP_NAME}
+
+    pub_rc_secureplayer
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -403,6 +407,8 @@ function pub {
     cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${CANDIDATE_DIR}${FW_ZIP_NAME} to ${RELEASE_DIR}${FW_ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${FW_ZIP_NAME} "${RELEASE_DIR}"${FW_ZIP_NAME}
+
+    pub_release_secureplayer
   fi
   cd "${pub_currdir}"
 }
