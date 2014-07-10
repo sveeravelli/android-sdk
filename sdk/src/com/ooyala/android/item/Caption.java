@@ -7,6 +7,8 @@ public class Caption {
   protected double _end = 0;
   protected String _text = null;
 
+  private static final String TAG = Caption.class.getName();
+
   Caption() {}
 
   Caption(Element element) {
@@ -58,5 +60,17 @@ public class Caption {
    */
   public String getText() {
     return _text;
+  }
+
+  /**
+   * append caption
+   * 
+   * @param the
+   *          caption to append
+   */
+  void append(final Caption caption) {
+    _text += "\n";
+    _text += caption.getText();
+    _end = Math.max(_end, caption.getEnd());
   }
 }

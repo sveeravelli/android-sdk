@@ -145,11 +145,18 @@ public class ClosedCaptions implements JSONUpdatableItem {
       }
 
       NodeList ps = div.getElementsByTagName(ELEMENT_P);
+      Caption lastCaption = null;
       for (int j = 0; j < ps.getLength(); j++) {
         Element p = (Element) ps.item(j);
         Caption caption = new Caption(p);
         if (caption != null) {
-          captionsForLang.add(caption);
+          if (lastCaption != null
+              && lastCaption.getBegin() >= caption.getBegin()) {
+            lastCaption.append(caption);
+          } else {
+            captionsForLang.add(caption);
+            lastCaption = caption;
+          }
         }
       }
     }
@@ -240,6 +247,13 @@ public class ClosedCaptions implements JSONUpdatableItem {
     }
     if (found) { return captionsForLanguage.get(currIdx); }
     return null;
+  }
+
+  // Test interfaces
+  boolean testUpdate(String language, Element xml) {
+    _languages.add(language);
+    _captions.put(language, new ArrayList<Caption>());
+    return this.update(xml);
   }
 
 }
