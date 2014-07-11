@@ -42,6 +42,7 @@ public class TestConstants {
   public static final String TEST_DICTIONARY_STREAM_MP4 = "resources/test_stream_mp4.json";
   public static final String TEST_DICTIONARY_STREAMS_MP4 = "resources/test_streams_mp4.json";
   public static final String TEST_DICTIONARY_CLOSED_CAPTIONS = "resources/test_closed_captions.json";
+  public static final String TEST_XML_CLOSED_CAPTIONS = "resources/test_closed_captions_timeline.xml";
 
   public static final String TEST_ANALYTICS_HTML = "resources/test_analytics.html";
   public static final String TEST_ANALYTICS_HTML_FAIL = "resources/test_analytics_fail.html";
