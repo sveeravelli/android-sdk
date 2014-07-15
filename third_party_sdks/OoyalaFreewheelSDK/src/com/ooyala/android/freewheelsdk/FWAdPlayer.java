@@ -125,22 +125,6 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
   }
 
   @Override
-  public void adReady(ISlot ad) {
-    setState(State.READY);
-    _currentAd = ad;
-
-    //If there were no pre-rolls fetched, we need to set state to complete only
-    //when play() is called (see play function below)
-    if (_currentAd == null) {
-      _noPrerolls = true;
-    }
-
-    if (_playQueued) {
-      play();
-    }
-  }
-
-  @Override
   public void onError() {
     //If play() has already been called, set state to error to resume content. Else, we set state to ready and
     //wait until play() is called to error out (or else, content may play when we haven't called play() yet).
@@ -219,7 +203,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
       _currentAd.stop();
       _currentAd = null;
     }
-    _adManager.setFWAdPlayerListener(null);
+    _adManager.adsDestroyed();
     super.destroy();
   }
 }

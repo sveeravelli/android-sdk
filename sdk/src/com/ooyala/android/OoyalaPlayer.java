@@ -530,7 +530,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     sendNotification(AUTHORIZATION_READY_NOTIFICATION);
-    processAdModes(AdMode.ContentChanged, 0);
     return changeCurrentItemAfterAuth();
   }
 
@@ -614,7 +613,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    if (!processAdModes(AdMode.InitialPlay, 0)) {
+    if (!processAdModes(AdMode.ContentChanged, 0)) {
       switchToContent(false);
     }
     return true;
@@ -838,10 +837,21 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (isAdPlaying()) {
         sendNotification(AD_STARTED_NOTIFICATION);
       }
-      currentPlayer().play();
+
+      if (!initialContentPlay()) {
+        currentPlayer().play();
+      }
     } else {
       queuePlay();
     }
+  }
+
+  private boolean initialContentPlay() {
+    if (_player.getState() != State.READY || _player.currentTime() > 0) {
+      return false;
+    }
+
+    return this.processAdModes(AdMode.InitialPlay, 0);
   }
 
   /**
@@ -1778,8 +1788,12 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void switchToAdMode(AdMode mode) {
     DebugMode.logD(TAG, "switchToAdMode");
 
-    if (_player != null && mode != AdMode.ContentFinished) {
-      _player.suspend();
+    if (_player != null) {
+      if (mode == AdMode.InitialPlay) {
+        _player.suspend(_player.currentTime(), State.PLAYING);
+      } else if (mode != AdMode.ContentFinished) {
+        _player.suspend();
+      }
     }
     removeClosedCaptionsView();
     _adManager.onAdModeEntered();
@@ -1825,6 +1839,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         + "ads did play " + String.valueOf(adsDidPlay));
     switch (mode) {
     case ContentChanged:
+      switchToContent(false);
       break;
     case InitialPlay:
     case Playhead:

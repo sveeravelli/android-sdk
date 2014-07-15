@@ -77,8 +77,8 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     }
 
     AdPluginInterface nextPlugin = getNextPlugin(_plugins, plugin);
-    while (nextPlugin != null && !pluginNeedsAdMode(plugin, _admode)) {
-      nextPlugin = getNextPlugin(_plugins, plugin);
+    while (nextPlugin != null && !pluginNeedsAdMode(nextPlugin, _admode)) {
+      nextPlugin = getNextPlugin(_plugins, nextPlugin);
     }
     
     if (nextPlugin == null) {

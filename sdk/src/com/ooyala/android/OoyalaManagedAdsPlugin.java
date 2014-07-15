@@ -55,14 +55,14 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   @Override
   public boolean onContentChanged() {
     resetAds();
-    _lastPlayedTime = 0;
     return false;
   }
 
   @Override
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
-    return hasAdsBeforeTime(0);
+    _lastPlayedTime = 0;
+    return hasAdsBeforeTime(_lastPlayedTime);
   }
 
   @Override
@@ -90,8 +90,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
 
   @Override
   public void onAdModeEntered() {
-    playAdsBeforeTime(this._lastPlayedTime, this._lastPlayedTime > 0 ? true
-        : false);
+    playAdsBeforeTime(this._lastPlayedTime, true);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
@@ -106,9 +105,9 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     p.addObserver(this);
 
     p.init(_player.get(), ad);
-    if (p.getError() != null) {
-      return false;
-    }
+    // if (p.getError() != null) {
+    // return false;
+    // }
     p.setSeekable(_seekable);
     return true;
   }
