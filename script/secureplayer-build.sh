@@ -22,8 +22,8 @@ function gen_secureplayer {
   echo "Created On: ${DATE}" >> ${SP_ZIP_BASE}/VERSION
 
   cp -r ${BASE_DIR}/vendor/SecurePlayer/assets ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_SPP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/SIGNATURES_ANDR_SPP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${BASE_DIR}/vendor/SecurePlayer/SIGNATURES_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
   cp -r ${BASE_DIR}/vendor/SecurePlayer/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
   cp -r ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp ${BASE_DIR}/${SP_ZIP_BASE}/
 
