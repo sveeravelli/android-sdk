@@ -22,7 +22,7 @@ SecurePlayerSampleApp is an example of this integration
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has smooth playback capiblities (or a remote asset pointing at a manifest)
+7. play an embed code that has smooth playback capablities (or a remote asset pointing at a manifest)
 
 
 === How to deal with Error codes ===

@@ -16,4 +16,4 @@ VisualOnSampleApp is an example of this integration
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has HLS playback capiblities (or a remote asset pointing at an .m3u8 file)
+7. play an embed code that has HLS playback capablities (or a remote asset pointing at an .m3u8 file)
