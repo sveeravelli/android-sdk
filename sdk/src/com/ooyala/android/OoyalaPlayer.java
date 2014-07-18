@@ -838,7 +838,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         sendNotification(AD_STARTED_NOTIFICATION);
       }
 
-      if (!initialContentPlay()) {
+      if (!initialContentPlay() || !this.processAdModes(AdMode.InitialPlay, 0)) {
         currentPlayer().play();
       }
     } else {
@@ -847,11 +847,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private boolean initialContentPlay() {
-    if (_player.getState() != State.READY || _player.currentTime() > 0) {
-      return false;
+    if (_player.getState() == State.READY && _player.currentTime() == 0) {
+      return true;
     }
 
-    return this.processAdModes(AdMode.InitialPlay, 0);
+    return false;
   }
 
   /**
@@ -1789,11 +1789,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "switchToAdMode");
 
     if (_player != null) {
-      if (mode == AdMode.InitialPlay) {
-        _player.suspend(_player.currentTime(), State.PLAYING);
-      } else if (mode != AdMode.ContentFinished) {
         _player.suspend();
-      }
     }
     removeClosedCaptionsView();
     _adManager.onAdModeEntered();
@@ -1803,7 +1799,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_player == null) {
       prepareContent(forcePlay);
     } else if (_player.getState() == State.SUSPENDED) {
-      _player.resume();
+      if (forcePlay) {
+        _player.resume(_player.currentTime(), State.PLAYING);
+      } else {
+        _player.resume();
+      }
       addClosedCaptionsView();
     }
   }

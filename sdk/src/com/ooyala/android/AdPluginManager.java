@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
@@ -115,6 +116,13 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   public void resume() {
     if (_activePlugin != null) {
       _activePlugin.resume();
+    }
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    if (_activePlugin != null) {
+      _activePlugin.resume(timeInMilliSecond, stateToResume);
     }
   }
 

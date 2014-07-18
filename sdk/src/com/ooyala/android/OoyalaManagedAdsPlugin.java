@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.AdMoviePlayer;
@@ -42,6 +43,13 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public void resume() {
     if (_adPlayer != null) {
       _adPlayer.resume();
+    }
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    if (_adPlayer != null) {
+      _adPlayer.resume(timeInMilliSecond, stateToResume);
     }
   }
 

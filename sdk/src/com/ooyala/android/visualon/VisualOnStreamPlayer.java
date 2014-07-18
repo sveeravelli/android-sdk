@@ -497,7 +497,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
-  private void resume(int millisToResume, State stateToResume) {
+  @Override
+  public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
     _stateBeforeSuspend = stateToResume;
 

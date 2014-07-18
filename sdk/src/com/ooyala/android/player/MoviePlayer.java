@@ -144,11 +144,6 @@ public class MoviePlayer extends Player implements Observer {
     _stateToResume = stateToResume;
     if (_basePlayer != null) {
       _basePlayer.deleteObserver(this);
-      // We need this trick to process suspend on initial play, shall we
-      // introduce another method?
-      if (_basePlayer.getState() != stateToResume) {
-        _basePlayer.setState(stateToResume);
-      }
       _basePlayer.suspend();
     }
   }
@@ -159,6 +154,7 @@ public class MoviePlayer extends Player implements Observer {
     setState(getState());
   }
 
+  @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
     _basePlayer.init(_parent, _streams);

@@ -144,6 +144,10 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
       default:
         break;
       }
+    } else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
+      if (_fwContext != null) {
+        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
+      }
     }
   }
 
@@ -379,6 +383,11 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   @Override
   public void resume() {
     // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    // TODO Auto-generated method stub
 
   }
 
@@ -444,4 +453,5 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     // TODO Auto-generated method stub
 
   }
+
 }

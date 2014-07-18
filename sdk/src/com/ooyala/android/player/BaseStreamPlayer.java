@@ -378,7 +378,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     resume(_timeBeforeSuspend, _stateBeforeSuspend);
   }
 
-  private void resume(int millisToResume, State stateToResume) {
+  @Override
+  public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
     if (stateToResume == State.PLAYING) {
       queuePlay();

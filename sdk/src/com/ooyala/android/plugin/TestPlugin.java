@@ -1,5 +1,6 @@
 package com.ooyala.android.plugin;
 
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 
 class TestPlugin implements AdPluginInterface {
@@ -84,6 +85,12 @@ class TestPlugin implements AdPluginInterface {
 
   @Override
   public void skipAd() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
     // TODO Auto-generated method stub
 
   }

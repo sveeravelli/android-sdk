@@ -105,6 +105,12 @@ public class Player extends Observable implements PlayerInterface,
   }
 
   @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
   public void destroy() {
     // TODO Auto-generated method stub
 
