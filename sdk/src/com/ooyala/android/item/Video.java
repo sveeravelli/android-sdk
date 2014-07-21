@@ -1,6 +1,7 @@
 package com.ooyala.android.item;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import com.ooyala.android.OoyalaAPIClient;
  * Stores the info and metatdata for the specified movie.
  */
 public class Video extends ContentItem implements PlayableItem {
+  private static final String TAG = Video.class.getName();
   protected List<AdSpot> _ads = new ArrayList<AdSpot>();
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected Channel _parent = null;
@@ -122,18 +124,9 @@ public class Video extends ContentItem implements PlayableItem {
    * @param ad the AdSpot to play during this video
    */
   public void insertAd(AdSpot ad) {
-    if (_ads == null) {
-      _ads = new ArrayList<AdSpot>();
-      _ads.add(ad);
-      return;
-    }
-    for (int i = 0; i < _ads.size(); i++) {
-      if (ad.getTime() < _ads.get(i).getTime()) {
-        _ads.add(i, ad);
-        return;
-      }
-    }
+    DebugMode.assertCondition(_ads != null, TAG, "ads is null");
     _ads.add(ad);
+    Collections.sort(_ads);
   }
 
   public void filterAds( IMatchObjectPredicate<AdSpot> keeper ) {

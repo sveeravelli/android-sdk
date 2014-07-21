@@ -2,32 +2,35 @@ package com.ooyala.android.freewheelsdk;
 
 import tv.freewheel.ad.interfaces.ISlot;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.item.AdSpot;
 
 /**
  * The ad spot that holds a list of ISlots (ads) and the Freewheel context
  */
 public class FWAdSpot extends AdSpot {
-
+  private static final String TAG = FWAdSpot.class.getName();
   private ISlot _ad;
-  private OoyalaFreewheelManager _adManager;
+
+  private FWAdSpot(ISlot ad) {
+    _ad = ad;
+  }
 
   /**
    * Initialize a Freewheel Ad Spot. Note that this AdSpot does not actually have a stream like other AdSpots
    * @param ad the ISlot to play
    * @param adManager the Freewheel ad manager
    */
-  public FWAdSpot(ISlot ad, OoyalaFreewheelManager adManager) {
-    _ad = ad;
-    _adManager = adManager;
+  public static FWAdSpot create(ISlot ad) {
+    if (ad == null) {
+      DebugMode.assertFail(TAG, "FWAdSpot.create error, ad is null");
+      return null;
+    }
+    return new FWAdSpot(ad);
   }
 
   public ISlot getAd() {
     return _ad;
-  }
-
-  public OoyalaFreewheelManager getAdManager() {
-    return _adManager;
   }
 
   @Override
@@ -41,10 +44,6 @@ public class FWAdSpot extends AdSpot {
    */
   public int getTime() {
     //Ad may be null if pre-rolls have not been fetched yet
-    if (_ad != null) {
-      return (int) (_ad.getTimePosition() * 1000);
-    } else {
-      return 0;
-    }
+    return (int) (_ad.getTimePosition() * 1000);
   }
 }

@@ -14,7 +14,7 @@ import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.ads.vast.VASTAdSpot;
 
-public abstract class AdSpot implements JSONUpdatableItem {
+public abstract class AdSpot implements JSONUpdatableItem, Comparable<AdSpot> {
   protected static final String KEY_TYPE = "type";  //AdSpot
   protected static final String KEY_TIME = "time";  //AdSpot
   protected static final String KEY_CLICK_URL = "click_url";
@@ -151,5 +151,9 @@ public abstract class AdSpot implements JSONUpdatableItem {
    */
   public boolean isReusable() {
     return _isReusable;
+  }
+
+  public int compareTo(AdSpot ad) {
+    return this.getTime() - ad.getTime();
   }
 }

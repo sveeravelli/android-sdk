@@ -1,10 +1,11 @@
 package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
@@ -14,12 +15,13 @@ import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 
-public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
+class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
+  private final Set<AdSpot> _playedAds = new HashSet<AdSpot>();
+  private int _timeAlignment;
   private int _lastPlayedTime;
 
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
@@ -70,20 +72,23 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
     _lastPlayedTime = 0;
-    return hasAdsBeforeTime(_lastPlayedTime);
+    return adBeforeTime(_player.get().getCurrentItem().getAds(),
+        _playedAds, _lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
   public boolean onPlayheadUpdate(int playhead) {
     DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastPlayedTime = playhead;
-    return hasAdsBeforeTime(_lastPlayedTime);
+    return adBeforeTime(_player.get().getCurrentItem().getAds(),
+        _playedAds, _lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
   public boolean onContentFinished() {
     _lastPlayedTime = Integer.MAX_VALUE;
-    return hasAdsBeforeTime(_lastPlayedTime);
+    return adBeforeTime(_player.get().getCurrentItem().getAds(),
+        _playedAds, _lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
@@ -98,7 +103,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
 
   @Override
   public void onAdModeEntered() {
-    playAdsBeforeTime(this._lastPlayedTime, true);
+    playAdsBeforeTime(_lastPlayedTime);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
@@ -164,52 +169,27 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     }
   }
 
-  public boolean hasAdsBeforeTime(int time) {
-    for (AdSpot ad : _player.get().getCurrentItem().getAds()) {
-      int adTime = ad.getTime();
-      // Align ad times to 10 second (HLS chunk length) boundaries
-      if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
-          .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
-        adTime = ((adTime + 5000) / 10000) * 10000;
-      }
-      if (adTime <= time && !this._playedAds.contains(ad)) {
-        return true;
-      }
+  public boolean playAdsBeforeTime(int time) {
+    AdSpot adToPlay = adBeforeTime(_player.get().getCurrentItem()
+        .getAds(), _playedAds, time, _timeAlignment);
+    if (adToPlay == null) {
+      return false;
     }
-    return false;
-  }
-
-  public boolean playAdsBeforeTime(int time, boolean autoplay) {
-    this._lastPlayedTime = time;
-    for (AdSpot ad : _player.get().getCurrentItem().getAds()) {
-      int adTime = ad.getTime();
-      // Align ad times to 10 second (HLS chunk length) boundaries
-      if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
-          .getStreams(),
-          Stream.DELIVERY_TYPE_HLS)) {
-        adTime = ((adTime + 5000) / 10000) * 10000;
-      }
-      if (adTime <= time && !this._playedAds.contains(ad)) {
-        _playedAds.add(ad);
-        if (!autoplay && initializeAd(ad)) {
-          return true;
-        } else if (autoplay && playAd(ad)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    _playedAds.add(adToPlay);
+    return playAd(adToPlay);
   }
 
   public void resetAds() {
     _playedAds.clear();
+    _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
+        .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
   }
 
   /**
    * Skip the currently playing ad. Do nothing if no ad is playing
    */
   public void skipAd() {
-    playAdsBeforeTime(_lastPlayedTime, true);
+    playAdsBeforeTime(_lastPlayedTime);
   }
 
   @Override
@@ -220,7 +200,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
       switch (player.getState()) {
       case COMPLETED:
-        if (!playAdsBeforeTime(_lastPlayedTime, true)) {
+        if (!playAdsBeforeTime(_lastPlayedTime)) {
           cleanupPlayer(_adPlayer);
           _player.get().exitAdMode(this);
         }
@@ -272,5 +252,38 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   @Override
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
+  }
+
+  /*
+   * helper function to identify the ad to be played before a certain time
+   * 
+   * @param adList the adspot list
+   * 
+   * @param filteredAdList the ads that should not be played
+   * 
+   * @param time the time stamp in millisecond
+   * 
+   * @param timeAlignment time alignment in millisecond
+   * 
+   * @return the ad spot to be played, null if no ad to be played
+   */
+  public static AdSpot adBeforeTime(List<AdSpot> adList,
+      Set<AdSpot> filteredAds, int time, int timeAlignment) {
+    if (adList == null) {
+      return null;
+    }
+
+    for (AdSpot ad : adList) {
+      int adTime = ad.getTime();
+      // Align ad times to 10 second (HLS chunk length) boundaries
+      if (timeAlignment > 0) {
+        adTime = ((adTime + timeAlignment / 2) / timeAlignment) * timeAlignment;
+      }
+      if (adTime > time || (filteredAds != null && filteredAds.contains(ad))) {
+        continue;
+      }
+      return ad;
+    }
+    return null;
   }
 }

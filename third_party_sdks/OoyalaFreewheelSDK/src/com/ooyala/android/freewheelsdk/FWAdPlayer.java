@@ -1,5 +1,6 @@
 package com.ooyala.android.freewheelsdk;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +26,9 @@ import com.ooyala.android.player.StreamPlayer;
 /**
  * This class represents the Base Movie Player that plays Freewheel ad spots.
  */
-public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
+public class FWAdPlayer extends AdMoviePlayer {
   private static String TAG = "FWAdPlayer";
-  private OoyalaFreewheelManager _adManager;
+  private WeakReference<OoyalaFreewheelManager> _adManager;
   private AdSpot _adSpot;
   private ISlot _currentAd;
   private List<IAdInstance> _adInstances;
@@ -62,6 +63,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
       }
     }
   };
+
   private IEventListener _slotEndedEventListener = new IEventListener() {
     @Override
     public void run(IEvent e) {
@@ -77,12 +79,14 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
       }
     }
   };
+
   private IEventListener _adPauseEventListener = new IEventListener() {
     @Override
     public void run(IEvent e) {
       setState(State.PAUSED);
     }
   };
+
   private IEventListener _adResumeEventListener = new IEventListener() {
     @Override
     public void run(IEvent e) {
@@ -90,15 +94,55 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
     }
   };
 
+  public void init(OoyalaFreewheelManager manager, OoyalaPlayer parent,
+      AdSpot ad) {
+    setManager(manager);
+    init(parent, ad);
+  }
+
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad) {
-    DebugMode.logD(TAG, "FW Ad Player: Initializing");
+    DebugMode.assertCondition(_adManager != null, TAG,
+        "FW Ad Player: Init should not be called!!! This is not a valid init");
+    setLayout(parent);
+    initAd(ad);
+  }
 
+  private void setManager(OoyalaFreewheelManager manager) {
+    _adManager = new WeakReference<OoyalaFreewheelManager>(manager);
+    _fwContext = _adManager.get().getFreewheelContext();
+    _fwConstants = _fwContext.getConstants();
+
+    // Add event listeners and set parameter to prevent ad click detection
+    _fwContext.addEventListener(_fwConstants.EVENT_AD_IMPRESSION(),
+        _adStartedEventListener);
+    _fwContext.addEventListener(_fwConstants.EVENT_SLOT_ENDED(),
+        _slotEndedEventListener);
+    _fwContext.addEventListener(_fwConstants.EVENT_AD_PAUSE(),
+        _adPauseEventListener);
+    _fwContext.addEventListener(_fwConstants.EVENT_AD_RESUME(),
+        _adResumeEventListener);
+    _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false",
+        _fwConstants.PARAMETER_LEVEL_OVERRIDE());
+  }
+
+  private void setLayout(OoyalaPlayer parent) {
+    // Initialize the Learn More button. Note that we don't have a click through
+    // URL yet.
+    if (_playerLayout == null) {
+      _playerLayout = parent.getLayout();
+      _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this,
+          parent.getTopBarOffset());
+    }
+  }
+
+  public void initAd(AdSpot ad) {
     if (!(ad instanceof FWAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       setState(State.ERROR);
       return;
     }
+
     _seekable = false;
     _playQueued = false;
     _adError = false;
@@ -106,25 +150,8 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
 
     _adSpot = ad;
     _currentAd = ((FWAdSpot) _adSpot).getAd();
-    _adManager = ((FWAdSpot) _adSpot).getAdManager();
-    _adManager.setFWAdPlayerListener(this);
-
-    _fwContext = _adManager.getFreewheelContext();
-    _fwConstants = _fwContext.getConstants();
-
-    //Add event listeners and set parameter to prevent ad click detection
-    _fwContext.addEventListener(_fwConstants.EVENT_AD_IMPRESSION(), _adStartedEventListener);
-    _fwContext.addEventListener(_fwConstants.EVENT_SLOT_ENDED(), _slotEndedEventListener);
-    _fwContext.addEventListener(_fwConstants.EVENT_AD_PAUSE(), _adPauseEventListener);
-    _fwContext.addEventListener(_fwConstants.EVENT_AD_RESUME(), _adResumeEventListener);
-    _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false", _fwConstants.PARAMETER_LEVEL_OVERRIDE());
-
-    //Initialize the Learn More button. Note that we don't have a click through URL yet.
-    _playerLayout = parent.getLayout();
-    _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, parent.getTopBarOffset());
   }
 
-  @Override
   public void onError() {
     //If play() has already been called, set state to error to resume content. Else, we set state to ready and
     //wait until play() is called to error out (or else, content may play when we haven't called play() yet).
@@ -151,7 +178,7 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
     } else if (_currentAd == null) {
       _playQueued = true;
     } else {
-      _adManager.adsPlaying();
+      _adManager.get().adsPlaying();
       _adInstances = _currentAd.getAdInstances();
 
       DebugMode.logD(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
@@ -203,7 +230,17 @@ public class FWAdPlayer extends AdMoviePlayer implements FWAdPlayerListener {
       _currentAd.stop();
       _currentAd = null;
     }
-    _adManager.adsDestroyed();
+
     super.destroy();
+  }
+
+  @Override
+  protected void setState(State state) {
+    if (state == State.COMPLETED) {
+      _adManager.get().onAdCompleted();
+    } else if (state == State.ERROR) {
+      _adManager.get().onAdError();
+    }
+    super.setState(state);
   }
 }
