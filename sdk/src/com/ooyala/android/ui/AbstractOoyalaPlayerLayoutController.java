@@ -301,8 +301,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
       this.optionList.addAll(languageSet);
       this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
+      // this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
+      // this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
       this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
       this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
     }
@@ -349,6 +349,15 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
         this.selectedLanguageIndex = position;
         _player.setClosedCaptionsLanguage(this.optionList.get(position));
+
+        // Enable or disable the Pop-on automatically
+        if (position > 1) {
+          ((RadioButton) listView.getChildAt(this.optionList.size() - 2)).setChecked(true);
+          this.selectedPresentationIndex = this.optionList.size() - 2;
+        } else if (position == 1){
+          ((RadioButton) listView.getChildAt(this.optionList.size() - 2)).setChecked(false);
+          this.selectedPresentationIndex = 0;
+        }
       } else {
         if (this.selectedPresentationIndex != 0) {
           int presIndexOnScreen = this.selectedPresentationIndex - listView.getFirstVisiblePosition();
@@ -390,7 +399,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     public boolean isEnabled(int position) {
       return (position != 0)
           && (position != this.itemList
-              .indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
+          .indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
     }
 
     @Override
