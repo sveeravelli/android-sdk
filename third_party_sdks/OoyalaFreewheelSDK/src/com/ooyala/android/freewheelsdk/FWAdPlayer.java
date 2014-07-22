@@ -1,6 +1,5 @@
 package com.ooyala.android.freewheelsdk;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ import com.ooyala.android.player.StreamPlayer;
  */
 public class FWAdPlayer extends AdMoviePlayer {
   private static String TAG = "FWAdPlayer";
-  private WeakReference<OoyalaFreewheelManager> _adManager;
+  private OoyalaFreewheelManager _adManager;
   private AdSpot _adSpot;
   private ISlot _currentAd;
   private List<IAdInstance> _adInstances;
@@ -109,8 +108,8 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   private void setManager(OoyalaFreewheelManager manager) {
-    _adManager = new WeakReference<OoyalaFreewheelManager>(manager);
-    _fwContext = _adManager.get().getFreewheelContext();
+    _adManager = manager;
+    _fwContext = _adManager.getFreewheelContext();
     _fwConstants = _fwContext.getConstants();
 
     // Add event listeners and set parameter to prevent ad click detection
@@ -178,7 +177,7 @@ public class FWAdPlayer extends AdMoviePlayer {
     } else if (_currentAd == null) {
       _playQueued = true;
     } else {
-      _adManager.get().adsPlaying();
+      _adManager.adsPlaying();
       _adInstances = _currentAd.getAdInstances();
 
       DebugMode.logD(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
@@ -237,9 +236,9 @@ public class FWAdPlayer extends AdMoviePlayer {
   @Override
   protected void setState(State state) {
     if (state == State.COMPLETED) {
-      _adManager.get().onAdCompleted();
+      _adManager.onAdCompleted();
     } else if (state == State.ERROR) {
-      _adManager.get().onAdError();
+      _adManager.onAdError();
     }
     super.setState(state);
   }

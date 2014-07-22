@@ -15,7 +15,7 @@ import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 
-class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
+public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;

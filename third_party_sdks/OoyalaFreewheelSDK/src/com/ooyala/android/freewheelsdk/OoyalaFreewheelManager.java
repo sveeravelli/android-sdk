@@ -40,6 +40,7 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
 
   private static final String TAG = "OoyalaFreewheelManager";
+  private static final double FWPLAYER_AD_REQUEST_TIMEOUT = 5.0;
 
   protected Activity _parent;
   protected WeakReference<OoyalaPlayer> _player;
@@ -287,7 +288,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
       }
     });
     //Submit request with 3s timeout
-    _fwContext.submitRequest(3.0);
+    _fwContext.submitRequest(FWPLAYER_AD_REQUEST_TIMEOUT);
   }
 
   private void exitAdMode() {
@@ -333,20 +334,22 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
    * Call this only via updateRollsAndDelegate() to ensure proper state.
    */
   private void updatePreMidPost() {
+    DebugMode.logD(TAG, "updatePreMidPost()");
     _overlays = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_OVERLAY());
-
+    if (_overlays != null) {
+      DebugMode.logD(TAG, "overlay count: " + String.valueOf(_overlays.size()));
+    }
     try {
       //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
-      List<ISlot> adsToPlay = new ArrayList<ISlot>();
-      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants
-          .TIME_POSITION_CLASS_PREROLL()));
-      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_MIDROLL()));
-      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_POSTROLL()));
-      for (ISlot ad : adsToPlay) {
-        insertAd(_ads, FWAdSpot.create(ad));
-      }
+      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_PREROLL()), "Preroll");
+      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_MIDROLL()), "Midroll");
+      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_POSTROLL()), "postroll");
     } catch (Exception e) {
-      DebugMode.logE(TAG, "Error in adding ad slots to the list of ads to play");
+      DebugMode.logE(TAG,
+          "Error in adding ad slots to the list of ads to play", e);
       e.printStackTrace();
     }
   }
@@ -467,14 +470,36 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     playAdsBeforeTime(_lastPlayedTime);
   }
 
-  private static void insertAd(List<AdSpot> adList, AdSpot ad) {
-    if (adList == null || ad == null) {
-      DebugMode.assertFail(TAG, "insertAd error, ad is null");
+  private static void insertAds(List<AdSpot> adList, List<ISlot> slotList,
+      String adType) {
+    if (adList == null) {
+      DebugMode.assertFail(TAG, "insertAds error, ad List or slot is null");
       return;
     }
 
-    adList.add(ad);
+    if (slotList == null) {
+      DebugMode.logD(TAG, "no " + adType + " is added");
+      return;
+    }
+
+    DebugMode.logD(TAG,
+        adType + " ads count: " + String.valueOf(slotList.size()));
+    for (ISlot slot : slotList) {
+      insertAd(adList, slot);
+    }
+
     Collections.sort(adList);
+  }
+
+  private static void insertAd(List<AdSpot> adList, ISlot slot) {
+    for (AdSpot ad : adList) {
+      if (((FWAdSpot) ad).getAd() == slot) {
+        DebugMode.assertFail(TAG, "ad " + slot.toString() + " already added");
+        return;
+      }
+    }
+
+    adList.add(FWAdSpot.create(slot));
   }
 
   public boolean playAdsBeforeTime(int time) {
