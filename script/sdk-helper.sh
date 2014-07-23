@@ -242,7 +242,6 @@ function gen {
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
-  rm -rf ${FW_ZIP_BASE}/FreewheelSampleApp/libs/FWAdManager.jar
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
