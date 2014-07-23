@@ -692,7 +692,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
-          setState(State.READY);
+          setState(State.PAUSED);
           dequeuePlay();
         }
       }
@@ -716,7 +716,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
-        setState(State.READY);
+        setState(State.PAUSED);
         dequeuePlay();
       }
       break;

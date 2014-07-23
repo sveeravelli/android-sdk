@@ -2,6 +2,8 @@ package com.ooyala.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,10 +20,10 @@ import android.widget.Spinner;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
-public class BaseInternalTestAppActivity extends Activity implements OnClickListener {
+public class BaseInternalTestAppActivity extends Activity implements OnClickListener, Observer {
 
   protected Map<String, String> embedMap;
   final String TAG = this.getClass().toString();
@@ -48,6 +50,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     PlayerDomain domain = new PlayerDomain(DOMAIN);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain);
     player = playerLayoutController.getPlayer();
+    player.addObserver(this);
 
     //Initialize the bottom controls
     embedMap = new HashMap<String, String>();
@@ -114,4 +117,13 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     }
     return super.onKeyDown(keyCode, event);
   }
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      return;
+    }
+    Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
+  }
+
 }

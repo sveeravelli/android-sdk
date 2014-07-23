@@ -126,7 +126,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_player == null) { return 0; }
     switch (getState()) {
       case INIT:
-      case LOADING:
       case SUSPENDED:
         return 0;
       default:
@@ -140,7 +139,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_player == null) { return 0; }
     switch (getState()) {
       case INIT:
-      case LOADING:
       case SUSPENDED:
         return 0;
       default:
@@ -247,8 +245,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     //These refer to when mid-playback buffering happens.  This doesn't apply to initial buffer
     if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
       DebugMode.logD(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
+      setState(State.LOADING);
     } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
       DebugMode.logD(TAG, "onInfo: Buffering Done! " + what + ", extra: " + extra);
+      if (_player.isPlaying()) {
+        setState(State.PLAYING);
+      }
+      else {
+        setState(State.PAUSED);
+      }
     }
     return true;
   }
