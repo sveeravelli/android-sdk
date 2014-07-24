@@ -67,8 +67,9 @@ public class OoyalaIMAManager implements Observer {
 
     //Initialize OoyalaPlayer-IMA Bridge
     _ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(_player, this);
-    _player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
-    _player.registerAdPlayer(IMAEmptyAdSpot.class, IMAAdPlayer.class);
+    // TODO: use register plugin instead
+    // _player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
+    // _player.registerAdPlayer(IMAEmptyAdSpot.class, IMAAdPlayer.class);
     _player.addObserver(this);
 
     //Initialize IMA classes
@@ -82,7 +83,8 @@ public class OoyalaIMAManager implements Observer {
         DebugMode.logE(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
         DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
         _onAdError = true;
-        _player.adPlayerCompleted();
+        // TODO: use exit ad mode instead.
+        // _player.adPlayerCompleted();
       }
     } );
 
@@ -100,7 +102,8 @@ public class OoyalaIMAManager implements Observer {
             DebugMode.logE(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
             DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
             _onAdError = true;
-            _player.adPlayerCompleted();
+            // TODO: use exit ad mode instead.
+            // _player.adPlayerCompleted();
           }
         } );
 

@@ -219,6 +219,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
     if (context != null) {
       setContext(context);
+      // use broadcastreceiver for the message bus
       _receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -679,6 +680,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     return new MoviePlayer();
   }
 
+  /**
+   * Create and initialize a content player for an item.
+   * 
+   * @return
+   */
   private MoviePlayer createAndInitPlayer(Video item) {
     if (item == null) {
       DebugMode.assertFail(TAG, "current item is null when initialze player");
@@ -691,7 +697,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       return null;
     }
 
-    Set<Stream> streams = _currentItem.getStreams();
+    Set<Stream> streams = item.getStreams();
 
     // Initialize this player
     p.addObserver(this);
@@ -700,7 +706,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     p.init(this, streams);
 
-    p.setLive(_currentItem.isLive());
+    p.setLive(item.isLive());
 
     addClosedCaptionsView();
 
@@ -846,6 +852,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * Determine if play is the initial play for the content, required to insert
+   * preroll properly.
+   * 
+   * @return true if it is initial play
+   */
   private boolean initialContentPlay() {
     if (_player.getState() == State.READY && _player.currentTime() == 0) {
       return true;
@@ -1072,6 +1084,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * Get the current player, can be either content player or ad player
+   * 
+   * @return the player
+   */
   private PlayerInterface currentPlayer() {
     return _adManager.inAdMode() ? _adManager.getPlayerInterface() : _player;
   }
@@ -1169,6 +1186,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     return false;
   }
 
+  /**
+   * reset the content player, only called by onComplete.
+   */
   private void reset() {
     removeClosedCaptionsView();
     _playQueued = false;
@@ -1218,7 +1238,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  public void processContentNotifications(Player player, String notification) {
+  /**
+   * For Internal Use Only. Process content player notification.
+   * 
+   * @param player
+   *          the notification sender
+   * @param notification
+   *          the notification
+   */
+  private void processContentNotifications(Player player, String notification) {
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
         // send analytics ping
@@ -1266,6 +1294,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * For Internal Use Only. Process ad player notification.
+   * 
+   * @param notification
+   *          the notification
+   */
   private void processAdNotifications(String notification) {
     DebugMode.logD(TAG, "processAdNotification " + notification);
     if (!isShowingAd()) {
@@ -1705,6 +1739,12 @@ public class OoyalaPlayer extends Observable implements Observer,
         }));
   }
 
+  /**
+   * set the analytics tags
+   * 
+   * @param tags
+   *          the list of tags to set
+   */
   public void setCustomAnalyticsTags(List<String> tags) {
     if (_analytics != null) {
       _analytics.setTags(tags);
@@ -1735,6 +1775,11 @@ public class OoyalaPlayer extends Observable implements Observer,
         OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, description);
   }
 
+  /**
+   * get the seek style
+   * 
+   * @return the seek style of current player
+   */
   public SeekStyle getSeekStyle() {
     if (getBasePlayer() != null) {
       return getBasePlayer().getSeekStyle();
@@ -1757,12 +1802,19 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param adPlayerClass
    *          A player that plays the ad
    */
-  public void registerAdPlayer(Class<? extends AdSpot> adTypeClass,
+  void registerAdPlayer(Class<? extends AdSpot> adTypeClass,
       Class<? extends AdMoviePlayer> adPlayerClass) {
     _adPlayers.put(adTypeClass, adPlayerClass);
   }
 
-  public Class<? extends AdMoviePlayer> getAdPlayerClass(AdSpot ad) {
+  /**
+   * get the ad player class for a certain ad spot
+   * 
+   * @param ad
+   *          the adspot
+   * @return the adplayer class
+   */
+  Class<? extends AdMoviePlayer> getAdPlayerClass(AdSpot ad) {
     return _adPlayers.get(ad.getClass());
   }
 
@@ -1775,11 +1827,25 @@ public class OoyalaPlayer extends Observable implements Observer,
     return SDK_VERSION;
   }
 
+  /**
+   * register a ad plugin
+   * 
+   * @param plugin
+   *          the plugin to be registered
+   * @return true if registration succeeded, false otherwise
+   */
   @Override
   public boolean registerPlugin(final AdPluginInterface plugin) {
     return _adManager.registerPlugin(plugin);
   }
 
+  /**
+   * deregister a ad plugin
+   * 
+   * @param plugin
+   *          the plugin to be deregistered
+   * @return true if deregistration succeeded, false otherwise
+   */
   @Override
   public boolean deregisterPlugin(final AdPluginInterface plugin) {
     return _adManager.deregisterPlugin(plugin);
@@ -1808,6 +1874,14 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * called by a plugin when it finishes ad play and return the control to
+   * ooyalaplayer
+   * 
+   * @param plugin
+   *          the caller plugin
+   * @return true if exit succeeded, false otherwise
+   */
   @Override
   public boolean exitAdMode(final AdPluginInterface plugin) {
     return _adManager.exitAdMode(plugin);
@@ -1908,16 +1982,14 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  public void adPlayerCompleted() {
-    // TODO: remove this after implement IMA plugin.
-  }
-
-  public void playAd(AdSpot ad) {
-    // TODO: remove this after implement IMA plugin.
-  }
-
   private static Context _context;
 
+  /**
+   * called by a ad player when buffer changed to update the UI
+   * 
+   * @param sender
+   *          the player who triggers the notification
+   */
   public static void notifyBufferChange(PlayerInterface sender) {
     if (_context == null) {
       DebugMode.assertFail(TAG, "notify buffer change when context is null");
@@ -1928,6 +2000,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
   }
 
+  /**
+   * called by a ad player when player state changed to update the UI
+   * 
+   * @param sender
+   *          the player who triggers the notification
+   */
   public static void notifyStateChange(PlayerInterface sender) {
     if (_context == null) {
       DebugMode.assertFail(TAG, "notify state change when context is null");
@@ -1938,6 +2016,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
   }
 
+  /**
+   * called by a ad player when ad playhead changed
+   * 
+   * @param sender
+   *          the player who triggers the notification
+   */
   public static void notifyTimeChange(PlayerInterface sender) {
     if (_context == null) {
       DebugMode.assertFail(TAG, "notify time change when context is null");
@@ -1963,7 +2047,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     LocalBroadcastManager.getInstance(_context).unregisterReceiver(receiver);
   }
 
-  public static void setContext(Context c) {
+  private static void setContext(Context c) {
     if (_context == null) {
       _context = c;
     }

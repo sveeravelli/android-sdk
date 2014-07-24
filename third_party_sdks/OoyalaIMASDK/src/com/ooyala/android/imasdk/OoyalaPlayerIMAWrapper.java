@@ -56,7 +56,8 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Playing Ad");
     _isPlayingIMAAd = true;
 
-    _player.playAd(_adSpot);
+    // TODO: implement IMA playad
+    // _player.playAd(_adSpot);
   }
 
   @Override
@@ -140,7 +141,8 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     for (VideoAdPlayerCallback callback : _adCallbacks) {
       callback.onPlay();
     }
-    _player.adPlayerCompleted();
+    // TODO: use exit ad mode instead.
+    // _player.adPlayerCompleted();
   }
 
   @Override

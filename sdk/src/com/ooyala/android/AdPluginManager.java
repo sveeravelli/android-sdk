@@ -9,6 +9,11 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 
+/**
+ * The plugin that manage ad plugins. AdPlugin manager handles content/ad switch
+ * and queries plugins when certain event happens.
+ * 
+ */
 class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   private static final String TAG = AdPluginManager.class.getName();
   private WeakReference<OoyalaPlayer> _player;
@@ -17,6 +22,13 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   private AdMode _admode = AdMode.None;
   private int _parameter = 0;
 
+  /**
+   * Constructor
+   * 
+   * @param player
+   *          the ooyalaplayer who owns the ad plugin manager
+   * @return true on success, false otherwise
+   */
   public AdPluginManager(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
   }

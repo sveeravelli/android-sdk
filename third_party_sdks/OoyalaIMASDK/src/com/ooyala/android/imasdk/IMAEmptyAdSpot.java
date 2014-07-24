@@ -6,6 +6,7 @@ import java.util.Set;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.Stream;
 
+// TODO: get rid of this class, no longer required.
 public class IMAEmptyAdSpot extends AdSpot implements IIMAAdSpot {
 
   private final OoyalaIMAManager _imaManager;
