@@ -14,7 +14,7 @@ import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.ads.vast.VASTAdSpot;
 
-public abstract class AdSpot implements JSONUpdatableItem, Comparable<AdSpot> {
+public abstract class AdSpot extends AdSpotBase implements JSONUpdatableItem {
   protected static final String KEY_TYPE = "type";  //AdSpot
   protected static final String KEY_TIME = "time";  //AdSpot
   protected static final String KEY_CLICK_URL = "click_url";
@@ -25,31 +25,20 @@ public abstract class AdSpot implements JSONUpdatableItem, Comparable<AdSpot> {
 
   static final int DEFAULT_AD_TIME_SECONDS = 0;
 
-  public static final boolean SINGLE_USE = false;
-  public static final boolean REUSABLE = true;
-
   protected int _time = -1;
   protected URL _clickURL = null;
   protected List<URL> _trackingURLs = null;
-  protected final boolean _isReusable;
 
   protected AdSpot() {
-    _isReusable = REUSABLE;
-  }
-
-  protected AdSpot( boolean isOneTimeUse ) {
-    _isReusable = isOneTimeUse;
   }
 
   protected AdSpot(int time, URL clickURL, List<URL> trackingURLs) {
     _time = time;
     _clickURL = clickURL;
     _trackingURLs = trackingURLs;
-    _isReusable = REUSABLE;
   }
 
   protected AdSpot(JSONObject data) {
-    _isReusable = REUSABLE;
     update(data);
   }
 
@@ -145,15 +134,5 @@ public abstract class AdSpot implements JSONUpdatableItem, Comparable<AdSpot> {
     return _trackingURLs;
   }
 
-  /**
-   * @return false if this ad should not survive being interrupted. true (the default value)
-   * means the ad will get put back into the collection of potential ads when interrupted.
-   */
-  public boolean isReusable() {
-    return _isReusable;
-  }
 
-  public int compareTo(AdSpot ad) {
-    return this.getTime() - ad.getTime();
-  }
 }

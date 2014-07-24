@@ -11,7 +11,7 @@ public class IMAEmptyAdSpot extends AdSpot implements IIMAAdSpot {
   private final OoyalaIMAManager _imaManager;
 
   public IMAEmptyAdSpot( OoyalaIMAManager imaManager ) {
-    super( AdSpot.SINGLE_USE );
+    super();
     _imaManager = imaManager;
   }
 

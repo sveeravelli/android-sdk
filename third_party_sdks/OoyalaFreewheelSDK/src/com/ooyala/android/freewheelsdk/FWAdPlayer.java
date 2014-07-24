@@ -13,11 +13,9 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.OoyalaException;
-import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AdSpotBase;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
 import com.ooyala.android.player.StreamPlayer;
@@ -28,7 +26,7 @@ import com.ooyala.android.player.StreamPlayer;
 public class FWAdPlayer extends AdMoviePlayer {
   private static String TAG = "FWAdPlayer";
   private OoyalaFreewheelManager _adManager;
-  private AdSpot _adSpot;
+  private FWAdSpot _adSpot;
   private ISlot _currentAd;
   private List<IAdInstance> _adInstances;
   private IAdInstance _currentAdInstance;
@@ -94,17 +92,16 @@ public class FWAdPlayer extends AdMoviePlayer {
   };
 
   public void init(OoyalaFreewheelManager manager, OoyalaPlayer parent,
-      AdSpot ad) {
+      FWAdSpot ad) {
     setManager(manager);
-    init(parent, ad);
+    setLayout(parent);
+    initAd(ad);
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
-    DebugMode.assertCondition(_adManager != null, TAG,
+  public void init(final OoyalaPlayer parent, AdSpotBase ad) {
+    DebugMode.assertFail(TAG,
         "FW Ad Player: Init should not be called!!! This is not a valid init");
-    setLayout(parent);
-    initAd(ad);
   }
 
   private void setManager(OoyalaFreewheelManager manager) {
@@ -135,12 +132,7 @@ public class FWAdPlayer extends AdMoviePlayer {
     }
   }
 
-  public void initAd(AdSpot ad) {
-    if (!(ad instanceof FWAdSpot)) {
-      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      setState(State.ERROR);
-      return;
-    }
+  public void initAd(FWAdSpot ad) {
 
     _seekable = false;
     _playQueued = false;
@@ -148,7 +140,7 @@ public class FWAdPlayer extends AdMoviePlayer {
     _noPrerolls = false;
 
     _adSpot = ad;
-    _currentAd = ((FWAdSpot) _adSpot).getAd();
+    _currentAd = ad.getAd();
   }
 
   public void onError() {
@@ -200,7 +192,7 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public AdSpot getAd() {
+  public AdSpotBase getAd() {
     return _adSpot;
   }
 

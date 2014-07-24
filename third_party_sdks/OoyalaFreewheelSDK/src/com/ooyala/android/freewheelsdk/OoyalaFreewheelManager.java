@@ -1,14 +1,10 @@
 package com.ooyala.android.freewheelsdk;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 
 import tv.freewheel.ad.AdManager;
 import tv.freewheel.ad.interfaces.IAdContext;
@@ -20,10 +16,9 @@ import tv.freewheel.ad.interfaces.ISlot;
 import android.app.Activity;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AdSpotManager;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
@@ -63,8 +58,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   protected IConstants _fwConstants = null;
 
   private FWAdPlayer _adPlayer = null;
-  private List<AdSpot> _ads = new ArrayList<AdSpot>();
-  private Set<AdSpot> _playedAds = new HashSet<AdSpot>();
+  private AdSpotManager<FWAdSpot> _adSpotManager = new AdSpotManager<FWAdSpot>();
   private int _timeAlignment;
   private int _lastPlayedTime;
 
@@ -146,8 +140,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
     _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
-    _ads.clear();
-    _playedAds.clear();
+    _adSpotManager.clear();
     _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
         .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
 
@@ -304,17 +297,6 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     if (_adPlayer != null) {
       _adPlayer.onError();
     }
-    removeAds();
-  }
-
-  private void removeAds() {
-    _player.get().getCurrentItem()
-        .filterAds(new IMatchObjectPredicate<AdSpot>() {
-      @Override
-      public boolean matches( AdSpot ad ) {
-        return ! (ad instanceof FWAdSpot);
-      }
-    } );
   }
 
   /**
@@ -341,11 +323,11 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     }
     try {
       //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
-      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
           .TIME_POSITION_CLASS_PREROLL()), "Preroll");
-      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
           .TIME_POSITION_CLASS_MIDROLL()), "Midroll");
-      insertAds(_ads, _fwContext.getSlotsByTimePositionClass(_fwConstants
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
           .TIME_POSITION_CLASS_POSTROLL()), "postroll");
     } catch (Exception e) {
       DebugMode.logE(TAG,
@@ -418,7 +400,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
     _lastPlayedTime = 0;
-    return adBeforeTime(_ads, _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
@@ -426,13 +408,13 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastPlayedTime = playhead;
     checkPlayableAds(_lastPlayedTime);
-    return adBeforeTime(_ads, _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
   public boolean onContentFinished() {
     _lastPlayedTime = Integer.MAX_VALUE;
-    return adBeforeTime(_ads, _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
@@ -462,7 +444,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
 
   @Override
   public void resetAds() {
-    _playedAds.clear();
+    _adSpotManager.resetAds();
   }
 
   @Override
@@ -470,13 +452,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     playAdsBeforeTime(_lastPlayedTime);
   }
 
-  private static void insertAds(List<AdSpot> adList, List<ISlot> slotList,
-      String adType) {
-    if (adList == null) {
-      DebugMode.assertFail(TAG, "insertAds error, ad List or slot is null");
-      return;
-    }
-
+  private void insertAds(List<ISlot> slotList, String adType) {
     if (slotList == null) {
       DebugMode.logD(TAG, "no " + adType + " is added");
       return;
@@ -485,66 +461,21 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     DebugMode.logD(TAG,
         adType + " ads count: " + String.valueOf(slotList.size()));
     for (ISlot slot : slotList) {
-      insertAd(adList, slot);
+      FWAdSpot adSpot = FWAdSpot.create(slot);
+      _adSpotManager.insertAd(adSpot);
     }
-
-    Collections.sort(adList);
-  }
-
-  private static void insertAd(List<AdSpot> adList, ISlot slot) {
-    for (AdSpot ad : adList) {
-      if (((FWAdSpot) ad).getAd() == slot) {
-        DebugMode.assertFail(TAG, "ad " + slot.toString() + " already added");
-        return;
-      }
-    }
-
-    adList.add(FWAdSpot.create(slot));
   }
 
   public boolean playAdsBeforeTime(int time) {
-    AdSpot adToPlay = adBeforeTime(_ads, _playedAds, time, _timeAlignment);
+    FWAdSpot adToPlay = _adSpotManager.adBeforeTime(time, _timeAlignment);
     if (adToPlay == null) {
       return false;
     }
-    _playedAds.add(adToPlay);
+    _adSpotManager.markAsPlayed(adToPlay);
     return playAd(adToPlay);
   }
 
-  /*
-   * helper function to identify the ad to be played before a certain time
-   * 
-   * @param adList the adspot list
-   * 
-   * @param filteredAdList the ads that should not be played
-   * 
-   * @param time the time stamp in millisecond
-   * 
-   * @param timeAlignment time alignment in millisecond
-   * 
-   * @return the ad spot to be played, null if no ad to be played
-   */
-  public static AdSpot adBeforeTime(List<AdSpot> adList,
-      Set<AdSpot> filteredAds, int time, int timeAlignment) {
-    if (adList == null) {
-      return null;
-    }
-
-    for (AdSpot ad : adList) {
-      int adTime = ad.getTime();
-      // Align ad times to 10 second (HLS chunk length) boundaries
-      if (timeAlignment > 0) {
-        adTime = ((adTime + timeAlignment / 2) / timeAlignment) * timeAlignment;
-      }
-      if (adTime > time || (filteredAds != null && filteredAds.contains(ad))) {
-        continue;
-      }
-      return ad;
-    }
-    return null;
-  }
-
-  private boolean playAd(AdSpot adToPlay) {
+  private boolean playAd(FWAdSpot adToPlay) {
     if (_adPlayer != null) {
       _adPlayer.destroy();
     }
@@ -563,6 +494,4 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   public void onAdError() {
     exitAdMode();
   }
-
-
 }

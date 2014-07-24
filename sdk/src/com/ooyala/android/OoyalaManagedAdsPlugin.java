@@ -1,14 +1,12 @@
 package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AdSpotManager;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
@@ -20,12 +18,13 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  private final Set<AdSpot> _playedAds = new HashSet<AdSpot>();
   private int _timeAlignment;
   private int _lastPlayedTime;
+  private AdSpotManager<AdSpot> _adSpotManager;
 
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
+    _adSpotManager = new AdSpotManager<AdSpot>();
   }
 
   @Override
@@ -64,7 +63,10 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
 
   @Override
   public boolean onContentChanged() {
-    resetAds();
+    _adSpotManager.clear();
+    _adSpotManager.insertAds(_player.get().getCurrentItem().getAds());
+    _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
+        .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
     return false;
   }
 
@@ -72,23 +74,20 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
     _lastPlayedTime = 0;
-    return adBeforeTime(_player.get().getCurrentItem().getAds(),
-        _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
   public boolean onPlayheadUpdate(int playhead) {
     DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastPlayedTime = playhead;
-    return adBeforeTime(_player.get().getCurrentItem().getAds(),
-        _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
   public boolean onContentFinished() {
     _lastPlayedTime = Integer.MAX_VALUE;
-    return adBeforeTime(_player.get().getCurrentItem().getAds(),
-        _playedAds, _lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
   }
 
   @Override
@@ -160,29 +159,22 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     // If an ad is playing, take it out of playedAds, and save it for playback
     // later
     if (_adPlayer != null) {
-      AdSpot oldAd = _adPlayer.getAd();
-        if (oldAd.isReusable()) {
-          _playedAds.remove(oldAd);
-        }
       cleanupPlayer(_adPlayer);
       _adPlayer = null;
     }
   }
 
   public boolean playAdsBeforeTime(int time) {
-    AdSpot adToPlay = adBeforeTime(_player.get().getCurrentItem()
-        .getAds(), _playedAds, time, _timeAlignment);
+    AdSpot adToPlay = _adSpotManager.adBeforeTime(time, _timeAlignment);
     if (adToPlay == null) {
       return false;
     }
-    _playedAds.add(adToPlay);
+    _adSpotManager.markAsPlayed(adToPlay);
     return playAd(adToPlay);
   }
 
   public void resetAds() {
-    _playedAds.clear();
-    _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
-        .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
+    _adSpotManager.resetAds();
   }
 
   /**
@@ -252,38 +244,5 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   @Override
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
-  }
-
-  /*
-   * helper function to identify the ad to be played before a certain time
-   * 
-   * @param adList the adspot list
-   * 
-   * @param filteredAdList the ads that should not be played
-   * 
-   * @param time the time stamp in millisecond
-   * 
-   * @param timeAlignment time alignment in millisecond
-   * 
-   * @return the ad spot to be played, null if no ad to be played
-   */
-  public static AdSpot adBeforeTime(List<AdSpot> adList,
-      Set<AdSpot> filteredAds, int time, int timeAlignment) {
-    if (adList == null) {
-      return null;
-    }
-
-    for (AdSpot ad : adList) {
-      int adTime = ad.getTime();
-      // Align ad times to 10 second (HLS chunk length) boundaries
-      if (timeAlignment > 0) {
-        adTime = ((adTime + timeAlignment / 2) / timeAlignment) * timeAlignment;
-      }
-      if (adTime > time || (filteredAds != null && filteredAds.contains(ad))) {
-        continue;
-      }
-      return ad;
-    }
-    return null;
   }
 }

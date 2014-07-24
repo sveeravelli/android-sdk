@@ -3,12 +3,12 @@ package com.ooyala.android.freewheelsdk;
 import tv.freewheel.ad.interfaces.ISlot;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AdSpotBase;
 
 /**
  * The ad spot that holds a list of ISlots (ads) and the Freewheel context
  */
-public class FWAdSpot extends AdSpot {
+public class FWAdSpot extends AdSpotBase {
   private static final String TAG = FWAdSpot.class.getName();
   private ISlot _ad;
 
@@ -33,11 +33,6 @@ public class FWAdSpot extends AdSpot {
     return _ad;
   }
 
-  @Override
-  public boolean fetchPlaybackInfo() {
-    return true;
-  }
-
   /**
    * Fetch the time at which this AdSpot should play.
    * @return The time at which this AdSpot should play in milliseconds.
@@ -45,5 +40,14 @@ public class FWAdSpot extends AdSpot {
   public int getTime() {
     //Ad may be null if pre-rolls have not been fetched yet
     return (int) (_ad.getTimePosition() * 1000);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof FWAdSpot)) {
+      return false;
+    }
+
+    return ((FWAdSpot) obj).getAd() == _ad;
   }
 }

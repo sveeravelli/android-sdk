@@ -21,12 +21,8 @@ class IMAAdSpot extends AdSpot implements IIMAAdSpot {
    * Initialize an IMA Ad Spot
    * @param url the URL for the video stream provided by the IMA Ad Manager
    */
-  public IMAAdSpot( String url, OoyalaIMAManager imaManager ) {
-    this( url, imaManager, AdSpot.REUSABLE ); 
-  }
-  
-  public IMAAdSpot( String url, OoyalaIMAManager imaManager, boolean isOneTimeUse ) {
-    super( isOneTimeUse );
+  public IMAAdSpot(String url, OoyalaIMAManager imaManager) {
+    super();
     _imaManager = imaManager;
     _stream = new IMAStream(url);
   }

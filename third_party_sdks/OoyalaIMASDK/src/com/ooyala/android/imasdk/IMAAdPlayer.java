@@ -8,7 +8,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.AdSpotBase;
 import com.ooyala.android.player.AdMoviePlayer;
 
 /**
@@ -19,10 +19,10 @@ import com.ooyala.android.player.AdMoviePlayer;
  */
 public class IMAAdPlayer extends AdMoviePlayer {
   private static String TAG = "IMAAdPlayer";
-  private AdSpot _ad;
+  private AdSpotBase _ad;
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
+  public void init(final OoyalaPlayer parent, AdSpotBase ad) {
     DebugMode.logD(TAG, "IMA Ad Player: Initializing");
 
     if ( ! (ad instanceof IIMAAdSpot) ) {
@@ -69,7 +69,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public AdSpot getAd() {
+  public AdSpotBase getAd() {
     return _ad;
   }
 
