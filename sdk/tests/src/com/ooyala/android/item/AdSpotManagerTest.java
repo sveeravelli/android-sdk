@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.test.AndroidTestCase;
 
-class TestAdSpot extends AdSpotBase {
+class TestAdSpot extends AdSpot {
   private int _time;
 
   private TestAdSpot(int time) {
@@ -37,9 +37,45 @@ public class AdSpotManagerTest extends AndroidTestCase {
 
   }
 
+  public void testInitAndClear() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    assertTrue(manager.size() == 0);
+    assertTrue(manager.getAlignment() == 0);
+
+    TestAdSpot s0 = TestAdSpot.create(0);
+    manager.insertAd(s0);
+    assertTrue(manager.size() == 1);
+
+    manager.setAlignment(1000);
+    assertTrue(manager.getAlignment() == 1000);
+
+    TestAdSpot s1 = TestAdSpot.create(1000);
+    manager.insertAd(s1);
+    assertTrue(manager.size() == 2);
+
+    manager.clear();
+    assertTrue(manager.size() == 0);
+    assertTrue(manager.getAlignment() == 0);
+  }
+
+  public void testIdenticalSpots() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+
+    TestAdSpot s0 = TestAdSpot.create(0);
+    manager.insertAd(s0);
+    assertTrue(manager.size() == 1);
+
+    TestAdSpot s1 = TestAdSpot.create(1000);
+    manager.insertAd(s1);
+    assertTrue(manager.size() == 2);
+    manager.insertAd(s1);
+    assertTrue(manager.size() == 2);
+    manager.insertAd(TestAdSpot.create(0));
+    assertTrue(manager.size() == 2);
+  }
+
   public void testAdsBeforeTime() {
     AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
-    int timeAlignment = 0;
 
     TestAdSpot s0 = TestAdSpot.create(0);
     TestAdSpot s1 = TestAdSpot.create(1000);
@@ -50,31 +86,30 @@ public class AdSpotManagerTest extends AndroidTestCase {
     manager.insertAd(s1);
     manager.insertAd(s0);
     manager.insertAd(s2);
-    manager.insertAd(s3);
-    manager.insertAd(s1);
-    manager.insertAd(s3);
     manager.insertAd(s4);
+    manager.insertAd(s3);
 
     assertTrue(manager.size() == 5);
-    assertTrue(manager.adBeforeTime(0, timeAlignment) == s0);
+    assertTrue(manager.adBeforeTime(0) == s0);
     manager.markAsPlayed(s0);
-    assertTrue(manager.adBeforeTime(0, timeAlignment) == null);
-    assertTrue(manager.adBeforeTime(999, timeAlignment) == null);
-    assertTrue(manager.adBeforeTime(1000, timeAlignment) == s1);
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(999) == null);
+    assertTrue(manager.adBeforeTime(1000) == s1);
     manager.markAsPlayed(s1);
-    assertTrue(manager.adBeforeTime(10000, timeAlignment) == null);
-    assertTrue(manager.adBeforeTime(20000, timeAlignment) == s2);
+    assertTrue(manager.adBeforeTime(10000) == null);
+    assertTrue(manager.adBeforeTime(20000) == s2);
     manager.markAsPlayed(s2);
-    assertTrue(manager.adBeforeTime(25000, timeAlignment) == s3);
+    assertTrue(manager.adBeforeTime(25000) == s3);
     manager.markAsPlayed(s3);
-    assertTrue(manager.adBeforeTime(30000, timeAlignment) == null);
-    assertTrue(manager.adBeforeTime(31000, timeAlignment) == s4);
+    assertTrue(manager.adBeforeTime(30000) == null);
+    assertTrue(manager.adBeforeTime(31000) == s4);
   }
 
   public void testAdsBeforeTimeWithAlignment() {
     int timeAlignment = 10000;
     List<TestAdSpot> adList = new ArrayList<TestAdSpot>();
     AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    manager.setAlignment(timeAlignment);
 
     TestAdSpot s0 = TestAdSpot.create(0);
     TestAdSpot s1 = TestAdSpot.create(1000);
@@ -90,18 +125,18 @@ public class AdSpotManagerTest extends AndroidTestCase {
     manager.insertAds(adList);
 
     assertTrue(manager.size() == 5);
-    assertTrue(manager.adBeforeTime(0, timeAlignment) == s0);
+    assertTrue(manager.adBeforeTime(0) == s0);
     manager.markAsPlayed(s0);
-    assertTrue(manager.adBeforeTime(0, timeAlignment) == s1);
+    assertTrue(manager.adBeforeTime(0) == s1);
     manager.markAsPlayed(s1);
-    assertTrue(manager.adBeforeTime(10000, timeAlignment) == s2);
+    assertTrue(manager.adBeforeTime(10000) == s2);
     manager.markAsPlayed(s2);
-    assertTrue(manager.adBeforeTime(20000, timeAlignment) == null);
-    assertTrue(manager.adBeforeTime(30000, timeAlignment) == s3);
+    assertTrue(manager.adBeforeTime(20000) == null);
+    assertTrue(manager.adBeforeTime(30000) == s3);
     manager.markAsPlayed(s3);
-    assertTrue(manager.adBeforeTime(30000, timeAlignment) == s4);
+    assertTrue(manager.adBeforeTime(30000) == s4);
     manager.markAsPlayed(s4);
-    assertTrue(manager.adBeforeTime(30000, timeAlignment) == null);
+    assertTrue(manager.adBeforeTime(30000) == null);
   }
 
 }

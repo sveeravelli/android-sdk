@@ -59,7 +59,6 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
 
   private FWAdPlayer _adPlayer = null;
   private AdSpotManager<FWAdSpot> _adSpotManager = new AdSpotManager<FWAdSpot>();
-  private int _timeAlignment;
   private int _lastPlayedTime;
 
   /**
@@ -141,8 +140,12 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     _overlays = null;
     _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
     _adSpotManager.clear();
-    _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
-        .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
+    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+        .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
+      _adSpotManager.setAlignment(10000);
+    } else {
+      _adSpotManager.setAlignment(0);
+    }
 
     return (item.getModuleData() != null
         && item.getModuleData().get("freewheel-ads-manager") != null && setupAdManager());
@@ -400,7 +403,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
     _lastPlayedTime = 0;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   @Override
@@ -408,13 +411,13 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastPlayedTime = playhead;
     checkPlayableAds(_lastPlayedTime);
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   @Override
   public boolean onContentFinished() {
     _lastPlayedTime = Integer.MAX_VALUE;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   @Override
@@ -467,7 +470,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   }
 
   public boolean playAdsBeforeTime(int time) {
-    FWAdSpot adToPlay = _adSpotManager.adBeforeTime(time, _timeAlignment);
+    FWAdSpot adToPlay = _adSpotManager.adBeforeTime(time);
     if (adToPlay == null) {
       return false;
     }

@@ -5,8 +5,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AdSpotManager;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
@@ -21,16 +21,15 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  private int _timeAlignment;
   private int _lastPlayedTime;
-  private AdSpotManager<AdSpot> _adSpotManager;
+  private AdSpotManager<OoyalaManagedAdSpot> _adSpotManager;
 
   /**
    * Ooyala managed ads plugin manages ooyala and vast ads.
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
-    _adSpotManager = new AdSpotManager<AdSpot>();
+    _adSpotManager = new AdSpotManager<OoyalaManagedAdSpot>();
   }
 
   /**
@@ -94,8 +93,10 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public boolean onContentChanged() {
     _adSpotManager.clear();
     _adSpotManager.insertAds(_player.get().getCurrentItem().getAds());
-    _timeAlignment = Stream.streamSetContainsDeliveryType(_player.get()
-        .getCurrentItem().getStreams(), Stream.DELIVERY_TYPE_HLS) ? 10000 : 0;
+    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+        .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
+      _adSpotManager.setAlignment(10000);
+    }
     return false;
   }
 
@@ -108,7 +109,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "onInitialPlay");
     _lastPlayedTime = 0;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   /**
@@ -122,7 +123,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   public boolean onPlayheadUpdate(int playhead) {
     DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastPlayedTime = playhead;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   /**
@@ -133,7 +134,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   @Override
   public boolean onContentFinished() {
     _lastPlayedTime = Integer.MAX_VALUE;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime, _timeAlignment) != null;
+    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
   }
 
   /**
@@ -165,7 +166,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     playAdsBeforeTime(_lastPlayedTime);
   }
 
-  private boolean initializeAdPlayer(AdMoviePlayer p, AdSpot ad) {
+  private boolean initializeAdPlayer(AdMoviePlayer p, OoyalaManagedAdSpot ad) {
     if (p == null) {
       DebugMode.assertFail(TAG, "initializeAdPlayer when adPlayer is null");
       return false;
@@ -184,7 +185,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     return true;
   }
 
-  private boolean initializeAd(AdSpot ad) {
+  private boolean initializeAd(OoyalaManagedAdSpot ad) {
     DebugMode.logD(TAG, "Ooyala Player: Playing Ad");
 
     cleanupExistingAdPlayer();
@@ -225,7 +226,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
   }
 
   private boolean playAdsBeforeTime(int time) {
-    AdSpot adToPlay = _adSpotManager.adBeforeTime(time, _timeAlignment);
+    OoyalaManagedAdSpot adToPlay = _adSpotManager.adBeforeTime(time);
     if (adToPlay == null) {
       return false;
     }
@@ -293,7 +294,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     }
   }
 
-  private boolean playAd(AdSpot ad) {
+  private boolean playAd(OoyalaManagedAdSpot ad) {
     if (!initializeAd(ad)) {
       return false;
     }

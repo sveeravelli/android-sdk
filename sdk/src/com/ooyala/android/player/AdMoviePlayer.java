@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.item.AdSpotBase;
+import com.ooyala.android.item.AdSpot;
 
 class PingTask extends AsyncTask<URL, Void, Void> {
 
@@ -33,10 +33,10 @@ class PingTask extends AsyncTask<URL, Void, Void> {
 
 public abstract class AdMoviePlayer extends MoviePlayer {
 
-  public void init(OoyalaPlayer parent, AdSpotBase ad) {
+  public void init(OoyalaPlayer parent, AdSpot ad) {
   }
 
-  public abstract AdSpotBase getAd();
+  public abstract AdSpot getAd();
 
   public void processClickThrough() { }
 

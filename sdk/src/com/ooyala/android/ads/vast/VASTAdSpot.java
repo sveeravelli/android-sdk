@@ -19,9 +19,9 @@ import android.os.AsyncTask;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.FetchPlaybackInfoCallback;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 
-public class VASTAdSpot extends AdSpot {
+public class VASTAdSpot extends OoyalaManagedAdSpot {
   static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
   static final String KEY_SIGNATURE = "signature"; // embedded, VAST
   static final String KEY_URL = "url";  // CC, Stream, VAST

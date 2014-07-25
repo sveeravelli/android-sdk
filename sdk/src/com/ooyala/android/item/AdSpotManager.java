@@ -11,14 +11,16 @@ import com.ooyala.android.DebugMode;
 /**
  * A helper class help us to manage ad spots
  */
-public class AdSpotManager<T extends AdSpotBase> {
+public class AdSpotManager<T extends AdSpot> {
   private static final String TAG = "AdSpotManager";
-  List<T> _ads;
-  Set<T> _playedAds;
+  private List<T> _ads;
+  private Set<T> _playedAds;
+  private int _timeAlignment;
 
   public AdSpotManager() {
     _ads = new ArrayList<T>();
     _playedAds = new HashSet<T>();
+    _timeAlignment = 0;
   }
 
   /**
@@ -34,6 +36,7 @@ public class AdSpotManager<T extends AdSpotBase> {
   public void clear() {
     _playedAds.clear();
     _ads.clear();
+    _timeAlignment = 0;
   }
 
   /**
@@ -78,11 +81,12 @@ public class AdSpotManager<T extends AdSpotBase> {
    * @returns the unplayed adspot before the specified time which, null if no
    *          such adspot
    */
-  public T adBeforeTime(int time, int timeAlignment) {
+  public T adBeforeTime(int time) {
     for (T ad : _ads) {
       int adTime = ad.getTime();
-      if (timeAlignment > 0) {
-        adTime = ((adTime + timeAlignment / 2) / timeAlignment) * timeAlignment;
+      if (_timeAlignment > 0) {
+        adTime = ((adTime + _timeAlignment / 2) / _timeAlignment)
+            * _timeAlignment;
       }
       if (adTime > time || _playedAds.contains(ad)) {
         continue;
@@ -114,5 +118,24 @@ public class AdSpotManager<T extends AdSpotBase> {
    */
   public int size() {
     return _ads.size();
+  }
+
+  /**
+   * set the time alignment
+   * 
+   * @param alignment
+   *          in millisecond
+   */
+  public void setAlignment(int alignment) {
+    _timeAlignment = alignment;
+  }
+
+  /**
+   * get the time alignment
+   * 
+   * @return the alignment in millisecond
+   */
+  public int getAlignment() {
+    return _timeAlignment;
   }
 }

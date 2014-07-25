@@ -3,12 +3,12 @@ package com.ooyala.android.freewheelsdk;
 import tv.freewheel.ad.interfaces.ISlot;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.item.AdSpotBase;
+import com.ooyala.android.item.AdSpot;
 
 /**
  * The ad spot that holds a list of ISlots (ads) and the Freewheel context
  */
-public class FWAdSpot extends AdSpotBase {
+public class FWAdSpot extends AdSpot {
   private static final String TAG = FWAdSpot.class.getName();
   private ISlot _ad;
 

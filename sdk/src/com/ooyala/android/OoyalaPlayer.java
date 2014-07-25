@@ -32,7 +32,7 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;
 import com.ooyala.android.item.Channel;
@@ -163,7 +163,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
   private StreamPlayer _basePlayer = null;
-  private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
+  private final Map<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
@@ -214,7 +214,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _actionAtEnd = ActionAtEnd.CONTINUE;
 
     // Initialize Ad Players
-    _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
+    _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
     if (context != null) {
@@ -1802,7 +1802,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param adPlayerClass
    *          A player that plays the ad
    */
-  void registerAdPlayer(Class<? extends AdSpot> adTypeClass,
+  void registerAdPlayer(Class<? extends OoyalaManagedAdSpot> adTypeClass,
       Class<? extends AdMoviePlayer> adPlayerClass) {
     _adPlayers.put(adTypeClass, adPlayerClass);
   }
@@ -1814,7 +1814,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          the adspot
    * @return the adplayer class
    */
-  Class<? extends AdMoviePlayer> getAdPlayerClass(AdSpot ad) {
+  Class<? extends AdMoviePlayer> getAdPlayerClass(OoyalaManagedAdSpot ad) {
     return _adPlayers.get(ad.getClass());
   }
 

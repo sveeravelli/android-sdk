@@ -15,7 +15,7 @@ import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpotBase;
+import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
 import com.ooyala.android.player.StreamPlayer;
@@ -99,7 +99,7 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpotBase ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad) {
     DebugMode.assertFail(TAG,
         "FW Ad Player: Init should not be called!!! This is not a valid init");
   }
@@ -192,7 +192,7 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public AdSpotBase getAd() {
+  public AdSpot getAd() {
     return _adSpot;
   }
 

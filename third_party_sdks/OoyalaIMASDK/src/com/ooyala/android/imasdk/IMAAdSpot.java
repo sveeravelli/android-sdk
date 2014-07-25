@@ -4,7 +4,7 @@ package com.ooyala.android.imasdk;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 
 /**
@@ -12,7 +12,7 @@ import com.ooyala.android.item.Stream;
  * @author michael.len
  *
  */
-class IMAAdSpot extends AdSpot implements IIMAAdSpot {
+class IMAAdSpot extends OoyalaManagedAdSpot implements IIMAAdSpot {
 
   private final OoyalaIMAManager _imaManager;
   private final Stream _stream;

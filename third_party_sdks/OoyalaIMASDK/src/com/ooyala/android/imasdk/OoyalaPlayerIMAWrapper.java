@@ -9,7 +9,7 @@ import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 
 /**
  * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.
@@ -22,7 +22,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   final OoyalaPlayer _player;
   private final OoyalaIMAManager _imaManager;
-  private AdSpot _adSpot;
+  private OoyalaManagedAdSpot _adSpot;
   private boolean _isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> _adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
   private int _liveContentTimePlayed;

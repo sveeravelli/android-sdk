@@ -22,7 +22,7 @@ import com.ooyala.android.OoyalaAPIClient;
  */
 public class Video extends ContentItem implements PlayableItem {
   private static final String TAG = Video.class.getName();
-  protected List<AdSpot> _ads = new ArrayList<AdSpot>();
+  protected List<OoyalaManagedAdSpot> _ads = new ArrayList<OoyalaManagedAdSpot>();
   protected Set<Stream> _streams = new HashSet<Stream>();
   protected Channel _parent = null;
   protected int _duration = 0;
@@ -82,7 +82,7 @@ public class Video extends ContentItem implements PlayableItem {
         if (ads.length() > 0) {
           _ads.clear();
           for (int i = 0; i < ads.length(); i++) {
-            AdSpot ad = AdSpot.create(ads.getJSONObject(i), _api);
+            OoyalaManagedAdSpot ad = OoyalaManagedAdSpot.create(ads.getJSONObject(i), _api);
             if (ad != null) {
               _ads.add(ad);
             } else {
@@ -115,7 +115,7 @@ public class Video extends ContentItem implements PlayableItem {
     return ReturnState.STATE_MATCHED;
   }
 
-  public List<AdSpot> getAds() {
+  public List<OoyalaManagedAdSpot> getAds() {
     return _ads;
   }
 
@@ -123,15 +123,15 @@ public class Video extends ContentItem implements PlayableItem {
    * Insert an AdSpot to play during this video
    * @param ad the AdSpot to play during this video
    */
-  public void insertAd(AdSpot ad) {
+  public void insertAd(OoyalaManagedAdSpot ad) {
     DebugMode.assertCondition(_ads != null, TAG, "ads is null");
     _ads.add(ad);
     Collections.sort(_ads);
   }
 
-  public void filterAds( IMatchObjectPredicate<AdSpot> keeper ) {
-    ArrayList<AdSpot> kept = new ArrayList<AdSpot>();
-    for( AdSpot ad : _ads ) {
+  public void filterAds( IMatchObjectPredicate<OoyalaManagedAdSpot> keeper ) {
+    ArrayList<OoyalaManagedAdSpot> kept = new ArrayList<OoyalaManagedAdSpot>();
+    for( OoyalaManagedAdSpot ad : _ads ) {
       if( keeper.matches( ad ) ) {
         kept.add( ad );
       }
@@ -163,7 +163,7 @@ public class Video extends ContentItem implements PlayableItem {
 
   public boolean fetchPlaybackInfo() {
     if (hasAds()) {
-      for (AdSpot ad : _ads) {
+      for (OoyalaManagedAdSpot ad : _ads) {
     	ad.fetchPlaybackInfo();
       }
     }
