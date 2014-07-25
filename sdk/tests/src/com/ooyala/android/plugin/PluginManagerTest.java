@@ -26,9 +26,11 @@ class TestAdSpot extends AdSpot {
 }
 
 class TestAdsPlugin extends DefaultAdsPlugin<TestAdSpot> {
+  private TestAdSpot _playedAd;
 
   public TestAdsPlugin() {
     super();
+    _playedAd = null;
   }
 
   @Override
@@ -69,10 +71,74 @@ class TestAdsPlugin extends DefaultAdsPlugin<TestAdSpot> {
 
   @Override
   protected boolean playAd(TestAdSpot ad) {
+    _playedAd = ad;
+    return true;
+  }
+
+  public TestAdSpot playedAd() {
+    return _playedAd;
+  }
+
+  public void insertAd(TestAdSpot ad) {
+    _adSpotManager.insertAd(ad);
+  }
+}
+
+class TestAdPlayer implements PlayerInterface {
+
+  @Override
+  public void pause() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void play() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void stop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public int currentTime() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int duration() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int buffer() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
   }
 
+  @Override
+  public void seekToTime(int timeInMillis) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public State getState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
 
 public class PluginManagerTest extends AndroidTestCase {
@@ -96,5 +162,71 @@ public class PluginManagerTest extends AndroidTestCase {
         "http://www.ooyala.com"), null);
     TestAdsPlugin plugin = new TestAdsPlugin();
     assertTrue(player.registerPlugin(plugin));
+  }
+
+  public void testPreroll() {
+    TestAdsPlugin plugin = new TestAdsPlugin();
+    TestAdSpot s0 = TestAdSpot.create(0);
+    plugin.insertAd(s0);
+
+    // test preroll
+    assertTrue(plugin.onInitialPlay());
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s0);
+
+    // test preroll again, ad should not play
+    assertFalse(plugin.onInitialPlay());
+  }
+
+  public void testMidroll() {
+    TestAdsPlugin plugin = new TestAdsPlugin();
+    TestAdSpot s0 = TestAdSpot.create(10);
+    plugin.insertAd(s0);
+
+    // test midroll
+    assertFalse(plugin.onPlayheadUpdate(5));
+    assertTrue(plugin.onPlayheadUpdate(10));
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s0);
+    assertFalse(plugin.onPlayheadUpdate(15));
+  }
+
+  public void testPostroll() {
+    TestAdsPlugin plugin = new TestAdsPlugin();
+    TestAdSpot s0 = TestAdSpot.create(100);
+    plugin.insertAd(s0);
+
+    assertTrue(plugin.onContentFinished());
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s0);
+
+    assertFalse(plugin.onContentFinished());
+  }
+
+  public void testPreMidPostrolls() {
+    TestAdsPlugin plugin = new TestAdsPlugin();
+    TestAdSpot s0 = TestAdSpot.create(0);
+    TestAdSpot s1 = TestAdSpot.create(10000);
+    TestAdSpot s2 = TestAdSpot.create(30000);
+
+    plugin.insertAd(s0);
+    plugin.insertAd(s1);
+    plugin.insertAd(s2);
+
+    assertTrue(plugin.onInitialPlay());
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s0);
+    assertFalse(plugin.onPlayheadUpdate(5000));
+    assertTrue(plugin.onPlayheadUpdate(10000));
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s1);
+
+    assertFalse(plugin.onPlayheadUpdate(15000));
+    assertFalse(plugin.onPlayheadUpdate(20000));
+    assertFalse(plugin.onPlayheadUpdate(25000));
+
+    assertTrue(plugin.onContentFinished());
+    plugin.onAdModeEntered();
+    assertTrue(plugin.playedAd() == s2);
   }
 }
