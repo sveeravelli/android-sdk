@@ -5,31 +5,31 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpotManager;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.DefaultAdsPlugin;
 
 /**
  * Ooyala managed ads plugin manages ooyala and vast ads.
  */
-public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
+public class OoyalaManagedAdsPlugin extends
+    DefaultAdsPlugin<OoyalaManagedAdSpot> implements Observer,
+    AdPluginInterface {
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
-  private WeakReference<OoyalaPlayer> _player;
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  private int _lastPlayedTime;
-  private AdSpotManager<OoyalaManagedAdSpot> _adSpotManager;
+  protected WeakReference<OoyalaPlayer> _player;
 
   /**
    * Ooyala managed ads plugin manages ooyala and vast ads.
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
+    super();
     _player = new WeakReference<OoyalaPlayer>(player);
-    _adSpotManager = new AdSpotManager<OoyalaManagedAdSpot>();
   }
 
   /**
@@ -91,79 +91,13 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
    */
   @Override
   public boolean onContentChanged() {
-    _adSpotManager.clear();
+    super.onContentChanged();
     _adSpotManager.insertAds(_player.get().getCurrentItem().getAds());
     if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
         .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
       _adSpotManager.setAlignment(10000);
     }
     return false;
-  }
-
-  /**
-   * called before content play starts
-   * 
-   * @return true if plugin needs to play preroll ads, false otherwise
-   */
-  @Override
-  public boolean onInitialPlay() {
-    DebugMode.logD(TAG, "onInitialPlay");
-    _lastPlayedTime = 0;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
-  }
-
-  /**
-   * called during content play
-   * 
-   * @param playhead
-   *          the current content playhead
-   * @return true if plugin needs to play midroll ads, false otherwise
-   */
-  @Override
-  public boolean onPlayheadUpdate(int playhead) {
-    DebugMode.logD(TAG, "onPlayheadUpdate");
-    _lastPlayedTime = playhead;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
-  }
-
-  /**
-   * called after content finish
-   * 
-   * @return true if plugin needs to play postroll ads, false otherwise
-   */
-  @Override
-  public boolean onContentFinished() {
-    _lastPlayedTime = Integer.MAX_VALUE;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
-  }
-
-  /**
-   * called on cue points
-   * 
-   * @return true if plugin needs to play midroll ads, false otherwise
-   */
-  @Override
-  public boolean onCuePoint(int cuePointIndex) {
-    return false;
-  }
-
-  /**
-   * called when content playback error happens
-   * 
-   * @return true if plugin needs to handle error, false otherwise
-   */
-  @Override
-  public boolean onContentError(int errorCode) {
-    return false;
-  }
-
-  /**
-   * called when admode is granted, plugin can start ad play now.
-   * 
-   */
-  @Override
-  public void onAdModeEntered() {
-    playAdsBeforeTime(_lastPlayedTime);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, OoyalaManagedAdSpot ad) {
@@ -225,29 +159,6 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     }
   }
 
-  private boolean playAdsBeforeTime(int time) {
-    OoyalaManagedAdSpot adToPlay = _adSpotManager.adBeforeTime(time);
-    if (adToPlay == null) {
-      return false;
-    }
-    _adSpotManager.markAsPlayed(adToPlay);
-    return playAd(adToPlay);
-  }
-
-  /**
-   * called when ads need to be reset
-   */
-  public void resetAds() {
-    _adSpotManager.resetAds();
-  }
-
-  /**
-   * Skip the currently playing ad. Do nothing if no ad is playing
-   */
-  public void skipAd() {
-    playAdsBeforeTime(_lastPlayedTime);
-  }
-
   /**
    * event observer
    */
@@ -259,7 +170,7 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
       switch (player.getState()) {
       case COMPLETED:
-        if (!playAdsBeforeTime(_lastPlayedTime)) {
+        if (!playAdsBeforeTime()) {
           cleanupPlayer(_adPlayer);
           _player.get().exitAdMode(this);
         }
@@ -294,7 +205,8 @@ public class OoyalaManagedAdsPlugin implements Observer, AdPluginInterface {
     }
   }
 
-  private boolean playAd(OoyalaManagedAdSpot ad) {
+  @Override
+  protected boolean playAd(OoyalaManagedAdSpot ad) {
     if (!initializeAd(ad)) {
       return false;
     }

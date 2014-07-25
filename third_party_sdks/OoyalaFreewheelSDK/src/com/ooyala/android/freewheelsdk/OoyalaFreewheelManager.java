@@ -18,11 +18,11 @@ import android.app.Activity;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpotManager;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.DefaultAdsPlugin;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 /**
@@ -32,7 +32,8 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
  * The OoyalaFreewheelManager works best with an OptimizedOoyalaPlayerLayoutController. If you do not
  * use this layout controller, you will not get media controllers in fullscreen mode.
  */
-public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
+public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
+    implements AdPluginInterface, Observer {
 
   private static final String TAG = "OoyalaFreewheelManager";
   private static final double FWPLAYER_AD_REQUEST_TIMEOUT = 5.0;
@@ -58,8 +59,6 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   protected IConstants _fwConstants = null;
 
   private FWAdPlayer _adPlayer = null;
-  private AdSpotManager<FWAdSpot> _adSpotManager = new AdSpotManager<FWAdSpot>();
-  private int _lastPlayedTime;
 
   /**
    * Initialize OoyalaFreewheelManager
@@ -395,29 +394,14 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
 
   @Override
   public boolean onContentChanged() {
-    _lastPlayedTime = -1;
+    super.onContentChanged();
     return currentItemChanged(_player.get().getCurrentItem());
   }
 
   @Override
-  public boolean onInitialPlay() {
-    DebugMode.logD(TAG, "onInitialPlay");
-    _lastPlayedTime = 0;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
-  }
-
-  @Override
   public boolean onPlayheadUpdate(int playhead) {
-    DebugMode.logD(TAG, "onPlayheadUpdate");
-    _lastPlayedTime = playhead;
-    checkPlayableAds(_lastPlayedTime);
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
-  }
-
-  @Override
-  public boolean onContentFinished() {
-    _lastPlayedTime = Integer.MAX_VALUE;
-    return _adSpotManager.adBeforeTime(_lastPlayedTime) != null;
+    checkPlayableAds(playhead);
+    return super.onPlayheadUpdate(playhead);
   }
 
   @Override
@@ -433,10 +417,10 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
 
   @Override
   public void onAdModeEntered() {
-    if (_lastPlayedTime < 0) {
-      this.submitAdRequest();
+    if (getLastAdModeTime() < 0) {
+      submitAdRequest();
     } else {
-      playAdsBeforeTime(_lastPlayedTime);
+      super.onAdModeEntered();
     }
   }
 
@@ -448,11 +432,6 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   @Override
   public void resetAds() {
     _adSpotManager.resetAds();
-  }
-
-  @Override
-  public void skipAd() {
-    playAdsBeforeTime(_lastPlayedTime);
   }
 
   private void insertAds(List<ISlot> slotList, String adType) {
@@ -469,16 +448,8 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
     }
   }
 
-  public boolean playAdsBeforeTime(int time) {
-    FWAdSpot adToPlay = _adSpotManager.adBeforeTime(time);
-    if (adToPlay == null) {
-      return false;
-    }
-    _adSpotManager.markAsPlayed(adToPlay);
-    return playAd(adToPlay);
-  }
-
-  private boolean playAd(FWAdSpot adToPlay) {
+  @Override
+  protected boolean playAd(FWAdSpot adToPlay) {
     if (_adPlayer != null) {
       _adPlayer.destroy();
     }
@@ -489,7 +460,7 @@ public class OoyalaFreewheelManager implements AdPluginInterface, Observer {
   }
 
   public void onAdCompleted() {
-    if (!playAdsBeforeTime(_lastPlayedTime)) {
+    if (!playAdsBeforeTime()) {
       exitAdMode();
     }
   }
