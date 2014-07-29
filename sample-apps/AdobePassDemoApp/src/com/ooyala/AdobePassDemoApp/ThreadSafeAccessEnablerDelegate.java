@@ -10,6 +10,7 @@ import android.os.Message;
 import com.adobe.adobepass.accessenabler.api.IAccessEnablerDelegate;
 import com.adobe.adobepass.accessenabler.models.Event;
 import com.adobe.adobepass.accessenabler.models.MetadataKey;
+import com.adobe.adobepass.accessenabler.models.MetadataStatus;
 import com.adobe.adobepass.accessenabler.models.Mvpd;
 
 public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessEnablerDelegate {
@@ -25,27 +26,27 @@ public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessE
   public static final int SEND_TRACKING_DATA = 7;
   public static final int SET_METADATA_STATUS = 8;
   public static final int PRE_AUTH_RESOURCES = 9;
-  
+
   public ThreadSafeAccessEnablerDelegate(IAccessEnablerDelegate delegate) {
     this.delegate = delegate;
   }
-  
+
   private Bundle getBundle(int method) {
     Bundle b = new Bundle();
     b.putInt("method", method);
     return b;
   }
-  
+
   private void createAndSendMessage(Bundle b) {
     Message m = obtainMessage();
     m.setData(b);
     sendMessage(m);
   }
-  
+
   @Override
   public void handleMessage(Message msg) {
       Bundle b = msg.getData();
-      
+
       switch(b.getInt("method")) {
       case SET_REQUESTOR_COMPLETE:
         delegate.setRequestorComplete(b.getInt("status"));
@@ -85,7 +86,7 @@ public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessE
         delegate.sendTrackingData(e, b.getStringArrayList("data"));
         break;
       case SET_METADATA_STATUS:
-        delegate.setMetadataStatus((MetadataKey)b.getSerializable("key"), b.getString("result"));
+        delegate.setMetadataStatus((MetadataKey)b.getSerializable("key"), (MetadataStatus)b.getSerializable("result"));
         break;
       case PRE_AUTH_RESOURCES:
         delegate.preauthorizedResources(b.getStringArrayList("resources"));
@@ -140,10 +141,10 @@ public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessE
   }
 
   @Override
-  public void setMetadataStatus(MetadataKey key, String result) {
+  public void setMetadataStatus(MetadataKey key, MetadataStatus result) {
     Bundle b = getBundle(SET_METADATA_STATUS);
     b.putSerializable("key", key);
-    b.putString("result", result);
+    b.putSerializable("result", result);
     createAndSendMessage(b);
   }
 

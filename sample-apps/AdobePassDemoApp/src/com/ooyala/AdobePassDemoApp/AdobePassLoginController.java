@@ -7,17 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.adobe.adobepass.accessenabler.api.AccessEnabler;
-import com.adobe.adobepass.accessenabler.api.AccessEnablerException;
-import com.adobe.adobepass.accessenabler.api.IAccessEnablerDelegate;
-import com.adobe.adobepass.accessenabler.models.Event;
-import com.adobe.adobepass.accessenabler.models.MetadataKey;
-import com.adobe.adobepass.accessenabler.models.Mvpd;
-import com.ooyala.AdobePassDemoApp.crypto.SignatureGenerator;
-import com.ooyala.AdobePassDemoApp.crypto.SigningCredential;
-import com.ooyala.android.EmbedTokenGenerator;
-import com.ooyala.android.EmbedTokenGeneratorCallback;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +14,18 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.adobe.adobepass.accessenabler.api.AccessEnabler;
+import com.adobe.adobepass.accessenabler.api.AccessEnablerException;
+import com.adobe.adobepass.accessenabler.api.IAccessEnablerDelegate;
+import com.adobe.adobepass.accessenabler.models.Event;
+import com.adobe.adobepass.accessenabler.models.MetadataKey;
+import com.adobe.adobepass.accessenabler.models.MetadataStatus;
+import com.adobe.adobepass.accessenabler.models.Mvpd;
+import com.ooyala.AdobePassDemoApp.crypto.SignatureGenerator;
+import com.ooyala.AdobePassDemoApp.crypto.SigningCredential;
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
 
 public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSelectedListener, NavigatedbackToAppListener, EmbedTokenGenerator {
   private AccessEnabler accessEnabler;
@@ -178,7 +179,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
   }
 
   @Override
-  public void setMetadataStatus(MetadataKey arg0, String arg1) {
+  public void setMetadataStatus(MetadataKey arg0, MetadataStatus arg1) {
     //do nothing
 
   }
