@@ -425,12 +425,13 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _completedQueued = true;
   }
 
-  private void dequeueCompleted() {
+  private boolean dequeueCompleted() {
     if (_completedQueued) {
       _playQueued = false;
       _completedQueued = false;
-      setState(State.COMPLETED);
+      return true;
     }
+    return false;
   }
 
   // Must queue play and wait for ready
@@ -452,11 +453,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     }
   }
 
-  private void dequeueAll() {
-    dequeueCompleted();
-    dequeuePlay();
-  }
-
   @Override
   public boolean isPlaying() {
     return _player != null && _player.isPlaying();
@@ -464,8 +460,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   protected void setState(State state) {
-    super.setState(state);
-    dequeueAll();
+    if (dequeueCompleted()) {
+      super.setState(State.COMPLETED);
+    } else {
+      super.setState(state);
+      dequeuePlay();
+    }
   }
 
   @Override
