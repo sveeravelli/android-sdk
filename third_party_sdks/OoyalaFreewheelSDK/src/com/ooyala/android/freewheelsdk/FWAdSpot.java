@@ -8,7 +8,6 @@ import com.ooyala.android.item.AdSpot;
  * The ad spot that holds a list of ISlots (ads) and the Freewheel context
  */
 public class FWAdSpot extends AdSpot {
-
   private ISlot _ad;
   private OoyalaFreewheelManager _adManager;
 
@@ -42,9 +41,20 @@ public class FWAdSpot extends AdSpot {
   public int getTime() {
     //Ad may be null if pre-rolls have not been fetched yet
     if (_ad != null) {
-      return (int) (_ad.getTimePosition() * 1000);
+      if (isPostRoll()) {
+        return Integer.MAX_VALUE - 5001;
+      } else {
+        return (int) (_ad.getTimePosition() * 1000);
+      }
     } else {
       return 0;
     }
+  }
+  
+  public boolean isPostRoll() {
+    if (_ad == null) {
+      return false;
+    }
+    return (_ad.getTimePositionClass() == _adManager.getFreewheelContext().getConstants().TIME_POSITION_CLASS_POSTROLL());
   }
 }
