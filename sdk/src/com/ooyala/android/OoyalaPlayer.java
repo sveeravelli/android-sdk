@@ -1293,13 +1293,15 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
           break;
         case PLAYING:
+          if (_lastPlayedTime == 0) {
+            sendNotification(PLAY_STARTED_NOTIFICATION);
+          }
           if (!isShowingAd() && getState() == State.READY) {
             if (_analytics != null) {
               _analytics.reportPlayStarted();
             } else {
               DebugMode.logE(TAG, "analytics is null when playing");
             }
-            sendNotification(PLAY_STARTED_NOTIFICATION);
           }
           setState(State.PLAYING);
           break;
