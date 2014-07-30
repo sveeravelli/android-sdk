@@ -32,12 +32,12 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
-import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;
 import com.ooyala.android.item.Channel;
 import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
@@ -1851,7 +1851,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     return _adManager.deregisterPlugin(plugin);
   }
 
-  private void switchToAdMode(AdMode mode) {
+  private void switchToAdMode() {
     DebugMode.logD(TAG, "switchToAdMode");
 
     if (_player != null) {
@@ -1887,6 +1887,27 @@ public class OoyalaPlayer extends Observable implements Observer,
     return _adManager.exitAdMode(plugin);
   }
 
+  /**
+   * called by a plugin when it request admode ooyalaplayer
+   * 
+   * @param plugin
+   *          the caller plugin
+   * @return true if exit succeeded, false otherwise
+   */
+  @Override
+  public boolean requestAdMode(AdPluginInterface plugin) {
+    // only allow request ad mode when content is playing
+    if (_player == null || _player.getState() != State.PLAYING) {
+      return false;
+    }
+    if (!_adManager.requestAdMode(plugin)) {
+      return false;
+    }
+
+    switchToAdMode();
+    return true;
+  }
+
   private boolean prepareContent(boolean forcePlay) {
     if (_player != null) {
       DebugMode.assertFail(TAG,
@@ -1918,6 +1939,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     case InitialPlay:
     case Playhead:
     case CuePoint:
+    case PluginInitiated:
       if (adsDidPlay) {
         _handler.post(new Runnable() {
           @Override
@@ -1956,7 +1978,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private boolean processAdModes(AdMode mode, int parameter) {
     boolean result = _adManager.onAdMode(mode, parameter);
     if (result) {
-      switchToAdMode(mode);
+      switchToAdMode();
     } else {
       processExitAdModes(mode, false);
     }

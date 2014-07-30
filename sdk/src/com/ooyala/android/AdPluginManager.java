@@ -89,11 +89,15 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
       return false;
     }
 
-    AdPluginInterface nextPlugin = getNextPlugin(_plugins, plugin);
-    while (nextPlugin != null && !pluginNeedsAdMode(nextPlugin, _admode)) {
-      nextPlugin = getNextPlugin(_plugins, nextPlugin);
+    AdPluginInterface nextPlugin = null;
+    if (_admode != AdMode.PluginInitiated) {
+      nextPlugin = getNextPlugin(_plugins, plugin);
+
+      while (nextPlugin != null && !pluginNeedsAdMode(nextPlugin, _admode)) {
+        nextPlugin = getNextPlugin(_plugins, nextPlugin);
+      }
     }
-    
+
     if (nextPlugin == null) {
       AdMode mode = _admode;
       _admode = AdMode.None;
@@ -263,6 +267,16 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
 
   protected void setActivePlugin(AdPluginInterface plugin) {
     _activePlugin = plugin;
+  }
+
+  @Override
+  public boolean requestAdMode(AdPluginInterface plugin) {
+    if (_activePlugin != null) {
+      return false;
+    }
+    _activePlugin = plugin;
+    _admode = AdMode.PluginInitiated;
+    return true;
   }
 
 }

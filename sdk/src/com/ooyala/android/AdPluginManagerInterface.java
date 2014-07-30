@@ -4,7 +4,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
 
 public interface AdPluginManagerInterface {
   enum AdMode {
-    None, ContentChanged, InitialPlay, Playhead, CuePoint, ContentFinished, ContentError
+    None, ContentChanged, InitialPlay, Playhead, CuePoint, ContentFinished, ContentError, PluginInitiated
   };
 
   /**
@@ -33,4 +33,13 @@ public interface AdPluginManagerInterface {
    * @return true on success, false otherwise
    */
   public boolean exitAdMode(final AdPluginInterface plugin);
+
+  /**
+   * called when plugin request ad mode
+   * 
+   * @param plugin
+   *          the plugin that request ad mode
+   * @return true on success, false otherwise
+   */
+  public boolean requestAdMode(final AdPluginInterface plugin);
 }

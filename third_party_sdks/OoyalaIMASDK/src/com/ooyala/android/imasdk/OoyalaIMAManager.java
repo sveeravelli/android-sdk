@@ -214,6 +214,7 @@ public class OoyalaIMAManager implements Observer {
     item.insertAd( new IMAEmptyAdSpot( this ) );
   }
 
+
   @Override
   public void update(Observable observable, Object data) {
     if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
