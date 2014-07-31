@@ -21,7 +21,6 @@ import com.ooyala.android.item.PaginatedParentItem;
 
 class PlayerAPIClient {
   //private static String TAG = PlayerAPIClient.class.getName();
-
   protected static final String KEY_DOMAIN = "domain";
   protected static final String KEY_AUTHORIZATION_DATA = "authorization_data";
   protected static final String KEY_USER_INFO = "user_info";
@@ -815,7 +814,7 @@ class PlayerAPIClient {
   private void setAuthToken(String authToken) {
     _authToken = authToken;
     if (_context != null) {
-      SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+      SharedPreferences preferences = _context.getSharedPreferences(OoyalaPlayer.PREFERENCES_NAME, 4);
       SharedPreferences.Editor editor = preferences.edit();
       editor.putString("authToken", authToken);
       editor.commit();
@@ -825,7 +824,7 @@ class PlayerAPIClient {
   public String getAuthToken() {
     if (_authToken == null) {
       if (_context != null) {
-        SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+        SharedPreferences preferences = _context.getSharedPreferences(OoyalaPlayer.PREFERENCES_NAME, 4);
         _authToken = preferences.getString("authToken", "");
       } else {
         _authToken = "";

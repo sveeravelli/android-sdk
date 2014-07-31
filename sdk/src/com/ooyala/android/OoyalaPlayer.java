@@ -52,6 +52,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   static final String SDK_VERSION = "2.6.0_RC2";
   static final String API_VERSION = "1";
+  public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
   public static enum ActionAtEnd {
     CONTINUE, PAUSE, STOP, RESET

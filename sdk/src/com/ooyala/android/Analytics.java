@@ -34,6 +34,7 @@ public class Analytics {
   private static final String JS_ANALYTICS_URI = "/reporter.js";
   private static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
   private static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
+  private static final String JS_ANALYTICS_GUID = "guid";
   private static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
 
   private boolean _ready;
@@ -47,7 +48,7 @@ public class Analytics {
   private String _userAgent = "";
   private TemporaryInternalStorageFileManager tmpBootHtmlFileManager;
 
-  private static String generateEmbedHTML(PlayerAPIClient api) {
+  private static String generateEmbedHTML(PlayerAPIClient api, Context context) {
 
     final Map<String, String> moduleParams = new HashMap<String, String>();
 
@@ -64,6 +65,10 @@ public class Analytics {
     if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
       moduleParams.put(JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
     }
+    
+    String clientId = ClientId.getId(context);
+    String encryptedId = Utils.encryptString(clientId);
+    moduleParams.put(JS_ANALYTICS_GUID, encryptedId);
 
     return EMBED_MODULEPARAMS_HTML
         .replaceAll("_HOST_", Environment.JS_ANALYTICS_HOST)
@@ -92,17 +97,7 @@ public class Analytics {
    * @param api the API to initialize this Analytics with
    */
   Analytics(Context context, PlayerAPIClient api) {
-    this(context, generateEmbedHTML(api), api.getDomain().toString());
-  }
-
-  /**
-   * Initialize an Analytics using the specified api and HTML (used for testing only)
-   * @param context the context the initialize the internal WebView with
-   * @param embedHTML the HTML to use when initializing this Analytics
-   */
-  Analytics(Context context, String embedHTML) {
-    //compatible with old behavior.  only used for test..
-    this(context, embedHTML, "http://www.ooyala.com/analytics.html");
+    this(context, generateEmbedHTML(api, context), api.getDomain().toString());
   }
 
   /**
