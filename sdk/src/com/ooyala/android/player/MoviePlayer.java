@@ -48,10 +48,13 @@ public class MoviePlayer extends Player implements Observer {
     boolean isRemoteSmooth = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET) &&
         Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains(".ism");
 
+    boolean isVisualOnHLSEnabled = OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls);
+    boolean isVisualOnSmoothEnabled = OoyalaPlayer.enableCustomSmoothPlayer && (isSmooth || isRemoteSmooth);
+
     if( streams == null || streams.size() == 0 ) {
       player = new EmptyStreamPlayer();
     }
-    else if (OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls || isSmooth || isRemoteSmooth)) {
+    else if (isVisualOnHLSEnabled || isVisualOnSmoothEnabled) {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
@@ -59,6 +62,12 @@ public class MoviePlayer extends Player implements Observer {
         player = new BaseStreamPlayer();
       }
     } else {
+      if (isSmooth || isRemoteSmooth) {
+        DebugMode.assertFail(TAG, "A Smooth stream is about to load on the base stream player.  Did you mean to set enableCustomSmoothPlayer?");
+      }
+      if (isVisualOnSmoothEnabled && (isHls || isRemoteHls)) {
+        DebugMode.logE(TAG,  "An HLS stream is loaded, while you enabled CustomSmoothPlayer.  Did you also want to set enableCustomHLSPlayer?");
+      }
       player = new BaseStreamPlayer();
     }
     return player;
