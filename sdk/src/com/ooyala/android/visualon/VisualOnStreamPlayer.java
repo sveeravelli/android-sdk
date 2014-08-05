@@ -72,7 +72,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private boolean _isLiveClosedCaptionsEnabled = false;
 
   protected static final long TIMER_DELAY = 0;
-  protected static final long TIMER_PERIOD = 250;
+  protected static final long TIMER_PERIOD = 1000;
 
   protected boolean _hasDiscredix = false;
 
