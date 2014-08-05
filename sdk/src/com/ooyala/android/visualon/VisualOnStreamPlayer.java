@@ -590,14 +590,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if (_player == null) {
-        return;
+      synchronized (this) {
+        if (_player == null) {
+          return;
+        }
+        try {
+          if (_lastPlayhead != _player.getPosition()) {
+            _playheadUpdateTimerHandler.sendEmptyMessage(0);
+          }
+          _lastPlayhead = (int) _player.getPosition();
+        } catch (Exception e) {
+          DebugMode.logE(TAG, "Player is not null, yet position fails, player state: " + getState().name());
+        }
       }
-
-      if (_lastPlayhead != _player.getPosition()) {
-        _playheadUpdateTimerHandler.sendEmptyMessage(0);
-      }
-      _lastPlayhead = (int) _player.getPosition();
     }
   }
 
