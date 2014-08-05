@@ -590,7 +590,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      synchronized (this) {
+      synchronized (_player) {
         if (_player == null) {
           return;
         }
