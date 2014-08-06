@@ -172,7 +172,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param ooyalaAPIClient
    *          an initialized OoyalaApiClient
    * @param an
@@ -184,7 +184,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -198,7 +198,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -682,7 +682,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Create and initialize a content player for an item.
-   * 
+   *
    * @return
    */
   private MoviePlayer createAndInitPlayer(Video item) {
@@ -855,11 +855,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Determine if play is the initial play for the content, required to insert
    * preroll properly.
-   * 
+   *
    * @return true if it is initial play
    */
   private boolean initialContentPlay() {
-    if (_player.getState() == State.READY && _player.currentTime() == 0) {
+    if (_player.getState() == State.READY) {
       return true;
     }
 
@@ -988,7 +988,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
       // Create Learn More button when going in and out of fullscreen
       if (isShowingAd()) {
-        ((AdMoviePlayer) _player).updateLearnMoreButton(getLayout(),
+        ((AdMoviePlayer) currentPlayer()).updateLearnMoreButton(getLayout(),
             getTopBarOffset());
       }
     }
@@ -1086,7 +1086,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the current player, can be either content player or ad player
-   * 
+   *
    * @return the player
    */
   private PlayerInterface currentPlayer() {
@@ -1240,7 +1240,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * For Internal Use Only. Process content player notification.
-   * 
+   *
    * @param player
    *          the notification sender
    * @param notification
@@ -1258,6 +1258,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       State state = player.getState();
       switch (state) {
       case COMPLETED:
+        DebugMode.logE(TAG, "content finished! should check for post-roll");
         processAdModes(AdMode.ContentFinished, 0);
         break;
       case ERROR:
@@ -1296,7 +1297,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * For Internal Use Only. Process ad player notification.
-   * 
+   *
    * @param notification
    *          the notification
    */
@@ -1449,7 +1450,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if the current state is State.Playing, false otherwise
    */
   public boolean isPlaying() {
-    return _state == State.PLAYING;
+    return getState() == State.PLAYING;
   }
 
   /**
@@ -1741,7 +1742,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * set the analytics tags
-   * 
+   *
    * @param tags
    *          the list of tags to set
    */
@@ -1777,7 +1778,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * get the seek style
-   * 
+   *
    * @return the seek style of current player
    */
   public SeekStyle getSeekStyle() {
@@ -1809,7 +1810,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * get the ad player class for a certain ad spot
-   * 
+   *
    * @param ad
    *          the adspot
    * @return the adplayer class
@@ -1829,7 +1830,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * register a ad plugin
-   * 
+   *
    * @param plugin
    *          the plugin to be registered
    * @return true if registration succeeded, false otherwise
@@ -1841,7 +1842,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * deregister a ad plugin
-   * 
+   *
    * @param plugin
    *          the plugin to be deregistered
    * @return true if deregistration succeeded, false otherwise
@@ -1877,7 +1878,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * called by a plugin when it finishes ad play and return the control to
    * ooyalaplayer
-   * 
+   *
    * @param plugin
    *          the caller plugin
    * @return true if exit succeeded, false otherwise
@@ -1889,7 +1890,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * called by a plugin when it request admode ooyalaplayer
-   * 
+   *
    * @param plugin
    *          the caller plugin
    * @return true if exit succeeded, false otherwise
@@ -1972,7 +1973,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /*
    * process adMode event
-   * 
+   *
    * @return true if adManager require ad mode, false otherwise
    */
   private boolean processAdModes(AdMode mode, int parameter) {
@@ -2008,7 +2009,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * called by a ad player when buffer changed to update the UI
-   * 
+   *
    * @param sender
    *          the player who triggers the notification
    */
@@ -2024,7 +2025,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * called by a ad player when player state changed to update the UI
-   * 
+   *
    * @param sender
    *          the player who triggers the notification
    */
@@ -2040,7 +2041,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * called by a ad player when ad playhead changed
-   * 
+   *
    * @param sender
    *          the player who triggers the notification
    */

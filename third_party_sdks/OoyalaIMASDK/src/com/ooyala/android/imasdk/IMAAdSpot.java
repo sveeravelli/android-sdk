@@ -12,7 +12,7 @@ import com.ooyala.android.item.Stream;
  * @author michael.len
  *
  */
-class IMAAdSpot extends OoyalaManagedAdSpot implements IIMAAdSpot {
+class IMAAdSpot extends OoyalaManagedAdSpot {
 
   private final OoyalaIMAManager _imaManager;
   private final Stream _stream;
@@ -32,14 +32,12 @@ class IMAAdSpot extends OoyalaManagedAdSpot implements IIMAAdSpot {
     return true;
   }
 
-  @Override
   public Set<Stream> getStreams() {
     Set<Stream> retVal = new HashSet<Stream>();
     retVal.add(_stream);
     return retVal;
   }
-  
-  @Override
+
   public OoyalaIMAManager getImaManager() {
     return _imaManager;
   }

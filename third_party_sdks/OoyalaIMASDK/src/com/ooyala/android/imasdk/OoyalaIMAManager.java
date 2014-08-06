@@ -4,8 +4,6 @@ package com.ooyala.android.imasdk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 
 import android.view.ViewGroup;
 
@@ -24,7 +22,10 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Video;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.AdPluginInterface;
 
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
@@ -35,8 +36,9 @@ import com.ooyala.android.item.Video;
  * @author michael.len
  *
  */
-public class OoyalaIMAManager implements Observer {
+public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
+  private final int TIMEOUT = 3000;
 
   public boolean _onAdError;
 
@@ -51,8 +53,11 @@ public class OoyalaIMAManager implements Observer {
   protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
   private String _adUrlOverride;
-  private boolean _queueAdsManagerInit = false;
-  protected boolean _adsManagerInited;
+
+  protected IMAAdPlayer _adPlayer = null;
+  private boolean _allAdsCompeleted = false; // Help to check if post-roll is available for content finished
+  private boolean _adsLoaded = false; // Help the timer to check if there is a pre-roll
+  private boolean _adsPlayed = false;
 
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
@@ -63,14 +68,13 @@ public class OoyalaIMAManager implements Observer {
    */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
     _player = ooyalaPlayer;
+    _adPlayer = new IMAAdPlayer();
+    _adPlayer.setIMAManager(this);
     _companionAdSlots = new ArrayList<CompanionAdSlot>();
 
     //Initialize OoyalaPlayer-IMA Bridge
     _ooyalaPlayerWrapper = new OoyalaPlayerIMAWrapper(_player, this);
-    // TODO: use register plugin instead
-    // _player.registerAdPlayer(IMAAdSpot.class, IMAAdPlayer.class);
-    // _player.registerAdPlayer(IMAEmptyAdSpot.class, IMAAdPlayer.class);
-    _player.addObserver(this);
+    _player.registerPlugin(this);
 
     //Initialize IMA classes
     _sdkFactory = ImaSdkFactory.getInstance();
@@ -83,27 +87,25 @@ public class OoyalaIMAManager implements Observer {
         DebugMode.logE(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
         DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
         _onAdError = true;
-        // TODO: use exit ad mode instead.
-        // _player.adPlayerCompleted();
+        _ooyalaPlayerWrapper.onAdError();
       }
-    } );
+    });
 
     _adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
 
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-        DebugMode.logD(TAG, "IMA AdsManager loaded");
+        DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
         _adsManager = event.getAdsManager();
-        _adsManagerInited = false;
-
+        _adsManager.init();
         _adsManager.addAdErrorListener(new AdErrorListener() {
+
           @Override
           public void onAdError(AdErrorEvent event) {
             DebugMode.logE(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
             DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
             _onAdError = true;
-            // TODO: use exit ad mode instead.
-            // _player.adPlayerCompleted();
+            _ooyalaPlayerWrapper.onAdError();
           }
         } );
 
@@ -111,44 +113,41 @@ public class OoyalaIMAManager implements Observer {
 
           @Override
           public void onAdEvent(AdEvent event) {
-
             DebugMode.logD(TAG,"IMA AdsManager Event: " + event.getType());
-
             switch (event.getType()) {
-              case LOADED:
-                DebugMode.logD(TAG,"IMA Ad Manager: Starting ad");
-                if( _adsManager != null ) {
-                  _adsManager.start();
-                }
-                break;
-              case CONTENT_PAUSE_REQUESTED:
-                _ooyalaPlayerWrapper.pauseContent();
-                break;
-              case CONTENT_RESUME_REQUESTED:
-                _ooyalaPlayerWrapper.playContent();
-                break;
-              case STARTED:
-                break;
-              case COMPLETED:
-                break;
-              case PAUSED:
-                break;
-              case RESUMED:
-                break;
-              default:
-                break;
+            case LOADED:
+              DebugMode.logD(TAG,"IMA Ad Manager: Starting ad");
+              _adsLoaded = true;
+              if( _adsManager != null ) {
+                _adsManager.start();
+              }
+              break;
+            case CONTENT_PAUSE_REQUESTED:
+              _ooyalaPlayerWrapper.pauseContent();
+              break;
+            case CONTENT_RESUME_REQUESTED:
+              _ooyalaPlayerWrapper.playContent();
+              break;
+            case STARTED:
+              // This is the right moment to update the State
+              _adPlayer.setState(State.PLAYING);
+              _adsPlayed = true;
+              break;
+            case ALL_ADS_COMPLETED:
+              _allAdsCompeleted = true;
+              break;
+            case COMPLETED:
+              break;
+            case PAUSED:
+              _adPlayer.setState(State.PAUSED);
+              break;
+            case RESUMED:
+              break;
+            default:
+              break;
             }
           }
         });
-
-        //Sometimes the ads manager will be created late, after PLAY_STARTED_NOTIFICATION
-        // We still need to init the manager in this case
-        // todo: make sure this works still.
-       if(_queueAdsManagerInit && !_adsManagerInited && _adsManager != null) {
-         _adsManager.init();
-         _adsManagerInited = true;
-         _queueAdsManagerInit = false;
-       }
       }
     });
   }
@@ -210,51 +209,163 @@ public class OoyalaIMAManager implements Observer {
     _adsLoader.requestAds(request);
   }
 
-  private void addPreRollAdSpotToItem( Video item ) {
-    item.insertAd( new IMAEmptyAdSpot( this ) );
+  // Implement AdPluginInterface
+
+  @Override
+  public boolean onInitialPlay() {
+    // Get Metadata, load ads, and check if pre-roll ad is available
+    DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
+
+    // If we have played the pre-roll already, we do not need to play again
+    if (_adsPlayed) {
+      return false;
+    }
+    destroy();
+    Video currentItem = _player.getCurrentItem();
+
+    final boolean isBacklotIMA = currentItem.getModuleData() != null &&
+        currentItem.getModuleData().get("google-ima-ads-manager") != null &&
+        currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
+    final boolean isOverrideIMA = _adUrlOverride != null;
+    if ( isBacklotIMA || isOverrideIMA ) {
+      String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
+      if(url != null) {
+        loadAds(url);
+
+        // We assume there are pre-roll ads by returning true
+        // If it turns out there is no pre-roll ad, resume content after timeout
+        Thread timeoutThread = new Thread() {
+          public void run() {
+              try {
+                  Thread.sleep(TIMEOUT);
+                  if (!_adsLoaded) {
+                    _ooyalaPlayerWrapper.playContent();
+                  }
+              } catch(InterruptedException v) {
+                  System.out.println(v);
+              }
+          }
+        };
+        timeoutThread.start();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean onContentChanged() {
+    DebugMode.logD(TAG, "IMA Ads Manager: onContentChanged");
+    destroy();
+    resetFields();
+    return false;  //True if you want to block, false otheriwse
+  }
+
+  @Override
+  public boolean onPlayheadUpdate(int playhead) {
+    // We do not know when to play ads until the IMAAdManager send the notification
+    // so we always return false;
+    return false;
+  }
+
+  @Override
+  public boolean onContentFinished() {
+    // This is the time we need to check should we play post-roll
+    DebugMode.logD(TAG, "IMA Ads Manager: onContentFinished");
+    if (!_allAdsCompeleted) {
+      _adsLoader.contentComplete();
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean onCuePoint(int cuePointIndex) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean onContentError(int errorCode) {
+    // Handled by call back
+    DebugMode.logD(TAG, "IMA Ads Manager: onContentError");
+    _ooyalaPlayerWrapper.fireIMAAdErrorCallback();
+    return false;
+  }
+
+  @Override
+  public void onAdModeEntered() {
+    // nothing need to be done here for Google IMA since we fire the AdModeEnter request first
+    DebugMode.logD(TAG, "IMA Ads Manager: onAdModeEntered");
+  }
+
+  @Override
+  public void suspend() {
+    // TODO Auto-generated method stub
+    DebugMode.logD(TAG, "IMA Ads Manager: suspend");
+    _ooyalaPlayerWrapper.fireVideoSuspendCallback();
+  }
+
+  @Override
+  public void resume() {
+    // TODO Auto-generated method stub
+    DebugMode.logD(TAG, "IMA Ads Manager: resume");
+    if (_adPlayer != null) {
+      _adPlayer.resume();
+    }
+    _ooyalaPlayerWrapper.fireIMAAdResumeCallback();
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    // TODO Auto-generated method stub
+    // Can we resume in this way for Google IMA??
+    // Currently we just do the normal resume
+    resume();
+  }
+
+  @Override
+  public void destroy() {
+    DebugMode.logD(TAG, "IMA Ads Manager: destroy");
+    if (_adsManager != null) {
+      _adsManager.destroy();
+      _onAdError = false;
+    }
+    _adsManager = null;
+  }
+
+  @Override
+  public PlayerInterface getPlayerInterface() {
+    // TODO Auto-generated method stub
+    return _adPlayer;
+  }
+
+  @Override
+  public void resetAds() {
+    DebugMode.logD(TAG, "IMA Ads Manager: reset");
+    // TODO Auto-generated method stub
+    resetFields();
+    onInitialPlay();
+  }
+
+  @Override
+  public void skipAd() {
+    DebugMode.logD(TAG, "IMA Ads Manager: skipAd");
+    // TODO Auto-generated method stub
+    _adsManager.skip();
+  }
+
+  private void resetFields() {
+    DebugMode.logD(TAG, "IMA Ads Manager: resetFields");
+    _adsLoaded = false;
+    _adsPlayed = false;
+    _allAdsCompeleted = false;
   }
 
 
   @Override
-  public void update(Observable observable, Object data) {
-    if (data.toString().equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
-      if (_adsManager != null) {
-        _adsManager.destroy();
-        // after adsManager destroyed _adsManagerInited should be set to false since there is no adsManager now.
-        _adsManagerInited = false;
-        _onAdError = false;
-      }
-      _adsManager = null;
-      _adsLoader.contentComplete();
-
-      Video currentItem = _player.getCurrentItem();
-
-      final boolean isBacklotIMA = currentItem.getModuleData() != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager") != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
-      final boolean isOverrideIMA = _adUrlOverride != null;
-      if ( isBacklotIMA || isOverrideIMA ) {
-        String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
-        if(url != null) {
-          addPreRollAdSpotToItem( currentItem );
-          loadAds(url);
-        }
-      }
-    }
-    else if (data.toString().equals(OoyalaPlayer.PLAY_STARTED_NOTIFICATION)) {
-      if (!_adsManagerInited) {
-        if (_adsManager != null) {
-          _adsManagerInited = true;
-          _adsManager.init();
-        } else {
-          _queueAdsManagerInit = true;
-        }
-      }
-    }
-    else if (data.toString().equals(OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION)) {
-      DebugMode.logD(TAG, "IMA Ad Update: Player Content Complete");
-      _adsLoader.contentComplete();
-    }
+  public void reset() {
+    // TODO Auto-generated method stub
+    resetAds();
   }
-
 }
