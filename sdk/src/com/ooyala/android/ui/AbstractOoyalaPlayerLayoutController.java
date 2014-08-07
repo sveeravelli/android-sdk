@@ -20,7 +20,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
@@ -300,10 +299,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       this.optionList = new ArrayList<String>();
       this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
       this.optionList.addAll(languageSet);
-      this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
       this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
     }
 
@@ -335,7 +334,22 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     if (position == (this.optionList.size() - 1)) {
       this.dialog.hide();
-    } else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
+    } else {
+      if (this.selectedLanguageIndex != 0) {
+        int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
+        // check if listView is trying to unCheck Language Index that is
+        // out of screen
+        if (langIndexOnScreen < 0 || this.selectedLanguageIndex > listView.getLastVisiblePosition()) {
+          DebugMode.logD(TAG, "previous selected language index out of screen");
+        } else {
+          ((RadioButton) listView.getChildAt(langIndexOnScreen)).setChecked(false);
+        }
+      }
+      this.selectedLanguageIndex = position;
+      _player.setClosedCaptionsLanguage(this.optionList.get(position));
+    }
+
+    /*else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
       if (position < this.optionList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
         if (this.selectedLanguageIndex != 0) {
           int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
@@ -369,7 +383,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           _player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPopOn);
         }
       }
-    }
+    }*/
   }
 
   class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
@@ -390,7 +404,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     public boolean isEnabled(int position) {
       return (position != 0)
           && (position != this.itemList
-              .indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
+          .indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
     }
 
     @Override
