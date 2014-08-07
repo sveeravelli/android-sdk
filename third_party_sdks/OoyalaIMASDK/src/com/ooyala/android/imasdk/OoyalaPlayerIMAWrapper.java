@@ -154,7 +154,6 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
     _player.exitAdMode(_imaManager);
   }
 
-
   public void update(Observable arg0, Object arg) {
     OoyalaPlayer player = (OoyalaPlayer) arg0;
     String notification = arg.toString();

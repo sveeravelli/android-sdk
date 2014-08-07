@@ -38,7 +38,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
  */
 public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
-  private final int TIMEOUT = 3000;
+  private static final int TIMEOUT = 3000;
 
   public boolean _onAdError;
 
@@ -242,7 +242,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
                     _ooyalaPlayerWrapper.playContent();
                   }
               } catch(InterruptedException v) {
-                  System.out.println(v);
+                  DebugMode.logD(TAG, "Timeout while waiting for IMA Pre-roll");
               }
           }
         };
