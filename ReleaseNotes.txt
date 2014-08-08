@@ -1,4 +1,14 @@
-Current Version: 2.6.0
+Current Version: 2.7.0
+
+------------ 2.7.0 ------------
+API/UI Changes
+[PBA-450] Removed the ability to use Paint-On or Roll-Up presentation styles for Closed Captions
+[PBA-485] Fix buffering state changes to be more consistent across both Base Stream Players
+[PBA-510] Add enableCustomSmoothPlayer setting for VisualOn enablement
+
+Bug Fixes
+[PBA-524] Fixed ANRs with using VisualOn while debugging or setting embed code
+[PBA-483] Fix scenario when Freewheel Postrolls would not play
 
 ------------ 2.6.0 ------------
 API/Package Changes
