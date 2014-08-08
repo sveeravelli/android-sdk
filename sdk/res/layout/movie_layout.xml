@@ -4,19 +4,53 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
- 		<com.ooyala.android.player.MovieView
- 		    android:id="@+id/movie_view"
- 		    android:layout_width="fill_parent"
- 		    android:layout_height="fill_parent"
- 		    android:layout_centerInParent="true"
- 		    android:background="#FF000000"/>
- 		
- 		<com.ooyala.android.ui.FCCTVRatingsWatermarkView
- 		    android:id="@+id/tvratings_view"
- 		    android:layout_width="wrap_content"
- 		    android:layout_height="wrap_content"
- 		    android:layout_alignLeft="@id/movie_view"
- 		    android:gravity="center"
- 		    android:background="#66FF0000"/>
- 		
+    <com.ooyala.android.player.MovieView
+        android:id="@+id/movie_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#FF000000" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/movie_view"
+        android:layout_alignLeft="@id/movie_view"
+        android:layout_alignRight="@id/movie_view"
+        android:layout_alignTop="@id/movie_view"
+        android:orientation="horizontal" >
+
+        <View
+            android:id="@+id/tvratings_watermark_view"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:background="#66FFFFFF"
+            android:layout_weight="1" />
+
+        <View
+            android:id="@+id/tvratings_padding_view"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1" />
+        
+    </LinearLayout>
+
+    <com.ooyala.android.ui.FCCTVRatingsView
+        android:id="@+id/tvratings_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/movie_view"
+        android:layout_alignTop="@id/movie_view"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="#FF000000" />
+
 </RelativeLayout>

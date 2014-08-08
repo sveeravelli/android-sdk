@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.view.View;
 
-public class FCCTVRatingsWatermarkView extends View {
+public class FCCTVRatingsView extends View {
   private final Paint backgroundPaint;
   private final Paint textPaint;
   private final Paint clearPaint;
@@ -22,7 +22,7 @@ public class FCCTVRatingsWatermarkView extends View {
   private String labels;
   public boolean debug;
 
-  public FCCTVRatingsWatermarkView( Context context, AttributeSet attrs ) {
+  public FCCTVRatingsView( Context context, AttributeSet attrs ) {
     super( context, attrs );
 
     backgroundPaint = new Paint();
@@ -61,7 +61,7 @@ public class FCCTVRatingsWatermarkView extends View {
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
     super.onMeasure( widthMeasureSpec, heightMeasureSpec );
     // todo: make it relative to video player size, per feature specs.
-    setMeasuredDimension( 80, 80 );
+    setMeasuredDimension( 100, 100 );
   }
 
   @Override
