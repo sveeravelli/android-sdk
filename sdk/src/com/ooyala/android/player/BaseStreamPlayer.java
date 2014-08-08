@@ -15,18 +15,16 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
+import com.ooyala.android.R;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.R;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsWatermarkView;
 
@@ -308,27 +306,34 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   }
 
   private void createAndAddViews() {
-    Context c = _parent.getLayout().getContext();
-    _view = new MovieView(c);
-    _parent.getLayout().addView(_view);
-    _view.setLayoutParams(
-        new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.CENTER
-            )
-        );
-    _view.setBackgroundColor(Color.BLACK);
 
-    FCCTVRatingsWatermarkView tvrv = new FCCTVRatingsWatermarkView(_parent.getLayout().getContext(), null);
-    _parent.getLayout().addView(tvrv);
-    tvrv.setLayoutParams(
-        new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.LEFT | Gravity.TOP
-            )
-        );
+    Context c = _parent.getLayout().getContext();
+
+    LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), true );
+    _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
+    FCCTVRatingsWatermarkView tvrv = (FCCTVRatingsWatermarkView)_parent.getLayout().findViewById( R.id.tvratings_view );
+
+//    _view = new MovieView(c);
+//    _parent.getLayout().addView(_view);
+//    _view.setLayoutParams(
+//        new FrameLayout.LayoutParams(
+//            ViewGroup.LayoutParams.WRAP_CONTENT,
+//            ViewGroup.LayoutParams.WRAP_CONTENT,
+//            Gravity.CENTER
+//            )
+//        );
+//    _view.setBackgroundColor(Color.BLACK);
+//
+//    FCCTVRatingsWatermarkView= new FCCTVRatingsWatermarkView(_parent.getLayout().getContext(), null);
+//    _parent.getLayout().addView(tvrv);
+//    tvrv.setLayoutParams(
+//        new FrameLayout.LayoutParams(
+//            ViewGroup.LayoutParams.WRAP_CONTENT,
+//            ViewGroup.LayoutParams.WRAP_CONTENT,
+//            Gravity.LEFT | Gravity.TOP
+//            )
+//        );
+
     tvrv.setRating( "PG" );
     tvrv.setLabels( "FV" );
   }
