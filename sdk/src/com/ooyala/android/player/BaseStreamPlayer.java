@@ -26,7 +26,9 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.R;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.ui.FCCTVRatingsWatermarkView;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -291,8 +293,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @SuppressWarnings("deprecation")
   private void setupView() {
-    createView(_parent.getLayout().getContext());
-    _parent.getLayout().addView(_view);
+    createAndAddViews();
 
     // Try to figure out the video size.  If not, use our default
     if (stream.getWidth() > 0 && stream.getHeight() > 0) {
@@ -306,11 +307,30 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
-  private void createView(Context c) {
+  private void createAndAddViews() {
+    Context c = _parent.getLayout().getContext();
     _view = new MovieView(c);
-    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+    _parent.getLayout().addView(_view);
+    _view.setLayoutParams(
+        new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            Gravity.CENTER
+            )
+        );
     _view.setBackgroundColor(Color.BLACK);
+
+    FCCTVRatingsWatermarkView tvrv = new FCCTVRatingsWatermarkView(_parent.getLayout().getContext(), null);
+    _parent.getLayout().addView(tvrv);
+    tvrv.setLayoutParams(
+        new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            Gravity.LEFT | Gravity.TOP
+            )
+        );
+    tvrv.setRating( "PG" );
+    tvrv.setLabels( "FV" );
   }
 
   private void removeView() {

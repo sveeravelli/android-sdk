@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/MovieLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+ 		<com.ooyala.android.player.MovieView
+ 		    android:id="@+id/MovieView"
+ 		    android:layout_width="fill_parent"
+ 		    android:layout_height="fill_parent"
+ 		    android:gravity="center"
+ 		    android:background="#FF000000"/>
+ 		
+ 		<com.ooyala.android.ui.FCCTVRatingsWatermarkView
+ 		    android:id="@+id/FCCTVRatingsWatermarkView"
+ 		    android:layout_width="wrap_content"
+ 		    android:layout_height="wrap_content"
+ 		    android:gravity="center"
+ 		    android:background="#66FF0000"/>
+ 		
+</RelativeLayout>

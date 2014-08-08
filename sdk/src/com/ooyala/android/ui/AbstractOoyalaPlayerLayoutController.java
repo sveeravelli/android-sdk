@@ -27,6 +27,7 @@ import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.Options;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
@@ -114,7 +115,22 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain,
       DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    this(l, new OoyalaPlayer(pcode, domain, generator, null), dcs);
+  }
+
+  /**
+   * Instantiate an AbstractOoyalaPlayerLayoutController
+   *
+   * @param l the layout to use
+   * @param pcode the provider code to use
+   * @param domain the embed domain to use
+   * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
+   * @param generator An embedTokenGenerator used to sign SAS requests
+   * @param options Extra values, can be null in which case defaults values are used.
+   */
+  public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain,
+      DefaultControlStyle dcs, EmbedTokenGenerator generator, Options options) {
+    this(l, new OoyalaPlayer(pcode, domain, generator, options), dcs);
   }
 
   /**

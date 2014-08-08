@@ -9,6 +9,7 @@ import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.Options;
 
 /**
  * This LayoutController is a generic LayoutController that will work in most cases (regardless of the
@@ -71,7 +72,20 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
   public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    this(l, new OoyalaPlayer(pcode, domain, generator, null), dcs);
+  }
+
+  /**
+   * Instantiate an OoyalaPlayerLayoutController
+   * @param l the layout to use
+   * @param pcode the provider code to use
+   * @param domain the embed domain to use
+   * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
+   * @param generator An embedTokenGenerator used to sign SAS requests
+   * @param options Extra values, can be null in which case defaults values are used.
+   */
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator, Options options) {
+    this(l, new OoyalaPlayer(pcode, domain, generator, options), dcs);
   }
 
   /**

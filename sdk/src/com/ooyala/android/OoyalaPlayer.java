@@ -28,6 +28,8 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.configuration.Options;
+import com.ooyala.android.configuration.ReadonlyOptionsInterface;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;
@@ -151,6 +153,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private MoviePlayer _player = null;
   private AdMoviePlayer _adPlayer = null;
   private PlayerAPIClient _playerAPIClient = null;
+  private Options _options;
   private State _state = State.INIT;
   private final List<AdSpot> _playedAds = new ArrayList<AdSpot>();
   private int _lastPlayedTime = 0;
@@ -180,7 +183,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          an initialized OoyalaApiClient
    */
   public OoyalaPlayer(OoyalaAPIClient apiClient) {
-    this(apiClient.getPcode(), apiClient.getDomain(), null);
+    this(apiClient.getPcode(), apiClient.getDomain(), null, null);
   }
 
   /**
@@ -192,22 +195,25 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          Your Embed Domain
    */
   public OoyalaPlayer(String pcode, PlayerDomain domain) {
-    this(pcode, domain, null);
+    this(pcode, domain, null, null);
   }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
    *
    * @param pcode
-   *          Your Provider Code
+   *          Your Provider Code, must be non-null.
    * @param domain
-   *          Your Embed Domain
+   *          Your Embed Domain, must be non-null.
    * @param generator
-   *          An embedTokenGenerator used to sign SAS requests
+   *          An embedTokenGenerator used to sign SAS requests, can be null.
+   * @param options
+   *          Extra settings, can be null in which case default values are used.
    */
-  public OoyalaPlayer(String pcode, PlayerDomain domain, EmbedTokenGenerator generator) {
+  public OoyalaPlayer(String pcode, PlayerDomain domain, EmbedTokenGenerator generator, Options options) {
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
     _actionAtEnd = ActionAtEnd.CONTINUE;
+    _options = options == null ? new Options.Builder().build() : options;
 
     // Initialize Ad Players
     _adPlayers = new HashMap<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>>();
@@ -216,6 +222,13 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
+  }
+
+  /**
+   * @return non-null, immutable Options.
+   */
+  public ReadonlyOptionsInterface getOptions() {
+    return _options;
   }
 
   /**
