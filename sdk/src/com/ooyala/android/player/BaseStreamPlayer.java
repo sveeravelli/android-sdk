@@ -310,6 +310,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), true );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
     FCCTVRatingsView tvrv = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
+    // todo: get the data from the content item.
+    // todo: timer to fade away.
     tvrv.setRating( "PG" );
     tvrv.setLabels( "FV" );
   }
