@@ -338,7 +338,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if (position == (this.optionList.size() - 1)) {
       this.dialog.hide();
     } else {
-      if (this.selectedLanguageIndex != 0) {
+      if (this.selectedLanguageIndex != 0 && this.selectedLanguageIndex != position) {
         int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
         // check if listView is trying to unCheck Language Index that is
         // out of screen
