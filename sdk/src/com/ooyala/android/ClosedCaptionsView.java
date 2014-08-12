@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -184,7 +185,7 @@ public class ClosedCaptionsView extends TextView {
 
 	public void setStyle(ClosedCaptionsStyle style) {
 		this.style = style;
-		this.setTextSize(style.textSize);
+		this.setTextSize( TypedValue.COMPLEX_UNIT_SP, style.textSize );
 		String testString = "just for height"; // any text including "j" and "f" can define the max height for this font size
 		super.getPaint().getTextBounds(testString, 0, testString.length(), this.textBounds);
 		this.textHeight = this.textBounds.height() * 1.5;
