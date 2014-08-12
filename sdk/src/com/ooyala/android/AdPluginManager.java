@@ -84,9 +84,13 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     }
 
     if (_activePlugin != plugin) {
-      DebugMode.assertFail(TAG, plugin.toString()
+      if (_activePlugin != null) {
+        DebugMode.assertFail(TAG, plugin.toString()
           + " exit admode but active plugin is " + _activePlugin.toString());
-      return false;
+        return false;
+      } else {
+        return true;
+      }
     }
 
     AdPluginInterface nextPlugin = null;
@@ -191,6 +195,10 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
       return false;
     }
 
+    if (mode == AdMode.ContentChanged) {
+      resetManager();
+    }
+
     AdPluginInterface plugin = _plugins.get(0);
     while (plugin != null && !pluginNeedsAdMode(plugin, mode)) {
       plugin = getNextPlugin(_plugins, plugin);
@@ -231,6 +239,13 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     default:
       DebugMode.assertFail(TAG, "request admode when admode is not defined");
       return false;
+    }
+  }
+
+  private void resetManager() {
+    if (_activePlugin != null) {
+      _activePlugin.destroy();
+      _activePlugin = null;
     }
   }
 
