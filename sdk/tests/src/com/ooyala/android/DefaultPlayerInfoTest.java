@@ -1,7 +1,7 @@
 package com.ooyala.android;
 
 import java.util.Set;
-
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
@@ -62,6 +62,7 @@ public class DefaultPlayerInfoTest extends AndroidTestCase {
     assertTrue(formats.contains("smooth"));
   }
 
+  @SuppressLint("NewApi")
   public void testHlsWidevineIfNewEnough() {
     Set<String> formats = info.getSupportedFormats();
 
