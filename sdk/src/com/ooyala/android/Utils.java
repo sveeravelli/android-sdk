@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
+import android.util.Base64;
 
 class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
@@ -131,5 +134,20 @@ class Utils {
       System.out.println("ClassCastException: " + exception);
       return null;
     }
+  }
+
+  public static String encryptString(String rawString) {
+    byte[] bytes = rawString.getBytes();
+    MessageDigest digest = null;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+      return null;
+    }
+    digest.reset();
+    String encrypted = Base64.encodeToString(digest.digest(bytes),
+        Base64.DEFAULT);
+    return encrypted;
   }
 }

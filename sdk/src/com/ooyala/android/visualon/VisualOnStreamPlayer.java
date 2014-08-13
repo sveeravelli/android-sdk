@@ -72,7 +72,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private boolean _isLiveClosedCaptionsEnabled = false;
 
   protected static final long TIMER_DELAY = 0;
-  protected static final long TIMER_PERIOD = 250;
+  protected static final long TIMER_PERIOD = 1000;
 
   protected boolean _hasDiscredix = false;
 
@@ -590,14 +590,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if (_player == null) {
-        return;
+      synchronized (_player) {
+        if (_player == null) {
+          return;
+        }
+        try {
+          if (_lastPlayhead != _player.getPosition()) {
+            _playheadUpdateTimerHandler.sendEmptyMessage(0);
+          }
+          _lastPlayhead = (int) _player.getPosition();
+        } catch (Exception e) {
+          DebugMode.logE(TAG, "Player is not null, yet position fails, player state: " + getState().name());
+        }
       }
-
-      if (_lastPlayhead != _player.getPosition()) {
-        _playheadUpdateTimerHandler.sendEmptyMessage(0);
-      }
-      _lastPlayhead = (int) _player.getPosition();
     }
   }
 
