@@ -1,6 +1,6 @@
 package com.ooyala.test;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -53,7 +53,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player.addObserver(this);
 
     //Initialize the bottom controls
-    embedMap = new HashMap<String, String>();
+    embedMap = new LinkedHashMap<String, String>();
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     setButton = (Button) findViewById(R.id.setButton);
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
