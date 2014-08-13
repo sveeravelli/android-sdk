@@ -11,6 +11,9 @@ import android.util.AttributeSet;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 
 import com.ooyala.android.configuration.TVRatingsConfiguration;
 
@@ -29,6 +32,13 @@ public class FCCTVRatingsView extends View {
   }
 
   private static final class StampDimensions {
+
+    private static final int WHITE_BORDER_DP = 2;
+    private static final int BLACK_BORDER_DP = 4;
+    private static final float SQUARE_SCALE = 0.25f;
+    private static final float NON_SQUARE_LARGE_SCALE = 0.20f;
+    private static final float NON_SQUARE_SMALL_SCALE = 0.30f;
+    private static final float MAX_RATIO = 1.4f;
 
     // sizes are in pixels.
     private int watermarkWidth;
@@ -86,14 +96,8 @@ public class FCCTVRatingsView extends View {
     }
   }
 
-//  private static final int FADE_MSEC = 1 * 1000;
+  private static final int FADE_MSEC = 1 * 1000;
   private static final float MINI_HEIGHT_FACTOR = 0.2f;
-  private static final int WHITE_BORDER_DP = 2;
-  private static final int BLACK_BORDER_DP = 4;
-  private static final float SQUARE_SCALE = 0.25f;
-  private static final float NON_SQUARE_LARGE_SCALE = 0.20f;
-  private static final float NON_SQUARE_SMALL_SCALE = 0.30f;
-  private static final float MAX_RATIO = 1.4f;
   private final Paint watermarkPaint;
   private final Paint textPaint;
   private final Paint blackPaint;
@@ -104,8 +108,10 @@ public class FCCTVRatingsView extends View {
   private int miniHeight;
   private String rating;
   private String labels;
-  private Bitmap nBitmap; // n means 'possibly null'; a reminder to check.
   private StampDimensions stampDimensions;
+  // n means 'possibly null'; a reminder to check.
+  private Bitmap nBitmap;
+  private AlphaAnimation nFadeAnimation;
 
   private TVRatingsConfiguration tvRatingsConfiguration;
 
@@ -148,33 +154,6 @@ public class FCCTVRatingsView extends View {
     freeResources();
   }
 
-  public void setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
-    this.tvRatingsConfiguration = tvRatingsConfiguration;
-  }
-
-//  private void setFade() {
-//    if( tvRatingsConfiguration != null &&
-//        tvRatingsConfiguration.timerSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
-//      final AlphaAnimation fadeOut = new AlphaAnimation( 1, 0 );
-//      fadeOut.setStartOffset( tvRatingsConfiguration.timerSeconds * 1000 );
-//      fadeOut.setDuration( FADE_MSEC );
-//      fadeOut.setFillAfter( true );
-//      fadeOut.setAnimationListener(new AnimationListener(){
-//        @Override
-//        public void onAnimationEnd(Animation arg0) {
-//          setVisibility( GONE );
-//        }
-//        @Override
-//        public void onAnimationRepeat(Animation arg0) {
-//        }
-//        @Override
-//        public void onAnimationStart(Animation arg0) {
-//        }
-//      });
-//      startAnimation( fadeOut );
-//    }
-//  }
-
   @Override
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
     final int paddingLeft = getPaddingLeft();
@@ -194,13 +173,43 @@ public class FCCTVRatingsView extends View {
     setMeasuredDimension( measuredWidth, measuredHeight );
   }
 
+  @Override
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged( w, h, oldw, oldh );
+    freeResources();
+  }
+
+  public void setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
+    this.tvRatingsConfiguration = tvRatingsConfiguration;
+  }
+
+  public void setRating( String rating ) {
+    this.rating = rating;
+    freeResources();
+    updateVisibility();
+    if( getVisibility() == VISIBLE ) {
+      startDelayedFadeAnimation();
+      invalidate();
+    }
+  }
+
+  public void setLabels( String labels ) {
+    this.labels = labels;
+    freeResources();
+    updateVisibility();
+    if( getVisibility() == VISIBLE ) {
+      invalidate();
+    }
+  }
+
   private void freeResources() {
     nBitmap = null;
   }
 
   private void updateVisibility() {
-    // todo: respect fade animation.
-    setVisibility( hasRating() ? VISIBLE : GONE );
+    if( nFadeAnimation == null ) {
+      setVisibility( hasRating() ? VISIBLE : GONE );
+    }
   }
 
   private boolean hasRating() {
@@ -219,24 +228,28 @@ public class FCCTVRatingsView extends View {
     return nBitmap != null;
   }
 
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged( w, h, oldw, oldh );
-    freeResources();
-  }
-
-  public void setRating( String rating ) {
-    this.rating = rating;
-    freeResources();
-    updateVisibility();
-    invalidate();
-  }
-
-  public void setLabels( String labels ) {
-    this.labels = labels;
-    freeResources();
-    updateVisibility();
-    invalidate();
+  private void startDelayedFadeAnimation() {
+    if( nFadeAnimation == null &&
+        tvRatingsConfiguration != null &&
+        tvRatingsConfiguration.timerSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+      nFadeAnimation = new AlphaAnimation( 1, 0 );
+      nFadeAnimation.setStartOffset( tvRatingsConfiguration.timerSeconds * 1000 );
+      nFadeAnimation.setDuration( FADE_MSEC );
+      nFadeAnimation.setFillAfter( true );
+      nFadeAnimation.setAnimationListener(new AnimationListener(){
+        @Override
+        public void onAnimationEnd(Animation arg0) {
+          setVisibility( GONE );
+        }
+        @Override
+        public void onAnimationRepeat(Animation arg0) {
+        }
+        @Override
+        public void onAnimationStart(Animation arg0) {
+        }
+      });
+      startAnimation( nFadeAnimation );
+    }
   }
 
   @Override

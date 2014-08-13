@@ -25,6 +25,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.configuration.TVRatingsConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
 
@@ -312,6 +313,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     FCCTVRatingsView tvrv = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
     // todo: get the data from the content item.
     // todo: timer to fade away.
+    tvrv.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds( 5 ) );
     tvrv.setRating( "PG" );
     tvrv.setLabels( "FV" );
   }
