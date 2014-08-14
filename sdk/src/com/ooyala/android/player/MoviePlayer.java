@@ -165,6 +165,10 @@ public class MoviePlayer extends Player implements Observer {
     _basePlayer.resume(millisToResume, stateToResume);
   }
 
+  public int timeToResume() {
+    return _millisToResume;
+  }
+
   public void destroy() {
     if (_basePlayer != null) {
       _basePlayer.deleteObserver(this);

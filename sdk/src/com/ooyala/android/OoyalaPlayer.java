@@ -1867,7 +1867,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       prepareContent(forcePlay);
     } else if (_player.getState() == State.SUSPENDED) {
       if (forcePlay) {
-        _player.resume(_player.currentTime(), State.PLAYING);
+        _player.resume(_player.timeToResume(), State.PLAYING);
       } else {
         _player.resume();
       }
