@@ -141,7 +141,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
     for (VideoAdPlayerCallback callback : _adCallbacks) {
       callback.onPlay();
     }
-    DebugMode.logE(TAG, "Destroy AdPlayer before play content");
+    DebugMode.logD(TAG, "Destroy AdPlayer before play content");
     _player.exitAdMode(_imaManager);
   }
 

@@ -72,7 +72,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
     // and start playing back content.  Ooyala Player expects the ad manager to resume content.
     if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && getState() == State.COMPLETED) {
       arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
-      DebugMode.logE(TAG, "Ad complete!");
+      DebugMode.logD(TAG, "Ad complete!");
       _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();
     }
 
