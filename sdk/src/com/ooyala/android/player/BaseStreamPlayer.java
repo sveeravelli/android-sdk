@@ -17,14 +17,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
+import android.view.View;
 
-import com.ooyala.android.R;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.R;
 import com.ooyala.android.configuration.TVRatingsConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
@@ -41,6 +42,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     SurfaceHolder.Callback {
 
   private static final String TAG = BaseStreamPlayer.class.getName();
+  protected View _container;
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -308,25 +310,33 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void createAndAddViews() {
     Context c = _parent.getLayout().getContext();
-    LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), true );
+    
+    // note: attachToRoot must be false. when true, it empirically prevents subsequent playbacks.
+    _container = LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), false );
+    _parent.getLayout().addView( _container );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
-    FCCTVRatingsView tvrv = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
+    _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
+    
     // todo: get the data from the content item.
     // todo: timer to fade away.
-    tvrv.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds( 5 ) );
-    tvrv.setRating( "PG" );
-    tvrv.setLabels( "FV" );
+    _tvRatingsView.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds( 5 ) );
+    _tvRatingsView.setRating( "PG" );
+    _tvRatingsView.setLabels( "FV" );
   }
 
   private void removeView() {
-    if (_parent != null) {
-      _parent.getLayout().removeView(_view);
-    }
-    if (_holder != null) {
-      _holder.removeCallback(this);
-    }
-    _view = null;
-    _holder = null;
+	  if (_parent != null) {
+		  _parent.getLayout().removeView(_tvRatingsView);
+		  _parent.getLayout().removeView(_view);
+		  _parent.getLayout().removeView(_container);
+	  }
+	  if (_holder != null) {
+		  _holder.removeCallback(this);
+	  }
+	  _tvRatingsView = null;
+	  _view = null;
+	  _container = null;
+	  _holder = null;
   }
 
   @Override

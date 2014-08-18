@@ -11,6 +11,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.ui.FCCTVRatingsView;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
@@ -24,6 +25,7 @@ public abstract class Player extends Observable {
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
   protected SurfaceView _view = null;
+  protected FCCTVRatingsView _tvRatingsView;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
   protected boolean _fullscreen = false;
