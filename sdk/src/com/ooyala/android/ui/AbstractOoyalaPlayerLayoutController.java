@@ -1,6 +1,7 @@
 package com.ooyala.android.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -291,14 +292,16 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void showClosedCaptionsMenu() {
     Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
-    languageSet.add(LocalizationSupport.localizedStringFor("None"));
+    List<String> languageList = new ArrayList<String>(languageSet);
+    Collections.sort(languageList);
+    languageList.add(0, LocalizationSupport.localizedStringFor("None"));
 
     final Context context = _layout.getContext();
 
     if (this.optionList == null) {
       this.optionList = new ArrayList<String>();
       this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
-      this.optionList.addAll(languageSet);
+      this.optionList.addAll(languageList);
       //this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
       //this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
       //this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
@@ -335,7 +338,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if (position == (this.optionList.size() - 1)) {
       this.dialog.hide();
     } else {
-      if (this.selectedLanguageIndex != 0) {
+      if (this.selectedLanguageIndex != 0 && this.selectedLanguageIndex != position) {
         int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
         // check if listView is trying to unCheck Language Index that is
         // out of screen
