@@ -1334,6 +1334,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _adPlayer = null;
       sendNotification(AD_COMPLETED_NOTIFICATION);
     }
+    else if (notification.equals(SEEK_COMPLETED_NOTIFICATION)) {
+      sendNotification(SEEK_COMPLETED_NOTIFICATION);
+    }
   }
 
   public void adPlayerCompleted() {
