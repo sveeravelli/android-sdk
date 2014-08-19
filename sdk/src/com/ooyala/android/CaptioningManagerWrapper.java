@@ -11,7 +11,7 @@ public class CaptioningManagerWrapper {
     CaptioningManager captioningManager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
     CaptioningManager.CaptionStyle captionStyle = captioningManager.getUserStyle();
 
-    style.textSize = captioningManager.getFontScale() * 26;
+    style.textSize = captioningManager.getFontScale() * ClosedCaptionsStyle.CC_FONT_SP;
     style.textFont = captionStyle.getTypeface();
     style.textColor = captionStyle.foregroundColor;
     style.backgroundColor = captionStyle.backgroundColor;

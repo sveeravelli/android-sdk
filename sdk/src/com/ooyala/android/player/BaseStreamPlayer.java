@@ -223,7 +223,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    _view.setBackgroundColor(Color.TRANSPARENT);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
@@ -245,8 +244,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public boolean onInfo(MediaPlayer mp, int what, int extra) {
 
+    //Set the visibility of the View above the surface to transparent, in order to show the video
+    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+      _view.setBackgroundColor(Color.TRANSPARENT);
+    }
     //These refer to when mid-playback buffering happens.  This doesn't apply to initial buffer
-    if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+    else if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
       DebugMode.logD(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
       setState(State.LOADING);
     } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
