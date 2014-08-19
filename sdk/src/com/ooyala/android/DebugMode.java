@@ -116,6 +116,15 @@ public final class DebugMode {
     if( DebugMode.mode != Mode.None ) { Log.e( tag, message, throwable ); }
   }
 
+  public static void assertEquals( Object a, Object b, String tag, String message ) {
+    if( a != null || b != null ) {
+      Object left = a == null ? b : a;
+      Object right = a == null ? a : b;
+      String preMessage = "(" + left + "?=" + right + ") ";
+      DebugMode.assertCondition( left.equals(right), tag, preMessage+message );
+    }
+  }
+  
   /**
    * Assert that the condition returns true.  If not, perform an action based on the DebugMode.Mode
    * @param condition The boolean condition to assert on
@@ -123,7 +132,7 @@ public final class DebugMode {
    * @param message the Log message
    */
   public static void assertCondition( boolean condition, String tag, String message ) {
-    if (condition) {
+    if (!condition) {
       switch( getMode() ) {
       case None:
         break;
