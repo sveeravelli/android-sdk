@@ -4,6 +4,10 @@ public class Options implements ReadonlyOptionsInterface {
 
   public static class Builder {
     private TVRatingsConfiguration tvRatingsConfiguration;
+    
+    public Builder() {
+      this.tvRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration(); 
+    }
 
     public Builder setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
       this.tvRatingsConfiguration = tvRatingsConfiguration;

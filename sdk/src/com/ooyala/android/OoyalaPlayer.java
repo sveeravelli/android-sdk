@@ -652,6 +652,15 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
+    final MoviePlayer moviePlayer = _getCorrectMoviePlayer( currentItem );
+    final TVRatings tvRatings = currentItem.getTVRatings();
+    if( tvRatings != null ) {
+      moviePlayer.setTVRatings( tvRatings );
+    }
+    return moviePlayer;
+  }
+  
+  private MoviePlayer _getCorrectMoviePlayer(Video currentItem) {
     Set<Stream> streams = currentItem.getStreams();
 
     // Get correct type of Movie Player
@@ -673,7 +682,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         setState(State.ERROR);
       }
     }
-
+    
     return new MoviePlayer();
   }
 

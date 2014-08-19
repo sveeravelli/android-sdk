@@ -16,7 +16,7 @@ public class TVRatingsConfiguration {
   public double percentScale;
   public double opacity;
 
-  public static final TVRatingsConfiguration getDefaultTVRatingsConfiguration() {
+  public static final TVRatingsConfiguration s_getDefaultTVRatingsConfiguration() {
     return new TVRatingsConfiguration( TIMER_NEVER, Position.TopLeft, 0.2, 0.9 );
   }
 

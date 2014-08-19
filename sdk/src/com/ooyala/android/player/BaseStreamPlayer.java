@@ -15,8 +15,6 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -28,7 +26,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.R;
-import com.ooyala.android.configuration.TVRatingsConfiguration;
+import com.ooyala.android.TVRatings;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
 
@@ -45,6 +43,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private static final String TAG = BaseStreamPlayer.class.getName();
   protected View _container;
+  protected TVRatings _tvRatings;
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -55,7 +54,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
   Stream stream = null;
-  private boolean _tvRatingsSeen;
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -72,11 +70,10 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       setState(State.ERROR);
       return;
     }
+    setParent(parent);
     setState(State.LOADING);
     _streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
-    setParent(parent);
-    setupView();
-    _tvRatingsSeen = false;
+    setupViews(); // must come after setParent().
     if (_player != null) { _player.reset(); }
   }
 
@@ -124,14 +121,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void reset() {
     suspend(0, State.PAUSED);
     setState(State.LOADING);
-    setupView();
+    setupViews();
     resume();
-  }
-  
-  @Override
-  protected void notifyTimeChanged() {
-    super.notifyTimeChanged();
-    updateTvRating();
   }
 
   @Override
@@ -299,26 +290,30 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void surfaceDestroyed(SurfaceHolder arg0) {
     DebugMode.logI(TAG, "Surface Destroyed");
   }
-
+  
   @Override
-  public void setParent(OoyalaPlayer parent) {
-    super.setParent(parent);
+  public void setTVRatings( TVRatings tvRatings ) {
+    _tvRatings = tvRatings;
+    pushTVRatings();
+  }
+  
+  private void pushTVRatings() {
+    if( _tvRatings != null && _tvRatingsView != null && currentTime() > 250 ) {
+      _tvRatingsView.setTVRatings( _tvRatings );
+      _tvRatings = null; // only do it once. 
+    }
+  }
+  
+  @Override
+  protected void notifyTimeChanged() {
+    super.notifyTimeChanged();
+    pushTVRatings();
   }
 
-  @SuppressWarnings("deprecation")
-  private void setupView() {
+  private void setupViews() {
     createAndAddViews();
-
-    // Try to figure out the video size.  If not, use our default
-    if (stream.getWidth() > 0 && stream.getHeight() > 0) {
-      setVideoSize(stream.getWidth(), stream.getHeight());
-    } else {
-      setVideoSize(16,9);
-    }
-
-    _holder = _view.getHolder();
-    _holder.addCallback(this);
-    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    setupVideoSize();
+    setupHolder();
   }
 
   private void createAndAddViews() {
@@ -328,6 +323,23 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _parent.getLayout().addView( _container );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
     _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
+    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
+  }
+
+  private void setupVideoSize() {
+    // Try to figure out the video size.  If not, use our default
+    if (stream.getWidth() > 0 && stream.getHeight() > 0) {
+      setVideoSize(stream.getWidth(), stream.getHeight());
+    } else {
+      setVideoSize(16,9);
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  private void setupHolder() {
+    _holder = _view.getHolder();
+    _holder.addCallback(this);
+    _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
   private void removeView() {
@@ -343,14 +355,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 	  _view = null;
 	  _container = null;
 	  _holder = null;
-  }
-  
-  private void updateTvRating() {
-	  if( ! _tvRatingsSeen && currentTime() > 250 ) {
-		  _tvRatingsView.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds(5) );
-		  _tvRatingsView.setRating( "MA" );
-		  _tvRatingsSeen = true;
-	  }
   }
 
   @Override

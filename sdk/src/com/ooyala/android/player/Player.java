@@ -10,6 +10,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.TVRatings;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
 
@@ -37,6 +38,13 @@ public abstract class Player extends Observable {
   protected Player() {}
 
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
+  
+  /**
+   * Optional feature for Players: support for showing TVRatings.
+   * Defaults to no support - nothing is shown for the given data.
+   * Subclasses must override if need be.
+   */
+  public void setTVRatings( TVRatings tvRatings ) {}
 
   /**
    * Pause the current video

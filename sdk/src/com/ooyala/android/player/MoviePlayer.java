@@ -12,6 +12,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.TVRatings;
 import com.ooyala.android.item.Stream;
 
 public class MoviePlayer extends Player implements Observer {
@@ -24,6 +25,7 @@ public class MoviePlayer extends Player implements Observer {
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
+  private TVRatings _tvRatings;
   private boolean _suspended = true;
   protected boolean _seekable = true;
   private boolean _live = false;
@@ -93,6 +95,19 @@ public class MoviePlayer extends Player implements Observer {
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
+    pushTVRatings();
+  }
+  
+  public void setTVRatings( TVRatings tvRatings ) {
+    _tvRatings = tvRatings;
+    pushTVRatings();
+  }
+  
+  private void pushTVRatings() {
+    if( _tvRatings != null && _basePlayer != null ) {
+      _basePlayer.setTVRatings( _tvRatings );
+      _tvRatings = null; // only do it once.
+    }
   }
 
   /**

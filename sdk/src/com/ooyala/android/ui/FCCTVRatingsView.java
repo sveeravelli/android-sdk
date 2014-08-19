@@ -16,6 +16,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
 import com.ooyala.android.DebugMode;
+import com.ooyala.android.TVRatings;
 import com.ooyala.android.configuration.TVRatingsConfiguration;
 
 /* todo:
@@ -147,8 +148,7 @@ public class FCCTVRatingsView extends View {
   private final Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private String rating;
-  private String labels;
+  private TVRatings tvRatings;
   private int watermarkWidth; // half of view's width; height is full height.
   private StampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
@@ -224,42 +224,24 @@ public class FCCTVRatingsView extends View {
   public void setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
     this.tvRatingsConfiguration = tvRatingsConfiguration;
   }
-
-  public void setRating( String rating ) {
-    this.rating = rating;
-    onSet();
-  }
-
-  public void setLabels( String labels ) {
-    this.labels = labels;
-    onSet();
-  }
   
-  private boolean hasAnimation() {
-	  return this.nFadeInAnimation != null || this.nFadeOutAnimation != null;
-  }
-  
-  private void onSet() {
+  public void setTVRatings( TVRatings tvRatings ) {
+    this.tvRatings = tvRatings;
 	  freeResources();
-	  if( hasRating() && ! hasAnimation() ) {
-		  startAnimation();
-	  }
-	  else {
-		  setVisibility( INVISIBLE );
-	  }
+	  startAnimation();
   }
 
   private void startAnimation() {
-    if( ! hasAnimation() &&
+    if( hasValidRating() &&
+        ! hasAnimation() &&
         tvRatingsConfiguration != null &&
-        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_NEVER ) {
     	startFadeInAnimation();
     }
   }
   
   private void startFadeInAnimation() {
 	  nFadeInAnimation = new AlphaAnimation( 0f, 1f );
-	  nFadeInAnimation.setStartOffset( 0 );
 	  nFadeInAnimation.setDuration( FADE_IN_MSEC );
 	  nFadeInAnimation.setFillAfter( true );
 	  nFadeInAnimation.setAnimationListener(new AnimationListener(){
@@ -304,17 +286,21 @@ public class FCCTVRatingsView extends View {
   private void freeResources() {
     nBitmap = null;
   }
+  
+  private boolean hasAnimation() {
+    return this.nFadeInAnimation != null || this.nFadeOutAnimation != null;
+  }
 
-  private boolean hasRating() {
-    return rating != null;
+  private boolean hasValidRating() {
+    return tvRatings != null && tvRatings.rating != null;
   }
 
   private boolean hasLabels() {
-    return labels != null && labels.length() > 0;
+    return tvRatings != null && tvRatings.labels != null && tvRatings.labels.length() > 0;
   }
 
   private boolean canGenerateBitmap() {
-    return stampDimensions.isValid() && hasRating();
+    return stampDimensions.isValid() && hasValidRating();
   }
 
   private boolean hasBitmap() {
@@ -369,12 +355,14 @@ public class FCCTVRatingsView extends View {
 
   private void drawStampLabels( Canvas c ) {
     if( hasLabels() ) {
-      drawLabels( c, stampDimensions.labelsRect, labels );
+      drawLabels( c, stampDimensions.labelsRect, tvRatings.labels );
     }
   }
 
   private void drawStampRating( Canvas c ) {
-    drawRating( c, stampDimensions.ratingRect, rating );
+    if( hasValidRating() ) {
+      drawRating( c, stampDimensions.ratingRect, tvRatings.rating );
+    }
   }
 
   private void drawTV( Canvas c, Rect r ) {

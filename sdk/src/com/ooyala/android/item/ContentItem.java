@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OrderedMapValue;
+import com.ooyala.android.TVRatings;
 
 /**
  * Stores the info and metadata for the specified content item.
@@ -41,6 +42,10 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_BASE = "base";
   protected static final String KEY_METADATA_MODULES = "modules";
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
+  protected static final String KEY_METADATA_TVRATING = "tvrating";
+  protected static final String KEY_METADATA_TVRATING_SURL = "tvratingsurl";
+  protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
+  protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
 
   protected static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   protected static final String CONTENT_TYPE_CHANNEL = "Channel";
@@ -60,6 +65,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected boolean _heartbeatRequired;
   protected Map<String, String> _metadata;
   protected Map<String, ModuleData> _moduleData;
+  protected TVRatings _tvRatings;
 
   ContentItem() {}
 
@@ -129,6 +135,13 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    * Subclasses must override this.
    */
   public abstract int getDuration();
+  
+  /**
+   * @return possibly null.
+   */
+  public TVRatings getTVRatings() {
+    return _tvRatings;
+  }
 
   @Override
   /** For internal use only.
@@ -191,6 +204,15 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
           Map<String, String> metadata = ItemUtils.mapFromJSONObject(module.getJSONObject(KEY_METADATA));
 
           _moduleData.put(key, new ModuleData(key, type, metadata));
+        }
+      }
+      if(myData.has(KEY_METADATA_TVRATING)) {
+        JSONObject rating = myData.getJSONObject(KEY_METADATA_TVRATING);
+        if( rating.has(KEY_METADATA_TVRATING_RATING) && rating.has(KEY_METADATA_TVRATING_SUBRATINGS) ) {
+          _tvRatings = new TVRatings(
+              rating.getString(KEY_METADATA_TVRATING_RATING),
+              rating.getString(KEY_METADATA_TVRATING_SUBRATINGS)
+              );
         }
       }
     } catch (JSONException exception) {
