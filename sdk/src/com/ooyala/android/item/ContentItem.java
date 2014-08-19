@@ -42,8 +42,6 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_BASE = "base";
   protected static final String KEY_METADATA_MODULES = "modules";
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
-  protected static final String KEY_METADATA_TVRATING = "tvrating";
-  protected static final String KEY_METADATA_TVRATING_SURL = "tvratingsurl";
   protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
   protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
 
@@ -206,14 +204,11 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
           _moduleData.put(key, new ModuleData(key, type, metadata));
         }
       }
-      if(myData.has(KEY_METADATA_TVRATING)) {
-        JSONObject rating = myData.getJSONObject(KEY_METADATA_TVRATING);
-        if( rating.has(KEY_METADATA_TVRATING_RATING) && rating.has(KEY_METADATA_TVRATING_SUBRATINGS) ) {
-          _tvRatings = new TVRatings(
-              rating.getString(KEY_METADATA_TVRATING_RATING),
-              rating.getString(KEY_METADATA_TVRATING_SUBRATINGS)
-              );
-        }
+      if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) && _metadata.containsKey(KEY_METADATA_TVRATING_SUBRATINGS) ) {
+        _tvRatings = new TVRatings(
+            _metadata.get(KEY_METADATA_TVRATING_RATING),
+            _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS)
+            );
       }
     } catch (JSONException exception) {
       System.out.println("JSONException: " + exception);

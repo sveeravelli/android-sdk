@@ -18,6 +18,7 @@ import android.view.animation.Animation.AnimationListener;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.TVRatings;
 import com.ooyala.android.configuration.TVRatingsConfiguration;
+import com.ooyala.android.configuration.TVRatingsConfiguration.Position;
 
 /* todo:
  * + update from content item.
@@ -38,8 +39,6 @@ public class FCCTVRatingsView extends View {
     private static final int WHITE_BORDER_DP = 2;
     private static final int BLACK_BORDER_DP = 4;
     private static final float SQUARE_SCALE = 0.25f;
-    private static final float NON_SQUARE_LARGE_SCALE = 0.20f;
-    private static final float NON_SQUARE_SMALL_SCALE = 0.30f;
     private static final float MAX_RATIO = 1.4f;
 
     // sizes are in pixels.
@@ -59,7 +58,7 @@ public class FCCTVRatingsView extends View {
 
     public StampDimensions() {}
 
-    public void update( Context context, int measuredWidth, int measuredHeight, int watermarkWidth, boolean hasLabels ) {
+    public void update( Context context, TVRatingsConfiguration tvRatingsConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, boolean hasLabels ) {
       this.whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
       this.blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
       this.borderSize = this.whiteBorderSize + this.blackBorderSize;
@@ -71,10 +70,9 @@ public class FCCTVRatingsView extends View {
         this.innerHeight = bitmapInnerSize;
       }
       else {
-        float scale = measuredWidth >= 430 ? NON_SQUARE_LARGE_SCALE : NON_SQUARE_SMALL_SCALE;
         // the bitmap is never wider than taller; it has the opposite aspect ratio than the video, hence flipping height/width.
-        this.innerWidth = Math.round( scale * measuredHeight );
-        this.innerHeight = Math.round( scale * measuredWidth );
+        this.innerWidth = Math.round( tvRatingsConfiguration.scale * measuredHeight );
+        this.innerHeight = Math.round( tvRatingsConfiguration.scale * measuredWidth );
       }
       this.innerWidth = constrainInnerWidth( this.innerWidth, watermarkWidth, measuredHeight );
       this.innerHeight = constrainInnerHeight( this.innerWidth, this.innerHeight, watermarkWidth, measuredHeight );
@@ -141,53 +139,29 @@ public class FCCTVRatingsView extends View {
   private static final int FADE_IN_MSEC = 1 * 500;
   private static final int FADE_OUT_MSEC = 1 * 1000;
   private static final float MINI_HEIGHT_FACTOR = 0.2f;
-  private final Paint watermarkPaint;
-  private final Paint textPaint;
-  private final Paint blackPaint;
-  private final Paint whitePaint;
-  private final Paint clearPaint;
+  private Paint watermarkPaint;
+  private Paint textPaint;
+  private Paint blackPaint;
+  private Paint whitePaint;
+  private Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private TVRatings tvRatings;
   private int watermarkWidth; // half of view's width; height is full height.
   private StampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
   private Bitmap nBitmap;
   private AlphaAnimation nFadeInAnimation;
   private AlphaAnimation nFadeOutAnimation;
-
-  private TVRatingsConfiguration tvRatingsConfiguration;
+  private TVRatingsConfiguration nTVRatingsConfiguration;
+  private TVRatings nTVRatings;
 
   public FCCTVRatingsView( Context context, AttributeSet attrs ) {
     super( context, attrs );
-
-    watermarkPaint = new Paint();
-    watermarkPaint.setColor( android.graphics.Color.argb( (int)Math.round(255*0.8f), 255, 255, 255 ) );
-    watermarkPaint.setStyle( Paint.Style.FILL );
-
-    blackPaint = new Paint();
-    blackPaint.setColor( android.graphics.Color.BLACK );
-    blackPaint.setStyle( Paint.Style.FILL );
-
-    whitePaint = new Paint();
-    whitePaint.setColor( android.graphics.Color.WHITE );
-    whitePaint.setStyle( Paint.Style.FILL );
-
-    textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
-    textPaint.setColor( android.graphics.Color.WHITE );
-    textPaint.setStyle( Paint.Style.FILL );
-    Typeface tf = Typeface.create( "DroidSans", Typeface.BOLD );
-    textPaint.setTypeface( tf );
-    textPaint.setTextAlign( Align.CENTER );
-
-    clearPaint = new Paint();
-    clearPaint.setColor( android.graphics.Color.TRANSPARENT );
-    clearPaint.setStyle( Paint.Style.FILL );
-
-    // these will be properly updated later when we know enough.
-    stampDimensions = new StampDimensions();
-    miniTextSize = 0;
-    miniTextScaleX = 0;
+    initPaints( TVRatingsConfiguration.DEFAULT_OPACITY );
+    this.nTVRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration();
+    this.stampDimensions = new StampDimensions();
+    this.miniTextSize = 0;
+    this.miniTextScaleX = 0;
   }
 
   @Override
@@ -198,21 +172,26 @@ public class FCCTVRatingsView extends View {
 
   @Override
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-    final int paddingLeft = getPaddingLeft();
-    final int paddingTop = getPaddingTop();
-    final int paddingRight = getPaddingRight();
-    final int paddingBottom = getPaddingBottom();
-    final int viewWidthSize = MeasureSpec.getSize(widthMeasureSpec);
-    final int viewHeightSize = MeasureSpec.getSize(heightMeasureSpec);
-    final int elementWidth = viewWidthSize - paddingLeft - paddingRight;
-    final int elementHeight = viewHeightSize - paddingTop - paddingBottom;
-    int measuredWidth = elementWidth + paddingLeft + paddingRight;
-    int measuredHeight = elementHeight + paddingTop + paddingBottom;
-    measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
-    measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
-    watermarkWidth = Math.round( measuredWidth / 2f );
-    stampDimensions.update( getContext(), measuredWidth, measuredHeight, watermarkWidth, hasLabels() );
-    setMeasuredDimension( measuredWidth, measuredHeight );
+    if( ! hasTVRatingsConfiguration() ) {
+      setMeasuredDimension( 0, 0 );
+    }
+    else {
+      final int paddingLeft = getPaddingLeft();
+      final int paddingTop = getPaddingTop();
+      final int paddingRight = getPaddingRight();
+      final int paddingBottom = getPaddingBottom();
+      final int viewWidthSize = MeasureSpec.getSize(widthMeasureSpec);
+      final int viewHeightSize = MeasureSpec.getSize(heightMeasureSpec);
+      final int elementWidth = viewWidthSize - paddingLeft - paddingRight;
+      final int elementHeight = viewHeightSize - paddingTop - paddingBottom;
+      int measuredWidth = elementWidth + paddingLeft + paddingRight;
+      int measuredHeight = elementHeight + paddingTop + paddingBottom;
+      measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
+      measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
+      watermarkWidth = Math.round( measuredWidth / 2f );
+      stampDimensions.update( getContext(), nTVRatingsConfiguration, measuredWidth, measuredHeight, watermarkWidth, hasLabels() );
+      setMeasuredDimension( measuredWidth, measuredHeight );
+    }
   }
 
   @Override
@@ -221,12 +200,47 @@ public class FCCTVRatingsView extends View {
     freeResources();
   }
 
+  /**
+   * For the configuration to actually take effect, it must be set before Android's
+   * layout system calls onMeasure.
+   */
   public void setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
-    this.tvRatingsConfiguration = tvRatingsConfiguration;
+    this.nTVRatingsConfiguration = tvRatingsConfiguration;
+    if( hasTVRatingsConfiguration() ) {
+      initPaints( tvRatingsConfiguration.opacity );
+      invalidate();
+    }
+  }
+  
+  private void initPaints( float opacity ) {
+    final int iOpaticy = (int)Math.round(255*opacity);
+    
+    watermarkPaint = new Paint();
+    watermarkPaint.setColor( android.graphics.Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
+    watermarkPaint.setStyle( Paint.Style.FILL );
+
+    blackPaint = new Paint();
+    blackPaint.setColor( android.graphics.Color.argb( iOpaticy, 0, 0, 0 ) );
+    blackPaint.setStyle( Paint.Style.FILL );
+
+    whitePaint = new Paint();
+    whitePaint.setColor( android.graphics.Color.argb( iOpaticy, 255, 255, 255 ) );
+    whitePaint.setStyle( Paint.Style.FILL );
+
+    textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
+    textPaint.setColor( android.graphics.Color.argb( iOpaticy, 255, 255, 255 ) );
+    textPaint.setStyle( Paint.Style.FILL );
+    Typeface tf = Typeface.create( "DroidSans", Typeface.BOLD );
+    textPaint.setTypeface( tf );
+    textPaint.setTextAlign( Align.CENTER );
+
+    clearPaint = new Paint();
+    clearPaint.setColor( android.graphics.Color.TRANSPARENT );
+    clearPaint.setStyle( Paint.Style.FILL );
   }
   
   public void setTVRatings( TVRatings tvRatings ) {
-    this.tvRatings = tvRatings;
+    this.nTVRatings = tvRatings;
 	  freeResources();
 	  startAnimation();
   }
@@ -234,8 +248,8 @@ public class FCCTVRatingsView extends View {
   private void startAnimation() {
     if( hasValidRating() &&
         ! hasAnimation() &&
-        tvRatingsConfiguration != null &&
-        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_NEVER ) {
+        hasTVRatingsConfiguration() &&
+        nTVRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_NEVER ) {
     	startFadeInAnimation();
     }
   }
@@ -261,10 +275,10 @@ public class FCCTVRatingsView extends View {
   }
 
   private void startFadeOutAnimation() {
-    if( tvRatingsConfiguration != null &&
-        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+    if( hasTVRatingsConfiguration() &&
+        nTVRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
       nFadeOutAnimation = new AlphaAnimation( 1f, 0f );
-      nFadeOutAnimation.setStartOffset( tvRatingsConfiguration.durationSeconds * 1000 );
+      nFadeOutAnimation.setStartOffset( nTVRatingsConfiguration.durationSeconds * 1000 );
       nFadeOutAnimation.setDuration( FADE_OUT_MSEC );
       nFadeOutAnimation.setFillAfter( true );
       nFadeOutAnimation.setAnimationListener(new AnimationListener(){
@@ -287,16 +301,20 @@ public class FCCTVRatingsView extends View {
     nBitmap = null;
   }
   
+  private boolean hasTVRatingsConfiguration() {
+    return this.nTVRatingsConfiguration != null;
+  }
+  
   private boolean hasAnimation() {
     return this.nFadeInAnimation != null || this.nFadeOutAnimation != null;
   }
 
   private boolean hasValidRating() {
-    return tvRatings != null && tvRatings.rating != null;
+    return nTVRatings != null && nTVRatings.rating != null;
   }
 
   private boolean hasLabels() {
-    return tvRatings != null && tvRatings.labels != null && tvRatings.labels.length() > 0;
+    return nTVRatings != null && nTVRatings.labels != null && nTVRatings.labels.length() > 0;
   }
 
   private boolean canGenerateBitmap() {
@@ -355,13 +373,13 @@ public class FCCTVRatingsView extends View {
 
   private void drawStampLabels( Canvas c ) {
     if( hasLabels() ) {
-      drawLabels( c, stampDimensions.labelsRect, tvRatings.labels );
+      drawLabels( c, stampDimensions.labelsRect, nTVRatings.labels );
     }
   }
 
   private void drawStampRating( Canvas c ) {
     if( hasValidRating() ) {
-      drawRating( c, stampDimensions.ratingRect, tvRatings.rating );
+      drawRating( c, stampDimensions.ratingRect, nTVRatings.rating );
     }
   }
 
