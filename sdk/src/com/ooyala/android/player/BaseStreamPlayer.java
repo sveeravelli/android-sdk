@@ -324,18 +324,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _parent.getLayout().addView( _container );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
     _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
-    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() ); //.setPosition( s_nextPosition() ).setScale( s_nextScale() ) );
+    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
   }
-//  private static Position[] s_positions = new Position[] { Position.BottomLeft, Position.TopRight, Position.BottomRight, Position.TopLeft };
-//  private static int positionIndex;
-//  private static Position s_nextPosition() {
-//    Position p = s_positions[ positionIndex ];
-//    positionIndex = (positionIndex+1) % s_positions.length;
-//    return p;
-//  }
-//  private static float s_nextScale() {
-//    return (float)(0.1 + Math.random()*0.3); 
-//  }
 
   private void setupVideoSize() {
     // Try to figure out the video size.  If not, use our default
