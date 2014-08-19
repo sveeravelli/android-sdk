@@ -3,9 +3,11 @@ package com.ooyala.android.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Pair;
@@ -215,6 +217,7 @@ public class FCCTVRatingsView extends View {
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
     if( ! hasTVRatingsConfiguration() ) {
       setMeasuredDimension( 0, 0 );
+      watermarkRect.set( 0, 0, 0, 0 );
     }
     else {
       final int paddingLeft = getPaddingLeft();
@@ -245,7 +248,6 @@ public class FCCTVRatingsView extends View {
       }
       watermarkRect.set( left, 0, Math.min(measuredWidth, left+watermarkWidth), measuredHeight );
       
-      stampDimensions.update( getContext(), nTVRatingsConfiguration, measuredWidth, measuredHeight, watermarkRect.width(), watermarkRect.height(), hasLabels() );
       setMeasuredDimension( measuredWidth, measuredHeight );
     }
   }
@@ -264,7 +266,7 @@ public class FCCTVRatingsView extends View {
     this.nTVRatingsConfiguration = tvRatingsConfiguration;
     if( hasTVRatingsConfiguration() ) {
       initPaints( tvRatingsConfiguration.opacity );
-      invalidate();
+      freeResources();
     }
   }
   
@@ -272,29 +274,29 @@ public class FCCTVRatingsView extends View {
     final int iOpaticy = (int)Math.round(255*opacity);
     
     watermarkPaint = new Paint();
-    watermarkPaint.setColor( android.graphics.Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
-//    watermarkPaint.setColor( android.graphics.Color.argb( 64, 255, 0, 0 ) );
+    watermarkPaint.setColor( Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
+//    watermarkPaint.setColor( Color.argb( 64, 255, 0, 0 ) );
     watermarkPaint.setStyle( Paint.Style.FILL );
 
     blackPaint = new Paint();
-    blackPaint.setColor( android.graphics.Color.argb( iOpaticy, 0, 0, 0 ) );
-//    blackPaint.setColor( android.graphics.Color.argb( 64, 0, 255, 0 ) );
+    blackPaint.setColor( Color.argb( iOpaticy, 0, 0, 0 ) );
+//    blackPaint.setColor( Color.argb( 64, 0, 255, 0 ) );
     blackPaint.setStyle( Paint.Style.FILL );
 
     whitePaint = new Paint();
-    whitePaint.setColor( android.graphics.Color.argb( iOpaticy, 255, 255, 255 ) );
-//    whitePaint.setColor( android.graphics.Color.argb( 64, 0, 0, 255 ) );
+    whitePaint.setColor( Color.argb( iOpaticy, 255, 255, 255 ) );
+//    whitePaint.setColor( Color.argb( 64, 0, 0, 255 ) );
     whitePaint.setStyle( Paint.Style.FILL );
 
     textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
-    textPaint.setColor( android.graphics.Color.argb( iOpaticy, 255, 255, 255 ) );
+    textPaint.setColor( Color.argb( iOpaticy, 255, 255, 255 ) );
     textPaint.setStyle( Paint.Style.FILL );
     Typeface tf = Typeface.create( "DroidSans", Typeface.BOLD );
     textPaint.setTypeface( tf );
     textPaint.setTextAlign( Align.CENTER );
 
     clearPaint = new Paint();
-    clearPaint.setColor( android.graphics.Color.TRANSPARENT );
+    clearPaint.setColor( Color.TRANSPARENT );
     clearPaint.setStyle( Paint.Style.FILL );
   }
   
@@ -376,10 +378,6 @@ public class FCCTVRatingsView extends View {
     return nTVRatings != null && nTVRatings.labels != null && nTVRatings.labels.length() > 0;
   }
 
-  private boolean canGenerateBitmap() {
-    return stampDimensions.isValid() && hasValidRating();
-  }
-
   private boolean hasBitmap() {
     return nBitmap != null;
   }
@@ -394,11 +392,12 @@ public class FCCTVRatingsView extends View {
   }
 
   private void maybeGenerateBitmap() {
-    if( canGenerateBitmap() ) {
+    if( hasValidRating() ) {      
+      stampDimensions.update( getContext(), nTVRatingsConfiguration, getMeasuredWidth(), getMeasuredHeight(), watermarkRect.width(), watermarkRect.height(), hasLabels() );
       generateBitmap();
     }
     else {
-      freeResources(); // todo: Check this isn't going to prevent forward progress.
+      freeResources();
     }
   }
 
@@ -421,22 +420,26 @@ public class FCCTVRatingsView extends View {
   }
 
   private void drawBitmapStampBackground( Canvas c ) {
+    c.clipRect( stampDimensions.outerRect, Region.Op.REPLACE );
     c.drawRect( stampDimensions.outerRect, whitePaint );
     c.drawRect( stampDimensions.innerRect, blackPaint );
   }
 
   private void drawBitmapStampTV( Canvas c ) {
+    c.clipRect( stampDimensions.tvRect, Region.Op.REPLACE );
     drawTV( c, stampDimensions.tvRect );
   }
 
   private void drawBitmapStampLabels( Canvas c ) {
     if( hasLabels() ) {
+      c.clipRect( stampDimensions.labelsRect, Region.Op.REPLACE );
       drawLabels( c, stampDimensions.labelsRect, nTVRatings.labels );
     }
   }
 
   private void drawBitmapStampRating( Canvas c ) {
     if( hasValidRating() ) {
+      c.clipRect( stampDimensions.ratingRect, Region.Op.REPLACE );
       drawRating( c, stampDimensions.ratingRect, nTVRatings.rating );
     }
   }
@@ -476,7 +479,7 @@ public class FCCTVRatingsView extends View {
     // fudge factors to really fit into rect.
     float textSize = ts * 0.7f;
     float tsx = r.width()/(float)tb.width()*1000;
-    float textScaleX = Math.min( 1f, tsx ) * 0.5f;
+    float textScaleX = Math.min( 1f, tsx ) * 0.7f;
     return new Pair<Float,Float>( textSize, textScaleX );
   }
 

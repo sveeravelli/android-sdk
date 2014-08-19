@@ -21,7 +21,10 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.Options;
+import com.ooyala.android.configuration.TVRatingsConfiguration;
 import com.ooyala.android.testapp.R;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator, AdvertisingIdUtils.IAdvertisingIdListener {
@@ -68,7 +71,12 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     }
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, domain, this);
+        (OoyalaPlayerLayout) findViewById(R.id.player),
+        PCODE,
+        domain,
+        DefaultControlStyle.AUTO,
+        this,
+        new Options.Builder().setTVRatingsConfiguration( TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration().setTimerSeconds( 5 ) ).build() );
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
