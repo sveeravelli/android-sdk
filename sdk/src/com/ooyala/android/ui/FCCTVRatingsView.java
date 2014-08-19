@@ -15,10 +15,8 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
-import com.ooyala.android.DebugMode;
 import com.ooyala.android.TVRatings;
 import com.ooyala.android.configuration.TVRatingsConfiguration;
-import com.ooyala.android.configuration.TVRatingsConfiguration.Position;
 
 /* todo:
  * + update from content item.
@@ -58,11 +56,20 @@ public class FCCTVRatingsView extends View {
 
     public StampDimensions() {}
 
-    public void update( Context context, TVRatingsConfiguration tvRatingsConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, boolean hasLabels ) {
+    public void update( Context context, TVRatingsConfiguration tvRatingsConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+      // the order of these 3 calls must be preserved.
+      updateBorder( context );
+      updateDimensions( tvRatingsConfiguration.scale, measuredWidth, measuredHeight, watermarkWidth );
+      updateRects( tvRatingsConfiguration.position, watermarkWidth, watermarkHeight, hasLabels );
+    }
+    
+    private void updateBorder( Context context ) {
       this.whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
       this.blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
       this.borderSize = this.whiteBorderSize + this.blackBorderSize;
-
+    }
+    
+    private void updateDimensions( float scale, int measuredWidth, int measuredHeight, int watermarkWidth ) {
       // todo: consider padding from parent layout?
       if( isSquareish( measuredWidth, measuredHeight ) ) {
         final int bitmapInnerSize = Math.round( Math.min(measuredWidth, measuredHeight) * SQUARE_SCALE );
@@ -71,26 +78,56 @@ public class FCCTVRatingsView extends View {
       }
       else {
         // the bitmap is never wider than taller; it has the opposite aspect ratio than the video, hence flipping height/width.
-        this.innerWidth = Math.round( tvRatingsConfiguration.scale * measuredHeight );
-        this.innerHeight = Math.round( tvRatingsConfiguration.scale * measuredWidth );
+        this.innerWidth = Math.round( scale * measuredHeight );
+        this.innerHeight = Math.round( scale * measuredWidth );
       }
       this.innerWidth = constrainInnerWidth( this.innerWidth, watermarkWidth, measuredHeight );
       this.innerHeight = constrainInnerHeight( this.innerWidth, this.innerHeight, watermarkWidth, measuredHeight );
       this.outerWidth = this.innerWidth + this.borderSize*2;
       this.outerHeight = this.innerHeight + this.borderSize*2;
+    }
+    
+    private void updateRects( TVRatingsConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+      int left, top;
+      int right = watermarkWidth - this.outerWidth;
+      int bottom = watermarkHeight - this.outerHeight;
+      switch( position ) {
+      default:
+      case TopLeft:
+        left = 0;
+        top = 0;
+        break;
+      case BottomLeft:
+        left = 0;
+        top = bottom;
+        break;
+      case TopRight:
+        left = right;
+        top = 0;
+        break;
+      case BottomRight:
+        left = right;
+        top = bottom;
+        break;
+      }
       
-      this.outerRect = new Rect(
-          0,
-          0,
-          this.outerWidth,
-          this.outerHeight
-          );
-      this.innerRect = new Rect(
-          this.whiteBorderSize,
-          this.whiteBorderSize,
-          this.outerWidth-this.whiteBorderSize,
-          this.outerHeight-this.whiteBorderSize
-          );
+      this.outerRect =
+          new Rect(
+              0,
+              0,
+              this.outerWidth,
+              this.outerHeight
+              );
+      this.outerRect.offset( left, top );
+      
+      this.innerRect =
+          new Rect(
+              this.whiteBorderSize,
+              this.whiteBorderSize,
+              this.outerWidth-this.whiteBorderSize,
+              this.outerHeight-this.whiteBorderSize
+              );
+      this.innerRect.offset( left, top );
       
       this.miniHeight = Math.round( this.innerHeight * MINI_HEIGHT_FACTOR );
 
@@ -99,18 +136,21 @@ public class FCCTVRatingsView extends View {
       int tr = tl + this.innerWidth;
       int tb = tt + this.miniHeight;
       this.tvRect = new Rect( tl, tt, tr, tb );
+      this.tvRect.offset( left, top );
       
       int ll = this.borderSize;
       int lt = this.outerHeight - this.borderSize - miniHeight;
       int lr = ll + this.innerWidth;
       int lb = lt + this.miniHeight;
       this.labelsRect = new Rect( ll, lt, lr, lb );
+      this.labelsRect.offset( left, top );
 
       int rl = this.borderSize;
       int rt = this.borderSize + miniHeight;
       int rr = rl + this.innerWidth;
       int rb = this.outerHeight - this.borderSize - (hasLabels ? miniHeight : 0);
       this.ratingRect = new Rect( rl, rt, rr, rb );
+      this.ratingRect.offset( left, top );
     }
 
     private static int constrainInnerWidth( int innerWidth, int watermarkWidth, int watermarkHeight ) {
@@ -146,7 +186,7 @@ public class FCCTVRatingsView extends View {
   private Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private int watermarkWidth; // half of view's width; height is full height.
+  private Rect watermarkRect;
   private StampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
   private Bitmap nBitmap;
@@ -158,10 +198,11 @@ public class FCCTVRatingsView extends View {
   public FCCTVRatingsView( Context context, AttributeSet attrs ) {
     super( context, attrs );
     initPaints( TVRatingsConfiguration.DEFAULT_OPACITY );
-    this.nTVRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration();
-    this.stampDimensions = new StampDimensions();
     this.miniTextSize = 0;
     this.miniTextScaleX = 0;
+    this.watermarkRect = new Rect();
+    this.stampDimensions = new StampDimensions();
+    this.nTVRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration();
   }
 
   @Override
@@ -188,8 +229,23 @@ public class FCCTVRatingsView extends View {
       int measuredHeight = elementHeight + paddingTop + paddingBottom;
       measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
       measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
-      watermarkWidth = Math.round( measuredWidth / 2f );
-      stampDimensions.update( getContext(), nTVRatingsConfiguration, measuredWidth, measuredHeight, watermarkWidth, hasLabels() );
+      
+      final int watermarkWidth = (int)Math.round(measuredWidth/2f);
+      int left;
+      switch( nTVRatingsConfiguration.position ) {
+      default:
+      case TopLeft:
+      case BottomLeft:
+        left = 0;
+        break;
+      case TopRight:
+      case BottomRight:
+        left = watermarkWidth;
+        break;
+      }
+      watermarkRect.set( left, 0, Math.min(measuredWidth, left+watermarkWidth), measuredHeight );
+      
+      stampDimensions.update( getContext(), nTVRatingsConfiguration, measuredWidth, measuredHeight, watermarkRect.width(), watermarkRect.height(), hasLabels() );
       setMeasuredDimension( measuredWidth, measuredHeight );
     }
   }
@@ -217,14 +273,17 @@ public class FCCTVRatingsView extends View {
     
     watermarkPaint = new Paint();
     watermarkPaint.setColor( android.graphics.Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
+//    watermarkPaint.setColor( android.graphics.Color.argb( 64, 255, 0, 0 ) );
     watermarkPaint.setStyle( Paint.Style.FILL );
 
     blackPaint = new Paint();
     blackPaint.setColor( android.graphics.Color.argb( iOpaticy, 0, 0, 0 ) );
+//    blackPaint.setColor( android.graphics.Color.argb( 64, 0, 255, 0 ) );
     blackPaint.setStyle( Paint.Style.FILL );
 
     whitePaint = new Paint();
     whitePaint.setColor( android.graphics.Color.argb( iOpaticy, 255, 255, 255 ) );
+//    whitePaint.setColor( android.graphics.Color.argb( 64, 0, 0, 255 ) );
     whitePaint.setStyle( Paint.Style.FILL );
 
     textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
@@ -330,7 +389,7 @@ public class FCCTVRatingsView extends View {
     super.onDraw( canvas );
     maybeGenerateBitmap();
     if( hasBitmap() ) {
-      canvas.drawBitmap( nBitmap, 0, 0, null );
+      canvas.drawBitmap( nBitmap, watermarkRect.left, watermarkRect.top, null );
     }
   }
 
@@ -344,40 +403,39 @@ public class FCCTVRatingsView extends View {
   }
 
   private void generateBitmap() {
-    nBitmap = Bitmap.createBitmap( watermarkWidth, getMeasuredHeight(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
+    nBitmap = Bitmap.createBitmap( watermarkRect.width(), getMeasuredHeight(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
     Canvas c = new Canvas( nBitmap );
-    drawWatermark( c );
-    drawStamp( c );
+    drawBitmapWatermark( c );
+    drawBitmapStamp( c );
   }
 
-  private void drawWatermark( Canvas c ) {
+  private void drawBitmapWatermark( Canvas c ) {
     c.drawRect( 0, 0, nBitmap.getWidth(), nBitmap.getHeight(), watermarkPaint );
   }
 
-  private void drawStamp( Canvas c ) {
-    drawStampBackground( c );
-    drawStampTV( c );
-    drawStampLabels( c );
-    drawStampRating( c );
+  private void drawBitmapStamp( Canvas c ) {
+    drawBitmapStampBackground( c );
+    drawBitmapStampTV( c );
+    drawBitmapStampLabels( c );
+    drawBitmapStampRating( c );
   }
 
-  private void drawStampBackground( Canvas c ) {
-    // todo: use Position for offset; this currently only does TopLeft.
+  private void drawBitmapStampBackground( Canvas c ) {
     c.drawRect( stampDimensions.outerRect, whitePaint );
     c.drawRect( stampDimensions.innerRect, blackPaint );
   }
 
-  private void drawStampTV( Canvas c ) {
+  private void drawBitmapStampTV( Canvas c ) {
     drawTV( c, stampDimensions.tvRect );
   }
 
-  private void drawStampLabels( Canvas c ) {
+  private void drawBitmapStampLabels( Canvas c ) {
     if( hasLabels() ) {
       drawLabels( c, stampDimensions.labelsRect, nTVRatings.labels );
     }
   }
 
-  private void drawStampRating( Canvas c ) {
+  private void drawBitmapStampRating( Canvas c ) {
     if( hasValidRating() ) {
       drawRating( c, stampDimensions.ratingRect, nTVRatings.rating );
     }

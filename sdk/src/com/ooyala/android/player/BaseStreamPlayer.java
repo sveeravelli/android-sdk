@@ -27,6 +27,7 @@ import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.R;
 import com.ooyala.android.TVRatings;
+import com.ooyala.android.configuration.TVRatingsConfiguration.Position;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
 
@@ -323,8 +324,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _parent.getLayout().addView( _container );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
     _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
-    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
+    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() ); // s_nextPosition() ) );
   }
+//  private static Position[] s_positions = new Position[] { Position.BottomLeft, Position.TopRight, Position.BottomRight, Position.TopLeft };
+//  private static int positionIndex;
+//  private static Position s_nextPosition() {
+//    Position p = s_positions[ positionIndex ];
+//    positionIndex = (positionIndex+1) % s_positions.length;
+//    return p;
+//  }
 
   private void setupVideoSize() {
     // Try to figure out the video size.  If not, use our default

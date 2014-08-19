@@ -11,7 +11,7 @@ public class TVRatingsConfiguration {
 
   public static final long TIMER_NEVER = 0;
   public static final long TIMER_ALWAYS = Long.MAX_VALUE;
-  public static final long DEFAULT_TIMER = TIMER_NEVER;
+  public static final long DEFAULT_TIMER = TIMER_ALWAYS;//TIMER_NEVER;
   public static final Position DEFAULT_POSITION = Position.TopLeft;
   public static final float DEFAULT_SCALE = 0.2f;
   public static final float DEFAULT_OPACITY = 0.9f;
