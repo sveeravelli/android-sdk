@@ -1,6 +1,7 @@
 package com.ooyala.android.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,9 +10,11 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -214,6 +217,20 @@ public class FCCTVRatingsView extends View {
   }
 
   @Override
+  public boolean onTouchEvent( MotionEvent event ) {
+    final boolean isVisible = getVisibility() == VISIBLE;
+    if( isVisible && hasClickthrough() ) {
+      getContext().startActivity(
+          new Intent(
+              Intent.ACTION_VIEW,
+              Uri.parse( nTVRatings.clickthrough )
+              )
+          );
+    }
+    return isVisible;
+  }
+
+  @Override
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
     if( ! hasTVRatingsConfiguration() ) {
       setMeasuredDimension( 0, 0 );
@@ -376,6 +393,10 @@ public class FCCTVRatingsView extends View {
 
   private boolean hasLabels() {
     return nTVRatings != null && nTVRatings.labels != null && nTVRatings.labels.length() > 0;
+  }
+  
+  private boolean hasClickthrough() {
+    return nTVRatings != null && nTVRatings.clickthrough != null;
   }
 
   private boolean hasBitmap() {

@@ -44,6 +44,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
   protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
   protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
+  protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "tvratingsurl";
 
   protected static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   protected static final String CONTENT_TYPE_CHANNEL = "Channel";
@@ -207,7 +208,8 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
       if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) && _metadata.containsKey(KEY_METADATA_TVRATING_SUBRATINGS) ) {
         _tvRatings = new TVRatings(
             _metadata.get(KEY_METADATA_TVRATING_RATING),
-            _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS)
+            _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS),
+            _metadata.get(KEY_METADATA_TVRATING_CLICKTHROUGH_URL)
             );
       }
     } catch (JSONException exception) {

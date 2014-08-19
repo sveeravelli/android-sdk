@@ -7,15 +7,23 @@ import android.text.TextUtils;
 public class TVRatings {
   public final String rating;
   public final String labels;
+  public final String clickthrough;
   
-  public TVRatings( String rating, String labels ) {
-    String fixedRating = rating.toUpperCase().replace( "TV-", "" );
-    this.rating = fixedRating;
+  public TVRatings( String rating, String labels, String clickthrough ) {
     
-    String fixedLabels = labels.toUpperCase().replace( ",", " " ).replace( ";", " " );
-    String[] labelsArray = fixedLabels.split( "\\s+" );
-    Arrays.sort( labelsArray, String.CASE_INSENSITIVE_ORDER );
-    fixedLabels = TextUtils.join( "", labelsArray );
-    this.labels = fixedLabels;
+    if( rating != null ) {
+      rating = rating.toUpperCase().replace( "TV-", "" );
+    }
+    this.rating = rating;
+    
+    if( labels != null ) {
+      labels = labels.toUpperCase().replace( ",", " " ).replace( ";", " " );
+      String[] labelsArray = labels.split( "\\s+" );
+      Arrays.sort( labelsArray, String.CASE_INSENSITIVE_ORDER );
+      labels = TextUtils.join( "", labelsArray );
+    }
+    this.labels = labels;
+    
+    this.clickthrough = clickthrough;
   }
 }
