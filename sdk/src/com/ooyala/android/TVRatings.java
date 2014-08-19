@@ -2,6 +2,8 @@ package com.ooyala.android;
 
 import java.util.Arrays;
 
+import android.text.TextUtils;
+
 public class TVRatings {
   public final String rating;
   public final String labels;
@@ -11,9 +13,9 @@ public class TVRatings {
     this.rating = fixedRating;
     
     String fixedLabels = labels.toUpperCase().replace( ",", " " ).replace( ";", " " );
-    String[] labelsArray = fixedLabels.split( "\\w+" );
+    String[] labelsArray = fixedLabels.split( "\\s+" );
     Arrays.sort( labelsArray, String.CASE_INSENSITIVE_ORDER );
+    fixedLabels = TextUtils.join( "", labelsArray );
     this.labels = fixedLabels;
-    
   }
 }
