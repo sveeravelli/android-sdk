@@ -154,6 +154,10 @@ function custom_gen {
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/AdobePassDemoApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
 
+  #update internal apps that need lib
+  mkdir ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
+
   #update third party sample apps
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
