@@ -11,7 +11,7 @@ public class TVRatingsConfiguration {
     BottomRight;
   }
 
-  public long timerSeconds;
+  public long durationSeconds;
   public Position position;
   public double percentScale;
   public double opacity;
@@ -21,13 +21,13 @@ public class TVRatingsConfiguration {
   }
 
   public TVRatingsConfiguration( long timerSeconds, Position position, double percentScale, double opacity ) {
-    this.timerSeconds = timerSeconds;
+    this.durationSeconds = timerSeconds;
     this.position = position;
     this.percentScale = percentScale;
     this.opacity = opacity;
   }
 
-  public TVRatingsConfiguration setTimerSeconds( long timerSeconds ) { this.timerSeconds = timerSeconds; return this; }
+  public TVRatingsConfiguration setTimerSeconds( long timerSeconds ) { this.durationSeconds = timerSeconds; return this; }
   public TVRatingsConfiguration setPosition( Position position ) { this.position = position; return this; }
   public TVRatingsConfiguration setPercentScale( double percentScale ) { this.percentScale = percentScale; return this; }
   public TVRatingsConfiguration setOpacity( double opacity ) { this.opacity = opacity; return this; }

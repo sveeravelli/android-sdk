@@ -15,6 +15,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.configuration.TVRatingsConfiguration;
 
 /* todo:
@@ -41,7 +42,7 @@ public class FCCTVRatingsView extends View {
     private static final float MAX_RATIO = 1.4f;
 
     // sizes are in pixels.
-    private int watermarkWidth;
+    public int miniHeight;
     public int whiteBorderSize;
     public int blackBorderSize;
     public int borderSize;
@@ -49,15 +50,18 @@ public class FCCTVRatingsView extends View {
     public int outerHeight; // including border.
     public int innerWidth; // excluding border.
     public int innerHeight; // excluding border.
+    public Rect outerRect;
+    public Rect innerRect;
+    public Rect tvRect;
+    public Rect labelsRect;
+    public Rect ratingRect;
 
     public StampDimensions() {}
 
-    public void update( Context context, int measuredWidth, int measuredHeight ) {
-      this.watermarkWidth = Math.round( measuredWidth / 2f );
-
+    public void update( Context context, int measuredWidth, int measuredHeight, int watermarkWidth, boolean hasLabels ) {
       this.whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
       this.blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
-      this.borderSize = whiteBorderSize + blackBorderSize;
+      this.borderSize = this.whiteBorderSize + this.blackBorderSize;
 
       // todo: consider padding from parent layout?
       if( isSquareish( measuredWidth, measuredHeight ) ) {
@@ -71,24 +75,61 @@ public class FCCTVRatingsView extends View {
         this.innerWidth = Math.round( scale * measuredHeight );
         this.innerHeight = Math.round( scale * measuredWidth );
       }
-      constrainInnerWidth();
-      constrainInnerHeight();
+      this.innerWidth = constrainInnerWidth( this.innerWidth, watermarkWidth, measuredHeight );
+      this.innerHeight = constrainInnerHeight( this.innerWidth, this.innerHeight, watermarkWidth, measuredHeight );
       this.outerWidth = this.innerWidth + this.borderSize*2;
       this.outerHeight = this.innerHeight + this.borderSize*2;
+      
+      this.outerRect = new Rect(
+          0,
+          0,
+          this.outerWidth,
+          this.outerHeight
+          );
+      this.innerRect = new Rect(
+          this.whiteBorderSize,
+          this.whiteBorderSize,
+          this.outerWidth-this.whiteBorderSize,
+          this.outerHeight-this.whiteBorderSize
+          );
+      
+      this.miniHeight = Math.round( this.innerHeight * MINI_HEIGHT_FACTOR );
+
+      int tl = this.borderSize;
+      int tt = this.borderSize;
+      int tr = tl + this.innerWidth;
+      int tb = tt + this.miniHeight;
+      this.tvRect = new Rect( tl, tt, tr, tb );
+      
+      int ll = this.borderSize;
+      int lt = this.outerHeight - this.borderSize - miniHeight;
+      int lr = ll + this.innerWidth;
+      int lb = lt + this.miniHeight;
+      this.labelsRect = new Rect( ll, lt, lr, lb );
+
+      int rl = this.borderSize;
+      int rt = this.borderSize + miniHeight;
+      int rr = rl + this.innerWidth;
+      int rb = this.outerHeight - this.borderSize - (hasLabels ? miniHeight : 0);
+      this.ratingRect = new Rect( rl, rt, rr, rb );
     }
 
-    private void constrainInnerWidth() {
+    private static int constrainInnerWidth( int innerWidth, int watermarkWidth, int watermarkHeight ) {
       // * bitmap is not allowed to be bigger than 50% of watermark.
-      innerWidth = Math.min( innerWidth, Math.round(watermarkWidth * 0.5f) );
+      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth ) * 0.5f );
+      innerWidth = Math.min( innerWidth, dimension );
+      return innerWidth;
     }
 
-    private void constrainInnerHeight() {
+    private static int constrainInnerHeight( int innerWidth, int innerHeight, int watermarkWidth, int watermarkHeight ) {
       // * bitmap is not allowed to be bigger than 50% of watermark.
-      innerHeight = Math.min( innerHeight, Math.round(watermarkWidth * 0.5f) );
+      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth ) * 0.5f );
+      innerHeight = Math.min( innerHeight, dimension );
       // * bitmap is not allowed to be wider than tall.
       innerHeight = Math.max( innerHeight, innerWidth );
       // * bitmap is not allowed to be lots taller than wide.
       innerHeight = Math.min( innerHeight, Math.round( innerHeight * MAX_RATIO ) );
+      return innerHeight;
     }
 
     public boolean isValid() {
@@ -96,7 +137,8 @@ public class FCCTVRatingsView extends View {
     }
   }
 
-  private static final int FADE_MSEC = 1 * 1000;
+  private static final int FADE_IN_MSEC = 1 * 500;
+  private static final int FADE_OUT_MSEC = 1 * 1000;
   private static final float MINI_HEIGHT_FACTOR = 0.2f;
   private final Paint watermarkPaint;
   private final Paint textPaint;
@@ -105,13 +147,14 @@ public class FCCTVRatingsView extends View {
   private final Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private int miniHeight;
   private String rating;
   private String labels;
+  private int watermarkWidth; // half of view's width; height is full height.
   private StampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
   private Bitmap nBitmap;
-  private AlphaAnimation nFadeAnimation;
+  private AlphaAnimation nFadeInAnimation;
+  private AlphaAnimation nFadeOutAnimation;
 
   private TVRatingsConfiguration tvRatingsConfiguration;
 
@@ -127,7 +170,7 @@ public class FCCTVRatingsView extends View {
     blackPaint.setStyle( Paint.Style.FILL );
 
     whitePaint = new Paint();
-    whitePaint.setColor( android.graphics.Color.argb( 255, 128, 128, 128 ) );
+    whitePaint.setColor( android.graphics.Color.WHITE );
     whitePaint.setStyle( Paint.Style.FILL );
 
     textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
@@ -145,7 +188,6 @@ public class FCCTVRatingsView extends View {
     stampDimensions = new StampDimensions();
     miniTextSize = 0;
     miniTextScaleX = 0;
-    miniHeight = 0;
   }
 
   @Override
@@ -168,8 +210,8 @@ public class FCCTVRatingsView extends View {
     int measuredHeight = elementHeight + paddingTop + paddingBottom;
     measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
     measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
-    stampDimensions.update( getContext(), measuredWidth, measuredHeight );
-    miniHeight = Math.round( stampDimensions.innerHeight * MINI_HEIGHT_FACTOR ); // todo: move into StampDimensions.
+    watermarkWidth = Math.round( measuredWidth / 2f );
+    stampDimensions.update( getContext(), measuredWidth, measuredHeight, watermarkWidth, hasLabels() );
     setMeasuredDimension( measuredWidth, measuredHeight );
   }
 
@@ -185,31 +227,82 @@ public class FCCTVRatingsView extends View {
 
   public void setRating( String rating ) {
     this.rating = rating;
-    freeResources();
-    updateVisibility();
-    if( getVisibility() == VISIBLE ) {
-      startDelayedFadeAnimation();
-      invalidate();
-    }
+    onSet();
   }
 
   public void setLabels( String labels ) {
     this.labels = labels;
-    freeResources();
-    updateVisibility();
-    if( getVisibility() == VISIBLE ) {
-      invalidate();
+    onSet();
+  }
+  
+  private boolean hasAnimation() {
+	  return this.nFadeInAnimation != null || this.nFadeOutAnimation != null;
+  }
+  
+  private void onSet() {
+	  freeResources();
+	  if( hasRating() && ! hasAnimation() ) {
+		  startAnimation();
+	  }
+	  else {
+		  setVisibility( INVISIBLE );
+	  }
+  }
+
+  private void startAnimation() {
+    if( ! hasAnimation() &&
+        tvRatingsConfiguration != null &&
+        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+    	startFadeInAnimation();
+    }
+  }
+  
+  private void startFadeInAnimation() {
+	  nFadeInAnimation = new AlphaAnimation( 0f, 1f );
+	  nFadeInAnimation.setStartOffset( 0 );
+	  nFadeInAnimation.setDuration( FADE_IN_MSEC );
+	  nFadeInAnimation.setFillAfter( true );
+	  nFadeInAnimation.setAnimationListener(new AnimationListener(){
+		  @Override
+		  public void onAnimationStart(Animation arg0) {
+			  setVisibility( VISIBLE );
+		  }
+		  @Override
+		  public void onAnimationEnd(Animation arg0) {
+			  startFadeOutAnimation();
+		  }
+		  @Override
+		  public void onAnimationRepeat(Animation arg0) {
+		  }
+	  });
+	  startAnimation( nFadeInAnimation );
+  }
+
+  private void startFadeOutAnimation() {
+    if( tvRatingsConfiguration != null &&
+        tvRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+      nFadeOutAnimation = new AlphaAnimation( 1f, 0f );
+      nFadeOutAnimation.setStartOffset( tvRatingsConfiguration.durationSeconds * 1000 );
+      nFadeOutAnimation.setDuration( FADE_OUT_MSEC );
+      nFadeOutAnimation.setFillAfter( true );
+      nFadeOutAnimation.setAnimationListener(new AnimationListener(){
+        @Override
+        public void onAnimationStart(Animation arg0) {
+        }
+        @Override
+        public void onAnimationEnd(Animation arg0) {
+          setVisibility( INVISIBLE );
+        }
+        @Override
+        public void onAnimationRepeat(Animation arg0) {
+        }
+      });
+      startAnimation( nFadeOutAnimation );
     }
   }
 
   private void freeResources() {
     nBitmap = null;
-  }
-
-  private void updateVisibility() {
-    if( nFadeAnimation == null ) {
-      setVisibility( hasRating() ? VISIBLE : GONE );
-    }
   }
 
   private boolean hasRating() {
@@ -226,30 +319,6 @@ public class FCCTVRatingsView extends View {
 
   private boolean hasBitmap() {
     return nBitmap != null;
-  }
-
-  private void startDelayedFadeAnimation() {
-    if( nFadeAnimation == null &&
-        tvRatingsConfiguration != null &&
-        tvRatingsConfiguration.timerSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
-      nFadeAnimation = new AlphaAnimation( 1, 0 );
-      nFadeAnimation.setStartOffset( tvRatingsConfiguration.timerSeconds * 1000 );
-      nFadeAnimation.setDuration( FADE_MSEC );
-      nFadeAnimation.setFillAfter( true );
-      nFadeAnimation.setAnimationListener(new AnimationListener(){
-        @Override
-        public void onAnimationEnd(Animation arg0) {
-          setVisibility( GONE );
-        }
-        @Override
-        public void onAnimationRepeat(Animation arg0) {
-        }
-        @Override
-        public void onAnimationStart(Animation arg0) {
-        }
-      });
-      startAnimation( nFadeAnimation );
-    }
   }
 
   @Override
@@ -271,7 +340,7 @@ public class FCCTVRatingsView extends View {
   }
 
   private void generateBitmap() {
-    nBitmap = Bitmap.createBitmap( Math.round(getMeasuredWidth()/2f), getMeasuredHeight(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
+    nBitmap = Bitmap.createBitmap( watermarkWidth, getMeasuredHeight(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
     Canvas c = new Canvas( nBitmap );
     drawWatermark( c );
     drawStamp( c );
@@ -290,80 +359,43 @@ public class FCCTVRatingsView extends View {
 
   private void drawStampBackground( Canvas c ) {
     // todo: use Position for offset; this currently only does TopLeft.
-    Rect outerRect = new Rect(
-        0,
-        0,
-        stampDimensions.outerWidth,
-        stampDimensions.outerHeight
-        );
-    c.drawRect( outerRect, whitePaint );
-    Rect innerRect = new Rect(
-        stampDimensions.whiteBorderSize,
-        stampDimensions.whiteBorderSize,
-        stampDimensions.outerWidth-stampDimensions.whiteBorderSize,
-        stampDimensions.outerHeight-stampDimensions.whiteBorderSize
-        );
-    c.drawRect( innerRect, blackPaint );
+    c.drawRect( stampDimensions.outerRect, whitePaint );
+    c.drawRect( stampDimensions.innerRect, blackPaint );
   }
 
   private void drawStampTV( Canvas c ) {
-    int tl = stampDimensions.borderSize;
-    int tt = stampDimensions.borderSize;
-    int tr = tl + stampDimensions.innerWidth;
-    int tb = tt + miniHeight;
-    Rect tvRect = new Rect( tl, tt, tr, tb );
-    drawTV( c, tvRect );
+    drawTV( c, stampDimensions.tvRect );
   }
 
   private void drawStampLabels( Canvas c ) {
     if( hasLabels() ) {
-      int ll = stampDimensions.borderSize;
-      int lt = stampDimensions.outerHeight - stampDimensions.borderSize - miniHeight;
-      int lr = ll + stampDimensions.innerWidth;
-      int lb = lt + miniHeight;
-      Rect labelsRect = new Rect( ll, lt, lr, lb );
-      drawLabels( c, labelsRect, labels );
+      drawLabels( c, stampDimensions.labelsRect, labels );
     }
   }
 
   private void drawStampRating( Canvas c ) {
-    int rl = stampDimensions.borderSize;
-    int rt = stampDimensions.borderSize + miniHeight;
-    int rr = rl + stampDimensions.innerWidth;
-    int rb = stampDimensions.outerHeight - stampDimensions.borderSize - (hasLabels() ? miniHeight : 0);
-    Rect ratingRect = new Rect( rl, rt, rr, rb );
-    drawRating( c, ratingRect, rating );
+    drawRating( c, stampDimensions.ratingRect, rating );
   }
 
   private void drawTV( Canvas c, Rect r ) {
     updateMiniTextPaintFactors( r );
-//    drawDebugBackground( c, r, android.graphics.Color.argb( 128, 0, 255, 255 ) );
     String text = "TV";
     drawTextInRectGivenTextFactors( c, r, text, miniTextSize, miniTextScaleX );
   }
 
   private void drawLabels( Canvas c, Rect r, String labels ) {
-//    drawDebugBackground( c, r, android.graphics.Color.argb( 128, 255, 255, 0 ) );
     drawTextInRectGivenTextFactors( c, r, labels, miniTextSize, miniTextScaleX );
   }
 
   private void drawRating( Canvas c, Rect r, String rating ) {
-//    drawDebugBackground( c, r, android.graphics.Color.argb( 128, 0, 0, 255 ) );
     drawTextInRectAutoTextFactors( c, r, rating );
   }
 
-//  private void drawDebugBackground( Canvas c, Rect r, int color ) {
-//    if( debug ) {
-//      int rx = (int)Math.rint( Math.random()*3 );
-//      Paint p = new Paint();
-//      p.setColor( color );
-//      p.setStyle( Paint.Style.FILL );
-//      c.drawRect( r.left+rx, r.top, r.right-rx, r.bottom, p );
-//      p.setColor( android.graphics.Color.argb( 128, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255) ) );
-//      c.drawLine(r.left, r.top, r.right, r.bottom, p );
-//      c.drawLine(r.left, r.bottom, r.right, r.top, p );
-//    }
-//  }
+  private void updateTextPaintFactors( Rect r, String text ) {
+    Pair<Float,Float> sizeAndScaleX = calculateTextPaintFactors( r, text );
+    textPaint.setTextSize( sizeAndScaleX.first );
+    textPaint.setTextScaleX( sizeAndScaleX.second );
+  }
 
   private void updateMiniTextPaintFactors( Rect exampleMiniRect ) {
     // calculate text factors; same ones are used for both top and bottom strips of the rating stamp.
@@ -380,14 +412,8 @@ public class FCCTVRatingsView extends View {
     // fudge factors to really fit into rect.
     float textSize = ts * 0.7f;
     float tsx = r.width()/(float)tb.width()*1000;
-    float textScaleX = Math.min( 1f, tsx ) * 0.8f;
+    float textScaleX = Math.min( 1f, tsx ) * 0.5f;
     return new Pair<Float,Float>( textSize, textScaleX );
-  }
-
-  private void updateTextPaintFactors( Rect r, String text ) {
-    Pair<Float,Float> sizeAndScaleX = calculateTextPaintFactors( r, text );
-    textPaint.setTextSize( sizeAndScaleX.first );
-    textPaint.setTextScaleX( sizeAndScaleX.second );
   }
 
   private void drawTextInRectGivenTextFactors( Canvas c, Rect r, String text, float textSize, float textScaleX ) {

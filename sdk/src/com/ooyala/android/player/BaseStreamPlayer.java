@@ -15,6 +15,8 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -53,6 +55,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
   Stream stream = null;
+  private boolean _tvRatingsSeen;
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
@@ -73,6 +76,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
     setParent(parent);
     setupView();
+    _tvRatingsSeen = false;
     if (_player != null) { _player.reset(); }
   }
 
@@ -122,6 +126,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     setState(State.LOADING);
     setupView();
     resume();
+  }
+  
+  @Override
+  protected void notifyTimeChanged() {
+    super.notifyTimeChanged();
+    updateTvRating();
   }
 
   @Override
@@ -313,18 +323,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void createAndAddViews() {
     Context c = _parent.getLayout().getContext();
-    
     // note: attachToRoot must be false. when true, it empirically prevents subsequent playbacks.
     _container = LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), false );
     _parent.getLayout().addView( _container );
     _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
     _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
-    
-    // todo: get the data from the content item.
-    // todo: timer to fade away.
-    _tvRatingsView.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds( 5 ) );
-    _tvRatingsView.setRating( "PG" );
-    _tvRatingsView.setLabels( "FV" );
   }
 
   private void removeView() {
@@ -340,6 +343,14 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 	  _view = null;
 	  _container = null;
 	  _holder = null;
+  }
+  
+  private void updateTvRating() {
+	  if( ! _tvRatingsSeen && currentTime() > 250 ) {
+		  _tvRatingsView.setTVRatingsConfiguration( TVRatingsConfiguration.getDefaultTVRatingsConfiguration().setTimerSeconds(5) );
+		  _tvRatingsView.setRating( "MA" );
+		  _tvRatingsSeen = true;
+	  }
   }
 
   @Override
