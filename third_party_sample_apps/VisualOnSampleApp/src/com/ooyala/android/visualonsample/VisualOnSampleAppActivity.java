@@ -1,6 +1,7 @@
 package com.ooyala.android.visualonsample;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -44,10 +45,10 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
-
     //Populate the embed map
-    embedMap = new HashMap<String, String>();
+    embedMap = new LinkedHashMap<String, String>();
     embedMap.put("Ooyala Sample HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
+    embedMap.put("Ooyala Sample Encrypted HLS VOD", "ZtZmtmbjpLGohvF5zBLvDyWexJ70KsL-");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
