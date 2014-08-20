@@ -141,11 +141,11 @@ function custom_gen {
   rm OoyalaFreewheelSDK.jar
 
   #update sample apps
-	for SAMPLE_APP in GettingStartedSampleApp ChannelBrowserSampleApp OOView AdobePassDemoApp DeviceManagementSampleApp PluginSampleApp; do
-			SAMPLE_APP_LIB_DIR=${SAMPLE_DIR}/${SAMPLE_APP}/libs/
+  for SAMPLE_APP in GettingStartedSampleApp ChannelBrowserSampleApp OOView AdobePassDemoApp DeviceManagementSampleApp PluginSampleApp; do
+      SAMPLE_APP_LIB_DIR=${SAMPLE_DIR}/${SAMPLE_APP}/libs/
       mkdir ${SAMPLE_APP_LIB_DIR}
       cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_APP_LIB_DIR}
-	done
+  done
 
   #update third party sample apps
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
