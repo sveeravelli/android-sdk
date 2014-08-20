@@ -839,7 +839,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_analytics != null) {
       _analytics.reportPlayRequested();
     }
-    if (currentPlayer() != null) {
+    if (currentPlayer() != null && isPlayable(currentPlayer().getState())) {
       if (isAdPlaying()) {
         sendNotification(AD_STARTED_NOTIFICATION);
       }
@@ -850,6 +850,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else {
       queuePlay();
     }
+  }
+
+  private boolean isPlayable(State state) {
+    return (state == State.READY || state == State.PLAYING || state == State.PAUSED);
   }
 
   /**
@@ -1284,6 +1288,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           seek(_queuedSeekTime);
         }
         setState(State.READY);
+        dequeuePlay();
         break;
       case INIT:
       case LOADING:
