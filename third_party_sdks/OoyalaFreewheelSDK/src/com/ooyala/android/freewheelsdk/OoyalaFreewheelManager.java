@@ -18,11 +18,13 @@ import android.app.Activity;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.StateNotifierListener;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.DefaultAdsPlugin;
+import com.ooyala.android.plugin.ManagedAdsPlugin;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 /**
@@ -32,8 +34,8 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
  * The OoyalaFreewheelManager works best with an OptimizedOoyalaPlayerLayoutController. If you do not
  * use this layout controller, you will not get media controllers in fullscreen mode.
  */
-public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
-    implements AdPluginInterface, Observer {
+public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
+    implements AdPluginInterface, StateNotifierListener, Observer {
 
   private static final String TAG = "OoyalaFreewheelManager";
   private static final double FWPLAYER_AD_REQUEST_TIMEOUT = 5.0;
@@ -59,6 +61,7 @@ public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
   protected IConstants _fwConstants = null;
 
   private FWAdPlayer _adPlayer = null;
+  private StateNotifier _notifier = null;
 
   /**
    * Initialize OoyalaFreewheelManager
@@ -72,6 +75,8 @@ public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
         playerLayoutController.getPlayer());
     _player.get().addObserver(this);
     _player.get().registerPlugin(this);
+    _notifier = _player.get().createStateNotifier();
+    _notifier.addListener(this);
   }
 
   /**
@@ -387,7 +392,6 @@ public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
     _player.clear();
 
     if (_adPlayer != null) {
-      _adPlayer.deleteObserver(this);
       _adPlayer.destroy();
     }
   }
@@ -454,18 +458,28 @@ public class OoyalaFreewheelManager extends DefaultAdsPlugin<FWAdSpot>
       _adPlayer.destroy();
     }
     _adPlayer = new FWAdPlayer();
-    _adPlayer.init(this, _player.get(), adToPlay);
+    _adPlayer.init(this, _player.get(), adToPlay, _notifier);
     _adPlayer.play();
     return true;
   }
 
-  public void onAdCompleted() {
-    if (!playAdsBeforeTime()) {
-      exitAdMode();
+  @Override
+  public void onStateChange(StateNotifier notifier) {
+    if (_adPlayer == null || _adPlayer.getNotifier() != notifier) {
+      return;
     }
-  }
-
-  public void onAdError() {
-    exitAdMode();
+    
+    switch (notifier.getState()) {
+    case COMPLETED:
+      if (!playAdsBeforeTime()) {
+        exitAdMode();
+      }
+      break;
+    case ERROR:
+      exitAdMode();
+      break;
+    default:
+      break;
+    }
   }
 }

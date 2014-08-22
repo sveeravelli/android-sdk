@@ -1,8 +1,6 @@
 package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
-import java.util.Observable;
-import java.util.Observer;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
@@ -11,18 +9,19 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.DefaultAdsPlugin;
+import com.ooyala.android.plugin.ManagedAdsPlugin;
 
 /**
  * Ooyala managed ads plugin manages ooyala and vast ads.
  */
 public class OoyalaManagedAdsPlugin extends
-    DefaultAdsPlugin<OoyalaManagedAdSpot> implements Observer,
-    AdPluginInterface {
+    ManagedAdsPlugin<OoyalaManagedAdSpot> implements
+    AdPluginInterface, StateNotifierListener {
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
   protected WeakReference<OoyalaPlayer> _player;
+  private StateNotifier _stateNotifier;
 
   /**
    * Ooyala managed ads plugin manages ooyala and vast ads.
@@ -30,6 +29,8 @@ public class OoyalaManagedAdsPlugin extends
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     super();
     _player = new WeakReference<OoyalaPlayer>(player);
+    _stateNotifier = player.createStateNotifier();
+    _stateNotifier.addListener(this);
   }
 
   /**
@@ -109,9 +110,8 @@ public class OoyalaManagedAdsPlugin extends
       DebugMode.assertFail(TAG, "initializeAdPlayer when ad is null");
       return false;
     }
-    p.addObserver(this);
 
-    p.init(_player.get(), ad);
+    p.init(_player.get(), ad, _stateNotifier);
     // if (p.getError() != null) {
     // return false;
     // }
@@ -163,31 +163,26 @@ public class OoyalaManagedAdsPlugin extends
    * event observer
    */
   @Override
-  public void update(Observable arg0, Object arg1) {
-    AdMoviePlayer player = (AdMoviePlayer) arg0;
-    String notification = arg1.toString();
+  public void onStateChange(StateNotifier notifier) {
 
-    if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
-      switch (player.getState()) {
-      case COMPLETED:
-        if (!playAdsBeforeTime()) {
-          cleanupPlayer(_adPlayer);
-          _player.get().exitAdMode(this);
-        }
-        break;
-      case ERROR:
-        DebugMode.logE(TAG, "Error recieved from Ad.  Cleaning up everything");
+    if (_adPlayer == null || _adPlayer.getNotifier() != notifier) {
+      return;
+    }
+
+    switch (notifier.getState()) {
+    case COMPLETED:
+      if (!playAdsBeforeTime()) {
         cleanupPlayer(_adPlayer);
         _player.get().exitAdMode(this);
-        break;
-      default:
-        break;
       }
-      OoyalaPlayer.notifyStateChange(player);
-    } else if (notification.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION)) {
-      OoyalaPlayer.notifyTimeChange(player);
-    } else if (notification.equals(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION)) {
-      OoyalaPlayer.notifyBufferChange(player);
+      break;
+    case ERROR:
+      DebugMode.logE(TAG, "Error recieved from Ad.  Cleaning up everything");
+      cleanupPlayer(_adPlayer);
+      _player.get().exitAdMode(this);
+      break;
+    default:
+      break;
     }
   }
 
@@ -200,7 +195,6 @@ public class OoyalaManagedAdsPlugin extends
 
   private void cleanupPlayer(Player p) {
     if (p != null) {
-      p.deleteObserver(this);
       p.destroy();
     }
   }

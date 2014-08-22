@@ -53,7 +53,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
   @Override
   public void playAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Playing Ad");
-    _imaManager._adPlayer.init(_player, _adSpot);
+    _imaManager._adPlayer.init(_player, _adSpot, _player.createStateNotifier());
     _player.play();
     _isPlayingIMAAd = true;
   }

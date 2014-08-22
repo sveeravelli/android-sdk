@@ -12,21 +12,21 @@ import tv.freewheel.ad.interfaces.ISlot;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.AdsLearnMoreInterface;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.AdSpot;
-import com.ooyala.android.player.AdMoviePlayer;
-import com.ooyala.android.player.BaseStreamPlayer;
-import com.ooyala.android.player.StreamPlayer;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
  * This class represents the Base Movie Player that plays Freewheel ad spots.
  */
-public class FWAdPlayer extends AdMoviePlayer {
+public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
+    AdsLearnMoreInterface {
   private static String TAG = "FWAdPlayer";
   private OoyalaFreewheelManager _adManager;
-  private FWAdSpot _adSpot;
   private ISlot _currentAd;
   private List<IAdInstance> _adInstances;
   private IAdInstance _currentAdInstance;
@@ -41,6 +41,8 @@ public class FWAdPlayer extends AdMoviePlayer {
   private boolean _playQueued;
   private boolean _adError;
   private boolean _noPrerolls;
+
+  private StateNotifier _notifier;
 
   //Create event listeners
   private IEventListener _adStartedEventListener = new IEventListener() {
@@ -92,16 +94,11 @@ public class FWAdPlayer extends AdMoviePlayer {
   };
 
   public void init(OoyalaFreewheelManager manager, OoyalaPlayer parent,
-      FWAdSpot ad) {
+      FWAdSpot ad, StateNotifier notifier) {
     setManager(manager);
     setLayout(parent);
     initAd(ad);
-  }
-
-  @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
-    DebugMode.assertFail(TAG,
-        "FW Ad Player: Init should not be called!!! This is not a valid init");
+    _notifier = notifier;
   }
 
   private void setManager(OoyalaFreewheelManager manager) {
@@ -133,13 +130,9 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   public void initAd(FWAdSpot ad) {
-
-    _seekable = false;
     _playQueued = false;
     _adError = false;
     _noPrerolls = false;
-
-    _adSpot = ad;
     _currentAd = ad.getAd();
   }
 
@@ -192,16 +185,6 @@ public class FWAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public AdSpot getAd() {
-    return _adSpot;
-  }
-
-  @Override
-  public StreamPlayer getBasePlayer() {
-    return new BaseStreamPlayer();
-  }
-
-  @Override
   public void destroy() {
     //Remove Learn More button if it exists
     if (_learnMore != null) {
@@ -221,17 +204,72 @@ public class FWAdPlayer extends AdMoviePlayer {
       _currentAd.stop();
       _currentAd = null;
     }
+  }
 
-    super.destroy();
+  protected void setState(State state) {
+    _notifier.setState(state);
   }
 
   @Override
-  protected void setState(State state) {
-    if (state == State.COMPLETED) {
-      _adManager.onAdCompleted();
-    } else if (state == State.ERROR) {
-      _adManager.onAdError();
-    }
-    super.setState(state);
+  public void reset() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void pause() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void stop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public int currentTime() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int duration() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int buffer() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean seekable() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void seekToTime(int timeInMillis) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public State getState() {
+    return _notifier.getState();
+  }
+
+  public StateNotifier getNotifier() {
+    return _notifier;
   }
 }

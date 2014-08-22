@@ -12,14 +12,10 @@ import java.util.Set;
 import org.json.JSONObject;
 
 import android.annotation.TargetApi;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.FrameLayout;
 
@@ -168,7 +164,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
-  private BroadcastReceiver _receiver = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -217,23 +212,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
-    if (context != null) {
-      setContext(context);
-      // use broadcastreceiver for the message bus
-      _receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-          String action = intent.getAction();
-          Integer sender = intent.getIntExtra("sender", 0);
-          PlayerInterface p = currentPlayer();
-          if (p == null || sender != currentPlayer().hashCode()) {
-            return;
-          }
-          processAdNotifications(action);
-        }
-      };
-      registerReceiver(_receiver);
-    }
 
     // Initialize third party plugin managers
     _adManager = new AdPluginManager(this);
@@ -895,18 +873,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     setState(State.SUSPENDED);
-    if (_receiver != null) {
-      unregisterReceiver(_receiver);
-    }
   }
 
   /**
    * Resume the current video from a suspended state
    */
   public void resume() {
-    if (_receiver != null) {
-      registerReceiver(_receiver);
-    }
     if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
@@ -2010,74 +1982,24 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private static Context _context;
-
-  /**
-   * called by a ad player when buffer changed to update the UI
-   *
-   * @param sender
-   *          the player who triggers the notification
-   */
-  public static void notifyBufferChange(PlayerInterface sender) {
-    if (_context == null) {
-      DebugMode.assertFail(TAG, "notify buffer change when context is null");
-      return;
-    }
-    Intent intent = new Intent(BUFFER_CHANGED_NOTIFICATION);
-    intent.putExtra("sender", sender.hashCode());
-    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
+  void notifyPluginEvent(StateNotifier notifier, String event) {
+    sendNotification(event);
   }
 
-  /**
-   * called by a ad player when player state changed to update the UI
-   *
-   * @param sender
-   *          the player who triggers the notification
-   */
-  public static void notifyStateChange(PlayerInterface sender) {
-    if (_context == null) {
-      DebugMode.assertFail(TAG, "notify state change when context is null");
-      return;
+  void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
+    sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    if (newState == State.COMPLETED) {
+      sendNotification(OoyalaPlayer.AD_COMPLETED_NOTIFICATION);
+    } else if (newState == State.ERROR) {
+      sendNotification(OoyalaPlayer.AD_ERROR_NOTIFICATION);
+    } else if (newState == State.PLAYING) {
+      if (oldState != State.PAUSED) {
+        sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION);
+      }
     }
-    Intent intent = new Intent(STATE_CHANGED_NOTIFICATION);
-    intent.putExtra("sender", sender.hashCode());
-    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
   }
 
-  /**
-   * called by a ad player when ad playhead changed
-   *
-   * @param sender
-   *          the player who triggers the notification
-   */
-  public static void notifyTimeChange(PlayerInterface sender) {
-    if (_context == null) {
-      DebugMode.assertFail(TAG, "notify time change when context is null");
-      return;
-    }
-    Intent intent = new Intent(TIME_CHANGED_NOTIFICATION);
-    intent.putExtra("sender", sender.hashCode());
-    LocalBroadcastManager.getInstance(_context).sendBroadcast(intent);
-  }
-
-  private static void registerReceiver(BroadcastReceiver receiver) {
-    if (_context == null) {
-      DebugMode.logE(TAG, "context is null");
-    }
-    IntentFilter filter = new IntentFilter(TIME_CHANGED_NOTIFICATION);
-    filter.addAction(BUFFER_CHANGED_NOTIFICATION);
-    filter.addAction(STATE_CHANGED_NOTIFICATION);
-    LocalBroadcastManager.getInstance(_context).registerReceiver(receiver,
-        filter);
-  }
-
-  private static void unregisterReceiver(BroadcastReceiver receiver) {
-    LocalBroadcastManager.getInstance(_context).unregisterReceiver(receiver);
-  }
-
-  private static void setContext(Context c) {
-    if (_context == null) {
-      _context = c;
-    }
+  public StateNotifier createStateNotifier() {
+    return new StateNotifier(this);
   }
 }

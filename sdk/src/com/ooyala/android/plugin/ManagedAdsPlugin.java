@@ -4,18 +4,18 @@ import com.ooyala.android.DebugMode;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AdSpotManager;
 
-public abstract class DefaultAdsPlugin<T extends AdSpot> implements
+public abstract class ManagedAdsPlugin<T extends AdSpot> implements
     AdPluginInterface {
 
   protected static final int PLUGIN_INIT = -2;
   protected static final int CONTENT_CHANGED = -1;
 
-  private static final String TAG = DefaultAdsPlugin.class.getName();
+  private static final String TAG = ManagedAdsPlugin.class.getName();
 
   protected AdSpotManager<T> _adSpotManager;
   private int _lastAdModeTime;
   
-  public DefaultAdsPlugin() {
+  public ManagedAdsPlugin() {
     _adSpotManager = new AdSpotManager<T>();
     _lastAdModeTime = PLUGIN_INIT;
   }

@@ -25,7 +25,7 @@ class TestAdSpot extends AdSpot {
   }
 }
 
-class TestAdsPlugin extends DefaultAdsPlugin<TestAdSpot> {
+class TestAdsPlugin extends ManagedAdsPlugin<TestAdSpot> {
   private TestAdSpot _playedAd;
 
   public TestAdsPlugin() {

@@ -8,6 +8,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 
@@ -23,7 +24,8 @@ public class IMAAdPlayer extends AdMoviePlayer {
   private OoyalaIMAManager _imaManager;
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
+    super.init(parent, ad, notifier);
     DebugMode.logD(TAG, "IMA Ad Player: Initializing");
     if ( ! (ad instanceof IMAAdSpot) ) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
@@ -65,7 +67,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     String notification = arg.toString();
     if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      OoyalaPlayer.notifyTimeChange(this); // Notify to update the UI
+      getNotifier().notifyPlayheadChange(); // Notify to update the UI
     }
     // This ad is managed by a third party, not OoyalaPlayer's ad manager! That means that this player
     // does not fire a normal "State Changed: Completed". This is so Ooyala's ad manager does not take over
@@ -90,6 +92,9 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   public void setState(State state) {
     super.setState(state);
-    OoyalaPlayer.notifyStateChange(this);
+  }
+
+  @Override
+  public void processClickThrough() {
   }
 }
