@@ -160,14 +160,14 @@ public class FCCTVRatingsView extends View {
 
     private static int constrainInnerWidth( int innerWidth, int watermarkWidth, int watermarkHeight ) {
       // * bitmap is not allowed to be bigger than 50% of watermark.
-      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth ) * 0.5f );
+      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth * 0.5f ) );
       innerWidth = Math.min( innerWidth, dimension );
       return innerWidth;
     }
 
     private static int constrainInnerHeight( int innerWidth, int innerHeight, int watermarkWidth, int watermarkHeight ) {
       // * bitmap is not allowed to be bigger than 50% of watermark.
-      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth ) * 0.5f );
+      int dimension = Math.round( Math.min( watermarkWidth, watermarkWidth * 0.5f ) );
       innerHeight = Math.min( innerHeight, dimension );
       // * bitmap is not allowed to be wider than tall.
       innerHeight = Math.max( innerHeight, innerWidth );
