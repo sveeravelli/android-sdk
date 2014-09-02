@@ -5,6 +5,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import com.ooyala.android.DebugMode;
@@ -102,7 +104,7 @@ public class MoviePlayer extends Player implements Observer {
   
   private void initTVRating() {
     if( _tvRatingUI != null ) {
-      // todo: cleanup!
+      _tvRatingUI.destroy();
     }
     _tvRatingUI = new TVRatingUI( _basePlayer.getView(), _parent.getLayout(), _parent.getOptions().getTVRatingConfiguration() );
   }
@@ -113,10 +115,21 @@ public class MoviePlayer extends Player implements Observer {
   }
   
   private void pushTVRating() {
-    if( _tvRating != null && _tvRatingUI != null ) {
-      _tvRatingUI.pushTVRating( _tvRating );
-      // prevent setTVRating from happening again with this data.
-      _tvRating = null;
+    if( _tvRating != null && _tvRatingUI != null && _basePlayer != null ) {
+      if( _basePlayer.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM ) {
+        _tvRatingUI.pushTVRating( _tvRating );
+        // prevent setTVRating from happening again with this data.
+        _tvRating = null;
+      }
+      else {
+        new Handler( Looper.getMainLooper() ).postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            pushTVRating();
+          }
+        },
+        TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM );
+      }
     }
   }
 

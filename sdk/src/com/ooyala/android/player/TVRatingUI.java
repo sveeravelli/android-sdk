@@ -17,25 +17,17 @@ import com.ooyala.android.ui.FCCTVRatingView;
 
 public class TVRatingUI {
 
+  public static final int TVRATING_PLAYHEAD_TIME_MINIMUM = 250;
   private static final int MARGIN_DIP = 5;
+  private ViewGroup _parentLayout;
   private RelativeLayout _relativeLayout;
-  private MovieView _movieView;
+  private View _videoView;
   private FCCTVRatingView _tvRatingView;
-  
-  public RelativeLayout getRelativeLayout() {
-    return _relativeLayout;
-  }
-
-  public MovieView getMovieView() {
-    return _movieView;
-  }
-
-  public FCCTVRatingView getTVRatingView() {
-    return _tvRatingView;
-  }
 
   public TVRatingUI( View videoView, ViewGroup parentLayout, TVRatingConfiguration tvRatingConfiguration ) {
-    Context context = parentLayout.getContext();
+    this._videoView = videoView;
+    this._parentLayout = parentLayout;
+    Context context = this._parentLayout.getContext();
     /*
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/movie_layout"
@@ -43,10 +35,8 @@ public class TVRatingUI {
         android:layout_height="fill_parent"
         android:background="#00000000" >
      */
-    _relativeLayout = new RelativeLayout( context );
-    _relativeLayout.setBackgroundColor( android.graphics.Color.TRANSPARENT );
-    FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
-    parentLayout.addView( _relativeLayout, paramsForRelative );
+    this._relativeLayout = new RelativeLayout( context );
+    this._relativeLayout.setBackgroundColor( android.graphics.Color.TRANSPARENT );
     /*
         <com.ooyala.android.player.MovieView
             android:id="@+id/movie_view"
@@ -55,13 +45,13 @@ public class TVRatingUI {
             android:layout_centerInParent="true"
             android:background="#FF000000" />
      */
-    if( videoView.getId() == View.NO_ID ) {
-      videoView.setId( getUnusedId( parentLayout ) );
+    if( this._videoView.getId() == View.NO_ID ) {
+      this._videoView.setId( getUnusedId( this._parentLayout ) );
     }
-    videoView.setBackgroundColor( android.graphics.Color.BLACK );
+    this._videoView.setBackgroundColor( android.graphics.Color.BLACK );
     RelativeLayout.LayoutParams paramsForMovieView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
     paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
-    _relativeLayout.addView( videoView, paramsForMovieView );
+    this._relativeLayout.addView( this._videoView, paramsForMovieView );
     /*
         <com.ooyala.android.ui.FCCTVRatingView
             android:id="@+id/TVRating_view"
@@ -78,18 +68,21 @@ public class TVRatingUI {
             android:visibility="invisible"
             android:background="#00000000" />
      */
-    _tvRatingView = new FCCTVRatingView( context );
-    _tvRatingView.setVisibility( View.INVISIBLE );
-    _tvRatingView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
+    this._tvRatingView = new FCCTVRatingView( context );
+    this._tvRatingView.setVisibility( View.INVISIBLE );
+    this._tvRatingView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
     RelativeLayout.LayoutParams paramsForRatingsView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_TOP, videoView.getId() );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_LEFT, videoView.getId() );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_BOTTOM, videoView.getId() );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_RIGHT, videoView.getId() );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_TOP, this._videoView.getId() );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_LEFT, this._videoView.getId() );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_BOTTOM, this._videoView.getId() );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_RIGHT, this._videoView.getId() );
     int margin = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, MARGIN_DIP, context.getResources().getDisplayMetrics() );
     paramsForRatingsView.setMargins( margin, margin, margin, margin ); 
-    _relativeLayout.addView( _tvRatingView, paramsForRatingsView );
-    _tvRatingView.setTVRatingConfiguration( tvRatingConfiguration );
+    this._relativeLayout.addView( this._tvRatingView, paramsForRatingsView );
+    this._tvRatingView.setTVRatingConfiguration( tvRatingConfiguration );
+    
+    FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
+    this._parentLayout.addView( this._relativeLayout, paramsForRelative );
   }
   
   public void pushTVRating( TVRating tvRating ) {
@@ -115,5 +108,19 @@ public class TVRatingUI {
       id++;
     }
     return id;
+  }
+  
+  public void destroy() {
+    _relativeLayout.removeView( _tvRatingView );
+    _tvRatingView.setVisibility( View.GONE );
+    _tvRatingView = null;
+   
+    _relativeLayout.removeView( _videoView );
+    _videoView.setVisibility( View.GONE );
+    _videoView = null;
+    
+    _parentLayout.removeView( _relativeLayout );
+    _relativeLayout.setVisibility( View.GONE );
+    _relativeLayout = null;
   }
 }
