@@ -116,7 +116,7 @@ public class MoviePlayer extends Player implements Observer {
   private void tryToPushTVRating() {
     if( _tvRating != null && _tvRatingUI != null && _basePlayer != null && _basePlayer.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM ) {
       _tvRatingUI.pushTVRating( _tvRating );
-      // prevent setTVRating from happening again with this data.
+      // prevent it happening more than once per set of tv rating data.
       _tvRating = null;
     }
   }
