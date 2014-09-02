@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OrderedMapValue;
-import com.ooyala.android.TVRatings;
+import com.ooyala.android.TVRating;
 
 /**
  * Stores the info and metadata for the specified content item.
@@ -44,7 +44,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
   protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
   protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
-  protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "tvratingsurl";
+  protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "TVRatingurl";
 
   protected static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   protected static final String CONTENT_TYPE_CHANNEL = "Channel";
@@ -64,7 +64,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected boolean _heartbeatRequired;
   protected Map<String, String> _metadata;
   protected Map<String, ModuleData> _moduleData;
-  protected TVRatings _tvRatings;
+  protected TVRating _tvRating;
 
   ContentItem() {}
 
@@ -138,8 +138,8 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   /**
    * @return possibly null.
    */
-  public TVRatings getTVRatings() {
-    return _tvRatings;
+  public TVRating getTVRating() {
+    return _tvRating;
   }
 
   @Override
@@ -206,7 +206,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
         }
       }
       if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) && _metadata.containsKey(KEY_METADATA_TVRATING_SUBRATINGS) ) {
-        _tvRatings = new TVRatings(
+        _tvRating = new TVRating(
             _metadata.get(KEY_METADATA_TVRATING_RATING),
             _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS),
             _metadata.get(KEY_METADATA_TVRATING_CLICKTHROUGH_URL)

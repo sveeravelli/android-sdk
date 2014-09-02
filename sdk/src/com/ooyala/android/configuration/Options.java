@@ -3,29 +3,29 @@ package com.ooyala.android.configuration;
 public class Options implements ReadonlyOptionsInterface {
 
   public static class Builder {
-    private TVRatingsConfiguration tvRatingsConfiguration;
+    private TVRatingConfiguration tvRatingConfiguration;
     
     public Builder() {
-      this.tvRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration(); 
+      this.tvRatingConfiguration = TVRatingConfiguration.s_getDefaultTVRatingConfiguration(); 
     }
 
-    public Builder setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
-      this.tvRatingsConfiguration = tvRatingsConfiguration;
+    public Builder setTVRatingConfiguration( TVRatingConfiguration tvRatingConfiguration ) {
+      this.tvRatingConfiguration = tvRatingConfiguration;
       return this;
     }
 
     public Options build() {
-      return new Options( tvRatingsConfiguration );
+      return new Options( tvRatingConfiguration );
     }
   }
 
-  private final TVRatingsConfiguration tvRatingsConfiguration;
+  private final TVRatingConfiguration tvRatingConfiguration;
 
-  private Options( TVRatingsConfiguration tvRatingsConfiguration ) {
-    this.tvRatingsConfiguration = tvRatingsConfiguration;
+  private Options( TVRatingConfiguration tvRatingConfiguration ) {
+    this.tvRatingConfiguration = tvRatingConfiguration;
   }
 
-  public TVRatingsConfiguration getTVRatingsConfiguration() {
-    return tvRatingsConfiguration;
+  public TVRatingConfiguration getTVRatingConfiguration() {
+    return tvRatingConfiguration;
   }
 }

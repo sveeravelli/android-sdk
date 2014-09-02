@@ -20,16 +20,16 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
-import com.ooyala.android.TVRatings;
-import com.ooyala.android.configuration.TVRatingsConfiguration;
+import com.ooyala.android.TVRating;
+import com.ooyala.android.configuration.TVRatingConfiguration;
 
 /* todo:
  * + update from content item.
  * + handle change between fullscreen & inline.
- * + handle all of TVRatingsConfiguration.
+ * + handle all of TVRatingConfiguration.
  */
 
-public class FCCTVRatingsView extends View {
+public class FCCTVRatingView extends View {
 
   private static boolean isSquareish( int w, int h ) {
     final float fullRatio = w / (float)h;
@@ -61,11 +61,11 @@ public class FCCTVRatingsView extends View {
 
     public StampDimensions() {}
 
-    public void update( Context context, TVRatingsConfiguration tvRatingsConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+    public void update( Context context, TVRatingConfiguration TVRatingConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
       // the order of these 3 calls must be preserved.
       updateBorder( context );
-      updateDimensions( tvRatingsConfiguration.scale, measuredWidth, measuredHeight, watermarkWidth );
-      updateRects( tvRatingsConfiguration.position, watermarkWidth, watermarkHeight, hasLabels );
+      updateDimensions( TVRatingConfiguration.scale, measuredWidth, measuredHeight, watermarkWidth );
+      updateRects( TVRatingConfiguration.position, watermarkWidth, watermarkHeight, hasLabels );
     }
     
     private void updateBorder( Context context ) {
@@ -92,7 +92,7 @@ public class FCCTVRatingsView extends View {
       this.outerHeight = this.innerHeight + this.borderSize*2;
     }
     
-    private void updateRects( TVRatingsConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+    private void updateRects( TVRatingConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
       int left, top;
       int right = watermarkWidth - this.outerWidth;
       int bottom = watermarkHeight - this.outerHeight;
@@ -197,21 +197,21 @@ public class FCCTVRatingsView extends View {
   private Bitmap nBitmap;
   private AlphaAnimation nFadeInAnimation;
   private AlphaAnimation nFadeOutAnimation;
-  private TVRatingsConfiguration nTVRatingsConfiguration;
-  private TVRatings nTVRatings;
+  private TVRatingConfiguration nTVRatingConfiguration;
+  private TVRating nTVRating;
 
-  public FCCTVRatingsView( Context context ) {
+  public FCCTVRatingView( Context context ) {
     this( context, null );
   }
   
-  public FCCTVRatingsView( Context context, AttributeSet attrs ) {
+  public FCCTVRatingView( Context context, AttributeSet attrs ) {
     super( context, attrs );
-    initPaints( TVRatingsConfiguration.DEFAULT_OPACITY );
+    initPaints( TVRatingConfiguration.DEFAULT_OPACITY );
     this.miniTextSize = 0;
     this.miniTextScaleX = 0;
     this.watermarkRect = new Rect();
     this.stampDimensions = new StampDimensions();
-    this.nTVRatingsConfiguration = TVRatingsConfiguration.s_getDefaultTVRatingsConfiguration();
+    this.nTVRatingConfiguration = TVRatingConfiguration.s_getDefaultTVRatingConfiguration();
   }
 
   @Override
@@ -227,7 +227,7 @@ public class FCCTVRatingsView extends View {
       getContext().startActivity(
           new Intent(
               Intent.ACTION_VIEW,
-              Uri.parse( nTVRatings.clickthrough )
+              Uri.parse( nTVRating.clickthrough )
               )
           );
     }
@@ -236,7 +236,7 @@ public class FCCTVRatingsView extends View {
 
   @Override
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-    if( ! hasTVRatingsConfiguration() ) {
+    if( ! hasTVRatingConfiguration() ) {
       setMeasuredDimension( 0, 0 );
       watermarkRect.set( 0, 0, 0, 0 );
     }
@@ -256,7 +256,7 @@ public class FCCTVRatingsView extends View {
       
       final int watermarkWidth = (int)Math.round(measuredWidth/2f);
       int left;
-      switch( nTVRatingsConfiguration.position ) {
+      switch( nTVRatingConfiguration.position ) {
       default:
       case TopLeft:
       case BottomLeft:
@@ -283,10 +283,10 @@ public class FCCTVRatingsView extends View {
    * For the configuration to actually take effect, it must be set before Android's
    * layout system calls onMeasure.
    */
-  public void setTVRatingsConfiguration( TVRatingsConfiguration tvRatingsConfiguration ) {
-    this.nTVRatingsConfiguration = tvRatingsConfiguration;
-    if( hasTVRatingsConfiguration() ) {
-      initPaints( tvRatingsConfiguration.opacity );
+  public void setTVRatingConfiguration( TVRatingConfiguration TVRatingConfiguration ) {
+    this.nTVRatingConfiguration = TVRatingConfiguration;
+    if( hasTVRatingConfiguration() ) {
+      initPaints( TVRatingConfiguration.opacity );
       freeResources();
     }
   }
@@ -321,8 +321,8 @@ public class FCCTVRatingsView extends View {
     clearPaint.setStyle( Paint.Style.FILL );
   }
   
-  public void setTVRatings( TVRatings tvRatings ) {
-    this.nTVRatings = tvRatings;
+  public void setTVRating( TVRating TVRating ) {
+    this.nTVRating = TVRating;
 	  freeResources();
 	  startAnimation();
   }
@@ -330,8 +330,8 @@ public class FCCTVRatingsView extends View {
   private void startAnimation() {
     if( hasValidRating() &&
         ! hasAnimation() &&
-        hasTVRatingsConfiguration() &&
-        nTVRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_NEVER ) {
+        hasTVRatingConfiguration() &&
+        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.TIMER_NEVER ) {
     	startFadeInAnimation();
     }
   }
@@ -357,10 +357,10 @@ public class FCCTVRatingsView extends View {
   }
 
   private void startFadeOutAnimation() {
-    if( hasTVRatingsConfiguration() &&
-        nTVRatingsConfiguration.durationSeconds != TVRatingsConfiguration.TIMER_ALWAYS ) {
+    if( hasTVRatingConfiguration() &&
+        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.TIMER_ALWAYS ) {
       nFadeOutAnimation = new AlphaAnimation( 1f, 0f );
-      nFadeOutAnimation.setStartOffset( nTVRatingsConfiguration.durationSeconds * 1000 );
+      nFadeOutAnimation.setStartOffset( nTVRatingConfiguration.durationSeconds * 1000 );
       nFadeOutAnimation.setDuration( FADE_OUT_MSEC );
       nFadeOutAnimation.setFillAfter( true );
       nFadeOutAnimation.setAnimationListener(new AnimationListener(){
@@ -383,8 +383,8 @@ public class FCCTVRatingsView extends View {
     nBitmap = null;
   }
   
-  private boolean hasTVRatingsConfiguration() {
-    return this.nTVRatingsConfiguration != null;
+  private boolean hasTVRatingConfiguration() {
+    return this.nTVRatingConfiguration != null;
   }
   
   private boolean hasAnimation() {
@@ -392,15 +392,15 @@ public class FCCTVRatingsView extends View {
   }
 
   private boolean hasValidRating() {
-    return nTVRatings != null && nTVRatings.rating != null;
+    return nTVRating != null && nTVRating.ageRestriction != null;
   }
 
   private boolean hasLabels() {
-    return nTVRatings != null && nTVRatings.labels != null && nTVRatings.labels.length() > 0;
+    return nTVRating != null && nTVRating.labels != null && nTVRating.labels.length() > 0;
   }
   
   private boolean hasClickthrough() {
-    return nTVRatings != null && nTVRatings.clickthrough != null;
+    return nTVRating != null && nTVRating.clickthrough != null;
   }
 
   private boolean hasBitmap() {
@@ -418,7 +418,7 @@ public class FCCTVRatingsView extends View {
 
   private void maybeGenerateBitmap() {
     if( hasValidRating() ) {      
-      stampDimensions.update( getContext(), nTVRatingsConfiguration, getMeasuredWidth(), getMeasuredHeight(), watermarkRect.width(), watermarkRect.height(), hasLabels() );
+      stampDimensions.update( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), watermarkRect.width(), watermarkRect.height(), hasLabels() );
       generateBitmap();
     }
     else {
@@ -458,14 +458,14 @@ public class FCCTVRatingsView extends View {
   private void drawBitmapStampLabels( Canvas c ) {
     if( hasLabels() ) {
       c.clipRect( stampDimensions.labelsRect, Region.Op.REPLACE );
-      drawLabels( c, stampDimensions.labelsRect, nTVRatings.labels );
+      drawLabels( c, stampDimensions.labelsRect, nTVRating.labels );
     }
   }
 
   private void drawBitmapStampRating( Canvas c ) {
     if( hasValidRating() ) {
       c.clipRect( stampDimensions.ratingRect, Region.Op.REPLACE );
-      drawRating( c, stampDimensions.ratingRect, nTVRatings.rating );
+      drawRating( c, stampDimensions.ratingRect, nTVRating.ageRestriction );
     }
   }
 

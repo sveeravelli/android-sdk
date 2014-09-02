@@ -29,9 +29,9 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.TVRatings;
+import com.ooyala.android.TVRating;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.ui.FCCTVRatingsView;
+import com.ooyala.android.ui.FCCTVRatingView;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -47,7 +47,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   private static final String TAG = BaseStreamPlayer.class.getName();
   private static final int MARGIN_DIP = 5;
   protected View _container;
-  protected TVRatings _tvRatings;
+  protected TVRating _TVRating;
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -296,22 +296,22 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   }
   
   @Override
-  public void setTVRatings( TVRatings tvRatings ) {
-    _tvRatings = tvRatings;
-    pushTVRatings();
+  public void setTVRating( TVRating TVRating ) {
+    _TVRating = TVRating;
+    pushTVRating();
   }
   
-  private void pushTVRatings() {
-    if( _tvRatings != null && _tvRatingsView != null && currentTime() > 250 ) {
-      _tvRatingsView.setTVRatings( _tvRatings );
-      _tvRatings = null; // only do it once. 
+  private void pushTVRating() {
+    if( _TVRating != null && _tvRatingView != null && currentTime() > 250 ) {
+      _tvRatingView.setTVRating( _TVRating );
+      _TVRating = null; // only do it once. 
     }
   }
   
   @Override
   protected void notifyTimeChanged() {
     super.notifyTimeChanged();
-    pushTVRatings();
+    pushTVRating();
   }
 
   private void setupViews() {
@@ -349,8 +349,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
     relativeLayout.addView( movieView, paramsForMovieView );
     /*
-      <com.ooyala.android.ui.FCCTVRatingsView
-          android:id="@+id/tvratings_view"
+      <com.ooyala.android.ui.FCCTVRatingView
+          android:id="@+id/TVRating_view"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:layout_alignTop="@id/movie_view"
@@ -364,7 +364,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
           android:visibility="invisible"
           android:background="#00000000" />
     */
-    FCCTVRatingsView ratingsView = new FCCTVRatingsView( c );
+    FCCTVRatingView ratingsView = new FCCTVRatingView( c );
     ratingsView.setVisibility( View.INVISIBLE );
     ratingsView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
     RelativeLayout.LayoutParams paramsForRatingsView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT );
@@ -378,8 +378,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     
     _container = relativeLayout;
     _view = movieView;
-    _tvRatingsView = ratingsView;
-    _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
+    _tvRatingView = ratingsView;
+    _tvRatingView.setTVRatingConfiguration( _parent.getOptions().getTVRatingConfiguration() );
   }
   
   private int getUnusedId() {
@@ -420,14 +420,14 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void removeView() {
 	  if (_parent != null) {
-		  _parent.getLayout().removeView(_tvRatingsView);
+		  _parent.getLayout().removeView(_tvRatingView);
 		  _parent.getLayout().removeView(_view);
 		  _parent.getLayout().removeView(_container);
 	  }
 	  if (_holder != null) {
 		  _holder.removeCallback(this);
 	  }
-	  _tvRatingsView = null;
+	  _tvRatingView = null;
 	  _view = null;
 	  _container = null;
 	  _holder = null;

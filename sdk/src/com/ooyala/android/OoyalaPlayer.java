@@ -653,9 +653,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
     final MoviePlayer moviePlayer = _getCorrectMoviePlayer( currentItem );
-    final TVRatings tvRatings = currentItem.getTVRatings();
-    if( tvRatings != null ) {
-      moviePlayer.setTVRatings( tvRatings );
+    final TVRating TVRating = currentItem.getTVRating();
+    if( TVRating != null ) {
+      moviePlayer.setTVRating( TVRating );
     }
     return moviePlayer;
   }

@@ -4,17 +4,17 @@ import java.util.Arrays;
 
 import android.text.TextUtils;
 
-public class TVRatings {
-  public final String rating;
+public class TVRating {
+  public final String ageRestriction;
   public final String labels;
   public final String clickthrough;
   
-  public TVRatings( String rating, String labels, String clickthrough ) {
+  public TVRating( String ageRestriction, String labels, String clickthrough ) {
     
-    if( rating != null ) {
-      rating = rating.toUpperCase().replace( "TV-", "" );
+    if( ageRestriction != null ) {
+      ageRestriction = ageRestriction.toUpperCase().replace( "TV-", "" );
     }
-    this.rating = rating;
+    this.ageRestriction = ageRestriction;
     
     if( labels != null ) {
       labels = labels.toUpperCase().replace( ",", " " ).replace( ";", " " );
