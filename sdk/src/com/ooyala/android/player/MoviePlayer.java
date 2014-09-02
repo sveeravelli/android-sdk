@@ -99,7 +99,7 @@ public class MoviePlayer extends Player implements Observer {
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
     initTVRating();
-    pushTVRating();
+    tryToPushTVRating();
   }
   
   private void initTVRating() {
@@ -109,27 +109,15 @@ public class MoviePlayer extends Player implements Observer {
     _tvRatingUI = new TVRatingUI( _basePlayer.getView(), _parent.getLayout(), _parent.getOptions().getTVRatingConfiguration() );
   }
   
-  public void setTVRating( TVRating TVRating ) {
-    _tvRating = TVRating;
-    pushTVRating();
+  public void setTVRating( TVRating tvRating ) {
+    _tvRating = tvRating;
   }
   
-  private void pushTVRating() {
-    if( _tvRating != null && _tvRatingUI != null && _basePlayer != null ) {
-      if( _basePlayer.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM ) {
-        _tvRatingUI.pushTVRating( _tvRating );
-        // prevent setTVRating from happening again with this data.
-        _tvRating = null;
-      }
-      else {
-        new Handler( Looper.getMainLooper() ).postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            pushTVRating();
-          }
-        },
-        TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM );
-      }
+  private void tryToPushTVRating() {
+    if( _tvRating != null && _tvRatingUI != null && _basePlayer != null && _basePlayer.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM ) {
+      _tvRatingUI.pushTVRating( _tvRating );
+      // prevent setTVRating from happening again with this data.
+      _tvRating = null;
     }
   }
 
@@ -221,6 +209,9 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void update(Observable arg0, Object arg) {
+    if(arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      tryToPushTVRating();
+    }
     setChanged();
     notifyObservers(arg);
   }
