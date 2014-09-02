@@ -25,7 +25,8 @@ public class MoviePlayer extends Player implements Observer {
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
-  private TVRating _TVRating;
+  private TVRating _tvRating;
+  private TVRatingUI _tvRatingUI;
   private boolean _suspended = true;
   protected boolean _seekable = true;
   private boolean _live = false;
@@ -95,18 +96,27 @@ public class MoviePlayer extends Player implements Observer {
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
+    initTVRating();
     pushTVRating();
   }
   
+  private void initTVRating() {
+    if( _tvRatingUI != null ) {
+      // todo: cleanup!
+    }
+    _tvRatingUI = new TVRatingUI( _basePlayer.getView(), _parent.getLayout(), _parent.getOptions().getTVRatingConfiguration() );
+  }
+  
   public void setTVRating( TVRating TVRating ) {
-    _TVRating = TVRating;
+    _tvRating = TVRating;
     pushTVRating();
   }
   
   private void pushTVRating() {
-    if( _TVRating != null && _basePlayer != null ) {
-      _basePlayer.setTVRating( _TVRating );
-      _TVRating = null; // only do it once.
+    if( _tvRating != null && _tvRatingUI != null ) {
+      _tvRatingUI.pushTVRating( _tvRating );
+      // prevent setTVRating from happening again with this data.
+      _tvRating = null;
     }
   }
 
@@ -183,6 +193,7 @@ public class MoviePlayer extends Player implements Observer {
     _suspended = false;
     _basePlayer.init(_parent, _streams);
     _basePlayer.addObserver(this);
+    initTVRating();
 
     if(_live) millisToResume = 0;
 

@@ -34,7 +34,6 @@ public class EmptyStreamPlayer extends StreamPlayer {
   @SuppressWarnings("deprecation")
   private void setupView() {
     createView(_parent.getLayout().getContext());
-    _parent.getLayout().addView(_view);
     ((MovieView) _view).setAspectRatio( 16f/9f );
     SurfaceHolder holder = _view.getHolder();
     holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -42,8 +41,6 @@ public class EmptyStreamPlayer extends StreamPlayer {
 
   private void createView(Context c) {
     _view = new MovieView(c);
-    _view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     _view.setBackgroundColor(Color.BLACK);
   }
 
@@ -85,9 +82,10 @@ public class EmptyStreamPlayer extends StreamPlayer {
   }
 
   private void removeView() {
-    if (_parent != null) {
-      _parent.getLayout().removeView(_view);
-    }
+// todo: do this elsewhere.
+//    if (_parent != null) {
+//      _parent.getLayout().removeView(_view);
+//    }
     _view = null;
   }
 

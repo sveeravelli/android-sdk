@@ -1,6 +1,5 @@
 package com.ooyala.android.player;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
@@ -16,12 +15,10 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.ViewParent;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
@@ -29,9 +26,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.TVRating;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.ui.FCCTVRatingView;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -45,9 +40,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     SurfaceHolder.Callback {
 
   private static final String TAG = BaseStreamPlayer.class.getName();
-  private static final int MARGIN_DIP = 5;
-  protected View _container;
-  protected TVRating _TVRating;
   protected MediaPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -74,10 +66,10 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       setState(State.ERROR);
       return;
     }
-    setParent(parent);
     setState(State.LOADING);
     _streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
-    setupViews(); // must come after setParent().
+    setParent(parent);
+    setupView();
     if (_player != null) { _player.reset(); }
   }
 
@@ -125,7 +117,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void reset() {
     suspend(0, State.PAUSED);
     setState(State.LOADING);
-    setupViews();
+    setupView();
     resume();
   }
 
@@ -294,143 +286,43 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void surfaceDestroyed(SurfaceHolder arg0) {
     DebugMode.logI(TAG, "Surface Destroyed");
   }
-  
+
   @Override
-  public void setTVRating( TVRating TVRating ) {
-    _TVRating = TVRating;
-    pushTVRating();
-  }
-  
-  private void pushTVRating() {
-    if( _TVRating != null && _tvRatingView != null && currentTime() > 250 ) {
-      _tvRatingView.setTVRating( _TVRating );
-      _TVRating = null; // only do it once. 
-    }
-  }
-  
-  @Override
-  protected void notifyTimeChanged() {
-    super.notifyTimeChanged();
-    pushTVRating();
+  public void setParent(OoyalaPlayer parent) {
+    super.setParent(parent);
   }
 
-  private void setupViews() {
-    createAndAddViews();
-    setupVideoSize();
-    setupHolder();
-  }
+  @SuppressWarnings("deprecation")
+  private void setupView() {
+    createView(_parent.getLayout().getContext());
 
-  private void createAndAddViews() {
-    Context c = _parent.getLayout().getContext();
-    /*
-  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      android:id="@+id/movie_layout"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:background="#00000000" >
-    */
-    RelativeLayout relativeLayout = new RelativeLayout( c );
-    relativeLayout.setBackgroundColor( android.graphics.Color.TRANSPARENT );
-    FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
-    _parent.getLayout().addView( relativeLayout, paramsForRelative );
-    /*
-      <com.ooyala.android.player.MovieView
-          android:id="@+id/movie_view"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_centerInParent="true"
-          android:background="#FF000000" />
-    */
-    int anId = getUnusedId();
-    MovieView movieView = new MovieView( c );
-    movieView.setId( anId );
-    movieView.setBackgroundColor( android.graphics.Color.BLACK );
-    RelativeLayout.LayoutParams paramsForMovieView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
-    paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
-    relativeLayout.addView( movieView, paramsForMovieView );
-    /*
-      <com.ooyala.android.ui.FCCTVRatingView
-          android:id="@+id/TVRating_view"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:layout_alignTop="@id/movie_view"
-          android:layout_alignLeft="@id/movie_view"
-          android:layout_alignBottom="@id/movie_view"
-          android:layout_alignRight="@id/movie_view"
-          android:layout_marginBottom="5dp"
-          android:layout_marginLeft="5dp"
-          android:layout_marginRight="5dp"
-          android:layout_marginTop="5dp"
-          android:visibility="invisible"
-          android:background="#00000000" />
-    */
-    FCCTVRatingView ratingsView = new FCCTVRatingView( c );
-    ratingsView.setVisibility( View.INVISIBLE );
-    ratingsView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
-    RelativeLayout.LayoutParams paramsForRatingsView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_TOP, anId );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_LEFT, anId );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_BOTTOM, anId );
-    paramsForRatingsView.addRule( RelativeLayout.ALIGN_RIGHT, anId );
-    int margin = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, MARGIN_DIP, c.getResources().getDisplayMetrics() );
-    paramsForRatingsView.setMargins( margin, margin, margin, margin ); 
-    relativeLayout.addView( ratingsView, paramsForRatingsView );
-    
-    _container = relativeLayout;
-    _view = movieView;
-    _tvRatingView = ratingsView;
-    _tvRatingView.setTVRatingConfiguration( _parent.getOptions().getTVRatingConfiguration() );
-  }
-  
-  private int getUnusedId() {
-    // i don't know if ids are generated up or down, and
-    // i've heard that some regions of int values are reserved.
-    // and empirically negative values didn't work.
-    // so all in all, i'm doing this heuristic.
-    Set<Integer> seenIds = new HashSet<Integer>();
-    View v = _parent.getLayout();
-    while( v != null ) {
-      seenIds.add( v.getId() );
-      ViewParent vp = v.getParent();
-      v = vp instanceof View ? (View)vp : null;
-    }
-    int id = 1;
-    // magic number rumoured, from http://stackoverflow.com/questions/6790623/programmatic-views-how-to-set-unique-ids.
-    while( seenIds.contains(id) && id < 0x00FFFFFF-1 ) {
-      id++;
-    }
-    return id;
-  }
-  
-  private void setupVideoSize() {
     // Try to figure out the video size.  If not, use our default
     if (stream.getWidth() > 0 && stream.getHeight() > 0) {
       setVideoSize(stream.getWidth(), stream.getHeight());
     } else {
       setVideoSize(16,9);
     }
-  }
 
-  @SuppressWarnings("deprecation")
-  private void setupHolder() {
     _holder = _view.getHolder();
     _holder.addCallback(this);
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
+  private void createView(Context c) {
+    _view = new MovieView(c);
+    _view.setBackgroundColor(Color.BLACK);
+  }
+
   private void removeView() {
-	  if (_parent != null) {
-		  _parent.getLayout().removeView(_tvRatingView);
-		  _parent.getLayout().removeView(_view);
-		  _parent.getLayout().removeView(_container);
-	  }
-	  if (_holder != null) {
-		  _holder.removeCallback(this);
-	  }
-	  _tvRatingView = null;
-	  _view = null;
-	  _container = null;
-	  _holder = null;
+// todo: this must be done elsewhere.
+//    if (_parent != null) {
+//      _parent.getLayout().removeView(_view);
+//    }
+    if (_holder != null) {
+      _holder.removeCallback(this);
+    }
+    _view = null;
+    _holder = null;
   }
 
   @Override

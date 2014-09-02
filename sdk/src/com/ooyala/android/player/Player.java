@@ -10,9 +10,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.TVRating;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.ui.FCCTVRatingView;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
@@ -26,7 +24,6 @@ public abstract class Player extends Observable {
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
   protected SurfaceView _view = null;
-  protected FCCTVRatingView _tvRatingView;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
   protected boolean _fullscreen = false;
@@ -38,13 +35,6 @@ public abstract class Player extends Observable {
   protected Player() {}
 
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
-  
-  /**
-   * Optional feature for Players: support for showing TVRating.
-   * Defaults to no support - nothing is shown for the given data.
-   * Subclasses must override if need be.
-   */
-  public void setTVRating( TVRating TVRating ) {}
 
   /**
    * Pause the current video
