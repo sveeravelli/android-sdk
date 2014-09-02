@@ -15,9 +15,11 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.view.LayoutInflater;
+import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
@@ -25,9 +27,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.R;
 import com.ooyala.android.TVRatings;
-import com.ooyala.android.configuration.TVRatingsConfiguration.Position;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.ui.FCCTVRatingsView;
 
@@ -43,6 +43,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     SurfaceHolder.Callback {
 
   private static final String TAG = BaseStreamPlayer.class.getName();
+  private static final int MARGIN_DIP = 5;
   protected View _container;
   protected TVRatings _tvRatings;
   protected MediaPlayer _player = null;
@@ -319,14 +320,66 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void createAndAddViews() {
     Context c = _parent.getLayout().getContext();
-    // note: attachToRoot must be false. when true, it empirically prevents subsequent playbacks.
-    _container = LayoutInflater.from(c).inflate( R.layout.movie_layout, _parent.getLayout(), false );
-    _parent.getLayout().addView( _container );
-    _view = (MovieView)_parent.getLayout().findViewById( R.id.movie_view );
-    _tvRatingsView = (FCCTVRatingsView)_parent.getLayout().findViewById( R.id.tvratings_view );
+    /*
+  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/movie_layout"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:background="#00000000" >
+    */
+    RelativeLayout relativeLayout = new RelativeLayout( c );
+    relativeLayout.setBackgroundColor( android.graphics.Color.TRANSPARENT );
+    FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
+    _parent.getLayout().addView( relativeLayout, paramsForRelative );
+    /*
+      <com.ooyala.android.player.MovieView
+          android:id="@+id/movie_view"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerInParent="true"
+          android:background="#FF000000" />
+    */
+    int anId = 42;
+    MovieView movieView = new MovieView( c );
+    movieView.setId( anId );
+    movieView.setBackgroundColor( android.graphics.Color.BLACK );
+    RelativeLayout.LayoutParams paramsForMovieView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
+    paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
+    relativeLayout.addView( movieView, paramsForMovieView );
+    /*
+      <com.ooyala.android.ui.FCCTVRatingsView
+          android:id="@+id/tvratings_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_alignTop="@id/movie_view"
+          android:layout_alignLeft="@id/movie_view"
+          android:layout_alignBottom="@id/movie_view"
+          android:layout_alignRight="@id/movie_view"
+          android:layout_marginBottom="5dp"
+          android:layout_marginLeft="5dp"
+          android:layout_marginRight="5dp"
+          android:layout_marginTop="5dp"
+          android:visibility="invisible"
+          android:background="#00000000" />
+    */
+    FCCTVRatingsView ratingsView = new FCCTVRatingsView( c );
+    ratingsView.setVisibility( View.INVISIBLE );
+    ratingsView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
+    RelativeLayout.LayoutParams paramsForRatingsView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_TOP, anId );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_LEFT, anId );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_BOTTOM, anId );
+    paramsForRatingsView.addRule( RelativeLayout.ALIGN_RIGHT, anId );
+    int margin = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, MARGIN_DIP, c.getResources().getDisplayMetrics() );
+    paramsForRatingsView.setMargins( margin, margin, margin, margin ); 
+    relativeLayout.addView( ratingsView, paramsForRatingsView );
+    
+    _container = relativeLayout;
+    _view = movieView;
+    _tvRatingsView = ratingsView;
     _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
   }
-
+  
   private void setupVideoSize() {
     // Try to figure out the video size.  If not, use our default
     if (stream.getWidth() > 0 && stream.getHeight() > 0) {

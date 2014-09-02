@@ -200,6 +200,10 @@ public class FCCTVRatingsView extends View {
   private TVRatingsConfiguration nTVRatingsConfiguration;
   private TVRatings nTVRatings;
 
+  public FCCTVRatingsView( Context context ) {
+    this( context, null );
+  }
+  
   public FCCTVRatingsView( Context context, AttributeSet attrs ) {
     super( context, attrs );
     initPaints( TVRatingsConfiguration.DEFAULT_OPACITY );
