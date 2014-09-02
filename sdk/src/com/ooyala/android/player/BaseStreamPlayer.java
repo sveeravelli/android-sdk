@@ -1,5 +1,6 @@
 package com.ooyala.android.player;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -339,7 +341,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
           android:layout_centerInParent="true"
           android:background="#FF000000" />
     */
-    int anId = 42;
+    int anId = getUnusedId();
     MovieView movieView = new MovieView( c );
     movieView.setId( anId );
     movieView.setBackgroundColor( android.graphics.Color.BLACK );
@@ -378,6 +380,26 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _view = movieView;
     _tvRatingsView = ratingsView;
     _tvRatingsView.setTVRatingsConfiguration( _parent.getOptions().getTVRatingsConfiguration() );
+  }
+  
+  private int getUnusedId() {
+    // i don't know if ids are generated up or down, and
+    // i've heard that some regions of int values are reserved.
+    // and empirically negative values didn't work.
+    // so all in all, i'm doing this heuristic.
+    Set<Integer> seenIds = new HashSet<Integer>();
+    View v = _parent.getLayout();
+    while( v != null ) {
+      seenIds.add( v.getId() );
+      ViewParent vp = v.getParent();
+      v = vp instanceof View ? (View)vp : null;
+    }
+    int id = 1;
+    // magic number rumoured, from http://stackoverflow.com/questions/6790623/programmatic-views-how-to-set-unique-ids.
+    while( seenIds.contains(id) && id < 0x00FFFFFF-1 ) {
+      id++;
+    }
+    return id;
   }
   
   private void setupVideoSize() {
