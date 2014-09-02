@@ -32,6 +32,7 @@ import com.ooyala.android.configuration.TVRatingConfiguration;
 public class FCCTVRatingView extends View {
   
   private static final String TAG = "FCCTVRatingView";
+  private static final long OVER_CLICKING_PREVENTION_MSEC = 250;
 
   static boolean isSquareish( int w, int h ) {
     final float fullRatio = w / (float)h;
@@ -82,7 +83,7 @@ public class FCCTVRatingView extends View {
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
     boolean consumed = false;
-    final boolean clickAllowed = System.currentTimeMillis() - clickTime > 500;
+    final boolean clickAllowed = System.currentTimeMillis() - clickTime > OVER_CLICKING_PREVENTION_MSEC;
     final boolean isVisible = getVisibility() == VISIBLE;
     // we're fighting with the controls so have to do it on down, rather than up.
     final boolean isDown = event.getAction() == MotionEvent.ACTION_DOWN;
