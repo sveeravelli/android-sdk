@@ -44,7 +44,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
   protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
   protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
-  protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "TVRatingurl";
+  protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "tvratingsurl";
 
   protected static final String CONTENT_TYPE_CHANNEL_SET = "MultiChannel";
   protected static final String CONTENT_TYPE_CHANNEL = "Channel";
