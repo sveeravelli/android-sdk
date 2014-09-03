@@ -1275,17 +1275,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       break;
     }
   }
-  
-  private void updateTVRatingUI() {
-    if( ! _pushedTVRating &&
-        _player.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
-        _currentItem != null &&
-        _currentItem.getTVRating() != null &&
-        _tvRatingUI != null ) {
-      _tvRatingUI.pushTVRating( _currentItem.getTVRating() );
-      _pushedTVRating = true;
-    }
-  }
 
   @Override
   /**
@@ -1922,6 +1911,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     if( _tvRatingUI != null ) {
       _tvRatingUI.removeVideoView();
       _tvRatingUI = null;
+    }
+  }
+  
+  private void updateTVRatingUI() {
+    if( ! _pushedTVRating &&
+        ! isShowingAd() &&
+        _player.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
+        _currentItem != null &&
+        _currentItem.getTVRating() != null &&
+        _tvRatingUI != null ) {
+      _tvRatingUI.pushTVRating( _currentItem.getTVRating() );
+      _pushedTVRating = true;
     }
   }
 

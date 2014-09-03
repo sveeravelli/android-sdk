@@ -120,8 +120,17 @@ public class FCCTVRatingView extends View {
       int measuredHeight = elementHeight + paddingTop + paddingBottom;
       measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
       measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
+      initWatermark( measuredWidth, measuredHeight );
+      setMeasuredDimension( measuredWidth, measuredHeight );
+    }
+  }
       
-      final int watermarkWidth = (int)Math.round(measuredWidth/2f);
+  private void initWatermark( int measuredWidth, int measuredHeight ) {
+    if( isSquareish( measuredWidth, measuredHeight ) ) {
+      watermarkRect.set( 0, 0, measuredWidth, measuredHeight );
+    }
+    else {
+      final int watermarkWidth = (int)Math.round(measuredWidth * 0.5f);
       int left;
       switch( nTVRatingConfiguration.position ) {
       default:
@@ -135,8 +144,6 @@ public class FCCTVRatingView extends View {
         break;
       }
       watermarkRect.set( left, 0, Math.min(measuredWidth, left+watermarkWidth), measuredHeight );
-      
-      setMeasuredDimension( measuredWidth, measuredHeight );
     }
   }
 
@@ -163,17 +170,14 @@ public class FCCTVRatingView extends View {
     
     watermarkPaint = new Paint();
     watermarkPaint.setColor( Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
-//    watermarkPaint.setColor( Color.argb( 64, 255, 0, 0 ) );
     watermarkPaint.setStyle( Paint.Style.FILL );
 
     blackPaint = new Paint();
     blackPaint.setColor( Color.argb( iOpaticy, 0, 0, 0 ) );
-//    blackPaint.setColor( Color.argb( 64, 0, 255, 0 ) );
     blackPaint.setStyle( Paint.Style.FILL );
 
     whitePaint = new Paint();
     whitePaint.setColor( Color.argb( iOpaticy, 255, 255, 255 ) );
-//    whitePaint.setColor( Color.argb( 64, 0, 0, 255 ) );
     whitePaint.setStyle( Paint.Style.FILL );
 
     textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
