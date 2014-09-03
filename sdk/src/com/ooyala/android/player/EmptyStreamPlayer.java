@@ -4,10 +4,7 @@ import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -34,6 +31,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
   @SuppressWarnings("deprecation")
   private void setupView() {
     createView(_parent.getLayout().getContext());
+    _parent.addVideoView( _view );
     ((MovieView) _view).setAspectRatio( 16f/9f );
     SurfaceHolder holder = _view.getHolder();
     holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -82,11 +80,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
   }
 
   private void removeView() {
-// todo: do this elsewhere.
-//    if (_parent != null) {
-//      _parent.getLayout().removeView(_view);
-//    }
+    _parent.removeVideoView();
     _view = null;
   }
-
 }

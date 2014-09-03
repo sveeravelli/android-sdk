@@ -12,12 +12,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
@@ -443,11 +440,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
     };
 
-    _view.setLayoutParams(new FrameLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
-    _parent.getLayout().addView(_view);
+    _parent.addVideoView( _view );
 
     _holder = _view.getHolder();
     _holder.addCallback(this);
@@ -455,10 +448,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   private void removeView() {
-// todo: do this elsewhere.
-//    if (_parent != null) {
-//      _parent.getLayout().removeView(_view);
-//    }
+    _parent.removeVideoView();
     if (_holder != null) {
       _holder.removeCallback(this);
     }

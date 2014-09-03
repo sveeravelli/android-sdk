@@ -27,8 +27,6 @@ public class MoviePlayer extends Player implements Observer {
   private int _millisToResume = 0;
   private StreamPlayer _basePlayer;
   private Set<Stream> _streams;
-  private TVRating _tvRating;
-  private TVRatingUI _tvRatingUI;
   private boolean _suspended = true;
   protected boolean _seekable = true;
   private boolean _live = false;
@@ -98,28 +96,6 @@ public class MoviePlayer extends Player implements Observer {
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
-    initTVRatingUI();
-  }
-  
-  private void initTVRatingUI() {
-    if( _tvRatingUI != null ) {
-      _tvRatingUI.destroy();
-    }
-    _tvRatingUI = new TVRatingUI( _basePlayer.getView(), _parent.getLayout(), _parent.getOptions().getTVRatingConfiguration() );
-    tryToPushTVRating();
-  }
-  
-  public void setTVRating( TVRating tvRating ) {
-    _tvRating = tvRating;
-    tryToPushTVRating();
-  }
-  
-  private void tryToPushTVRating() {
-    if( _tvRating != null && _tvRatingUI != null && _basePlayer != null && _basePlayer.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM ) {
-      _tvRatingUI.pushTVRating( _tvRating );
-      // prevent it happening more than once per set of tv rating data.
-      _tvRating = null;
-    }
   }
 
   /**
@@ -195,7 +171,6 @@ public class MoviePlayer extends Player implements Observer {
     _suspended = false;
     _basePlayer.init(_parent, _streams);
     _basePlayer.addObserver(this);
-    initTVRatingUI();
 
     if(_live) millisToResume = 0;
 
@@ -205,10 +180,6 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void destroy() {
-    if( _tvRatingUI != null ) { 
-      _tvRatingUI.destroy();
-      _tvRatingUI = null;
-    }
     if (_basePlayer != null) {
       _basePlayer.destroy();
       _basePlayer = null;
@@ -217,9 +188,6 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void update(Observable arg0, Object arg) {
-    if(arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      tryToPushTVRating();
-    }
     setChanged();
     notifyObservers(arg);
   }

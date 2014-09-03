@@ -24,27 +24,19 @@ public class TVRatingUI {
   private View _videoView;
   private FCCTVRatingView _tvRatingView;
 
-  public TVRatingUI( View videoView, ViewGroup parentLayout, TVRatingConfiguration tvRatingConfiguration ) {
+  public TVRatingUI() {
+  }
+  
+  public void addVideoView( View videoView, ViewGroup parentLayout, TVRatingConfiguration tvRatingConfiguration ) {
     this._videoView = videoView;
     this._parentLayout = parentLayout;
     Context context = this._parentLayout.getContext();
-    /*
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/movie_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#00000000" >
-     */
+    
+    // encompassing relative layout.
     this._relativeLayout = new RelativeLayout( context );
     this._relativeLayout.setBackgroundColor( android.graphics.Color.TRANSPARENT );
-    /*
-        <com.ooyala.android.player.MovieView
-            android:id="@+id/movie_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="#FF000000" />
-     */
+
+    // video view.
     if( this._videoView.getId() == View.NO_ID ) {
       this._videoView.setId( getUnusedId( this._parentLayout ) );
     }
@@ -52,22 +44,8 @@ public class TVRatingUI {
     RelativeLayout.LayoutParams paramsForMovieView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
     paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
     this._relativeLayout.addView( this._videoView, paramsForMovieView );
-    /*
-        <com.ooyala.android.ui.FCCTVRatingView
-            android:id="@+id/TVRating_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignTop="@id/movie_view"
-            android:layout_alignLeft="@id/movie_view"
-            android:layout_alignBottom="@id/movie_view"
-            android:layout_alignRight="@id/movie_view"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:visibility="invisible"
-            android:background="#00000000" />
-     */
+
+    // overlaying tv rating view.
     this._tvRatingView = new FCCTVRatingView( context );
     this._tvRatingView.setVisibility( View.INVISIBLE );
     this._tvRatingView.setBackgroundColor( android.graphics.Color.TRANSPARENT );
@@ -81,8 +59,32 @@ public class TVRatingUI {
     this._relativeLayout.addView( this._tvRatingView, paramsForRatingsView );
     this._tvRatingView.setTVRatingConfiguration( tvRatingConfiguration );
     
+    // add into parent.
     FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
     this._parentLayout.addView( this._relativeLayout, paramsForRelative );
+  }
+  
+  public void removeVideoView() {
+    if( _parentLayout != null ) {
+      if( _tvRatingView != null ) {
+        _relativeLayout.removeView( _tvRatingView );
+        _tvRatingView.setVisibility( View.GONE );
+        _tvRatingView = null;
+      }
+     
+      if( _videoView != null ) {
+        _relativeLayout.removeView( _videoView );
+        _videoView.setVisibility( View.GONE );
+        _videoView = null;
+      }
+      
+      if( _relativeLayout != null ) {
+        _parentLayout.removeView( _relativeLayout );
+        _relativeLayout.setVisibility( View.GONE );
+        _relativeLayout = null;
+      }
+      _parentLayout = null;
+    }
   }
   
   public void pushTVRating( TVRating tvRating ) {
@@ -111,16 +113,6 @@ public class TVRatingUI {
   }
   
   public void destroy() {
-    _relativeLayout.removeView( _tvRatingView );
-    _tvRatingView.setVisibility( View.GONE );
-    _tvRatingView = null;
-   
-    _relativeLayout.removeView( _videoView );
-    _videoView.setVisibility( View.GONE );
-    _videoView = null;
-    
-    _parentLayout.removeView( _relativeLayout );
-    _relativeLayout.setVisibility( View.GONE );
-    _relativeLayout = null;
+    removeVideoView();
   }
 }

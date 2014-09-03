@@ -17,6 +17,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,6 +43,7 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.StreamPlayer;
+import com.ooyala.android.player.TVRatingUI;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
@@ -176,6 +178,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
+  private TVRatingUI _tvRatingUI;
+  private boolean _pushedTVRating;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -612,6 +616,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       _player = getCorrectMoviePlayer(_currentItem);
       if (initializePlayer(_player, _currentItem) == null)
         return false;
+      _pushedTVRating = false;
       dequeuePlay();
     }
     return true;
@@ -653,10 +658,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
     final MoviePlayer moviePlayer = _getCorrectMoviePlayer( currentItem );
-    final TVRating TVRating = currentItem.getTVRating();
-    if( TVRating != null ) {
-      moviePlayer.setTVRating( TVRating );
-    }
     return moviePlayer;
   }
   
@@ -1274,6 +1275,17 @@ public class OoyalaPlayer extends Observable implements Observer,
       break;
     }
   }
+  
+  private void updateTVRatingUI() {
+    if( ! _pushedTVRating &&
+        _player.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
+        _currentItem != null &&
+        _currentItem.getTVRating() != null &&
+        _tvRatingUI != null ) {
+      _tvRatingUI.pushTVRating( _currentItem.getTVRating() );
+      _pushedTVRating = true;
+    }
+  }
 
   @Override
   /**
@@ -1299,6 +1311,8 @@ public class OoyalaPlayer extends Observable implements Observer,
         playAdsBeforeTime(this._lastPlayedTime, true);
         // closed captions
         displayCurrentClosedCaption();
+        // check tv rating ui.
+        updateTVRatingUI();
       }
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       switch (player.getState()) {
@@ -1370,6 +1384,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (_player == null) {
         _player = getCorrectMoviePlayer(_currentItem);
         initializePlayer(_player, _currentItem);
+        _pushedTVRating = false;
         play();
       }
 
@@ -1886,6 +1901,28 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void registerAdPlayer(Class<? extends AdSpot> adTypeClass,
       Class<? extends AdMoviePlayer> adPlayerClass) {
     _adPlayers.put(adTypeClass, adPlayerClass);
+  }
+  
+  /**
+   * For internal Ooyala use only.
+   * @param view
+   */
+  public void addVideoView( View view ) {
+    removeVideoView();
+    if( view != null ) {
+      _tvRatingUI = new TVRatingUI();
+      _tvRatingUI.addVideoView( view, getLayout(), getOptions().getTVRatingConfiguration() );
+    }
+  }
+
+  /**
+   * For internal Ooyala use only.
+   */
+  public void removeVideoView() {
+    if( _tvRatingUI != null ) {
+      _tvRatingUI.removeVideoView();
+      _tvRatingUI = null;
+    }
   }
 
   /**

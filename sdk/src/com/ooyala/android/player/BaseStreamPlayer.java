@@ -15,10 +15,7 @@ import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaException;
@@ -295,6 +292,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @SuppressWarnings("deprecation")
   private void setupView() {
     createView(_parent.getLayout().getContext());
+    _parent.addVideoView( _view );
 
     // Try to figure out the video size.  If not, use our default
     if (stream.getWidth() > 0 && stream.getHeight() > 0) {
@@ -314,10 +312,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   }
 
   private void removeView() {
-// todo: this must be done elsewhere.
-//    if (_parent != null) {
-//      _parent.getLayout().removeView(_view);
-//    }
+    _parent.removeVideoView();
     if (_holder != null) {
       _holder.removeCallback(this);
     }
