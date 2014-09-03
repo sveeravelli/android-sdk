@@ -98,19 +98,20 @@ public class MoviePlayer extends Player implements Observer {
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
-    initTVRating();
-    tryToPushTVRating();
+    initTVRatingUI();
   }
   
-  private void initTVRating() {
+  private void initTVRatingUI() {
     if( _tvRatingUI != null ) {
       _tvRatingUI.destroy();
     }
     _tvRatingUI = new TVRatingUI( _basePlayer.getView(), _parent.getLayout(), _parent.getOptions().getTVRatingConfiguration() );
+    tryToPushTVRating();
   }
   
   public void setTVRating( TVRating tvRating ) {
     _tvRating = tvRating;
+    tryToPushTVRating();
   }
   
   private void tryToPushTVRating() {
@@ -194,7 +195,7 @@ public class MoviePlayer extends Player implements Observer {
     _suspended = false;
     _basePlayer.init(_parent, _streams);
     _basePlayer.addObserver(this);
-    initTVRating();
+    initTVRatingUI();
 
     if(_live) millisToResume = 0;
 
@@ -204,7 +205,14 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void destroy() {
-    if (_basePlayer != null) _basePlayer.destroy();
+    if( _tvRatingUI != null ) { 
+      _tvRatingUI.destroy();
+      _tvRatingUI = null;
+    }
+    if (_basePlayer != null) {
+      _basePlayer.destroy();
+      _basePlayer = null;
+    }
   }
 
   @Override
