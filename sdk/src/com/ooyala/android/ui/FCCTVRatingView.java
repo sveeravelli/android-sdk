@@ -202,7 +202,7 @@ public class FCCTVRatingView extends View {
     if( hasValidRating() &&
         ! hasAnimation() &&
         hasTVRatingConfiguration() &&
-        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.TIMER_NEVER ) {
+        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.DURATION_NONE ) {
     	startFadeInAnimation();
     }
   }
@@ -229,7 +229,7 @@ public class FCCTVRatingView extends View {
 
   private void startFadeOutAnimation() {
     if( hasTVRatingConfiguration() &&
-        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.TIMER_ALWAYS ) {
+        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.DURATION_FOR_EVER ) {
       nFadeOutAnimation = new AlphaAnimation( 1f, 0f );
       nFadeOutAnimation.setStartOffset( nTVRatingConfiguration.durationSeconds * 1000 );
       nFadeOutAnimation.setDuration( FADE_OUT_MSEC );
