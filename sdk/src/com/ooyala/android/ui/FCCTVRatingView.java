@@ -158,7 +158,7 @@ public class FCCTVRatingView extends View {
    * layout system calls onMeasure.
    */
   public void setTVRatingConfiguration( TVRatingConfiguration TVRatingConfiguration ) {
-    this.nTVRatingConfiguration = TVRatingConfiguration;
+    nTVRatingConfiguration = TVRatingConfiguration;
     if( hasTVRatingConfiguration() ) {
       initPaints( TVRatingConfiguration.opacity );
       freeResources();
@@ -192,10 +192,16 @@ public class FCCTVRatingView extends View {
     clearPaint.setStyle( Paint.Style.FILL );
   }
   
-  public void setTVRating( TVRating TVRating ) {
-    this.nTVRating = TVRating;
-	  freeResources();
-	  startAnimation();
+  public void setTVRating( TVRating tvRating ) {
+    if( tvRating != null && !tvRating.equals(nTVRating) ) {
+      nTVRating = tvRating;
+  	  freeResources();
+  	  startAnimation();
+    }
+  }
+  
+  public TVRating getTVRating() {
+    return nTVRating;
   }
 
   private void startAnimation() {
@@ -255,11 +261,11 @@ public class FCCTVRatingView extends View {
   }
   
   private boolean hasTVRatingConfiguration() {
-    return this.nTVRatingConfiguration != null;
+    return nTVRatingConfiguration != null;
   }
   
   private boolean hasAnimation() {
-    return this.nFadeInAnimation != null || this.nFadeOutAnimation != null;
+    return nFadeInAnimation != null || nFadeOutAnimation != null;
   }
 
   private boolean hasValidRating() {

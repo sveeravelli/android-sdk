@@ -111,7 +111,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param fullscreen
    */
   @Override
-  public void setFullscreen(boolean fullscreen) {
+  protected void doFullscreenChange(boolean fullscreen) {
     _player.suspend();
     OoyalaPlayerControls controlsToShow = null;
     OoyalaPlayerControls overlayToShow = null;

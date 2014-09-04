@@ -87,8 +87,16 @@ public class TVRatingUI {
     }
   }
   
-  public void pushTVRating( TVRating tvRating ) {
-    _tvRatingView.setTVRating( tvRating );
+  public boolean pushTVRating( TVRating tvRating ) {
+    boolean pushable = _tvRatingView != null;
+    if( pushable ) {
+      _tvRatingView.setTVRating( tvRating );
+    }
+    return pushable;
+  }
+  
+  public TVRating getTVRating() {
+    return _tvRatingView == null ? null : _tvRatingView.getTVRating();
   }
 
   private int getUnusedId( ViewGroup parentLayout ) {

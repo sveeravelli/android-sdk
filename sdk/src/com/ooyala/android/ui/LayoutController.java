@@ -2,9 +2,11 @@ package com.ooyala.android.ui;
 
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.TVRating;
 
 public interface LayoutController {
   /**
@@ -46,4 +48,23 @@ public interface LayoutController {
    * @return
    */
   public boolean onKeyUp(int keyCode, KeyEvent event);
+  
+  /**
+   * Insert the video view into the view hierarchy. Will
+   * automatically include other views such as TV Ratings.
+   * @param videoView
+   */
+  public void addVideoView( View videoView );
+  
+  /**
+   * Remove any previously added video view, and related
+   * items such as the TV Ratings view.
+   */
+  public void removeVideoView();
+  
+  /**
+   * @param tvRating
+   * @return true if the rating was pushed to the ui, false otherwise (try again later).
+   */
+  public boolean pushTVRating( TVRating tvRating );
 }

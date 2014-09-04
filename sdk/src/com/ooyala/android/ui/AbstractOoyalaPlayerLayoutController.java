@@ -27,7 +27,9 @@ import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.TVRating;
 import com.ooyala.android.configuration.Options;
+import com.ooyala.android.player.TVRatingUI;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
@@ -47,6 +49,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected List<String> optionList;
   protected ListView listView;
   protected AlertDialog dialog;
+  private TVRatingUI _tvRatingUI;
 
   private int selectedLanguageIndex;
   private int selectedPresentationIndex;
@@ -150,6 +153,30 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _inlineControls.hide();
       _player.addObserver(_inlineControls);
     }
+  }
+  
+  public void addVideoView( View videoView ) {
+    removeVideoView();
+    if( videoView != null ) {
+      _tvRatingUI = new TVRatingUI();
+      _tvRatingUI.addVideoView( videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
+    }
+  }
+
+  public void removeVideoView() {
+    if( _tvRatingUI != null ) {
+      _tvRatingUI.removeVideoView();
+      _tvRatingUI = null;
+    }
+  }
+  
+  public boolean pushTVRating( TVRating tvRating ) {
+    boolean didPush = false;
+    boolean pushable = _tvRatingUI != null && tvRating != null;
+    if( pushable ) {
+      didPush = _tvRatingUI.pushTVRating( tvRating );
+    }
+    return didPush;
   }
 
   public void setInlineOverlay(OoyalaPlayerControls controlsOverlay) {
@@ -287,11 +314,26 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   }
 
   @Override
-  public void setFullscreen(boolean fullscreen) {}
+  public final void setFullscreen(boolean fullscreen) {
+    beforeFullscreenChange();
+    doFullscreenChange( fullscreen );
+    afterFullscreenChange();
+  }
 
   @Override
   public boolean isFullscreen() {
     return false;
+  }
+  
+  private TVRating _tvRatingOnFullscreenChange;
+  protected void beforeFullscreenChange() {
+    _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
+  }
+  
+  protected abstract void doFullscreenChange( boolean fullscreen );
+  
+  protected void afterFullscreenChange() {
+    pushTVRating( _tvRatingOnFullscreenChange );
   }
 
   public OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout, boolean fullscreen) {

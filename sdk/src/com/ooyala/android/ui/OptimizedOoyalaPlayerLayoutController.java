@@ -118,7 +118,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param fullscreen
    */
   @Override
-  public void setFullscreen(boolean fullscreen) {
+  protected void doFullscreenChange(boolean fullscreen) {
     if (isFullscreen() && !fullscreen) { // Fullscreen -> Not Fullscreen
       _fullscreen = fullscreen;
       _layout.setLayoutParams(_inlineLP);
@@ -127,5 +127,5 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
       _layout.setLayoutParams(_fullscreenLP);
       _layout.bringToFront();
     }
-  }
+  }  
 }

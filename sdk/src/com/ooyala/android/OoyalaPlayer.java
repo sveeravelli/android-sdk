@@ -178,7 +178,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends AdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
-  private TVRatingUI _tvRatingUI;
   private boolean _pushedTVRating;
 
   /**
@@ -1896,22 +1895,15 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For internal Ooyala use only.
    * @param view
    */
-  public void addVideoView( View view ) {
-    removeVideoView();
-    if( view != null ) {
-      _tvRatingUI = new TVRatingUI();
-      _tvRatingUI.addVideoView( view, getLayout(), getOptions().getTVRatingConfiguration() );
-    }
+  public void addVideoView( View videoView ) {
+    _layoutController.addVideoView( videoView );
   }
 
   /**
    * For internal Ooyala use only.
    */
   public void removeVideoView() {
-    if( _tvRatingUI != null ) {
-      _tvRatingUI.removeVideoView();
-      _tvRatingUI = null;
-    }
+    _layoutController.removeVideoView();
   }
   
   private void updateTVRatingUI() {
@@ -1919,10 +1911,8 @@ public class OoyalaPlayer extends Observable implements Observer,
         ! isShowingAd() &&
         _player.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
         _currentItem != null &&
-        _currentItem.getTVRating() != null &&
-        _tvRatingUI != null ) {
-      _tvRatingUI.pushTVRating( _currentItem.getTVRating() );
-      _pushedTVRating = true;
+        _currentItem.getTVRating() != null ) {
+      _pushedTVRating = _layoutController.pushTVRating( _currentItem.getTVRating() );
     }
   }
 
