@@ -334,9 +334,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       _player.setViewSize(dm.widthPixels, dm.heightPixels);
       _player.setView(_view);
+
       // Register SDK event listener
       _player.setOnEventListener(this);
 
+      // If we are using VisualON OSMP player without Discredix, enable eHLS playback
+      // eHLS playback will not work using the SecurePlayer
       if (!isDiscredixLoaded()) {
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
