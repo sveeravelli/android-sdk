@@ -337,6 +337,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       // Register SDK event listener
       _player.setOnEventListener(this);
 
+      if (!isDiscredixLoaded()) {
+        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
+      }
+
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
       _player.setPreAgreedLicense(licenseText);
