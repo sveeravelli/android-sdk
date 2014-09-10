@@ -27,9 +27,9 @@ import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
-import com.ooyala.android.TVRating;
+import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.configuration.Options;
-import com.ooyala.android.player.TVRatingUI;
+import com.ooyala.android.player.FCCTVRatingUI;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
@@ -49,7 +49,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected List<String> optionList;
   protected ListView listView;
   protected AlertDialog dialog;
-  private TVRatingUI _tvRatingUI;
+  private FCCTVRatingUI _tvRatingUI;
 
   private int selectedLanguageIndex;
   private int selectedPresentationIndex;
@@ -158,7 +158,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   public void addVideoView( View videoView ) {
     removeVideoView();
     if( videoView != null ) {
-      _tvRatingUI = new TVRatingUI();
+      _tvRatingUI = new FCCTVRatingUI();
       _tvRatingUI.addVideoView( videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
     }
   }
@@ -170,7 +170,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     }
   }
   
-  public boolean pushTVRating( TVRating tvRating ) {
+  public boolean pushTVRating( FCCTVRating tvRating ) {
     boolean didPush = false;
     boolean pushable = _tvRatingUI != null && tvRating != null;
     if( pushable ) {
@@ -325,7 +325,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     return false;
   }
   
-  private TVRating _tvRatingOnFullscreenChange;
+  private FCCTVRating _tvRatingOnFullscreenChange;
   protected void beforeFullscreenChange() {
     _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
   }

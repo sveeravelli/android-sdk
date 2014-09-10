@@ -20,8 +20,8 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.TVRating;
-import com.ooyala.android.configuration.TVRatingConfiguration;
+import com.ooyala.android.FCCTVRating;
+import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 
 /* todo:
  * + update from content item.
@@ -57,8 +57,8 @@ public class FCCTVRatingView extends View {
   private Bitmap nBitmap;
   private AlphaAnimation nFadeInAnimation;
   private AlphaAnimation nFadeOutAnimation;
-  private TVRatingConfiguration nTVRatingConfiguration;
-  private TVRating nTVRating;
+  private FCCTVRatingConfiguration nTVRatingConfiguration;
+  private FCCTVRating nTVRating;
 
   public FCCTVRatingView( Context context ) {
     this( context, null );
@@ -66,12 +66,12 @@ public class FCCTVRatingView extends View {
   
   public FCCTVRatingView( Context context, AttributeSet attrs ) {
     super( context, attrs );
-    initPaints( TVRatingConfiguration.DEFAULT_OPACITY );
+    initPaints( FCCTVRatingConfiguration.DEFAULT_OPACITY );
     this.miniTextSize = 0;
     this.miniTextScaleX = 0;
     this.watermarkRect = new Rect();
     this.stampDimensions = new FCCTVRatingViewStampDimensions();
-    this.nTVRatingConfiguration = TVRatingConfiguration.s_getDefaultTVRatingConfiguration();
+    this.nTVRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
   }
 
   @Override
@@ -157,7 +157,7 @@ public class FCCTVRatingView extends View {
    * For the configuration to actually take effect, it must be set before Android's
    * layout system calls onMeasure.
    */
-  public void setTVRatingConfiguration( TVRatingConfiguration TVRatingConfiguration ) {
+  public void setTVRatingConfiguration( FCCTVRatingConfiguration TVRatingConfiguration ) {
     nTVRatingConfiguration = TVRatingConfiguration;
     if( hasTVRatingConfiguration() ) {
       initPaints( TVRatingConfiguration.opacity );
@@ -192,7 +192,7 @@ public class FCCTVRatingView extends View {
     clearPaint.setStyle( Paint.Style.FILL );
   }
   
-  public void setTVRating( TVRating tvRating ) {
+  public void setTVRating( FCCTVRating tvRating ) {
     if( tvRating != null && !tvRating.equals(nTVRating) ) {
       nTVRating = tvRating;
   	  freeResources();
@@ -200,7 +200,7 @@ public class FCCTVRatingView extends View {
     }
   }
   
-  public TVRating getTVRating() {
+  public FCCTVRating getTVRating() {
     return nTVRating;
   }
 
@@ -208,7 +208,7 @@ public class FCCTVRatingView extends View {
     if( hasValidRating() &&
         ! hasAnimation() &&
         hasTVRatingConfiguration() &&
-        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.DURATION_NONE ) {
+        nTVRatingConfiguration.durationSeconds != FCCTVRatingConfiguration.DURATION_NONE ) {
     	startFadeInAnimation();
     }
   }
@@ -235,7 +235,7 @@ public class FCCTVRatingView extends View {
 
   private void startFadeOutAnimation() {
     if( hasTVRatingConfiguration() &&
-        nTVRatingConfiguration.durationSeconds != TVRatingConfiguration.DURATION_FOR_EVER ) {
+        nTVRatingConfiguration.durationSeconds != FCCTVRatingConfiguration.DURATION_FOR_EVER ) {
       nFadeOutAnimation = new AlphaAnimation( 1f, 0f );
       nFadeOutAnimation.setStartOffset( nTVRatingConfiguration.durationSeconds * 1000 );
       nFadeOutAnimation.setDuration( FADE_OUT_MSEC );

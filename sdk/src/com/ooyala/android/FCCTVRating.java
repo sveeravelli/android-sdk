@@ -4,13 +4,13 @@ import java.util.Arrays;
 
 import android.text.TextUtils;
 
-public class TVRating {
+public class FCCTVRating {
 
   public final String ageRestriction;
   public final String labels;
   public final String clickthrough;
   
-  public TVRating( String ageRestriction, String labels, String clickthrough ) {
+  public FCCTVRating( String ageRestriction, String labels, String clickthrough ) {
     
     if( ageRestriction != null ) {
       ageRestriction = ageRestriction.toUpperCase().replace( "TV-", "" );
@@ -48,7 +48,7 @@ public class TVRating {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    TVRating other = (TVRating) obj;
+    FCCTVRating other = (FCCTVRating) obj;
     if (ageRestriction == null) {
       if (other.ageRestriction != null)
         return false;

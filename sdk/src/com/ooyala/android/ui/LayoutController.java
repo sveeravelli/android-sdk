@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.TVRating;
+import com.ooyala.android.FCCTVRating;
 
 public interface LayoutController {
   /**
@@ -66,5 +66,5 @@ public interface LayoutController {
    * @param tvRating
    * @return true if the rating was pushed to the ui, false otherwise (try again later).
    */
-  public boolean pushTVRating( TVRating tvRating );
+  public boolean pushTVRating( FCCTVRating tvRating );
 }

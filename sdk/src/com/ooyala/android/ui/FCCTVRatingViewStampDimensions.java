@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.util.TypedValue;
 
-import com.ooyala.android.configuration.TVRatingConfiguration;
+import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 
 final class FCCTVRatingViewStampDimensions {
 
@@ -34,7 +34,7 @@ final class FCCTVRatingViewStampDimensions {
     return outerRect.contains( (int)x, (int)y );
   }
 
-  public void update( Context context, TVRatingConfiguration TVRatingConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+  public void update( Context context, FCCTVRatingConfiguration TVRatingConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
     // the order of these 3 calls must be preserved.
     updateBorder( context );
     updateDimensions( TVRatingConfiguration.scale, measuredWidth, measuredHeight, watermarkWidth );
@@ -65,7 +65,7 @@ final class FCCTVRatingViewStampDimensions {
     this.outerHeight = this.innerHeight + this.borderSize*2;
   }
   
-  private void updateRects( TVRatingConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+  private void updateRects( FCCTVRatingConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
     int left, top;
     int right = watermarkWidth - this.outerWidth;
     int bottom = watermarkHeight - this.outerHeight;

@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OrderedMapValue;
-import com.ooyala.android.TVRating;
+import com.ooyala.android.FCCTVRating;
 
 /**
  * Stores the info and metadata for the specified content item.
@@ -64,7 +64,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected boolean _heartbeatRequired;
   protected Map<String, String> _metadata;
   protected Map<String, ModuleData> _moduleData;
-  protected TVRating _tvRating;
+  protected FCCTVRating _tvRating;
 
   ContentItem() {}
 
@@ -138,7 +138,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   /**
    * @return possibly null.
    */
-  public TVRating getTVRating() {
+  public FCCTVRating getTVRating() {
     return _tvRating;
   }
 
@@ -206,7 +206,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
         }
       }
       if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) && _metadata.containsKey(KEY_METADATA_TVRATING_SUBRATINGS) ) {
-        _tvRating = new TVRating(
+        _tvRating = new FCCTVRating(
             _metadata.get(KEY_METADATA_TVRATING_RATING),
             _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS),
             _metadata.get(KEY_METADATA_TVRATING_CLICKTHROUGH_URL)

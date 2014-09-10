@@ -11,11 +11,11 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.ooyala.android.TVRating;
-import com.ooyala.android.configuration.TVRatingConfiguration;
+import com.ooyala.android.FCCTVRating;
+import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 import com.ooyala.android.ui.FCCTVRatingView;
 
-public class TVRatingUI {
+public class FCCTVRatingUI {
 
   public static final int TVRATING_PLAYHEAD_TIME_MINIMUM = 250;
   private static final int MARGIN_DIP = 5;
@@ -24,10 +24,10 @@ public class TVRatingUI {
   private View _videoView;
   private FCCTVRatingView _tvRatingView;
 
-  public TVRatingUI() {
+  public FCCTVRatingUI() {
   }
   
-  public void addVideoView( View videoView, ViewGroup parentLayout, TVRatingConfiguration tvRatingConfiguration ) {
+  public void addVideoView( View videoView, ViewGroup parentLayout, FCCTVRatingConfiguration tvRatingConfiguration ) {
     this._videoView = videoView;
     this._parentLayout = parentLayout;
     Context context = this._parentLayout.getContext();
@@ -87,7 +87,7 @@ public class TVRatingUI {
     }
   }
   
-  public boolean pushTVRating( TVRating tvRating ) {
+  public boolean pushTVRating( FCCTVRating tvRating ) {
     boolean pushable = _tvRatingView != null;
     if( pushable ) {
       _tvRatingView.setTVRating( tvRating );
@@ -95,7 +95,7 @@ public class TVRatingUI {
     return pushable;
   }
   
-  public TVRating getTVRating() {
+  public FCCTVRating getTVRating() {
     return _tvRatingView == null ? null : _tvRatingView.getTVRating();
   }
 

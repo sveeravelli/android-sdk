@@ -43,7 +43,7 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.StreamPlayer;
-import com.ooyala.android.player.TVRatingUI;
+import com.ooyala.android.player.FCCTVRatingUI;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
@@ -1909,7 +1909,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void updateTVRatingUI() {
     if( ! _pushedTVRating &&
         ! isShowingAd() &&
-        _player.currentTime() > TVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
+        _player.currentTime() > FCCTVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
         _currentItem != null &&
         _currentItem.getTVRating() != null ) {
       _pushedTVRating = _layoutController.pushTVRating( _currentItem.getTVRating() );
