@@ -127,6 +127,7 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void reset() {
+    _suspended = false;
     if (_basePlayer != null) {
       _basePlayer.reset();
     }
@@ -141,33 +142,31 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
-  @Override
   public void suspend(int millisToResume, State stateToResume) {
     // If we're already suspended, we don't need to do it again
-    if (stateToResume == State.SUSPENDED) {
+    if (_suspended) {
       DebugMode.logI(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
       return;
     }
     DebugMode.logD(this.getClass().toString(), "Movie Player Suspending. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
-    _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
     if (_basePlayer != null) {
-      _basePlayer.deleteObserver(this);
-      _basePlayer.suspend(millisToResume, stateToResume);
+      _basePlayer.suspend();
     }
+    _suspended = true;
   }
 
   @Override
   public void resume() {
     resume(_millisToResume, _stateToResume);
+    setState(getState());
   }
 
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
     _basePlayer.init(_parent, _streams);
-    _basePlayer.addObserver(this);
 
     if(_live) millisToResume = 0;
 
@@ -175,13 +174,22 @@ public class MoviePlayer extends Player implements Observer {
     _basePlayer.resume(millisToResume, stateToResume);
   }
 
-  @Override
+  public int timeToResume() {
+    return _millisToResume;
+  }
+
   public void destroy() {
-    if (_basePlayer != null) _basePlayer.destroy();
+    if (_basePlayer != null) {
+      _basePlayer.deleteObserver(this);
+      _basePlayer.destroy();
+    }
   }
 
   @Override
   public void update(Observable arg0, Object arg) {
+    if (_suspended) {
+      return;
+    }
     setChanged();
     notifyObservers(arg);
   }

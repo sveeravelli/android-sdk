@@ -3,13 +3,13 @@ package com.ooyala.android.imasdk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 
 /**
  * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.
@@ -17,12 +17,12 @@ import com.ooyala.android.item.AdSpot;
  * @author michael.len
  *
  */
-class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
+class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
   private static String TAG = "OoyalaPlayerIMAWrapper";
 
   final OoyalaPlayer _player;
   private final OoyalaIMAManager _imaManager;
-  private AdSpot _adSpot;
+  private OoyalaManagedAdSpot _adSpot;
   private boolean _isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> _adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
   private int _liveContentTimePlayed;
@@ -42,21 +42,20 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
    * @param callback a callback for when content is completed
    */
   public OoyalaPlayerIMAWrapper(OoyalaPlayer player, OoyalaIMAManager imaManager){
+    DebugMode.logD(TAG, "IMA Ad Wrapper: Initializing");
     _player = player;
     _imaManager = imaManager;
-    DebugMode.logD(TAG, "IMA Ad Wrapper: Initializing");
     _isPlayingIMAAd = false;
     _liveContentTimePlayed = 0;
-    player.addObserver(this);
   }
 
   // Methods implementing VideoAdPlayer interface.
   @Override
   public void playAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Playing Ad");
+    _imaManager._adPlayer.init(_player, _adSpot, _player.createStateNotifier());
+    _player.play();
     _isPlayingIMAAd = true;
-
-    _player.playAd(_adSpot);
   }
 
   @Override
@@ -74,6 +73,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
   public void loadAd(String url) {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Loading Ad: " + url);
     _adSpot = new IMAAdSpot(url, _imaManager);
+    _imaManager._adPlayer.setState(State.LOADING);
   }
 
   @Override
@@ -110,12 +110,12 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
 
   @Override
   public VideoProgressUpdate getProgress() {
-   int durationMs = _player.getDuration();
-   int playheadMs = _player.getPlayheadTime();
+    int durationMs = _player.getDuration();
+    int playheadMs = _player.getPlayheadTime();
 
-   if(!_isPlayingIMAAd) {
-     playheadMs += _liveContentTimePlayed;
-   }
+    if(!_isPlayingIMAAd) {
+      playheadMs += _liveContentTimePlayed;
+    }
 
     if (durationMs == 0) durationMs = Integer.MAX_VALUE;
     DebugMode.logV(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
@@ -130,6 +130,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     if(_player.getCurrentItem().isLive()) {
       _liveContentTimePlayed = _liveContentTimePlayed + _player.getPlayheadTime();
     }
+    _player.requestAdMode(_imaManager);
   }
 
   /**
@@ -140,10 +141,19 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     for (VideoAdPlayerCallback callback : _adCallbacks) {
       callback.onPlay();
     }
-    _player.adPlayerCompleted();
+    DebugMode.logD(TAG, "Destroy AdPlayer before play content");
+    _player.exitAdMode(_imaManager);
   }
 
-  @Override
+  /**
+   * Called by OoyalaIMAManager when an error is encountered
+   */
+  public void onAdError() {
+    fireIMAAdErrorCallback();
+    _imaManager.destroy();
+    _player.exitAdMode(_imaManager);
+  }
+
   public void update(Observable arg0, Object arg) {
     OoyalaPlayer player = (OoyalaPlayer) arg0;
     String notification = arg.toString();
@@ -182,6 +192,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
           break;
         case SUSPENDED:
           DebugMode.logD(TAG, "IMA Ad Update: Player Ad Pause on Suspend");
+
           for (VideoAdPlayerCallback callback : _adCallbacks) {
             callback.onPause();
           }
@@ -235,4 +246,88 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, Observer {
     }
   }
 
+  /**
+   * Fire callback to IMASDK when a video(ima-ad or content) starts
+   */
+  public void fireVideoStartCallback() {
+    if (_player.isShowingAd()) {
+      DebugMode.logD(TAG, "IMASDK callback fired: Player Ad start");
+    } else {
+      DebugMode.logD(TAG, "IMASDK callback fired: Content start");
+    }
+
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onPlay();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when a video(ima-ad or content) pauses
+   */
+  public void fireVideoPauseCallback() {
+    if (_player.isShowingAd()) {
+      DebugMode.logD(TAG, "IMASDK callback fired: Player Ad pauses");
+    } else {
+      DebugMode.logD(TAG, "IMASDK callback fired: Content pauses");
+    }
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onPause();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when a video(ima-ad or content) suspends
+   */
+  public void fireVideoSuspendCallback() {
+    if (_player.isShowingAd()) {
+      DebugMode.logD(TAG, "IMASDK callback fired: Player Ad suspends");
+    } else {
+      DebugMode.logD(TAG, "IMASDK callback fired: Content suspends");
+    }
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onPause();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when current item changed
+   */
+  public void fireCurrentItemChangedCallback() {
+    DebugMode.logD(TAG, "IMASDK callback fired: Current item changed");
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onEnded();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when IMA-Ad complete
+   */
+  public void fireIMAAdCompleteCallback() {
+    DebugMode.logD(TAG, "IMASDK callback: Player Ad Complete");
+    _isPlayingIMAAd = false;
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onEnded();
+      _imaManager._adPlayer.destroy();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when IMA-Ad resume
+   */
+  public void fireIMAAdResumeCallback() {
+    DebugMode.logD(TAG, "IMASDK callback: Player Ad Resume");
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onResume();
+    }
+  }
+
+  /**
+   * Fire callback to IMASDK when IMA-Ad resume
+   */
+  public void fireIMAAdErrorCallback() {
+    DebugMode.logD(TAG, "IMASDK callback: Player Ad on Error");
+    for (VideoAdPlayerCallback callback : _adCallbacks) {
+      callback.onError();
+    }
+  }
 }

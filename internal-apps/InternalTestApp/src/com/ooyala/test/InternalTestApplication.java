@@ -3,15 +3,15 @@ package com.ooyala.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Activity;
+import android.app.Application;
+import android.os.StrictMode;
+
+import com.ooyala.test.cases.CustomEmbedInternalTestAppActivity;
 import com.ooyala.test.cases.FreewheelInternalTestAppActivity;
 import com.ooyala.test.cases.IMAInternalTestAppActivity;
 import com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity;
 import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
-import com.ooyala.test.cases.CustomEmbedInternalTestAppActivity;
-
-import android.app.Activity;
-import android.app.Application;
-import android.os.StrictMode;
 
 /**
  * A global scope of the application.  This allows all activities to use the same list of information.

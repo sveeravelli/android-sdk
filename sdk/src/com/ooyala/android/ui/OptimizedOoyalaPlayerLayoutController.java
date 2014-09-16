@@ -72,7 +72,8 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    super(l, pcode, domain, dcs, generator);
+    extraInit(dcs);
   }
 
   /**
@@ -83,6 +84,10 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    */
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
     super(l, p, dcs);
+    extraInit(dcs);
+  }
+
+  private void extraInit(DefaultControlStyle dcs) {
     if (dcs == DefaultControlStyle.AUTO) {
       _fullscreenControls = _inlineControls;
       _fullscreenOverlay = _inlineOverlay;
