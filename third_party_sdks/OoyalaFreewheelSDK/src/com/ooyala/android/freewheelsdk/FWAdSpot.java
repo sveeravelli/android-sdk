@@ -12,9 +12,11 @@ public class FWAdSpot extends AdSpot {
 
   private static final String TAG = FWAdSpot.class.getName();
   private ISlot _ad;
+  private boolean _isPostRoll;
 
-  private FWAdSpot(ISlot ad) {
+  private FWAdSpot(ISlot ad, boolean isPostRoll) {
     _ad = ad;
+    _isPostRoll = isPostRoll;
   }
 
   /**
@@ -22,12 +24,12 @@ public class FWAdSpot extends AdSpot {
    * @param ad the ISlot to play
    * @param adManager the Freewheel ad manager
    */
-  public static FWAdSpot create(ISlot ad) {
+  public static FWAdSpot create(ISlot ad, boolean isPostRoll) {
     if (ad == null) {
       DebugMode.assertFail(TAG, "FWAdSpot.create error, ad is null");
       return null;
     }
-    return new FWAdSpot(ad);
+    return new FWAdSpot(ad, isPostRoll);
   }
 
   public ISlot getAd() {
@@ -39,6 +41,9 @@ public class FWAdSpot extends AdSpot {
    * @return The time at which this AdSpot should play in milliseconds.
    */
   public int getTime() {
+    if (_isPostRoll) {
+      return Integer.MAX_VALUE - 1;
+    }
     return (int) (_ad.getTimePosition() * 1000);
   }
 

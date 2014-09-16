@@ -1215,8 +1215,6 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void update(Observable arg0, Object arg1) {
     String notification = arg1.toString();
-    DebugMode.logD(TAG, "update from" + arg0.toString() + " notification "
-        + notification);
 
     if (arg0 instanceof Player) {
       processContentNotifications((Player) arg0, notification);
@@ -1921,8 +1919,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   void processExitAdModes(AdMode mode, boolean adsDidPlay) {
-    DebugMode.logD(TAG, "exit admode from mode " + mode.toString()
-        + "ads did play " + String.valueOf(adsDidPlay));
+    if (adsDidPlay) {
+      DebugMode.logD(TAG, "exit admode from mode " + mode.toString());
+    }
     switch (mode) {
     case ContentChanged:
       switchToContent(false);

@@ -331,11 +331,14 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     try {
       //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
       insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
-          .TIME_POSITION_CLASS_PREROLL()), "Preroll");
+          .TIME_POSITION_CLASS_PREROLL()),
+          _fwConstants.TIME_POSITION_CLASS_PREROLL());
       insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
-          .TIME_POSITION_CLASS_MIDROLL()), "Midroll");
+          .TIME_POSITION_CLASS_MIDROLL()),
+          _fwConstants.TIME_POSITION_CLASS_MIDROLL());
       insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
-          .TIME_POSITION_CLASS_POSTROLL()), "postroll");
+          .TIME_POSITION_CLASS_POSTROLL()),
+          _fwConstants.TIME_POSITION_CLASS_POSTROLL());
     } catch (Exception e) {
       DebugMode.logE(TAG,
           "Error in adding ad slots to the list of ads to play", e);
@@ -438,18 +441,36 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     _adSpotManager.resetAds();
   }
 
-  private void insertAds(List<ISlot> slotList, String adType) {
+  private void insertAds(List<ISlot> slotList, int adType) {
     if (slotList == null) {
-      DebugMode.logD(TAG, "no " + adType + " is added");
       return;
     }
 
     DebugMode.logD(TAG,
-        adType + " ads count: " + String.valueOf(slotList.size()));
+        "Freewheel insertAds: " + String.valueOf(slotList.size())
+            + adTypeString(adType) + " ads");
     for (ISlot slot : slotList) {
-      FWAdSpot adSpot = FWAdSpot.create(slot);
+      FWAdSpot adSpot = FWAdSpot.create(slot,
+          adType == _fwConstants.TIME_POSITION_CLASS_POSTROLL());
       _adSpotManager.insertAd(adSpot);
     }
+  }
+
+  private String adTypeString(int adType) {
+    if (adType == _fwConstants.TIME_POSITION_CLASS_PREROLL()) {
+      return "PREROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_MIDROLL()) {
+      return "MIDROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_POSTROLL()) {
+      return "POSTROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_PAUSE_MIDROLL()) {
+      return "PAUSE_MIDROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_OVERLAY()) {
+      return "OVERLAY";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_DISPLAY()) {
+      return "DISPLAY";
+    }
+    return "UNKNOWN_TYPE";
   }
 
   @Override

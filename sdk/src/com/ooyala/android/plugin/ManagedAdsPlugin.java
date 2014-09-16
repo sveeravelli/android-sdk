@@ -48,7 +48,6 @@ public abstract class ManagedAdsPlugin<T extends AdSpot> implements
    */
   @Override
   public boolean onPlayheadUpdate(int playhead) {
-    DebugMode.logD(TAG, "onPlayheadUpdate");
     _lastAdModeTime = playhead;
     return _adSpotManager.adBeforeTime(_lastAdModeTime) != null;
   }
