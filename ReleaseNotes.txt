@@ -1,4 +1,9 @@
-Current Version: 2.7.0
+Current Version: 3.0.0_RC1
+
+------------ 3.0.0 ------------
+
+API Changes
+  [PBA-298] New Ad Manager API
 
 ------------ 2.7.0 ------------
 API/UI Changes
