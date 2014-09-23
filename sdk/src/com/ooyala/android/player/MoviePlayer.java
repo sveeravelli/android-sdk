@@ -166,18 +166,25 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
+
+    if (_basePlayer != null) {
     _basePlayer.init(_parent, _streams);
 
     if(_live) millisToResume = 0;
 
     DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
+    }
+    else {
+      DebugMode.logE(TAG, "Trying to resume MoviePlayer without a base player!");
+    }
   }
 
   public int timeToResume() {
     return _millisToResume;
   }
 
+  @Override
   public void destroy() {
     if (_basePlayer != null) {
       _basePlayer.deleteObserver(this);
@@ -196,22 +203,50 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public View getView() {
-    return _basePlayer.getView();
+    if (_basePlayer != null) {
+      return _basePlayer.getView();
+    } else {
+      DebugMode.logE(TAG, "Trying to getView without a Base Player");
+      return null;
+    }
   }
 
   @Override
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
+    if (_basePlayer != null) {
     _basePlayer.setParent(parent);
+    } else {
+      DebugMode.logE(TAG, "Trying to setParent MoviePlayer without a Base Player");
+    }
   }
 
   //Delegated to base player
   @Override
-  public void pause() { _basePlayer.pause(); }
+  public void pause() {
+    if (_basePlayer != null) {
+      _basePlayer.pause();
+    } else {
+      DebugMode.logE(TAG, "Trying to pause MoviePlayer without a Base Player");
+    }
+  }
   @Override
-  public void play() { DebugMode.logV( TAG, "play()" ); _basePlayer.play(); }
+  public void play() {
+    if (_basePlayer != null) {
+      DebugMode.logV( TAG, "play()" );
+      _basePlayer.play();
+    } else {
+      DebugMode.logE(TAG, "Trying to play MoviePlayer without a Base Player");
+    }
+  }
   @Override
-  public void stop() { _basePlayer.stop(); }
+  public void stop() {
+    if (_basePlayer != null) {
+      _basePlayer.play();
+    } else {
+    DebugMode.logE(TAG, "Trying to stop MoviePlayer without a Base Player");
+    }
+  }
 
   @Override
   public int currentTime() { return _basePlayer != null ? _basePlayer.currentTime() : 0; }
@@ -222,10 +257,18 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
 
+  @Override
   public boolean seekable() { return _seekable; }
   public void setSeekable(boolean seekable) { _seekable = seekable; }
+
   @Override
-  public void seekToTime(int timeInMillis) { if (_seekable) { _basePlayer.seekToTime(timeInMillis); } }
+  public void seekToTime(int timeInMillis) {
+    if (_basePlayer != null) {
+      if (_seekable) { _basePlayer.seekToTime(timeInMillis); }
+    } else {
+      DebugMode.logE(TAG, "Trying to seek MoviePlayer without a Base Player");
+    }
+}
 
   @Override
   public SeekStyle getSeekStyle() {
@@ -250,5 +293,11 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
   @Override
-  public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
+  public void setLiveClosedCaptionsEnabled(boolean enabled) {
+    if (_basePlayer != null) {
+      _basePlayer.setLiveClosedCaptionsEnabled(enabled);
+    } else {
+      DebugMode.logE(TAG, "Trying to setLiveClosedCaptionsEnabled MoviePlayer without a Base Player");
+    }
+  }
 }
