@@ -1233,7 +1233,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
         // send analytics ping
-      _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+      if (_analytics != null) {
+        _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+      }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
@@ -1696,8 +1698,10 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setBasePlayer(StreamPlayer basePlayer) {
     _basePlayer = basePlayer;
 
-    _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo()
-        .getUserAgent() : null);
+    if (_analytics != null) {
+      _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo()
+          .getUserAgent() : null);
+    }
 
     if (getCurrentItem() == null) {
       return;
