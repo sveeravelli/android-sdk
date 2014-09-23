@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 
@@ -24,26 +25,27 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
 
   private WeakReference<SampleAdPlugin> _plugin;
 
-  private State _state;
+  private StateNotifier _stateNotifier;
   private Timer _timer;
   private int _playhead = 0;
   private String _adText;
   private Handler _timerHandler;
 
-  public SampleAdPlayer(Context context, SampleAdPlugin plugin, ViewGroup parent) {
+  public SampleAdPlayer(Context context, StateNotifier notifier,
+      ViewGroup parent) {
     super(context);
     this.setLayoutParams(new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     this.setBackgroundColor(Color.BLACK);
     parent.addView(this);
-    _plugin = new WeakReference<SampleAdPlugin>(plugin);
+    _stateNotifier = notifier;
     _timerHandler = new Handler() {
       public void handleMessage(Message msg) {
         refresh();
       }
     };
-    setState(State.LOADING);
+    _stateNotifier.setState(State.LOADING);
   }
 
   @Override
@@ -64,7 +66,7 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
 
   @Override
   public State getState() {
-    return _state;
+    return _stateNotifier.getState();
   }
 
   @Override
@@ -83,7 +85,7 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
         }
       }, REFRESH_RATE, REFRESH_RATE);
     }
-    setState(State.PLAYING);
+    _stateNotifier.setState(State.PLAYING);
   }
 
   @Override
@@ -106,11 +108,10 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
     if (_playhead >= DURATION) {
       _timer.cancel();
       _timer = null;
-      setState(State.COMPLETED);
+      _stateNotifier.setState(State.COMPLETED);
     } else {
-      _plugin.get().onPlayerPlayheadChange();
+      _stateNotifier.notifyPlayheadChange();
     }
-
   }
 
   @Override
@@ -139,7 +140,6 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
   @Override
   public void suspend() {
     // TODO Auto-generated method stub
-
   }
 
   public void loadAd(SampleAdSpot ad) {
@@ -149,11 +149,7 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
       _adText = "null";
     }
     this.setText(_adText);
-    setState(State.READY);
+    _stateNotifier.setState(State.READY);
   }
 
-  public void setState(State state) {
-    _state = state;
-    _plugin.get().onPlayerStateChange();
-  }
 }
