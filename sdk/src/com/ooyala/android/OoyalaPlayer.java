@@ -1351,7 +1351,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       return;
     }
 
-    MoviePlayer mp = (MoviePlayer) _player;
+    MoviePlayer mp = _player;
     // If we're given the "cc" language, we know it's live closed captions
     if (_language == LIVE_CLOSED_CAPIONS_LANGUAGE) {
       mp.setLiveClosedCaptionsEnabled(true);
@@ -1396,7 +1396,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // If our player found live closed captions, only show option for CC.
     if (_player != null && (_player instanceof MoviePlayer)
-        && ((MoviePlayer) _player).isLiveClosedCaptionsAvailable()) {
+        && _player.isLiveClosedCaptionsAvailable()) {
       Set<String> retval = new HashSet<String>();
       retval.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
       return retval;
@@ -1726,7 +1726,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             }
 
             if (_player != null && (_player instanceof MoviePlayer)) {
-              ((MoviePlayer) _player).setBasePlayer(_basePlayer);
+              _player.setBasePlayer(_basePlayer);
             }
           }
         }));
