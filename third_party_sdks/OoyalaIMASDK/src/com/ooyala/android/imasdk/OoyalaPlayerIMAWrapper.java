@@ -54,7 +54,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
   public void playAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Playing Ad");
     _imaManager._adPlayer.init(_player, _adSpot, _player.createStateNotifier());
-    _player.play();
+    _imaManager._adPlayer.play();
     _isPlayingIMAAd = true;
   }
 
@@ -110,9 +110,12 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
 
   @Override
   public VideoProgressUpdate getProgress() {
-    int durationMs = _player.getDuration();
-    int playheadMs = _player.getPlayheadTime();
-
+	int durationMs = 0;
+	int playheadMs = 0;
+	if (_player.getState() == State.PAUSED || _player.getState() == State.READY || _player.getState() == State.PLAYING) {
+	  durationMs = _player.getDuration();
+	  playheadMs = _player.getPlayheadTime();
+	}
     if(!_isPlayingIMAAd) {
       playheadMs += _liveContentTimePlayed;
     }
