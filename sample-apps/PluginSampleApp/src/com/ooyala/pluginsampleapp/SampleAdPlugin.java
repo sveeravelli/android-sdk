@@ -6,10 +6,12 @@ import android.content.Context;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.StateNotifierListener;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 
-public class SampleAdPlugin implements AdPluginInterface {
+public class SampleAdPlugin implements AdPluginInterface, StateNotifierListener {
   private WeakReference<OoyalaPlayer> _player;
   private Context _context;
 
@@ -18,10 +20,13 @@ public class SampleAdPlugin implements AdPluginInterface {
   private SampleAdSpot _midroll;
   private SampleAdSpot _postroll;
   private SampleAdSpot _adToPlay;
+  private StateNotifier _stateNotifier;
 
   SampleAdPlugin(Context context, OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
     _context = context;
+    _stateNotifier = _player.get().createStateNotifier();
+    _stateNotifier.addListener(this);
   }
 
   @Override
@@ -122,29 +127,24 @@ public class SampleAdPlugin implements AdPluginInterface {
 
   }
 
-  public void onPlayerStateChange() {
-    if (_adPlayer == null) {
-      return;
-    }
-
-    if (_adPlayer.getState() == State.COMPLETED) {
-      _player.get().getLayout().removeView(_adPlayer);
-      _adPlayer.destroy();
-      _adPlayer = null;
-      _player.get().exitAdMode(this);
-    } else {
-      OoyalaPlayer.notifyStateChange(_adPlayer);
-    }
-  }
-
-  public void onPlayerPlayheadChange() {
-    _player.get().notifyTimeChange(_adPlayer);
-  }
-
   private void playAd(SampleAdSpot ad) {
-    _adPlayer = new SampleAdPlayer(_context, this, _player.get().getLayout());
+    _adPlayer = new SampleAdPlayer(_context, _stateNotifier, _player.get()
+        .getLayout());
     _adPlayer.loadAd(_adToPlay);
     _adPlayer.play();
   }
 
+  @Override
+  public void onStateChange(StateNotifier notifier) {
+    if (_adPlayer == null) {
+      return;
+    }
+
+    if (_stateNotifier.getState() == State.COMPLETED) {
+      _player.get().getLayout().removeView(_adPlayer);
+      _adPlayer.destroy();
+      _adPlayer = null;
+      _player.get().exitAdMode(this);
+    }
+  }
 }
