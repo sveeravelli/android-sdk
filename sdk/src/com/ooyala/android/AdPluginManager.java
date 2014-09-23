@@ -2,7 +2,9 @@ package com.ooyala.android;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
@@ -292,6 +294,15 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     _activePlugin = plugin;
     _admode = AdMode.PluginInitiated;
     return true;
+  }
+
+  @Override
+  public Set<Integer> cuePoints() {
+    Set<Integer> cuePoints = new HashSet<Integer>();
+    for (AdPluginInterface plugin : _plugins) {
+      cuePoints.addAll(plugin.cuePoints());
+    }
+    return cuePoints;
   }
 
 }

@@ -2018,4 +2018,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   public StateNotifier createStateNotifier() {
     return new StateNotifier(this);
   }
+
+  @Override
+  public Set<Integer> cuePoints() {
+    return _adManager.cuePoints();
+  }
 }

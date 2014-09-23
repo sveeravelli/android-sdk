@@ -58,22 +58,6 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.getAlignment() == 0);
   }
 
-  public void testIdenticalSpots() {
-    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
-
-    TestAdSpot s0 = TestAdSpot.create(0);
-    manager.insertAd(s0);
-    assertTrue(manager.size() == 1);
-
-    TestAdSpot s1 = TestAdSpot.create(1000);
-    manager.insertAd(s1);
-    assertTrue(manager.size() == 2);
-    manager.insertAd(s1);
-    assertTrue(manager.size() == 2);
-    manager.insertAd(TestAdSpot.create(0));
-    assertTrue(manager.size() == 2);
-  }
-
   public void testAdsBeforeTime() {
     AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
 
@@ -139,4 +123,68 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.adBeforeTime(30000) == null);
   }
 
+  public void testCuePoints() {
+    TestAdSpot s0 = TestAdSpot.create(0);
+    TestAdSpot s1 = TestAdSpot.create(1000);
+    TestAdSpot s2 = TestAdSpot.create(1000);
+    TestAdSpot s3 = TestAdSpot.create(2000);
+    TestAdSpot s4 = TestAdSpot.create(3000);
+    
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    manager.insertAd(s0);
+    assertTrue(manager.cuePoints().isEmpty());
+    manager.insertAd(s1);
+    assertTrue(manager.cuePoints().size() == 1);
+    assertTrue(manager.cuePoints().contains(1000));
+    manager.insertAd(s2);
+    assertTrue(manager.cuePoints().size() == 1);
+    manager.insertAd(s3);
+    assertTrue(manager.cuePoints().size() == 2);
+    assertTrue(manager.cuePoints().contains(2000));
+    manager.insertAd(s4);
+    assertTrue(manager.cuePoints().size() == 3);
+    assertTrue(manager.cuePoints().contains(3000));
+
+    manager.markAsPlayed(s0);
+    assertTrue(manager.cuePoints().size() == 3);
+    assertTrue(manager.cuePoints().contains(1000));
+    manager.markAsPlayed(s1);
+    assertTrue(manager.cuePoints().size() == 3);
+    manager.markAsPlayed(s2);
+    assertTrue(manager.cuePoints().size() == 2);
+    assertTrue(!manager.cuePoints().contains(1000));
+    manager.markAsPlayed(s3);
+    assertTrue(manager.cuePoints().size() == 1);
+    assertTrue(!manager.cuePoints().contains(2000));
+    manager.markAsPlayed(s4);
+    assertTrue(manager.cuePoints().size() == 0);
+
+    manager.resetAds();
+    assertTrue(manager.cuePoints().size() == 3);
+    assertTrue(manager.cuePoints().contains(1000));
+    assertTrue(manager.cuePoints().contains(2000));
+    assertTrue(manager.cuePoints().contains(3000));
+  }
+
+  public void testCuePointsWithList() {
+    TestAdSpot s0 = TestAdSpot.create(0);
+    TestAdSpot s1 = TestAdSpot.create(1000);
+    TestAdSpot s2 = TestAdSpot.create(1000);
+    TestAdSpot s3 = TestAdSpot.create(2000);
+    TestAdSpot s4 = TestAdSpot.create(3000);
+
+    List<TestAdSpot> adList = new ArrayList<TestAdSpot>();
+    adList.add(s0);
+    adList.add(s1);
+    adList.add(s2);
+    adList.add(s3);
+    adList.add(s4);
+
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    manager.insertAds(adList);
+    assertTrue(manager.cuePoints().size() == 3);
+    assertTrue(manager.cuePoints().contains(1000));
+    assertTrue(manager.cuePoints().contains(2000));
+    assertTrue(manager.cuePoints().contains(3000));
+  }
 }

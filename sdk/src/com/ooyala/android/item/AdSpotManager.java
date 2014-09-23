@@ -2,8 +2,10 @@ package com.ooyala.android.item;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ooyala.android.DebugMode;
@@ -16,11 +18,13 @@ public class AdSpotManager<T extends AdSpot> {
   private List<T> _ads;
   private Set<T> _playedAds;
   private int _timeAlignment;
+  private Map<Integer, Set<T>> _cuePointMap;
 
   public AdSpotManager() {
     _ads = new ArrayList<T>();
     _playedAds = new HashSet<T>();
     _timeAlignment = 0;
+    _cuePointMap = new HashMap<Integer, Set<T>>();
   }
 
   /**
@@ -28,6 +32,7 @@ public class AdSpotManager<T extends AdSpot> {
    */
   public void resetAds() {
     _playedAds.clear();
+    refreshCuePoints();
   }
 
   /**
@@ -58,6 +63,7 @@ public class AdSpotManager<T extends AdSpot> {
 
     _ads.add(ad);
     Collections.sort(_ads);
+    updateCuePoints(ad);
   }
 
   /**
@@ -69,6 +75,7 @@ public class AdSpotManager<T extends AdSpot> {
   public void insertAds(List<T> adSpots) {
     _ads.addAll(adSpots);
     Collections.sort(_ads);
+    refreshCuePoints();
   }
 
   /**
@@ -109,6 +116,7 @@ public class AdSpotManager<T extends AdSpot> {
     }
 
     _playedAds.add(ad);
+    updateCuePoints(ad);
   }
 
   /**
@@ -137,5 +145,42 @@ public class AdSpotManager<T extends AdSpot> {
    */
   public int getAlignment() {
     return _timeAlignment;
+  }
+
+  public Set<Integer> cuePoints() {
+    return _cuePointMap.keySet();
+  }
+
+  private void refreshCuePoints() {
+    _cuePointMap.clear();
+    for (T ad : _ads) {
+      this.updateCuePoints(ad);
+    }
+  }
+
+  private void updateCuePoints(T ad) {
+    if (ad == null || ad.getTime() <= 0) {
+      return;
+    }
+
+    Integer key = ad.getTime();
+    Set<T> adset = _cuePointMap.get(key);
+    if (!_playedAds.contains(ad)) {
+      // The ad is not played yet, check if we need to insert a cue point.
+      // it.
+      if (adset == null) {
+        adset = new HashSet<T>();
+        _cuePointMap.put(key, adset);
+      }
+      adset.add(ad);
+    } else {
+      // the ad is marked as played. check if we need to remove the cue point.
+      if (adset != null) {
+        adset.remove(ad);
+        if (adset.isEmpty()) {
+          _cuePointMap.remove(key);
+        }
+      }
+    }
   }
 }
