@@ -19,7 +19,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
-import com.ooyala.android.DebugMode;
 import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 
@@ -44,14 +43,12 @@ public class FCCTVRatingView extends View {
   private static final int FADE_OUT_MSEC = 1 * 1000;
   static final float MINI_HEIGHT_FACTOR = 0.2f;
   private long clickTime;
-  private Paint watermarkPaint;
   private Paint textPaint;
   private Paint blackPaint;
   private Paint whitePaint;
   private Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private Rect watermarkRect;
   private FCCTVRatingViewStampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
   private Bitmap nBitmap;
@@ -69,7 +66,6 @@ public class FCCTVRatingView extends View {
     initPaints( FCCTVRatingConfiguration.DEFAULT_OPACITY );
     this.miniTextSize = 0;
     this.miniTextScaleX = 0;
-    this.watermarkRect = new Rect();
     this.stampDimensions = new FCCTVRatingViewStampDimensions();
     this.nTVRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
   }
@@ -105,7 +101,6 @@ public class FCCTVRatingView extends View {
   protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
     if( ! hasTVRatingConfiguration() ) {
       setMeasuredDimension( 0, 0 );
-      watermarkRect.set( 0, 0, 0, 0 );
     }
     else {
       final int paddingLeft = getPaddingLeft();
@@ -120,30 +115,7 @@ public class FCCTVRatingView extends View {
       int measuredHeight = elementHeight + paddingTop + paddingBottom;
       measuredWidth = Math.max(measuredWidth, getSuggestedMinimumWidth());
       measuredHeight = Math.max(measuredHeight, getSuggestedMinimumHeight());
-      initWatermark( measuredWidth, measuredHeight );
       setMeasuredDimension( measuredWidth, measuredHeight );
-    }
-  }
-      
-  private void initWatermark( int measuredWidth, int measuredHeight ) {
-    if( isSquareish( measuredWidth, measuredHeight ) ) {
-      watermarkRect.set( 0, 0, measuredWidth, measuredHeight );
-    }
-    else {
-      final int watermarkWidth = (int)Math.round(measuredWidth * 0.5f);
-      int left;
-      switch( nTVRatingConfiguration.position ) {
-      default:
-      case TopLeft:
-      case BottomLeft:
-        left = 0;
-        break;
-      case TopRight:
-      case BottomRight:
-        left = watermarkWidth;
-        break;
-      }
-      watermarkRect.set( left, 0, Math.min(measuredWidth, left+watermarkWidth), measuredHeight );
     }
   }
 
@@ -166,22 +138,18 @@ public class FCCTVRatingView extends View {
   }
   
   private void initPaints( float opacity ) {
-    final int iOpaticy = (int)Math.round(255*opacity);
+    final int iOpacity = (int)Math.round(255*opacity);
     
-    watermarkPaint = new Paint();
-    watermarkPaint.setColor( Color.argb( (int)Math.round(iOpaticy*0.8f), 255, 255, 255 ) );
-    watermarkPaint.setStyle( Paint.Style.FILL );
-
     blackPaint = new Paint();
-    blackPaint.setColor( Color.argb( iOpaticy, 0, 0, 0 ) );
+    blackPaint.setColor( Color.argb( iOpacity, 0, 0, 0 ) );
     blackPaint.setStyle( Paint.Style.FILL );
 
     whitePaint = new Paint();
-    whitePaint.setColor( Color.argb( iOpaticy, 255, 255, 255 ) );
+    whitePaint.setColor( Color.argb( iOpacity, 255, 255, 255 ) );
     whitePaint.setStyle( Paint.Style.FILL );
 
     textPaint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG );
-    textPaint.setColor( Color.argb( iOpaticy, 255, 255, 255 ) );
+    textPaint.setColor( Color.argb( iOpacity, 255, 255, 255 ) );
     textPaint.setStyle( Paint.Style.FILL );
     Typeface tf = Typeface.create( "DroidSans", Typeface.BOLD );
     textPaint.setTypeface( tf );
@@ -289,32 +257,49 @@ public class FCCTVRatingView extends View {
     super.onDraw( canvas );
     maybeGenerateBitmap();
     if( hasBitmap() ) {
-      canvas.drawBitmap( nBitmap, watermarkRect.left, watermarkRect.top, null );
+      canvas.drawBitmap( nBitmap, stampDimensions.outerRect.left, stampDimensions.outerRect.top, null );
     }
   }
 
   private void maybeGenerateBitmap() {
-    if( hasValidRating() ) {      
-      stampDimensions.update( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), watermarkRect.width(), watermarkRect.height(), hasLabels() );
+    if( hasValidRating() ) {
+      stampDimensions.update( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), hasLabels() );
+      updateBitmapOrigin();
       generateBitmap();
     }
     else {
       freeResources();
     }
   }
-
-  private void generateBitmap() {
-    nBitmap = Bitmap.createBitmap( watermarkRect.width(), getMeasuredHeight(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
-    Canvas c = new Canvas( nBitmap );
-    drawBitmapWatermark( c );
-    drawBitmapStamp( c );
+  
+  private void updateBitmapOrigin() {
+    
   }
 
-  private void drawBitmapWatermark( Canvas c ) {
-    c.drawRect( 0, 0, nBitmap.getWidth(), nBitmap.getHeight(), watermarkPaint );
+  private void generateBitmap() {
+    nBitmap = Bitmap.createBitmap( stampDimensions.outerRect.width(), stampDimensions.outerRect.height(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
+    Canvas c = new Canvas( nBitmap );
+    drawBitmapStamp( c );
+  }
+  
+  private static Paint s_debugPaint;
+  private void debugDrawRect( Canvas c, Rect r ) {
+    if( s_debugPaint == null ) {
+      s_debugPaint = new Paint();
+      s_debugPaint.setColor( Color.argb( 0xCC, 255, 0, 0 ) );
+      s_debugPaint.setStyle( Paint.Style.STROKE );
+      s_debugPaint.setStrokeWidth( 2 );
+    }
+    c.drawRect( r, s_debugPaint );
+    c.drawLine( r.left, r.top, r.right, r.bottom, s_debugPaint );
+    c.drawLine( r.left, r.bottom, r.right, r.top, s_debugPaint );
   }
 
   private void drawBitmapStamp( Canvas c ) {
+//    debugDrawRect( c, stampDimensions.outerRect );
+//    debugDrawRect( c, stampDimensions.innerRect );
+//    debugDrawRect( c, stampDimensions.tvRect );
+//    debugDrawRect( c, stampDimensions.labelsRect );
     drawBitmapStampBackground( c );
     drawBitmapStampTV( c );
     drawBitmapStampLabels( c );

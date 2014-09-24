@@ -10,8 +10,7 @@ final class FCCTVRatingViewStampDimensions {
 
   private static final int WHITE_BORDER_DP = 2;
   private static final int BLACK_BORDER_DP = 4;
-  private static final float SQUARE_SCALE = 0.25f;
-  private static final float MAX_RATIO = 1.4f;
+  private static final int MINIMUM_SIZE_PT = 24; // different than iOS version, to work on small Android displays.
 
   // sizes are in pixels.
   public int miniHeight;
@@ -34,41 +33,67 @@ final class FCCTVRatingViewStampDimensions {
     return outerRect.contains( (int)x, (int)y );
   }
 
-  public void update( Context context, FCCTVRatingConfiguration TVRatingConfiguration, int measuredWidth, int measuredHeight, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+  public void update( Context context, FCCTVRatingConfiguration tvRatingConfiguration, int measuredWidth, int measuredHeight, boolean hasLabels ) {
     // the order of these 3 calls must be preserved.
     updateBorder( context );
-    updateDimensions( TVRatingConfiguration.scale, measuredWidth, measuredHeight, watermarkWidth );
-    updateRects( TVRatingConfiguration.position, watermarkWidth, watermarkHeight, hasLabels );
+    updateDimensions( context, tvRatingConfiguration.scale, measuredWidth, measuredHeight );
+    updateRects( tvRatingConfiguration.position, measuredWidth, measuredHeight, hasLabels );
   }
   
   private void updateBorder( Context context ) {
-    this.whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
-    this.blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
-    this.borderSize = this.whiteBorderSize + this.blackBorderSize;
+    whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
+    blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
+    borderSize = whiteBorderSize + blackBorderSize;
   }
   
-  private void updateDimensions( float scale, int measuredWidth, int measuredHeight, int watermarkWidth ) {
-    // todo: consider padding from parent layout?
-    if( FCCTVRatingView.isSquareish( measuredWidth, measuredHeight ) ) {
-      final int bitmapInnerSize = Math.round( Math.min(measuredWidth, measuredHeight) * SQUARE_SCALE );
-      this.innerWidth = bitmapInnerSize;
-      this.innerHeight = bitmapInnerSize;
-    }
-    else {
-      // the bitmap is never wider than taller; it has the opposite aspect ratio than the video, hence flipping height/width.
-      this.innerWidth = Math.round( scale * measuredHeight );
-      this.innerHeight = Math.round( scale * measuredWidth );
-    }
-    this.innerWidth = constrainInnerWidth( this.innerWidth, watermarkWidth, measuredHeight );
-    this.innerHeight = constrainInnerHeight( this.innerWidth, this.innerHeight, watermarkWidth, measuredHeight );
-    this.outerWidth = this.innerWidth + this.borderSize*2;
-    this.outerHeight = this.innerHeight + this.borderSize*2;
+  private void updateDimensions( Context context, float scale, int measuredWidth, int measuredHeight ) {
+    setInnerDimensions( context, scale, measuredWidth, measuredHeight );
+    setOuterFromInnerDimensions();
   }
   
-  private void updateRects( FCCTVRatingConfiguration.Position position, int watermarkWidth, int watermarkHeight, boolean hasLabels ) {
+  private void setInnerDimensions( Context context, float scale, int measuredWidth, int measuredHeight ) {
+    setBasicInnerDimentions( scale, measuredWidth, measuredHeight );
+    setFinalInnerDimensions( context );
+  }
+  
+  private void setBasicInnerDimentions( float scale, int measuredWidth, int measuredHeight ) {
+      // Base the square off the halved video
+    float w = measuredWidth;
+    float h = measuredHeight;
+    if (measuredWidth > measuredHeight) {
+      w = measuredWidth / 2;
+    } else {
+      h = measuredHeight / 2;
+    }
+    innerWidth = Math.round( scale * w );
+    innerHeight = Math.round( scale * h );
+  }
+  
+  private void setFinalInnerDimensions( Context context ) {
+    //    // Ensure width and height are of minimum size
+    //    +  int minimumSize = [self calculateMinimumSizeInPixels];
+    //    +  width = MAX( width, minimumSize );
+    //    +  height = MAX( height, minimumSize );
+    int minimumSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_PT, MINIMUM_SIZE_PT, context.getResources().getDisplayMetrics() );
+    innerWidth = Math.max( innerWidth, minimumSize );
+    innerHeight = Math.max( innerHeight, minimumSize );
+
+    //    +  //Square the stamp
+    //    +  height = MIN( height, width );
+    //    +  width = height;
+    int min = Math.min( innerHeight, innerWidth );
+    innerWidth = min;
+  }
+  
+  private void setOuterFromInnerDimensions() {
+    outerWidth = innerWidth + borderSize*2;
+    outerHeight = innerHeight + borderSize*2;
+  }
+  
+  private void updateRects( FCCTVRatingConfiguration.Position position, int measuredWidth, int measuredHeight, boolean hasLabels ) {
     int left, top;
-    int right = watermarkWidth - this.outerWidth;
-    int bottom = watermarkHeight - this.outerHeight;
+    int right = measuredWidth - outerWidth;
+    int bottom = measuredHeight - outerHeight;
     switch( position ) {
     default:
     case TopLeft:
@@ -89,64 +114,46 @@ final class FCCTVRatingViewStampDimensions {
       break;
     }
     
-    this.outerRect =
+    outerRect =
         new Rect(
             0,
             0,
-            this.outerWidth,
-            this.outerHeight
+            outerWidth,
+            outerHeight
             );
-    this.outerRect.offset( left, top );
+    outerRect.offset( left, top );
     
-    this.innerRect =
+    innerRect =
         new Rect(
-            this.whiteBorderSize,
-            this.whiteBorderSize,
-            this.outerWidth-this.whiteBorderSize,
-            this.outerHeight-this.whiteBorderSize
+            whiteBorderSize,
+            whiteBorderSize,
+            outerWidth-whiteBorderSize,
+            outerHeight-whiteBorderSize
             );
-    this.innerRect.offset( left, top );
+    innerRect.offset( left, top );
     
-    this.miniHeight = Math.round( this.innerHeight * FCCTVRatingView.MINI_HEIGHT_FACTOR );
+    miniHeight = Math.round( innerHeight * FCCTVRatingView.MINI_HEIGHT_FACTOR );
 
-    int tl = this.borderSize;
-    int tt = this.borderSize;
-    int tr = tl + this.innerWidth;
-    int tb = tt + this.miniHeight;
-    this.tvRect = new Rect( tl, tt, tr, tb );
-    this.tvRect.offset( left, top );
+    int tl = borderSize;
+    int tt = borderSize;
+    int tr = tl + innerWidth;
+    int tb = tt + miniHeight;
+    tvRect = new Rect( tl, tt, tr, tb );
+    tvRect.offset( left, top );
     
-    int ll = this.borderSize;
-    int lt = this.outerHeight - this.borderSize - miniHeight;
-    int lr = ll + this.innerWidth;
-    int lb = lt + this.miniHeight;
-    this.labelsRect = new Rect( ll, lt, lr, lb );
-    this.labelsRect.offset( left, top );
+    int ll = borderSize;
+    int lt = outerHeight - borderSize - miniHeight;
+    int lr = ll + innerWidth;
+    int lb = lt + miniHeight;
+    labelsRect = new Rect( ll, lt, lr, lb );
+    labelsRect.offset( left, top );
 
-    int rl = this.borderSize;
-    int rt = this.borderSize + miniHeight;
-    int rr = rl + this.innerWidth;
-    int rb = this.outerHeight - this.borderSize - (hasLabels ? miniHeight : 0);
-    this.ratingRect = new Rect( rl, rt, rr, rb );
-    this.ratingRect.offset( left, top );
-  }
-
-  private static int constrainInnerWidth( int innerWidth, int watermarkWidth, int watermarkHeight ) {
-    // * bitmap is not allowed to be bigger than 50% of watermark.
-    int dimension = Math.round( watermarkWidth * 0.5f );
-    innerWidth = Math.min( innerWidth, dimension );
-    return innerWidth;
-  }
-
-  private static int constrainInnerHeight( int innerWidth, int innerHeight, int watermarkWidth, int watermarkHeight ) {
-    // * bitmap is not allowed to be bigger than 50% of watermark.
-    int dimension = Math.round( watermarkHeight * 0.5f );
-    innerHeight = Math.min( innerHeight, dimension );
-    // * bitmap height must be >= width.
-    innerHeight = Math.max( innerHeight, innerWidth );
-    // * bitmap height must be <= width * ratio.
-    innerHeight = Math.min( innerHeight, Math.round( innerWidth * MAX_RATIO ) );
-    return innerHeight;
+    int rl = borderSize;
+    int rt = borderSize + miniHeight;
+    int rr = rl + innerWidth;
+    int rb = outerHeight - borderSize - (hasLabels ? miniHeight : 0);
+    ratingRect = new Rect( rl, rt, rr, rb );
+    ratingRect.offset( left, top );
   }
 
   public boolean isValid() {

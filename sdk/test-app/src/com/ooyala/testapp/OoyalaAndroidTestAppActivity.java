@@ -21,8 +21,8 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 import com.ooyala.android.configuration.Options;
-import com.ooyala.android.configuration.TVRatingConfiguration;
 import com.ooyala.android.testapp.R;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
@@ -38,7 +38,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private final String APIKEY = "";
   private final String SECRET = "";
   private final String PCODE = "BidTQxOqebpNk1rVsjs2sUJSTOZc";
-  private final String EMBEDCODE = "1zN3Fmazphf6PLaC9BGVpHCGrSlUl0Lq";
+  private final String EMBEDCODE = "5od253bzo-9DTMTY5q45pX-PRRXa5c4d";
   private final String ACCOUNT_ID = "pbk-373@ooyala.com";
   private final String PLAYERDOMAIN = "http://www.ooyala.com";
 
@@ -70,13 +70,14 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       e.printStackTrace();
     }
 
+    final FCCTVRatingConfiguration tvRatingConfiguration = new FCCTVRatingConfiguration.Builder().setDurationSeconds(5).build();
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player),
         PCODE,
         domain,
         DefaultControlStyle.AUTO,
         this,
-        new Options.Builder().setTVRatingConfiguration( TVRatingConfiguration.s_getDefaultTVRatingConfiguration().setTimerSeconds( 5 ) ).build() );
+        new Options.Builder().setTVRatingConfiguration( tvRatingConfiguration ).build() );
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);

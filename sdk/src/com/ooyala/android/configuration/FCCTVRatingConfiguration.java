@@ -29,7 +29,7 @@ public class FCCTVRatingConfiguration {
       this.opacity = DEFAULT_OPACITY;
     }
     
-    public FCCTVRatingConfiguration emit() {
+    public FCCTVRatingConfiguration build() {
       return new FCCTVRatingConfiguration( durationSeconds, position, scale, opacity );
     }
 
