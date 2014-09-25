@@ -8,56 +8,72 @@ import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 
 final class FCCTVRatingViewStampDimensions {
 
+  private static final class Dimensions {
+    public final int width;
+    public final int height;
+    public Dimensions( int width, int height ) {
+      this.width = width;
+      this.height = height;
+    }
+  }
+
   private static final int WHITE_BORDER_DP = 2;
   private static final int BLACK_BORDER_DP = 4;
   private static final int MINIMUM_SIZE_PT = 24; // different than iOS version, to work on small Android displays.
 
   // sizes are in pixels.
-  public int miniHeight;
-  public int whiteBorderSize;
-  public int blackBorderSize;
-  public int borderSize;
-  public int outerWidth; // including border.
-  public int outerHeight; // including border.
-  public int innerWidth; // excluding border.
-  public int innerHeight; // excluding border.
-  public Rect outerRect;
-  public Rect innerRect;
+  private int miniHeight;
+  // there's a white outer border
+  // and then a space inside that,
+  // called the black border,
+  // so the text doesn't hit the white border.
+  private int whiteBorderSize;
+  private int blackBorderSize;
+  private int totalBorderSize;
+  private Dimensions textableDimensions;
+  public int left;
+  public int top;
+  public Rect blackRect;
+  public Rect whiteRect;
   public Rect tvRect;
   public Rect labelsRect;
   public Rect ratingRect;
 
+  // fyi: there are relationships among values, so the order of calls is important in the code below.
+
   public FCCTVRatingViewStampDimensions() {}
-  
+
   public boolean contains( float x, float y ) {
-    return outerRect.contains( (int)x, (int)y );
+    return whiteRect.contains( (int)x-left, (int)y-top );
   }
 
   public void update( Context context, FCCTVRatingConfiguration tvRatingConfiguration, int measuredWidth, int measuredHeight, boolean hasLabels ) {
-    // the order of these 3 calls must be preserved.
     updateBorder( context );
     updateDimensions( context, tvRatingConfiguration.scale, measuredWidth, measuredHeight );
-    updateRects( tvRatingConfiguration.position, measuredWidth, measuredHeight, hasLabels );
+    updateRects( measuredWidth, measuredHeight, hasLabels );
+    updatePosition( tvRatingConfiguration.position, measuredWidth, measuredHeight );
   }
-  
+
   private void updateBorder( Context context ) {
+    // yet it really only needs to be done once, but the context requirement prevents it from going into the constructor.
     whiteBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, WHITE_BORDER_DP, context.getResources().getDisplayMetrics() );
     blackBorderSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, BLACK_BORDER_DP, context.getResources().getDisplayMetrics() );
-    borderSize = whiteBorderSize + blackBorderSize;
+    totalBorderSize = whiteBorderSize + blackBorderSize;
   }
-  
+
   private void updateDimensions( Context context, float scale, int measuredWidth, int measuredHeight ) {
-    setInnerDimensions( context, scale, measuredWidth, measuredHeight );
-    setOuterFromInnerDimensions();
+    textableDimensions = calculateTextableDimensions( context, scale, measuredWidth, measuredHeight );
   }
-  
-  private void setInnerDimensions( Context context, float scale, int measuredWidth, int measuredHeight ) {
-    setBasicInnerDimentions( scale, measuredWidth, measuredHeight );
-    setFinalInnerDimensions( context );
+
+  private Dimensions calculateTextableDimensions( Context context, float scale, int measuredWidth, int measuredHeight ) {
+    return
+        calculateFinalTextableDimensions( context,
+            calculateBasicTextableDimentions( scale, measuredWidth, measuredHeight )
+            );
   }
-  
-  private void setBasicInnerDimentions( float scale, int measuredWidth, int measuredHeight ) {
-      // Base the square off the halved video
+
+  private Dimensions calculateBasicTextableDimentions( float scale, int measuredWidth, int measuredHeight ) {
+    // Base the square off the halved video
     float w = measuredWidth;
     float h = measuredHeight;
     if (measuredWidth > measuredHeight) {
@@ -65,98 +81,67 @@ final class FCCTVRatingViewStampDimensions {
     } else {
       h = measuredHeight / 2;
     }
-    innerWidth = Math.round( scale * w );
-    innerHeight = Math.round( scale * h );
+    int textableWidth = Math.round( scale * w );
+    int textableHeight = Math.round( scale * h );
+    return new Dimensions( textableWidth, textableHeight );
   }
-  
-  private void setFinalInnerDimensions( Context context ) {
+
+  private Dimensions calculateFinalTextableDimensions( Context context, Dimensions textableSoFar ) {
+    int textableWidth = textableSoFar.width;
+    int textableHeight = textableSoFar.height;
+    // per iOS:
     //    // Ensure width and height are of minimum size
     //    +  int minimumSize = [self calculateMinimumSizeInPixels];
     //    +  width = MAX( width, minimumSize );
     //    +  height = MAX( height, minimumSize );
     int minimumSize = (int)TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_PT, MINIMUM_SIZE_PT, context.getResources().getDisplayMetrics() );
-    innerWidth = Math.max( innerWidth, minimumSize );
-    innerHeight = Math.max( innerHeight, minimumSize );
-
+    textableWidth = Math.max( textableWidth, minimumSize );
+    textableHeight = Math.max( textableHeight, minimumSize );
     //    +  //Square the stamp
     //    +  height = MIN( height, width );
     //    +  width = height;
-    int min = Math.min( innerHeight, innerWidth );
-    innerWidth = min;
+    int min = Math.min( textableHeight, textableWidth );
+    textableWidth = min;
+    return new Dimensions( textableWidth, textableHeight );
   }
-  
-  private void setOuterFromInnerDimensions() {
-    outerWidth = innerWidth + borderSize*2;
-    outerHeight = innerHeight + borderSize*2;
-  }
-  
-  private void updateRects( FCCTVRatingConfiguration.Position position, int measuredWidth, int measuredHeight, boolean hasLabels ) {
-    int left, top;
-    int right = measuredWidth - outerWidth;
-    int bottom = measuredHeight - outerHeight;
-    switch( position ) {
-    default:
-    case TopLeft:
-      left = 0;
-      top = 0;
-      break;
-    case BottomLeft:
-      left = 0;
-      top = bottom;
-      break;
-    case TopRight:
-      left = right;
-      top = 0;
-      break;
-    case BottomRight:
-      left = right;
-      top = bottom;
-      break;
-    }
-    
-    outerRect =
-        new Rect(
-            0,
-            0,
-            outerWidth,
-            outerHeight
-            );
-    outerRect.offset( left, top );
-    
-    innerRect =
-        new Rect(
-            whiteBorderSize,
-            whiteBorderSize,
-            outerWidth-whiteBorderSize,
-            outerHeight-whiteBorderSize
-            );
-    innerRect.offset( left, top );
-    
-    miniHeight = Math.round( innerHeight * FCCTVRatingView.MINI_HEIGHT_FACTOR );
 
-    int tl = borderSize;
-    int tt = borderSize;
-    int tr = tl + innerWidth;
+  private void updateRects( int measuredWidth, int measuredHeight, boolean hasLabels ) {
+    Rect textableRect = new Rect( totalBorderSize, totalBorderSize, textableDimensions.width, textableDimensions.height );
+    blackRect = new Rect( textableRect );
+    blackRect.inset( -blackBorderSize, -blackBorderSize );
+    whiteRect = new Rect( blackRect );
+    whiteRect.inset( -whiteBorderSize, -whiteBorderSize );
+
+    miniHeight = Math.round( textableRect.height() * FCCTVRatingView.MINI_HEIGHT_FACTOR );
+
+    int tl = textableRect.left;
+    int tt = textableRect.top;
+    int tr = textableRect.right;
     int tb = tt + miniHeight;
     tvRect = new Rect( tl, tt, tr, tb );
-    tvRect.offset( left, top );
-    
-    int ll = borderSize;
-    int lt = outerHeight - borderSize - miniHeight;
-    int lr = ll + innerWidth;
-    int lb = lt + miniHeight;
-    labelsRect = new Rect( ll, lt, lr, lb );
-    labelsRect.offset( left, top );
 
-    int rl = borderSize;
-    int rt = borderSize + miniHeight;
-    int rr = rl + innerWidth;
-    int rb = outerHeight - borderSize - (hasLabels ? miniHeight : 0);
+    int rl = textableRect.left;
+    int rt = tb;
+    int rr = textableRect.right;
+    int rb = textableRect.bottom - (hasLabels ? miniHeight : 0);
     ratingRect = new Rect( rl, rt, rr, rb );
-    ratingRect.offset( left, top );
+
+    int ll = textableRect.left;
+    int lt = rb;
+    int lr = textableRect.right;
+    int lb = textableRect.bottom;
+    labelsRect = new Rect( ll, lt, lr, lb );
   }
 
-  public boolean isValid() {
-    return innerWidth > 0 && innerHeight > 0;
+  private void updatePosition( FCCTVRatingConfiguration.Position position, int measuredWidth, int measuredHeight ) {
+    int right = measuredWidth - whiteRect.width();
+    int bottom = measuredHeight - whiteRect.height();
+    switch( position ) {
+    default:
+    case TopLeft:     left = 0;     top = 0;      break;
+    case BottomLeft:  left = 0;     top = bottom; break;
+    case TopRight:    left = right; top = 0;      break;
+    case BottomRight: left = right; top = bottom; break;
+    }
   }
 }

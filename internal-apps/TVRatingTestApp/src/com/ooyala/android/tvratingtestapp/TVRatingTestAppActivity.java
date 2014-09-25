@@ -21,8 +21,10 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
+import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration.Position;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 
 public class TVRatingTestAppActivity extends Activity implements Observer {
   
@@ -36,6 +38,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     }
   }
   
+  OoyalaPlayerLayout playerLayout;
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
@@ -62,10 +65,10 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     //Populate the embed map
     embedMap = new HashMap<String, MyMapRow>();
     FCCTVRatingConfiguration.Builder builder = new FCCTVRatingConfiguration.Builder();
-    embedMap.put("Square TopLeft", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.TopLeft).emit() ) );
-    embedMap.put("Tall TopRight", new MyMapRow( "tnMG93bzr1X1IJn-Jcjehub0WlX138vg", builder.setPosition(Position.TopRight).emit() ) );
-    embedMap.put("Wide BottomLeft", new MyMapRow( "VyN293bzq5EbxnKI0ff696-PSgHGStM6", builder.setPosition(Position.BottomLeft).emit() ) );
-    embedMap.put("Square BottomRight", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.BottomRight).emit() ) );
+    embedMap.put("Square TopLeft", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.TopLeft).setDurationSeconds(5).build() ) );
+    embedMap.put("Tall TopRight", new MyMapRow( "tnMG93bzr1X1IJn-Jcjehub0WlX138vg", builder.setPosition(Position.TopRight).setDurationSeconds(5).build() ) );
+    embedMap.put("Wide BottomLeft", new MyMapRow( "VyN293bzq5EbxnKI0ff696-PSgHGStM6", builder.setPosition(Position.BottomLeft).setDurationSeconds(5).build() ) );
+    embedMap.put("Square BottomRight", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.BottomRight).setDurationSeconds(5).build() ) );
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
 
@@ -78,7 +81,13 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
 
       @Override
       public void onClick(View v) {
-        loadPlayer();
+        if( player != null ) {
+          player.pause();
+        }
+        
+        FCCTVRatingConfiguration tvRatingConfiguration = embedMap.get(embedSpinner.getSelectedItem()).tvRatingConfiguration;
+        loadPlayer( tvRatingConfiguration );
+        
         String embedCode = embedMap.get(embedSpinner.getSelectedItem()).embedCode;
         if (player.setEmbedCode(embedCode)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
@@ -99,16 +108,17 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
 
   }
   
-  private void loadPlayer() {
+  private void loadPlayer( FCCTVRatingConfiguration tvRatingConfiguration ) {
     LinearLayout mainLayout = (LinearLayout)findViewById( R.id.mainLayout );
     if( player != null ) {
-      mainLayout.removeView( mainLayout );
+      mainLayout.removeView( playerLayout );
       player.deleteObserver( this );
     }
-    OoyalaPlayerLayout playerLayout = new OoyalaPlayerLayout( this );
+    playerLayout = new OoyalaPlayerLayout( this );
     LinearLayout.LayoutParams pllp = new LinearLayout.LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT );
     mainLayout.addView( playerLayout, pllp );
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
+    Options options = new Options.Builder().setTVRatingConfiguration(tvRatingConfiguration).build();
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController( playerLayout, PCODE, new PlayerDomain(DOMAIN), DefaultControlStyle.AUTO, null, options );
     player = playerLayoutController.getPlayer();
     player.addObserver(this);
   }

@@ -29,7 +29,7 @@ import com.ooyala.android.configuration.FCCTVRatingConfiguration;
  */
 
 public class FCCTVRatingView extends View {
-  
+
   private static final String TAG = "FCCTVRatingView";
   private static final long OVER_CLICKING_PREVENTION_MSEC = 250;
 
@@ -60,7 +60,7 @@ public class FCCTVRatingView extends View {
   public FCCTVRatingView( Context context ) {
     this( context, null );
   }
-  
+
   public FCCTVRatingView( Context context, AttributeSet attrs ) {
     super( context, attrs );
     initPaints( FCCTVRatingConfiguration.DEFAULT_OPACITY );
@@ -136,10 +136,10 @@ public class FCCTVRatingView extends View {
       freeResources();
     }
   }
-  
+
   private void initPaints( float opacity ) {
     final int iOpacity = (int)Math.round(255*opacity);
-    
+
     blackPaint = new Paint();
     blackPaint.setColor( Color.argb( iOpacity, 0, 0, 0 ) );
     blackPaint.setStyle( Paint.Style.FILL );
@@ -159,7 +159,7 @@ public class FCCTVRatingView extends View {
     clearPaint.setColor( Color.TRANSPARENT );
     clearPaint.setStyle( Paint.Style.FILL );
   }
-  
+
   public void setTVRating( FCCTVRating tvRating ) {
     if( tvRating != null && !tvRating.equals(nTVRating) ) {
       nTVRating = tvRating;
@@ -167,7 +167,7 @@ public class FCCTVRatingView extends View {
   	  startAnimation();
     }
   }
-  
+
   public FCCTVRating getTVRating() {
     return nTVRating;
   }
@@ -180,7 +180,7 @@ public class FCCTVRatingView extends View {
     	startFadeInAnimation();
     }
   }
-  
+
   private void startFadeInAnimation() {
 	  nFadeInAnimation = new AlphaAnimation( 0f, 1f );
 	  nFadeInAnimation.setDuration( FADE_IN_MSEC );
@@ -227,11 +227,11 @@ public class FCCTVRatingView extends View {
   private void freeResources() {
     nBitmap = null;
   }
-  
+
   private boolean hasTVRatingConfiguration() {
     return nTVRatingConfiguration != null;
   }
-  
+
   private boolean hasAnimation() {
     return nFadeInAnimation != null || nFadeOutAnimation != null;
   }
@@ -243,9 +243,13 @@ public class FCCTVRatingView extends View {
   private boolean hasLabels() {
     return nTVRating != null && nTVRating.labels != null && nTVRating.labels.length() > 0;
   }
-  
+
   private boolean hasClickthrough() {
     return nTVRating != null && nTVRating.clickthrough != null;
+  }
+
+  private boolean hasValidStampDimensions() {
+    return stampDimensions.whiteRect.width() > 0 && stampDimensions.whiteRect.height() > 0;
   }
 
   private boolean hasBitmap() {
@@ -257,49 +261,29 @@ public class FCCTVRatingView extends View {
     super.onDraw( canvas );
     maybeGenerateBitmap();
     if( hasBitmap() ) {
-      canvas.drawBitmap( nBitmap, stampDimensions.outerRect.left, stampDimensions.outerRect.top, null );
+      canvas.drawBitmap( nBitmap, stampDimensions.left, stampDimensions.top, null );
     }
   }
 
   private void maybeGenerateBitmap() {
     if( hasValidRating() ) {
       stampDimensions.update( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), hasLabels() );
-      updateBitmapOrigin();
-      generateBitmap();
+      if( hasValidStampDimensions() ) {
+        generateBitmap();
+      }
     }
     else {
       freeResources();
     }
   }
-  
-  private void updateBitmapOrigin() {
-    
-  }
 
   private void generateBitmap() {
-    nBitmap = Bitmap.createBitmap( stampDimensions.outerRect.width(), stampDimensions.outerRect.height(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
+    nBitmap = Bitmap.createBitmap( stampDimensions.whiteRect.width(), stampDimensions.whiteRect.height(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
     Canvas c = new Canvas( nBitmap );
     drawBitmapStamp( c );
   }
-  
-  private static Paint s_debugPaint;
-  private void debugDrawRect( Canvas c, Rect r ) {
-    if( s_debugPaint == null ) {
-      s_debugPaint = new Paint();
-      s_debugPaint.setColor( Color.argb( 0xCC, 255, 0, 0 ) );
-      s_debugPaint.setStyle( Paint.Style.STROKE );
-      s_debugPaint.setStrokeWidth( 2 );
-    }
-    c.drawRect( r, s_debugPaint );
-    c.drawLine( r.left, r.top, r.right, r.bottom, s_debugPaint );
-    c.drawLine( r.left, r.bottom, r.right, r.top, s_debugPaint );
-  }
 
   private void drawBitmapStamp( Canvas c ) {
-//    debugDrawRect( c, stampDimensions.outerRect );
-//    debugDrawRect( c, stampDimensions.innerRect );
-//    debugDrawRect( c, stampDimensions.tvRect );
-//    debugDrawRect( c, stampDimensions.labelsRect );
     drawBitmapStampBackground( c );
     drawBitmapStampTV( c );
     drawBitmapStampLabels( c );
@@ -307,9 +291,9 @@ public class FCCTVRatingView extends View {
   }
 
   private void drawBitmapStampBackground( Canvas c ) {
-    c.clipRect( stampDimensions.outerRect, Region.Op.REPLACE );
-    c.drawRect( stampDimensions.outerRect, whitePaint );
-    c.drawRect( stampDimensions.innerRect, blackPaint );
+    c.clipRect( stampDimensions.whiteRect, Region.Op.REPLACE );
+    c.drawRect( stampDimensions.whiteRect, whitePaint );
+    c.drawRect( stampDimensions.blackRect, blackPaint );
   }
 
   private void drawBitmapStampTV( Canvas c ) {
