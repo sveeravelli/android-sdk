@@ -297,10 +297,10 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   }
 
   @Override
-  public Set<Integer> cuePoints() {
+  public Set<Integer> getCuePointsInMilliSeconds() {
     Set<Integer> cuePoints = new HashSet<Integer>();
     for (AdPluginInterface plugin : _plugins) {
-      cuePoints.addAll(plugin.cuePoints());
+      cuePoints.addAll(plugin.getCuePointsInMilliSeconds());
     }
     return cuePoints;
   }

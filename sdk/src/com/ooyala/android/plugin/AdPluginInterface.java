@@ -85,5 +85,5 @@ public interface AdPluginInterface extends LifeCycleInterface {
    * This returns the cue points.
    * 
    */
-  public Set<Integer> cuePoints();
+  public Set<Integer> getCuePointsInMilliSeconds();
 }

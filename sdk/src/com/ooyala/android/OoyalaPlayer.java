@@ -2020,7 +2020,27 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   @Override
-  public Set<Integer> cuePoints() {
-    return _adManager.cuePoints();
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return _adManager.getCuePointsInMilliSeconds();
+  }
+
+  public Set<Integer> getCuePointsInPercentage() {
+    Set<Integer> cuePoints = new HashSet<Integer>();
+    int duration = getDuration();
+
+    if (isShowingAd() || duration <= 0) {
+      return cuePoints;
+    }
+
+    for (Integer i : _adManager.getCuePointsInMilliSeconds()) {
+      if (i <= 0) {
+        continue;
+      }
+
+      int point = Math.min(i * 100 / duration, 100);
+      cuePoints.add(point);
+    }
+
+    return cuePoints;
   }
 }

@@ -127,7 +127,7 @@ public abstract class ManagedAdsPlugin<T extends AdSpot> implements
   }
 
   @Override
-  public Set<Integer> cuePoints() {
-    return _adSpotManager.cuePoints();
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return _adSpotManager.getCuePointsInMilliSeconds();
   }
 }

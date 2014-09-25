@@ -45,5 +45,5 @@ public interface AdPluginManagerInterface {
    */
   public boolean requestAdMode(final AdPluginInterface plugin);
 
-  public Set<Integer> cuePoints();
+  public Set<Integer> getCuePointsInMilliSeconds();
 }

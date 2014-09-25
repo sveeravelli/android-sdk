@@ -372,7 +372,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   }
 
   @Override
-  public Set<Integer> cuePoints() {
+  public Set<Integer> getCuePointsInMilliSeconds() {
     return new HashSet<Integer>();
   }
 }
