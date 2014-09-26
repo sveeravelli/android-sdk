@@ -112,31 +112,134 @@ public class AdSpotManagerTest extends AndroidTestCase {
     manager.setAlignment(timeAlignment);
 
     TestAdSpot s0 = TestAdSpot.create(0);
-    TestAdSpot s1 = TestAdSpot.create(1000);
-    TestAdSpot s2 = TestAdSpot.create(10500);
-    TestAdSpot s3 = TestAdSpot.create(25000);
-    TestAdSpot s4 = TestAdSpot.create(31000);
+    TestAdSpot s1 = TestAdSpot.create(10500);
+    TestAdSpot s2 = TestAdSpot.create(35000);
+    TestAdSpot s3 = TestAdSpot.create(51000);
 
     adList.add(s2);
     adList.add(s1);
     adList.add(s3);
     adList.add(s0);
-    adList.add(s4);
     manager.insertAds(adList);
 
-    assertTrue(manager.size() == 5);
     assertTrue(manager.adBeforeTime(0) == s0);
-    manager.markAsPlayed(s0);
-    assertTrue(manager.adBeforeTime(0) == s1);
-    manager.markAsPlayed(s1);
+    assertTrue(manager.adBeforeTime(10000) == s1);
+    assertTrue(manager.adBeforeTime(20000) == s1);
+    assertTrue(manager.adBeforeTime(30000) == s1);
+    assertTrue(manager.adBeforeTime(40000) == s2);
+    assertTrue(manager.adBeforeTime(50000) == s3);
+  }
+
+  public void testAdBeforeTimePreroll() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(0);
+    manager.insertAd(s0);
+
+    assertTrue(manager.adBeforeTime(0) == s0);
+    assertTrue(manager.adBeforeTime(1) == s0);
+    assertTrue(manager.adBeforeTime(1000000) == s0);
+  }
+
+  public void testAdsBeforePlaySingleMidroll() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(2000);
+    manager.insertAd(s0);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == s0);
+    assertTrue(manager.adBeforeTime(3000) == s0);
+  }
+
+  public void testAdsBeforePlayMultipleMidroll() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(2000);
+    TestAdSpot s1 = TestAdSpot.create(5000);
+    TestAdSpot s2 = TestAdSpot.create(10000);
+    manager.insertAd(s0);
+    manager.insertAd(s1);
+    manager.insertAd(s2);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == s0);
+    assertTrue(manager.adBeforeTime(4000) == s0);
+    assertTrue(manager.adBeforeTime(5000) == s1);
+    assertTrue(manager.adBeforeTime(8000) == s1);
     assertTrue(manager.adBeforeTime(10000) == s2);
-    manager.markAsPlayed(s2);
-    assertTrue(manager.adBeforeTime(20000) == null);
-    assertTrue(manager.adBeforeTime(30000) == s3);
-    manager.markAsPlayed(s3);
-    assertTrue(manager.adBeforeTime(30000) == s4);
-    manager.markAsPlayed(s4);
-    assertTrue(manager.adBeforeTime(30000) == null);
+    assertTrue(manager.adBeforeTime(2800000) == s2);
+  }
+
+  public void testAdBeforeTimePrerollMarkedAsPlayed() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(0);
+    manager.insertAd(s0);
+    assertTrue(manager.adBeforeTime(0) == s0);
+
+    manager.markAsPlayed(s0);
+    assertTrue(manager.adBeforeTime(0) == null);
+  }
+
+  public void testAdsBeforePlayMultipleMidrollMarkedAsPlayed() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(2000);
+    TestAdSpot s1 = TestAdSpot.create(5000);
+    TestAdSpot s2 = TestAdSpot.create(10000);
+
+    manager.insertAd(s0);
+    manager.insertAd(s1);
+    manager.insertAd(s2);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == s0);
+    assertTrue(manager.adBeforeTime(4000) == s0);
+    assertTrue(manager.adBeforeTime(5000) == s1);
+    assertTrue(manager.adBeforeTime(8000) == s1);
+    assertTrue(manager.adBeforeTime(10000) == s2);
+    assertTrue(manager.adBeforeTime(2800000) == s2);
+
+    manager.markAsPlayed(s0);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == null);
+    assertTrue(manager.adBeforeTime(4000) == null);
+    assertTrue(manager.adBeforeTime(5000) == s1);
+    assertTrue(manager.adBeforeTime(8000) == s1);
+    assertTrue(manager.adBeforeTime(10000) == s2);
+    assertTrue(manager.adBeforeTime(2800000) == s2);
+  }
+
+  public void testAdsBeforePlayMultipleMidrollMarkedAsPlayedSeek() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(2000);
+    TestAdSpot s1 = TestAdSpot.create(5000);
+    TestAdSpot s2 = TestAdSpot.create(10000);
+
+    manager.insertAd(s0);
+    manager.insertAd(s1);
+    manager.insertAd(s2);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == s0);
+    assertTrue(manager.adBeforeTime(4000) == s0);
+    assertTrue(manager.adBeforeTime(5000) == s1);
+    assertTrue(manager.adBeforeTime(8000) == s1);
+    assertTrue(manager.adBeforeTime(10000) == s2);
+    assertTrue(manager.adBeforeTime(2800000) == s2);
+
+    manager.markAsPlayed(s1);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    assertTrue(manager.adBeforeTime(1000) == null);
+    assertTrue(manager.adBeforeTime(2000) == s0);
+    assertTrue(manager.adBeforeTime(4000) == s0);
+    assertTrue(manager.adBeforeTime(5000) == null);
+    assertTrue(manager.adBeforeTime(8000) == null);
+    assertTrue(manager.adBeforeTime(10000) == s2);
+    assertTrue(manager.adBeforeTime(2800000) == s2);
   }
 
 }
