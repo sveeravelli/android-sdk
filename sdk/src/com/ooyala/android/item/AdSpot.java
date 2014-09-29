@@ -20,13 +20,4 @@ public abstract class AdSpot implements Comparable<AdSpot> {
   public int compareTo(AdSpot ad) {
     return this.getTime() - ad.getTime();
   }
-
-  @Override
-  public boolean equals(Object o) {
-    if (!(o instanceof AdSpot)) {
-      return false;
-    }
-
-    return ((AdSpot) o).getTime() == this.getTime();
-  }
 }

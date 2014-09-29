@@ -70,8 +70,6 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.size() == 2);
     manager.insertAd(s1);
     assertTrue(manager.size() == 2);
-    manager.insertAd(TestAdSpot.create(0));
-    assertTrue(manager.size() == 2);
   }
 
   public void testAdsBeforeTime() {
@@ -240,6 +238,53 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.adBeforeTime(8000) == null);
     assertTrue(manager.adBeforeTime(10000) == s2);
     assertTrue(manager.adBeforeTime(2800000) == s2);
+  }
+  
+  public void testAdsBeforePlayMultiplePreroll() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+    TestAdSpot s0 = TestAdSpot.create(0);
+    TestAdSpot s1 = TestAdSpot.create(2000);
+    TestAdSpot s2 = TestAdSpot.create(4000);
+    manager.insertAd(s0);
+    manager.insertAd(s1);
+    manager.insertAd(s2);
+    manager.setAlignment(10000);
+
+    TestAdSpot s = manager.adBeforeTime(0);
+    assertTrue(s == s2 || s == s1 || s == s0 );
+    manager.markAsPlayed(s0);
+    s = manager.adBeforeTime(0);
+    assertTrue(s == s1 || s == s2);
+    manager.markAsPlayed(s1);
+    s = manager.adBeforeTime(0);
+    assertTrue(s == s2);
+    manager.markAsPlayed(s2);
+    s = manager.adBeforeTime(0);
+    assertTrue(s == null);
+  }
+  
+  public void testAdsBeforePlayMultipleMidrollSameTime() {
+    AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
+
+    TestAdSpot s0 = TestAdSpot.create(10000);
+    TestAdSpot s1 = TestAdSpot.create(10000);
+    TestAdSpot s2 = TestAdSpot.create(10000);
+    manager.insertAd(s0);
+    manager.insertAd(s1);
+    manager.insertAd(s2);
+
+    assertTrue(manager.adBeforeTime(0) == null);
+    TestAdSpot s = manager.adBeforeTime(10000);
+    assertTrue(s == s2 || s == s1 || s == s0);
+    manager.markAsPlayed(s0);
+    s = manager.adBeforeTime(10000);
+    assertTrue(s == s1 || s == s2);
+    manager.markAsPlayed(s1);
+    s = manager.adBeforeTime(10000);
+    assertTrue(s == s2);
+    manager.markAsPlayed(s2);
+    s = manager.adBeforeTime(10000);
+    assertTrue(s == null);
   }
 
 }

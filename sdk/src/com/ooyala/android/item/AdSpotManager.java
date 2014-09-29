@@ -83,6 +83,7 @@ public class AdSpotManager<T extends AdSpot> {
    */
   public T adBeforeTime(int time) {
     T candidate = null;
+    int candidateTime = 0;
     for (T ad : _ads) {
       int adTime = ad.getTime();
       if (_timeAlignment > 0) {
@@ -92,15 +93,18 @@ public class AdSpotManager<T extends AdSpot> {
       if (time < adTime) {
         break;
       } else {
-        candidate = ad;
+        if (adTime > candidateTime) {
+          candidateTime = adTime;
+          candidate = null;
+        }
+        if (!this._playedAds.contains(ad)) {
+          candidate = ad;
+        }
       }
     }
 
-    if (candidate == null || this._playedAds.contains(candidate)) {
-      return null;
-    } else {
-      return candidate;
-    }
+    return candidate;
+
   }
 
   /**
