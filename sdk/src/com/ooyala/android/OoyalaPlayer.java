@@ -2037,7 +2037,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         continue;
       }
 
-      int point = Math.min(i * 100 / duration, 100);
+      int point = (i >= duration) ? 100 : (i * 100 / duration);
       cuePoints.add(point);
     }
 
