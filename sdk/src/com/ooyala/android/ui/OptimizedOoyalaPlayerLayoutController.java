@@ -97,6 +97,10 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    */
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
     super(l, p, dcs);
+    extraInit(dcs);
+  }
+
+  private void extraInit(DefaultControlStyle dcs) {
     if (dcs == DefaultControlStyle.AUTO) {
       _fullscreenControls = _inlineControls;
       _fullscreenOverlay = _inlineOverlay;

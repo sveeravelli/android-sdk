@@ -331,8 +331,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       _player.setViewSize(dm.widthPixels, dm.heightPixels);
       _player.setView(_view);
+
       // Register SDK event listener
       _player.setOnEventListener(this);
+
+      // If we are using VisualON OSMP player without Discredix, enable eHLS playback
+      // eHLS playback will not work using the SecurePlayer
+      if (!isDiscredixLoaded()) {
+        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
+      }
 
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
@@ -461,8 +468,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     suspend(_player != null ? (int) _player.getPosition() : 0, getState());
   }
 
-  @Override
-  public void suspend(int millisToResume, State stateToResume) {
+  private void suspend(int millisToResume, State stateToResume) {
     DebugMode.logV(TAG, "Player Suspend");
     if (getState() == State.SUSPENDED) {
       return;

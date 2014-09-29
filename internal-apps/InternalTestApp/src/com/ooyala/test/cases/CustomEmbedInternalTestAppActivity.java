@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.test.BaseInternalTestAppActivity;
 import com.ooyala.test.R;
 

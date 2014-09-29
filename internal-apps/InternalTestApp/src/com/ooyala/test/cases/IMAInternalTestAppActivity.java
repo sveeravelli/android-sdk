@@ -45,7 +45,8 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     //embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
     embedMap.put("IMA Skip Ad (Google Provided)", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");  //Google provided
     embedMap.put("IMA Wrapper (Google Provided)", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");  //Google provided
-    embedMap.put(IMA_OVERRIDE_URL_FROM_CODE_LABEL, "Q0Y21vaToE56_FVxaLFoXZxJlc0YVoiY"); 
+    embedMap.put(IMA_OVERRIDE_URL_FROM_CODE_LABEL, "Q0Y21vaToE56_FVxaLFoXZxJlc0YVoiY");
+    embedMap.put("IMA Playlist", "NraTJyZDqrL9L_H8ws-47siVyywgy1N3"); // with all pre-roll, mid-roll, and post-rolls
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());

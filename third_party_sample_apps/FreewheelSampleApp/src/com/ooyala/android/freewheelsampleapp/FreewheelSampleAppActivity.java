@@ -4,26 +4,32 @@ package com.ooyala.android.freewheelsampleapp;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
-import com.ooyala.android.freewheelsampleapp.R;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class FreewheelSampleAppActivity extends Activity {
 
-  final String EMBED  = "RlODZyZDr93PAbk-a9fY7Phq93pA-Uwt";
   final String PCODE  = "5idHc6Pt1kJ18w4u9Q5jEwAQDYCH";
   final String DOMAIN = "http://www.ooyala.com";
 
-  OptimizedOoyalaPlayerLayoutController playerLayoutController;
-  OoyalaFreewheelManager freewheelManager;
+  private OptimizedOoyalaPlayerLayoutController playerLayoutController;
+  private OoyalaFreewheelManager freewheelManager;
+
+  private Spinner embedSpinner;
+  private Button setButton;
+  private Map<String, String> embedMap;
 
   /**
    * Called when the activity is first created.
@@ -32,9 +38,43 @@ public class FreewheelSampleAppActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    OoyalaPlayer player = playerLayoutController.getPlayer();
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(
+        playerLayout, PCODE, new PlayerDomain(DOMAIN));
+    final OoyalaPlayer player = playerLayoutController.getPlayer();
+
+    embedMap = new HashMap<String, String>();
+    embedMap.put("Freewheel Preroll", "Q5MXg2bzq0UAXXMjLIFWio_6U0Jcfk6v");
+    embedMap.put("Freewheel Midroll", "NwcGg4bzrwxc6rqAZbYij4pWivBsX57a");
+    embedMap.put("Freewheel Postroll", "NmcGg4bzqbeqXO_x9Rfj5IX6gwmRRrse");
+    embedMap.put("Freewheel PreMidPost", "NqcGg4bzoOmMiV35ZttQDtBX1oNQBnT-");
+    embedMap.put("Freewheel Overlay", "NucGg4bzrVrilZrMdlSA9tyg6Vty46DN");
+    embedMap.put("Freewheel PreMidPost Overlay",
+        "NscGg4bzpO9s5rUMyW-AAfoeEA7CX6hP");
+
+    embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        android.R.layout.simple_spinner_item);
+    adapter.addAll(embedMap.keySet());
+    adapter.notifyDataSetChanged();
+    embedSpinner.setAdapter(adapter);
+    setButton = (Button) findViewById(R.id.setButton);
+    setButton.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View arg0) {
+        Object embedKey = embedSpinner.getSelectedItem();
+        if (embedKey == null) {
+          return;
+        }
+        String embedCode = embedMap.get(embedKey.toString());
+        if (player.setEmbedCode(embedCode)) {
+          player.play();
+        } else {
+          Log.d(this.getClass().getName(), "Something Went Wrong!");
+        }
+      }
+    });
 
     //Initialize Freewheel Ad Manager
     freewheelManager = new OoyalaFreewheelManager(this, playerLayoutController);
@@ -49,12 +89,6 @@ public class FreewheelSampleAppActivity extends Activity {
     //freewheelParameters.put("fw_android_video_asset_id",  "ooyala_test_video_with_bvi_cuepoints");
 
     freewheelManager.overrideFreewheelParameters(freewheelParameters);
-
-    if (player.setEmbedCode(EMBED)) {
-      player.play();
-    } else {
-      Log.d(this.getClass().getName(), "Something Went Wrong!");
-    }
   }
 
   @Override

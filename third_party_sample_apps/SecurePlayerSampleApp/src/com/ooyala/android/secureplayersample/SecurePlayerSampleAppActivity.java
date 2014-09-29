@@ -2,6 +2,7 @@ package com.ooyala.android.secureplayersample;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -54,10 +55,11 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     playerAdapter.notifyDataSetChanged();
 
     //Populate the embed map
-    embedMap = new HashMap<String, String>();
-    embedMap.put("Clear HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
-    embedMap.put("Ooyala-Ingested Playready Sample VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
-    embedMap.put("Playready-Provided Sample VOD",      "tkZmhyazr-ekNG8wb5kNWA_LV3E8QiPY");
+    embedMap = new LinkedHashMap<String, String>();
+    embedMap.put("Ooyala-Ingested Playready Smooth VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
+    embedMap.put("Microsoft-Ingested Playready Smooth VOD",      "V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_");
+    embedMap.put("Microsoft-Ingested Clear Smooth VOD", "1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T");
+    embedMap.put("Ooyala-Ingested Clear HLS VOD",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);

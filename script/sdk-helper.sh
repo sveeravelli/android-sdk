@@ -50,6 +50,7 @@ function usage {
   echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
   echo "        -rc<CANDIDATE>        : set the release candidate number to <CANDIDATE>"
+  echo "        -f                    : force 'y' answer to interactive console question about dirty local git repo."
   echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
@@ -107,7 +108,7 @@ function git_check {
 function sanity_checks {
   echo "Running Sanity Checks..."
   custom_sanity_checks
-	echo "... done running sanity checks"
+  echo "... done running sanity checks"
 }
 
 function tests {
@@ -170,9 +171,19 @@ function verify_final_zips {
 
 # Generate the release
 function gen {
+  force_git_y=false
+  for i in $*; do
+  	case "$i" in
+	  -f) force_git_y=true;;
+      *) ;;
+	esac
+  done
+
   gen_currdir=`pwd`
   echo "Generating the release..."
-  git_check
+  if [[ ${force_git_y} != true ]]; then
+      git_check
+  fi
 
   tests=true
   set_version=false
@@ -183,6 +194,7 @@ function gen {
     case "$i" in
       -notests|-notest|-nt) tests=false;;
       -push|-p) push=true;;
+      -f) ;;
       *)
         if [[ "$i" =~ ${VERSION_REGEX} ]]; then
           set_version=true

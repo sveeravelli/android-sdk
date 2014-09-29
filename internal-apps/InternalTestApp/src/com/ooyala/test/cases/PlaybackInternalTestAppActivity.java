@@ -1,13 +1,13 @@
 package com.ooyala.test.cases;
 
-import com.ooyala.test.BaseInternalTestAppActivity;
-import com.ooyala.test.R;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+
+import com.ooyala.test.BaseInternalTestAppActivity;
+import com.ooyala.test.R;
 
 public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity {
 
@@ -31,6 +31,7 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     embedMap.put("MP4 Video",    "h4aHB1ZDqV7hbmLEv4xSOx3FdUUuephx");
     embedMap.put("VOD with CCs", "92cWp0ZDpDm4Q8rzHfVK6q9m6OtFP-ww");
     embedMap.put("WV-MP4",       "N3ZnF1ZDo2cUf0JIIFMaxv-gKgmF6Dvv");
+    embedMap.put("Avatar Widevine", "54NzJ4NTpMvOAm3p-rdp3qttbqkRad9I"); // WVM
     embedMap.put("Channel",      "ozNTJ2ZDqvPWyXTriQF_Ovcd1VuKHGdH");
     embedMap.put("Channel with pre-roll",    "FncDB0YTrvdMGK3Sva1NUmeQMuB33wbV");
     embedMap.put("Multiple Google IMA",      "4wbjhoYTp6oRqD6lslRn0xYVTbm2GBzh");

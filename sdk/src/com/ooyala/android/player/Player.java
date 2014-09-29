@@ -11,16 +11,16 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
  * @author michael.len
  *
  */
-public abstract class Player extends Observable {
+public class Player extends Observable implements PlayerInterface,
+    LifeCycleInterface {
   protected OoyalaPlayer _parent = null;
-  /** the current state of the player */
-  private State _state = State.INIT;
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
   protected SurfaceView _view = null;
@@ -28,6 +28,7 @@ public abstract class Player extends Observable {
   protected int _buffer = 0;
   protected boolean _fullscreen = false;
   protected boolean _pausable = true;
+  protected State _state = State.INIT;
 
   /**
    * Init the player
@@ -36,59 +37,15 @@ public abstract class Player extends Observable {
 
   public void init(OoyalaPlayer parent, Set<Stream> streams) {}
 
-  /**
-   * Pause the current video
-   */
-  public void pause() {}
-
-  /**
-   * Play the current video
-   */
-  public void play() {}
-
-  /**
-   * Stop playback, remove listeners
-   */
-  public void stop() {}
-
-  /**
-   * Get the current playhead time
-   * @return the current playhead time in milliseconds as an int
-   */
-  public int currentTime() {
-    return 0;
-  }
-
-  /**
-   * Get the current item's duration
-   * @return duration in milliseconds as an int
-   */
-  public int duration() {
-    return 0;
-  }
-
-  /**
-   * Get the current item's buffer
-   * @return buffer+played percentage as an int
-   */
-  public int buffer() {
-    return 0;
-  }
-
-  /**
-   * Set the current playhead time of the player
-   * @param timeInMillis int millis to set the playhead time to
-   */
-  public void seekToTime(int timeInMillis) {}
-
+  @Override
   public State getState() {
     return _state;
   }
 
   protected void setState(State state) {
-    this._state = state;
-    setChanged();
-    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    _state = state;
+    super.setChanged();
+    super.notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
   public OoyalaException getError() {
@@ -129,15 +86,81 @@ public abstract class Player extends Observable {
     return SeekStyle.ENHANCED;
   }
 
-  public abstract void reset();
+  @Override
+  public void reset() {
+    // TODO Auto-generated method stub
 
-  public abstract void suspend();
+  }
 
-  public abstract void suspend(int millisToResume, State stateToResume);
+  @Override
+  public void suspend() {
+    // TODO Auto-generated method stub
 
-  public abstract void resume();
+  }
 
-  public abstract void resume(int millisToResume, State stateToResume);
+  @Override
+  public void resume() {
+    // TODO Auto-generated method stub
 
-  public abstract void destroy();
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void destroy() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void pause() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void play() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void stop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public int currentTime() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int duration() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int buffer() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToTime(int timeInMillis) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public boolean seekable() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }
