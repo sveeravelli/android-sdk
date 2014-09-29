@@ -54,7 +54,9 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
     embedSpinner.setAdapter(embedAdapter);
 
     //Update the spinner with the embed map
-    embedAdapter.addAll(embedMap.keySet());
+    for (String key : embedMap.keySet()) {
+      embedAdapter.add(key);
+    }
     embedAdapter.notifyDataSetChanged();
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
