@@ -58,8 +58,6 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.getAlignment() == 0);
   }
 
-<<<<<<< HEAD
-=======
   public void testIdenticalSpots() {
     AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
 
@@ -74,7 +72,6 @@ public class AdSpotManagerTest extends AndroidTestCase {
     assertTrue(manager.size() == 2);
   }
 
->>>>>>> PBA-634
   public void testAdsBeforeTime() {
     AdSpotManager<TestAdSpot> manager = new AdSpotManager<TestAdSpot>();
 

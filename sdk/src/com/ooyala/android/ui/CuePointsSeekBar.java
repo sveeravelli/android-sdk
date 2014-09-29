@@ -13,8 +13,8 @@ public class CuePointsSeekBar extends SeekBar {
   private Set<Integer> _cuePoints;
   private Paint _paint;
 
-  private static final int CUE_POINT_COLOR = 0xff448cc9;
-  private static final float CUE_POINT_RADIUS_FACTOR = 6.0f;
+  private static final int CUE_POINT_COLOR = 0xffffffff;
+  private static final float CUE_POINT_RADIUS_FACTOR = 0.15f;
 
   public CuePointsSeekBar(Context context) {
     super(context);
@@ -54,7 +54,7 @@ public class CuePointsSeekBar extends SeekBar {
 
       for (Integer i : _cuePoints) {
         canvas.drawCircle(i * step + getThumbOffset(), height / 2, height
-            / CUE_POINT_RADIUS_FACTOR,
+            * CUE_POINT_RADIUS_FACTOR,
             _paint);
       }
     }
