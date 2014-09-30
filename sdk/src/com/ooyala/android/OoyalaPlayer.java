@@ -2018,4 +2018,29 @@ public class OoyalaPlayer extends Observable implements Observer,
   public StateNotifier createStateNotifier() {
     return new StateNotifier(this);
   }
+
+  @Override
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return _adManager.getCuePointsInMilliSeconds();
+  }
+
+  public Set<Integer> getCuePointsInPercentage() {
+    Set<Integer> cuePoints = new HashSet<Integer>();
+    int duration = getDuration();
+
+    if (isShowingAd() || duration <= 0) {
+      return cuePoints;
+    }
+
+    for (Integer i : _adManager.getCuePointsInMilliSeconds()) {
+      if (i <= 0) {
+        continue;
+      }
+
+      int point = (i >= duration) ? 100 : (i * 100 / duration);
+      cuePoints.add(point);
+    }
+
+    return cuePoints;
+  }
 }

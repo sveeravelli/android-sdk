@@ -36,7 +36,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private PlayPauseButton _playPause = null;
   private FullscreenButton _fullscreen = null;
   private ClosedCaptionsButton _closedCaptions = null;
-  private SeekBar _seek = null;
+  private CuePointsSeekBar _seek = null;
   private TextView _currTime = null;
   private TextView _duration = null;
   private TextView _liveIndicator = null;
@@ -114,7 +114,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
         ViewGroup.LayoutParams.WRAP_CONTENT);
     currTimeLP.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
     _currTime.setLayoutParams(currTimeLP);
-    _seek = new SeekBar(_seekWrapper.getContext());
+    _seek = new CuePointsSeekBar(_seekWrapper.getContext());
     LinearLayout.LayoutParams seekLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT,
         1f);
     seekLP.gravity = Gravity.CENTER;
@@ -144,9 +144,9 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _liveIndicator = new TextView(_liveWrapper.getContext());
     _liveIndicator.setText(LocalizationSupport.localizedStringFor("LIVE"));
     _liveIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
-    @SuppressWarnings("deprecation")
     LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
     liveIndicatorLP.gravity = Gravity.CENTER;
     _liveIndicator.setLayoutParams(liveIndicatorLP);
     _liveWrapper.addView(_liveIndicator);
@@ -248,6 +248,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     if (_seek != null && !_seeking) {
       _seek.setProgress(_player.getPlayheadPercentage());
       _seek.setSecondaryProgress(_player.getBufferPercentage());
+      _seek.setCuePoints(_player.getCuePointsInPercentage());
     }
     if (_duration != null && _currTime != null) {
       //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
