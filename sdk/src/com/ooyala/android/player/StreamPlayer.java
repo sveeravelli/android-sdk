@@ -72,5 +72,4 @@ public abstract class StreamPlayer extends Player {
     setChanged();
     notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
   }
-
 }

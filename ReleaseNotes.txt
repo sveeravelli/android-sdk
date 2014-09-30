@@ -1,4 +1,50 @@
-Current Version: 2.4.0_RC2_Playready_Epsilon
+Current Version: 3.0.0_RC1
+
+------------ 3.0.0 ------------
+
+API Changes
+  [PBA-298] New Ad Manager API
+
+------------ 2.7.0 ------------
+API/UI Changes
+[PBA-450] Removed the ability to use Paint-On or Roll-Up presentation styles for Closed Captions
+[PBA-485] Fix buffering state changes to be more consistent across both Base Stream Players
+[PBA-510] Add enableCustomSmoothPlayer setting for VisualOn enablement
+[PBA-503] Generate/use a UUID for more precise device tracking for Ooyala Analytics
+
+Bug Fixes
+[PBA-524] Fixed ANRs with using VisualOn while debugging or setting embed code
+[PBA-483] Fix scenario when Freewheel Postrolls would not play
+[PBA-477] Re-sort languages alphabetically in the closed captions language selection screen
+
+------------ 2.6.0 ------------
+API/Package Changes
+[PBA-358] Ooyala no longer provides Google IMA libraries alongside our integration. Please download these libraries from Google IMA directly
+
+Bug Fixes
+[PBA-405] Fix bug where current item duration was not available on Current Item Changed Notification
+[PBA-387] Add support of hh:mm:ss:ff timestamp format for Closed Captions
+
+------------ 2.5.0 ------------
+API/Class Package Changes
+[PBA-243] added beginFetchingAdvertisingId for replacement of LR_DEVICEID in VAST ads. Requires Google Play Services Library
+[PBA-320] Add setCustomDrmData for third party authentication tokens
+[PBA-297] Add DebugMode class for consistent logging and runtime assertions
+[PBA-18]  Add closed captions to full screen controller
+[PBK-680] Move UI classes to new package, update all sample apps as such
+[PBK-683] Move Data Model classes into their own package
+[PBK-688] Move Player classes to their own package
+[PBK-703] Move VAST classes into their own package
+[PBK-404] Support for Playready DRM
+
+Bug Fixes
+[PBA-315] Fixed crash with closed captions menu
+[PBA-311] re-aligned play button with pause button
+[PBK-691] Fix showing closed captions during advertisements
+[PB-3451] Fix Null Pointer when resuming a unauthorized video.
+[PBA-262] Fix app crash when ad is unauthorized
+[PBA-301] fix analytics logic by only report play request and play started once after each currentItemChange.
+[PBA-309] Updated javadocs to have more relevant classes
 
 ------------ 2.4.0 ------------
 Freewheel/IMA Bug fixes

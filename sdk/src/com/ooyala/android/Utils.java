@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
+import android.util.Base64;
 
 class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
@@ -26,6 +29,8 @@ class Utils {
 
   static final String SEPARATOR_AMPERSAND = "&";
   static final String SEPARATOR_TIME = ":";
+
+  private static final String TAG = Utils.class.getName();
 
   public static String device() {
     // temporarily disable HLS
@@ -131,16 +136,18 @@ class Utils {
     }
   }
 
-
-  public static double secondsFromTimeString(String time) {
-    String[] hms = time.split(SEPARATOR_TIME);
-    double multiplier = 1.0;
-    double milliseconds = 0.0;
-    for (int i = hms.length - 1; i >= 0; i--) {
-      milliseconds += (Double.parseDouble(hms[i]) * multiplier);
-      multiplier *= 60.0;
+  public static String encryptString(String rawString) {
+    byte[] bytes = rawString.getBytes();
+    MessageDigest digest = null;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+      return null;
     }
-    return milliseconds;
+    digest.reset();
+    String encrypted = Base64.encodeToString(digest.digest(bytes),
+        Base64.DEFAULT);
+    return encrypted;
   }
-
 }

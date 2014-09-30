@@ -50,6 +50,7 @@ function usage {
   echo "        -[notests|notest|nt]  : do not run the unit tests"
   echo "        -v<VERSION>           : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+"
   echo "        -rc<CANDIDATE>        : set the release candidate number to <CANDIDATE>"
+  echo "        -f                    : force 'y' answer to interactive console question about dirty local git repo."
   echo "        -[push|p]             : push the generated release. Also create a tag if -v<VERSION> was specified"
   echo "    pub_release|publish|pub|p : publish the release"
   echo "      options:"
@@ -107,7 +108,7 @@ function git_check {
 function sanity_checks {
   echo "Running Sanity Checks..."
   custom_sanity_checks
-	echo "... done running sanity checks"
+  echo "... done running sanity checks"
 }
 
 function tests {
@@ -135,6 +136,12 @@ function verify {
     echo "ERROR: docs not included"
     exit 1
   fi
+
+  if [[ ! ( -f "${ZIP_BASE}/Documentation/index.html" ) ]]; then 
+      echo "ERROR: docs are empty"
+      exit 1
+  fi
+
   if [[ ! ( -d "${ZIP_BASE}/SampleApps" ) ]]; then
     echo "ERROR: sample apps not included"
     exit 1
@@ -156,11 +163,27 @@ function verify {
   cd ${verify_currdir}
 }
 
+function verify_final_zips {
+	echo "Verifying the final .zip files..."
+	custom_verify_final_zips
+	echo "... done verifying the final .zip files."
+}
+
 # Generate the release
 function gen {
+  force_git_y=false
+  for i in $*; do
+  	case "$i" in
+	  -f) force_git_y=true;;
+      *) ;;
+	esac
+  done
+
   gen_currdir=`pwd`
   echo "Generating the release..."
-  git_check
+  if [[ ${force_git_y} != true ]]; then
+      git_check
+  fi
 
   tests=true
   set_version=false
@@ -171,6 +194,7 @@ function gen {
     case "$i" in
       -notests|-notest|-nt) tests=false;;
       -push|-p) push=true;;
+      -f) ;;
       *)
         if [[ "$i" =~ ${VERSION_REGEX} ]]; then
           set_version=true
@@ -223,11 +247,13 @@ function gen {
 
   custom_gen #also moves the jars into zip folder
 
+  gen_secureplayer
+  gen_vo
+
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
-  rm -rf ${FW_ZIP_BASE}/FreewheelSampleApp/libs/FWAdManager.jar
 
   #getting started guide and release notes
   cp getting_started.pdf ${ZIP_BASE}/
@@ -239,16 +265,20 @@ function gen {
   #version file
   version=$(get_version)
   saved_rc=$(get_rc)
+  git_rev=`git rev-parse HEAD`
   echo "v${version}_RC${saved_rc}" >> ${ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${ZIP_BASE}/VERSION
 
   #IMA version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
 
   #Freewheel version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${FW_ZIP_BASE}/VERSION
   echo "Tested with Freewheel SDK version ${fw_version}" >> ${FW_ZIP_BASE}/VERSION
+  echo "Git SHA: ${git_rev}" >> ${FW_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${FW_ZIP_BASE}/VERSION
 
   #docs
@@ -276,6 +306,8 @@ function gen {
   rm ${FW_ZIP_NAME}
   zip -r ${FW_ZIP_BASE} ${FW_ZIP_BASE}/*
   rm -rf ${FW_ZIP_BASE}
+
+  verify_final_zips
 
   echo
   echo "Release Generated!"
@@ -352,6 +384,9 @@ function pub {
     cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${FW_ZIP_NAME} to ${CANDIDATE_DIR}${FW_ZIP_NAME}"
     cp ${FW_ZIP_NAME} "${CANDIDATE_DIR}"${FW_ZIP_NAME}
+
+    pub_rc_secureplayer
+    pub_rc_vo
   else
     echo "Publishing the Release..."
     if [[ "`ls \"${RELEASE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
@@ -385,6 +420,9 @@ function pub {
     cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${CANDIDATE_DIR}${FW_ZIP_NAME} to ${RELEASE_DIR}${FW_ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${FW_ZIP_NAME} "${RELEASE_DIR}"${FW_ZIP_NAME}
+
+    pub_release_secureplayer
+    pub_release_vo
   fi
   cd "${pub_currdir}"
 }

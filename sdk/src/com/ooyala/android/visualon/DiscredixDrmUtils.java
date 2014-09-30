@@ -57,10 +57,13 @@ class DiscredixDrmUtils {
     boolean isDrmContent = false;
     try {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
+      DebugMode.logD(TAG, "isStreamProtected. Discredix Version: " + dlc.getDrmVersion());
       isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+    } catch (DrmGeneralFailureException e) {
       e.printStackTrace();
     }
     return isDrmContent;
@@ -145,7 +148,13 @@ class DiscredixDrmUtils {
   public static void warmDxDrmDlc(Context context){
     DebugMode.logD(TAG, "Warming DxDrmDlc");
     try {
-      DxDrmDlc.getDxDrmDlc(context, null);
+      IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, null);
+      try {
+        DebugMode.logD(TAG, "Discredix Version: " + dlc.getDrmVersion());
+      } catch (DrmGeneralFailureException e) {
+        DebugMode.logE(TAG, "Failed trying to get discredix version");
+        e.printStackTrace();
+      }
     } catch (DrmClientInitFailureException e) {
       e.printStackTrace();
     }

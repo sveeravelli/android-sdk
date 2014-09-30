@@ -17,6 +17,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
@@ -26,7 +27,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
   private List<String> _impressionURLs = new ArrayList<String>();
-
   private boolean _impressionSent = false;
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -51,10 +51,11 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
+    super.init(parent, ad, notifier);
     if (!(ad instanceof VASTAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     DebugMode.logD(TAG, "VAST Ad Player Loaded");
@@ -149,7 +150,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       setState(State.COMPLETED);
       return;
     }
-    if (_state != State.PLAYING) {
+    if (getState() != State.PLAYING) {
       sendTrackingEvent(TrackingEvent.PAUSE);
     }
     super.pause();
@@ -295,9 +296,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (currentAd() != null && currentAd().getClickTrackingURLs() != null) {
       Set<String> urls = currentAd().getClickTrackingURLs();
       if (urls != null) {
-        for (String url : urls) {
-          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-          ping(VASTAdSpot.urlFromAdUrlString(url));
+        for (String urlStr : urls) {
+          final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + url);
+          ping(url);
         }
       }
     }
@@ -319,17 +321,19 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
     Set<String> urls = currentAd().getTrackingEvents().get(event);
     if (urls != null) {
-      for (String url : urls) {
-        DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-        ping(VASTAdSpot.urlFromAdUrlString(url));
+      for (String urlStr : urls) {
+        final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+        DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + url);
+        ping(url);
       }
     }
   }
 
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-    for(String url : impressionURLs) {
-      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + VASTAdSpot.urlFromAdUrlString(url));
-      ping(VASTAdSpot.urlFromAdUrlString(url));
+    for(String urlStr : impressionURLs) {
+      final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
+      ping(url);
     }
     _impressionSent = true;
   }

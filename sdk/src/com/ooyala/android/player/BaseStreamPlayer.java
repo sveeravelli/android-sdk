@@ -76,7 +76,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public void pause() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
       case PLAYING:
         stopPlayheadTimer();
         _player.pause();
@@ -89,7 +89,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public void play() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
       case INIT:
       case LOADING:
         queuePlay();
@@ -124,9 +124,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public int currentTime() {
     if (_player == null) { return 0; }
-    switch (_state) {
+    switch (getState()) {
       case INIT:
-      case LOADING:
       case SUSPENDED:
         return 0;
       default:
@@ -138,9 +137,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public int duration() {
     if (_player == null) { return 0; }
-    switch (_state) {
+    switch (getState()) {
       case INIT:
-      case LOADING:
       case SUSPENDED:
         return 0;
       default:
@@ -176,7 +174,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   }
 
   private boolean isSeekAllowed() {
-    return _state == State.PAUSED || _state == State.READY || _state == State.COMPLETED || _state == State.PLAYING;
+    return getState() == State.PAUSED || getState() == State.READY
+        || getState() == State.COMPLETED || getState() == State.PLAYING;
   }
 
   protected void createMediaPlayer() {
@@ -221,7 +220,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void onPrepared(MediaPlayer mp) {
-    _view.setBackgroundColor(Color.TRANSPARENT);
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
@@ -243,11 +241,22 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public boolean onInfo(MediaPlayer mp, int what, int extra) {
 
+    //Set the visibility of the View above the surface to transparent, in order to show the video
+    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+      _view.setBackgroundColor(Color.TRANSPARENT);
+    }
     //These refer to when mid-playback buffering happens.  This doesn't apply to initial buffer
-    if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+    else if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
       DebugMode.logD(TAG, "onInfo: Buffering Starting! " + what + ", extra: " + extra);
+      setState(State.LOADING);
     } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
       DebugMode.logD(TAG, "onInfo: Buffering Done! " + what + ", extra: " + extra);
+      if (_player.isPlaying()) {
+        setState(State.PLAYING);
+      }
+      else {
+        setState(State.PAUSED);
+      }
     }
     return true;
   }
@@ -350,12 +359,13 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void suspend() {
-    suspend(_player != null ? _player.getCurrentPosition() : 0, _state);
+    suspend(_player != null ? _player.getCurrentPosition() : 0, getState());
   }
 
-  @Override
-  public void suspend(int millisToResume, State stateToResume) {
-    if (_state == State.SUSPENDED) { return; }
+  private void suspend(int millisToResume, State stateToResume) {
+    if (getState() == State.SUSPENDED) {
+      return;
+    }
     if (_player != null) {
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
@@ -399,7 +409,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
-    _state = State.INIT;
+    setState(State.INIT);
   }
 
   private void setVideoSize(int width, int height) {
@@ -417,12 +427,13 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _completedQueued = true;
   }
 
-  private void dequeueCompleted() {
+  private boolean dequeueCompleted() {
     if (_completedQueued) {
       _playQueued = false;
       _completedQueued = false;
-      setState(State.COMPLETED);
+      return true;
     }
+    return false;
   }
 
   // Must queue play and wait for ready
@@ -432,7 +443,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void dequeuePlay() {
     if (_playQueued) {
-      switch (_state) {
+      switch (getState()) {
         case PAUSED:
         case READY:
         case COMPLETED:
@@ -444,11 +455,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     }
   }
 
-  private void dequeueAll() {
-    dequeueCompleted();
-    dequeuePlay();
-  }
-
   @Override
   public boolean isPlaying() {
     return _player != null && _player.isPlaying();
@@ -456,8 +462,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   protected void setState(State state) {
-    super.setState(state);
-    dequeueAll();
+    if (dequeueCompleted()) {
+      super.setState(State.COMPLETED);
+    } else {
+      super.setState(state);
+      dequeuePlay();
+    }
   }
 
   @Override

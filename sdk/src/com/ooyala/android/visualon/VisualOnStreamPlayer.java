@@ -72,7 +72,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private boolean _isLiveClosedCaptionsEnabled = false;
 
   protected static final long TIMER_DELAY = 0;
-  protected static final long TIMER_PERIOD = 250;
+  protected static final long TIMER_PERIOD = 1000;
 
   protected boolean _hasDiscredix = false;
 
@@ -145,7 +145,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void play() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case LOADING:
       queuePlay();
@@ -156,7 +156,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case COMPLETED:
       DebugMode.logV(TAG, "Play: ready - about to start");
       if (_timeBeforeSuspend >= 0 ) {
-      	  seekToTime(_timeBeforeSuspend);
+        seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
       }
 
@@ -171,10 +171,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
     case SUSPENDED:
       queuePlay();
-      DebugMode.logD(TAG, "Play: Suspended already. re-queue: " + _state);
+      DebugMode.logD(TAG, "Play: Suspended already. re-queue: " + getState());
       break;
     default:
-      DebugMode.logD(TAG, "Play: invalid status? " + _state);
+      DebugMode.logD(TAG, "Play: invalid status? " + getState());
       break;
     }
   }
@@ -182,7 +182,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void pause() {
     _playQueued = false;
-    switch (_state) {
+    switch (getState()) {
     case PLAYING:
       stopPlayheadTimer();
       _player.pause();
@@ -213,7 +213,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return 0;
     }
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case SUSPENDED:
       return 0;
@@ -229,7 +229,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player == null) {
       return 0;
     }
-    switch (_state) {
+    switch (getState()) {
     case INIT:
     case SUSPENDED:
       return 0;
@@ -275,7 +275,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if (_player.setPosition(timeInMillis) < 0) {
       DebugMode.logE(TAG, "setPosition failed.");
     }
-    setState(State.LOADING);
+//    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
+//    setState(State.LOADING);
   }
 
   protected void createMediaPlayer() {
@@ -333,8 +334,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       _player.setViewSize(dm.widthPixels, dm.heightPixels);
       _player.setView(_view);
+
       // Register SDK event listener
       _player.setOnEventListener(this);
+
+      // If we are using VisualON OSMP player without Discredix, enable eHLS playback
+      // eHLS playback will not work using the SecurePlayer
+      if (!isDiscredixLoaded()) {
+        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
+      }
 
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
@@ -471,13 +479,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void suspend() {
-    suspend(_player != null ? (int)_player.getPosition() : 0, _state);
+    suspend(_player != null ? (int) _player.getPosition() : 0, getState());
   }
 
-  @Override
-  public void suspend(int millisToResume, State stateToResume) {
+  private void suspend(int millisToResume, State stateToResume) {
     DebugMode.logV(TAG, "Player Suspend");
-    if (_state == State.SUSPENDED) {
+    if (getState() == State.SUSPENDED) {
       return;
     }
     if (_player != null) {
@@ -520,8 +527,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void destroyBasePlayer() {
     if (_player != null) {
       stop();
-      _player.setView(null);
       _player.destroy();
+      _player.setView(null);
       _player = null;
     }
   }
@@ -533,7 +540,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _buffer = 0;
     _playQueued = false;
     _timeBeforeSuspend = -1;
-    _state = State.INIT;
+    setState(State.INIT);
   }
 
   private void currentItemCompleted() {
@@ -560,7 +567,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private void dequeuePlay() {
     if (_playQueued) {
-      switch (_state) {
+      switch (getState()) {
       case PAUSED:
       case READY:
       case COMPLETED:
@@ -589,14 +596,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected class PlayheadUpdateTimerTask extends TimerTask {
     @Override
     public void run() {
-      if (_player == null) {
-        return;
+      synchronized (_player) {
+        if (_player == null) {
+          return;
+        }
+        try {
+          if (_lastPlayhead != _player.getPosition()) {
+            _playheadUpdateTimerHandler.sendEmptyMessage(0);
+          }
+          _lastPlayhead = (int) _player.getPosition();
+        } catch (Exception e) {
+          DebugMode.logE(TAG, "Player is not null, yet position fails, player state: " + getState().name());
+        }
       }
-
-      if (_lastPlayhead != _player.getPosition()) {
-        _playheadUpdateTimerHandler.sendEmptyMessage(0);
-      }
-      _lastPlayhead = (int) _player.getPosition();
     }
   }
 
@@ -691,7 +703,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
-          setState(State.READY);
+          setState(State.PAUSED);
           dequeuePlay();
         }
       }
@@ -715,7 +727,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
-        setState(State.READY);
+        setState(State.PAUSED);
         dequeuePlay();
       }
       break;
@@ -883,7 +895,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       else {
         DebugMode.logD(TAG, "Acquiring rights");
         String authToken = _parent.getAuthToken();
-        AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath, authToken);
+        String customDRMData = _parent.getCustomDRMData();
+        AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath,
+            authToken, customDRMData);
         acquireRightsTask.execute();
       }
     }

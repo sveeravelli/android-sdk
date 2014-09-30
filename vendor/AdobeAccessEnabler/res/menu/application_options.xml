@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/authn_exp"
+          android:icon="@drawable/icon"
+          android:title="AuthN exp." />
+    <item android:id="@+id/authz_exp"
+          android:icon="@drawable/icon"
+          android:title="AuthZ exp." />
+    <item android:id="@+id/device_id"
+          android:icon="@drawable/icon"
+          android:title="Device ID" />
+    <item android:id="@+id/current_mvpd"
+          android:icon="@drawable/icon"
+          android:title="Current MVPD" />
+</menu>

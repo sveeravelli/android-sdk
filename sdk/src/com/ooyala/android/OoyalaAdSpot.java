@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
-import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
@@ -22,7 +22,7 @@ import com.ooyala.android.player.StreamPlayer;
  * Stores the info and metadata for an Ooyala Managed Adspot.
  *
  */
-public class OoyalaAdSpot extends AdSpot implements AuthorizableItem, PlayableItem {
+public class OoyalaAdSpot extends OoyalaManagedAdSpot implements AuthorizableItem, PlayableItem {
   static final String KEY_AUTHORIZED = "authorized";
   static final String KEY_CODE = "code";
   static final String KEY_STREAMS = "streams";  //OoyalaAdSpot, Video

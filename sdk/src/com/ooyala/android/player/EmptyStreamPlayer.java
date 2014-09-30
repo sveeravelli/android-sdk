@@ -49,7 +49,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
 
   @Override
   public void play() {
-    switch (_state) {
+    switch (getState()) {
     case PAUSED:
     case READY:
     case COMPLETED:
@@ -68,15 +68,7 @@ public class EmptyStreamPlayer extends StreamPlayer {
   }
 
   @Override
-  public void suspend(int millisToResume, State stateToResume) {
-  }
-
-  @Override
   public void resume() {
-  }
-
-  @Override
-  public void resume(int millisToResume, State stateToResume) {
   }
 
   @Override

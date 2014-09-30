@@ -28,10 +28,11 @@ class OoyalaAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
+    super.init(parent, ad, notifier);
     if (!(ad instanceof OoyalaAdSpot)) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     DebugMode.logD(TAG, "Ooyala Ad Player Loaded");
@@ -42,7 +43,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     //If this ad tried to authorize and failed
     if(!_ad.isAuthorized() && _ad.getAuthCode() > 0) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode()));
-      this._state = State.ERROR;
+      setState(State.ERROR);
       return;
     }
     if (_ad.getStream() == null || getBasePlayer() != null) {

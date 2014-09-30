@@ -25,19 +25,6 @@ public class UtilsTest extends AndroidTestCase {
     assertFalse(Utils.isNullOrEmpty(str));
   }
 
-  public void testTimeStringConverters() {
-    String time = "00:00:00.123";
-    assertEquals(Utils.secondsFromTimeString(time), 0.123);
-    time = "00:00:01";
-    assertEquals(Utils.secondsFromTimeString(time), 1.000);
-    time = "00:00:01.123";
-    assertEquals(Utils.secondsFromTimeString(time), 1.123);
-    time = "00:19:01.123";
-    assertEquals(Utils.secondsFromTimeString(time), 1141.123);
-    time = "91:29:34.999";
-    assertEquals(Utils.secondsFromTimeString(time), 329374.999);
-  }
-
   public void testGetParamsString() {
     Map<String, String> paramDictionary = new HashMap<String, String>();;
     paramDictionary.put("device", "android");
@@ -58,4 +45,5 @@ public class UtilsTest extends AndroidTestCase {
     String expected = "http://hello.com/omggggggg/omg?otherParamName=otherParamVal&paramName=paramVal";
     assertEquals(url.toString(), expected);
   }
+
 }

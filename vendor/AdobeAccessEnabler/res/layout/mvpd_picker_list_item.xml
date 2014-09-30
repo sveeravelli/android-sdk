@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  style="@style/MvpdListItemContainer">
+    <ImageView android:id="@+id/mvpd_logo" style="@style/MvpdListItemIcon" />
+    <TextView android:id="@+id/mvpd_name" style="@style/MvpdListItemName"/>
+</RelativeLayout>

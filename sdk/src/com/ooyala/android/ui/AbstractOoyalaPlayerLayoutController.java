@@ -1,6 +1,7 @@
 package com.ooyala.android.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
@@ -28,6 +29,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
+  private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
   public static enum DefaultControlStyle {
     NONE, AUTO
   };
@@ -45,8 +47,16 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected ListView listView;
   protected AlertDialog dialog;
 
-  private int selectedLanagugeIndex;
+  private int selectedLanguageIndex;
   private int selectedPresentationIndex;
+
+  public int getSelectedLanguageIndex() {
+    return this.selectedLanguageIndex;
+  }
+
+  public int getSelectedPresentationIndex() {
+    return this.selectedPresentationIndex;
+  }
 
   /**
    * Instantiate an AbstractOoyalaPlayerLayoutController
@@ -90,7 +100,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
-    this(l, new OoyalaPlayer(pcode,domain), dcs);
+    this(l, new OoyalaPlayer(pcode, domain, l.getContext()), dcs);
   }
 
   /**
@@ -104,7 +114,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain,
       DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    this(l, new OoyalaPlayer(pcode, domain, generator, l.getContext()), dcs);
   }
 
   /**
@@ -282,24 +292,26 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void showClosedCaptionsMenu() {
     Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
-    languageSet.add(LocalizationSupport.localizedStringFor("None"));
+    List<String> languageList = new ArrayList<String>(languageSet);
+    Collections.sort(languageList);
+    languageList.add(0, LocalizationSupport.localizedStringFor("None"));
 
     final Context context = _layout.getContext();
 
     if (this.optionList == null) {
       this.optionList = new ArrayList<String>();
       this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
-      this.optionList.addAll(languageSet);
-      this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
+      this.optionList.addAll(languageList);
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
+      //this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
       this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
     }
 
-
     listView = new ListView(context);
-    ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context, android.R.layout.simple_list_item_checked, this.optionList, this.selectedLanagugeIndex, this.selectedPresentationIndex, this);
+    ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context,
+        android.R.layout.simple_list_item_checked, this.optionList, this);
     listView.setAdapter(optionAdapter);
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setView(listView);
@@ -322,18 +334,48 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   }
 
   private void radioButtonClicked(int position) {
+
     if (position == (this.optionList.size() - 1)) {
       this.dialog.hide();
-    } else if (position != this.selectedLanagugeIndex && position != this.selectedPresentationIndex) {
-      if (position < this.optionList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
-        if (this.selectedLanagugeIndex != 0) {
-          ((RadioButton)listView.getChildAt(this.selectedLanagugeIndex)).setChecked(false);
+    } else {
+      if (this.selectedLanguageIndex != 0 && this.selectedLanguageIndex != position) {
+        int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
+        // check if listView is trying to unCheck Language Index that is
+        // out of screen
+        if (langIndexOnScreen < 0 || this.selectedLanguageIndex > listView.getLastVisiblePosition()) {
+          DebugMode.logD(TAG, "previous selected language index out of screen");
+        } else {
+          ((RadioButton) listView.getChildAt(langIndexOnScreen)).setChecked(false);
         }
-        this.selectedLanagugeIndex = position;
+      }
+      this.selectedLanguageIndex = position;
+      _player.setClosedCaptionsLanguage(this.optionList.get(position));
+    }
+
+    /*else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
+      if (position < this.optionList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
+        if (this.selectedLanguageIndex != 0) {
+          int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();
+          // check if listView is trying to unCheck Language Index that is
+          // out of screen
+          if (langIndexOnScreen < 0 || this.selectedLanguageIndex > listView.getLastVisiblePosition()) {
+            DebugMode.logD(TAG, "previous selected language index out of screen");
+          } else {
+            ((RadioButton) listView.getChildAt(langIndexOnScreen)).setChecked(false);
+          }
+        }
+        this.selectedLanguageIndex = position;
         _player.setClosedCaptionsLanguage(this.optionList.get(position));
       } else {
         if (this.selectedPresentationIndex != 0) {
-          ((RadioButton)listView.getChildAt(this.selectedPresentationIndex)).setChecked(false);
+          int presIndexOnScreen = this.selectedPresentationIndex - listView.getFirstVisiblePosition();
+          // check if listView is trying to unCheck Presentation Index that is
+          // out of screen
+          if (presIndexOnScreen < 0 || this.selectedPresentationIndex > listView.getLastVisiblePosition()) {
+            DebugMode.logD(TAG, "previous selected language index out of screen");
+          } else {
+            ((RadioButton) listView.getChildAt(presIndexOnScreen)).setChecked(false);
+          }
         }
         this.selectedPresentationIndex = position;
         if (this.optionList.get(position).equals(LocalizationSupport.localizedStringFor("Roll-Up"))) {
@@ -344,7 +386,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
           _player.setClosedCaptionsPresentationStyle(OOClosedCaptionPresentation.OOClosedCaptionPopOn);
         }
       }
-    }
+    }*/
   }
 
   class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
@@ -352,26 +394,27 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     private final List<String> itemList;
     private final Context context;
     private final AbstractOoyalaPlayerLayoutController controller;
-    private final int selectedLanguageIndex;
-    private final int selectedPresentationIndex;
 
-    public ClosedCaptionArrayAdapter(Context context, int textViewResourceId, List<String> objects, int selectedLanguageIndex, int selectedPresentationIndex, AbstractOoyalaPlayerLayoutController controller) {
+    public ClosedCaptionArrayAdapter(Context context, int textViewResourceId, List<String> objects,
+        AbstractOoyalaPlayerLayoutController controller) {
       super(context, textViewResourceId, objects);
       this.itemList = objects;
       this.context = context;
-      this.selectedLanguageIndex = selectedLanguageIndex;
-      this.selectedPresentationIndex = selectedPresentationIndex;
       this.controller = controller;
     }
 
     @Override
     public boolean isEnabled(int position) {
-      return (position != 0) && (position != this.itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
+      return (position != 0)
+          && (position != this.itemList
+          .indexOf(LocalizationSupport.localizedStringFor("Presentation Styles")));
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      if (position == 0 || position == itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
+      // If "Languages" or "Presentation Styles", do NOT add a radio button
+      if (position == this.itemList.indexOf(LocalizationSupport.localizedStringFor("Languages"))
+          || position == this.itemList.indexOf(LocalizationSupport.localizedStringFor("Presentation Styles"))) {
         TextView header = new TextView(this.context);
         header.setText(itemList.get(position));
         header.setTextColor(Color.LTGRAY);
@@ -400,7 +443,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       radioButton.setText(itemList.get(position));
       //radioButton.setPadding(10, 0, 0, 0); If we set the padding for radio button we will have radio button and text overlap
       final int currentPosition = position;
-      if (currentPosition == this.selectedLanguageIndex || currentPosition == this.selectedPresentationIndex) {
+      if (currentPosition == this.controller.getSelectedLanguageIndex()
+          || currentPosition == this.controller.getSelectedPresentationIndex()) {
         radioButton.setChecked(true);
       }
       radioButton.setOnClickListener(new View.OnClickListener() {

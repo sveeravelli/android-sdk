@@ -39,8 +39,11 @@ public class OoyalaException extends Exception {
     /** DRM Rights Acquisition server error */
     ERROR_DRM_RIGHTS_SERVER_ERROR,
     /** General non-Ooyala related DRM failure. stack trace of resulting failure is attached */
-    ERROR_DRM_GENERAL_FAILURE
+    ERROR_DRM_GENERAL_FAILURE,
 
+    /* Advertising Id Errors */
+    /** Failed to obtain Advertising Id. */
+    ERROR_ADVERTISING_ID_FAILURE,
   };
 
   private OoyalaErrorCode _code;

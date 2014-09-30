@@ -48,10 +48,13 @@ public class MoviePlayer extends Player implements Observer {
     boolean isRemoteSmooth = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET) &&
         Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains(".ism");
 
+    boolean isVisualOnHLSEnabled = OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls);
+    boolean isVisualOnSmoothEnabled = OoyalaPlayer.enableCustomSmoothPlayer && (isSmooth || isRemoteSmooth);
+
     if( streams == null || streams.size() == 0 ) {
       player = new EmptyStreamPlayer();
     }
-    else if (OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls || isSmooth || isRemoteSmooth)) {
+    else if (isVisualOnHLSEnabled || isVisualOnSmoothEnabled) {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
@@ -59,6 +62,12 @@ public class MoviePlayer extends Player implements Observer {
         player = new BaseStreamPlayer();
       }
     } else {
+      if (isSmooth || isRemoteSmooth) {
+        DebugMode.assertFail(TAG, "A Smooth stream is about to load on the base stream player.  Did you mean to set enableCustomSmoothPlayer?");
+      }
+      if (isVisualOnSmoothEnabled && (isHls || isRemoteHls)) {
+        DebugMode.logE(TAG,  "An HLS stream is loaded, while you enabled CustomSmoothPlayer.  Did you also want to set enableCustomHLSPlayer?");
+      }
       player = new BaseStreamPlayer();
     }
     return player;
@@ -118,6 +127,7 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public void reset() {
+    _suspended = false;
     if (_basePlayer != null) {
       _basePlayer.reset();
     }
@@ -132,69 +142,111 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
-  @Override
   public void suspend(int millisToResume, State stateToResume) {
     // If we're already suspended, we don't need to do it again
-    if (stateToResume == State.SUSPENDED) {
+    if (_suspended) {
       DebugMode.logI(this.getClass().toString(), "Trying to suspend an already suspended MoviePlayer");
       return;
     }
     DebugMode.logD(this.getClass().toString(), "Movie Player Suspending. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
-    _suspended = true;
     _millisToResume = millisToResume;
     _stateToResume = stateToResume;
     if (_basePlayer != null) {
-      _basePlayer.deleteObserver(this);
-      _basePlayer.suspend(millisToResume, stateToResume);
+      _basePlayer.suspend();
     }
+    _suspended = true;
   }
 
   @Override
   public void resume() {
     resume(_millisToResume, _stateToResume);
+    setState(getState());
   }
 
   @Override
   public void resume(int millisToResume, State stateToResume) {  // TODO: Wtf to do here?
     _suspended = false;
+
+    if (_basePlayer != null) {
     _basePlayer.init(_parent, _streams);
-    _basePlayer.addObserver(this);
 
     if(_live) millisToResume = 0;
 
     DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
+    }
+    else {
+      DebugMode.logE(TAG, "Trying to resume MoviePlayer without a base player!");
+    }
+  }
+
+  public int timeToResume() {
+    return _millisToResume;
   }
 
   @Override
   public void destroy() {
-    if (_basePlayer != null) _basePlayer.destroy();
+    if (_basePlayer != null) {
+      _basePlayer.deleteObserver(this);
+      _basePlayer.destroy();
+    }
   }
 
   @Override
   public void update(Observable arg0, Object arg) {
+    if (_suspended) {
+      return;
+    }
     setChanged();
     notifyObservers(arg);
   }
 
   @Override
   public View getView() {
-    return _basePlayer.getView();
+    if (_basePlayer != null) {
+      return _basePlayer.getView();
+    } else {
+      DebugMode.logE(TAG, "Trying to getView without a Base Player");
+      return null;
+    }
   }
 
   @Override
   public void setParent(OoyalaPlayer parent) {
     _parent = parent;
+    if (_basePlayer != null) {
     _basePlayer.setParent(parent);
+    } else {
+      DebugMode.logE(TAG, "Trying to setParent MoviePlayer without a Base Player");
+    }
   }
 
   //Delegated to base player
   @Override
-  public void pause() { _basePlayer.pause(); }
+  public void pause() {
+    if (_basePlayer != null) {
+      _basePlayer.pause();
+    } else {
+      DebugMode.logE(TAG, "Trying to pause MoviePlayer without a Base Player");
+    }
+  }
   @Override
-  public void play() { DebugMode.logV( TAG, "play()" ); _basePlayer.play(); }
+  public void play() {
+    if (_basePlayer != null) {
+      DebugMode.logV( TAG, "play()" );
+      _basePlayer.play();
+    } else {
+      DebugMode.logE(TAG, "Trying to play MoviePlayer without a Base Player");
+    }
+  }
   @Override
-  public void stop() { _basePlayer.stop(); }
+  public void stop() {
+    if (_basePlayer != null) {
+      _basePlayer.play();
+    } else {
+    DebugMode.logE(TAG, "Trying to stop MoviePlayer without a Base Player");
+    }
+  }
 
   @Override
   public int currentTime() { return _basePlayer != null ? _basePlayer.currentTime() : 0; }
@@ -205,10 +257,18 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
 
+  @Override
   public boolean seekable() { return _seekable; }
   public void setSeekable(boolean seekable) { _seekable = seekable; }
+
   @Override
-  public void seekToTime(int timeInMillis) { if (_seekable) { _basePlayer.seekToTime(timeInMillis); } }
+  public void seekToTime(int timeInMillis) {
+    if (_basePlayer != null) {
+      if (_seekable) { _basePlayer.seekToTime(timeInMillis); }
+    } else {
+      DebugMode.logE(TAG, "Trying to seek MoviePlayer without a Base Player");
+    }
+}
 
   @Override
   public SeekStyle getSeekStyle() {
@@ -233,5 +293,11 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
   @Override
-  public void setLiveClosedCaptionsEnabled(boolean enabled) { _basePlayer.setLiveClosedCaptionsEnabled(enabled); }
+  public void setLiveClosedCaptionsEnabled(boolean enabled) {
+    if (_basePlayer != null) {
+      _basePlayer.setLiveClosedCaptionsEnabled(enabled);
+    } else {
+      DebugMode.logE(TAG, "Trying to setLiveClosedCaptionsEnabled MoviePlayer without a Base Player");
+    }
+  }
 }

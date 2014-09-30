@@ -8,6 +8,6 @@ BASEDIR=${SCRIPTDIR}/../../
 cd ${BASEDIR}
 
 ${BASEDIR}/script/android-sdk setup -noavd
-${BASEDIR}/script/android-sdk tests || exit $?
+${BASEDIR}/script/android-sdk gen -f || exit $?
 
 cd ${CURRDIR}

@@ -1,5 +1,17 @@
 package com.ooyala.android.item;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
@@ -83,5 +95,43 @@ public class ClosedCaptionsTest extends AndroidTestCase {
     caption = cc.getCaption("en", 42.00);
     assertNull(caption);
     caption = cc.getCaption("en", 15.084);
+  }
+
+  public void testOverlapBeginTime() {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder db = null;
+    try {
+      db = dbf.newDocumentBuilder();
+    } catch (ParserConfigurationException e1) {
+      e1.printStackTrace();
+      assertNull(e1);
+    }
+
+    Document doc = null;
+    InputStream is = TestConstants
+        .getTestResourceAsStream(TestConstants.TEST_XML_CLOSED_CAPTIONS);
+    try {
+      doc = db.parse(is);
+    } catch (SAXException e) {
+      e.printStackTrace();
+      assertNull(e);
+    } catch (IOException e) {
+      e.printStackTrace();
+      assertNull(e);
+    }
+
+    Element root = doc.getDocumentElement();
+    assertNotNull(root);
+    String tag = root.getTagName();
+    assertTrue(tag.equals(ClosedCaptions.ELEMENT_TT));
+    ClosedCaptions cc = new ClosedCaptions();
+    assertTrue(cc.testUpdate("en", root));
+    List<Caption> cclist = cc.closedCaptionsForLanguage("en");
+    assertNotNull(cclist);
+    assertTrue(cclist.size() == 4);
+    Caption c = cclist.get(0);
+    assertTrue(c.getText().endsWith("This is the second."));
+    c = cclist.get(1);
+    assertTrue(c.getEnd() == ItemUtils.secondsFromTimeString("00:00:18:16"));
   }
 }

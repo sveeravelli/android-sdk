@@ -71,7 +71,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param generator An embedTokenGenerator used to sign SAS requests
    */
   public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs, EmbedTokenGenerator generator) {
-    this(l, new OoyalaPlayer(pcode, domain, generator), dcs);
+    super(l, pcode, domain, dcs, generator);
   }
 
   /**

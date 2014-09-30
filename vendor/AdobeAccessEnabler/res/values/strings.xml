@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AdobePassDemo</string>
+
+    <!-- service provider URLs -->
+    <string name="sp_url_production">sp.auth.adobe.com/adobe-services</string>
+    <string name="sp_url_staging">sp.auth-staging.adobe.com/adobe-services</string>
+    <string name="sp_url_uat1">sp.auth-uat1.adobe.com/adobe-services</string>
+
+    <string name="credential_store_passwd">adobepass</string>
+    <string name="separatorInitAndLogout">Initialization and Settings</string>
+    <string name="lblRequestorID">Requestor ID:</string>
+    <string name="btnSetRequestor">Set</string>
+    <string name="btnLogout">Logout</string>
+    <string name="separatorAuthentication">Authentication and Logout</string>
+    <string name="btnCheckAuthentication">Check</string>
+    <string name="btnGetAuthentication">Get</string>
+    <string name="btnTempPassResetActivity">Reset TP</string>
+    <string name="btnReset">Reset</string>
+    <string name="btnBackToMainActivity">Cancel</string>
+    <string name="separatorAuthorization">Authorization</string>
+    <string name="btnCheckAuthorization">Check</string>
+    <string name="btnGetAuthorization">Get</string>
+    <string name="btnCheckPreauthorizedResources">Pre</string>
+    <string name="separatorUserMetadata">User Metadata</string>
+    <string name="lblUserMetadataName">Metadata name:</string>
+    <string name="btnGetUserMetadata">Get</string>
+    <string name="btnShowPreferences">Preferences</string>
+    <string name="btnStorageViewer">Storage Viewer</string>
+    <string name="radioPrequal">Prequal</string>
+    <string name="radioRelease">Release</string>
+    <string name="radioCustom">Custom URL</string>
+    <string name="separatorTprEnvironment">Environment</string>
+    <string name="separatorTprApiKey">Api Key</string>
+    <string name="separatorTprActions">Actions</string>
+
+    <!-- preferences activity -->
+    <string name="separatorEnvironment">Environment</string>
+    <string name="separatorHttpProtocol">Protocol</string>
+    <string name="btnSetPreferences">Ok</string>
+    <string name="radioStaging">Staging</string>
+    <string name="radioProduction">Production</string>
+
+    <!-- storage viewer activity -->
+    <string name="clear_all_menu">Clear All</string>
+    <string name="show_storage1_menu">Show v1</string>
+    <string name="clear_storage1_menu">Clear v1</string>
+    <string name="show_storage2_menu">Show v2</string>
+    <string name="clear_storage2_menu">Clear v2</string>
+    <string name="show_storage3_menu">Show v3</string>
+    <string name="clear_storage3_menu">Clear v3</string>
+    <string name="expand_all_menu">Expand All</string>
+    <string name="collapse_all_menu">Collapse All</string>
+</resources>

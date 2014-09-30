@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ ADOBE CONFIDENTIAL
+  ~ ___________________
+  ~
+  ~  Copyright 2013 Adobe Systems Incorporated
+  ~  All Rights Reserved.
+  ~
+  ~ NOTICE:  All information contained herein is, and remains
+  ~ the property of Adobe Systems Incorporated and its suppliers,
+  ~ if any.  The intellectual and technical concepts contained
+  ~ herein are proprietary to Adobe Systems Incorporated and its
+  ~ suppliers and are protected by all applicable intellectual property laws,
+  ~ including trade secret and copyright laws.
+  ~ Dissemination of this information or reproduction of this material
+  ~ is strictly forbidden unless prior written permission is obtained
+  ~ from Adobe Systems Incorporated.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
+    <TextView style="@style/Separator"
+              android:text="@string/separatorTprEnvironment"/>
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/tpr_radio_group_environment_url"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+        <RadioButton android:id="@+id/tpr_radio_prequal"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/radioPrequal"
+                     android:checked="true"/>
+        <RadioButton android:id="@+id/tpr_radio_release"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/radioRelease"/>
+        <RadioButton android:id="@+id/tpr_radio_custom"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/radioCustom"/>
+    </RadioGroup>
+    <EditText android:id="@+id/tpr_edit_custom_url"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:inputType="text"/>
+
+    <TextView style="@style/Separator"
+              android:text="@string/separatorTprApiKey"/>
+    <EditText android:id="@+id/tpr_edit_apikey"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:inputType="text"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Temp Pass ID (Mvpd id)"
+            android:id="@+id/separatorTprTempPassId" style="@style/Separator"/>
+    <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tpr_edit_tempassid" android:inputType="text"/>
+    <TextView style="@style/Separator"
+              android:text="@string/separatorTprActions"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent">
+        <Button android:id="@+id/tpr_btn_back_to_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/btnBackToMainActivity"/>
+        <Button android:id="@+id/tpr_btn_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/btnReset"/>
+    </LinearLayout>
+</LinearLayout>

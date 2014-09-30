@@ -3,10 +3,16 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-    <FrameLayout
+  <LinearLayout
+      android:layout_gravity="bottom"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:id="@+id/controlsLayout">
+      
+      <FrameLayout
         android:id="@+id/companionFrame"
-        android:layout_gravity="center_horizontal|bottom"
+        android:layout_gravity="center_horizontal"
         android:layout_width="300dp"
         android:layout_height="50dp" >
 
@@ -16,8 +22,26 @@
             android:layout_height="fill_parent"
             android:text="@string/companion_placeholder"
             android:textSize="25sp" />
+     </FrameLayout>
+     <LinearLayout 
+       android:orientation="horizontal"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content">
 
-    </FrameLayout>
+      <Spinner
+         android:id="@+id/embedSpinner"
+         android:layout_width="0dip"
+         android:layout_height="wrap_content"
+         android:layout_weight="1" />
+
+     <Button
+         android:id="@+id/setButton"
+         android:layout_width="wrap_content"
+         android:layout_height="fill_parent"
+         android:text="@string/btn_load" />
+     </LinearLayout>
+
+    </LinearLayout>
 
     <com.ooyala.android.OoyalaPlayerLayout
       android:id="@+id/ooyalaPlayer"
