@@ -21,13 +21,13 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
-import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration.Position;
-import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+import com.ooyala.android.configuration.Options;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class TVRatingTestAppActivity extends Activity implements Observer {
-  
+
   // todo: player choice ie. visual on.
   private static class MyMapRow {
     public final String embedCode;
@@ -37,7 +37,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
       this.tvRatingConfiguration = tvRatingConfiguration;
     }
   }
-  
+
   OoyalaPlayerLayout playerLayout;
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
@@ -73,7 +73,9 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     embedSpinner.setAdapter(embedAdapter);
 
     //Update the spinner with the embed map
-    embedAdapter.addAll(embedMap.keySet());
+    for (String key : embedMap.keySet()) {
+      embedAdapter.add(key);
+    }
     embedAdapter.notifyDataSetChanged();
 
     Button setButton = (Button) findViewById(R.id.setButton);
@@ -84,10 +86,10 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
         if( player != null ) {
           player.pause();
         }
-        
+
         FCCTVRatingConfiguration tvRatingConfiguration = embedMap.get(embedSpinner.getSelectedItem()).tvRatingConfiguration;
         loadPlayer( tvRatingConfiguration );
-        
+
         String embedCode = embedMap.get(embedSpinner.getSelectedItem()).embedCode;
         if (player.setEmbedCode(embedCode)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
@@ -107,7 +109,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     });
 
   }
-  
+
   private void loadPlayer( FCCTVRatingConfiguration tvRatingConfiguration ) {
     LinearLayout mainLayout = (LinearLayout)findViewById( R.id.mainLayout );
     if( player != null ) {
