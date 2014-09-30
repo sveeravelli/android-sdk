@@ -152,6 +152,8 @@ function custom_gen {
   #update internal apps that need lib
   mkdir ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
+  mkdir ${BASE_DIR}/internal-apps/TVRatingTestApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/internal-apps/TvRatingTestApp/libs/
 
   #update third party sample apps
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
