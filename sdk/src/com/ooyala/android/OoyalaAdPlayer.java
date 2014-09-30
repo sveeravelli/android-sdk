@@ -4,10 +4,14 @@ import java.net.URL;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.StreamPlayer;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
   private static String TAG = OoyalaAdPlayer.class.getName();
@@ -24,19 +28,22 @@ class OoyalaAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public void init(final OoyalaPlayer parent, AdSpot ad) {
+  public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
+    super.init(parent, ad, notifier);
     if (!(ad instanceof OoyalaAdSpot)) {
-      this._error = "Invalid Ad";
-      this._state = State.ERROR;
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
+      setState(State.ERROR);
       return;
     }
+    DebugMode.logD(TAG, "Ooyala Ad Player Loaded");
+
     _seekable = false;
     _ad = (OoyalaAdSpot) ad;
 
     //If this ad tried to authorize and failed
     if(!_ad.isAuthorized() && _ad.getAuthCode() > 0) {
-      this._error = "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode());
-      this._state = State.ERROR;
+      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "This ad was unauthorized to play: " + ContentItem.getAuthError(_ad.getAuthCode()));
+      setState(State.ERROR);
       return;
     }
     if (_ad.getStream() == null || getBasePlayer() != null) {
@@ -45,12 +52,12 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       }
       PlayerInfo info = getBasePlayer() != null ? getBasePlayer().getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
 
-      _fetchTask = _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+      _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
         @Override
-        public void callback(boolean result, OoyalaException error) {
-          if (error != null || !_ad.isAuthorized()) {
-            _error = "Error fetching VAST XML";
+        public void callback(boolean result) {
+          if (!_ad.isAuthorized()) {
+            _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching VAST XML");
             setState(State.ERROR);
             return;
           } else {
@@ -76,11 +83,12 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
-        NetUtils.ping(url);
+        ping(url);
       }
     }
   }
 
+  @Override
   public OoyalaAdSpot getAd() {
     return _ad;
   }
@@ -95,11 +103,13 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     PlayerInfo info = basePlayer != null ? basePlayer.getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
     final StreamPlayer player = basePlayer;
 
-    _ad._api.authorize(_ad, info, new AuthorizeCallback() {
+    _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
       @Override
-      public void callback(boolean result, OoyalaException error) {
-        if (error != null || !_ad.isAuthorized()) {
+      public void callback(boolean result) {
+        if (!_ad.isAuthorized()) {
+          _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching playback info on setBasePlayer");
+          setState(State.ERROR);
           return;
         } else {
           setBasePlayer2(player);
@@ -147,9 +157,9 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
       _playerLayout.getContext().startActivity(browserIntent);
-      Log.d(TAG, "Opening brower to " + url);
+      DebugMode.logD(TAG, "Opening brower to " + url);
     } catch (Exception e) {
-      Log.e(TAG, "There was some exception on clickthrough!");
+      DebugMode.logE(TAG, "There was some exception on clickthrough!");
       e.printStackTrace();
     }
   }

@@ -16,7 +16,6 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -32,35 +31,48 @@ public class Analytics {
   private static final String EMBED_MODULEPARAMS_HTML =
       "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
 
+  private static final String JS_ANALYTICS_URI = "/reporter.js";
+  private static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
+  private static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
+  private static final String JS_ANALYTICS_GUID = "guid";
+  private static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
+
   private boolean _ready;
   private boolean _failed;
+  private boolean _initialPlay = true;
+  private boolean _shouldReportPlayRequest = false;
+  private boolean _shouldReportPlayStart = false;
   private WebView _jsAnalytics;
   private List<String> _queue = new ArrayList<String>();
   private String _defaultUserAgent = "";
   private String _userAgent = "";
   private TemporaryInternalStorageFileManager tmpBootHtmlFileManager;
 
-  private static String generateEmbedHTML(PlayerAPIClient api) {
+  private static String generateEmbedHTML(PlayerAPIClient api, Context context) {
 
     final Map<String, String> moduleParams = new HashMap<String, String>();
 
     String url = "http://www.ooyala.com/analytics.html";
     try {
-      url = new URL("http", api.getDomain(), "/").toString();
+      url = new URL("http", api.getDomain().toString(), "/").toString();
     }
     catch (MalformedURLException e) {
       System.out.println("falling back to default analytics URL " + url);
     }
-    moduleParams.put(Constants.JS_ANALYTICS_DOCUMENT_URL, url);
+    moduleParams.put(JS_ANALYTICS_DOCUMENT_URL, url);
 
     //If there is an account ID, add it to the Reporter.js initializer
     if(api.getUserInfo() != null && api.getUserInfo().getAccountId() != null) {
-      moduleParams.put(Constants.JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
+      moduleParams.put(JS_ANALYTICS_ACCOUNT_ID, api.getUserInfo().getAccountId());
     }
+    
+    String clientId = ClientId.getId(context);
+    String encryptedId = Utils.encryptString(clientId);
+    moduleParams.put(JS_ANALYTICS_GUID, encryptedId);
 
     return EMBED_MODULEPARAMS_HTML
-        .replaceAll("_HOST_", Constants.JS_ANALYTICS_HOST)
-        .replaceAll("_URI_", Constants.JS_ANALYTICS_URI)
+        .replaceAll("_HOST_", Environment.JS_ANALYTICS_HOST)
+        .replaceAll("_URI_", JS_ANALYTICS_URI)
         .replaceAll("_PCODE_", api.getPcode())
         .replaceAll("_MODULE_PARAMS_", new JSONObject(moduleParams).toString());
   }
@@ -72,7 +84,7 @@ public class Analytics {
           m.invoke( settings, true );
         }
         catch (Exception e) {
-          Log.d( TAG, "failed: " + e.getStackTrace() );
+          DebugMode.logD( TAG, "failed: " + e.getStackTrace() );
         }
         break;
       }
@@ -85,17 +97,7 @@ public class Analytics {
    * @param api the API to initialize this Analytics with
    */
   Analytics(Context context, PlayerAPIClient api) {
-    this(context, generateEmbedHTML(api), api.getDomain());
-  }
-
-  /**
-   * Initialize an Analytics using the specified api and HTML (used for testing only)
-   * @param context the context the initialize the internal WebView with
-   * @param embedHTML the HTML to use when initializing this Analytics
-   */
-  Analytics(Context context, String embedHTML) {
-    //compatible with old behavior.  only used for test..
-    this(context, embedHTML, "http://www.ooyala.com/analytics.html");
+    this(context, generateEmbedHTML(api, context), api.getDomain().toString());
   }
 
   /**
@@ -111,7 +113,7 @@ public class Analytics {
 
     _jsAnalytics = new WebView(context);
 
-    _defaultUserAgent = String.format(Constants.JS_ANALYTICS_USER_AGENT, Constants.SDK_VERSION,
+    _defaultUserAgent = String.format(JS_ANALYTICS_USER_AGENT, OoyalaPlayer.getVersion(),
         _jsAnalytics.getSettings().getUserAgentString());
     _userAgent = _defaultUserAgent;
     _jsAnalytics.getSettings().setUserAgentString(_defaultUserAgent);
@@ -123,7 +125,7 @@ public class Analytics {
       public void onPageFinished(WebView view, String url) {
         if (!_ready && !_failed) {
           _ready = true;
-          Log.d(this.getClass().getName(), "Initialized Analytics.");
+          DebugMode.logD(this.getClass().getName(), "Initialized Analytics.");
           performQueuedActions();
         }
       }
@@ -132,7 +134,7 @@ public class Analytics {
         if (!_failed) {
           _ready = false;
           _failed = true;
-          Log.e(this.getClass().getName(), "ERROR: Failed to load js Analytics!");
+          DebugMode.logE(this.getClass().getName(), "ERROR: Failed to load js Analytics!");
         }
       }
     });
@@ -140,7 +142,7 @@ public class Analytics {
     _jsAnalytics.setWebChromeClient( new WebChromeClient() {
       @Override
       public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-        Log.v( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
+        DebugMode.logV( TAG, "javascript: " + sourceID + "@" + lineNumber + ": " + message );
       }
       @Override
       public boolean onConsoleMessage(ConsoleMessage cm) {
@@ -151,8 +153,9 @@ public class Analytics {
 
     bootHtml( context, embedDomain, embedHTML );
 
-    Log.d(TAG, "Initialized Analytics with user agent: "
+    DebugMode.logD(TAG, "Initialized Analytics with user agent: "
         + _jsAnalytics.getSettings().getUserAgentString());
+    reportPlayerLoad();
   }
 
   private void bootHtml( final Context context, final String embedDomain, final String embedHTML ) {
@@ -162,20 +165,20 @@ public class Analytics {
       loadTmpBootHtmlFile( tmpBootHtmlFile );
     }
     catch (IOException e) {
-      Log.e( TAG, "failed: " + e.getStackTrace() );
+      DebugMode.logE( TAG, "failed: " + e.getStackTrace() );
     }
     catch (IllegalArgumentException e) {
-      Log.e( TAG, "failed: " + e.getStackTrace() );
+      DebugMode.logE( TAG, "failed: " + e.getStackTrace() );
     }
   }
 
   private void loadTmpBootHtmlFile( final TemporaryInternalStorageFile tmpBootHtmlFile ) {
     final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
-    Log.d( TAG, "trying to load: " + htmlUrlStr );
+    DebugMode.logD( TAG, "trying to load: " + htmlUrlStr );
 
     try {
       final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
-      try { while( true ) { Log.d( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
+      try { while( true ) { DebugMode.logD( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
       scanner.close();
     }
     catch( FileNotFoundException e ) { }
@@ -184,31 +187,35 @@ public class Analytics {
   }
 
   /**
-   * Report a new video being initialized with the given embed code and duration
-   * @param embedCode the embed code of the new video
-   * @param duration the duration (in seconds) of the new video
+   * Helper function to report a player load
    */
-  void initializeVideo(String embedCode, double duration) {
+  private void report(String action) {
     if (_failed) { return; }
-    String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
     if (!_ready) {
       queue(action);
     } else {
+    //  DebugMode.logD(TAG, "report:" + action);
       _jsAnalytics.loadUrl(action);
     }
   }
 
   /**
+   * Report a new video being initialized with the given embed code and duration
+   * @param embedCode the embed code of the new video
+   * @param duration the duration (in seconds) of the new video
+   */
+  void initializeVideo(String embedCode, double duration) {
+    String action = "javascript:reporter.initializeVideo('" + embedCode + "'," + duration + ");";
+    _shouldReportPlayRequest = true;
+    _shouldReportPlayStart = true;
+    report(action);
+  }
+
+  /**
    * Report a player load
    */
-  void reportPlayerLoad() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportPlayerLoad();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+  private void reportPlayerLoad() {
+    report("javascript:reporter.reportPlayerLoad();");
   }
 
   /**
@@ -216,49 +223,43 @@ public class Analytics {
    * @param time the new playhead time (in seconds)
    */
   void reportPlayheadUpdate(double time) {
-    if (_failed) { return; }
     String action = "javascript:reporter.reportPlayheadUpdate(" + time * 1000 + ");";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report(action);
   }
 
   /**
    * Report that the player has started playing
    */
   void reportPlayStarted() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportPlayStarted();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
+    if (!_shouldReportPlayStart) {
+      return;
     }
+    _shouldReportPlayStart = false;
+    report("javascript:reporter.reportPlayStarted();");
   }
 
   /**
    * Report that the player was asked to replay
    */
   void reportReplay() {
-    if (_failed) { return; }
-    String action = "javascript:reporter.reportReplay();";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
+    report("javascript:reporter.reportReplay();");
+  }
+
+  void reportPlayRequested() {
+    if (!_shouldReportPlayRequest) {
+      return;
     }
+    // TODO: Enable this after reporter.js implement this method.
+    // String param = _initialPlay ? "1" : "0";
+    // String action = "javascript:reporter.reportPlay(" + param + ");";
+    _initialPlay = false;
+    _shouldReportPlayRequest = false;
+    // report(action);
   }
 
   void setTags(List<String> tags) {
-    if (_failed) { return; }
     String action = "javascript:reporter.setTags([\"" + Utils.join(tags, "\",\"") + "\"]);";
-    if (!_ready) {
-      queue(action);
-    } else {
-      _jsAnalytics.loadUrl(action);
-    }
+    report(action);
   }
 
   private void queue(String action) {
@@ -267,8 +268,10 @@ public class Analytics {
 
   private void performQueuedActions() {
     for (String action : _queue) {
+      DebugMode.logI(TAG, "reporting:" + action);
       _jsAnalytics.loadUrl(action);
     }
+    _queue.clear();
   }
 
   public void setUserAgent(String userAgent) {

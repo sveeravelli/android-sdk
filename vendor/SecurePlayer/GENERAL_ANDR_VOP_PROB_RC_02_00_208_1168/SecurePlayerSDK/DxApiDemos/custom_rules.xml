@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SecurePlayerApp">
+	<condition property="playertype.visualonplayer">
+		<or>
+			<isset property="env.DX_VISUALON_PLAYER"/>
+			<equals arg1="${playertype}" arg2="visualonplayer"/>
+		</or>
+	</condition>
+
+	<condition property="packtype.migration">
+		<and>
+			<isset property="playertype.visualonplayer"/>
+			<equals arg1="${packtype}" arg2="migration"/>
+		</and>
+	</condition>
+
+	<condition property="playertype.castlabsplayer">
+		<or>
+			<isset property="env.DX_CASTLABS_PLAYER"/>
+			<equals arg1="${playertype}" arg2="castlabsplayer"/>
+		</or>
+	</condition>
+
+	<condition property="playertype.drmproxy">
+		<or>
+			<isset property="env.DX_DRM_PROXY"/>
+			<equals arg1="${playertype}" arg2="drmproxy"/>
+		</or>
+	</condition>
+
+	<condition property="new.ui.required">
+		<and>
+			<isset property="playertype.visualonplayer"/>
+			<not>
+				<isset property="packtype.migration"/>
+			</not>
+		</and>
+	</condition>
+
+	<property name="package.main.dir" value="com/example/secureplayer"/>
+	<script language="javascript">
+		var sPlayerType = '';
+		if (project.getProperty('playertype.visualonplayer') !== 'undefined') {
+			sPlayerType = 'VOP';
+		}
+		else if (project.getProperty('playertype.castlabsplayer') !== 'undefined') {
+			sPlayerType = 'CLP';
+		}
+		else if (project.getProperty('playertype.drmproxy') !== 'undefined') {
+			sPlayerType = 'NP';
+		}
+		
+		project.setProperty('package.main.dir', project.getProperty('package.main.dir') + sPlayerType);
+	</script>
+
+	<target name="clean-new-ui" unless="new.ui.required">
+		<delete file="${source.absolute.dir}/${package.main.dir}/apis/PlaybackControl.java"/>
+		<delete file="${source.absolute.dir}/${package.main.dir}/apis/PlaybackOptionsActivity.java"/>
+		<delete dir="${basedir}/menu"/>
+		<delete file="${basedir}/res/xml/playback_options.xml"/>
+		<move file="${basedir}/res/values/strings.original.obsolete.source" tofile="${basedir}/res/values/strings.xml"/>
+	</target>
+
+	<target name="clean-migration" unless="packtype.migration">
+		<delete file="${basedir}/AndroidManifest.obsolete.source"/>
+		<delete dir="${source.absolute.dir}/${package.main.dir}/obsolete"/>
+		<delete file="${basedir}/res/layout/main.obsolete.source"/>
+		<delete file="${basedir}/res/layout/player.obsolete.source"/>
+	</target>
+	
+	<target name="prepare-migration" depends="clean-new-ui" if="packtype.migration">
+		<move file="${basedir}/AndroidManifest.obsolete.source" tofile="${basedir}/AndroidManifest.xml"/>
+		<delete file="${source.absolute.dir}/${package.main.dir}/apis/PlaybackActivity.java"/>
+		<move file="${basedir}/res/layout/main.obsolete.source" tofile="${basedir}/res/layout/main.xml"/>
+		<move file="${basedir}/res/layout/player.obsolete.source" tofile="${basedir}/res/layout/player.xml"/>
+	</target>
+
+	<target name="-pre-build-original" depends="clean-migration,clean-new-ui" unless="playertype.visualonplayer">
+		<move file="${basedir}/AndroidManifest.original.source" tofile="${basedir}/AndroidManifest.xml"/>
+		<move file="${source.absolute.dir}/${package.main.dir}/apis/PlaybackActivity.original.source" tofile="${source.absolute.dir}/${package.main.dir}/apis/PlaybackActivity.java"/>
+		<delete>
+			<fileset dir="${basedir}/res/drawable" includes="*.*">
+				<exclude name="splash.png"/>
+			</fileset>
+		</delete>
+		<move file="${basedir}/res/layout/main.original.source" tofile="${basedir}/res/layout/main.xml"/>
+		<delete file="${basedir}/res/layout/player.xml"/>
+	</target>
+
+	<target name="-pre-build-visualon" depends="clean-migration,prepare-migration" if="playertype.visualonplayer">
+		<delete file="${basedir}/AndroidManifest.original.source"/>
+		<delete file="${source.absolute.dir}/${package.main.dir}/apis/PlaybackActivity.original.source"/>
+		<delete file="${basedir}/res/layout/main.original.source"/>
+		<delete file="${basedir}/res/values/strings.original.obsolete.source"/>
+	</target>
+
+	<target name="-pre-build" depends="-pre-build-original,-pre-build-visualon"/>
+	
+	<target name="-post-build">
+		<delete file="${basedir}/custome_rules.xml"/>
+	</target>
+</project>

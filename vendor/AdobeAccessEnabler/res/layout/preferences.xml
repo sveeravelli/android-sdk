@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+
+    <TextView style="@style/Separator"
+              android:text="@string/separatorEnvironment"/>
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radio_group_environment_url"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_staging"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/radioStaging"/>
+        <RadioButton android:id="@+id/radio_production"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/radioProduction"/>
+    </RadioGroup>
+
+    <TextView style="@style/Separator"
+              android:text="@string/separatorHttpProtocol"/>
+    <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/checkbox_https"
+              android:text="Use HTTPS"
+              android:checked="true"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+    <Button android:id="@+id/btn_set_preferences"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btnSetPreferences"/>
+</LinearLayout>

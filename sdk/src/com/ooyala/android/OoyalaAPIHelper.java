@@ -6,9 +6,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
-import org.json.*;
 
-import android.util.Log;
+import org.json.JSONObject;
 
 class OoyalaAPIHelper {
 
@@ -26,7 +25,7 @@ class OoyalaAPIHelper {
   }
 
   private static String jsonForAPI(URL url) {
-    Log.d(OoyalaAPIHelper.class.getName(), "Sending Request: " + url.toString());
+    DebugMode.logD(OoyalaAPIHelper.class.getName(), "Sending Request: " + url.toString());
     StringBuffer sb = new StringBuffer();
     try {
       URLConnection conn = url.openConnection();
@@ -42,7 +41,7 @@ class OoyalaAPIHelper {
       for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
         if (headerName.equals("Set-Cookie")) {
           String fullCookie = conn.getHeaderField(i);
-          Log.d(OoyalaAPIHelper.class.getName(), "FOUND COOKIE: " + fullCookie);
+          DebugMode.logD(OoyalaAPIHelper.class.getName(), "FOUND COOKIE: " + fullCookie);
           if (fullCookie.indexOf(";") > 0) {
             String cookie = fullCookie.substring(0, fullCookie.indexOf(";"));
             String cookieName = cookie.substring(0, cookie.indexOf("="));

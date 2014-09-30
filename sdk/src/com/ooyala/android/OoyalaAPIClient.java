@@ -7,7 +7,10 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.PaginatedParentItem;
 
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
@@ -20,7 +23,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String apiKey, String secret, String pcode, String domain) {
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain) {
     this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
   }
 
@@ -31,7 +34,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, String domain) {
+  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, PlayerDomain domain) {
     this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
   }
 
@@ -41,7 +44,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, String domain) {
+  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, PlayerDomain domain) {
     this(pcode, domain);
     _secureUrlGenerator = secureURLGenerator;
   }
@@ -51,7 +54,7 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String pcode, String domain) {
+  public OoyalaAPIClient(String pcode, PlayerDomain domain) {
     this(new PlayerAPIClient(pcode, domain, null));
   }
 
@@ -61,6 +64,19 @@ public class OoyalaAPIClient {
    */
   OoyalaAPIClient(PlayerAPIClient apiClient) {
     _playerAPI = apiClient;
+  }
+
+  /**
+   * Perform a SAS Authorization on an authorizable item
+   * root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be videos. As this
+   * method is not asynchronous it should be used within an AsyncTask.
+   * @param item the content item to authorize
+   * @param playerInfo a PlayerInfo object to determine what can be returned
+   * @return success if authorization was successful (not if the item is authorized)
+   * @throws OoyalaException
+   */
+  public boolean authorize(AuthorizableItem item, PlayerInfo playerInfo) throws OoyalaException {
+    return _playerAPI.authorize(item, playerInfo);
   }
 
   /**
@@ -170,10 +186,10 @@ public class OoyalaAPIClient {
    */
   public JSONObject objectFromBacklotAPI(String uri, Map<String, String> params) {
     if (_secureUrlGenerator == null) {
-      Log.d(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
+      DebugMode.logD(getClass().getName(),  "Backlot APIs are not supported without a SecureURLGenerator or apikey/secret");
       return null;
     }
-    URL url = _secureUrlGenerator.secureURL(Constants.BACKLOT_HOST, Constants.BACKLOT_URI_PREFIX + uri, params);
+    URL url = _secureUrlGenerator.secureURL(Environment.BACKLOT_HOST, PlayerAPIClient.BACKLOT_URI_PREFIX + uri, params);
     return OoyalaAPIHelper.objectForAPI(url);
   }
 
@@ -234,14 +250,14 @@ public class OoyalaAPIClient {
   /**
    * @return the pcode this OoyalaAPIClient uses
    */
-  String getPcode() {
+  public String getPcode() {
     return _playerAPI.getPcode();
   }
 
   /**
    * @return the domain this OoyalaAPIClient uses
    */
-  String getDomain() {
+  PlayerDomain getDomain() {
     return _playerAPI.getDomain();
   }
 }

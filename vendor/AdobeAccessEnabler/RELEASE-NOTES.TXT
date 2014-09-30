@@ -1,0 +1,108 @@
+Native Android client library for AdobePass
+
+Version: 1.7.3
+
+================================================================================
+ABSTRACT
+
+This sample application explores the capabilities of the AccessEnabler library.
+It provides an generic sample application that exercises the AccessEnabler's
+API.
+
+================================================================================
+INSTALLATION
+
+Unzip. Switch to the demo application folder and modify the local.properties
+file to point to the location of your Android SDK installation folder.
+
+Launch your emulator device (2.3.x or later):
+$ emulator -avd <avd_name> -partition-size 128
+
+Set the path to the Android SDK in the local.properties file:
+sdk.dir=/path/to/android/sdk
+
+Once the device is online, run the "ant" build/install script:
+$ ant clean debug install
+
+On the emulated device launch the "AdobePass Demo Application".
+
+================================================================================
+HOW TO
+
+After the application launches, Programmer identity must be established. After
+the requestor is set, the rest of the AccessEnabler's entitlement methods become
+available: checkAuthentication, getAuthentication, checkAuthorization,
+getAuthorization, checkPreauthorizedResources and logout.
+
+================================================================================
+PACKAGE CONTENT
+
+* AdobePassDemoApp - basic demonstration application. Enables the integration
+  engineer to exercise basic entitlement flows.
+* AdobePassDemoApp/libs/com.adobe.adobepass.accessenabler-<version> - the native
+  Android client library for AdobePass services
+
+================================================================================
+RELEASE NOTES:
+
+Build Number
+1.7.3
+
+Release Overview
+  This release includes support for OAuth-enabled MVPDs and an optimization
+  for the setRequestor flow.
+
+New Features
+- OAuth-enabled MVPDs are now supported (alongside SAML MVPDs). This is
+  transparent for the Programmer, no code change is required.
+
+Improvements
+- The configuration call made on setRequestor now supports gzip encoding,
+  minimizing the HTTP response payload from Adobe Pass. This provides a
+  faster response time and reduced network traffic.
+- The p12 key-store used for signing the Requestor ID and decrypting user
+  metadata has been updated in the DemoApp, so that it contains 2048-bit
+  (instead of 1024-bit) public and private keys. The decryption code has
+  been updates as well.
+
+Bug Fixes
+N/A
+
+Dependencies
+- Google Gson is required by the AccessEnabler to perform various parsing
+  operations. The Programmer MUST link the appropriate JAR when building
+  the final application. Adobe provides a sample Gson JAR in the 'lib'
+  directory of the DemoApp Ant project (gson-<version>.jar), but newer
+  version of the library can also be used.
+
+Compatibility
+- This SDK is fully compatible with SDK 1.7.x, it uses the same storage area
+  and has the token importer functionality enabled (if no authentication token
+  is available in the current storage, the importer will try to copy tokens
+  that were obtained by older SDKs).
+
+Known Issues
+- It is now mandatory to call the setRequestor API from the main UI thread
+  and in the context of an Activity, as the Android framework imposes these
+  constraints when instantiating and calling methods on a WebView (as is the
+  case for passive authentication).
+
+System Requirements
+Android SDK 2.3.x or later (API level 9)
+
+Package content
+- AdobePassDemoApp - basic demonstration application. Enables the integration
+  engineer to exercise basic entitlement flows;
+- AdobePassDemoApp/libs/com.adobe.adobepass.accessenabler-<version> - the native
+  Android client library for AdobePass services.
+
+Installation and Upgrade Notes
+- Unzip, switch to the demo application folder and modify the local.properties
+  file to point to the location of your Android SDK installation folder.
+- Launch your emulator device (2.3.x or later):
+  $ emulator -avd <avd_name> -partition-size 128
+- Set the path to the Android SDK in the local.properties file:
+  sdk.dir=/path/to/android/sdk
+- Once the device is online, run the "ant" build/install script:
+  $ ant clean debug install
+- On the emulated device launch the "AdobePass Demo Application".

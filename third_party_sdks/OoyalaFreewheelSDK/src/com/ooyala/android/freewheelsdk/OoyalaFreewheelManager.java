@@ -1,6 +1,6 @@
 package com.ooyala.android.freewheelsdk;
 
-import java.util.ArrayList;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -13,12 +13,19 @@ import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
-
 import android.app.Activity;
-import android.util.Log;
 
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.StateNotifierListener;
+import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.Video;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.ManagedAdsPlugin;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 /**
  * The OoyalaFreewheelManager will play back all Freewheel ads affiliated with any playing Ooyala asset. It will
@@ -27,16 +34,19 @@ import com.ooyala.android.OoyalaPlayer;
  * The OoyalaFreewheelManager works best with an OptimizedOoyalaPlayerLayoutController. If you do not
  * use this layout controller, you will not get media controllers in fullscreen mode.
  */
-public class OoyalaFreewheelManager implements Observer {
+public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
+    implements AdPluginInterface, StateNotifierListener, Observer {
 
   private static final String TAG = "OoyalaFreewheelManager";
+  private static final double FWPLAYER_AD_REQUEST_TIMEOUT = 5.0;
 
   protected Activity _parent;
-  protected OoyalaPlayer _player;
+  protected WeakReference<OoyalaPlayer> _player;
   protected OptimizedOoyalaPlayerLayoutController _layoutController;
   protected Map<String,String> _fwParameters = null;
-  protected FWAdPlayerListener _fwAdPlayerListener;
   protected List<ISlot> _overlays = null;
+  protected boolean haveDataToUpdate;
+  protected boolean didUpdateRollsAndDelegate;
 
   //Freewheel ad request parameters
   protected int _fwNetworkId = -1;
@@ -50,6 +60,9 @@ public class OoyalaFreewheelManager implements Observer {
   protected IAdContext _fwContext = null;
   protected IConstants _fwConstants = null;
 
+  private FWAdPlayer _adPlayer = null;
+  private StateNotifier _notifier = null;
+
   /**
    * Initialize OoyalaFreewheelManager
    * @param parent Activity to be used to set into IAdContext
@@ -58,9 +71,12 @@ public class OoyalaFreewheelManager implements Observer {
   public OoyalaFreewheelManager(Activity parent, OptimizedOoyalaPlayerLayoutController playerLayoutController) {
     _parent = parent;
     _layoutController = playerLayoutController;
-    _player = playerLayoutController.getPlayer();
-    _player.addObserver(this);
-    _player.registerAdPlayer(FWAdSpot.class, FWAdPlayer.class);
+    _player = new WeakReference<OoyalaPlayer>(
+        playerLayoutController.getPlayer());
+    _player.get().addObserver(this);
+    _player.get().registerPlugin(this);
+    _notifier = _player.get().createStateNotifier();
+    _notifier.addListener(this);
   }
 
   /**
@@ -86,14 +102,6 @@ public class OoyalaFreewheelManager implements Observer {
   }
 
   /**
-   * Sets the FWAdPlayerListener
-   * @param adPlayer the FWAdPlayer to be set
-   */
-  public void setFWAdPlayerListener(FWAdPlayerListener adPlayer) {
-    _fwAdPlayerListener = adPlayer;
-  }
-
-  /**
    * To be called only by the FWAdPlayer. Let the manager know that ads are playing.
    */
   public void adsPlaying() {
@@ -104,57 +112,47 @@ public class OoyalaFreewheelManager implements Observer {
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      //Check to play overlay ads when content is playing
-      if (_fwContext != null && !_player.isShowingAd()) {
-        checkPlayableAds();
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      // Listen to state changed notification to set correct video states
+      State state = _player.get().getState();
+      boolean isShowingAd = _player.get().isShowingAd();
+      DebugMode.logD(TAG, "State changed to: " + state.toString());
+      switch (state) {
+      case PLAYING:
+        if (_fwContext != null && isShowingAd) {
+          _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
+        }
+        break;
+      case PAUSED:
+      case SUSPENDED:
+        if (_fwContext != null && isShowingAd) {
+          _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
+        }
+        break;
+      default:
+        break;
       }
-    }
-    else if (arg1 == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION) {
-      currentItemChanged();
-    }
-    else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
+    } else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
       if (_fwContext != null) {
         _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
       }
     }
-    else if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      //Listen to state changed notification to set correct video states
-      Log.d(TAG, "State changed to: " + _player.getState());
-
-      switch(_player.getState()) {
-        case PLAYING:
-          if (_fwContext != null && !_player.isShowingAd()) {
-            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
-          }
-          break;
-        case PAUSED:
-        case SUSPENDED:
-          if(_fwContext != null && !_player.isShowingAd()) {
-            _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
-          }
-          break;
-        default:
-          break;
-      }
-    }
-    else if (arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION) {
-      //When ads are completed, re-enable the controls
-      //TODO: this fires when any ad is played, not just Freewheel ads.
-      _layoutController.getControls().setVisible(true);
-    }
   }
 
-  private void currentItemChanged() {
+  private boolean currentItemChanged(Video item) {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
     _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
-
-    if (_player.getCurrentItem().getModuleData() != null &&
-        _player.getCurrentItem().getModuleData().get("freewheel-ads-manager") != null &&
-        setupAdManager()) {
-      _player.getCurrentItem().insertAd(new FWAdSpot(null, this));
+    _adSpotManager.clear();
+    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+        .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
+      _adSpotManager.setAlignment(10000);
+    } else {
+      _adSpotManager.setAlignment(0);
     }
+
+    return (item.getModuleData() != null
+        && item.getModuleData().get("freewheel-ads-manager") != null && setupAdManager());
   }
 
   /**
@@ -167,7 +165,7 @@ public class OoyalaFreewheelManager implements Observer {
     String fwNetworkIdStr = getParameter("fw_android_mrm_network_id", "fw_mrm_network_id");
     int networkId = (fwNetworkIdStr != null) ? Integer.parseInt(fwNetworkIdStr) : -1;
     if (_fwNetworkId > 0 && _fwNetworkId != networkId) {
-      Log.e(TAG, "The Freewheel network id can be set only once. Overriding it will not have any effect!");
+      DebugMode.logE(TAG, "The Freewheel network id can be set only once. Overriding it will not have any effect!");
     } else {
       _fwNetworkId = networkId;
     }
@@ -180,10 +178,9 @@ public class OoyalaFreewheelManager implements Observer {
     _fwFRMSegment = getParameter("FRMSegment", "FRMSegment");
 
     if (_fwNetworkId > 0 && _fwAdServer != null && _fwProfile != null && _fwSiteSectionId != null && _fwVideoAssetId != null) {
-      submitAdRequest();
       return true;
     } else {
-      Log.e(TAG, "Could not fetch all metadata for the Freewheel ad");
+      DebugMode.logE(TAG, "Could not fetch all metadata for the Freewheel ad");
       return false;
     }
   }
@@ -206,27 +203,29 @@ public class OoyalaFreewheelManager implements Observer {
     } else {
       try {
         //First try getting the Android specific value from Backdoor
-        value = _player.getCurrentItem().getModuleData().get("freewheel-ads-manager").getMetadata().get(overrideKey);
+        value = _player.get().getCurrentItem().getModuleData()
+            .get("freewheel-ads-manager").getMetadata().get(overrideKey);
 
         //If value is null, try using the backlotKey
         if (value == null) {
-          Log.i(TAG, "Tried to get " + overrideKey + " but received a null value. Trying Backlot key: " + backlotKey);
-          value = _player.getCurrentItem().getModuleData().get("freewheel-ads-manager").getMetadata().get(backlotKey);
+          DebugMode.logI(TAG, "Tried to get " + overrideKey + " but received a null value. Trying Backlot key: " + backlotKey);
+          value = _player.get().getCurrentItem().getModuleData()
+              .get("freewheel-ads-manager").getMetadata().get(backlotKey);
         }
       } catch (Exception e) {
-        Log.e(TAG, e + " exception in parsing Freewheel metadata for key " + overrideKey);
+        DebugMode.logE(TAG, e + " exception in parsing Freewheel metadata for key " + overrideKey);
         return value; //short circuit when there's an error
       }
     }
     if (value == null) {
-      Log.e(TAG, "Was not able to fetch value using Backlot key: " + backlotKey + "!");
+      DebugMode.logE(TAG, "Was not able to fetch value using Backlot key: " + backlotKey + "!");
     }
     return value;
   }
 
   /**
    * Sets up the ad manager and submits the ad request
-   * If the ad request was successful, it will call handleAdManagerRequestComplete()
+   * If the ad request was successful, it will call updateRollsAndDelegate()
    */
   private void submitAdRequest() {
     IAdManager fwAdManager = AdManager.getInstance(_parent.getApplicationContext());
@@ -238,7 +237,9 @@ public class OoyalaFreewheelManager implements Observer {
     //Set up profile, site section, and video asset info
     _fwContext.setProfile(_fwProfile, null, null, null);
     _fwContext.setSiteSection(_fwSiteSectionId, random(), 0, _fwConstants.ID_TYPE_CUSTOM(), 0);
-    _fwContext.setVideoAsset(_fwVideoAssetId, _player.getDuration() / 1000, null, _fwConstants.VIDEO_ASSET_AUTO_PLAY_TYPE_ATTENDED(), random(), 0,
+    _fwContext.setVideoAsset(_fwVideoAssetId, _player.get().getCurrentItem()
+        .getDuration() / 1000.0, null,
+        _fwConstants.VIDEO_ASSET_AUTO_PLAY_TYPE_ATTENDED(), random(), 0,
         _fwConstants.ID_TYPE_CUSTOM(), 0, _fwConstants.VIDEO_ASSET_DURATION_TYPE_EXACT());
     _fwContext.setActivity(_parent);
 
@@ -264,62 +265,83 @@ public class OoyalaFreewheelManager implements Observer {
 
         if (_fwConstants != null) {
           if (_fwConstants.EVENT_REQUEST_COMPLETE().equals(eType) && Boolean.valueOf(eSuccess)) {
-            Log.d(TAG, "Request completed successfully");
-            handleAdManagerRequestComplete();
+            DebugMode.logD(TAG, "Request completed successfully");
+            haveDataToUpdate = true;
+            didUpdateRollsAndDelegate = false;
+            updateRollsAndDelegate();
           } else {
-            Log.e(TAG, "Request failed");
-            if (_fwAdPlayerListener != null) {
-              _fwAdPlayerListener.onError();
-            }
+            DebugMode.logE(TAG, "Request failed");
+            cleanupOnError();
           }
         }
+            exitAdMode();
       }
     });
     //Listen for any errors that may happen
     _fwContext.addEventListener(_fwConstants.EVENT_ERROR(), new IEventListener() {
       public void run(IEvent e) {
-        Log.e(TAG, "There was an error in the Freewheel Ad Manager!");
+        DebugMode.logE(TAG, "There was an error in the Freewheel Ad Manager!");
         //Set overlay ads to null so they don't affect playback
         _overlays = null;
-
-        if (_fwAdPlayerListener != null) {
-          _fwAdPlayerListener.onError();
-        }
+        cleanupOnError();
+            exitAdMode();
       }
     });
     //Submit request with 3s timeout
-    _fwContext.submitRequest(3.0);
+    _fwContext.submitRequest(FWPLAYER_AD_REQUEST_TIMEOUT);
+  }
+
+  private void exitAdMode() {
+    if (_adPlayer != null) {
+      _adPlayer.destroy();
+      _adPlayer = null;
+    }
+    _layoutController.getControls().setVisible(true);
+    _player.get().exitAdMode(this);
+  }
+
+  private void cleanupOnError() {
+    if (_adPlayer != null) {
+      _adPlayer.onError();
+    }
   }
 
   /**
    * Gets the pre, mid, and post-rolls when ad request is complete
-   * Play pre-rolls if _player.play() was called
+   * Play pre-rolls if _player.play() was called.
+   * If no listener has been set yet, this does nothing; we'll be called again when the listener is set to a non-null value.
    */
-  private void handleAdManagerRequestComplete() {
-    List<ISlot> prerolls = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_PREROLL());
-    _overlays = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_OVERLAY());
-
-    if (_fwAdPlayerListener != null) {
-      //If there are pre-rolls, pop the first pre-roll off and call adReady. The rest of the pre-rolls will be added below.
-      //Else, make sure to pass nil to the listener so that FWAdPlayer can fire ad complete and resume content.
-      if (prerolls != null && prerolls.size() > 0) {
-        _fwAdPlayerListener.adReady(prerolls.remove(0));
-      } else {
-        _fwAdPlayerListener.adReady(null);
-      }
+  private void updateRollsAndDelegate() {
+    if (haveDataToUpdate && !didUpdateRollsAndDelegate) {
+      updatePreMidPost();
+      haveDataToUpdate = false;
+      didUpdateRollsAndDelegate = true;
     }
+  }
 
+  /**
+   * Call this only via updateRollsAndDelegate() to ensure proper state.
+   */
+  private void updatePreMidPost() {
+    DebugMode.logD(TAG, "updatePreMidPost()");
+    _overlays = _fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_OVERLAY());
+    if (_overlays != null) {
+      DebugMode.logD(TAG, "overlay count: " + String.valueOf(_overlays.size()));
+    }
     try {
       //Add the rest of pre-rolls, mid-rolls, and post-rolls to the list and insert them to the current item to be played by the OoyalaPlayer
-      List<ISlot> adsToPlay = new ArrayList<ISlot>();
-      adsToPlay.addAll(prerolls);
-      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_MIDROLL()));
-      adsToPlay.addAll(_fwContext.getSlotsByTimePositionClass(_fwConstants.TIME_POSITION_CLASS_POSTROLL()));
-      for (ISlot ad : adsToPlay) {
-        _player.getCurrentItem().insertAd(new FWAdSpot(ad, this));
-      }
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_PREROLL()),
+          _fwConstants.TIME_POSITION_CLASS_PREROLL());
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_MIDROLL()),
+          _fwConstants.TIME_POSITION_CLASS_MIDROLL());
+      insertAds(_fwContext.getSlotsByTimePositionClass(_fwConstants
+          .TIME_POSITION_CLASS_POSTROLL()),
+          _fwConstants.TIME_POSITION_CLASS_POSTROLL());
     } catch (Exception e) {
-      Log.e(TAG, "Error in adding ad slots to the list of ads to play");
+      DebugMode.logE(TAG,
+          "Error in adding ad slots to the list of ads to play", e);
       e.printStackTrace();
     }
   }
@@ -328,9 +350,8 @@ public class OoyalaFreewheelManager implements Observer {
    * Check to play overlays. If the playheadTime passes the ad's time to play, play only the
    * first item on the list since other items may have different times to be played at.
    */
-  private void checkPlayableAds() {
-    double playheadTime = _player.getPlayheadTime() / 1000;
-
+  private void checkPlayableAds(int time) {
+    double playheadTime = time / 1000.0;
     if (_overlays != null && _overlays.size() > 0 && playheadTime > _overlays.get(0).getTimePosition()) {
       _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
       _overlays.remove(0).play();
@@ -339,5 +360,147 @@ public class OoyalaFreewheelManager implements Observer {
 
   private int random() {
     return (int)Math.floor(Math.random() * Integer.MAX_VALUE);
+  }
+
+  @Override
+  public void reset() {
+    resetAds();
+  }
+
+  @Override
+  public void suspend() {
+    if (_adPlayer != null) {
+      _adPlayer.suspend();
+    }
+  }
+
+  @Override
+  public void resume() {
+    if (_adPlayer != null) {
+      _adPlayer.resume();
+    }
+  }
+
+  @Override
+  public void resume(int timeInMilliSecond, State stateToResume) {
+    if (_adPlayer != null) {
+      _adPlayer.resume(timeInMilliSecond, stateToResume);
+    }
+  }
+
+  @Override
+  public void destroy() {
+    _player.get().deleteObserver(this);
+    _player.get().deregisterPlugin(this);
+    _player.clear();
+
+    if (_adPlayer != null) {
+      _adPlayer.destroy();
+    }
+  }
+
+  @Override
+  public boolean onContentChanged() {
+    super.onContentChanged();
+    return currentItemChanged(_player.get().getCurrentItem());
+  }
+
+  @Override
+  public boolean onPlayheadUpdate(int playhead) {
+    checkPlayableAds(playhead);
+    return super.onPlayheadUpdate(playhead);
+  }
+
+  @Override
+  public boolean onCuePoint(int cuePointIndex) {
+    return false;
+  }
+
+  @Override
+  public boolean onContentError(int errorCode) {
+    this.cleanupOnError();
+    return false;
+  }
+
+  @Override
+  public void onAdModeEntered() {
+    if (getLastAdModeTime() < 0) {
+      submitAdRequest();
+    } else {
+      super.onAdModeEntered();
+    }
+  }
+
+  @Override
+  public PlayerInterface getPlayerInterface() {
+    return _adPlayer;
+  }
+
+  @Override
+  public void resetAds() {
+    _adSpotManager.resetAds();
+  }
+
+  private void insertAds(List<ISlot> slotList, int adType) {
+    if (slotList == null) {
+      return;
+    }
+
+    DebugMode.logD(TAG,
+        "Freewheel insertAds: " + String.valueOf(slotList.size())
+            + adTypeString(adType) + " ads");
+    for (ISlot slot : slotList) {
+      FWAdSpot adSpot = FWAdSpot.create(slot,
+          adType == _fwConstants.TIME_POSITION_CLASS_POSTROLL());
+      _adSpotManager.insertAd(adSpot);
+    }
+  }
+
+  private String adTypeString(int adType) {
+    if (adType == _fwConstants.TIME_POSITION_CLASS_PREROLL()) {
+      return "PREROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_MIDROLL()) {
+      return "MIDROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_POSTROLL()) {
+      return "POSTROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_PAUSE_MIDROLL()) {
+      return "PAUSE_MIDROLL";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_OVERLAY()) {
+      return "OVERLAY";
+    } else if (adType == _fwConstants.TIME_POSITION_CLASS_DISPLAY()) {
+      return "DISPLAY";
+    }
+    return "UNKNOWN_TYPE";
+  }
+
+  @Override
+  protected boolean playAd(FWAdSpot adToPlay) {
+    if (_adPlayer != null) {
+      _adPlayer.destroy();
+    }
+    _adPlayer = new FWAdPlayer();
+    _adPlayer.init(this, _player.get(), adToPlay, _notifier);
+    _adPlayer.play();
+    return true;
+  }
+
+  @Override
+  public void onStateChange(StateNotifier notifier) {
+    if (_adPlayer == null || _adPlayer.getNotifier() != notifier) {
+      return;
+    }
+    
+    switch (notifier.getState()) {
+    case COMPLETED:
+      if (!playAdsBeforeTime()) {
+        exitAdMode();
+      }
+      break;
+    case ERROR:
+      exitAdMode();
+      break;
+    default:
+      break;
+    }
   }
 }

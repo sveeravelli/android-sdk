@@ -1,17 +1,18 @@
 package com.ooyala.test.cases;
 
-import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
-import com.ooyala.test.BaseInternalTestAppActivity;
-import com.ooyala.test.R;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.view.inputmethod.InputMethodManager;
+
+import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.test.BaseInternalTestAppActivity;
+import com.ooyala.test.R;
 
 /**
  * Use your own custom embed and pcode to test
@@ -23,7 +24,7 @@ public class CustomEmbedInternalTestAppActivity extends BaseInternalTestAppActiv
 //  OoyalaPlayer player;
 
   final String TAG = this.getClass().toString();
-  final String DOMAIN = "ooyala.com";
+  final String DOMAIN = "http://www.ooyala.com";
 
   private OoyalaPlayerLayout playerLayout;
   private EditText pcodeText;
@@ -65,7 +66,8 @@ public class CustomEmbedInternalTestAppActivity extends BaseInternalTestAppActiv
 
       //Set the pcode and embed code
       Log.i(TAG, "Pcode: " + pcodeText.getText().toString() + "" + "Embed Code: " + embedCodeText.getText().toString());
-      playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, pcodeText.getText().toString(), DOMAIN);
+      PlayerDomain domain = new PlayerDomain(DOMAIN);
+      playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, pcodeText.getText().toString(), domain);
       player = playerLayoutController.getPlayer();
       player.setEmbedCode(embedCodeText.getText().toString());
     }

@@ -1,7 +1,7 @@
 package com.ooyala.android.imasdk;
 
 
-import com.ooyala.android.Stream;
+import com.ooyala.android.item.Stream;
 
 class IMAStream extends Stream {
   /**

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DxApiDemos</string>
+    <string name="settings_category_personalization">Perform Personalization</string>
+    <string name="category_contant">Content</string>
+    <string name="Custom_contant">Use Custom Content</string>
+    <string name="Local_playback">Use Local Playback</string>
+    <string name="Active_Content">Active Content</string>
+    <string name="category_Player_Type">Player Type</string> 
+    <string name="Select_Hardware_Acceleration">Player HW Acceleration</string> 
+    <string name="Select_Hardware_Acceleration_Summary">Usage of Hardware acceleration</string>     
+  
+    <string name="category_streaming_downloader">Streaming Downloader</string> 
+    <string name="select_streaming_downloader">Streaming Downloader</string>    
+    
+    <string name="menu_download_content">Download Content</string>
+    <string name="menu_download_Harmonic_Ts">Download Harmonic HLS TS</string>
+    <string name="menu_aquire_initiator">Initiator-Based Rights Acquisition</string>
+    <string name="meanu_aquire_content">Acquire Rights</string>
+    <string name="menu_play">Playback</string>
+    <string name="menu_Progressive_Download">Progressive Download</string>
+    <string name="menu_localize">Right Info Display</string>
+    <string name="menu_Version">Version</string>
+    <string name="menu_summery_initiator">Acquire rights for a protected content using a PlayReady Initiator</string>
+    <string name="menu_summery_content">Acquire rights for a protected content located on the file-system</string>
+    <string name="menu_summery_download">Download file from URL to local path</string>
+    <string name="menu_summery_Harmonic_Ts">Download TS fragment for Harmonic HLS stream</string>
+    <string name="menu_summery_perform_playback">Playback of of content that have valid rights</string>
+    <string name="menu_summery_localize">Display the rights information of a protected content as a human readable string</string>
+    <string name="menu_summery_About">N/A</string>
+    <string name="Local_playback_summary">Play only after the content has been downloaded to the device</string>
+    
+    <string name="acquire_Rights_before_download">You need to download the file before you acquire Rights.</string>
+	<string name="BpsQuality_Auto">Auto</string>
+    
+<!-- keys values -->
+	<string name="key_active_content_pref">active content</string>
+	<string name="key_use_custom_content_checkBox">use custom content</string>
+	<string name="key_use_local_playback_checkBox">use local playback content</string>
+	<string name="key_content_url_pref">content url</string>
+	<string name="key_initiator_url_pref">initiator url</string>
+	<string name="key_custom_la_url_pref">Custom LA URL</string>
+	<string name="key_custom_cookies_pref">Cookies</string>
+	<string name="key_custom_data_pref">Custom Data</string>
+	<string name="key_custom_data_type_pref">Custom Data Type</string>
+	<string name="key_active_content_display">active content display</string>
+	<string name="key_about">Version display</string>
+	<string name="key_hardware_accelerator">Hardware Accelerator</string>
+
+
+	<string name="str_OK">OK</string>
+	<string name="str_ErrPlay_Title">Error</string>
+	<string name="str_ErrPlay_Message">Don\'t support this file format!</string>
+
+
+<!-- Playback options values -->
+
+	<string name="category_title_subtitles">Subtitles</string>
+
+	<string name="title_checkbox_subtitles">Use Subtitles</string>
+	<string name="key_checkbox_subtitles">use_subtitles</string>
+	<string name="title_list_subtitles">Available Subtitles</string>
+	<string name="key_list_subtitles">use_selected_subtitles</string>
+	<string name="title_custom_subtitles">Custom Subtitles</string>
+	<string name="key_custom_subtitles">custom_subtitles</string>
+
+	<string name="category_title_audio_languages">Audio Languages</string>
+
+	<string name="title_list_audio_languages">Available Audio Languages</string>
+	<string name="key_list_audio_languages">use_selected_audio_languages</string>
+	<string name="streaming_downloader_download">Download</string>
+	<string name="streaming_downloader_URL">URL</string>
+	<string name="streaming_downloader_pause">Pause</string>
+</resources>

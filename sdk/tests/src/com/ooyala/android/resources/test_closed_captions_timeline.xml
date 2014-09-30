@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xmlns:ttm="http://www.w3.org/ns/ttml#metadata" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:smpte="http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt" xmlns:m608="http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt#cea608" xml:lang="en" ttp:timeBase="media" ttp:frameRate="1" ttp:frameRateMultipler="30000 1001"> 
+<head>
+<ttm:desc>SMPTE Timed Text document created by Anvato</ttm:desc>
+	<metadata>
+		<smpte:information xmlns:m608="http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt#cea608" origin="http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt#cea608" mode="Enhanced" m608:channel="CC1" m608:programName="/tmp/ccyIqukd" m608:captionService="F1C1CC"/>
+	</metadata>
+	<styling>
+		<style xml:id="basic" tts:color="white" tts:backgroundColor="black" tts:fontFamily="monospace" tts:lineHeight="100%" tts:fontSize="80%" tts:fontWeight="normal" tts:fontStyle="normal"/>
+	</styling>
+	<layout>
+		<region xml:id="pop1" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="pop2" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="pop3" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="pop4" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="rollup1" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="rollup2" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+		<region xml:id="rollup3" tts:backgroundColor="transparent" tts:showBackground="whenActive"/>
+	</layout>
+</head>
+	<body>
+		<div xml:lang="en">
+			<p begin="00:00:03:27" end="00:00:06:16" region="rollup1" style="basic" tts:origin="15% 88.33%" tts:extent="71% 5.33%">&gt;&gt; This is the first llllline 1234120394581298345981237459218347598. </p>
+			<p begin="00:00:03:27" end="00:00:06:16" region="rollup2" style="basic" tts:origin="15% 93.67%" tts:extent="53% 5.33%">This is the second.</p>
+			<p begin="00:00:07:27" end="00:00:08:16" region="rollup1" style="basic" tts:origin="15% 88.33%" tts:extent="71% 5.33%">&gt;&gt; this is the third. </p>
+			<p begin="00:00:07:27" end="00:00:18:16" region="rollup2" style="basic" tts:origin="15% 93.67%" tts:extent="53% 5.33%">this is the forth.</p>
+			<p begin="00:00:07:27" end="00:00:15:16" region="rollup2" style="basic" tts:origin="15% 93.67%" tts:extent="53% 5.33%">this is the fifth.</p>
+			<p begin="00:00:20:16" end="00:00:25:05" region="rollup1" style="basic" tts:origin="15% 88.33%" tts:extent="61% 5.33%">&gt;&gt; this is the sixth</p>
+			<p begin="00:00:22:16" end="00:00:27:05" region="rollup2" style="basic" tts:origin="15% 93.67%" tts:extent="43% 5.33%">&gt;&gt; this is the seventh.</p>
+		</div>
+	</body>
+</tt>

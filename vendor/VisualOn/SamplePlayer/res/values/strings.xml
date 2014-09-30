@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello VisualOn</string>
-    <string name="app_name">Ooyala Sample Player</string>
+    <string name="app_name">API3 Sample Player</string>
     <string name="str_Welcome_Title">Disclaimers</string>
     <string name="str_Welcome_Message"></string>
     <string name="str_Welcome_Agree">Agree</string>
@@ -18,7 +18,7 @@
 	<string name="str_Render_Comment">Java render, C render, Native window</string>
 	<string name="str_Render_Dialog_Title">Select Video Render Type</string>
 	<string name="Player_BpsQuality_Auto">Auto</string>
-	<string name="Player_Audio_None">None</string>
+	<string name="Player_DownloadSelectVideo">Default</string>
 	<string name="Player_CloseCaptionSelector_None">None</string>
     <!-- The following string is modified automatically during the build
 	 with sed command.  Must use single quote ' to prevent C shell
@@ -57,18 +57,18 @@
 	<string name="str_Back_To_Root">Back to /sdcard </string>
 	<string name="str_Back_To_Parent">Back to ../</string>
 	<string name="str_URL">URL...</string>
-	<string name="str_AddURL">Input streaming URL address or file path</string>
-	<string name="str_SelURL">Select a URL address</string>
+	<string name="str_AddURL">Input streaming URL address or file path.</string>
+	<string name="str_SelURL">Select an URL address</string>
 	<string name="str_SelURL_FirstLine">Select a url from the following</string>
 	<string name="str_SelSubtitle_FirstLine">Select a subtitle from the following</string>
 	<string name="str_option">Option</string>
 	<string name="str_colorRGB8888_comment">If Checked, use RGB8888 as pixels format; else use RGB565</string>
 	<string name="str_colorRGB8888">RGB8888</string>
 	<string name="str_MAX_Performance">Max Performance</string>
-	<string name="str_MAX_Performance_comment">Turn off CPU dynamic frequency scaling</string>
+	<string name="str_MAX_Performance_comment">If Checked, make the application run at max performance</string>
 	<string name="str_use_surface_render">Surface render</string>
 	<string name="str_use_surface_render_comment">If Checked, video surface render is enabled; else java render will be used</string>
-	<string name="str_dolby_effect">Enable Dolby Surround</string>
+	<string name="str_dolby_effect">Enable Dolby Effect</string>
 	<string name="str_Audio_Animation">Audio Screen Animation</string>
 	<string name="str_Audio_Animation_comment">Enable / disable audio 3D background animation</string>
 	<string name="str_Threads_Title">Select Threads Count</string>
@@ -84,5 +84,21 @@
 	<string name="str_SocketType_Dialog_Title">Set RTSP Default Connection Type</string>
 	<string name="str_HLS_OPTION">Set HLS bit rate</string>
 	<string name="str_HLS_Summary">Input HLS max bit rate</string>
-	<string name="str_HLS_Dialog_message">A value of 0 indicates the max bit rate is unlimited</string>
+	<string name="str_HLS_Dialog_message">Please input HLS max bit rate(bps), 0 present not limited</string>
+	<string name="VO_OSMP_CB_LICENSE_FAIL">License check failed!</string>
+	<string name="VO_OSMP_CB_ERROR">Unknown error!</string>
+	<string name="VO_OSMP_SRC_CB_DRM_FAIL">DRM engine error!</string>
+	<string name="VO_OSMP_SRC_CB_DOWNLOAD_FAIL">Source download failed!</string>
+	<string name="VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR">Play list parse error!</string>
+	<string name="VO_OSMP_SRC_CB_CONNECTION_REJECTED">Maximum number of connections was reached, Currently used for RTSP only!</string>
+	<string name="VO_OSMP_SRC_CB_DRM_NOT_SECURE">Device is rooted/jailbroken, DRM not secure!</string>
+	<string name="VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL">Device uses A/V output device but the content license does not allow it. Playback stopped</string>
+	<string name="VO_OSMP_SRC_CB_CONNECTION_FAIL">Source connection failed!</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_PLAYLIST_PARSEFAIL">Play list parse failed</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_PLAYLIST_UNSUPPORTED">Play list not supported</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_UNSUPPORTED">Stream not supported</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_DOWNLOADFAIL">Stream download failed</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_DRMLICENSEERROR">Stream DRM error</string>
+	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_VOLIBLICENSEERROR">Stream license error</string>
+	<string name="spinnerURLTitle">Select</string>
 </resources>

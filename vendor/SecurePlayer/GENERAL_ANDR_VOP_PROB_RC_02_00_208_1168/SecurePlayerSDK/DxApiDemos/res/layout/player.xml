@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/transparent" >
+
+    <LinearLayout
+        android:id="@+id/layout4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#00000000" >
+
+        <ProgressBar
+            android:id="@+id/pbBuffer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" >
+        </ProgressBar>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:background="@drawable/bg"
+        android:gravity="center"
+        android:orientation="vertical" >
+        
+        <TableLayout
+            android:id="@+id/layout2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#00000000"
+            android:orientation="horizontal"
+            android:paddingTop="15dp"
+            android:stretchColumns="1" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/zapButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/restart"
+                    android:text="Zap" />
+
+                <ImageButton
+                    android:id="@+id/pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="20dp"
+                    android:background="#00000000"
+                    android:gravity="center"
+                    android:src="@drawable/pause_button" />
+            </RelativeLayout>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/CurrentPosition"
+                    android:layout_width="55dp"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:paddingLeft="15dp"
+                    android:text="0:11:10"
+                    android:textStyle="bold" />
+
+                <SeekBar
+                    android:id="@+id/SeekBar01"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:max="100"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="2dp"
+                    android:progress="0"
+                    android:thumb="@drawable/seek" />
+
+                <TextView
+                    android:id="@+id/Duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:paddingRight="15dp"
+                    android:text="1:49:00"
+                    android:textStyle="bold" />
+            </TableRow>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp"
+                android:gravity="center" >
+
+                <ImageButton
+                    android:id="@+id/ibLowSpeed"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/transparent_background"
+                    android:src="@drawable/btn_bf" />
+
+                <TextView
+                    android:id="@+id/tvAudioSpeed"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_centerInParent="true"
+                    android:text="      "
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <ImageButton
+                    android:id="@+id/ibHighSpeed"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/transparent_background"
+                    android:src="@drawable/btn_ff" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+            </LinearLayout>
+        </TableLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

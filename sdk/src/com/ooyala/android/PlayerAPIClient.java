@@ -15,10 +15,50 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.ContentItem;
+import com.ooyala.android.item.PaginatedParentItem;
 
 class PlayerAPIClient {
+  //private static String TAG = PlayerAPIClient.class.getName();
+  protected static final String KEY_DOMAIN = "domain";
+  protected static final String KEY_AUTHORIZATION_DATA = "authorization_data";
+  protected static final String KEY_USER_INFO = "user_info";
+  protected static final String KEY_CONTENT_TREE = "content_tree";
+  protected static final String KEY_MESSAGE = "message";
+  protected static final String KEY_AD_SET_CODE = "adSetCode";
+  protected static final String KEY_HEARTBEAT_DATA = "heartbeat_data";
+  protected static final String KEY_HEARTBEAT_INTERVAL = "heartbeat_interval";
+  protected static final String KEY_AUTH_TOKEN = "auth_token";
+  protected static final String KEY_CODE = "code";
+  protected static final String KEY_AUTHORIZED = "authorized";
+  protected static final String KEY_CHILDREN = "children";
+  protected static final String KEY_EXPIRES = "expires";
+  protected static final String KEY_HEIGHT = "height";
+  protected static final String KEY_WIDTH = "width";
+  protected static final String KEY_METADATA = "metadata";
+  protected static final String KEY_DEVICE = "device";
+  protected static final String KEY_ERRORS = "errors";
+
+  protected static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
+  protected static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
+  protected static final String AUTHORIZE_HEARTBEAT_URI = "/sas/player_api/v%s/auth_heartbeat/pcode/%s/auth_token/%s";
+  protected static final String AUTHORIZE_PUBLIC_KEY_B64 = "MCgCIQD1PX86jvLr5bB3b5IFEze7TiWGEaRSHl5Ls7/3AKO5IwIDAQAB";
+  protected static final String AUTHORIZE_PUBLIC_KEY_NAME = "sas_public_key";
+  protected static final int AUTHORIZE_SIGNATURE_DIGEST_LENGTH = 20;
+
+  protected static final String BACKLOT_URI_PREFIX = "/v2";
+
+  protected static final String CONTENT_TREE_URI = "/player_api/v%s/content_tree/embed_code/%s/%s";
+  protected static final String CONTENT_TREE_BY_EXTERNAL_ID_URI = "/player_api/v%s/content_tree/external_id/%s/%s";
+  protected static final String CONTENT_TREE_NEXT_URI = "/player_api/v%s/content_tree/next/%s/%s";
+
+  protected static final String METADATA_EMBED_CODE_URI = "/player_api/v%s/metadata/embed_code/%s/%s";
+
+  protected static final String SEPARATOR_URL_IDS = ",";
+
   protected String _pcode = null;
-  protected String _domain = null;
+  protected PlayerDomain _domain = null;
   protected int _width = -1;
   protected int _height = -1;
   protected EmbedTokenGenerator _embedTokenGenerator;
@@ -31,7 +71,7 @@ class PlayerAPIClient {
 
   public PlayerAPIClient() {}
 
-  public PlayerAPIClient(String pcode, String domain, EmbedTokenGenerator embedTokenGenerator) {
+  public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator) {
     _pcode = pcode;
     _domain = domain;
     _embedTokenGenerator = embedTokenGenerator;
@@ -42,26 +82,26 @@ class PlayerAPIClient {
         "Authorization response invalid (nil)."); }
 
     try {
-      if (!authResult.isNull(Constants.KEY_ERRORS)) {
-        JSONObject errors = authResult.getJSONObject(Constants.KEY_ERRORS);
-        if (!errors.isNull(Constants.KEY_CODE) && errors.getInt(Constants.KEY_CODE) != 0) { throw new OoyalaException(
-            OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID, errors.isNull(Constants.KEY_MESSAGE) ? ""
-                : errors.getString(Constants.KEY_MESSAGE)); }
+      if (!authResult.isNull(KEY_ERRORS)) {
+        JSONObject errors = authResult.getJSONObject(KEY_ERRORS);
+        if (!errors.isNull(KEY_CODE) && errors.getInt(KEY_CODE) != 0) { throw new OoyalaException(
+            OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID, errors.isNull(KEY_MESSAGE) ? ""
+                : errors.getString(KEY_MESSAGE)); }
       }
 
-      if (authResult.isNull(Constants.KEY_USER_INFO)) {
+      if (authResult.isNull(KEY_USER_INFO)) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
             "User info data does not exist.");
       }
 
-      if (authResult.isNull(Constants.KEY_AUTHORIZATION_DATA)) {
+      if (authResult.isNull(KEY_AUTHORIZATION_DATA)) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
             "Authorization data does not exist.");
       } else {
-        JSONObject authData = authResult.getJSONObject(Constants.KEY_AUTHORIZATION_DATA);
+        JSONObject authData = authResult.getJSONObject(KEY_AUTHORIZATION_DATA);
         for (String embedCode : embedCodes) {
           if (authData.isNull(embedCode)
-              || authData.getJSONObject(embedCode).isNull(Constants.KEY_AUTHORIZED)) { throw new OoyalaException(
+              || authData.getJSONObject(embedCode).isNull(KEY_AUTHORIZED)) { throw new OoyalaException(
               OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID, "Authorization invalid for embed code: "
                   + embedCode); }
         }
@@ -82,54 +122,26 @@ class PlayerAPIClient {
     if (result == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
         "response invalid (nil)."); }
 
-    if (result.isNull(Constants.KEY_MESSAGE)) {
+    if (result.isNull(KEY_MESSAGE)) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
           "response invalid (nil).");
     }
     try {
-      if(!result.getString(Constants.KEY_MESSAGE).equals("OK")) {
+      if(!result.getString(KEY_MESSAGE).equals("OK")) {
         throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
-            "response code (" + result.getString(Constants.KEY_MESSAGE) + ").");
-      } else if(result.getInt(Constants.KEY_EXPIRES) < System.currentTimeMillis()/1000  ) {
+            "response code (" + result.getString(KEY_MESSAGE) + ").");
+      } else if(result.getInt(KEY_EXPIRES) < System.currentTimeMillis()/1000  ) {
     	  throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
     	          "response expired.");
       }
-      if (!result.isNull(Constants.KEY_AUTH_TOKEN)) {
-          setAuthToken(result.getString(Constants.KEY_AUTH_TOKEN));
+      if (!result.isNull(KEY_AUTH_TOKEN)) {
+          setAuthToken(result.getString(KEY_AUTH_TOKEN));
       }
     } catch (JSONException e) {
       throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED,
           "response invalid (error).");
     }
     return result;
-  }
-
-  private JSONObject getContentTreeData(JSONObject contentTree) throws OoyalaException {
-    if (contentTree == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
-        "Content Tree response invalid (nil)."); }
-
-    try {
-      if (!contentTree.isNull(Constants.KEY_ERRORS)) {
-        JSONObject errors = contentTree.getJSONObject(Constants.KEY_ERRORS);
-        if (!errors.isNull(Constants.KEY_CODE) && errors.getInt(Constants.KEY_CODE) != 0) { throw new OoyalaException(
-            OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, errors.isNull(Constants.KEY_MESSAGE) ? ""
-                : errors.getString(Constants.KEY_MESSAGE)); }
-      }
-
-      // TODO(mikhail): currently we do not check signature. fix this once we properly implement signatures
-      // server side.
-
-      if (contentTree.isNull(Constants.KEY_CONTENT_TREE)) {
-        throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
-            "Content tree data does not exist.");
-      } else {
-        return contentTree.getJSONObject(Constants.KEY_CONTENT_TREE);
-      }
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
-          "Content tree response invalid (exception).");
-    }
   }
 
   private JSONObject verifyContentTreeObject(JSONObject contentTree, List<String> keys)
@@ -180,11 +192,11 @@ class PlayerAPIClient {
 
   private Map<String, String> authorizeParams(List<String> embedCodes) {
     final Map<String, String> params = new HashMap<String, String>();
-    params.put(Constants.KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
-    params.put(Constants.KEY_DOMAIN, _domain);
+    params.put(KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
+    params.put(KEY_DOMAIN, _domain.toString());
 
     if (getAuthToken().length() > 0) {
-      params.put(Constants.KEY_AUTH_TOKEN, getAuthToken());
+      params.put(KEY_AUTH_TOKEN, getAuthToken());
     }
 
     if (_embedTokenGenerator != null) {
@@ -205,125 +217,6 @@ class PlayerAPIClient {
     return params;
   }
 
-  private Map<String, String> contentTreeParams(Map<String, String> additionalParams) {
-    Map<String, String> params = new HashMap<String, String>();
-    if (additionalParams != null) {
-      params.putAll(additionalParams);
-    }
-    params.put(Constants.KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
-    if (_height > 0 && _width > 0) {
-      params.put(Constants.KEY_WIDTH, Integer.toString(_width));
-      params.put(Constants.KEY_HEIGHT, Integer.toString(_height));
-    }
-    return params;
-  }
-
-  public boolean authorize(AuthorizableItemInternal item) throws OoyalaException {
-    List<String> embedCodes = item.embedCodesToAuthorize();
-    return authorizeEmbedCodes(embedCodes, item);
-  }
-
-  public boolean authorize(AuthorizableItemInternal item, PlayerInfo playerInfo) throws OoyalaException {
-    List<String> embedCodes = item.embedCodesToAuthorize();
-    return authorizeEmbedCodes(embedCodes, item, playerInfo);
-  }
-
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent)
-      throws OoyalaException {
-    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
-    JSONObject authData = null;
-    try {
-      authData = verifyAuthorizeJSON(json, embedCodes);
-
-      //parse out and save auth token and heartbeat data
-      if (!json.isNull(Constants.KEY_AUTH_TOKEN)) {
-        setAuthToken(json.getString(Constants.KEY_AUTH_TOKEN));
-      }
-
-      if (!json.isNull(Constants.KEY_HEARTBEAT_DATA)) {
-        JSONObject heartbeatData = json.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
-        if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
-          _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
-        }
-      }
-
-      if (!json.isNull(Constants.KEY_USER_INFO)) {
-        _userInfo = new UserInfo(json.getJSONObject(Constants.KEY_USER_INFO));
-      }
-    } catch (OoyalaException e) {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
-          "Authorization response invalid (exception).");
-    }
-
-    if (parent != null) {
-      parent.update(authData);
-    }
-    return true;
-  }
-
-  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent, PlayerInfo playerInfo)
-      throws OoyalaException {
-    String uri = String.format(Constants.AUTHORIZE_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    Map<String, String> params = authorizeParams(embedCodes);
-    params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
-
-    if (playerInfo.getSupportedFormats() != null)
-      params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
-
-    if (playerInfo.getSupportedProfiles() != null)
-      params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
-
-    if (playerInfo.getMaxHeight() > 0)
-      params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
-
-    if (playerInfo.getMaxWidth() > 0)
-      params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
-
-    if (playerInfo.getMaxBitrate() > 0) {
-      params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
-    }
-
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, params);
-    JSONObject authData = null;
-    try {
-      authData = verifyAuthorizeJSON(json, embedCodes);
-      //parse out and save auth token and heartbeat data
-      if (!json.isNull(Constants.KEY_AUTH_TOKEN)) {
-        setAuthToken(json.getString(Constants.KEY_AUTH_TOKEN));
-      }
-
-      if (!json.isNull(Constants.KEY_HEARTBEAT_DATA)) {
-        JSONObject heartbeatData = json.getJSONObject(Constants.KEY_HEARTBEAT_DATA);
-        if (!heartbeatData.isNull(Constants.KEY_HEARTBEAT_INTERVAL)) {
-          _heartbeatInterval = heartbeatData.getInt(Constants.KEY_HEARTBEAT_INTERVAL);
-        }
-      }
-
-      if (!json.isNull(Constants.KEY_USER_INFO)) {
-        _userInfo = new UserInfo(json.getJSONObject(Constants.KEY_USER_INFO));
-      }
-    } catch (OoyalaException e) {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
-          "Authorization response invalid (exception).");
-    }
-
-    if (parent != null) {
-      parent.update(authData);
-    }
-    return true;
-  }
-
   private class AuthorizeTask extends AsyncTask<Object, Integer, Boolean> {
     protected OoyalaException _error = null;
     protected AuthorizeCallback _callback = null;
@@ -336,13 +229,13 @@ class PlayerAPIClient {
     @SuppressWarnings("unchecked")
     @Override
     protected Boolean doInBackground(Object... params) { // List<String> embedCodes
-                                                         // AuthorizableItemInternal parent
+                                                         // AuthorizableItem parent
       if (params.length < 2) { return false; }
       if (!(params[0] instanceof List<?>)) { return false; }
 
       List<String> embedCodes = (List<String>)params[0];
-      AuthorizableItemInternal parent = params[1] instanceof AuthorizableItemInternal ?
-          (AuthorizableItemInternal) params[1] : null;
+      AuthorizableItem parent = params[1] instanceof AuthorizableItem ?
+          (AuthorizableItem) params[1] : null;
 
       switch (params.length) {
         case 2:
@@ -371,31 +264,132 @@ class PlayerAPIClient {
     }
   }
 
-  public Object authorize(AuthorizableItemInternal item, AuthorizeCallback callback) {
+  public boolean authorize(AuthorizableItem item) throws OoyalaException {
+    List<String> embedCodes = item.embedCodesToAuthorize();
+    return authorizeEmbedCodes(embedCodes, item);
+  }
+
+  public boolean authorize(AuthorizableItem item, PlayerInfo playerInfo) throws OoyalaException {
+    List<String> embedCodes = item.embedCodesToAuthorize();
+    return authorizeEmbedCodes(embedCodes, item, playerInfo);
+  }
+
+  public Object authorize(AuthorizableItem item, AuthorizeCallback callback) {
     return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, callback);
   }
 
-  public Object authorize(AuthorizableItemInternal item, PlayerInfo playerInfo, AuthorizeCallback callback) {
+  public Object authorize(AuthorizableItem item, PlayerInfo playerInfo, AuthorizeCallback callback) {
     return authorizeEmbedCodes(item.embedCodesToAuthorize(), item, playerInfo, callback);
   }
 
-  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
+      throws OoyalaException {
+    String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
+        Utils.join(embedCodes, SEPARATOR_URL_IDS));
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
+    JSONObject authData = null;
+    try {
+      authData = verifyAuthorizeJSON(json, embedCodes);
+
+      //parse out and save auth token and heartbeat data
+      if (!json.isNull(KEY_AUTH_TOKEN)) {
+        setAuthToken(json.getString(KEY_AUTH_TOKEN));
+      }
+
+      if (!json.isNull(KEY_HEARTBEAT_DATA)) {
+        JSONObject heartbeatData = json.getJSONObject(KEY_HEARTBEAT_DATA);
+        if (!heartbeatData.isNull(KEY_HEARTBEAT_INTERVAL)) {
+          _heartbeatInterval = heartbeatData.getInt(KEY_HEARTBEAT_INTERVAL);
+        }
+      }
+
+      if (!json.isNull(KEY_USER_INFO)) {
+        _userInfo = new UserInfo(json.getJSONObject(KEY_USER_INFO));
+      }
+    } catch (OoyalaException e) {
+      System.out.println("Unable to authorize: " + e);
+      throw e;
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
+          "Authorization response invalid (exception).");
+    }
+
+    if (parent != null) {
+      parent.update(authData);
+    }
+    return true;
+  }
+
+  public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent, PlayerInfo playerInfo)
+      throws OoyalaException {
+    String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
+        Utils.join(embedCodes, SEPARATOR_URL_IDS));
+    Map<String, String> params = authorizeParams(embedCodes);
+    params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
+
+    if (playerInfo.getSupportedFormats() != null)
+      params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
+
+    if (playerInfo.getSupportedProfiles() != null)
+      params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
+
+    if (playerInfo.getMaxHeight() > 0)
+      params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
+
+    if (playerInfo.getMaxWidth() > 0)
+      params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
+
+    if (playerInfo.getMaxBitrate() > 0) {
+      params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+    }
+
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, params);
+    JSONObject authData = null;
+    try {
+      authData = verifyAuthorizeJSON(json, embedCodes);
+      //parse out and save auth token and heartbeat data
+      if (!json.isNull(KEY_AUTH_TOKEN)) {
+        setAuthToken(json.getString(KEY_AUTH_TOKEN));
+      }
+
+      if (!json.isNull(KEY_HEARTBEAT_DATA)) {
+        JSONObject heartbeatData = json.getJSONObject(KEY_HEARTBEAT_DATA);
+        if (!heartbeatData.isNull(KEY_HEARTBEAT_INTERVAL)) {
+          _heartbeatInterval = heartbeatData.getInt(KEY_HEARTBEAT_INTERVAL);
+        }
+      }
+
+      if (!json.isNull(KEY_USER_INFO)) {
+        _userInfo = new UserInfo(json.getJSONObject(KEY_USER_INFO));
+      }
+    } catch (OoyalaException e) {
+      System.out.println("Unable to authorize: " + e);
+      throw e;
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
+          "Authorization response invalid (exception).");
+    }
+
+    if (parent != null) {
+      parent.update(authData);
+    }
+    return true;
+  }
+
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent,
       AuthorizeCallback callback) {
     AuthorizeTask task = new AuthorizeTask(callback);
     task.execute(embedCodes, parent);
     return task;
   }
 
-  // boolean here refers to the response.
-  public boolean authorizeHeartbeat() throws OoyalaException {
-    String uri = String.format(Constants.AUTHORIZE_HEARTBEAT_URI, Constants.API_VERSION, _pcode, getAuthToken());
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Constants.AUTHORIZE_HOST, uri, null);
-    try {
-      return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
-    } catch (OoyalaException e) {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    }
+  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent,
+      PlayerInfo playerInfo, AuthorizeCallback callback) {
+    AuthorizeTask task = new AuthorizeTask(callback);
+    task.execute(embedCodes, parent, playerInfo);
+    return task;
   }
 
   private class AuthorizeHeartbeatTask extends AsyncTask<Void, Void, Boolean> {
@@ -432,43 +426,62 @@ class PlayerAPIClient {
     public void callback(boolean result, OoyalaException error);
   }
 
+  // boolean here refers to the response.
+  public boolean authorizeHeartbeat() throws OoyalaException {
+    String uri = String.format(AUTHORIZE_HEARTBEAT_URI, OoyalaPlayer.API_VERSION, _pcode, getAuthToken());
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, null);
+    try {
+      return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
+    } catch (OoyalaException e) {
+      System.out.println("Unable to authorize: " + e);
+      throw e;
+    }
+  }
+
   public Object authorizeHeartbeat(AuthorizeHeartbeatCallback callback) {
     AuthorizeHeartbeatTask task = new AuthorizeHeartbeatTask(callback);
     task.execute();
     return task;
   }
-  public Object authorizeEmbedCodes(List<String> embedCodes, AuthorizableItemInternal parent,
-      PlayerInfo playerInfo, AuthorizeCallback callback) {
-    AuthorizeTask task = new AuthorizeTask(callback);
-    task.execute(embedCodes, parent, playerInfo);
-    return task;
-  }
-
-  public ContentItem contentTree(List<String> embedCodes) throws OoyalaException {
-    return contentTreeWithAdSet(embedCodes, null);
-  }
-
-  public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
-    Map<String, String> params = null;
-    if (adSetCode != null) {
-      params = new HashMap<String, String>(1);
-      params.put(Constants.KEY_AD_SET_CODE, adSetCode);
+  private Map<String, String> contentTreeParams(Map<String, String> additionalParams) {
+    Map<String, String> params = new HashMap<String, String>();
+    if (additionalParams != null) {
+      params.putAll(additionalParams);
     }
+    params.put(KEY_DEVICE, Utils.device() + (_isHook ? HOOK : ""));
+    if (_height > 0 && _width > 0) {
+      params.put(KEY_WIDTH, Integer.toString(_width));
+      params.put(KEY_HEIGHT, Integer.toString(_height));
+    }
+    return params;
+  }
 
-    String uri = String.format(Constants.CONTENT_TREE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(params));
-    JSONObject contentTree = null;
+  private JSONObject getContentTreeData(JSONObject contentTree) throws OoyalaException {
+    if (contentTree == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+        "Content Tree response invalid (nil)."); }
+
     try {
-      contentTree = verifyContentTreeObject(obj, embedCodes);
-    } catch (OoyalaException e) {
-      System.out.println("Unable to create objects: " + e);
-      throw e;
+      if (!contentTree.isNull(KEY_ERRORS)) {
+        JSONObject errors = contentTree.getJSONObject(KEY_ERRORS);
+        if (!errors.isNull(KEY_CODE) && errors.getInt(KEY_CODE) != 0) { throw new OoyalaException(
+            OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID, errors.isNull(KEY_MESSAGE) ? ""
+                : errors.getString(KEY_MESSAGE)); }
+      }
+
+      // TODO(mikhail): currently we do not check signature. fix this once we properly implement signatures
+      // server side.
+
+      if (contentTree.isNull(KEY_CONTENT_TREE)) {
+        throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+            "Content tree data does not exist.");
+      } else {
+        return contentTree.getJSONObject(KEY_CONTENT_TREE);
+      }
+    } catch (JSONException exception) {
+      System.out.println("JSONException: " + exception);
+      throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+          "Content tree response invalid (exception).");
     }
-    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
-        "Unknown Content Type"); }
-    return item;
   }
 
   private class ContentTreeTaskParam {
@@ -503,40 +516,6 @@ class PlayerAPIClient {
     }
   }
 
-  public Object contentTree(List<String> embedCodes, ContentTreeCallback callback) {
-    return contentTreeWithAdSet(embedCodes, null, callback);
-  }
-
-  public Object contentTreeWithAdSet(List<String> embedCodes, String adSetCode, ContentTreeCallback callback) {
-    ContentTreeTask task = new ContentTreeTask(callback);
-    ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
-    taskParam.idList = embedCodes;
-    taskParam.adSetCode = adSetCode;
-    task.execute(taskParam);
-    return task;
-  }
-
-  public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
-    String uri = String.format(Constants.CONTENT_TREE_BY_EXTERNAL_ID_URI, Constants.API_VERSION, _pcode,
-        Utils.join(externalIds, Constants.SEPARATOR_COMMA));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(null));
-    if (obj == null) { return null; }
-    List<String> embedCodes = new ArrayList<String>(); // will be filled in by verifyContentTreeObject call
-                                                       // below
-    JSONObject contentTree = null;
-    try {
-      contentTree = verifyContentTreeObject(obj, externalIds, embedCodes);
-    } catch (OoyalaException e) {
-      System.out.println("Unable to create externalId objects: " + e);
-      throw e;
-    }
-
-    ContentItem item = ContentItem.create(contentTree, embedCodes, this);
-    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
-        "Unknown Content Type"); }
-    return item;
-  }
-
   private class ContentTreeByExternalIdsTask extends ContentTreeTask {
     public ContentTreeByExternalIdsTask(ContentTreeCallback callback) {
       super(callback);
@@ -555,6 +534,88 @@ class PlayerAPIClient {
     }
   }
 
+  private class ContentTreeNextTask extends AsyncTask<Object, Integer, PaginatedItemResponse> {
+    protected OoyalaException _error = null;
+    protected ContentTreeNextCallback _callback = null;
+
+    public ContentTreeNextTask(ContentTreeNextCallback callback) {
+      super();
+      _callback = callback;
+    }
+
+    @Override
+    protected PaginatedItemResponse doInBackground(Object... params) {
+      if (params.length < 1 || params[0] == null || !(params[0] instanceof PaginatedParentItem)) { return null; }
+      return contentTreeNext((PaginatedParentItem) (params[1]));
+    }
+
+    @Override
+    protected void onPostExecute(PaginatedItemResponse result) {
+      _callback.callback(result, _error);
+    }
+  }
+
+  public ContentItem contentTree(List<String> embedCodes) throws OoyalaException {
+    return contentTreeWithAdSet(embedCodes, null);
+  }
+
+  public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
+    Map<String, String> params = null;
+    if (adSetCode != null) {
+      params = new HashMap<String, String>(1);
+      params.put(KEY_AD_SET_CODE, adSetCode);
+    }
+
+    String uri = String.format(CONTENT_TREE_URI, OoyalaPlayer.API_VERSION, _pcode,
+        Utils.join(embedCodes, SEPARATOR_URL_IDS));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(params));
+    JSONObject contentTree = null;
+    try {
+      contentTree = verifyContentTreeObject(obj, embedCodes);
+    } catch (OoyalaException e) {
+      System.out.println("Unable to create objects: " + e);
+      throw e;
+    }
+    ContentItem item = ContentItem.create(contentTree, embedCodes, new OoyalaAPIClient(this));
+    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+        "Unknown Content Type"); }
+    return item;
+  }
+
+  public Object contentTree(List<String> embedCodes, ContentTreeCallback callback) {
+    return contentTreeWithAdSet(embedCodes, null, callback);
+  }
+
+  public Object contentTreeWithAdSet(List<String> embedCodes, String adSetCode, ContentTreeCallback callback) {
+    ContentTreeTask task = new ContentTreeTask(callback);
+    ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
+    taskParam.idList = embedCodes;
+    taskParam.adSetCode = adSetCode;
+    task.execute(taskParam);
+    return task;
+  }
+
+  public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
+    String uri = String.format(CONTENT_TREE_BY_EXTERNAL_ID_URI, OoyalaPlayer.API_VERSION, _pcode,
+        Utils.join(externalIds, SEPARATOR_URL_IDS));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null));
+    if (obj == null) { return null; }
+    List<String> embedCodes = new ArrayList<String>(); // will be filled in by verifyContentTreeObject call
+                                                       // below
+    JSONObject contentTree = null;
+    try {
+      contentTree = verifyContentTreeObject(obj, externalIds, embedCodes);
+    } catch (OoyalaException e) {
+      System.out.println("Unable to create externalId objects: " + e);
+      throw e;
+    }
+
+    ContentItem item = ContentItem.create(contentTree, embedCodes, new OoyalaAPIClient(this));
+    if (item == null) { throw new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID,
+        "Unknown Content Type"); }
+    return item;
+  }
+
   public Object contentTreeByExternalIds(List<String> externalIds, ContentTreeCallback callback) {
     return contentTreeByExternalIdsWithAdSetCode(externalIds, null, callback);
   }
@@ -569,9 +630,9 @@ class PlayerAPIClient {
 
   public PaginatedItemResponse contentTreeNext(PaginatedParentItem parent) {
     if (!parent.hasMoreChildren()) { return null; }
-    String uri = String.format(Constants.CONTENT_TREE_NEXT_URI, Constants.API_VERSION, _pcode,
+    String uri = String.format(CONTENT_TREE_NEXT_URI, OoyalaPlayer.API_VERSION, _pcode,
         parent.getNextChildren());
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Constants.CONTENT_TREE_HOST, uri, contentTreeParams(null));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null));
     if (obj == null) { return null; }
     JSONObject contentTree = null;
     List<String> keys = new ArrayList<String>();
@@ -599,32 +660,11 @@ class PlayerAPIClient {
 
       int startIdx = parent.childrenCount();
       parent.update(parentDict);
-      return new PaginatedItemResponse(startIdx, tokenDict.isNull(Constants.KEY_CHILDREN) ? 0 : tokenDict
-          .getJSONArray(Constants.KEY_CHILDREN).length());
+      return new PaginatedItemResponse(startIdx, tokenDict.isNull(KEY_CHILDREN) ? 0 : tokenDict
+          .getJSONArray(KEY_CHILDREN).length());
     } catch (JSONException e) {
       System.out.println("Unable to create next objects due to JSON Exception: " + e);
       return null;
-    }
-  }
-
-  private class ContentTreeNextTask extends AsyncTask<Object, Integer, PaginatedItemResponse> {
-    protected OoyalaException _error = null;
-    protected ContentTreeNextCallback _callback = null;
-
-    public ContentTreeNextTask(ContentTreeNextCallback callback) {
-      super();
-      _callback = callback;
-    }
-
-    @Override
-    protected PaginatedItemResponse doInBackground(Object... params) {
-      if (params.length < 1 || params[0] == null || !(params[0] instanceof PaginatedParentItem)) { return null; }
-      return contentTreeNext((PaginatedParentItem) (params[1]));
-    }
-
-    @Override
-    protected void onPostExecute(PaginatedItemResponse result) {
-      _callback.callback(result, _error);
     }
   }
 
@@ -634,37 +674,6 @@ class PlayerAPIClient {
     return task;
   }
 
-
-  public boolean fetchMetadataForEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException {
-    // fetch metadata
-    String uri = String.format(Constants.METADATA_EMBED_CODE_URI, Constants.API_VERSION, _pcode,
-        Utils.join(embedCodes, Constants.SEPARATOR_COMMA));
-    JSONObject root = OoyalaAPIHelper.objectForAPI(Constants.METADATA_HOST, uri, contentTreeParams(null));
-
-    // validate the result
-    if (root == null) {
-      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Empty metadata response");
-    }
-
-    try {
-      int errorCode = root.getJSONObject("errors").getInt("code");
-      if(errorCode != 0) {
-        throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Non-zero metadata response code");
-      }
-
-      ((ContentItem)parent).update(root.getJSONObject(Constants.KEY_METADATA));
-
-    } catch (JSONException je) {
-      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Failed to parse metadata");
-    }
-
-    // return the JSON data
-    return true;
-  }
-
-  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
-    return fetchMetadataForEmbedCodes(item.embedCodesToAuthorize(), item);
-  }
 
   private class MetadataFetchTaskParam {
     public ContentItem item;
@@ -696,6 +705,37 @@ class PlayerAPIClient {
     }
   }
 
+  public boolean fetchMetadataForEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException {
+    // fetch metadata
+    String uri = String.format(METADATA_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
+        Utils.join(embedCodes, SEPARATOR_URL_IDS));
+    JSONObject root = OoyalaAPIHelper.objectForAPI(Environment.METADATA_HOST, uri, contentTreeParams(null));
+
+    // validate the result
+    if (root == null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Empty metadata response");
+    }
+
+    try {
+      int errorCode = root.getJSONObject("errors").getInt("code");
+      if(errorCode != 0) {
+        throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Non-zero metadata response code");
+      }
+
+      ((ContentItem)parent).update(root.getJSONObject(KEY_METADATA));
+
+    } catch (JSONException je) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED, "Failed to parse metadata");
+    }
+
+    // return the JSON data
+    return true;
+  }
+
+  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
+    return fetchMetadataForEmbedCodes(item.embedCodesToAuthorize(), item);
+  }
+
   public Object metadata(ContentItem item, MetadataFetchedCallback callback) {
     MetadataFetchTask task = new MetadataFetchTask(callback);
     MetadataFetchTaskParam taskParam = new MetadataFetchTaskParam();
@@ -704,18 +744,77 @@ class PlayerAPIClient {
     return task;
   }
 
+  private boolean _isFetchingMoreChildren = false;
+  public boolean fetchMoreChildrenForPaginatedParentItem(PaginatedParentItem parent, PaginatedItemListener listener) {
+    // The two lines below aren't within a synchronized block because we assume
+    // single thread
+    // of execution except for the threads we explicitly spawn below, but those
+    // set
+    // _isFetchingMoreChildren = false at the very end of their execution.
+    if (!parent.hasMoreChildren() || _isFetchingMoreChildren) { return false; }
+    _isFetchingMoreChildren = true;
+
+    Thread thread = new Thread(new NextChildrenRunner(parent, listener));
+    thread.start();
+    return true;
+  }
+
+  private class NextChildrenRunner implements Runnable {
+    private PaginatedItemListener _listener = null;
+    private PaginatedParentItem _parent = null;
+
+    public NextChildrenRunner(PaginatedParentItem parent, PaginatedItemListener listener) {
+      _parent = parent;
+      _listener = listener;
+    }
+
+    @Override
+    public void run() {
+      PaginatedItemResponse response = contentTreeNext(_parent);
+      if (response == null) {
+        _listener.onItemsFetched(-1, 0, new OoyalaException(OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED,
+            "Null response"));
+        _isFetchingMoreChildren = false;
+        return;
+      }
+
+      if (response.firstIndex < 0) {
+        _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+            OoyalaErrorCode.ERROR_CONTENT_TREE_NEXT_FAILED, "No additional children found"));
+        _isFetchingMoreChildren = false;
+        return;
+      }
+
+      List<String> childEmbedCodesToAuthorize = ContentItem.getEmbedCodes(_parent.getAllAvailableChildren().subList(
+          response.firstIndex, response.firstIndex + response.count));
+      try {
+        if (authorizeEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent) &&
+            fetchMetadataForEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent)) {
+          _listener.onItemsFetched(response.firstIndex, response.count, null);
+        } else {
+          _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
+              OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED, "Additional child authorization failed"));
+        }
+      } catch (OoyalaException e) {
+        _listener.onItemsFetched(response.firstIndex, response.count, e);
+      }
+      _isFetchingMoreChildren = false;
+      return;
+    }
+  }
+
   public String getPcode() {
     return _pcode;
   }
 
-  public String getDomain() {
+  public PlayerDomain getDomain() {
     return _domain;
   }
 
   private void setAuthToken(String authToken) {
     _authToken = authToken;
     if (_context != null) {
-      SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+      SharedPreferences preferences = _context.getSharedPreferences(OoyalaPlayer.PREFERENCES_NAME, 4);
       SharedPreferences.Editor editor = preferences.edit();
       editor.putString("authToken", authToken);
       editor.commit();
@@ -725,7 +824,7 @@ class PlayerAPIClient {
   public String getAuthToken() {
     if (_authToken == null) {
       if (_context != null) {
-        SharedPreferences preferences = _context.getSharedPreferences("com.ooyala.android_preferences", 4);
+        SharedPreferences preferences = _context.getSharedPreferences(OoyalaPlayer.PREFERENCES_NAME, 4);
         _authToken = preferences.getString("authToken", "");
       } else {
         _authToken = "";

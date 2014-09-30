@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
-
 import java.util.Observer;
 
 import android.app.Activity;
@@ -15,14 +14,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.ooyala.android.AdvertisingIdUtils;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.testapp.R;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
-public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator {
+public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator, AdvertisingIdUtils.IAdvertisingIdListener {
   private static final String TAG = "OoyalaSampleApp";
   private OoyalaPlayer player;
 
@@ -30,12 +32,12 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   private Button insertAd;
   private Button setEmbed;
 
-  private String APIKEY = "";
-  private String SECRET = "";
-  private String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
-  private String EMBEDCODE = "poNTl5ZDoOwns_09h8NxYZg24onVl1V6";
-  private String ACCOUNT_ID = "pbk-373@ooyala.com";
-  private String PLAYERDOMAIN = "ooyala.com";
+  private final String APIKEY = "";
+  private final String SECRET = "";
+  private final String PCODE = "NoeGo6WRLOIhAQ1x9F7zzKKKuFOh";
+  private final String EMBEDCODE = "EyMmRwODrAfvav2W8y6NAxHShxi3pjup";
+  private final String ACCOUNT_ID = "pbk-373@ooyala.com";
+  private final String PLAYERDOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -57,13 +59,30 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
     // optional localization
     // LocalizationSupport.useLocalizedStrings(LocalizationSupport.loadLocalizedStrings("ja_JP"));
+    PlayerDomain domain = null;
+    try {
+      domain = new PlayerDomain(PLAYERDOMAIN);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, PLAYERDOMAIN, this);
+        (OoyalaPlayerLayout) findViewById(R.id.player), PCODE, domain, this);
     player = layoutController.getPlayer();
     player.setAdsSeekable(true); // this will help us skip ads if need be.
     player.addObserver(this);
     player.addObserver(this);
+    int r = player.beginFetchingAdvertisingId(this, this);
+    Log.d( TAG, "initAdvertisingId: " + r );
+  }
+
+  public void onAdvertisingIdSuccess( String adId ) {
+    Log.d( TAG, "onAdvertisingIdSuccess: " + adId );
+  }
+
+  public void onAdvertisingIdError( OoyalaException oe ) {
+    Log.e( TAG, "onAdvertisingIdError", oe );
   }
 
   private void setEmbedCode() {
@@ -97,7 +116,8 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     player = null;
   }
 
-  private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+  private final Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+    @Override
     public void uncaughtException(Thread thread, Throwable ex) {
       Log.e(TAG, "Uncaught exception", ex);
       showErrorDialog(ex);

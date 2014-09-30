@@ -4,34 +4,45 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.os.Build;
-import android.text.format.DateUtils;
-import android.util.Log;
+import android.util.Base64;
 
 class Utils {
+  static final String DEVICE_ANDROID_SDK = "android_sdk";
+  /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
+  static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
+  static final String DEVICE_IPAD = "ipad"; // hack for Washington Post - See PB-279
+
+  static final String SEPARATOR_AMPERSAND = "&";
+  static final String SEPARATOR_TIME = ":";
+
+  private static final String TAG = Utils.class.getName();
+
   public static String device() {
     // temporarily disable HLS
     if (OoyalaPlayer.enableHighResHLS) { // hack for Washington Post - See PB-279
-      return Constants.DEVICE_IPAD;
-    } else if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Constants.SDK_INT_ICS) {
-      return Constants.DEVICE_ANDROID_HLS_SDK;
-    } else return Constants.DEVICE_ANDROID_SDK;
+      return DEVICE_IPAD;
+    } else if (OoyalaPlayer.enableHLS || Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+      return DEVICE_ANDROID_HLS_SDK;
+    } else return DEVICE_ANDROID_SDK;
   }
 
   public static URL makeURL(String host, String uri, Map<String, String> params) {
-    return makeURL(host, uri, getParamsString(params, Constants.SEPARATOR_AMPERSAND, true));
+    return makeURL(host, uri, getParamsString(params, SEPARATOR_AMPERSAND, true));
   }
 
   public static URL makeURL(String host, String uri, String params) {
@@ -67,7 +78,7 @@ class Utils {
         try {
           result.append(URLEncoder.encode(params.get(key), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-          Log.e(Utils.class.getName(), "ERROR while trying to encode parameter", e);
+          DebugMode.logE(Utils.class.getName(), "ERROR while trying to encode parameter", e);
           result.append(params.get(key));
         }
       } else {
@@ -110,7 +121,7 @@ class Utils {
   }
 
   public static boolean isNullOrEmpty(String string) {
-    return string == null || string.equals(Constants.SEPARATOR_EMPTY);
+    return string == null || string.equals("");
   }
 
   public static JSONObject objectFromJSON(String json) {
@@ -125,38 +136,18 @@ class Utils {
     }
   }
 
-  public static Map<String, String> mapFromJSONObject(JSONObject obj) {
-    Map<String, String> map = new HashMap<String, String>();
-
-    if (obj == null) {
-      return map;
+  public static String encryptString(String rawString) {
+    byte[] bytes = rawString.getBytes();
+    MessageDigest digest = null;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+      return null;
     }
-
-    Iterator<?> itr = obj.keys();
-    while (itr.hasNext()) {
-      String key = (String)itr.next();
-      try {
-        map.put(key, obj.getString(key));
-      } catch (JSONException e) {
-        //do nothing
-      }
-    }
-
-    return map;
-  }
-
-  public static double secondsFromTimeString(String time) {
-    String[] hms = time.split(Constants.SEPARATOR_COLON);
-    double multiplier = 1.0;
-    double milliseconds = 0.0;
-    for (int i = hms.length - 1; i >= 0; i--) {
-      milliseconds += (Double.parseDouble(hms[i]) * multiplier);
-      multiplier *= 60.0;
-    }
-    return milliseconds;
-  }
-
-  public static String timeStringFromMillis(int millis, boolean includeHours) {
-    return DateUtils.formatElapsedTime(millis / 1000);
+    digest.reset();
+    String encrypted = Base64.encodeToString(digest.digest(bytes),
+        Base64.DEFAULT);
+    return encrypted;
   }
 }

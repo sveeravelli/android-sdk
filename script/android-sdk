@@ -4,6 +4,8 @@ BEGIN_DIR=`pwd`
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLATFORM_NAME="Android"
 source ${SCRIPT_DIR}/sdk-helper.sh
+source ${SCRIPT_DIR}/secureplayer-build.sh
+source ${SCRIPT_DIR}/visualon-build.sh
 JAR_NAME="${LIB_BASE}.jar"
 IMA_JAR_NAME="${IMA_LIB_BASE}.jar"
 FW_JAR_NAME="${FW_LIB_BASE}.jar"
@@ -12,17 +14,18 @@ ADB=${ANDROID_SDKS}/platform-tools/adb
 EMULATOR=${ANDROID_SDKS}/tools/emulator
 ANDROID=${ANDROID_SDKS}/tools/android
 DOCS_CLASSPATH=${ANDROID_SDKS}/tools/support/annotations.jar
+TMP_UNZIPPED="tmp_unzipped"
 
 function get_version {
-  echo `cat ${SDK_DIR}/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`
+  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $6}' |sed 's/"\([0-9]*\.[0-9]*\.[0-9]*\)_RC[0-9]*";/\1/'`
 }
 
 function get_rc {
-  echo `cat ${SDK_DIR}/src/com/ooyala/android/Constants.java |grep "SDK_VERSION" |awk '{print $7}' |sed 's/"[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)";/\1/'`
+  echo `cat ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java |grep "SDK_VERSION" |awk '{print $6}' |sed 's/"[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)";/\1/'`
 }
 function set_version {
   new_version=$1
-  sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDK_DIR}/src/com/ooyala/android/Constants.java
+  sed -i '' -e "s/\(SDK_VERSION *= *\)\".*\"/\1\"${new_version}\"/g" ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayer.java
 }
 
 function public_docs {
@@ -58,6 +61,54 @@ function custom_verify {
   fi
 }
 
+function init_custom_verify_final_zip {
+	cd ${BASE_DIR}
+	rm -rf ${TMP_UNZIPPED}
+	mkdir ${TMP_UNZIPPED}
+	cd ${TMP_UNZIPPED}
+}
+
+function cleanup_custom_verify_final_zip {
+	cd ${BASE_DIR}
+	rm -rf ${TMP_UNZIPPED}
+}
+
+function custom_verify_final_zip_documentation {
+	echo "Verifying documentation in zip of ${1}..."
+	if [[ ! ( -f ${1}/Documentation/index.html ) ]]; then
+			echo "ERROR: no docs found in zip of ${1}"
+			exit 1
+	fi
+	echo "...done verifying documentation in zip of ${1}"
+}
+
+function custom_verify_final_sdk_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${ZIP_NAME}
+	custom_verify_final_zip_documentation ${ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_ima_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${IMA_ZIP_NAME}
+	custom_verify_final_zip_documentation ${IMA_ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_freewheel_zip {
+	init_custom_verify_final_zip
+	unzip -qq ../${FW_ZIP_NAME}
+	custom_verify_final_zip_documentation ${FW_ZIP_BASE}
+	cleanup_custom_verify_final_zip
+}
+
+function custom_verify_final_zips {
+	custom_verify_final_sdk_zip
+	custom_verify_final_ima_zip	
+	custom_verify_final_freewheel_zip	
+}
+
 function custom_gen {
   currdir=`pwd`
 
@@ -71,9 +122,10 @@ function custom_gen {
   cd ${IMA_SDK_DIR}
   ant clean
   ant release
-  ant jar
+  cp bin/classes.jar OoyalaIMASDK.jar
   cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
   #update IMA Sample App
+  mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
@@ -82,36 +134,53 @@ function custom_gen {
   cd ${FW_SDK_DIR}
   ant clean
   ant release
-  ant jar
+  cp bin/classes.jar OoyalaFreewheelSDK.jar
   cp OoyalaFreewheelSDK.jar ${BASE_DIR}/${FW_ZIP_BASE}/
   #update Freewheel Sample App
+  mkdir  ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   cp OoyalaFreewheelSDK.jar ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp/libs/
   rm OoyalaFreewheelSDK.jar
 
   #update sample apps
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/GettingStartedSampleApp/libs/
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/ChannelBrowserSampleApp/libs/
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/OOView/libs/
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/AdobePassDemoApp/libs/
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_DIR}/DeviceManagementSampleApp/libs/
+  for SAMPLE_APP in GettingStartedSampleApp ChannelBrowserSampleApp OOView AdobePassDemoApp DeviceManagementSampleApp PluginSampleApp; do
+      SAMPLE_APP_LIB_DIR=${SAMPLE_DIR}/${SAMPLE_APP}/libs/
+      mkdir ${SAMPLE_APP_LIB_DIR}
+      cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SAMPLE_APP_LIB_DIR}
+  done
+
+  #update internal apps that need lib
+  mkdir ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/internal-apps/LocalOPTSampleApp/libs/
 
   #update third party sample apps
+  mkdir ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/OmnitureSampleApp/libs/
 
   #default controls
   mkdir ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/AbstractDefaultOoyalaPlayerControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/AbstractOoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerFullscreenControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/DefaultOoyalaPlayerInlineControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/Images.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/LayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerControls.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
-  cp ${SDK_DIR}/src/com/ooyala/android/OptimizedOoyalaPlayerLayoutController.java ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
+  cp ${SDK_DIR}/src/com/ooyala/android/ui/* ${BASE_DIR}/${ZIP_BASE}/DefaultControlsSource
 
   cd "${currdir}"
+}
+
+function custom_sanity_check_dir {
+	if ! [ -e $1 ]; then
+		echo "couldn't find $1"
+		exit 1
+	fi
+	for me in `find $1 -name \*.java -and -not -name DebugMode.java`; do
+			if [[ `grep "Log.[ivde]" $me` ]]; then
+				echo $me
+				echo "(see PBA-297) Use DebugMode.log{ivde} instead of directly calling Android's Log.{ivde}."
+				exit 1
+			fi
+	done
+}
+
+function custom_sanity_checks {
+	custom_sanity_check_dir ${SDK_DIR}/src/com/ooyala/android
+	custom_sanity_check_dir ${BASE_DIR}/third_party_sdks
 }
 
 function custom_tests {
@@ -190,6 +259,7 @@ function setup {
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/sdk/tests/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${IMA_SDK_DIR}/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${FW_SDK_DIR}/local.properties
+  cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/vendor/google_play_services/libproject/google-play-services_lib/local.properties
 
   if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."

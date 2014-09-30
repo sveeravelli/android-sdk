@@ -2,6 +2,8 @@ package com.ooyala.android;
 
 import java.util.Set;
 
+import com.ooyala.android.item.Stream;
+
 public interface StreamSelector {
   /**
    * The method used to select the correct Stream to play.

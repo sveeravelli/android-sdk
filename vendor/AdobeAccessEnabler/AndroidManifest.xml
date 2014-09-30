@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.adobe.adobepass.apps.demo"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:label="@string/app_name"
+                 android:name=".AdobePassDemoApp"
+                  android:icon="@drawable/icon">
+
+        <service android:name="com.adobe.adobepass.accessenabler.api.AccessEnablerService"
+				 android:label="AccessEnabler service"/>
+
+        <activity android:name=".ui.MainActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.MvpdPickerActivity" />
+
+        <activity android:name=".ui.MvpdLoginActivity" />
+
+        <activity android:name=".ui.PreferencesActivity"
+                  android:label="Application Preferences"
+                  android:theme="@android:style/Theme.Dialog" />
+
+        <activity android:name=".ui.TempPassResetActivity" android:label="Temp Pass Reset"/>
+        <activity android:name=".ui.storageviewer.StorageViewerActivity" />
+
+        <uses-library android:name="android.test.runner" />
+    </application>
+
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:targetPackage="com.adobe.adobepass.apps.demo.ui"
+                     android:label="Unit tests">
+    </instrumentation>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="10" />
+</manifest>

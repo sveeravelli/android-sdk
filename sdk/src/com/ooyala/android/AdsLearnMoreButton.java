@@ -11,16 +11,15 @@ import android.widget.TextView;
 public class AdsLearnMoreButton extends RelativeLayout {
 
   private TextView _learnMore;
-  private AdMoviePlayer _adPlayer;
 
   public AdsLearnMoreButton(Context context) {
     super(context);
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-  public AdsLearnMoreButton(Context context, AdMoviePlayer adPlayer, int topMargin) {
+  public AdsLearnMoreButton(Context context,
+      final AdsLearnMoreInterface callback, int topMargin) {
     super(context);
-    _adPlayer = adPlayer;
 
     //Set up the Learn More button's properties
     _learnMore = new TextView(context);
@@ -36,7 +35,7 @@ public class AdsLearnMoreButton extends RelativeLayout {
     _learnMore.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        _adPlayer.processClickThrough();
+        callback.processClickThrough();
       }
     });
 

@@ -7,17 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.adobe.adobepass.accessenabler.api.AccessEnabler;
-import com.adobe.adobepass.accessenabler.api.AccessEnablerException;
-import com.adobe.adobepass.accessenabler.api.IAccessEnablerDelegate;
-import com.adobe.adobepass.accessenabler.models.Event;
-import com.adobe.adobepass.accessenabler.models.MetadataKey;
-import com.adobe.adobepass.accessenabler.models.Mvpd;
-import com.ooyala.AdobePassDemoApp.crypto.SignatureGenerator;
-import com.ooyala.AdobePassDemoApp.crypto.SigningCredential;
-import com.ooyala.android.EmbedTokenGenerator;
-import com.ooyala.android.EmbedTokenGeneratorCallback;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +14,18 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.adobe.adobepass.accessenabler.api.AccessEnabler;
+import com.adobe.adobepass.accessenabler.api.AccessEnablerException;
+import com.adobe.adobepass.accessenabler.api.IAccessEnablerDelegate;
+import com.adobe.adobepass.accessenabler.models.Event;
+import com.adobe.adobepass.accessenabler.models.MetadataKey;
+import com.adobe.adobepass.accessenabler.models.MetadataStatus;
+import com.adobe.adobepass.accessenabler.models.Mvpd;
+import com.ooyala.AdobePassDemoApp.crypto.SignatureGenerator;
+import com.ooyala.AdobePassDemoApp.crypto.SigningCredential;
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
 
 public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSelectedListener, NavigatedbackToAppListener, EmbedTokenGenerator {
   private AccessEnabler accessEnabler;
@@ -34,7 +35,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
   private Boolean isAuthenticating = false;
   private HashMap<String, EmbedTokenGeneratorCallback> embedTokenCallbacks;
   private String requestor;
-  
+
   public AdobePassLoginController(Context context, String requestor, InputStream keystore, String keypass,
       OnAuthorizationChangedListener authChangedListener) {
     this.requestor = requestor;
@@ -47,7 +48,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
       accessEnabler.setDelegate(new ThreadSafeAccessEnablerDelegate(this));
       String signedRequestorId = new SignatureGenerator(new SigningCredential(keystore, keypass)).generateSignature(requestor);
       ArrayList<String> spUrls = new ArrayList<String>();
-      spUrls.add("sp.auth-uat1.adobe.com/adobe-services");
+      spUrls.add("sp.auth-staging.adobe.com/adobe-services");
       accessEnabler.setRequestor(requestor, signedRequestorId, spUrls);
     } catch (AccessEnablerException e) {
       e.printStackTrace();
@@ -57,7 +58,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
   public void login() {
     accessEnabler.getAuthentication();
   }
-  
+
   public void logout() {
     accessEnabler.logout();
   }
@@ -96,7 +97,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
     if (isAuthenticating) {
       return;
     }
- 
+
     isAuthenticating = true;
     flipper = new AlertDialogFlipper(
         context,
@@ -152,11 +153,11 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
       embedToken += "&requestor=" + URLEncoder.encode(requestor, "UTF-8");
       embedToken += "&token=" + URLEncoder.encode(token, "UTF-8");
       embedToken += "&resource=" + URLEncoder.encode(resource, "UTF-8");
-      
+
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
-    
+
     callback.setEmbedToken(embedToken);
   }
 
@@ -176,9 +177,9 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
   public void sendTrackingData(Event arg0, ArrayList<String> arg1) {
     //do nothing
   }
-  
+
   @Override
-  public void setMetadataStatus(MetadataKey arg0, String arg1) {
+  public void setMetadataStatus(MetadataKey arg0, MetadataStatus arg1) {
     //do nothing
 
   }

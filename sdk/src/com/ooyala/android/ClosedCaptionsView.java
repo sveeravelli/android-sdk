@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -22,6 +23,7 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
+import com.ooyala.android.item.Caption;
 
 public class ClosedCaptionsView extends TextView {
 
@@ -122,7 +124,7 @@ public class ClosedCaptionsView extends TextView {
 			// TODO: choose duration for live since live does not contain caption object
 			int currentDuration = 600;
 			if (!isLive) {
-				currentDuration = (int) (100 * ((caption._end - caption._begin) * 2 / 3));
+				currentDuration = (int) (100 * ((caption.getEnd() - caption.getBegin()) * 2 / 3));
 			}
 			this.scroller.startScroll(0, prevBottomLine -  (currentBottomLine - prevBottomLine), 0, currentBottomLine - prevBottomLine, currentDuration);
 			// Clean the textView before it is too big. When there are too many texts in textView it will scroll really slow and unsmoonthly
@@ -133,7 +135,7 @@ public class ClosedCaptionsView extends TextView {
 		} else if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
 			//TODO: choose paint-on delay for live since live does not contain caption object
 			if (!isLive) {
-				this.paintOnDelay = Math.min(this.paintOnDelay, (long)(caption._end - caption._begin) * 2 / (caption.getText().length() * 3));
+				this.paintOnDelay = Math.min(this.paintOnDelay, (long)(caption.getEnd() - caption.getBegin()) * 2 / (caption.getText().length() * 3));
 			}
 			this.setGravity(Gravity.LEFT | Gravity.TOP);
 			String splitText = getSplitTextAndUpdateFrame(text);
@@ -183,7 +185,7 @@ public class ClosedCaptionsView extends TextView {
 
 	public void setStyle(ClosedCaptionsStyle style) {
 		this.style = style;
-		this.setTextSize(style.textSize);
+		this.setTextSize( TypedValue.COMPLEX_UNIT_SP, style.textSize );
 		String testString = "just for height"; // any text including "j" and "f" can define the max height for this font size
 		super.getPaint().getTextBounds(testString, 0, testString.length(), this.textBounds);
 		this.textHeight = this.textBounds.height() * 1.5;

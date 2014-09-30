@@ -1,74 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center" >
 
-    <LinearLayout
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/tvInputURL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="left|center_vertical"
-            android:text="@string/str_AddURL" >
-        </TextView>
+        android:layout_height="fill_parent"
+         >
+   <LinearLayout 
+       android:id="@+id/llUrl" 
+       android:layout_height="wrap_content"
+       android:layout_width="fill_parent"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentTop="true"
+       android:orientation="horizontal">
+     
 
         <EditText
             android:id="@+id/edtInputURL"
+            android:layout_weight="1"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="50dp" >
         </EditText>
-
-        <TextView
-            android:id="@+id/tvSelectURL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select a URL on /sdcard/url.txt" />
-
-        <Spinner
-            android:id="@+id/spSelectURL"
+         <Button
+            android:id="@+id/bSelectURL"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="50dp"
+            android:layout_weight="6"
+            android:text="Select"
+             />
         
-        <TextView
-            android:id="@+id/tvSelectSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select a subtitle URL on /sdcard/ttml_url.txt" />
-
-        <Spinner
-            android:id="@+id/spSelectSubtitle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
         
-        <RelativeLayout
-            android:id="@+id/rlOptions"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+</LinearLayout>
+        
+           
+     
+         <RelativeLayout
+             android:layout_below="@+id/llUrl"
+             android:layout_alignLeft="@+id/rlUrl"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:id="@+id/rlOptions3">
+        
 
-            <CheckBox
-                android:id="@+id/chbOpenMAXAL"
+            <TextView
+                android:id="@+id/textView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:text="OpenMAX AL" />
+                android:text="VCAS server IP"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <CheckBox
-                android:id="@+id/chbAsync"
+            <EditText
+                android:id="@+id/editTextIP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/chbOpenMAXAL"
-                android:checked="true"
-                android:text="Asynchronous"
-                android:visibility="visible"  />
-            
-        </RelativeLayout>
-        
-    </LinearLayout>
-</ScrollView>
+                android:layout_below="@+id/textView1"
+                
+                android:ems="10" >
+
+                <requestFocus />
+            </EditText>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/editTextPort"
+                android:layout_alignLeft="@+id/editTextPort"
+                android:text="VCAS sever Port"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/editTextPort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/editTextIP"
+                
+                android:ems="10"
+                android:inputType="number" >
+            </EditText>
+
+
+      </RelativeLayout>
+        <RelativeLayout
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/rlOption"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">            
+            <Button
+                android:id="@+id/bStart"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:text="Start" />
+            <Button 
+                android:id="@+id/bOption"
+                android:text="Options"
+                android:gravity="center"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+       
+    </RelativeLayout>

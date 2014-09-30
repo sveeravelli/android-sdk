@@ -2,8 +2,10 @@ package com.ooyala.android;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 import android.view.MotionEvent;
+import android.widget.FrameLayout;
+
+import com.ooyala.android.ui.LayoutController;
 
 public class OoyalaPlayerLayout extends FrameLayout {
   private LayoutController _controller = null;

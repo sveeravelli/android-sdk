@@ -20,7 +20,7 @@ import com.visualon.OSMPUtils.voLog;
 public class TimeCal {
 	
 	private static final 	String TAG  			= "TimeCal";
-	private static boolean  m_bEnable 				= false;
+	private static boolean  m_bEnable 				= true;
 	
 	private static long 	m_lLastTime;
 	private static boolean  m_bStart				= false;

@@ -17,7 +17,7 @@ public class EmbeddedSignatureGeneratorTest extends AndroidTestCase {
 
   public void testSign() {
     String testString = "oogabooga";
-    String expectedSignature = "Sd7Y1rr2Jx7bONdTFCke2ykX4dP7JVSQC/N4TrcAFbk";
+    String expectedSignature = "kxplw81748bBk41gvI17cfxHolbu3JtYNYvQHTp+9aM";
     String signature = sigGen.sign(testString);
     assertEquals(signature, expectedSignature);
   }
