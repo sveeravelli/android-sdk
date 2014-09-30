@@ -1,5 +1,7 @@
 package com.ooyala.android.plugin;
 
+import java.util.Set;
+
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AdSpotManager;
@@ -122,5 +124,10 @@ public abstract class ManagedAdsPlugin<T extends AdSpot> implements
    */
   protected int getLastAdModeTime() {
     return _lastAdModeTime;
+  }
+
+  @Override
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return _adSpotManager.getCuePointsInMilliSeconds();
   }
 }

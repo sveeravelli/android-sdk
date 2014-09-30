@@ -1,5 +1,7 @@
 package com.ooyala.android.plugin;
 
+import java.util.Set;
+
 import com.ooyala.android.player.PlayerInterface;
 
 /**
@@ -78,4 +80,10 @@ public interface AdPluginInterface extends LifeCycleInterface {
    * 
    */
   public void skipAd();
+
+  /**
+   * This returns the cue points.
+   * 
+   */
+  public Set<Integer> getCuePointsInMilliSeconds();
 }

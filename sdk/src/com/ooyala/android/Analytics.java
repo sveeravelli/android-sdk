@@ -176,11 +176,15 @@ public class Analytics {
     final String htmlUrlStr = "file://" + tmpBootHtmlFile.getAbsolutePath();
     DebugMode.logD( TAG, "trying to load: " + htmlUrlStr );
 
+    // this is purely for our own debugging purposes...
     try {
       final Scanner scanner = new Scanner( tmpBootHtmlFile.getFile() );
-      try { while( true ) { DebugMode.logD( TAG, scanner.nextLine() ); } } catch( NoSuchElementException e ) { }
+      try { while( true ) { DebugMode.logD( TAG, scanner.nextLine() ); } }
+      catch( NoSuchElementException e ) {}
+      finally { scanner.close(); }
     }
     catch( FileNotFoundException e ) { }
+    // ...this is purely for our own debugging purposes.
 
     _jsAnalytics.loadUrl( htmlUrlStr );
   }

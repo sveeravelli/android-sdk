@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import java.util.Set;
+
 import com.ooyala.android.plugin.AdPluginInterface;
 
 public interface AdPluginManagerInterface {
@@ -42,4 +44,6 @@ public interface AdPluginManagerInterface {
    * @return true on success, false otherwise
    */
   public boolean requestAdMode(final AdPluginInterface plugin);
+
+  public Set<Integer> getCuePointsInMilliSeconds();
 }

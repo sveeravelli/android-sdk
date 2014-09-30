@@ -56,7 +56,7 @@ public class FreewheelInternalTestAppActivity extends BaseInternalTestAppActivit
     if (embedSpinner.getSelectedItem().toString().contains("OLD")) {
       Map<String, String> freewheelParameters = new HashMap<String, String>();
       freewheelParameters.put("fw_android_mrm_network_id",  "90750");
-      freewheelParameters.put("fw_android_ad_server",       "http://demo.v.fwmrm.net/");
+      freewheelParameters.put("fw_android_ad_server", "http://g1.v.fwmrm.net/");
       freewheelParameters.put("fw_android_player_profile",  "90750:ooyala_android");
       freewheelParameters.put("fw_android_site_section_id", "ooyala_test_site_section");
       freewheelParameters.put("fw_android_video_asset_id",  "ooyala_test_video_with_bvi_cuepoints");
@@ -64,7 +64,7 @@ public class FreewheelInternalTestAppActivity extends BaseInternalTestAppActivit
 
     } else {
       Map<String, String> freewheelParameters = new HashMap<String, String>();
-      freewheelParameters.put("fw_android_ad_server",       "http://demo.v.fwmrm.net/");
+      freewheelParameters.put("fw_android_ad_server", "http://g1.v.fwmrm.net/");
       freewheelParameters.put("fw_android_player_profile",  "90750:ooyala_android");
       freewheelParameters.put("fw_android_site_section_id", "ooyala_android_internalapp");
       freewheelParameters.put("fw_android_video_asset_id",  embedMap.get(embedSpinner.getSelectedItem()));

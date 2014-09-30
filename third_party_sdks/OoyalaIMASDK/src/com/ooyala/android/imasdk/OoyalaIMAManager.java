@@ -2,8 +2,10 @@ package com.ooyala.android.imasdk;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.view.ViewGroup;
 
@@ -367,5 +369,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public void reset() {
     // TODO Auto-generated method stub
     resetAds();
+  }
+
+  @Override
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return new HashSet<Integer>();
   }
 }
