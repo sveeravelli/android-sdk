@@ -31,7 +31,6 @@ import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
-import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
 import com.ooyala.android.item.Caption;
 import com.ooyala.android.item.Channel;
@@ -41,11 +40,11 @@ import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.player.FCCTVRatingUI;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
-import com.ooyala.android.player.FCCTVRatingUI;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
@@ -655,7 +654,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     final MoviePlayer moviePlayer = _getCorrectMoviePlayer( currentItem );
     return moviePlayer;
   }
-  
+
   private MoviePlayer _getCorrectMoviePlayer(Video currentItem) {
     Set<Stream> streams = currentItem.getStreams();
 
@@ -678,7 +677,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         setState(State.ERROR);
       }
     }
-    
+
     return new MoviePlayer();
   }
 
@@ -1254,6 +1253,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
+
+      //TV Ratings
+      updateTVRatingUI();
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
       switch (state) {
@@ -1814,7 +1816,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       Class<? extends AdMoviePlayer> adPlayerClass) {
     _adPlayers.put(adTypeClass, adPlayerClass);
   }
-  
+
   /**
    * For internal Ooyala use only.
    * @param view
@@ -1829,7 +1831,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void removeVideoView() {
     _layoutController.removeVideoView();
   }
-  
+
   private void updateTVRatingUI() {
     if( ! _pushedTVRating &&
         ! isShowingAd() &&
