@@ -23,11 +23,11 @@ import android.widget.TextView;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
-import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.player.FCCTVRatingUI;
 
@@ -104,7 +104,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public AbstractOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
-    this(l, new OoyalaPlayer(pcode, domain, l.getContext()), dcs);
+    this(l, new OoyalaPlayer(pcode, domain), dcs);
   }
 
   /**
@@ -154,7 +154,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _player.addObserver(_inlineControls);
     }
   }
-  
+
+  @Override
   public void addVideoView( View videoView ) {
     removeVideoView();
     if( videoView != null ) {
@@ -163,13 +164,15 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     }
   }
 
+  @Override
   public void removeVideoView() {
     if( _tvRatingUI != null ) {
       _tvRatingUI.removeVideoView();
       _tvRatingUI = null;
     }
   }
-  
+
+  @Override
   public boolean pushTVRating( FCCTVRating tvRating ) {
     boolean didPush = false;
     boolean pushable = _tvRatingUI != null && tvRating != null;
@@ -324,14 +327,14 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   public boolean isFullscreen() {
     return false;
   }
-  
+
   private FCCTVRating _tvRatingOnFullscreenChange;
   protected void beforeFullscreenChange() {
     _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
   }
-  
+
   protected abstract void doFullscreenChange( boolean fullscreen );
-  
+
   protected void afterFullscreenChange() {
     pushTVRating( _tvRatingOnFullscreenChange );
   }
