@@ -95,6 +95,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       case READY:
       case COMPLETED:
         _player.start();
+        _view.setBackgroundColor(Color.TRANSPARENT);
         setState(State.PLAYING);
         startPlayheadTimer();
       default:
