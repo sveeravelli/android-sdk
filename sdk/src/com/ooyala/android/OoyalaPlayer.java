@@ -1272,7 +1272,8 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        if (getState() == State.READY) {
+        if (getLastState() == State.READY) {
+          sendNotification(PLAY_STARTED_NOTIFICATION);
           if (_analytics != null) {
             _analytics.reportPlayStarted();
             } else {
@@ -2084,5 +2085,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     return cuePoints;
+  }
+
+  private State getLastState() {
+    // *** this method should only be called from state change handling
+    // to compare state-to-override and the current state
+    return _state;
   }
 }
