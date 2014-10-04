@@ -365,6 +365,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playQueued = false;
     _queuedSeekTime = 0;
     cleanupPlayers();
+    _adManager.resetManager();
 
     // request content tree
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
