@@ -90,6 +90,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
     _imaManager = imaManager;
   }
 
+  @Override
   public void setState(State state) {
     super.setState(state);
   }
