@@ -1,5 +1,6 @@
 package com.ooyala.android.ui;
 
+import android.graphics.Color;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -98,6 +99,7 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, OoyalaPlayer p, DefaultControlStyle dcs) {
     super(l, p, dcs);
     extraInit(dcs);
+    _layout.setBackgroundColor(Color.BLACK);
   }
 
   private void extraInit(DefaultControlStyle dcs) {
@@ -131,5 +133,5 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
       _layout.setLayoutParams(_fullscreenLP);
       _layout.bringToFront();
     }
-  }  
+  }
 }
