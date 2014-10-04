@@ -151,6 +151,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private final Handler _handler = new Handler();
   private Video _currentItem = null;
+  private boolean _currentItemPlayed = false;
   private ContentItem _rootItem = null;
   private final JSONObject _metadata = null;
   private OoyalaException _error = null;
@@ -477,6 +478,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
 
     _currentItem = video;
+    _currentItemPlayed = false;
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
@@ -625,6 +627,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     _rootItem = tree;
     _currentItem = tree.firstVideo();
+    _currentItemPlayed = false;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -1273,16 +1276,9 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        if (getLastState() == State.READY) {
-          sendNotification(PLAY_STARTED_NOTIFICATION);
-          if (_analytics != null) {
-            _analytics.reportPlayStarted();
-            } else {
-              DebugMode.logE(TAG, "analytics is null when playing");
-            }
-          }
-          setState(State.PLAYING);
-          break;
+        markCurrentItemAsPlayed();
+        setState(State.PLAYING);
+        break;
       case READY:
         if (_queuedSeekTime > 0) {
           seek(_queuedSeekTime);
@@ -2088,9 +2084,16 @@ public class OoyalaPlayer extends Observable implements Observer,
     return cuePoints;
   }
 
-  private State getLastState() {
-    // *** this method should only be called from state change handling
-    // to compare state-to-override and the current state
-    return _state;
+  private void markCurrentItemAsPlayed() {
+    if (_currentItemPlayed) {
+      return;
+    }
+    _currentItemPlayed = true;
+    sendNotification(PLAY_STARTED_NOTIFICATION);
+    if (_analytics != null) {
+      _analytics.reportPlayStarted();
+    } else {
+      DebugMode.logE(TAG, "analytics is null when playing");
+    }
   }
 }
