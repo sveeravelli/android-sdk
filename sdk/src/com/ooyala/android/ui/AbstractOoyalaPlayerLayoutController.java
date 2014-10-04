@@ -330,7 +330,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   private FCCTVRating _tvRatingOnFullscreenChange;
   protected void beforeFullscreenChange() {
-    _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
+    if (_tvRatingUI != null) {
+      _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
+    }
   }
 
   protected abstract void doFullscreenChange( boolean fullscreen );
