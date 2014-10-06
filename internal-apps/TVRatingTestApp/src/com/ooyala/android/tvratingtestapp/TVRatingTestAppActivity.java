@@ -28,6 +28,8 @@ import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class TVRatingTestAppActivity extends Activity implements Observer {
 
+  private static final int DURATION = 3;
+
   // todo: player choice ie. visual on.
   private static class MyMapRow {
     public final String embedCode;
@@ -65,10 +67,10 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     //Populate the embed map
     embedMap = new HashMap<String, MyMapRow>();
     FCCTVRatingConfiguration.Builder builder = new FCCTVRatingConfiguration.Builder();
-    embedMap.put("Square TopLeft", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.TopLeft).setDurationSeconds(5).build() ) );
-    embedMap.put("Tall TopRight", new MyMapRow( "tnMG93bzr1X1IJn-Jcjehub0WlX138vg", builder.setPosition(Position.TopRight).setDurationSeconds(5).build() ) );
-    embedMap.put("Wide BottomLeft", new MyMapRow( "VyN293bzq5EbxnKI0ff696-PSgHGStM6", builder.setPosition(Position.BottomLeft).setDurationSeconds(5).build() ) );
-    embedMap.put("Square BottomRight", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.BottomRight).setDurationSeconds(5).build() ) );
+    embedMap.put("MidRoll TopLeft", new MyMapRow( "pncmp0ZDp7OKlwTPJlMZzrI59j8Imefa", builder.setPosition(Position.TopLeft).setDurationSeconds(DURATION).build() ) );
+    embedMap.put("Tall TopRight", new MyMapRow( "tnMG93bzr1X1IJn-Jcjehub0WlX138vg", builder.setPosition(Position.TopRight).setDurationSeconds(DURATION).build() ) );
+    embedMap.put("Wide BottomLeft", new MyMapRow( "VyN293bzq5EbxnKI0ff696-PSgHGStM6", builder.setPosition(Position.BottomLeft).setDurationSeconds(DURATION).build() ) );
+    embedMap.put("Square BottomRight", new MyMapRow( "5od253bzo-9DTMTY5q45pX-PRRXa5c4d", builder.setPosition(Position.BottomRight).setDurationSeconds(DURATION).build() ) );
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
 
@@ -101,7 +103,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
             OoyalaPlayer.enableCustomHLSPlayer = true;
           }
 
-          player.play();
+//          player.play();
         } else {
           Log.d(this.getClass().getName(), "Something Went Wrong!");
         }
