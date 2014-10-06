@@ -9,10 +9,10 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OrderedMapValue;
-import com.ooyala.android.FCCTVRating;
 
 /**
  * Stores the info and metadata for the specified content item.
@@ -42,7 +42,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_METADATA_BASE = "base";
   protected static final String KEY_METADATA_MODULES = "modules";
   protected static final String KEY_METADATA_MODULE_TYPE = "type";
-  protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";  
+  protected static final String KEY_METADATA_TVRATING_RATING = "tvrating";
   protected static final String KEY_METADATA_TVRATING_SUBRATINGS = "tvsubratings";
   protected static final String KEY_METADATA_TVRATING_CLICKTHROUGH_URL = "tvratingsurl";
 
@@ -134,7 +134,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    * Subclasses must override this.
    */
   public abstract int getDuration();
-  
+
   /**
    * @return possibly null.
    */
@@ -205,7 +205,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
           _moduleData.put(key, new ModuleData(key, type, metadata));
         }
       }
-      if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) && _metadata.containsKey(KEY_METADATA_TVRATING_SUBRATINGS) ) {
+      if( _metadata != null && _metadata.containsKey(KEY_METADATA_TVRATING_RATING) ) {
         _tvRating = new FCCTVRating(
             _metadata.get(KEY_METADATA_TVRATING_RATING),
             _metadata.get(KEY_METADATA_TVRATING_SUBRATINGS),

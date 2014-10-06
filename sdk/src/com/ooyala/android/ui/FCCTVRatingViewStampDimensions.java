@@ -41,17 +41,15 @@ final class FCCTVRatingViewStampDimensions {
 
   // fyi: there are relationships among values, so the order of calls is important in the code below.
 
-  public FCCTVRatingViewStampDimensions() {}
-
-  public boolean contains( float x, float y ) {
-    return whiteRect.contains( (int)x-left, (int)y-top );
-  }
-
-  public void update( Context context, FCCTVRatingConfiguration tvRatingConfiguration, int measuredWidth, int measuredHeight, boolean hasLabels ) {
+  public FCCTVRatingViewStampDimensions( Context context, FCCTVRatingConfiguration tvRatingConfiguration, int measuredWidth, int measuredHeight, boolean hasLabels ) {
     updateBorder( context );
     updateDimensions( context, tvRatingConfiguration.scale, measuredWidth, measuredHeight );
     updateRects( measuredWidth, measuredHeight, hasLabels );
     updatePosition( tvRatingConfiguration.position, measuredWidth, measuredHeight );
+  }
+
+  public boolean contains( float x, float y ) {
+    return whiteRect.contains( (int)x-left, (int)y-top );
   }
 
   private void updateBorder( Context context ) {

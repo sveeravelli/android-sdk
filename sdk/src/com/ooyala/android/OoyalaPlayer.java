@@ -40,7 +40,6 @@ import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
-import com.ooyala.android.player.FCCTVRatingUI;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
@@ -1243,6 +1242,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param notification
    *          the notification
    */
+  private boolean _PLAY_STARTED_NOTIFICATION_sent;
   private void processContentNotifications(Player player, String notification) {
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
@@ -1253,9 +1253,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
-
-      //TV Ratings
-      updateTVRatingUI();
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
       switch (state) {
@@ -1272,7 +1269,8 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        if (getLastState() == State.READY) {
+        if (!_PLAY_STARTED_NOTIFICATION_sent) {
+          _PLAY_STARTED_NOTIFICATION_sent = true;
           sendNotification(PLAY_STARTED_NOTIFICATION);
           if (_analytics != null) {
             _analytics.reportPlayStarted();
@@ -1833,16 +1831,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _layoutController.removeVideoView();
   }
 
-  private void updateTVRatingUI() {
-    if( ! _pushedTVRating &&
-        ! isShowingAd() &&
-        _player.currentTime() > FCCTVRatingUI.TVRATING_PLAYHEAD_TIME_MINIMUM &&
-        _currentItem != null &&
-        _currentItem.getTVRating() != null ) {
-      _pushedTVRating = _layoutController.pushTVRating( _currentItem.getTVRating() );
-    }
-  }
-
   /**
    * get the ad player class for a certain ad spot
    *
@@ -1898,6 +1886,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void switchToContent(boolean forcePlay) {
+    _PLAY_STARTED_NOTIFICATION_sent = false;
     if (_player == null) {
       prepareContent(forcePlay);
     } else if (_player.getState() == State.SUSPENDED) {

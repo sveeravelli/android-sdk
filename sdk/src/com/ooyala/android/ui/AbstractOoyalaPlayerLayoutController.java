@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
-import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
@@ -160,26 +159,16 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     removeVideoView();
     if( videoView != null ) {
       _tvRatingUI = new FCCTVRatingUI();
-      _tvRatingUI.addVideoView( videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
+      _tvRatingUI.addVideoView( _player, videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
     }
   }
 
   @Override
   public void removeVideoView() {
     if( _tvRatingUI != null ) {
-      _tvRatingUI.removeVideoView();
+      _tvRatingUI.destroy();
       _tvRatingUI = null;
     }
-  }
-
-  @Override
-  public boolean pushTVRating( FCCTVRating tvRating ) {
-    boolean didPush = false;
-    boolean pushable = _tvRatingUI != null && tvRating != null;
-    if( pushable ) {
-      didPush = _tvRatingUI.pushTVRating( tvRating );
-    }
-    return didPush;
   }
 
   public void setInlineOverlay(OoyalaPlayerControls controlsOverlay) {
@@ -328,15 +317,18 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     return false;
   }
 
-  private FCCTVRating _tvRatingOnFullscreenChange;
+  private FCCTVRatingView.RestoreState _tvRatingRestoreState;
   protected void beforeFullscreenChange() {
-    _tvRatingOnFullscreenChange = _tvRatingUI.getTVRating();
+    _tvRatingRestoreState = _tvRatingUI.getRestoreState();
   }
 
   protected abstract void doFullscreenChange( boolean fullscreen );
 
   protected void afterFullscreenChange() {
-    pushTVRating( _tvRatingOnFullscreenChange );
+      boolean pushable = _tvRatingUI != null && _tvRatingRestoreState != null;
+      if( pushable ) {
+        _tvRatingUI.restoreState( _tvRatingRestoreState );
+      }
   }
 
   public OoyalaPlayerControls createDefaultControls(OoyalaPlayerLayout layout, boolean fullscreen) {
