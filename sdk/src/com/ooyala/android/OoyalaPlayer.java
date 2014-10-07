@@ -990,7 +990,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       addClosedCaptionsView();
 
       // Create Learn More button when going in and out of fullscreen
-      if (isShowingAd()) {
+      if (isShowingAd() && currentPlayer() != null) {
         ((AdMoviePlayer) currentPlayer()).updateLearnMoreButton(getLayout(),
             getTopBarOffset());
       }
@@ -1658,7 +1658,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // PB-3090: we currently only support captions for the main content, not
     // also the advertisements.
-    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd()) {
+    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd() && currentPlayer() != null) {
       double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null
           || currT > _closedCaptionsView.getCaption().getEnd()
