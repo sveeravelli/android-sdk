@@ -137,9 +137,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_player == null) { return 0; }
     switch (getState()) {
     case INIT:
-    case LOADING:
     case SUSPENDED:
-    case ERROR:
       return 0;
     default:
       break;
