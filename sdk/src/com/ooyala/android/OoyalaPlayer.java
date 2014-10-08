@@ -55,7 +55,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "3.0.0_RC1";
+  static final String SDK_VERSION = "3.0.0_RC4";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -150,6 +150,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private final Handler _handler = new Handler();
   private Video _currentItem = null;
+  private boolean _currentItemPlayed = false;
   private ContentItem _rootItem = null;
   private final JSONObject _metadata = null;
   private OoyalaException _error = null;
@@ -364,6 +365,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playQueued = false;
     _queuedSeekTime = 0;
     cleanupPlayers();
+    _adManager.resetManager();
 
     // request content tree
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
@@ -475,6 +477,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
 
     _currentItem = video;
+    _currentItemPlayed = false;
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
@@ -623,6 +626,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     _rootItem = tree;
     _currentItem = tree.firstVideo();
+    _currentItemPlayed = false;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -985,7 +989,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       addClosedCaptionsView();
 
       // Create Learn More button when going in and out of fullscreen
-      if (isShowingAd()) {
+      if (isShowingAd() && currentPlayer() != null) {
         ((AdMoviePlayer) currentPlayer()).updateLearnMoreButton(getLayout(),
             getTopBarOffset());
       }
@@ -1242,7 +1246,6 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param notification
    *          the notification
    */
-  private boolean _PLAY_STARTED_NOTIFICATION_sent;
   private void processContentNotifications(Player player, String notification) {
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
@@ -1269,17 +1272,9 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        if (!_PLAY_STARTED_NOTIFICATION_sent) {
-          _PLAY_STARTED_NOTIFICATION_sent = true;
-          sendNotification(PLAY_STARTED_NOTIFICATION);
-          if (_analytics != null) {
-            _analytics.reportPlayStarted();
-            } else {
-              DebugMode.logE(TAG, "analytics is null when playing");
-            }
-          }
-          setState(State.PLAYING);
-          break;
+        markCurrentItemAsPlayed();
+        setState(State.PLAYING);
+        break;
       case READY:
         if (_queuedSeekTime > 0) {
           seek(_queuedSeekTime);
@@ -1659,7 +1654,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // PB-3090: we currently only support captions for the main content, not
     // also the advertisements.
-    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd()) {
+    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd() && currentPlayer() != null) {
       double currT = (currentPlayer().currentTime()) / 1000d;
       if (_closedCaptionsView.getCaption() == null
           || currT > _closedCaptionsView.getCaption().getEnd()
@@ -1886,7 +1881,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void switchToContent(boolean forcePlay) {
-    _PLAY_STARTED_NOTIFICATION_sent = false;
     if (_player == null) {
       prepareContent(forcePlay);
     } else if (_player.getState() == State.SUSPENDED) {
@@ -2076,9 +2070,16 @@ public class OoyalaPlayer extends Observable implements Observer,
     return cuePoints;
   }
 
-  private State getLastState() {
-    // *** this method should only be called from state change handling
-    // to compare state-to-override and the current state
-    return _state;
+  private void markCurrentItemAsPlayed() {
+    if (_currentItemPlayed) {
+      return;
+    }
+    _currentItemPlayed = true;
+    sendNotification(PLAY_STARTED_NOTIFICATION);
+    if (_analytics != null) {
+      _analytics.reportPlayStarted();
+    } else {
+      DebugMode.logE(TAG, "analytics is null when playing");
+    }
   }
 }

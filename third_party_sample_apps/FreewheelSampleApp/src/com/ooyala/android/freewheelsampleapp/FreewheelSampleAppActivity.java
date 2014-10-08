@@ -50,6 +50,7 @@ public class FreewheelSampleAppActivity extends Activity {
     embedMap.put("Freewheel Postroll", "NmcGg4bzqbeqXO_x9Rfj5IX6gwmRRrse");
     embedMap.put("Freewheel PreMidPost", "NqcGg4bzoOmMiV35ZttQDtBX1oNQBnT-");
     embedMap.put("Freewheel Overlay", "NucGg4bzrVrilZrMdlSA9tyg6Vty46DN");
+    embedMap.put("Freewheel Multi Midroll", "htdnB3cDpMzXVL7fecaIWdv9rTd125As");
     embedMap.put("Freewheel PreMidPost Overlay",
         "NscGg4bzpO9s5rUMyW-AAfoeEA7CX6hP");
 

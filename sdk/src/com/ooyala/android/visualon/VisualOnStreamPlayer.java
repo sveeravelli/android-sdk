@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
@@ -448,6 +449,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     };
 
     _parent.addVideoView( _view );
+    _view.setBackgroundColor(Color.TRANSPARENT);
 
     _holder = _view.getHolder();
     _holder.addCallback(this);

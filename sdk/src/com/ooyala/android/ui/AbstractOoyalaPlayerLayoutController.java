@@ -319,7 +319,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   private FCCTVRatingView.RestoreState _tvRatingRestoreState;
   protected void beforeFullscreenChange() {
-    _tvRatingRestoreState = _tvRatingUI.getRestoreState();
+    if (_tvRatingUI != null) {
+      _tvRatingRestoreState = _tvRatingUI.getRestoreState();
+    }
   }
 
   protected abstract void doFullscreenChange( boolean fullscreen );

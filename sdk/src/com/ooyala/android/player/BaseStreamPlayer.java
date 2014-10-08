@@ -136,11 +136,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public int duration() {
     if (_player == null) { return 0; }
     switch (getState()) {
-      case INIT:
-      case SUSPENDED:
-        return 0;
-      default:
-        break;
+    case INIT:
+    case SUSPENDED:
+      return 0;
+    default:
+      break;
     }
     return _player.getDuration();
   }

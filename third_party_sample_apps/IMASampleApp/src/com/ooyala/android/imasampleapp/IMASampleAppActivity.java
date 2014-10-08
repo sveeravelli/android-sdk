@@ -1,7 +1,7 @@
 package com.ooyala.android.imasampleapp;
 
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import android.app.Activity;
@@ -20,6 +20,16 @@ import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.imasdk.OoyalaIMAManager;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
+/**
+ * A Sample integration of OoyalaPlayer and Google IMA Manager
+ *
+ * This application will not run unless you link Google Play Service's project
+ *
+ * http://developer.android.com/google/play-services/setup.html
+ *
+ * @author michael.len
+ *
+ */
 public class IMASampleAppActivity extends Activity {
 
   final String EMBED  = "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M";  //Embed Code, or Content ID
@@ -48,7 +58,7 @@ public class IMASampleAppActivity extends Activity {
     ViewGroup companionView = (ViewGroup) findViewById(R.id.companionFrame);
     imaManager.addCompanionSlot(companionView, 300, 50);
 
-    embedMap = new HashMap<String, String>();
+    embedMap = new LinkedHashMap<String, String>();
     embedMap
         .put(
             "Preroll",
@@ -85,7 +95,9 @@ public class IMASampleAppActivity extends Activity {
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
         android.R.layout.simple_spinner_item);
-    adapter.addAll(embedMap.keySet());
+    for (String key : embedMap.keySet()) {
+      adapter.add(key);
+    }
     adapter.notifyDataSetChanged();
     embedSpinner.setAdapter(adapter);
     setButton = (Button) findViewById(R.id.setButton);

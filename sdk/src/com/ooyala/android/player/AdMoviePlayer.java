@@ -61,8 +61,6 @@ public abstract class AdMoviePlayer extends MoviePlayer implements
         _notifier.setState(getState());
       } else if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
         _notifier.notifyPlayheadChange();
-      } else if (notification == OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION) {
-        _notifier.notifyBufferChange();
       }
     }
   }
