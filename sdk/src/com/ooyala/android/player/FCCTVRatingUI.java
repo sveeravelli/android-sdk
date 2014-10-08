@@ -28,24 +28,7 @@ public class FCCTVRatingUI implements Observer {
   private View _videoView;
   private FCCTVRatingView _tvRatingView;
 
-  public FCCTVRatingUI() {
-  }
-
-  public FCCTVRatingView.RestoreState getRestoreState() {
-    FCCTVRatingView.RestoreState state = null;
-    if( _tvRatingView != null ) {
-      state = _tvRatingView.getRestoreState();
-    }
-    return state;
-  }
-
-  public void restoreState( FCCTVRatingView.RestoreState state ) {
-    if( _tvRatingView != null ) {
-      _tvRatingView.restoreState( state );
-    }
-  }
-
-  public void addVideoView( OoyalaPlayer player, View videoView, ViewGroup parentLayout, FCCTVRatingConfiguration tvRatingConfiguration ) {
+  public FCCTVRatingUI( OoyalaPlayer player, View videoView, ViewGroup parentLayout, FCCTVRatingConfiguration tvRatingConfiguration ) {
     this._player = player;
     this._videoView = videoView;
     this._parentLayout = parentLayout;
@@ -86,6 +69,20 @@ public class FCCTVRatingUI implements Observer {
     this._player.addObserver( this );
   }
 
+  public FCCTVRatingView.RestoreState getRestoreState() {
+    FCCTVRatingView.RestoreState state = null;
+    if( _tvRatingView != null ) {
+      state = _tvRatingView.getRestoreState();
+    }
+    return state;
+  }
+
+  public void restoreState( FCCTVRatingView.RestoreState state ) {
+    if( _tvRatingView != null ) {
+      _tvRatingView.restoreState( state );
+    }
+  }
+
   public boolean pushTVRating( FCCTVRating tvRating ) {
     boolean pushable = _tvRatingView != null;
     if( pushable ) {
@@ -96,6 +93,12 @@ public class FCCTVRatingUI implements Observer {
 
   public FCCTVRating getTVRating() {
     return _tvRatingView == null ? null : _tvRatingView.getTVRating();
+  }
+
+  public void reshow() {
+    if( _tvRatingView != null ) {
+      _tvRatingView.reshow();
+    }
   }
 
   private int getUnusedId( ViewGroup parentLayout ) {
@@ -150,15 +153,10 @@ public class FCCTVRatingUI implements Observer {
 
   @Override
   public void update(Observable observable, Object data) {
-    if (observable == _player && !OoyalaPlayer.TIME_CHANGED_NOTIFICATION.equals(data) ) {
-      if(OoyalaPlayer.PLAY_STARTED_NOTIFICATION.equals(data) ||
-          OoyalaPlayer.AD_COMPLETED_NOTIFICATION.equals(data) ||
-          OoyalaPlayer.AD_SKIPPED_NOTIFICATION.equals(data) ||
-          OoyalaPlayer.AD_ERROR_NOTIFICATION.equals(data)) {
-        if( _tvRatingView != null ) {
-          _tvRatingView.reshow();
-        }
-      }
+    // see MoviePlayer for AD_*_NOTIFICATION since they happen at a tricky time.
+    if (observable == _player &&
+        OoyalaPlayer.PLAY_STARTED_NOTIFICATION.equals(data) ) {
+      reshow();
     }
   }
 }

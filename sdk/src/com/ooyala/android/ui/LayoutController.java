@@ -60,4 +60,9 @@ public interface LayoutController {
    * items such as the TV Ratings view.
    */
   public void removeVideoView();
+
+  /**
+   * Reshow TV rating (if the current FCCTVRatingConfiguration allows it).
+   */
+  public void reshowTVRating();
 }

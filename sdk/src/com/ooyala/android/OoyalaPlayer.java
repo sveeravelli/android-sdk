@@ -175,7 +175,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
-  private boolean _pushedTVRating;
+  private String _tvRatingAdNotification;
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
@@ -1873,6 +1873,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void switchToAdMode() {
     DebugMode.logD(TAG, "switchToAdMode");
 
+    _tvRatingAdNotification = null;
+
     if (_player != null) {
         _player.suspend();
     }
@@ -1891,6 +1893,15 @@ public class OoyalaPlayer extends Observable implements Observer,
       }
       addClosedCaptionsView();
     }
+
+    maybeReshowTVRating();
+  }
+
+  private void maybeReshowTVRating() {
+    if( _tvRatingAdNotification != null && _layoutController != null ) {
+      _layoutController.reshowTVRating();
+    }
+    _tvRatingAdNotification = null;
   }
 
   /**
@@ -2031,9 +2042,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
     sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
     if (newState == State.COMPLETED) {
-      sendNotification(OoyalaPlayer.AD_COMPLETED_NOTIFICATION);
+      _tvRatingAdNotification = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
+      sendNotification(_tvRatingAdNotification);
     } else if (newState == State.ERROR) {
-      sendNotification(OoyalaPlayer.AD_ERROR_NOTIFICATION);
+      _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION;
+      sendNotification(_tvRatingAdNotification);
     } else if (newState == State.PLAYING) {
       if (oldState != State.PAUSED) {
         sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION);

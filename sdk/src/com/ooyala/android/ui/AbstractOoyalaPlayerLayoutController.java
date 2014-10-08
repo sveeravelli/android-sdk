@@ -158,8 +158,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   public void addVideoView( View videoView ) {
     removeVideoView();
     if( videoView != null ) {
-      _tvRatingUI = new FCCTVRatingUI();
-      _tvRatingUI.addVideoView( _player, videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
+      _tvRatingUI = new FCCTVRatingUI( _player, videoView, getLayout(), _player.getOptions().getTVRatingConfiguration() );
     }
   }
 
@@ -168,6 +167,13 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if( _tvRatingUI != null ) {
       _tvRatingUI.destroy();
       _tvRatingUI = null;
+    }
+  }
+
+  @Override
+  public void reshowTVRating() {
+    if( _tvRatingUI != null ) {
+      _tvRatingUI.reshow();
     }
   }
 
