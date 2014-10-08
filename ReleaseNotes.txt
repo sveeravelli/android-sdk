@@ -1,4 +1,4 @@
-Current Version: 3.0.0_RC4
+Current Version: 3.0.0_RC5
 
 ------------ 3.0.0 ------------
 Major Features
