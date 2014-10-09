@@ -330,7 +330,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       Display display = wm.getDefaultDisplay();
       display.getMetrics(dm);
 
-      _player.setViewSize(dm.widthPixels, dm.heightPixels);
+      _player.setViewSize(Math.max(dm.widthPixels, dm.heightPixels), Math.max(dm.widthPixels, dm.heightPixels));
       _player.setView(_view);
 
       // Register SDK event listener
