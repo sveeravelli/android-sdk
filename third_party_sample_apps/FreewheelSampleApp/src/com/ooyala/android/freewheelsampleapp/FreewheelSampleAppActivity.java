@@ -57,7 +57,10 @@ public class FreewheelSampleAppActivity extends Activity {
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
         android.R.layout.simple_spinner_item);
-    adapter.addAll(embedMap.keySet());
+    //Update the spinner with the embed map
+    for (String key : embedMap.keySet()) {
+      adapter.add(key);
+    }
     adapter.notifyDataSetChanged();
     embedSpinner.setAdapter(adapter);
     setButton = (Button) findViewById(R.id.setButton);
