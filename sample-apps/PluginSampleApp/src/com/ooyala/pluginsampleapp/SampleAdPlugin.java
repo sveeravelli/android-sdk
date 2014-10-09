@@ -1,6 +1,7 @@
 package com.ooyala.pluginsampleapp;
 
 import java.lang.ref.WeakReference;
+import java.util.Set;
 
 import android.content.Context;
 
@@ -146,5 +147,10 @@ public class SampleAdPlugin implements AdPluginInterface, StateNotifierListener 
       _adPlayer = null;
       _player.get().exitAdMode(this);
     }
+  }
+
+  @Override
+  public Set<Integer> getCuePointsInMilliSeconds() {
+    return null;
   }
 }
