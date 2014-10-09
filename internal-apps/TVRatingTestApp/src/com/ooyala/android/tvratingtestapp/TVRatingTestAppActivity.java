@@ -67,6 +67,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     //Populate the embed map
     embedMap = new HashMap<String, MyMapRow>();
     FCCTVRatingConfiguration.Builder builder = new FCCTVRatingConfiguration.Builder();
+    embedMap.put("MidRoll null default", new MyMapRow( "pncmp0ZDp7OKlwTPJlMZzrI59j8Imefa", null ) );
     embedMap.put("MidRoll TopLeft", new MyMapRow( "pncmp0ZDp7OKlwTPJlMZzrI59j8Imefa", builder.setPosition(Position.TopLeft).setDurationSeconds(DURATION).build() ) );
     embedMap.put("Tall TopRight", new MyMapRow( "tnMG93bzr1X1IJn-Jcjehub0WlX138vg", builder.setPosition(Position.TopRight).setDurationSeconds(DURATION).build() ) );
     embedMap.put("Wide BottomLeft", new MyMapRow( "VyN293bzq5EbxnKI0ff696-PSgHGStM6", builder.setPosition(Position.BottomLeft).setDurationSeconds(DURATION).build() ) );
@@ -121,7 +122,7 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     playerLayout = new OoyalaPlayerLayout( this );
     LinearLayout.LayoutParams pllp = new LinearLayout.LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT );
     mainLayout.addView( playerLayout, pllp );
-    Options options = new Options.Builder().setTVRatingConfiguration(tvRatingConfiguration).build();
+    Options options = tvRatingConfiguration == null ? null : new Options.Builder().setTVRatingConfiguration(tvRatingConfiguration).build();
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController( playerLayout, PCODE, new PlayerDomain(DOMAIN), DefaultControlStyle.AUTO, null, options );
     player = playerLayoutController.getPlayer();
     player.addObserver(this);

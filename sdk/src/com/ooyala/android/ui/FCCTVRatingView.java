@@ -95,9 +95,15 @@ public class FCCTVRatingView extends View {
   }
 
   public void reshow() {
-    setAlphaForView(this, 1);
-    setVisibility(VISIBLE);
-    startAnimation();
+    if( nTVRatingConfiguration != null && nTVRatingConfiguration.durationSeconds > 0 ) {
+      setAlphaForView(this, 1);
+      setVisibility(VISIBLE);
+      startAnimation();
+    }
+    else {
+      setAlphaForView(this, 0);
+      setVisibility(GONE);
+    }
   }
 
   @Override
