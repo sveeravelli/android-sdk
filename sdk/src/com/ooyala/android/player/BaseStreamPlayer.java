@@ -466,11 +466,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public SeekStyle getSeekStyle() {
-    if(stream == null || Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType()) || stream.decodedURL().toString().contains("m3u8")) {
+    // *** Disable ENHANCED seek due to some media player bug.
+
+    // if(stream == null ||
+    // Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType()) ||
+    // stream.decodedURL().toString().contains("m3u8")) {
       return SeekStyle.BASIC;
-    }
-    else {
-      return SeekStyle.ENHANCED;
-    }
+    // }
+    // else {
+    // return SeekStyle.ENHANCED;
+    // }
   }
 }

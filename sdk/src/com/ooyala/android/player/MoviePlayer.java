@@ -273,7 +273,7 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public SeekStyle getSeekStyle() {
-    return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.ENHANCED;
+    return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.BASIC;
   }
 
   @Override
