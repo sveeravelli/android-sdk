@@ -95,7 +95,7 @@ public class FCCTVRatingView extends View {
   }
 
   public void reshow() {
-    setAlpha(1);
+    setAlphaForView(this, 1);
     setVisibility(VISIBLE);
     startAnimation();
   }
@@ -228,6 +228,13 @@ public class FCCTVRatingView extends View {
 		  }
 	  });
 	  startAnimation( nFadeInAnimation );
+  }
+
+  private void setAlphaForView(View v, float alpha) {
+    AlphaAnimation animation = new AlphaAnimation(alpha, alpha);
+    animation.setDuration(0);
+    animation.setFillAfter(true);
+    v.startAnimation(animation);
   }
 
   private void startFadeOutAnimation() {
