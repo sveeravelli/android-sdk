@@ -240,6 +240,9 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    if (_seeking) {
+      _currTime.setText(DateUtils.formatElapsedTime((int)((seekBar.getProgress() / (100f)) * _player.getDuration() / 1000)));
+    }
     if (fromUser && _player.getSeekStyle() == SeekStyle.ENHANCED) {
       _player.seekToPercent(progress);
       update(null, null);

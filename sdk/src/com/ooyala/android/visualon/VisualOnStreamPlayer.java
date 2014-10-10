@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
@@ -329,7 +330,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       Display display = wm.getDefaultDisplay();
       display.getMetrics(dm);
 
-      _player.setViewSize(dm.widthPixels, dm.heightPixels);
+      _player.setViewSize(Math.max(dm.widthPixels, dm.heightPixels), Math.max(dm.widthPixels, dm.heightPixels));
       _player.setView(_view);
 
       // Register SDK event listener
@@ -448,6 +449,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     };
 
     _parent.addVideoView( _view );
+    _view.setBackgroundColor(Color.TRANSPARENT);
 
     _holder = _view.getHolder();
     _holder.addCallback(this);

@@ -1,4 +1,4 @@
-Current Version: 3.0.0_RC1
+Current Version: 3.0.0_RC7
 
 ------------ 3.0.0 ------------
 Major Features
@@ -19,6 +19,7 @@ Bug Fixes
   [PBA-661] Fixed a number of null pointer errors
   [PBA-641] updated VisualOn License file
   [PBA-307] Integrated with Google IMA v3 beta8 libraries
+  [PBA-716] Removed "Enhanced Seek" behavior due to media player ANR issues
 
 ------------ 2.7.0 ------------
 API/UI Changes

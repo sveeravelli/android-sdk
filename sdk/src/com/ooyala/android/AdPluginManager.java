@@ -14,7 +14,7 @@ import com.ooyala.android.plugin.LifeCycleInterface;
 /**
  * The plugin that manage ad plugins. AdPlugin manager handles content/ad switch
  * and queries plugins when certain event happens.
- * 
+ *
  */
 class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   private static final String TAG = AdPluginManager.class.getName();
@@ -26,7 +26,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
 
   /**
    * Constructor
-   * 
+   *
    * @param player
    *          the ooyalaplayer who owns the ad plugin manager
    * @return true on success, false otherwise
@@ -34,7 +34,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   public AdPluginManager(OoyalaPlayer player) {
     _player = new WeakReference<OoyalaPlayer>(player);
   }
-  
+
   @Override
   public boolean registerPlugin(final AdPluginInterface plugin) {
     if (_plugins.contains(plugin)) {
@@ -73,6 +73,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     return true;
   }
 
+  @Override
   public boolean exitAdMode(final AdPluginInterface plugin) {
     if (plugin == null) {
       DebugMode.assertFail(TAG, "exitAdModed.plugin is null");
@@ -186,10 +187,10 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   /**
    * AdPluginManager is notified by OoyalaPlayer for ad events query plugins
    * whether they need control
-   * 
+   *
    * @return a token when any of the plugins wants control or null if no plugin
    *         needs control
-   * 
+   *
    */
   boolean onAdMode(AdMode mode, int parameter) {
     _parameter = parameter;
@@ -197,9 +198,9 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
       return false;
     }
 
-    if (mode == AdMode.ContentChanged) {
-      resetManager();
-    }
+//    if (mode == AdMode.ContentChanged) {
+//      resetManager();
+//    }
 
     AdPluginInterface plugin = _plugins.get(0);
     while (plugin != null && !pluginNeedsAdMode(plugin, mode)) {
@@ -244,7 +245,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
     }
   }
 
-  private void resetManager() {
+  public void resetManager() {
     if (_activePlugin != null) {
       _activePlugin.destroy();
       _activePlugin = null;

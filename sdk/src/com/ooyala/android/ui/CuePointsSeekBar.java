@@ -48,8 +48,8 @@ public class CuePointsSeekBar extends SeekBar {
     super.onDraw(canvas);
 
     if (_cuePoints != null) {
-      float width = canvas.getWidth() - getThumbOffset() * 2;
-      float height = canvas.getHeight();
+      float width = getWidth() - getThumbOffset() * 2;
+      float height = getHeight();
       float step = width / getMax();
 
       for (Integer i : _cuePoints) {

@@ -136,11 +136,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public int duration() {
     if (_player == null) { return 0; }
     switch (getState()) {
-      case INIT:
-      case SUSPENDED:
-        return 0;
-      default:
-        break;
+    case INIT:
+    case SUSPENDED:
+      return 0;
+    default:
+      break;
     }
     return _player.getDuration();
   }
@@ -466,11 +466,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public SeekStyle getSeekStyle() {
-    if(stream == null || Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType()) || stream.decodedURL().toString().contains("m3u8")) {
+    // *** Disable ENHANCED seek due to some media player bug.
+
+    // if(stream == null ||
+    // Stream.DELIVERY_TYPE_HLS.equals(stream.getDeliveryType()) ||
+    // stream.decodedURL().toString().contains("m3u8")) {
       return SeekStyle.BASIC;
-    }
-    else {
-      return SeekStyle.ENHANCED;
-    }
+    // }
+    // else {
+    // return SeekStyle.ENHANCED;
+    // }
   }
 }
