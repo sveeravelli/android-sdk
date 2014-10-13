@@ -5,8 +5,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 
 import com.ooyala.android.DebugMode;
@@ -14,7 +12,6 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.item.Stream;
 
 public class MoviePlayer extends Player implements Observer {
@@ -246,7 +243,7 @@ public class MoviePlayer extends Player implements Observer {
   @Override
   public void stop() {
     if (_basePlayer != null) {
-      _basePlayer.play();
+      _basePlayer.stop();
     } else {
     DebugMode.logE(TAG, "Trying to stop MoviePlayer without a Base Player");
     }
@@ -276,7 +273,7 @@ public class MoviePlayer extends Player implements Observer {
 
   @Override
   public SeekStyle getSeekStyle() {
-    return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.ENHANCED;
+    return _basePlayer != null ? _basePlayer.getSeekStyle() : SeekStyle.BASIC;
   }
 
   @Override

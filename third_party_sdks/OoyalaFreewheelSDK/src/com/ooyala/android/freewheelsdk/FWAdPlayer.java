@@ -43,6 +43,7 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   private boolean _noPrerolls;
 
   private StateNotifier _notifier;
+  private boolean _pauseAfterResume;
 
   //Create event listeners
   private IEventListener _adStartedEventListener = new IEventListener() {
@@ -174,13 +175,17 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   @Override
   public void resume() {
     DebugMode.logD(TAG, "FW Ad Player: Resuming activity");
-    _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_RESUME());
+    if (!_pauseAfterResume) {
+      _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_RESUME());
+    }
   }
 
   @Override
   public void suspend() {
-    DebugMode.logD(TAG, "FW Ad Player: Suspending activity");
+    DebugMode.logD(TAG, "FW Ad Player: Suspending activity at state "
+        + getState().toString());
     _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_PAUSE());
+    _pauseAfterResume = (getState() == State.PAUSED);
     setState(State.SUSPENDED);
   }
 

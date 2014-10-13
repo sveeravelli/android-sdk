@@ -19,6 +19,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 
@@ -29,6 +30,15 @@ import com.ooyala.android.configuration.FCCTVRatingConfiguration;
  */
 
 public class FCCTVRatingView extends View {
+
+  public static final class RestoreState {
+    public final boolean isShowing;
+    public final FCCTVRating tvRating;
+    public RestoreState(boolean isShowing, FCCTVRating tvRating) {
+      this.isShowing = isShowing;
+      this.tvRating = tvRating;
+    }
+  }
 
   private static final String TAG = "FCCTVRatingView";
   private static final long OVER_CLICKING_PREVENTION_MSEC = 250;
@@ -49,8 +59,8 @@ public class FCCTVRatingView extends View {
   private Paint clearPaint;
   private float miniTextSize;
   private float miniTextScaleX;
-  private FCCTVRatingViewStampDimensions stampDimensions;
   // n means 'possibly null'; a reminder to check.
+  private FCCTVRatingViewStampDimensions nStampDimensions;
   private Bitmap nBitmap;
   private AlphaAnimation nFadeInAnimation;
   private AlphaAnimation nFadeOutAnimation;
@@ -66,8 +76,34 @@ public class FCCTVRatingView extends View {
     initPaints( FCCTVRatingConfiguration.DEFAULT_OPACITY );
     this.miniTextSize = 0;
     this.miniTextScaleX = 0;
-    this.stampDimensions = new FCCTVRatingViewStampDimensions();
     this.nTVRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
+  }
+
+  public RestoreState getRestoreState() {
+    RestoreState state = null;
+    if( nTVRating != null ) {
+      state = new RestoreState( getVisibility() == VISIBLE, nTVRating );
+    }
+    return state;
+  }
+
+  public void restoreState( RestoreState state ) {
+    setTVRating( state.tvRating );
+    if( state.isShowing ) {
+      reshow();
+    }
+  }
+
+  public void reshow() {
+    if( nTVRatingConfiguration != null && nTVRatingConfiguration.durationSeconds > 0 ) {
+      setAlphaForView(this, 1);
+      setVisibility(VISIBLE);
+      startAnimation();
+    }
+    else {
+      setAlphaForView(this, 0);
+      setVisibility(GONE);
+    }
   }
 
   @Override
@@ -83,7 +119,7 @@ public class FCCTVRatingView extends View {
     final boolean isVisible = getVisibility() == VISIBLE;
     // we're fighting with the controls so have to do it on down, rather than up.
     final boolean isDown = event.getAction() == MotionEvent.ACTION_DOWN;
-    final boolean contains = stampDimensions.contains( event.getX(), event.getY() );
+    final boolean contains = nStampDimensions == null ? false : nStampDimensions.contains( event.getX(), event.getY() );
     if( hasClickthrough() && clickAllowed && isVisible && isDown && contains ) {
       getContext().startActivity(
           new Intent(
@@ -164,7 +200,6 @@ public class FCCTVRatingView extends View {
     if( tvRating != null && !tvRating.equals(nTVRating) ) {
       nTVRating = tvRating;
   	  freeResources();
-  	  startAnimation();
     }
   }
 
@@ -199,6 +234,13 @@ public class FCCTVRatingView extends View {
 		  }
 	  });
 	  startAnimation( nFadeInAnimation );
+  }
+
+  private void setAlphaForView(View v, float alpha) {
+    AlphaAnimation animation = new AlphaAnimation(alpha, alpha);
+    animation.setDuration(0);
+    animation.setFillAfter(true);
+    v.startAnimation(animation);
   }
 
   private void startFadeOutAnimation() {
@@ -249,7 +291,7 @@ public class FCCTVRatingView extends View {
   }
 
   private boolean hasValidStampDimensions() {
-    return stampDimensions.whiteRect.width() > 0 && stampDimensions.whiteRect.height() > 0;
+    return nStampDimensions == null ? false : nStampDimensions.whiteRect.width() > 0 && nStampDimensions.whiteRect.height() > 0;
   }
 
   private boolean hasBitmap() {
@@ -261,13 +303,14 @@ public class FCCTVRatingView extends View {
     super.onDraw( canvas );
     maybeGenerateBitmap();
     if( hasBitmap() ) {
-      canvas.drawBitmap( nBitmap, stampDimensions.left, stampDimensions.top, null );
+      DebugMode.assertCondition( nStampDimensions != null, TAG, "nStampDimensions should not be null if we bitmap is non-null" );
+      canvas.drawBitmap( nBitmap, nStampDimensions.left, nStampDimensions.top, null );
     }
   }
 
   private void maybeGenerateBitmap() {
     if( hasValidRating() ) {
-      stampDimensions.update( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), hasLabels() );
+      nStampDimensions = new FCCTVRatingViewStampDimensions( getContext(), nTVRatingConfiguration, getMeasuredWidth(), getMeasuredHeight(), hasLabels() );
       if( hasValidStampDimensions() ) {
         generateBitmap();
       }
@@ -278,7 +321,7 @@ public class FCCTVRatingView extends View {
   }
 
   private void generateBitmap() {
-    nBitmap = Bitmap.createBitmap( stampDimensions.whiteRect.width(), stampDimensions.whiteRect.height(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
+    nBitmap = Bitmap.createBitmap( nStampDimensions.whiteRect.width(), nStampDimensions.whiteRect.height(), Bitmap.Config.ARGB_8888 ); // todo: Check for fastest ARGB mode vs. SurfaceView.
     Canvas c = new Canvas( nBitmap );
     drawBitmapStamp( c );
   }
@@ -291,27 +334,27 @@ public class FCCTVRatingView extends View {
   }
 
   private void drawBitmapStampBackground( Canvas c ) {
-    c.clipRect( stampDimensions.whiteRect, Region.Op.REPLACE );
-    c.drawRect( stampDimensions.whiteRect, whitePaint );
-    c.drawRect( stampDimensions.blackRect, blackPaint );
+    c.clipRect( nStampDimensions.whiteRect, Region.Op.REPLACE );
+    c.drawRect( nStampDimensions.whiteRect, whitePaint );
+    c.drawRect( nStampDimensions.blackRect, blackPaint );
   }
 
   private void drawBitmapStampTV( Canvas c ) {
-    c.clipRect( stampDimensions.tvRect, Region.Op.REPLACE );
-    drawTV( c, stampDimensions.tvRect );
+    c.clipRect( nStampDimensions.tvRect, Region.Op.REPLACE );
+    drawTV( c, nStampDimensions.tvRect );
   }
 
   private void drawBitmapStampLabels( Canvas c ) {
     if( hasLabels() ) {
-      c.clipRect( stampDimensions.labelsRect, Region.Op.REPLACE );
-      drawLabels( c, stampDimensions.labelsRect, nTVRating.labels );
+      c.clipRect( nStampDimensions.labelsRect, Region.Op.REPLACE );
+      drawLabels( c, nStampDimensions.labelsRect, nTVRating.labels );
     }
   }
 
   private void drawBitmapStampRating( Canvas c ) {
     if( hasValidRating() ) {
-      c.clipRect( stampDimensions.ratingRect, Region.Op.REPLACE );
-      drawRating( c, stampDimensions.ratingRect, nTVRating.ageRestriction );
+      c.clipRect( nStampDimensions.ratingRect, Region.Op.REPLACE );
+      drawRating( c, nStampDimensions.ratingRect, nTVRating.ageRestriction );
     }
   }
 

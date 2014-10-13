@@ -259,6 +259,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
     //Listen for the request complete event
     _fwContext.addEventListener(_fwConstants.EVENT_REQUEST_COMPLETE(), new IEventListener() {
+      @Override
       public void run(IEvent e) {
         String eType = e.getType();
         String eSuccess = e.getData().get(_fwConstants.INFO_KEY_SUCCESS()).toString();
@@ -279,6 +280,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     });
     //Listen for any errors that may happen
     _fwContext.addEventListener(_fwConstants.EVENT_ERROR(), new IEventListener() {
+      @Override
       public void run(IEvent e) {
         DebugMode.logE(TAG, "There was an error in the Freewheel Ad Manager!");
         //Set overlay ads to null so they don't affect playback
@@ -390,9 +392,6 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
   @Override
   public void destroy() {
-    _player.get().deleteObserver(this);
-    _player.get().deregisterPlugin(this);
-    _player.clear();
 
     if (_adPlayer != null) {
       _adPlayer.destroy();
@@ -489,7 +488,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     if (_adPlayer == null || _adPlayer.getNotifier() != notifier) {
       return;
     }
-    
+
     switch (notifier.getState()) {
     case COMPLETED:
       if (!playAdsBeforeTime()) {

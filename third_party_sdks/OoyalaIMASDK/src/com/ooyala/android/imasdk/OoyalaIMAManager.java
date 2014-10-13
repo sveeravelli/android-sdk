@@ -237,6 +237,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
         // We assume there are pre-roll ads by returning true
         // If it turns out there is no pre-roll ad, resume content after timeout
         Thread timeoutThread = new Thread() {
+          @Override
           public void run() {
               try {
                   Thread.sleep(TIMEOUT);
@@ -305,6 +306,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public void suspend() {
     // TODO Auto-generated method stub
     DebugMode.logD(TAG, "IMA Ads Manager: suspend");
+    _adPlayer.suspend();
     _ooyalaPlayerWrapper.fireVideoSuspendCallback();
   }
 
@@ -331,6 +333,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
     DebugMode.logD(TAG, "IMA Ads Manager: destroy");
     if (_adsManager != null) {
       _adsManager.destroy();
+      _ooyalaPlayerWrapper.stopAd();
       _onAdError = false;
     }
     _adsManager = null;

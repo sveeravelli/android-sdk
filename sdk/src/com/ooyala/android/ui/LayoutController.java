@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.FCCTVRating;
 
 public interface LayoutController {
   /**
@@ -48,23 +47,22 @@ public interface LayoutController {
    * @return
    */
   public boolean onKeyUp(int keyCode, KeyEvent event);
-  
+
   /**
    * Insert the video view into the view hierarchy. Will
    * automatically include other views such as TV Ratings.
    * @param videoView
    */
   public void addVideoView( View videoView );
-  
+
   /**
    * Remove any previously added video view, and related
    * items such as the TV Ratings view.
    */
   public void removeVideoView();
-  
+
   /**
-   * @param tvRating
-   * @return true if the rating was pushed to the ui, false otherwise (try again later).
+   * Reshow TV rating (if the current FCCTVRatingConfiguration allows it).
    */
-  public boolean pushTVRating( FCCTVRating tvRating );
+  public void reshowTVRating();
 }

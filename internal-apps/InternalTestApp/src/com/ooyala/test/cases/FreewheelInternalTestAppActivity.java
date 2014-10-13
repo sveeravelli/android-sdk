@@ -40,6 +40,7 @@ public class FreewheelInternalTestAppActivity extends BaseInternalTestAppActivit
     embedMap.put("Freewheel Postroll", "NmcGg4bzqbeqXO_x9Rfj5IX6gwmRRrse");
     embedMap.put("Freewheel PreMidPost", "NqcGg4bzoOmMiV35ZttQDtBX1oNQBnT-");
     embedMap.put("Freewheel Overlay", "NucGg4bzrVrilZrMdlSA9tyg6Vty46DN");
+    embedMap.put("Freewheel Multi Midroll", "htdnB3cDpMzXVL7fecaIWdv9rTd125As");
     embedMap.put("Freewheel Skip Ad (Can't Skip)", "NocGg4bzoRJ1yu3JY3LP44tVlsC2E_gi");
 
     embedMap.put("Freewheel Pre, Mid, Postroll + Overlay (OLD)", "VmMnA4ZzoSrZEiptnTUbroi7BqpNqotP");

@@ -83,7 +83,7 @@ public class Player extends Observable implements PlayerInterface,
   public void setLiveClosedCaptionsEnabled(boolean enabled){}
 
   public SeekStyle getSeekStyle() {
-    return SeekStyle.ENHANCED;
+    return SeekStyle.BASIC;
   }
 
   @Override
