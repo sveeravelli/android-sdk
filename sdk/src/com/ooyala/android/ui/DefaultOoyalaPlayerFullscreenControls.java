@@ -51,9 +51,8 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private static final int OVERLAY_BACKGROUND_COLOR = Color.argb(200, 0, 0, 0);
 
   public DefaultOoyalaPlayerFullscreenControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
-    setParentLayout(layout);
     setOoyalaPlayer(player);
-    setupControls();
+    setParentLayout(layout);
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -354,5 +353,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
+  }
+
+  @Override
+  public void setParentLayout(OoyalaPlayerLayout layout) {
+    super.setParentLayout(layout);
+    setupControls();
   }
 }

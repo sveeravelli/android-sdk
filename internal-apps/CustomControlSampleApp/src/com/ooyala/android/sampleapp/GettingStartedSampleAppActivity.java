@@ -7,6 +7,7 @@ import android.util.Log;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class GettingStartedSampleAppActivity extends Activity {
 
@@ -23,11 +24,15 @@ public class GettingStartedSampleAppActivity extends Activity {
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    MyLayoutController playerLayoutController = new MyLayoutController(
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(
         playerLayout, PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
+
     MyInlineControls ic = new MyInlineControls(player, playerLayout);
     playerLayoutController.setInlineControls(ic);
+
+    MyFullscreenControls fc = new MyFullscreenControls(player, null);
+    playerLayoutController.setFullscreenControls(fc);
 
     if (player.setEmbedCode(EMBED)) {
       player.play();

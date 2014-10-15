@@ -118,7 +118,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
     if (isFullscreen() && !fullscreen) { // Fullscreen -> Not Fullscreen
       _fullscreenDialog.dismiss();
       _fullscreenDialog = null;
-      _fullscreenControls = null;
+      _fullscreenLayout.removeAllViews();
       _fullscreenLayout = null;
       controlsToShow = _inlineControls;
       if (_inlineOverlay != null) {
@@ -155,7 +155,11 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
 
       _inlineControls.setVisible(false);
 
-      setFullscreenControls(createDefaultControls(_fullscreenLayout, true));
+      if (_fullscreenControls == null) {
+        setFullscreenControls(createDefaultControls(_fullscreenLayout, true));
+      } else {
+        _fullscreenControls.setParentLayout(_fullscreenLayout);
+      }
       controlsToShow = _fullscreenControls;
       if (_fullscreenOverlay != null) {
         _fullscreenOverlay.setParentLayout(_fullscreenLayout);
