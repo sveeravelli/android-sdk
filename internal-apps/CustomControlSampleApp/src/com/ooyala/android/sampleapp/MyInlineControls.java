@@ -1,11 +1,10 @@
-package com.ooyala.android.ui;
+package com.ooyala.android.sampleapp;
 
 import java.util.Observable;
 import java.util.Observer;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.text.format.DateUtils;
 import android.view.Gravity;
@@ -18,21 +17,25 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.ui.AbstractDefaultOoyalaPlayerControls;
+import com.ooyala.android.ui.CuePointsSeekBar;
 
-public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
+public class MyInlineControls extends AbstractDefaultOoyalaPlayerControls
+    implements
 SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
-  private LinearLayout _bottomOverlay = null;
-  private LinearLayout _topBar = null;
+
+  private static final String TAG = "DefaultOoyalaPlayerInlineControls";
+
+  private LinearLayout _bottomBar = null;
   private LinearLayout _seekWrapper = null;
   private LinearLayout _liveWrapper = null;
   private PlayPauseButton _playPause = null;
-  private NextButton _next = null;
-  private PreviousButton _previous = null;
   private FullscreenButton _fullscreen = null;
   private ClosedCaptionsButton _closedCaptions = null;
   private CuePointsSeekBar _seek = null;
@@ -44,18 +47,13 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private boolean _seeking;
   private boolean _fullscreenButtonShowing = true;
 
-  private static final float OVERLAY_SCALE = 1.2f;
-  private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) (PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
-  private static final int OVERLAY_PREFERRED_BUTTON_HEIGHT_DP = (int) (PREFERRED_BUTTON_HEIGHT_DP * OVERLAY_SCALE);
-  private static final int OVERLAY_MARGIN_SIZE_DP = 10;
-  private static final int OVERLAY_BACKGROUND_COLOR = Color.argb(200, 0, 0, 0);
-
-  public DefaultOoyalaPlayerFullscreenControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
-    setOoyalaPlayer(player);
+  public MyInlineControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
+    setOoyalaPlayer(player);
+    setupControls();
   }
 
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  @SuppressLint("NewApi")
   @Override
   protected void updateButtonStates() {
     if (_playPause != null) {
@@ -99,58 +97,19 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _baseLayout = new FrameLayout(_layout.getContext());
     _baseLayout.setBackgroundColor(Color.TRANSPARENT);
 
-    _bottomOverlay = new LinearLayout(_baseLayout.getContext());
-    _bottomOverlay.setOrientation(LinearLayout.HORIZONTAL);
-    _bottomOverlay.setBackgroundColor(OVERLAY_BACKGROUND_COLOR);
+    _bottomBar = new LinearLayout(_baseLayout.getContext());
+    _bottomBar.setOrientation(LinearLayout.HORIZONTAL);
+    // _bottomBar.setBackgroundDrawable(Images.gradientBackground(GradientDrawable.Orientation.BOTTOM_TOP));
+    _bottomBar.setBackgroundColor(Color.GREEN);
 
-    _previous = new PreviousButton(_bottomOverlay.getContext());
-    LinearLayout.LayoutParams previousLP = new LinearLayout.LayoutParams(Images.dpToPixels(
-        _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(
-            _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_HEIGHT_DP));
-    previousLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP * 2);
-    previousLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), 0);
-    previousLP.topMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    previousLP.bottomMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    _previous.setLayoutParams(previousLP);
-    _previous.setOnClickListener(this);
-
-    _playPause = new PlayPauseButton(_bottomOverlay.getContext());
+    _playPause = new PlayPauseButton(_bottomBar.getContext());
     _playPause.setPlaying(_player.isPlaying());
-    LinearLayout.LayoutParams ppLP = new LinearLayout.LayoutParams(Images.dpToPixels(
-        _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(
-            _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_HEIGHT_DP));
-    ppLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    ppLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    ppLP.topMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    ppLP.bottomMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
+    ViewGroup.LayoutParams ppLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(),
+        PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
     _playPause.setLayoutParams(ppLP);
     _playPause.setOnClickListener(this);
 
-    _next = new NextButton(_bottomOverlay.getContext());
-    LinearLayout.LayoutParams nextLP = new LinearLayout.LayoutParams(Images.dpToPixels(
-        _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(
-            _baseLayout.getContext(), OVERLAY_PREFERRED_BUTTON_HEIGHT_DP));
-    nextLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), 0);
-    nextLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP * 2);
-    nextLP.topMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    nextLP.bottomMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    _next.setLayoutParams(nextLP);
-    _next.setOnClickListener(this);
-
-    _bottomOverlay.addView(_previous);
-    _bottomOverlay.addView(_playPause);
-    _bottomOverlay.addView(_next);
-    FrameLayout.LayoutParams bottomOverlayLP = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
-        | Gravity.CENTER_HORIZONTAL);
-    bottomOverlayLP.bottomMargin = Images.dpToPixels(_baseLayout.getContext(), OVERLAY_MARGIN_SIZE_DP);
-    _baseLayout.addView(_bottomOverlay, bottomOverlayLP);
-
-    _topBar = new LinearLayout(_baseLayout.getContext());
-    _topBar.setOrientation(LinearLayout.HORIZONTAL);
-    _topBar.setBackgroundDrawable(Images.gradientBackground(GradientDrawable.Orientation.TOP_BOTTOM));
-
-    _seekWrapper = new LinearLayout(_topBar.getContext());
+    _seekWrapper = new LinearLayout(_bottomBar.getContext());
     _seekWrapper.setOrientation(LinearLayout.HORIZONTAL);
     _currTime = new TextView(_seekWrapper.getContext());
     _currTime.setText("00:00:00");
@@ -182,27 +141,26 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     seekWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     _seekWrapper.setLayoutParams(seekWrapperLP);
 
-    _liveWrapper = new LinearLayout(_topBar.getContext());
+    _liveWrapper = new LinearLayout(_bottomBar.getContext());
     _liveWrapper.setVisibility(View.GONE);
     _liveWrapper.setOrientation(LinearLayout.HORIZONTAL);
     _liveIndicator = new TextView(_liveWrapper.getContext());
     _liveIndicator.setText(LocalizationSupport.localizedStringFor("LIVE"));
     _liveIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
-    @SuppressWarnings("deprecation")
     LinearLayout.LayoutParams liveIndicatorLP = new LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
     liveIndicatorLP.gravity = Gravity.CENTER;
     _liveIndicator.setLayoutParams(liveIndicatorLP);
     _liveWrapper.addView(_liveIndicator);
     LinearLayout.LayoutParams liveWrapperLP = new LinearLayout.LayoutParams(0,
         ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
     liveWrapperLP.gravity = Gravity.CENTER;
-    liveWrapperLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP
-        + PREFERRED_BUTTON_WIDTH_DP);
+    liveWrapperLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     liveWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     _liveWrapper.setLayoutParams(liveWrapperLP);
 
-    _fullscreen = new FullscreenButton(_topBar.getContext());
+    _fullscreen = new FullscreenButton(_bottomBar.getContext());
     _fullscreen.setFullscreen(_player.isFullscreen());
     LinearLayout.LayoutParams fsLP = new LinearLayout.LayoutParams(Images.dpToPixels(
         _baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP), Images.dpToPixels(_baseLayout.getContext(),
@@ -212,34 +170,38 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _fullscreen.setLayoutParams(fsLP);
     _fullscreen.setOnClickListener(this);
 
-    _closedCaptions = new ClosedCaptionsButton(_topBar.getContext());
+    _closedCaptions = new ClosedCaptionsButton(_bottomBar.getContext());
     ViewGroup.LayoutParams ccLP = new ViewGroup.LayoutParams(Images.dpToPixels(_baseLayout.getContext(),
         PREFERRED_BUTTON_WIDTH_DP), Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP));
     _closedCaptions.setLayoutParams(ccLP);
     _closedCaptions.setOnClickListener(this);
 
-    _topBar.addView(_seekWrapper);
-    _topBar.addView(_liveWrapper);
-    _topBar.addView(_closedCaptions);
-    _topBar.addView(_fullscreen);
-    FrameLayout.LayoutParams topBarLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-    _baseLayout.addView(_topBar, topBarLP);
+    _bottomBar.addView(_playPause);
+    _bottomBar.addView(_seekWrapper);
+    _bottomBar.addView(_liveWrapper);
+    _bottomBar.addView(_closedCaptions);
+    _bottomBar.addView(_fullscreen);
+    FrameLayout.LayoutParams bottomBarLP = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM
+        | Gravity.CENTER_HORIZONTAL);
+    _baseLayout.addView(_bottomBar, bottomBarLP);
+
+    _spinner = new ProgressBar(_layout.getContext());
+    _spinner.setVisibility(View.INVISIBLE);
+    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+    _layout.addView(_spinner, spinnerLP);
 
     FrameLayout.LayoutParams baseLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT);
     _layout.addView(_baseLayout, baseLP);
     hide();
-
-    _spinner = new ProgressBar(_layout.getContext());
-    FrameLayout.LayoutParams spinnerLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-        FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
-    _layout.addView(_spinner, spinnerLP);
   }
 
   @Override
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     if (_seeking) {
+      //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
       _currTime.setText(DateUtils.formatElapsedTime((int)((seekBar.getProgress() / (100f)) * _player.getDuration() / 1000)));
     }
     if (fromUser && _player.getSeekStyle() == SeekStyle.ENHANCED) {
@@ -257,6 +219,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
+    DebugMode.logV( TAG, "onStopTrackingTouch(): _wasPlaying=" + _wasPlaying + ", " + "percent=" + seekBar.getProgress() );
     _player.seekToPercent(seekBar.getProgress());
     update(null, null);
     _seeking = false;
@@ -267,11 +230,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public void onClick(View v) {
-    if (v == _previous) {
-      _player.previousVideo(_player.isPlaying() ? OoyalaPlayer.DO_PLAY : OoyalaPlayer.DO_PAUSE);
-    } else if (v == _next) {
-      _player.nextVideo(_player.isPlaying() ? OoyalaPlayer.DO_PLAY : OoyalaPlayer.DO_PAUSE);
-    } else if (v == _playPause) {
+    if (v == _playPause) {
       if (_player.isPlaying()) {
         _player.pause();
       } else {
@@ -283,7 +242,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       updateButtonStates();
       hide();
     } else if (v == _closedCaptions) {
-        _layout.getLayoutController().showClosedCaptionsMenu();
+      _layout.getLayoutController().showClosedCaptionsMenu();
     }
   }
 
@@ -294,9 +253,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       _seek.setSecondaryProgress(_player.getBufferPercentage());
       _seek.setCuePoints(_player.getCuePointsInPercentage());
     }
-    //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
-    _duration.setText(DateUtils.formatElapsedTime(_player.getDuration()/ 1000));
-    _currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()/ 1000));
+    if (_duration != null && _currTime != null) {
+      //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
+      _duration.setText(DateUtils.formatElapsedTime(_player.getDuration() / 1000));
+      _currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime() / 1000));
+    }
 
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
@@ -317,7 +278,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
       updateButtonStates();
 
-      if ((currentState == State.INIT || currentState == State.LOADING) && _isVisible) {
+      if (currentState == State.LOADING && _isVisible) {
         _spinner.setVisibility(View.VISIBLE);
       } else {
         _spinner.setVisibility(View.INVISIBLE);
@@ -327,12 +288,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
         _isPlayerReady = true;
       }
 
-      if (currentState == State.SUSPENDED) {
+      if (currentState == State.SUSPENDED || currentState == State.ERROR) {
         _isPlayerReady = false;
         hide();
       }
       if (!isShowing() && currentState != State.INIT && currentState != State.LOADING
-          && currentState != State.ERROR && currentState != State.SUSPENDED && _player.isFullscreen()) {
+          && currentState != State.ERROR && currentState != State.SUSPENDED && !_player.isFullscreen()) {
         show();
       }
     }
@@ -340,24 +301,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public int bottomBarOffset() {
-    if (_baseLayout == null) return 0;
-    int pixelValue = OVERLAY_PREFERRED_BUTTON_HEIGHT_DP * 2 + OVERLAY_MARGIN_SIZE_DP * 4;
-    return Images.dpToPixels(_baseLayout.getContext(), pixelValue);
-  }
-
-  @Override
-  public int topBarOffset() {
-    return Images.dpToPixels(_baseLayout.getContext(), PREFERRED_BUTTON_HEIGHT_DP);
+    return (PREFERRED_BUTTON_HEIGHT_DP * 2 + MARGIN_SIZE_DP * 4);
   }
 
   @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
-  }
-
-  @Override
-  public void setParentLayout(OoyalaPlayerLayout layout) {
-    super.setParentLayout(layout);
-    setupControls();
   }
 }

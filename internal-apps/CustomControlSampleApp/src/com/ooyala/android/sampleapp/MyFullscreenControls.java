@@ -1,11 +1,10 @@
-package com.ooyala.android.ui;
+package com.ooyala.android.sampleapp;
 
 import java.util.Observable;
 import java.util.Observer;
 
 import android.annotation.TargetApi;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.text.format.DateUtils;
 import android.view.Gravity;
@@ -23,8 +22,10 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.ui.AbstractDefaultOoyalaPlayerControls;
+import com.ooyala.android.ui.CuePointsSeekBar;
 
-public class DefaultOoyalaPlayerFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
+public class MyFullscreenControls extends AbstractDefaultOoyalaPlayerControls implements
 SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private LinearLayout _bottomOverlay = null;
   private LinearLayout _topBar = null;
@@ -48,11 +49,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private static final int OVERLAY_PREFERRED_BUTTON_WIDTH_DP = (int) (PREFERRED_BUTTON_WIDTH_DP * OVERLAY_SCALE);
   private static final int OVERLAY_PREFERRED_BUTTON_HEIGHT_DP = (int) (PREFERRED_BUTTON_HEIGHT_DP * OVERLAY_SCALE);
   private static final int OVERLAY_MARGIN_SIZE_DP = 10;
-  private static final int OVERLAY_BACKGROUND_COLOR = Color.argb(200, 0, 0, 0);
+  private static final int OVERLAY_BACKGROUND_COLOR = Color
+      .argb(200, 200, 0, 0);
 
-  public DefaultOoyalaPlayerFullscreenControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
-    setOoyalaPlayer(player);
+  public MyFullscreenControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
+    setOoyalaPlayer(player);
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -148,12 +150,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
     _topBar = new LinearLayout(_baseLayout.getContext());
     _topBar.setOrientation(LinearLayout.HORIZONTAL);
-    _topBar.setBackgroundDrawable(Images.gradientBackground(GradientDrawable.Orientation.TOP_BOTTOM));
+    _topBar.setBackgroundColor(Color.RED);
 
     _seekWrapper = new LinearLayout(_topBar.getContext());
     _seekWrapper.setOrientation(LinearLayout.HORIZONTAL);
     _currTime = new TextView(_seekWrapper.getContext());
-    _currTime.setText("00:00:00");
+    _currTime.setText("hooray");
     LinearLayout.LayoutParams currTimeLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT);
     currTimeLP.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
@@ -294,9 +296,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       _seek.setSecondaryProgress(_player.getBufferPercentage());
       _seek.setCuePoints(_player.getCuePointsInPercentage());
     }
-    //boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
-    _duration.setText(DateUtils.formatElapsedTime(_player.getDuration()/ 1000));
-    _currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()/ 1000));
+    boolean includeHours = _player.getDuration() >= 1000 * 60 * 60;
+    _duration
+        .setText(DateUtils.formatElapsedTime(_player.getDuration() / 1000));
+    _currTime
+        .setText(DateUtils.formatElapsedTime(_player.getPlayheadTime() / 1000));
 
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
@@ -356,8 +360,8 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   }
 
   @Override
-  public void setParentLayout(OoyalaPlayerLayout layout) {
-    super.setParentLayout(layout);
+  public void setParentLayout(OoyalaPlayerLayout parent) {
+    super.setParentLayout(parent);
     setupControls();
   }
 }
