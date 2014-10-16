@@ -55,7 +55,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   public MyFullscreenControls(OoyalaPlayer player, OoyalaPlayerLayout layout) {
     setParentLayout(layout);
     setOoyalaPlayer(player);
-    setupControls();
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -358,5 +357,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   @Override
   public void setFullscreenButtonShowing(boolean showing) {
     _fullscreenButtonShowing = showing;
+  }
+
+  @Override
+  public void setParentLayout(OoyalaPlayerLayout parent) {
+    super.setParentLayout(parent);
+    setupControls();
   }
 }
