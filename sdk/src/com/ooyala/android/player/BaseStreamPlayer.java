@@ -212,8 +212,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (what == -10 && extra == -10) {  //I think this means unsupported format
       DebugMode.logE(TAG, "Unsupported video type given to base media player");
     }
-    if (what == 100 && extra == 0) {
-      // Media server died!
+    if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
       this.stop();
     }
     
