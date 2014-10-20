@@ -197,7 +197,7 @@ public class Analytics {
     if (!_ready) {
       queue(action);
     } else {
-    //  DebugMode.logD(TAG, "report:" + action);
+    DebugMode.logD(TAG, "report:" + action);
       _jsAnalytics.loadUrl(action);
     }
   }
@@ -252,8 +252,7 @@ public class Analytics {
     if (!_shouldReportPlayRequest) {
       return;
     }
-     String param = _initialPlay ? "1" : "0";
-     String action = "javascript:reporter.reportPlay(" + param + ");";
+    String action = "javascript:reporter.reportPlayStarted();";
     _initialPlay = false;
     _shouldReportPlayRequest = false;
      report(action);
