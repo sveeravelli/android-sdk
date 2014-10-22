@@ -194,7 +194,7 @@ public class Analytics {
     if (!_ready) {
       queue(action);
     } else {
-    DebugMode.logD(TAG, "report:" + action);
+      DebugMode.logV(TAG, "report:" + action);
       _jsAnalytics.loadUrl(action);
     }
   }
