@@ -3,8 +3,6 @@ package com.ooyala.android;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,13 +50,12 @@ public class Analytics {
 
     final Map<String, String> moduleParams = new HashMap<String, String>();
 
-    String url = "http://www.ooyala.com/analytics.html";
-    try {
-      url = new URL("http", api.getDomain().toString(), "/").toString();
+    String url = api.getDomain().toString();
+    if (url.length() <= 0) {
+      url = "http://www.ooyala.com/analytics.html";
+      DebugMode.logE(TAG, "falling back to default analytics URL " + url);
     }
-    catch (MalformedURLException e) {
-      System.out.println("falling back to default analytics URL " + url);
-    }
+
     moduleParams.put(JS_ANALYTICS_DOCUMENT_URL, url);
 
     //If there is an account ID, add it to the Reporter.js initializer
