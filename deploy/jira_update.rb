@@ -170,4 +170,5 @@ ticket_data = get_issue_data(ticket_key, uri)
 unless transition_issue(ticket_key, ticket_data, operation) 
   exit -1
 end
+puts true
 exit 0

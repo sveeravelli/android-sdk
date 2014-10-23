@@ -9,6 +9,7 @@ release_date=
 target_branch=""
 subtask_name=""
 subtask_number=""
+ticket_update_result=""
 
 function usage {
   echo "$0 <task> <options>"
@@ -18,9 +19,9 @@ function usage {
   echo ""
   echo "    clone-ticket | -ct:                                     Creates new ticket from stub ticket in JIRA"
   echo "" 
-  echo "    cut-branch | -cb <ticket-id>:                           Creates branch from master with name release/YYY-MM-DD"
-  echo ""
   echo "    file-doc-ticket | -fdt <ticket-id>:                     Generate a doc ticket for the current release by cloning the DOC-510"
+  echo ""
+  echo "    cut-branch | -cb <ticket-id>:                           Creates branch from master with name release/YYY-MM-DD"
   echo ""
   echo "    update-first-round-testing-task | -frt <ticket-id>:     Update the first round testing subtask by posting the related links and comments"
   echo ""
@@ -37,42 +38,42 @@ function usage {
 
 
 function clone_ticket {
-  echo ""
-  echo "Generate main release ticket"
+  echo -e "\033[37mGenerate main release ticket"
 
   read -p "Enter release date in YYYY-MM-DD format: " release_date
   check_release_date_format
-  echo "Cloning stub ticket PBA-664..."
+  echo -e "\033[37mCloning stub ticket PBA-664..."
 
   new_ticket_num=`ruby ~/repos/android-sdk/deploy/jira_clone.rb PBA-664 "Android SDK Release Ticket ${release_date}" true`
   check_ticket_number_format
   receiver="liusha.huang@ooyala.com" #TODO: playback-oncall
-  body="JIRA Deployment ticket created"
-  subject="New Cloned Ticket for ${new_ticket_num}"
+  body="New Release Ticket for ${new_ticket_num} is generated"
+  subject="New Release Ticket for ${new_ticket_num} has been generated"
   echo ${body} | mail -s "${subject}" ${receiver}
-  echo -e "\033[32mNew Ticket ${new_ticket_num} Created. Sent email to ${receiver}."
+  echo -e "\033[32mNew Release Ticket ${new_ticket_num} Created. Sent email to ${receiver}."
 }
 
 function file_release_doc_ticket {
   echo ""
-  echo "File a DOCS ticket to update SDK integration guides"
+  echo -e "\033[37mFile a DOCS ticket to update SDK integration guides"
   subtask_name="File a DOCS ticket to update SDK integration guides"
   fetch_release_info
 
   echo "Generating doc tickets for Android Release-${release_date}"
 
-  #create a new DOCS ticket to track documentation
+  create a new DOCS ticket to track documentation
   new_Android_docs_ticket=`ruby ~/repos/android-sdk/deploy/jira_clone.rb DOC-510 "Prepare for Android Release-${release_date}"`
   if ! [[ ${new_Android_docs_ticket} =~ ^[Dd][Oo][Cc]-[0-9]{1,}$ ]]; then
-    echo -e "\033[31mFail to generate the DOC ticket"
+    1>&2 echo -e "\033[31mError: Fail to generate the DOC ticket"
     exit 1
   fi
   echo "new doc ticket: " ${new_Android_docs_ticket}
   echo "main task ticket: " ${new_ticket_num}
 
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "File a DOCS ticket to update SDK integration guides" "
-  Android-SDK Release Note Ticket: ${new_Android_docs_ticket}" closed
-  
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "File a DOCS ticket to update SDK integration guides" "
+  Android-SDK Release Note Ticket: ${new_Android_docs_ticket}" closed`
+  check_ticket_update_result
+
   receiver="liusha.huang@ooyala.com" #TODO: playback-oncall
   body="Make sure to post the update for this release in this DOC ticket"
   subject="New DOC Ticket ${new_Android_docs_ticket} has been generated."
@@ -82,39 +83,43 @@ function file_release_doc_ticket {
 
 function cut_branch {
   echo ""
-  echo "Create RC and Tag Master"
+  echo -e "\033[37mCreate RC and Tag Master"
   subtask_name="Create RC and Tag Master"
   fetch_release_info
   target_branch="master"
   check_if_in_clean_target_branch
 
-  echo "Publishing Android Release RC for Release-${release_date}..."
+  echo -e "\033[37mPublishing Android Release RC for Release-${release_date}..."
   ~/repos/android-sdk/script/android-sdk pub -rc -push
+  check_build_result
 
   new_branch="release/${release_date}"
   git checkout -b releases/${release_date}
   git push -u origin releases/${release_date}
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Create RC and Tag Master" "Branch ${new_branch} is created. Closing sub-task." closed  
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Create RC and Tag Master" "Branch ${new_branch} is created. Closing sub-task." closed`
+  check_ticket_update_result
+  
   echo -e "\033[32mPublished a new RC from master" 
 }
 
 function update_first_round_testing_task {
   echo ""
-  echo "First Round Testing"
+  echo -e "\033[37mFirst Round Testing"
   subtask_name="First Round Testing"
   fetch_release_info
-  echo "Updating first round sub-task..."
+  echo -e "\033[37mUpdating first round sub-task..."
   testing_ticket_url="https://jira.corp.ooyala.com/issues/?jql=Project%3D%20PBA%20AND%20labels%20%3D%20SDK-Deploy-${release_date}"
 
   comment="Testing ticket url: ${testing_ticket_url}"$'\n\n'"When you create new bugs, please leave them unassigned. DO NOT assign them to Michael Len!"
 
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "First Round Testing" "${comment}" closed
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "First Round Testing" "${comment}" closed`
+  check_ticket_update_result
   echo -e "\033[32mClosed first round testing ticket"
 }
 
 function cherry_pick_fixes {
   echo ""
-  echo "Cherry pick fixes"
+  echo -e "\033[37mCherry pick fixes"
   subtask_name="Cherry Pick Fixes and Deploy From New Release Branch"
   fetch_release_info
   target_branch="release/${release_date}"  
@@ -122,41 +127,49 @@ function cherry_pick_fixes {
   subtask_name="Second Round Testing"
   get_subtask_number
 
-  comment="Closing this first round testing ticket."$'\n'"Please take a look at our second round testing ticket: ${subtask_number} and please provide your feedback there."
-  echo "${comment}"
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Cherry Pick Fixes and Deploy From New Release Branch" "${comment}" closed    
-  update-second-round-testing-task
-  echo -e "\033[32mUpdated cherry_pick_fixes ticket"
-
   ~/repos/android-sdk/script/android-sdk pub -rc -push
+  check_build_result
+
   echo -e "\033[32mGenerated a new RC for next round testing" 
+  comment="Closing this first round testing ticket."$'\n'"Please take a look at our second round testing ticket: ${subtask_number} and please provide your feedback there."
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Cherry Pick Fixes and Deploy From New Release Branch" "${comment}" closed`
+  check_ticket_update_result
+  echo -e "\033[32mUpdated cherry_pick_fixes ticket"
   update_second_round_testing_task
 }
 
 function update_second_round_testing_task {
   echo ""
-  echo "Second Round Testing"
+  echo -e "\033[37mSecond Round Testing"
   subtask_name="Second Round Testing"
   fetch_release_info
-  echo "Updating second round sub-task"
+  echo -e "\033[37mUpdating second round sub-task"
   testing_ticket_url="https://jira.corp.ooyala.com/issues/?jql=Project%3D%20PBA%20AND%20labels%20%3D%20SDK-Deploy-${release_date}"
   comment="${testing_ticket_url}"$'\n\n'"When you create new bugs, please leave them unassigned"
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Second Round Testing" "Test tickets url: ${testing_ticket_url}" Investigating
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Second Round Testing" "Test tickets url: ${testing_ticket_url}" Investigating`
+  check_ticket_update_result
   echo -e "\033[32mUpdated second round testing ticket"
 }
 
 function publish_sdk_release {
+  echo ""
+  echo -e "\033[37mPublish SDK Release"
   subtask_name="Publish SDK Releases"
   fetch_release_info
   target_branch="release/${release_date}"  
   check_if_in_clean_target_branch
-  echo "Publishing Adnroid-SDK/${release_date}"
+  echo -e "\033[37mPublishing Adnroid-SDK/${release_date}"
   ~/repos/android-sdk/script/android-sdk pub -push
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Publish SDK Releases" "Adnroid-SDK/${release_date} is released" closed
+  check_build_result
+
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Publish SDK Releases" "Adnroid-SDK/${release_date} is released" closed`
+  check_ticket_update_result
   echo -e "\033[32mAdnroid-SDK/${release_date} published!"
 }
 
 function email_after_release {
+  echo ""
+  echo -e "\033[Email SDK Release"
   subtask_name="Email Announcement and Release Notes"
   fetch_release_info
   receiver="liusha.huang@ooyala.com"
@@ -165,18 +178,19 @@ function email_after_release {
   echo ${body} | mail -s "${subject}" ${receiver}
   echo -e "\033[32mRelease email has been sent to ${receiver}."
 
-  ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Email Announcement and Release Notes" "Release email has been sent to ${receiver}." closed
+  ticket_update_result=`ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Email Announcement and Release Notes" "Release email has been sent to ${receiver}." closed`
+  check_ticket_update_result
 }
 
 function fetch_release_info { 
-  echo "Fetching release info..."
+  echo "\033[37mFetching release info..."
   check_ticket_number_format
   can_move_on
   get_release_date
 }
 
 function check_if_in_clean_target_branch {
-  echo "Checking ${target_branch}..."
+  echo "\033[37mChecking ${target_branch}..."
   if [[ "`git branch | sed -n '/\* /s///p'`" != "${target_branch}" ]]; then
     read -p "You are not on the ${target_branch} branch. Do you want to force to switch to ${target_branch} now? [Y/n]" switch
     if [ "${switch}" = "Y" ]; then
@@ -191,7 +205,6 @@ function check_if_in_clean_target_branch {
     BASE=$(git merge-base ${target_branch} origin/${target_branch})
 
     if [ ${LOCAL} = ${REMOTE} ]; then
-      echo "Up-to-date"
       if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
         read -p "You are not on the ${target_branch} branch. Do you want to force to switch to ${target_branch} now? [Y/n]" clean
         if [ "${clean}" = "Y" ]; then
@@ -203,13 +216,13 @@ function check_if_in_clean_target_branch {
       fi
 
     elif [ ${LOCAL} = ${BASE} ]; then
-        echo "Need to pull. Fetch and merge origin/master; then retry."
+        1>&2 echo "\033[31mError: Need to pull. Fetch and merge origin/master; then retry."
         exit 1
     elif [ ${REMOTE} = ${BASE} ]; then
-        echo "Need to push"
+        echo "\033[31mError: Need to push"
         exit 1
     else
-        echo "Diverged. Error."
+        echo "\033[31mError: The branch is diverged."
         exit 1
     fi
   fi
@@ -217,7 +230,7 @@ function check_if_in_clean_target_branch {
 
 function get_release_date {
   if [ "${release_date}" = "" ]; then
-    echo "Trying to get the ticket name for ${new_ticket_num}"
+    echo "\033[37mTrying to get the ticket name for ${new_ticket_num}"
 
     release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed "s/Android SDK Release Ticket //g"`
     check_release_date_format
@@ -226,36 +239,54 @@ function get_release_date {
 
 function check_release_date_format {
   if ! [[ $release_date =~ ^20[1-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$ ]]; then
-    echo -e "\033[31mNot a valid date format. Please make sure the main release ticket name is in correct format: Android SDK Release Ticket YYYY-MM-DD"
+    1>&2 echo -e "\033[31mError: Not a valid date format. Please make sure the main release ticket name is in correct format: Android SDK Release Ticket YYYY-MM-DD"
     exit 1
   fi
   echo -e "\033[32mGet release date = ${release_date}"
 }
 
 function can_move_on {
-  echo "Checking previous subtask status..."
+  echo "\033[37mChecking previous subtask status..."
   information=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} --previous-steps-finished "${subtask_name}"`
   echo $information | sed "s/false/ /"
   can_move_on=`echo ${information} | awk '{ print $(NF) }'`
   if [[ ${can_move_on} != "true" ]]; then
-    echo -e "\033[31mFail: have not finish previous subtaskes or current subtask is not open anymore"
+    1>&2 echo -e "\033[31mError: have not finish previous subtaskes or current subtask is not open anymore"
     exit 1
   fi   
   echo -e "\033[32mAll previous steps have been finished and the current step has not been started yet. OK to move on!"
 }
 
 function get_subtask_number {
-  echo "Fetching subtask number for ${subtask_name}"
+  echo "\033[37mFetching subtask number for ${subtask_name}"
   subtask_number=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -sn ${subtask_name}`
+  check_ticket_number_format
 }
 
 function check_ticket_number_format {
-  echo "Checking ticket format: ${new_ticket_num}"
+  echo "\033[37mChecking ticket format: ${new_ticket_num}"
   if ! [[ ${new_ticket_num} =~ ^[Pp][Bb][Aa]-[0-9]{1,}$ ]]; then
-    echo -e "\033[31mNot a valid PBA ticket format."
+    1>&2 echo -e "\033[31mError: Not a valid PBA ticket format."
     exit 1
   fi
   echo -e "\033[32mValid PBA ticket format."
+}
+
+function check_ticket_update_result {
+  echo "\033[37mChecking ticket update result"
+  update_result=`echo ${ticket_update_result} | tail -1`
+  if [[ ${update_result} != "true" ]]; then
+    1>&2 echo -e "\033[31mError: Fail to update the ticket"
+    exit 1
+  fi
+}
+
+function check_build_result {
+  result=$?
+  if [ $result -eq 1 ]; then
+     1>&2 echo -e "\033[31mError: Fail to build RC"
+    exit 1
+  fi
 }
 
 function auto_release {
@@ -267,7 +298,7 @@ function auto_release {
 
 
 case "$1" in
-  auto-release | -ar) auto_release shift;
+  auto-release | -ar) shift; auto_release $*;;
   clone-ticket | -ct) shift; clone_ticket $*;;
   file-doc-ticket | -fdt) shift; file_release_doc_ticket $*;;
   cut-branch | -cb) shift; cut_branch $*;;
