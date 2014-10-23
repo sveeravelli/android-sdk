@@ -121,7 +121,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
     }
 
     if (durationMs == 0) durationMs = Integer.MAX_VALUE;
-    DebugMode.logV(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
+//    DebugMode.logV(TAG, "GetProgress time: " + playheadMs + ", duration: " + durationMs);
     return new VideoProgressUpdate(playheadMs, durationMs);
   }
 
