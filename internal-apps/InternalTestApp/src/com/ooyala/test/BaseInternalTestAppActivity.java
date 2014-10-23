@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
@@ -41,6 +42,10 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
    */
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    String localeString = getResources().getConfiguration().locale.toString();
+    Log.d(TAG, "locale is " + localeString);
+    LocalizationSupport.useLocalizedStrings(LocalizationSupport
+        .loadLocalizedStrings(localeString));
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.test_case_layout);

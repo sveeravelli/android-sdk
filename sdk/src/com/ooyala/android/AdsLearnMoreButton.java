@@ -23,7 +23,8 @@ public class AdsLearnMoreButton extends RelativeLayout {
 
     //Set up the Learn More button's properties
     _learnMore = new TextView(context);
-    _learnMore.setText("Learn More");
+    String learnMoreText = LocalizationSupport.localizedStringFor("Learn More");
+    _learnMore.setText(learnMoreText);
     _learnMore.setTextSize(15);
     _learnMore.setTextColor(Color.BLACK);
     _learnMore.setBackgroundColor(Color.GRAY);
