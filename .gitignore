@@ -2,6 +2,8 @@
 OoyalaSDK-Android.zip
 OoyalaIMASDK-Android.zip
 OoyalaFreewheelSDK-Android.zip
+OoyalaSecurePlayerIntegration-Android.zip
+OoyalaVisualOnIntegration-Android.zip
 test_results.txt
 *.class
 */javadoc
@@ -26,6 +28,10 @@ third_party_sample_apps/*/gen
 third_party_sdks/*/Documentation
 third_party_sdks/*/bin
 third_party_sdks/*/gen
+third_party_sample_apps/VisualOnSampleApp/libs
+third_party_sample_apps/VisualOnSampleApp/assets
+third_party_sample_apps/SecurePlayerSampleApp/libs
+third_party_sample_apps/SecurePlayerSampleApp/assets
 third_party_sdks/*/local.properties
 internal-apps/*/bin
 internal-apps/*/gen

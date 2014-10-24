@@ -291,6 +291,9 @@ function gen {
   cd ${BASE_DIR}
   #verify everything exists
   verify
+  verify_vo
+  verify_secureplayer
+
   rm ${ZIP_NAME}
   zip -r ${ZIP_BASE} ${ZIP_BASE}/*
   rm -rf ${ZIP_BASE}
@@ -306,6 +309,9 @@ function gen {
   rm ${FW_ZIP_NAME}
   zip -r ${FW_ZIP_BASE} ${FW_ZIP_BASE}/*
   rm -rf ${FW_ZIP_BASE}
+
+  zip_vo
+  zip_secureplayer
 
   verify_final_zips
 
