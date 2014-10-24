@@ -5,6 +5,7 @@ BASE_DIR=${SCRIPT_DIR}/../
 SP_ZIP_BASE="OoyalaSecurePlayerIntegration-${PLATFORM_NAME}"
 SP_ZIP_NAME=${SP_ZIP_BASE}.zip
 
+LICENSE_MD5="7e9d73349dd632c818ddffece0669c22"
 
 function gen_secureplayer {
   echo "Building SecurePlayer zip"
@@ -38,7 +39,9 @@ function gen_secureplayer {
 
   cp -r ${BASE_DIR}/vendor/SecurePlayer/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
   cp -r ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp ${BASE_DIR}/${SP_ZIP_BASE}/
+}
 
+function zip_secureplayer {
   rm ${SP_ZIP_NAME}
   zip -r ${SP_ZIP_BASE} ${SP_ZIP_BASE}/*
   rm -rf ${SP_ZIP_BASE}
@@ -54,4 +57,15 @@ function pub_release_secureplayer {
   echo "Moving SecurePlayer RC to Release"
   echo "  Copying ${CANDIDATE_DIR}${SP_ZIP_NAME} to ${RELEASE_DIR}${SP_ZIP_NAME}"
   cp "${CANDIDATE_DIR}"${SP_ZIP_NAME} "${RELEASE_DIR}"${SP_ZIP_NAME}
+}
+
+function verify_secureplayer {
+  package_license=`md5 -q ${BASE_DIR}/${SP_ZIP_BASE}/assets/voVidDec.dat`
+  if [ "$LICENSE_MD5" !=  "$package_license" ]; then
+    echo "ERROR: license in SecurePlayer package is not the correct license file!"
+    echo "$LICENSE_MD5 vs $package_license"
+    exit 1
+  fi
+
+  echo "SecurePlayer License verified"
 }
