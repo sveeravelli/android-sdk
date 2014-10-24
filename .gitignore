@@ -2,6 +2,8 @@
 OoyalaSDK-Android.zip
 OoyalaIMASDK-Android.zip
 OoyalaFreewheelSDK-Android.zip
+OoyalaSecurePlayerIntegration-Android.zip
+OoyalaVisualOnIntegration-Android.zip
 test_results.txt
 *.class
 */javadoc
