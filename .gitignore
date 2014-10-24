@@ -28,6 +28,8 @@ third_party_sdks/*/bin
 third_party_sdks/*/gen
 third_party_sample_apps/VisualOnSampleApp/libs
 third_party_sample_apps/VisualOnSampleApp/assets
+third_party_sample_apps/SecurePlayerSampleApp/libs
+third_party_sample_apps/SecurePlayerSampleApp/assets
 third_party_sdks/*/local.properties
 internal-apps/*/bin
 internal-apps/*/gen

@@ -32,10 +32,13 @@ function gen_vo {
   mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi
   mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
 
+  #Copy libs for sample app
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
   cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
   cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi/
+
+  #Copy assets for sample app
   cp ${BASE_DIR}/${VO_ZIP_BASE}/assets/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
 
   cp -r ${BASE_DIR}/vendor/VisualOn/HOW_TO_INTEGRATE_WITH_VISUALON.txt ${BASE_DIR}/${VO_ZIP_BASE}/
   cp -r ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp ${BASE_DIR}/${VO_ZIP_BASE}/
