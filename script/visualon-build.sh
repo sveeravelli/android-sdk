@@ -8,6 +8,7 @@ VO_ZIP_NAME=${VO_ZIP_BASE}.zip
 
 function gen_vo {
   echo "Building VisualOn zip"
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
 
   cd ${BASE_DIR}
   mkdir ${VO_ZIP_BASE}
@@ -21,22 +22,10 @@ function gen_vo {
   echo "Created On: ${DATE}" >> ${VO_ZIP_BASE}/VERSION
 
   mkdir ${VO_ZIP_BASE}/libs
-  mkdir ${VO_ZIP_BASE}/libs/armeabi
-  mkdir ${VO_ZIP_BASE}/assets
-
-  cp ${BASE_DIR}/vendor/VisualOn/Assets/* ${BASE_DIR}/${VO_ZIP_BASE}/assets
+  mkdir ${VO_ZIP_BASE}/libs/armeabi-v7a
+  cp -r ${BASE_DIR}/vendor/VisualOn/Assets ${BASE_DIR}/${VO_ZIP_BASE}/assets
+  cp ${BASE_DIR}/vendor/VisualOn/Libs/* ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi-v7a
   cp ${BASE_DIR}/vendor/VisualOn/Jar/* ${BASE_DIR}/${VO_ZIP_BASE}/libs
-  cp ${BASE_DIR}/vendor/VisualOn/Libs/* ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi
-
-  mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs
-  mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi
-  mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
-
-  cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
-  cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi/
-  cp ${BASE_DIR}/${VO_ZIP_BASE}/assets/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
-
   cp -r ${BASE_DIR}/vendor/VisualOn/HOW_TO_INTEGRATE_WITH_VISUALON.txt ${BASE_DIR}/${VO_ZIP_BASE}/
   cp -r ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp ${BASE_DIR}/${VO_ZIP_BASE}/
 
