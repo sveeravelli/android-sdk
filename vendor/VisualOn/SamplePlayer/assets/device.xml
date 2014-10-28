@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This is the list of white listed devices for smooth bitrate adaptation in xml format.-->
+<!--This file is optional.-->
+<!--This file is used when the VisualOn OSMP+ SDK use audio or video HW decoder(like IOMX, MediaCodec or AutoHW), the file is not used otherwise.-->
+<!--IOMX, MediaCodec or AutoHW are set using the setDecoderType() method with arguments such as VO_OSMP_DEC_VIDEO_IOMX, VO_OSMP_DEC_VIDEO_MEDIACODEC or VO_OSMP_DEC_VIDEO_HARDWARE_AUTO_SELECTED (please consult the reference manual for a list of audio arguments)-->
+<!--The item element describes one device configuration, it holds five elements: Model, Release, Platform, CodecSolution and TextureView.--> 
+<!--The Model element holds the value of [ro.product.model]-->
+<!--The Release element holds the value of [ro.build.version.release]-->
+<!--The Platform element holds the value of [ro.board.platform]-->
+<!--[ro.*.*] values can be found in the build.prop file of the /system directory of an Android device.-->
+<!--The CodecSolution element can take three values IOMX , MediaCodec, None.-->
+<!--When CodecSolution value is None, it means that the corresponding device configuration cannot use any hardware audio or video decoders. In this case, the SDK will send a VO_OSMP_CB_CODEC_NOT_SUPPORT event.-->
+<!--For example, the SDK will send a VO_OSMP_CB_CODEC_NOT_SUPPORT event if the audio decoder is set to hardware (autoHW, IOMX or MEDIACODEC) and the video decoder value is SW.-->
+<!--The application can change the audio and video decoder type to software when receiving the VO_OSMP_CB_CODEC_NOT_SUPPORT event.-->
+<!--The state of enableVOAdaptivePlayback() is only relevant when AutoHW is set. -->
+<!--When enableVOAdaptivePlayback(false) and autoHW is set, the default AutoHW codec values are used for all devices. The CodecSolution value is ignored except if the value is None.-->
+<!--When enableVOAdaptivePlayback(true) and autoHW is set, the device.xml CodecSolution value overrides the AutoHW default video setting (the audio setting DOES NOT change). The devices not in device.xml use the default AutoHW codec.-->
+<!--AutoHW default codec values are MediaCodec for Android 4.2 and above, IOMX for Android 4.0 to 4.1.x-->
+<!--If IOMX or MEDIACODEC are set, the IOMX or MEDIACODEC are  used for all devices respectively. The CodecSolution value is ignored except if the value is None. -->
+<!--A device CodecSolution value of None always trigger the VO_OSMP_CB_CODEC_NOT_SUPPORT event if setDecoderType() is set to audio or video hardware decoding (IOMX, MEDIACODEC or AutoHW) regardless of the state of enableVOAdaptivePlayback().-->
+<!--A TextureView is used to improve smooth bitrate adaptation when enableVOAdaptivePlayback(true).-->
+<!--When enableVOAdaptivePlayback(false), TextureView is not used for any device.-->
+<!--The TextureView element value can be set to No to disable the use of TextureView for a specific device when enableVOAdaptivePlayback(true). Other TextureView element values are ignored.-->
+
+<DeviceData>
+    
+                 <item>
+		<Model>LG-D684</Model>
+		<Release>4.1</Release>
+		<Platform>mt6577</Platform>
+		<CodecSolution>MediaCodec</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>
+	
+                <item>
+		<Model>MiBOX1S</Model>
+		<Release>4.2</Release>
+		<Platform>meson6</Platform>
+		<CodecSolution>None</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+	
+	<item>
+		<Model>GT-P5100</Model>
+		<Release>4.0</Release>
+		<Platform>omap4</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+
+	<item>
+		<Model>GT-P3110</Model>
+		<Release>4.1</Release>
+		<Platform>omap4</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+
+	<item>
+		<Model>SM-T210</Model>
+		<Release>4.1</Release>
+		<Platform>mrvl</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+
+	<item>
+		<Model>Nexus 4</Model>
+		<Release>4.3</Release>
+		<Platform>msm8960</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>
+	
+	<item>
+		<Model>GT-I9508</Model>
+		<Release>4.3</Release>
+		<Platform>msm8960</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>
+	
+	<item>
+		<Model>Nexus 7</Model>
+		<Release>4.3</Release>
+		<Platform>msm8960</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>
+	
+	<item>
+		<Model>SGP311</Model>
+		<Release>4.2</Release>
+		<Platform>msm8960</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>
+
+	<item>
+		<Model>HTC One X</Model>
+		<Release>4.2</Release>
+		<Platform>tegra</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>	
+	
+	<item>
+		<Model>ASUS_T00G</Model>
+		<Release>4.3</Release>
+		<Platform>clovertrail</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>Yes</TextureView>
+	</item>	
+	
+	<item>
+		<Model>Venue 8 3830</Model>
+		<Release>4.3</Release>
+		<Platform>clovertrail</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+	
+	<item>
+		<Model>Venue 7 3730</Model>
+		<Release>4.3</Release>
+		<Platform>clovertrail</Platform>
+		<CodecSolution>IOMX</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+	
+	<item>
+                <Model>SM-G900H</Model>
+                <Release>4.4</Release>
+                <Platform>exynos5</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>Yes</TextureView>
+                </item>
+    
+         <item>
+                <Model>L50t</Model>
+                <Release>4.4</Release>
+                <Platform>msm8974</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>Yes</TextureView>
+         </item>  
+         
+         <item>
+                <Model>LT26i</Model>
+                <Release>4.1</Release>
+                <Platform>msm8660</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>No</TextureView>
+        </item>
+        
+          <item>
+                <Model>SHV-E160S</Model>
+                <Release>4.0</Release>
+                <Platform>msm8660</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>No</TextureView>
+        </item>
+        
+          <item>
+                <Model>GT-P5210</Model>
+                <Release>4.2</Release>
+                <Platform>clovertrail</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>No</TextureView>
+        </item>
+        
+         <item>
+                <Model>GT-P5110</Model>
+                <Release>4.1</Release>
+                <Platform>omap4</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>No</TextureView>
+        </item>
+</DeviceData>

@@ -123,7 +123,7 @@
         <Event>
             <EventId>0x00000026</EventId><!-- VO_OSMP_CB_OUTPUT_CONTROL_DOWNGRADE_RESOLUTION -->
             <Enable>1</Enable><!-- 0:disable; 1:enable  -->
-            <Action>3</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
+            <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
             <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
             <Description>[APP][EVENT]Resolution downgraded</Description>
         </Event>
@@ -278,7 +278,7 @@
             </Param1>
         </Event>
         <Event>
-            <EventId>0X02000050</EventId><!-- VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING -->
+            <EventId>0X02000050</EventId><!-- VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_WARNING -->
             <Enable>1</Enable><!-- 0:disable; 1:enable  -->
             <Action>1</Action><!-- 1:log; 2:popup message; 3:both; 4:param1; 5:param2 -->
             <AppBehavior>0</AppBehavior><!-- 0:continue; 1:stop 2:pause 3:switch engine  -->
