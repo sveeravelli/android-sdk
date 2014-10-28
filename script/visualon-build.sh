@@ -5,7 +5,7 @@ BASE_DIR=${SCRIPT_DIR}/../
 VO_ZIP_BASE="OoyalaVisualOnIntegration-${PLATFORM_NAME}"
 VO_ZIP_NAME=${VO_ZIP_BASE}.zip
 
-LICENSE_MD5="7e9d73349dd632c818ddffece0669c22"
+LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
 function gen_vo {
   echo "Building VisualOn zip"
