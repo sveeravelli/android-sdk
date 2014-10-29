@@ -43,6 +43,7 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   private boolean _noPrerolls;
 
   private StateNotifier _notifier;
+  private boolean _pauseAfterResume;
 
   //Create event listeners
   private IEventListener _adStartedEventListener = new IEventListener() {
@@ -115,8 +116,6 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
         _adPauseEventListener);
     _fwContext.addEventListener(_fwConstants.EVENT_AD_RESUME(),
         _adResumeEventListener);
-    _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false",
-        _fwConstants.PARAMETER_LEVEL_OVERRIDE());
   }
 
   private void setLayout(OoyalaPlayer parent) {
@@ -173,15 +172,21 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
 
   @Override
   public void resume() {
-    DebugMode.logD(TAG, "FW Ad Player: Resuming activity");
+    DebugMode.logD(TAG, "FW Ad Player: Resuming activity, pauseAfterResume "
+        + String.valueOf(_pauseAfterResume));
     _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_RESUME());
+    if (_pauseAfterResume) {
+      _currentAd.pause();
+    }
     setState(State.PLAYING);
   }
 
   @Override
   public void suspend() {
-    DebugMode.logD(TAG, "FW Ad Player: Suspending activity");
+    _pauseAfterResume = (getState() == State.PAUSED);
     _fwContext.setActivityState(_fwConstants.ACTIVITY_STATE_PAUSE());
+    DebugMode.logD(TAG, "FW Ad Player: Suspending activity, pauseAfterResume "
+        + String.valueOf(_pauseAfterResume));
     setState(State.SUSPENDED);
   }
 
