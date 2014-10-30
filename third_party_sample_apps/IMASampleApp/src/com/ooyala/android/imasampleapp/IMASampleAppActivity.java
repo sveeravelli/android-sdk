@@ -32,7 +32,6 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
  */
 public class IMASampleAppActivity extends Activity {
 
-  final String EMBED  = "h5OWFoYTrG4YIPdrDKrIz5-VhobsuT-M";  //Embed Code, or Content ID
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "http://www.ooyala.com";
   OptimizedOoyalaPlayerLayoutController playerLayoutController;
@@ -59,38 +58,18 @@ public class IMASampleAppActivity extends Activity {
     imaManager.addCompanionSlot(companionView, 300, 50);
 
     embedMap = new LinkedHashMap<String, String>();
-    embedMap
-        .put(
-            "Preroll",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_preroll_ad&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Midroll",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/7521029/pb_test_mid&ciu_szs=640x480&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Postroll",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_post_roll&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Pre, Mid and Post Skippable",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_skippable_ad_unit&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Pre, Mid and Post Podded",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_skippable_ad_unit&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Preroll 2 Podded",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_preroll_2_prod&ciu_szs&impl=s&cmsid=%20949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Midroll 2 Podded",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_midroll_2_prod&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
-    embedMap
-        .put(
-            "Postroll 2 Podded",
-            "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/7521029/pb_postroll_2_prod&ciu_szs&impl=s&cmsid=949&vid=FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]");
+    embedMap.put("Ad-Rules Preroll", "EzZ29lcTq49IswgZYkMknnU4Ukb9PQMH");
+    embedMap.put("Ad-Rules Midroll", "VlaG9lcTqeUU18adfd1DVeQ8YekP3H4l");
+    embedMap.put("Ad-Rules Postroll", "BnaG9lcTqLXQNyod7ON8Yv3eDas2Oog6");
+    embedMap.put("Podded Preroll", "1wNjE3cDox0G3hQIWxTjsZ8MPUDLSkDY");
+    embedMap.put("Podded Midroll", "1yNjE3cDodUEfUfp2WNzHkCZCMb47MUP");
+    embedMap.put("Podded Postroll", "1sNjE3cDoN3ZewFm1238ce730J4BMrEJ");
+    embedMap.put("Podded Pre-Mid-Post", "ZrOTE3cDoXo2sLOWzQPxjS__M-Qk32Co");
+    embedMap.put("Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
+    embedMap.put("Non Ad-Rules Preroll", "FlbGRjbzptyEbStMiMLcyNQE6l6TMgwq");
+    embedMap.put("Non Ad-Rules Midroll", "xrbGRjbzoBJUwtSLOHrcceTvMBe5pZdN");
+    embedMap.put("Non Ad-Rules Postroll", "FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C");
+    embedMap.put("Pre, Mid and Post Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
 
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -108,10 +87,10 @@ public class IMASampleAppActivity extends Activity {
         if (embedKey == null) {
           return;
         }
-        String adtag = embedMap.get(embedKey.toString());
-        imaManager.setAdUrlOverride(adtag);
-        imaManager.setAdTagParameters(null);
-        if (player.setEmbedCode(EMBED)) {
+        String embed = embedMap.get(embedKey.toString());
+       // imaManager.setAdUrlOverride(adtag);
+       // imaManager.setAdTagParameters(null);
+        if (player.setEmbedCode(embed)) {
           player.play();
         } else {
           Log.d(this.getClass().getName(), "Something Went Wrong!");
