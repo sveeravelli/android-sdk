@@ -233,7 +233,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     fwAdManager.setNetwork(_fwNetworkId);
     _fwContext = fwAdManager.newContext();
     _fwConstants = _fwContext.getConstants();
-
+    
     //Set up profile, site section, and video asset info
     _fwContext.setProfile(_fwProfile, null, null, null);
     _fwContext.setSiteSection(_fwSiteSectionId, random(), 0, _fwConstants.ID_TYPE_CUSTOM(), 0);
@@ -243,9 +243,15 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
         _fwConstants.ID_TYPE_CUSTOM(), 0, _fwConstants.VIDEO_ASSET_DURATION_TYPE_EXACT());
     _fwContext.setActivity(_parent);
 
+    // Set parameters to use control panels
+    _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false",
+        _fwConstants.PARAMETER_LEVEL_OVERRIDE());
+    // TODO: use USE_CONTROL_PANEL from fwConstants when it is made public
+    _fwContext.setParameter("renderer.video.useControlPanel", "true",
+        _fwConstants.PARAMETER_LEVEL_OVERRIDE());
+
     //parse FRMSegment to put into the context
-    if (_fwFRMSegment != "" && _fwFRMSegment != null)
-    {
+    if (_fwFRMSegment != "" && _fwFRMSegment != null) {
       String[] keyValues = _fwFRMSegment.split(";");
       for (String keyValue : keyValues)
       {
