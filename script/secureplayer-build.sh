@@ -22,17 +22,19 @@ function gen_secureplayer {
   echo "Created On: ${DATE}" >> ${SP_ZIP_BASE}/VERSION
 
   cp -r ${BASE_DIR}/vendor/SecurePlayer/assets ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/SIGNATURES_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB*/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${BASE_DIR}/vendor/SecurePlayer/SIGNATURES_ANDR_VOP_PROB*/General/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
 
   mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs
   mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi
+  mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi-v7a
   mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/assets
 
   #Copy libs for sample app
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/
   cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/
   cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi/
+  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi-v7a/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi-v7a/
 
   #Copy assets for sample app
   cp ${BASE_DIR}/${SP_ZIP_BASE}/assets/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/assets/

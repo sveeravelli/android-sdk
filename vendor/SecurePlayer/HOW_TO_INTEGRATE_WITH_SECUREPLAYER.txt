@@ -3,10 +3,11 @@ How to integrate your app with VisualOn's SecurePlayer for Playready playback
 SecurePlayerSampleApp is an example of this integration
 
 1. Copy all of the zip/libs/*.jar files into the project/libs/ folder.
-2. Copy all of the zip/libs/armeabi/*.so files into the project/libs/armeabi/ folder.
-3. Copy all of the the zip/assets/* files into the project/assets/ folder.
-4. Ensure your OoyalaSDK.jar file is up to date in your project
-5. Make sure the following permissions are enabled in your application:
+2. Copy all of the zip/libs/armeabi/*.so files into the project/libs/armeabi/ folders.
+3. Copy all of the zip/libs/armeabi-v7a/*.so files into the project/libs/armeabi-v7a/ folders.
+4. Copy all of the the zip/assets/* files into the project/assets/ folder.
+5. Ensure your OoyalaSDK.jar file is up to date in your project
+6. Make sure the following permissions are enabled in your application:
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,11 +19,11 @@ SecurePlayerSampleApp is an example of this integration
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-6. In your application, set the following STATIC property before calling setEmbedCode:
+7. In your application, set the following STATIC property before calling setEmbedCode:
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has smooth playback capablities (or a remote asset pointing at a manifest)
+8. play an embed code that has smooth playback capablities (or a remote asset pointing at a manifest)
 
 
 === How to deal with Error codes ===
