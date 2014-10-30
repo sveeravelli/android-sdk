@@ -28,7 +28,7 @@ public final class LocalizationSupport {
     ja_JP.put("Pop-On", "上のポップアップ表示");
     ja_JP.put("Done", "完了");
     ja_JP.put("None", "なし");
-    ja_JP.put("Learn More", "詳細はこちら");
+    ja_JP.put("Learn More", "さらに詳しく");
 
     final Map<String, String> es = new HashMap<String, String>();
     es.put("LIVE", "En vivo");
