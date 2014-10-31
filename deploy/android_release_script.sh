@@ -63,7 +63,7 @@ function file_release_doc_ticket {
   subtask_name="File a DOCS ticket to update SDK integration guides"
   fetch_release_info
 
-  echo "Generating doc tickets for Android Release-${release_date}"
+  echo -e "${white}Generating doc tickets for Android Release-${release_date}"
 
   # create a new DOCS ticket to track documentation
   new_Android_docs_ticket=`ruby ~/repos/android-sdk/deploy/jira_clone.rb DOC-510 "Prepare for Android Release-${release_date}"`  
@@ -224,10 +224,10 @@ function check_if_in_clean_target_branch {
         1>&2 echo -e "${red}Error: Need to pull. Fetch and merge origin/master; then retry."
         exit 1
     elif [ ${REMOTE} = ${BASE} ]; then
-        echo "${red}Error: Need to push"
+        echo -e "${red}Error: Need to push"
         exit 1
     else
-        echo "${red}Error: The branch is diverged."
+        echo -e "${red}Error: The branch is diverged."
         exit 1
     fi
   fi
