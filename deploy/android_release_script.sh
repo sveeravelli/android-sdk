@@ -96,12 +96,8 @@ function cut_branch {
   read -p "Enter release version: " release_version
   check_release_version_format ${release_version}
 
-  echo -e "${white}"
-  read -p "Enter RC number: " rc_number
-  check_rc_number_format ${rc_number}
-
   echo -e "${white}Publishing Android Release RC for Release-${release_date}..."
-  ~/repos/android-sdk/script/android-sdk pub -rc${rc_number} -v${release_version} -push
+  ~/repos/android-sdk/script/android-sdk pub -rc -v${release_version} -push
   build_script_result=$?
   check_build_result
 
@@ -247,14 +243,6 @@ function check_release_version_format () {
     exit 1
   fi
   echo -e "${green}Get release version = $1"
-}
-
-function check_rc_number_format () {
-    if ! [[ $1 =~ ^[0-9]+$ ]]; then
-    1>&2 echo -e "${red}Error: Not a valid rc number (expected any positive integer)."
-    exit 1
-  fi
-  echo -e "${green}Get rc number  = $1"
 }
 
 function check_release_date_format {
