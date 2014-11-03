@@ -66,9 +66,6 @@ public class IMASampleAppActivity extends Activity {
     embedMap.put("Podded Postroll", "1sNjE3cDoN3ZewFm1238ce730J4BMrEJ");
     embedMap.put("Podded Pre-Mid-Post", "ZrOTE3cDoXo2sLOWzQPxjS__M-Qk32Co");
     embedMap.put("Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
-    embedMap.put("Non Ad-Rules Preroll", "FlbGRjbzptyEbStMiMLcyNQE6l6TMgwq");
-    embedMap.put("Non Ad-Rules Midroll", "xrbGRjbzoBJUwtSLOHrcceTvMBe5pZdN");
-    embedMap.put("Non Ad-Rules Postroll", "FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C");
     embedMap.put("Pre, Mid and Post Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
 
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
