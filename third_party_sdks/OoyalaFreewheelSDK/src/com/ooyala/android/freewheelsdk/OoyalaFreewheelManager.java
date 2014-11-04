@@ -371,13 +371,14 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   private void playFirstOverlay() {
-    ISlot o = _overlays.get(0);
+    ISlot o = _overlays.remove(0);
     if( _overlaysActive == null ) { _overlaysActive = new ArrayList<ISlot>(); }
     _overlaysActive.add( o );
     o.play();
   }
 
   private void clearActiveOverlays() {
+    DebugMode.logV( TAG, "clearActiveOverlays" );
     if( _overlaysActive != null ) {
       for( ISlot o : _overlaysActive ) {
         o.stop();
