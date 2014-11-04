@@ -1,6 +1,7 @@
 package com.ooyala.android.freewheelsdk;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -45,6 +46,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   protected OptimizedOoyalaPlayerLayoutController _layoutController;
   protected Map<String,String> _fwParameters = null;
   protected List<ISlot> _overlays = null;
+  protected List<ISlot> _overlaysActive = null;
   protected boolean haveDataToUpdate;
   protected boolean didUpdateRollsAndDelegate;
 
@@ -142,6 +144,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   private boolean currentItemChanged(Video item) {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
+    _overlaysActive = null;
     _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
     _adSpotManager.clear();
     if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
@@ -233,7 +236,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     fwAdManager.setNetwork(_fwNetworkId);
     _fwContext = fwAdManager.newContext();
     _fwConstants = _fwContext.getConstants();
-    
+
     //Set up profile, site section, and video asset info
     _fwContext.setProfile(_fwProfile, null, null, null);
     _fwContext.setSiteSection(_fwSiteSectionId, random(), 0, _fwConstants.ID_TYPE_CUSTOM(), 0);
@@ -291,6 +294,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
         DebugMode.logE(TAG, "There was an error in the Freewheel Ad Manager!");
         //Set overlay ads to null so they don't affect playback
         _overlays = null;
+        _overlaysActive = null;
         cleanupOnError();
             exitAdMode();
       }
@@ -362,7 +366,23 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     double playheadTime = time / 1000.0;
     if (_overlays != null && _overlays.size() > 0 && playheadTime > _overlays.get(0).getTimePosition()) {
       _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
-      _overlays.remove(0).play();
+      playFirstOverlay();
+    }
+  }
+
+  private void playFirstOverlay() {
+    ISlot o = _overlays.get(0);
+    if( _overlaysActive == null ) { _overlaysActive = new ArrayList<ISlot>(); }
+    _overlaysActive.add( o );
+    o.play();
+  }
+
+  private void clearActiveOverlays() {
+    if( _overlaysActive != null ) {
+      for( ISlot o : _overlaysActive ) {
+        o.stop();
+      }
+      _overlaysActive = null;
     }
   }
 
@@ -429,6 +449,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
   @Override
   public void onAdModeEntered() {
+    clearActiveOverlays(); // PBA-896
     if (getLastAdModeTime() < 0) {
       submitAdRequest();
     } else {
