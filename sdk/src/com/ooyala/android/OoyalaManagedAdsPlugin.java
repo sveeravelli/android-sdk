@@ -1,6 +1,5 @@
 package com.ooyala.android;
 
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +21,7 @@ public class OoyalaManagedAdsPlugin extends
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  protected WeakReference<OoyalaPlayer> _player;
+  protected OoyalaPlayer _player;
   private StateNotifier _stateNotifier;
 
   /**
@@ -30,7 +29,7 @@ public class OoyalaManagedAdsPlugin extends
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     super();
-    _player = new WeakReference<OoyalaPlayer>(player);
+    _player = player;
     _stateNotifier = player.createStateNotifier();
     _stateNotifier.addListener(this);
   }
@@ -95,8 +94,8 @@ public class OoyalaManagedAdsPlugin extends
   @Override
   public boolean onContentChanged() {
     super.onContentChanged();
-    _adSpotManager.insertAds(_player.get().getCurrentItem().getAds());
-    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+    _adSpotManager.insertAds(_player.getCurrentItem().getAds());
+    if (Stream.streamSetContainsDeliveryType(_player.getCurrentItem()
         .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
       _adSpotManager.setAlignment(10000);
     }
@@ -113,7 +112,7 @@ public class OoyalaManagedAdsPlugin extends
       return false;
     }
 
-    p.init(_player.get(), ad, _stateNotifier);
+    p.init(_player, ad, _stateNotifier);
     // if (p.getError() != null) {
     // return false;
     // }
@@ -128,7 +127,7 @@ public class OoyalaManagedAdsPlugin extends
 
     AdMoviePlayer adPlayer = null;
     try {
-      Class<? extends AdMoviePlayer> adPlayerClass = _player.get()
+      Class<? extends AdMoviePlayer> adPlayerClass = _player
           .getAdPlayerClass(ad);
       if (adPlayerClass != null) {
         adPlayer = adPlayerClass.newInstance();
@@ -175,13 +174,13 @@ public class OoyalaManagedAdsPlugin extends
     case COMPLETED:
       if (!playAdsBeforeTime()) {
         cleanupPlayer(_adPlayer);
-        _player.get().exitAdMode(this);
+        _player.exitAdMode(this);
       }
       break;
     case ERROR:
       DebugMode.logE(TAG, "Error recieved from Ad.  Cleaning up everything");
       cleanupPlayer(_adPlayer);
-      _player.get().exitAdMode(this);
+      _player.exitAdMode(this);
       break;
     default:
       break;
