@@ -1,6 +1,5 @@
 package com.ooyala.android.freewheelsdk;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -25,7 +24,7 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.ManagedAdsPlugin;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 
 /**
  * The OoyalaFreewheelManager will play back all Freewheel ads affiliated with any playing Ooyala asset. It will
@@ -41,8 +40,8 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   private static final double FWPLAYER_AD_REQUEST_TIMEOUT = 5.0;
 
   protected Activity _parent;
-  protected WeakReference<OoyalaPlayer> _player;
-  protected OptimizedOoyalaPlayerLayoutController _layoutController;
+  protected OoyalaPlayer _player;
+  protected AbstractOoyalaPlayerLayoutController _layoutController;
   protected Map<String,String> _fwParameters = null;
   protected List<ISlot> _overlays = null;
   protected boolean haveDataToUpdate;
@@ -68,14 +67,14 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
    * @param parent Activity to be used to set into IAdContext
    * @param playerLayoutController OoyalaPlayerLayoutController to get the player and playerLayout
    */
-  public OoyalaFreewheelManager(Activity parent, OptimizedOoyalaPlayerLayoutController playerLayoutController) {
+  public OoyalaFreewheelManager(Activity parent,
+      AbstractOoyalaPlayerLayoutController playerLayoutController) {
     _parent = parent;
     _layoutController = playerLayoutController;
-    _player = new WeakReference<OoyalaPlayer>(
-        playerLayoutController.getPlayer());
-    _player.get().addObserver(this);
-    _player.get().registerPlugin(this);
-    _notifier = _player.get().createStateNotifier();
+    _player = playerLayoutController.getPlayer();
+    _player.addObserver(this);
+    _player.registerPlugin(this);
+    _notifier = _player.createStateNotifier();
     _notifier.addListener(this);
   }
 
@@ -114,8 +113,8 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
       // Listen to state changed notification to set correct video states
-      State state = _player.get().getState();
-      boolean isShowingAd = _player.get().isShowingAd();
+      State state = _player.getState();
+      boolean isShowingAd = _player.isShowingAd();
       DebugMode.logD(TAG, "State changed to: " + state.toString());
       switch (state) {
       case PLAYING:
@@ -144,7 +143,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     _overlays = null;
     _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
     _adSpotManager.clear();
-    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+    if (Stream.streamSetContainsDeliveryType(_player.getCurrentItem()
         .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
       _adSpotManager.setAlignment(10000);
     } else {
@@ -203,13 +202,13 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     } else {
       try {
         //First try getting the Android specific value from Backdoor
-        value = _player.get().getCurrentItem().getModuleData()
+        value = _player.getCurrentItem().getModuleData()
             .get("freewheel-ads-manager").getMetadata().get(overrideKey);
 
         //If value is null, try using the backlotKey
         if (value == null) {
           DebugMode.logI(TAG, "Tried to get " + overrideKey + " but received a null value. Trying Backlot key: " + backlotKey);
-          value = _player.get().getCurrentItem().getModuleData()
+          value = _player.getCurrentItem().getModuleData()
               .get("freewheel-ads-manager").getMetadata().get(backlotKey);
         }
       } catch (Exception e) {
@@ -237,7 +236,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     //Set up profile, site section, and video asset info
     _fwContext.setProfile(_fwProfile, null, null, null);
     _fwContext.setSiteSection(_fwSiteSectionId, random(), 0, _fwConstants.ID_TYPE_CUSTOM(), 0);
-    _fwContext.setVideoAsset(_fwVideoAssetId, _player.get().getCurrentItem()
+    _fwContext.setVideoAsset(_fwVideoAssetId, _player.getCurrentItem()
         .getDuration() / 1000.0, null,
         _fwConstants.VIDEO_ASSET_AUTO_PLAY_TYPE_ATTENDED(), random(), 0,
         _fwConstants.ID_TYPE_CUSTOM(), 0, _fwConstants.VIDEO_ASSET_DURATION_TYPE_EXACT());
@@ -305,7 +304,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
       _adPlayer = null;
     }
     _layoutController.getControls().setVisible(true);
-    _player.get().exitAdMode(this);
+    _player.exitAdMode(this);
   }
 
   private void cleanupOnError() {
@@ -407,7 +406,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   @Override
   public boolean onContentChanged() {
     super.onContentChanged();
-    return currentItemChanged(_player.get().getCurrentItem());
+    return currentItemChanged(_player.getCurrentItem());
   }
 
   @Override
@@ -484,7 +483,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
       _adPlayer.destroy();
     }
     _adPlayer = new FWAdPlayer();
-    _adPlayer.init(this, _player.get(), adToPlay, _notifier);
+    _adPlayer.init(this, _player, adToPlay, _notifier);
     _adPlayer.play();
     return true;
   }

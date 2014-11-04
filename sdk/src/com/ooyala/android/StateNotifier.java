@@ -22,7 +22,9 @@ public class StateNotifier {
     for (StateNotifierListener l : _listeners) {
       l.onStateChange(this);
     }
-    _player.get().notifyPluginStateChange(this, oldState, state);
+    if (_player.get() != null) {
+      _player.get().notifyPluginStateChange(this, oldState, state);
+    }
   }
 
   public State getState() {
@@ -30,17 +32,24 @@ public class StateNotifier {
   }
   
   public void notifyPlayheadChange() {
-    _player.get().notifyPluginEvent(this,
+    if (_player.get() != null) {
+      _player.get().notifyPluginEvent(this,
         OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+    }
   }
 
   public void notifyBufferChange() {
-    _player.get().notifyPluginEvent(this,
+    if (_player.get() != null) {
+      _player.get().notifyPluginEvent(this,
         OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION);
+    }
   }
 
   public void notifyAdSkipped() {
-    _player.get().notifyPluginEvent(this, OoyalaPlayer.AD_SKIPPED_NOTIFICATION);
+    if (_player.get() != null) {
+      _player.get().notifyPluginEvent(this,
+          OoyalaPlayer.AD_SKIPPED_NOTIFICATION);
+    }
   }
 
   public void addListener(StateNotifierListener l) {
