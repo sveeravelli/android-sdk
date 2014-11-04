@@ -1,4 +1,4 @@
-Current Version: 3.1.0_RC1
+Current Version: 3.1.0_RC3
 
 ------------ 3.1.0 ------------
 Major Features
@@ -16,6 +16,8 @@ Bug fixes
   [PBA-779] Fix analytics host URL
   [PBA-775] Fix lock/unlock logic while playing Freewheel Ads.
   [PBA-795] Updated localization translations Japanese
+  [PBA-896] Clear all Freewheel overlays when starting an advertisement
+  [PBA-767] Added notifications to a number of sample apps
 
 ------------ 3.0.0 ------------
 Major Features
