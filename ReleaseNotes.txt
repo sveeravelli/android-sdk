@@ -8,7 +8,6 @@ Major Features
 
 Bug fixes
   [PBA-777] Add more MediaPlayer error handling
-  [PBA-767] Enable reportPlayStarted notification
   [PBA-769] Added VisualOn License verification
   [PBA-796] Fix IMA SDK Logging every multiple times a second
   [PBA-852] Update IMA Sample App and InternalTestApp with new assets
