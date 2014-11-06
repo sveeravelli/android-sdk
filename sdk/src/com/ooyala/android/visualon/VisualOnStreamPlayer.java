@@ -29,6 +29,7 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_MODULE_TYPE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_PLAYER_ENGINE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_RETURN_CODE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_SRC_FLAG;
@@ -341,7 +342,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (!isDiscredixLoaded()) {
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
-
+      DebugMode.logI(TAG, "VisualOn Version: " + _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK));
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
       _player.setPreAgreedLicense(licenseText);

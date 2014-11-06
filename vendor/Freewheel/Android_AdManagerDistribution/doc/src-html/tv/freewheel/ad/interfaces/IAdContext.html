@@ -393,119 +393,120 @@
 <FONT color="green">390</FONT>             *              &lt;br&gt; TIME_POSITION_CLASS_POSTROLL<a name="line.390"></a>
 <FONT color="green">391</FONT>             *              &lt;br&gt; TIME_POSITION_CLASS_OVERLAY<a name="line.391"></a>
 <FONT color="green">392</FONT>             *              &lt;br&gt; TIME_POSITION_CLASS_DISPLAY<a name="line.392"></a>
-<FONT color="green">393</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.393"></a>
-<FONT color="green">394</FONT>             */<a name="line.394"></a>
-<FONT color="green">395</FONT>            public ArrayList&lt;ISlot&gt; getSlotsByTimePositionClass(int timePositionClass);<a name="line.395"></a>
-<FONT color="green">396</FONT>            <a name="line.396"></a>
-<FONT color="green">397</FONT>            /**<a name="line.397"></a>
-<FONT color="green">398</FONT>             *      Get all the temporal slots.<a name="line.398"></a>
-<FONT color="green">399</FONT>             *<a name="line.399"></a>
-<FONT color="green">400</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.400"></a>
-<FONT color="green">401</FONT>             */<a name="line.401"></a>
-<FONT color="green">402</FONT>            public ArrayList&lt;ISlot&gt; getTemporalSlots();<a name="line.402"></a>
-<FONT color="green">403</FONT>            <a name="line.403"></a>
-<FONT color="green">404</FONT>            /**<a name="line.404"></a>
-<FONT color="green">405</FONT>             *      Get all the video player non-temporal slots.<a name="line.405"></a>
-<FONT color="green">406</FONT>             *<a name="line.406"></a>
-<FONT color="green">407</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.407"></a>
-<FONT color="green">408</FONT>             */<a name="line.408"></a>
-<FONT color="green">409</FONT>            public ArrayList&lt;ISlot&gt; getVideoPlayerNonTemporalSlots();<a name="line.409"></a>
-<FONT color="green">410</FONT>            <a name="line.410"></a>
-<FONT color="green">411</FONT>            /**<a name="line.411"></a>
-<FONT color="green">412</FONT>             *      Get all the site section non-temporal slots.<a name="line.412"></a>
-<FONT color="green">413</FONT>             *<a name="line.413"></a>
-<FONT color="green">414</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.414"></a>
-<FONT color="green">415</FONT>             */<a name="line.415"></a>
-<FONT color="green">416</FONT>            public ArrayList&lt;ISlot&gt; getSiteSectionNonTemporalSlots();<a name="line.416"></a>
-<FONT color="green">417</FONT>            <a name="line.417"></a>
-<FONT color="green">418</FONT>            /**<a name="line.418"></a>
-<FONT color="green">419</FONT>         *  Submit the request to FreeWheel Ad Server.<a name="line.419"></a>
-<FONT color="green">420</FONT>             *<a name="line.420"></a>
-<FONT color="green">421</FONT>         *  Each AdContext can only submitRequest once.<a name="line.421"></a>
-<FONT color="green">422</FONT>         *  <a name="line.422"></a>
-<FONT color="green">423</FONT>         *  @param timeoutSeconds timeout time in seconds for this request<a name="line.423"></a>
-<FONT color="green">424</FONT>         */<a name="line.424"></a>
-<FONT color="green">425</FONT>            public void submitRequest(double timeoutSeconds);<a name="line.425"></a>
-<FONT color="green">426</FONT>            <a name="line.426"></a>
-<FONT color="green">427</FONT>            public void addRenderer(String url, String baseUnit, String adUnit, String contentType, String slotType, HashMap&lt;String, Object&gt; parameters);<a name="line.427"></a>
-<FONT color="green">428</FONT>            <a name="line.428"></a>
-<FONT color="green">429</FONT>            public void addRenderer(String url, String baseUnit, String adUnit, String contentType, String slotType, String creativeAPI, HashMap&lt;String, Object&gt; parameters);<a name="line.429"></a>
-<FONT color="green">430</FONT>            <a name="line.430"></a>
-<FONT color="green">431</FONT>            /**<a name="line.431"></a>
-<FONT color="green">432</FONT>             * Register an event listener.<a name="line.432"></a>
-<FONT color="green">433</FONT>             *<a name="line.433"></a>
-<FONT color="green">434</FONT>             * @param type name of the event to listen to<a name="line.434"></a>
-<FONT color="green">435</FONT>             * @param listener the listener<a name="line.435"></a>
-<FONT color="green">436</FONT>             */<a name="line.436"></a>
-<FONT color="green">437</FONT>            public void addEventListener(String type, IEventListener listener);<a name="line.437"></a>
-<FONT color="green">438</FONT>            <a name="line.438"></a>
+<FONT color="green">393</FONT>             *          &lt;br&gt; TIME_POSITION_CLASS_PAUSE_MIDROLL<a name="line.393"></a>
+<FONT color="green">394</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.394"></a>
+<FONT color="green">395</FONT>             */<a name="line.395"></a>
+<FONT color="green">396</FONT>            public ArrayList&lt;ISlot&gt; getSlotsByTimePositionClass(int timePositionClass);<a name="line.396"></a>
+<FONT color="green">397</FONT>            <a name="line.397"></a>
+<FONT color="green">398</FONT>            /**<a name="line.398"></a>
+<FONT color="green">399</FONT>             *      Get all the temporal slots.<a name="line.399"></a>
+<FONT color="green">400</FONT>             *<a name="line.400"></a>
+<FONT color="green">401</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.401"></a>
+<FONT color="green">402</FONT>             */<a name="line.402"></a>
+<FONT color="green">403</FONT>            public ArrayList&lt;ISlot&gt; getTemporalSlots();<a name="line.403"></a>
+<FONT color="green">404</FONT>            <a name="line.404"></a>
+<FONT color="green">405</FONT>            /**<a name="line.405"></a>
+<FONT color="green">406</FONT>             *      Get all the video player non-temporal slots.<a name="line.406"></a>
+<FONT color="green">407</FONT>             *<a name="line.407"></a>
+<FONT color="green">408</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.408"></a>
+<FONT color="green">409</FONT>             */<a name="line.409"></a>
+<FONT color="green">410</FONT>            public ArrayList&lt;ISlot&gt; getVideoPlayerNonTemporalSlots();<a name="line.410"></a>
+<FONT color="green">411</FONT>            <a name="line.411"></a>
+<FONT color="green">412</FONT>            /**<a name="line.412"></a>
+<FONT color="green">413</FONT>             *      Get all the site section non-temporal slots.<a name="line.413"></a>
+<FONT color="green">414</FONT>             *<a name="line.414"></a>
+<FONT color="green">415</FONT>             *      @return an Array of ISlot object, will return an empty array if none found<a name="line.415"></a>
+<FONT color="green">416</FONT>             */<a name="line.416"></a>
+<FONT color="green">417</FONT>            public ArrayList&lt;ISlot&gt; getSiteSectionNonTemporalSlots();<a name="line.417"></a>
+<FONT color="green">418</FONT>            <a name="line.418"></a>
+<FONT color="green">419</FONT>            /**<a name="line.419"></a>
+<FONT color="green">420</FONT>         *  Submit the request to FreeWheel Ad Server.<a name="line.420"></a>
+<FONT color="green">421</FONT>             *<a name="line.421"></a>
+<FONT color="green">422</FONT>         *  Each AdContext can only submitRequest once.<a name="line.422"></a>
+<FONT color="green">423</FONT>         *  <a name="line.423"></a>
+<FONT color="green">424</FONT>         *  @param timeoutSeconds timeout time in seconds for this request<a name="line.424"></a>
+<FONT color="green">425</FONT>         */<a name="line.425"></a>
+<FONT color="green">426</FONT>            public void submitRequest(double timeoutSeconds);<a name="line.426"></a>
+<FONT color="green">427</FONT>            <a name="line.427"></a>
+<FONT color="green">428</FONT>            public void addRenderer(String url, String baseUnit, String adUnit, String contentType, String slotType, HashMap&lt;String, Object&gt; parameters);<a name="line.428"></a>
+<FONT color="green">429</FONT>            <a name="line.429"></a>
+<FONT color="green">430</FONT>            public void addRenderer(String url, String baseUnit, String adUnit, String contentType, String slotType, String creativeAPI, HashMap&lt;String, Object&gt; parameters);<a name="line.430"></a>
+<FONT color="green">431</FONT>            <a name="line.431"></a>
+<FONT color="green">432</FONT>            /**<a name="line.432"></a>
+<FONT color="green">433</FONT>             * Register an event listener.<a name="line.433"></a>
+<FONT color="green">434</FONT>             *<a name="line.434"></a>
+<FONT color="green">435</FONT>             * @param type name of the event to listen to<a name="line.435"></a>
+<FONT color="green">436</FONT>             * @param listener the listener<a name="line.436"></a>
+<FONT color="green">437</FONT>             */<a name="line.437"></a>
+<FONT color="green">438</FONT>            public void addEventListener(String type, IEventListener listener);<a name="line.438"></a>
 <FONT color="green">439</FONT>            <a name="line.439"></a>
-<FONT color="green">440</FONT>            /**<a name="line.440"></a>
-<FONT color="green">441</FONT>             * Remove an event listener.<a name="line.441"></a>
-<FONT color="green">442</FONT>             *<a name="line.442"></a>
-<FONT color="green">443</FONT>             * @param type the name of the event to listen to<a name="line.443"></a>
-<FONT color="green">444</FONT>             * @param listener the listener<a name="line.444"></a>
-<FONT color="green">445</FONT>             */<a name="line.445"></a>
-<FONT color="green">446</FONT>            public void removeEventListener(String type, IEventListener listener);<a name="line.446"></a>
-<FONT color="green">447</FONT>            <a name="line.447"></a>
-<FONT color="green">448</FONT>            public void dispatchEvent(IEvent event);<a name="line.448"></a>
-<FONT color="green">449</FONT>            <a name="line.449"></a>
-<FONT color="green">450</FONT>            /**<a name="line.450"></a>
-<FONT color="green">451</FONT>             * Dispose this AdContext object and remove all event listeners of it, stop all playing slots.<a name="line.451"></a>
-<FONT color="green">452</FONT>             * &lt;br/&gt;<a name="line.452"></a>
-<FONT color="green">453</FONT>             * After this call, all other methods should not be invoked in this adContext.<a name="line.453"></a>
-<FONT color="green">454</FONT>             */<a name="line.454"></a>
-<FONT color="green">455</FONT>            public void dispose();<a name="line.455"></a>
-<FONT color="green">456</FONT>            <a name="line.456"></a>
-<FONT color="green">457</FONT>            /**<a name="line.457"></a>
-<FONT color="green">458</FONT>             *      Get video asset's url location.<a name="line.458"></a>
-<FONT color="green">459</FONT>             *<a name="line.459"></a>
-<FONT color="green">460</FONT>             *      @return a String set by API setVideoAsset's location parameter, or null if not set<a name="line.460"></a>
-<FONT color="green">461</FONT>             */<a name="line.461"></a>
-<FONT color="green">462</FONT>            public String getVideoLocation();<a name="line.462"></a>
-<FONT color="green">463</FONT>            <a name="line.463"></a>
-<FONT color="green">464</FONT>            /**<a name="line.464"></a>
-<FONT color="green">465</FONT>             *      Retrieve a parameter.<a name="line.465"></a>
-<FONT color="green">466</FONT>             *<a name="line.466"></a>
-<FONT color="green">467</FONT>             *  @param  name name of the parameter need to retrieve<a name="line.467"></a>
-<FONT color="green">468</FONT>             */<a name="line.468"></a>
-<FONT color="green">469</FONT>            public Object getParameter(String name);<a name="line.469"></a>
-<FONT color="green">470</FONT>            <a name="line.470"></a>
-<FONT color="green">471</FONT>            /**<a name="line.471"></a>
-<FONT color="green">472</FONT>             *  Get the AdManager object which create the current AdContext.<a name="line.472"></a>
-<FONT color="green">473</FONT>             *<a name="line.473"></a>
-<FONT color="green">474</FONT>             *  @return an IAdManager object<a name="line.474"></a>
-<FONT color="green">475</FONT>             */<a name="line.475"></a>
-<FONT color="green">476</FONT>            public IAdManager getAdManager();<a name="line.476"></a>
-<FONT color="green">477</FONT>            <a name="line.477"></a>
-<FONT color="green">478</FONT>            /**<a name="line.478"></a>
-<FONT color="green">479</FONT>             *      Get the mode of ad request.<a name="line.479"></a>
-<FONT color="green">480</FONT>             *<a name="line.480"></a>
-<FONT color="green">481</FONT>             *      @return A int value set by API setRequestMode , possible value is:<a name="line.481"></a>
-<FONT color="green">482</FONT>             *                                              &lt;br&gt; REQUEST_MODE_ON_DEMAND<a name="line.482"></a>
-<FONT color="green">483</FONT>             *                                              &lt;br&gt; REQUEST_MODE_LIVE <a name="line.483"></a>
-<FONT color="green">484</FONT>             *                      &lt;br&gt; default value is REQUEST_MODE_ON_DEMAND<a name="line.484"></a>
-<FONT color="green">485</FONT>             */<a name="line.485"></a>
-<FONT color="green">486</FONT>            public int getRequestMode();<a name="line.486"></a>
-<FONT color="green">487</FONT>            <a name="line.487"></a>
-<FONT color="green">488</FONT>            /**<a name="line.488"></a>
-<FONT color="green">489</FONT>             *      Set the user actions.<a name="line.489"></a>
-<FONT color="green">490</FONT>             *<a name="line.490"></a>
-<FONT color="green">491</FONT>             *      @param userAction The value should be one of:<a name="line.491"></a>
-<FONT color="green">492</FONT>             *                                              &lt;br&gt; USER_ACTION_PAUSE_BUTTON_CLICKED<a name="line.492"></a>
-<FONT color="green">493</FONT>             *                                              &lt;br&gt; USER_ACTION_RESUME_BUTTON_CLICKED<a name="line.493"></a>
-<FONT color="green">494</FONT>             */<a name="line.494"></a>
-<FONT color="green">495</FONT>            public void notifyUserAction(int userAction);<a name="line.495"></a>
-<FONT color="green">496</FONT>            <a name="line.496"></a>
-<FONT color="green">497</FONT>            /**<a name="line.497"></a>
-<FONT color="green">498</FONT>             *      Load player extension from given URL which implements IExtension.<a name="line.498"></a>
-<FONT color="green">499</FONT>             *<a name="line.499"></a>
-<FONT color="green">500</FONT>             *      &lt;br&gt;Event &lt;IConstants.EVENT_EXTENSION_LOADED&gt; will be fired when an extension succeeds or fails to initialize.<a name="line.500"></a>
-<FONT color="green">501</FONT>             *      <a name="line.501"></a>
-<FONT color="green">502</FONT>             *      @param name a String identifier of the extension<a name="line.502"></a>
-<FONT color="green">503</FONT>             */<a name="line.503"></a>
-<FONT color="green">504</FONT>            public void loadExtension(String name);<a name="line.504"></a>
-<FONT color="green">505</FONT>    }<a name="line.505"></a>
+<FONT color="green">440</FONT>            <a name="line.440"></a>
+<FONT color="green">441</FONT>            /**<a name="line.441"></a>
+<FONT color="green">442</FONT>             * Remove an event listener.<a name="line.442"></a>
+<FONT color="green">443</FONT>             *<a name="line.443"></a>
+<FONT color="green">444</FONT>             * @param type the name of the event to listen to<a name="line.444"></a>
+<FONT color="green">445</FONT>             * @param listener the listener<a name="line.445"></a>
+<FONT color="green">446</FONT>             */<a name="line.446"></a>
+<FONT color="green">447</FONT>            public void removeEventListener(String type, IEventListener listener);<a name="line.447"></a>
+<FONT color="green">448</FONT>            <a name="line.448"></a>
+<FONT color="green">449</FONT>            public void dispatchEvent(IEvent event);<a name="line.449"></a>
+<FONT color="green">450</FONT>            <a name="line.450"></a>
+<FONT color="green">451</FONT>            /**<a name="line.451"></a>
+<FONT color="green">452</FONT>             * Dispose this AdContext object and remove all event listeners of it, stop all playing slots.<a name="line.452"></a>
+<FONT color="green">453</FONT>             * &lt;br/&gt;<a name="line.453"></a>
+<FONT color="green">454</FONT>             * After this call, all other methods should not be invoked in this adContext.<a name="line.454"></a>
+<FONT color="green">455</FONT>             */<a name="line.455"></a>
+<FONT color="green">456</FONT>            public void dispose();<a name="line.456"></a>
+<FONT color="green">457</FONT>            <a name="line.457"></a>
+<FONT color="green">458</FONT>            /**<a name="line.458"></a>
+<FONT color="green">459</FONT>             *      Get video asset's url location.<a name="line.459"></a>
+<FONT color="green">460</FONT>             *<a name="line.460"></a>
+<FONT color="green">461</FONT>             *      @return a String set by API setVideoAsset's location parameter, or null if not set<a name="line.461"></a>
+<FONT color="green">462</FONT>             */<a name="line.462"></a>
+<FONT color="green">463</FONT>            public String getVideoLocation();<a name="line.463"></a>
+<FONT color="green">464</FONT>            <a name="line.464"></a>
+<FONT color="green">465</FONT>            /**<a name="line.465"></a>
+<FONT color="green">466</FONT>             *      Retrieve a parameter.<a name="line.466"></a>
+<FONT color="green">467</FONT>             *<a name="line.467"></a>
+<FONT color="green">468</FONT>             *  @param  name name of the parameter need to retrieve<a name="line.468"></a>
+<FONT color="green">469</FONT>             */<a name="line.469"></a>
+<FONT color="green">470</FONT>            public Object getParameter(String name);<a name="line.470"></a>
+<FONT color="green">471</FONT>            <a name="line.471"></a>
+<FONT color="green">472</FONT>            /**<a name="line.472"></a>
+<FONT color="green">473</FONT>             *  Get the AdManager object which create the current AdContext.<a name="line.473"></a>
+<FONT color="green">474</FONT>             *<a name="line.474"></a>
+<FONT color="green">475</FONT>             *  @return an IAdManager object<a name="line.475"></a>
+<FONT color="green">476</FONT>             */<a name="line.476"></a>
+<FONT color="green">477</FONT>            public IAdManager getAdManager();<a name="line.477"></a>
+<FONT color="green">478</FONT>            <a name="line.478"></a>
+<FONT color="green">479</FONT>            /**<a name="line.479"></a>
+<FONT color="green">480</FONT>             *      Get the mode of ad request.<a name="line.480"></a>
+<FONT color="green">481</FONT>             *<a name="line.481"></a>
+<FONT color="green">482</FONT>             *      @return A int value set by API setRequestMode , possible value is:<a name="line.482"></a>
+<FONT color="green">483</FONT>             *                                              &lt;br&gt; REQUEST_MODE_ON_DEMAND<a name="line.483"></a>
+<FONT color="green">484</FONT>             *                                              &lt;br&gt; REQUEST_MODE_LIVE <a name="line.484"></a>
+<FONT color="green">485</FONT>             *                      &lt;br&gt; default value is REQUEST_MODE_ON_DEMAND<a name="line.485"></a>
+<FONT color="green">486</FONT>             */<a name="line.486"></a>
+<FONT color="green">487</FONT>            public int getRequestMode();<a name="line.487"></a>
+<FONT color="green">488</FONT>            <a name="line.488"></a>
+<FONT color="green">489</FONT>            /**<a name="line.489"></a>
+<FONT color="green">490</FONT>             *      Set the user actions.<a name="line.490"></a>
+<FONT color="green">491</FONT>             *<a name="line.491"></a>
+<FONT color="green">492</FONT>             *      @param userAction The value should be one of:<a name="line.492"></a>
+<FONT color="green">493</FONT>             *                                              &lt;br&gt; USER_ACTION_PAUSE_BUTTON_CLICKED<a name="line.493"></a>
+<FONT color="green">494</FONT>             *                                              &lt;br&gt; USER_ACTION_RESUME_BUTTON_CLICKED<a name="line.494"></a>
+<FONT color="green">495</FONT>             */<a name="line.495"></a>
+<FONT color="green">496</FONT>            public void notifyUserAction(int userAction);<a name="line.496"></a>
+<FONT color="green">497</FONT>            <a name="line.497"></a>
+<FONT color="green">498</FONT>            /**<a name="line.498"></a>
+<FONT color="green">499</FONT>             *      Load player extension from given URL which implements IExtension.<a name="line.499"></a>
+<FONT color="green">500</FONT>             *<a name="line.500"></a>
+<FONT color="green">501</FONT>             *      &lt;br&gt;Event &lt;IConstants.EVENT_EXTENSION_LOADED&gt; will be fired when an extension succeeds or fails to initialize.<a name="line.501"></a>
+<FONT color="green">502</FONT>             *      <a name="line.502"></a>
+<FONT color="green">503</FONT>             *      @param name a String identifier of the extension<a name="line.503"></a>
+<FONT color="green">504</FONT>             */<a name="line.504"></a>
+<FONT color="green">505</FONT>            public void loadExtension(String name);<a name="line.505"></a>
+<FONT color="green">506</FONT>    }<a name="line.506"></a>
 
 
 

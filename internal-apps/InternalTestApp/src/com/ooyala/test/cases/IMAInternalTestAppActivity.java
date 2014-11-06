@@ -40,13 +40,18 @@ public class IMAInternalTestAppActivity extends BaseInternalTestAppActivity {
     imaManager.addCompanionSlot(companionView, 300, 50);
 
     //Populate the embed map
-    embedMap.put("IMA Preroll", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");  //Created by us
-    embedMap.put("IMA with Custom Ad Tag Parameters", "xoaWp0ZDrsQs20cgpMqddHI1jSFaCK5U");
-    //embedMap.put("IMA Postroll", "VsaWp0ZDp2xNyhf3VWecMqDlg2uPItlw");
-    embedMap.put("IMA Skip Ad (Google Provided)", "1waWp0ZDqGixRx40HtJcEmCi2wWoJokK");  //Google provided
-    embedMap.put("IMA Wrapper (Google Provided)", "ByaWp0ZDrGk1S_vkI-VgHaT5JkS3LDo_");  //Google provided
-    embedMap.put(IMA_OVERRIDE_URL_FROM_CODE_LABEL, "Q0Y21vaToE56_FVxaLFoXZxJlc0YVoiY");
-    embedMap.put("IMA Playlist", "NraTJyZDqrL9L_H8ws-47siVyywgy1N3"); // with all pre-roll, mid-roll, and post-rolls
+    embedMap.put("Ad-Rules Preroll", "EzZ29lcTq49IswgZYkMknnU4Ukb9PQMH");
+    embedMap.put("Ad-Rules Midroll", "VlaG9lcTqeUU18adfd1DVeQ8YekP3H4l");
+    embedMap.put("Ad-Rules Postroll", "BnaG9lcTqLXQNyod7ON8Yv3eDas2Oog6");
+    embedMap.put("Podded Preroll", "1wNjE3cDox0G3hQIWxTjsZ8MPUDLSkDY");
+    embedMap.put("Podded Midroll", "1yNjE3cDodUEfUfp2WNzHkCZCMb47MUP");
+    embedMap.put("Podded Postroll", "1sNjE3cDoN3ZewFm1238ce730J4BMrEJ");
+    embedMap.put("Podded Pre-Mid-Post", "ZrOTE3cDoXo2sLOWzQPxjS__M-Qk32Co");
+    embedMap.put("Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
+    embedMap.put("Non Ad-Rules Preroll", "FlbGRjbzptyEbStMiMLcyNQE6l6TMgwq");
+    embedMap.put("Non Ad-Rules Midroll", "xrbGRjbzoBJUwtSLOHrcceTvMBe5pZdN");
+    embedMap.put("Non Ad-Rules Postroll", "FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C");
+    embedMap.put("Pre, Mid and Post Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());

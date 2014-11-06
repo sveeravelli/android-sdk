@@ -43,7 +43,6 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
   OoyalaPlayerLayout playerLayout;
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
-  Spinner playerSpinner;
   Spinner embedSpinner;
   HashMap<String, MyMapRow> embedMap;
   ArrayAdapter<String> embedAdapter;
@@ -57,12 +56,6 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     setContentView(R.layout.main);
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
-    playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
-    playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
-    playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("VisualOn");
-    playerAdapter.add("Native Player");
-    playerAdapter.notifyDataSetChanged();
 
     //Populate the embed map
     embedMap = new HashMap<String, MyMapRow>();
@@ -97,12 +90,6 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
         if (player.setEmbedCode(embedCode)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
-
-          if(playerSpinner.getSelectedItem().toString()  == "Native Player") {
-            OoyalaPlayer.enableCustomHLSPlayer = false;
-          } else {
-            OoyalaPlayer.enableCustomHLSPlayer = true;
-          }
 
 //          player.play();
         } else {

@@ -1,6 +1,5 @@
 package com.ooyala.android;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +17,7 @@ import com.ooyala.android.plugin.LifeCycleInterface;
  */
 class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
   private static final String TAG = AdPluginManager.class.getName();
-  private WeakReference<OoyalaPlayer> _player;
+  private OoyalaPlayer _player;
   private List<AdPluginInterface> _plugins = new ArrayList<AdPluginInterface>();
   private AdPluginInterface _activePlugin = null;
   private AdMode _admode = AdMode.None;
@@ -32,7 +31,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
    * @return true on success, false otherwise
    */
   public AdPluginManager(OoyalaPlayer player) {
-    _player = new WeakReference<OoyalaPlayer>(player);
+    _player = player;
   }
 
   @Override
@@ -110,7 +109,7 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
       _admode = AdMode.None;
       setActivePlugin(null);
       // Need to set _admode to none before calling process exit admode.
-      _player.get().processExitAdModes(mode, true);
+      _player.processExitAdModes(mode, true);
     } else {
       setActivePlugin(nextPlugin);
       _activePlugin.onAdModeEntered();

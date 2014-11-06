@@ -274,6 +274,12 @@ public class Player extends Activity
         /* Notify SDK on Surface Creation */  
         public void surfaceCreated(SurfaceHolder surfaceholder) {
             voLog.i(TAG, "Surface Created");
+            
+            if(m_bStoped){
+                m_bReturnSourceWindow = false;
+                return;
+            }
+            
             if (m_sdkPlayer !=null && m_isResume) {
                 // For handling the situation such as phone calling is coming.
                
@@ -495,7 +501,7 @@ public class Player extends Activity
                 break;
 			   case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
             case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR:
-            case VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING:
+            case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_WARNING:
                 abManager.processEvent(nID.getValue(), nParam1, nParam2, null);
                 break; 
                 
@@ -1236,6 +1242,7 @@ public class Player extends Activity
 	    	return;
 	    }
 	    setupParameters();
+	    updateRightView();
 	    
 	    strPath=strPath.trim();
 		m_bOnError = false;
@@ -1361,7 +1368,8 @@ public class Player extends Activity
 	private void stopVideo() {
 	    m_bPaused = false;
         m_bStoped = true;
-
+        m_svMain.setVisibility(View.INVISIBLE);
+        m_svMain.setVisibility(View.VISIBLE);
     	if (m_sdkPlayer != null) {
     	    if(abManager.getOptionItemByID(OPTION_ID.OPTION_PERFORMANCE_ID.getValue()).getSelect()==1)
 			m_sdkPlayer.stopAnalyticsNotification();
@@ -1388,6 +1396,7 @@ public class Player extends Activity
 			TimeCal.printTime("Destroy <---");
 			
 			m_sdkPlayer = null;
+			m_strVideoPath="";
 			
 			voLog.v(TAG, "MediaPlayer released.");
 		}
@@ -1595,14 +1604,10 @@ public class Player extends Activity
 			voLog.v(TAG, "Key click is Back key");
 		  stopVideo();
 		  uninitPlayer();
-			m_bReturnSourceWindow=true;
-			
-			
-			SourceWindow();
-
-			return true;
+		  m_bReturnSourceWindow=true;
+		  SourceWindow();
+          return true;
 		}
-
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -1853,6 +1858,31 @@ public class Player extends Activity
             public void onClick(View v) { /* do nothing */ }});
         
     }
+    private void updateRightView(){
+        if(abManager.getOptionItemByID(OPTION_ID.OPTION_SUBTITLE_ID.getValue()).getSelect()==1) 
+            m_bEnableSubtitle=true;
+        else
+            m_bEnableSubtitle=false;
+        if (!m_bEnableVideo && !m_bEnableAudio && !m_bEnableSubtitle)
+            m_rlProgramInfoArrow.setVisibility(View.INVISIBLE);
+        else {
+        	m_rlProgramInfoArrow.setVisibility(View.VISIBLE);
+            if (!m_bEnableVideo)
+                findViewById(R.id.rlVideo).setVisibility(View.GONE);
+            else
+            	findViewById(R.id.rlVideo).setVisibility(View.VISIBLE);
+            if (!m_bEnableAudio)
+                findViewById(R.id.rlAudio).setVisibility(View.GONE);
+            else
+            	findViewById(R.id.rlAudio).setVisibility(View.VISIBLE);
+           
+            if (!m_bEnableSubtitle)
+                findViewById(R.id.rlSubtitle).setVisibility(View.GONE);
+            else
+            	findViewById(R.id.rlSubtitle).setVisibility(View.VISIBLE);
+        }
+    	
+    }
 
     private void initLayoutRight() {
 
@@ -1883,21 +1913,7 @@ public class Player extends Activity
 
             }
         });
-        if(abManager.getOptionItemByID(OPTION_ID.OPTION_SUBTITLE_ID.getValue()).getSelect()==1) 
-            m_bEnableSubtitle=true;
-        else
-            m_bEnableSubtitle=false;
-        if (!m_bEnableVideo && !m_bEnableAudio && !m_bEnableSubtitle)
-            m_rlProgramInfoArrow.setVisibility(View.INVISIBLE);
-        else {
-            if (!m_bEnableVideo)
-                findViewById(R.id.rlVideo).setVisibility(View.GONE);
-            if (!m_bEnableAudio)
-                findViewById(R.id.rlAudio).setVisibility(View.GONE);
-           
-            if (!m_bEnableSubtitle)
-                findViewById(R.id.rlSubtitle).setVisibility(View.GONE);
-        }
+        updateRightView();
         
         disablePopupMenuLableClick();
         

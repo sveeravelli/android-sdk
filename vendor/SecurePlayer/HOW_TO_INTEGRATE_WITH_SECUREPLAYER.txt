@@ -3,7 +3,7 @@ How to integrate your app with VisualOn's SecurePlayer for Playready playback
 SecurePlayerSampleApp is an example of this integration
 
 1. Copy all of the zip/libs/*.jar files into the project/libs/ folder.
-2. Copy all of the zip/libs/armeabi-v7a/*.so files into the project/libs/armeabi-v7a/ folder.
+2. Copy all of the zip/libs/armeabi/*.so files into the project/libs/armeabi/ folder.
 3. Copy all of the the zip/assets/* files into the project/assets/ folder.
 4. Ensure your OoyalaSDK.jar file is up to date in your project
 5. Make sure the following permissions are enabled in your application:
