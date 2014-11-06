@@ -152,16 +152,9 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void seekToTime(int timeInMillis) {
-    if (_player == null) {
-      _timeBeforeSuspend = timeInMillis;
-      return;
-    }
-
-    if( isSeekAllowed() ) {
+    _timeBeforeSuspend = timeInMillis;
+    if (_player != null && isSeekAllowed()) {
       _player.seekTo(timeInMillis);
-    }
-    else {
-      _timeBeforeSuspend = timeInMillis;
     }
   }
 
@@ -215,7 +208,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
       this.stop();
     }
-    
+
     setState(State.ERROR);
     return false;
   }
