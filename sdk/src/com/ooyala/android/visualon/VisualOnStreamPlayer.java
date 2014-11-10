@@ -779,11 +779,33 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
 
+    case VO_OSMP_SRC_CB_CUSTOMER_TAG:
+      handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( id, param1, param2, obj );
+      break;
+
     default:
       break;
     }
     DebugMode.logV(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
+  }
+
+
+  private void handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj ) {
+    VO_OSMP_SRC_CUSTOMERTAGID tag = VO_OSMP_SRC_CUSTOMERTAGID.valueOf( param1 );
+    switch (tag) {
+    case VO_OSMP_SRC_CUSTOMERTAGID_TIMEDTAG:
+      int time = param2;
+      byte[] b = (byte[]) obj;
+      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b );
+//      NlsId3Tag nlsID3 = new NlsId3Tag(b);
+//      // Sent ID3 Tags to App
+//      appProcessID3tag(nlsID3.NlsPayload);
+//      appId3If.onId3(nlsID3.NlsPayload);
+      break;
+    default:
+      break;
+    }
   }
 
   @Override
