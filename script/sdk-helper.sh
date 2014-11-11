@@ -28,6 +28,9 @@ FW_LIB_BASE="OoyalaFreewheelSDK"
 FW_ZIP_BASE="${FW_LIB_BASE}-${PLATFORM_NAME}"
 FW_ZIP_NAME="${FW_ZIP_BASE}.zip"
 
+ARCHIVE_ZIP_BASE="${LIB_BASE}Archive-${PLATFORM_NAME}"
+ARCHIVE_ZIP_NAME="${ARCHIVE_ZIP_BASE}.zip"
+
 USER_DIR=`cd ~; pwd`
 if [[ "${BOX_DIR}" = "" ]]; then
   BOX_DIR="${USER_DIR}/Documents/Box Documents/"
@@ -313,6 +316,11 @@ function gen {
   zip_vo
   zip_secureplayer
 
+  echo "Zipping files ${ZIP_NAME} ${FW_ZIP_NAME} ${IMA_ZIP_NAME} ${SP_ZIP_NAME} ${VO_ZIP_NAME}"
+  echo "  into ${ARCHIVE_ZIP_BASE}"
+
+  zip ${ARCHIVE_ZIP_BASE} ${ZIP_NAME} ${FW_ZIP_NAME} ${IMA_ZIP_NAME} ${SP_ZIP_NAME} ${VO_ZIP_NAME}
+
   verify_final_zips
 
   echo
@@ -364,7 +372,7 @@ function pub {
   if [[ ${rc} = true ]]; then
     # Figure out which release candidate this is.
     cd "${CANDIDATE_DIR}/Versions"
-    last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1 | sed "s/^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)\.zip$/\1/"`
+    last_rc=`ls -rt | grep "${ARCHIVE_ZIP_BASE}-${version}" | tail -1 | sed "s/^${ARCHIVE_ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC\([0-9]*\)\.zip$/\1/"`
     if [[ ! ( ${last_rc} =~ ^[0-9]*$ ) ]]; then
       echo "Error: Could not figure out last release candidate"
       cd "${pub_currdir}"
@@ -374,6 +382,8 @@ function pub {
     gen -v${version} -rc${new_rc} ${push}
     version_with_rc=${version}_RC${new_rc}
 
+    echo "We determined the next version is ${version_with_rc}"
+
     if [[ "`ls \"${CANDIDATE_DIR}\" |grep ${ZIP_BASE}-`" != "" ]]; then
       echo "  Removing Existing Release Candidate"
       rm "${CANDIDATE_DIR}"${ZIP_BASE}-*
@@ -382,10 +392,10 @@ function pub {
     echo "Publishing the Release Candidate..."
     echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_BASE}-${version_with_rc}.zip"
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_BASE}-${version_with_rc}.zip
-    echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip"
-    cp ${ZIP_NAME} "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ZIP_BASE}-${version_with_rc}.zip
     echo "  Copying ${ZIP_NAME} to ${CANDIDATE_DIR}${ZIP_NAME}"
     cp ${ZIP_NAME} "${CANDIDATE_DIR}"${ZIP_NAME}
+    echo "  Copying ${ARCHIVE_ZIP_NAME} to ${CANDIDATE_DIR}${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip"
+    cp ${ARCHIVE_ZIP_NAME} "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip
     echo "  Copying ${IMA_ZIP_NAME} to ${CANDIDATE_DIR}${IMA_ZIP_NAME}"
     cp ${IMA_ZIP_NAME} "${CANDIDATE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${FW_ZIP_NAME} to ${CANDIDATE_DIR}${FW_ZIP_NAME}"
@@ -401,8 +411,8 @@ function pub {
     fi
 
     cd "${CANDIDATE_DIR}"
-    last_rc=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1`
-    if [[ ! ( ${last_rc} =~ ^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\.zip$ ) ]]; then
+    last_rc_zip_name=`ls -rt | grep "${ZIP_BASE}-${version}" | tail -1`
+    if [[ ! ( ${last_rc_zip_name} =~ ^${ZIP_BASE}-[0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\.zip$ ) ]]; then
       echo "Error: Could not figure out last release candidate to release"
       cd "${pub_currdir}"
       usage
@@ -411,17 +421,19 @@ function pub {
     cd ${BASE_DIR}
     #add release tag
     if [[ ${push} = true ]]; then
-      curr_tag=`echo "${last_rc}" | sed "s/^${ZIP_BASE}-\([0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\)\.zip$/v\1/"`
+      curr_tag=`echo "${last_rc_zip_name}" | sed "s/^${ZIP_BASE}-\([0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\)\.zip$/v\1/"`
       git tag ${version} ${curr_tag}
       git push --tags
     fi
 
-    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${last_rc}"
-    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${last_rc}
-    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${VERSIONS_SUFFIX}${last_rc}"
-    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${VERSIONS_SUFFIX}${last_rc}
-    echo "  Copying ${CANDIDATE_DIR}${last_rc} to ${RELEASE_DIR}${ZIP_NAME}"
-    cp "${CANDIDATE_DIR}"${last_rc} "${RELEASE_DIR}"${ZIP_NAME}
+    version_with_rc=`echo "${last_rc_zip_name}" | sed "s/^${ZIP_BASE}-\([0-9]*\.[0-9]*\.[0-9]*_RC[0-9]*\)\.zip$/\1/"`
+
+    echo "  Copying ${CANDIDATE_DIR}${last_rc_zip_name} to ${RELEASE_DIR}${last_rc_zip_name}"
+    cp "${CANDIDATE_DIR}"${last_rc_zip_name} "${RELEASE_DIR}"${last_rc_zip_name}
+    echo "  Copying ${CANDIDATE_DIR}${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip to ${RELEASE_DIR}${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip"
+    cp "${CANDIDATE_DIR}"${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip "${RELEASE_DIR}"${VERSIONS_SUFFIX}${ARCHIVE_ZIP_BASE}-${version_with_rc}.zip
+    echo "  Copying ${CANDIDATE_DIR}${last_rc_zip_name} to ${RELEASE_DIR}${ZIP_NAME}"
+    cp "${CANDIDATE_DIR}"${last_rc_zip_name} "${RELEASE_DIR}"${ZIP_NAME}
     echo "  Copying ${CANDIDATE_DIR}${IMA_ZIP_NAME} to ${RELEASE_DIR}${IMA_ZIP_NAME}"
     cp "${CANDIDATE_DIR}"${IMA_ZIP_NAME} "${RELEASE_DIR}"${IMA_ZIP_NAME}
     echo "  Copying ${CANDIDATE_DIR}${FW_ZIP_NAME} to ${RELEASE_DIR}${FW_ZIP_NAME}"
