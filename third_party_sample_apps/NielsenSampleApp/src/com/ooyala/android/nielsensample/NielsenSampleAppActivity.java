@@ -1,4 +1,4 @@
-package com.ooyala.android.visualonsample;
+package com.ooyala.android.nielsensample;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,7 +21,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
-public class VisualOnSampleAppActivity extends Activity implements Observer {
+public class NielsenSampleAppActivity extends Activity implements Observer {
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
@@ -41,7 +41,7 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("VisualOn");
+    playerAdapter.add("Nielsen");
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
