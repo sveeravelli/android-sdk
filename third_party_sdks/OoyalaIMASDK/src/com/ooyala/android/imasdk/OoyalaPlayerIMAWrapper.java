@@ -26,6 +26,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
   private boolean _isPlayingIMAAd;
   private final List<VideoAdPlayerCallback> _adCallbacks = new ArrayList<VideoAdPlayerCallback>(1);
   private int _liveContentTimePlayed;
+  private int _lastPausedMs;
 
   /**
    * A simple interface to allow for a callback when content is completed
@@ -112,9 +113,13 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
   public VideoProgressUpdate getProgress() {
     int durationMs = 0;
     int playheadMs = 0;
-    if (_player.getState() == State.PAUSED || _player.getState() == State.READY || _player.getState() == State.PLAYING) {
+    if (_player.getState() == State.READY || _player.getState() == State.PLAYING) {
       durationMs = _player.getDuration();
       playheadMs = _player.getPlayheadTime();
+      _lastPausedMs = playheadMs;
+    }
+    if( _player.getState() == State.PAUSED ) {
+      playheadMs = _lastPausedMs;
     }
     if(!_isPlayingIMAAd) {
       playheadMs += _liveContentTimePlayed;

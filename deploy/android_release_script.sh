@@ -102,8 +102,8 @@ function cut_branch {
   check_build_result
 
   new_branch="release/${release_date}"
-  git checkout -b releases/${release_date}
-  git push -u origin releases/${release_date}
+  git checkout -b release/${release_date}
+  git push -u origin release/${release_date}
   ruby ~/repos/android-sdk/deploy/jira_update.rb "${new_ticket_num}" "Create RC and Tag Master" "Branch ${new_branch} is created. Closing sub-task." closed
   ticket_update_result=$?
   check_ticket_update_result

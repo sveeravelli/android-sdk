@@ -3,6 +3,8 @@ package com.ooyala.android.imasampleapp;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -30,12 +32,13 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
  * @author michael.len
  *
  */
-public class IMASampleAppActivity extends Activity {
+public class IMASampleAppActivity extends Activity implements Observer {
 
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "http://www.ooyala.com";
   OptimizedOoyalaPlayerLayoutController playerLayoutController;
   OoyalaIMAManager imaManager;
+  OoyalaPlayer player;
 
   private Map<String, String> embedMap;
   private Spinner embedSpinner;
@@ -50,7 +53,8 @@ public class IMASampleAppActivity extends Activity {
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    final OoyalaPlayer player = playerLayoutController.getPlayer();
+    player = playerLayoutController.getPlayer();
+    player.addObserver(this);
 
     //Initialize IMA classes
     imaManager = new OoyalaIMAManager(player);
@@ -66,10 +70,7 @@ public class IMASampleAppActivity extends Activity {
     embedMap.put("Podded Postroll", "1sNjE3cDoN3ZewFm1238ce730J4BMrEJ");
     embedMap.put("Podded Pre-Mid-Post", "ZrOTE3cDoXo2sLOWzQPxjS__M-Qk32Co");
     embedMap.put("Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
-    embedMap.put("Non Ad-Rules Preroll", "FlbGRjbzptyEbStMiMLcyNQE6l6TMgwq");
-    embedMap.put("Non Ad-Rules Midroll", "xrbGRjbzoBJUwtSLOHrcceTvMBe5pZdN");
-    embedMap.put("Non Ad-Rules Postroll", "FjbGRjbzp0DV_5-NtXBVo5Rgp3Sj0R5C");
-    embedMap.put("Pre, Mid and Post Skippable", "FhbGRjbzq8tfaoA3dhfxc2Qs0-RURJfO");
+    embedMap.put("Pre, Mid and Post Skippable", "10NjE3cDpj8nUzYiV1PnFsjC6nEvPQAE");
 
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -115,4 +116,11 @@ public class IMASampleAppActivity extends Activity {
     }
   }
 
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      return;
+    }
+    Log.d(IMASampleAppActivity.class.getSimpleName(), "Notification Received: " + arg1 + " - state: " + player.getState());
+  }
 }

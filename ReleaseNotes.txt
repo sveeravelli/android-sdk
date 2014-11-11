@@ -1,4 +1,4 @@
-Current Version: 3.1.0_RC1
+Current Version: 3.1.0_RC7
 
 ------------ 3.1.0 ------------
 Major Features
@@ -8,7 +8,6 @@ Major Features
 
 Bug fixes
   [PBA-777] Add more MediaPlayer error handling
-  [PBA-767] Enable reportPlayStarted notification
   [PBA-769] Added VisualOn License verification
   [PBA-796] Fix IMA SDK Logging every multiple times a second
   [PBA-852] Update IMA Sample App and InternalTestApp with new assets
@@ -16,6 +15,8 @@ Bug fixes
   [PBA-779] Fix analytics host URL
   [PBA-775] Fix lock/unlock logic while playing Freewheel Ads.
   [PBA-795] Updated localization translations Japanese
+  [PBA-896] Clear all Freewheel overlays when starting an advertisement
+  [PBA-767] Added notifications to a number of sample apps
 
 ------------ 3.0.0 ------------
 Major Features

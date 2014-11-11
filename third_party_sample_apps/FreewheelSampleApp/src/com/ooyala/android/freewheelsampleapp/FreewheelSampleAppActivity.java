@@ -3,6 +3,8 @@ package com.ooyala.android.freewheelsampleapp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,13 +21,14 @@ import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
-public class FreewheelSampleAppActivity extends Activity {
+public class FreewheelSampleAppActivity extends Activity implements Observer {
 
   final String PCODE  = "5idHc6Pt1kJ18w4u9Q5jEwAQDYCH";
   final String DOMAIN = "http://www.ooyala.com";
 
   private OptimizedOoyalaPlayerLayoutController playerLayoutController;
   private OoyalaFreewheelManager freewheelManager;
+  OoyalaPlayer player;
 
   private Spinner embedSpinner;
   private Button setButton;
@@ -42,7 +45,8 @@ public class FreewheelSampleAppActivity extends Activity {
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(
         playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    final OoyalaPlayer player = playerLayoutController.getPlayer();
+    player = playerLayoutController.getPlayer();
+    player.addObserver(this);
 
     embedMap = new HashMap<String, String>();
     embedMap.put("Freewheel Preroll", "Q5MXg2bzq0UAXXMjLIFWio_6U0Jcfk6v");
@@ -109,5 +113,14 @@ public class FreewheelSampleAppActivity extends Activity {
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().resume();
     }
+  }
+
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      return;
+    }
+    Log.d(FreewheelSampleAppActivity.class.getSimpleName(), "Notification Received: " + arg1 + " - state: " + player.getState());
   }
 }
