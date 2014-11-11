@@ -794,14 +794,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     VO_OSMP_SRC_CUSTOMERTAGID tag = VO_OSMP_SRC_CUSTOMERTAGID.valueOf( param1 );
     switch (tag) {
     case VO_OSMP_SRC_CUSTOMERTAGID_TIMEDTAG:
+      // todo: emit the tags in a generic way?
       int time = param2;
       byte[] b = (byte[]) obj;
-      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b );
-// todo: emit the tags in a generic way?
-//      NlsId3Tag nlsID3 = new NlsId3Tag(b);
-//      // Sent ID3 Tags to App
-//      appProcessID3tag(nlsID3.NlsPayload);
-//      appId3If.onId3(nlsID3.NlsPayload);
+      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
       break;
     default:
       break;

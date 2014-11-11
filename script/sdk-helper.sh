@@ -249,6 +249,7 @@ function gen {
 
   gen_secureplayer
   gen_vo
+  gen_nielsen
 
   #sampleapp
   cp -R ${SAMPLE_DIR} ${ZIP_BASE}/SampleApps

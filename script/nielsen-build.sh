@@ -10,9 +10,10 @@ function gen_nielsen {
 
   cd ${BASE_DIR}
 
+  # Note: mips is supported by Nielsen, but not by VisualOn.
   rm -rf ${APP_DIR}/{assets,libs}
   mkdir -p ${APP_DIR}/{assets,libs}
-  mkdir -p ${APP_DIR}/libs/{armeabi,armeabi-v7a,mips,x86}
+  mkdir -p ${APP_DIR}/libs/{armeabi,armeabi-v7a,x86}
   # VisualOn
   cp ${BASE_DIR}/vendor/VisualOn/Assets/* ${APP_DIR}/assets
   cp ${BASE_DIR}/vendor/VisualOn/Jar/*.jar ${APP_DIR}/libs
@@ -20,10 +21,9 @@ function gen_nielsen {
   cp ${BASE_DIR}/vendor/VisualOn/Libs_x86/*.so ${APP_DIR}/libs/x86
   # Nielsen
   cp ${BASE_DIR}/vendor/Nielsen/libs/*.jar ${APP_DIR}/libs
-  cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi ${APP_DIR}/libs/armeabi
-  cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi-v7a ${APP_DIR}/libs/armeabi-v7a
-  cp -r ${BASE_DIR}/vendor/Nielsen/libs/mips ${APP_DIR}/libs/mips
-  cp -r ${BASE_DIR}/vendor/Nielsen/libs/x86 ${APP_DIR}/libs/x86
+  cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi ${APP_DIR}/libs
+  cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi-v7a ${APP_DIR}/libs
+  cp -r ${BASE_DIR}/vendor/Nielsen/libs/x86 ${APP_DIR}/libs
 }
 
 function verify_nielsen {

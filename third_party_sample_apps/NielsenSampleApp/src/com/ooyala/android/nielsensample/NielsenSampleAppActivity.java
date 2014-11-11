@@ -23,8 +23,6 @@ import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
   OoyalaPlayer player;
-  ArrayAdapter<String> playerAdapter;
-  Spinner playerSpinner;
   Spinner embedSpinner;
   HashMap<String, String> embedMap;
   ArrayAdapter<String> embedAdapter;
@@ -38,12 +36,6 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     setContentView(R.layout.main);
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
-    playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
-    playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
-    playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("Nielsen");
-    playerAdapter.add("Native Player");
-    playerAdapter.notifyDataSetChanged();
 
     //Populate the embed map
     embedMap = new LinkedHashMap<String, String>();
@@ -73,13 +65,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         if (player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()))) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
-
-          if(playerSpinner.getSelectedItem().toString()  == "Native Player") {
-            OoyalaPlayer.enableCustomHLSPlayer = false;
-          } else {
-            OoyalaPlayer.enableCustomHLSPlayer = true;
-          }
-
+          OoyalaPlayer.enableCustomHLSPlayer = true;
           player.play();
         } else {
           Log.d(this.getClass().getName(), "Something Went Wrong!");
