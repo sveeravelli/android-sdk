@@ -18,6 +18,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.ooyala.android.DebugMode;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -798,6 +799,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       int time = param2;
       byte[] b = (byte[]) obj;
       DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
+      ID3TagNotifier.s_instance.onTag( b );
       break;
     default:
       break;
