@@ -1,6 +1,12 @@
 package com.ooyala.android.configuration;
 
 
+/**
+ * VisualOnConfiguration is a bundle that holds application-defined properties that configure
+ * Ooyala Player's use of VisualOn and SecurePlayer
+ * @author michael.len
+ *
+ */
 public class VisualOnConfiguration {
   public boolean disableLibraryVersionChecks;
   private static boolean DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS = false;
@@ -43,7 +49,11 @@ public class VisualOnConfiguration {
     return new VisualOnConfiguration( DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS );
   }
 
-  public VisualOnConfiguration( boolean disableLibraryVersionChecks ) {
+  /**
+   * Initialize a VisualOnConfiguration. Private in favor of the Builder class
+   * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
+   */
+  private VisualOnConfiguration( boolean disableLibraryVersionChecks ) {
     this.disableLibraryVersionChecks = disableLibraryVersionChecks;
   }
 }
