@@ -65,7 +65,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * called when plugin should be resumed
-   * 
+   *
    * @param timeInMilliSecond
    *          playhead time to seek after resume
    * @param stateToResume
@@ -100,6 +100,10 @@ public class OoyalaManagedAdsPlugin extends
       _adSpotManager.setAlignment(10000);
     }
     return false;
+  }
+
+  public void insertAd(OoyalaManagedAdSpot adSpot) {
+    _adSpotManager.insertAd(adSpot);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, OoyalaManagedAdSpot ad) {
@@ -211,7 +215,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * get the ad player, used to update UI controls
-   * 
+   *
    * @return the ad player
    */
   @Override
