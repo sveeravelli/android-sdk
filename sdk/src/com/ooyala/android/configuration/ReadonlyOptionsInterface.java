@@ -4,4 +4,5 @@ public interface ReadonlyOptionsInterface {
 
   FCCTVRatingConfiguration getTVRatingConfiguration();
 
+  VisualOnConfiguration getVisualOnConfiguration();
 }

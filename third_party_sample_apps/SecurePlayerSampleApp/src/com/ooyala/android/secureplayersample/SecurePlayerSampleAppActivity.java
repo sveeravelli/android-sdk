@@ -23,6 +23,9 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.Options;
+import com.ooyala.android.configuration.VisualOnConfiguration;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
@@ -68,9 +71,12 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedAdapter.addAll(embedMap.keySet());
     embedAdapter.notifyDataSetChanged();
 
+    VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
+    Options.Builder builder = new Options.Builder().setVisualOnConfiguration(visualOnConfiguration);
+    Options options = builder.build();
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-    		PCODE, new PlayerDomain(DOMAIN), this);
+        PCODE, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, this, options);
     player = playerLayoutController.getPlayer();
 
     player.addObserver(this);
