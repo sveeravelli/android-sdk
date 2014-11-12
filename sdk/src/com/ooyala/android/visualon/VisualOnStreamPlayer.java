@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -23,6 +24,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
@@ -52,6 +54,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static boolean didCleanupLocalFiles = false;
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
+  private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
+  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.11.0-B65078";
+  private VisualOnConfiguration _visualOnConfiguration = null;
+
   protected VOCommonPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -102,6 +108,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
+    _visualOnConfiguration = parent.getOptions().getVisualOnConfiguration();
+
     if (!isDiscredixNeeded()) {
       DebugMode.logD(TAG, "This asset doesn't need Discredix");
     }
@@ -130,6 +138,22 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
+
+      // Check if the Discredix version string matches what we expect
+      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(_parent.getLayout().getContext())) {
+        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+          this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "SecurePlayer Initialization error: Unexpected Discredix Version");
+          setState(State.ERROR);
+          return;
+        }
+        else {
+          DebugMode.logE(TAG, "Disabled Library version checks. Attempting to continue playback");
+        }
+      }
+      else {
+        DebugMode.logI(TAG, "Discredix Version correct for this SDK version");
+      }
+
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
@@ -326,6 +350,38 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         return;
       }
 
+      String visualOnVersion = _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK);
+      DebugMode.logI(TAG, "VisualOn Version: " + visualOnVersion);
+
+      String expectedVersion = isDiscredixLoaded() ? EXPECTED_SECUREPLAYER_VO_VERSION : EXPECTED_VISUALON_VERSION;
+      String libraryUsed = isDiscredixLoaded() ? "SecurePlayer" : "VisualOn";
+      if (expectedVersion.compareTo(visualOnVersion) != 0) {
+        DebugMode.logE(TAG, libraryUsed + " Version was not expected! Expected: " + expectedVersion + ", Actual: " + visualOnVersion);
+        DebugMode.logE(TAG, "Please ask your CSM for updated versions of the " + libraryUsed + " libraries");
+
+        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+          // Errors here cannot be run on async thread - This is run in SurfaceCreated, and erroring will nullpointer exception SurfaceChanged
+          Handler mainHandler = new Handler(Looper.getMainLooper());
+          Runnable runner =  new Runnable() {
+            @Override
+            public void run() {
+              setState(State.ERROR);
+            }
+
+          };
+          this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, libraryUsed + " Initialization error: Unexpected VisualOn Player Version");
+          mainHandler.post(runner);
+          return;
+        }
+        else {
+          DebugMode.logE(TAG, "Disabled Library version checks. Attempting to continue playback");
+        }
+      }
+      else {
+        DebugMode.logI(TAG, libraryUsed + " libraries version correct for this SDK version");
+      }
+
+
       DisplayMetrics dm  = new DisplayMetrics();
       WindowManager wm = (WindowManager) _view.getContext().getSystemService(Context.WINDOW_SERVICE);
       Display display = wm.getDefaultDisplay();
@@ -342,7 +398,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (!isDiscredixLoaded()) {
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
-      DebugMode.logI(TAG, "VisualOn Version: " + _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK));
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
       _player.setPreAgreedLicense(licenseText);
