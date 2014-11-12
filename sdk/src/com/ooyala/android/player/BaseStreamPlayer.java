@@ -44,6 +44,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   protected int _height = 0;
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
+
+  private boolean _playerPrepared = false;
   private int _timeBeforeSuspend = -1;
   private State _stateBeforeSuspend = State.INIT;
   Stream stream = null;
@@ -135,6 +137,10 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   @Override
   public int duration() {
     if (_player == null) { return 0; }
+    if (!_playerPrepared) {
+      DebugMode.logE(TAG, "Trying to getDuration without MediaPlayer");
+      return 0;
+    }
     switch (getState()) {
     case INIT:
     case SUSPENDED:
@@ -223,6 +229,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_timeBeforeSuspend > 0) {
       seekToTimeOnPrepared(_timeBeforeSuspend);
     }
+    _playerPrepared = true;
     setState(State.READY);
   }
 
@@ -364,6 +371,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _player.stop();
       _player.release();
       _player = null;
+      _playerPrepared = false;
     }
     removeView();
     _width = 0;
@@ -392,6 +400,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_player != null) {
       stop();
       _player = null;
+      _playerPrepared = false;
     }
     removeView();
     _parent = null;
