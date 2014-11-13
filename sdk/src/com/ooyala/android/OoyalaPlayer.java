@@ -2098,9 +2098,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Get the Ooyala Managed Ads Plugin, which maintains VAST and Ooyala Advertisements
-   * @return the OoyalaManagedAdsPlugin
+   * @return the ManagedAdsPlugin
    */
-  public OoyalaManagedAdsPlugin getOoyalaManagedAdsPlugin() {
+  public OoyalaManagedAdsPlugin getManagedAdsPlugin() {
     return _managedAdsPlugin;
   }
 }

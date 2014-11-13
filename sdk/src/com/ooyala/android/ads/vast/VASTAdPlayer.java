@@ -33,7 +33,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private boolean _midSent = false;
   private boolean _thirdQSent = false;
 
-  private boolean _fetching = false;
   private boolean _playQueued = false;
 
   private int _topMargin;
@@ -69,7 +68,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       if (_fetchTask != null) {
         this._parent.getOoyalaAPIClient().cancel(_fetchTask);
       }
-      _fetching = true;
+
       _fetchTask = _ad.fetchPlaybackInfo(new FetchPlaybackInfoCallback() {
 
         @Override
@@ -131,7 +130,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
       }
     }
 
-    _fetching = false;
     dequeuePlay();
     return true;
   }
@@ -149,7 +147,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
-    if (_fetching) {
+    if (this.getBasePlayer() == null) {
       queuePlay();
       return;
     }

@@ -25,7 +25,7 @@ public class OoyalaManagedAdsPlugin extends
   private StateNotifier _stateNotifier;
 
   /**
-   * Ooyala managed ads plugin manages ooyala and vast ads.
+   * Ooyala Managed Ads Plugin manages VAST and Ooyala ads
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     super();
@@ -102,6 +102,10 @@ public class OoyalaManagedAdsPlugin extends
     return false;
   }
 
+  /**
+   * Insert an Ooyala Managed Ad into the plugin's list of ads
+   * @param adSpot either an OoyalaAdSpot or VASTAdSpot
+   */
   public void insertAd(OoyalaManagedAdSpot adSpot) {
     _adSpotManager.insertAd(adSpot);
   }

@@ -18,7 +18,6 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
   private OoyalaAdSpot _ad;
   private Object _fetchTask;
-  private boolean _fetching = false;
   private boolean _playQueued = false;
 
 
@@ -55,7 +54,6 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       }
       PlayerInfo info = getBasePlayer() != null ? getBasePlayer().getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
 
-      _fetching = true;
       _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
 
         @Override
@@ -91,7 +89,6 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       }
     }
 
-    _fetching = false;
     dequeuePlay();
   }
 
@@ -108,7 +105,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
-    if (_fetching) {
+    if (this.getBasePlayer() == null) {
       queuePlay();
       return;
     }
