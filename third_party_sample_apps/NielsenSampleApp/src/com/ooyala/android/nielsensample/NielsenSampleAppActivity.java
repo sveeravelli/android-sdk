@@ -15,8 +15,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.ooyala.android.NielsenAnalytics;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
@@ -50,10 +50,13 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     }
     embedAdapter.notifyDataSetChanged();
 
+    NielsenAnalytics.s_setNielsenConfiguration(this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
+
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
+    player.setNielsenAnalytics( new NielsenAnalytics( "testChannel" ) );
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
@@ -78,7 +81,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   @Override
   protected void onPause() {
     super.onPause();
-    if (player != null && player.getState() != State.SUSPENDED) {
+    if (player != null && player.getState() != OoyalaPlayer.State.SUSPENDED) {
       player.suspend();
     }
   }
@@ -86,7 +89,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   @Override
   protected void onResume() {
     super.onResume();
-    if (player != null && player.getState() == State.SUSPENDED) {
+    if (player != null && player.getState() == OoyalaPlayer.State.SUSPENDED) {
       player.resume();
     }
   }

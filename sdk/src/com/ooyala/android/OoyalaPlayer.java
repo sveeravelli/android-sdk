@@ -230,8 +230,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _managedAdsPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_managedAdsPlugin);
 
-    _nielsenAnalytics = new NielsenAnalytics(); // todo: rework this for a production design. just here now for easier development.
-
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
   }
@@ -253,6 +251,10 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setLayoutController(LayoutController layoutController) {
     _layoutController = layoutController;
     _playerAPIClient.setContext(getLayout().getContext());
+  }
+
+  public void setNielsenAnalytics( NielsenAnalytics nielsenAnalytics ) {
+    this._nielsenAnalytics = nielsenAnalytics;
   }
 
   public void setHook() {
@@ -1267,7 +1269,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
       if( _nielsenAnalytics != null ) {
-        _nielsenAnalytics.onPlayheadUpdate( _player.currentTime() / 1000 );
+        _nielsenAnalytics.onPlayheadUpdate( _player.currentTime() );
       }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions

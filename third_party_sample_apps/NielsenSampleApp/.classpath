@@ -5,6 +5,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry exported="true" kind="lib" path="/ooyala-android-sdk/bin/ooyala-android-sdk.jar"/>
+	<classpathentry exported="true" kind="lib" path="/ooyala-android-sdk/bin/ooyala-android-sdk.jar" sourcepath="/ooyala-android-sdk/src"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

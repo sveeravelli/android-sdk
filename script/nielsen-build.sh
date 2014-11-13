@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
+APP_DIR=${BASE_DIR}/sdk
 APP_DIR=${BASE_DIR}/third_party_sample_apps/NielsenSampleApp
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
@@ -22,6 +23,7 @@ function gen_nielsen {
   cp ${BASE_DIR}/vendor/VisualOn/Libs/*.so ${APP_DIR}/libs/armeabi-v7a
   cp ${BASE_DIR}/vendor/VisualOn/Libs_x86/*.so ${APP_DIR}/libs/x86
   # Nielsen
+  cp ${BASE_DIR}/vendor/Nielsen/libs/*.jar ${SDK_DIR}/libs
   cp ${BASE_DIR}/vendor/Nielsen/libs/*.jar ${APP_DIR}/libs
   cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi ${APP_DIR}/libs
   cp -r ${BASE_DIR}/vendor/Nielsen/libs/armeabi-v7a ${APP_DIR}/libs
