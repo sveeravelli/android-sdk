@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.NielsenAnalytics;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
@@ -33,29 +34,29 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    DebugMode.setMode( DebugMode.Mode.LogAndAbort );
+
     setContentView(R.layout.main);
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
-
     //Populate the embed map
     embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("nielsen",    "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
-
+    embedMap.put("nielsen", "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
-
     //Update the spinner with the embed map
     for (String key : embedMap.keySet()) {
       embedAdapter.add(key);
     }
     embedAdapter.notifyDataSetChanged();
 
-    NielsenAnalytics.s_setNielsenConfiguration(this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
-
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
+
+    NielsenAnalytics.s_setNielsenConfiguration(this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
     player.setNielsenAnalytics( new NielsenAnalytics( "testChannel" ) );
 
     player.addObserver(this);
