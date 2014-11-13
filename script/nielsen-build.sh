@@ -18,6 +18,8 @@ function gen_nielsen {
   cp ${BASE_DIR}/vendor/VisualOn/Assets/* ${APP_DIR}/assets
   cp ${BASE_DIR}/vendor/VisualOn/Jar/*.jar ${APP_DIR}/libs
   cp ${BASE_DIR}/vendor/VisualOn/Libs/*.so ${APP_DIR}/libs/armeabi
+  # visual on doesn't make it clear if anything / what is v7a, so copy them all.
+  cp ${BASE_DIR}/vendor/VisualOn/Libs/*.so ${APP_DIR}/libs/armeabi-v7a
   cp ${BASE_DIR}/vendor/VisualOn/Libs_x86/*.so ${APP_DIR}/libs/x86
   # Nielsen
   cp ${BASE_DIR}/vendor/Nielsen/libs/*.jar ${APP_DIR}/libs
