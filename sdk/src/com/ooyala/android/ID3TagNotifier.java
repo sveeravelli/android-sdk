@@ -3,14 +3,13 @@ package com.ooyala.android;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
-
 /**
  * thread safe queue of collections of bytes.
  */
 public class ID3TagNotifier {
 
-  public static final ID3TagNotifier s_instance = new ID3TagNotifier();
+  private static final ID3TagNotifier s_instance = new ID3TagNotifier();
+  public static final ID3TagNotifier s_getInstance() { return s_instance; }
 
   public static interface ID3TagNotifierListener {
     /**

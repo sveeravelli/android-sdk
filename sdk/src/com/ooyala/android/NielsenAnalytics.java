@@ -57,6 +57,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
   public NielsenAnalytics( String channelName ) {
     this.nielsenApp = NielsenAnalytics.s_instance;
     this.channelNameJson = "{\"channelName\":\"" + channelName + "\"}";
+    ID3TagNotifier.s_getInstance().addWeakListener( this );
   }
 
   /**
@@ -73,12 +74,13 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  @Override
   public synchronized void onTag( byte[] tag ) {
     if( isValid() ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
       if( tagStr.contains("www.nielsen.com") ) {
-        final String nielsenStr = tagStr.replaceFirst( ".*www.nielsen.com", "" );
+        final String nielsenStr = tagStr.replaceFirst( ".*www.nielsen.com", "www.nielsen.com" );
         DebugMode.logV( TAG, "onTag(): nielsenStr=" + nielsenStr );
       }
     }

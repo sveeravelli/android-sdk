@@ -799,7 +799,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       int time = param2;
       byte[] b = (byte[]) obj;
       DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
-      ID3TagNotifier.s_instance.onTag( b );
+      ID3TagNotifier.s_getInstance().onTag( b );
       break;
     default:
       break;
