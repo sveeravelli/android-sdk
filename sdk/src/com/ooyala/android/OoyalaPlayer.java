@@ -2095,4 +2095,12 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logE(TAG, "analytics is null when playing");
     }
   }
+
+  /**
+   * Get the Ooyala Managed Ads Plugin, which maintains VAST and Ooyala Advertisements
+   * @return the ManagedAdsPlugin
+   */
+  public OoyalaManagedAdsPlugin getManagedAdsPlugin() {
+    return _managedAdsPlugin;
+  }
 }

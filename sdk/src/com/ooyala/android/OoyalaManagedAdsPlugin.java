@@ -25,7 +25,7 @@ public class OoyalaManagedAdsPlugin extends
   private StateNotifier _stateNotifier;
 
   /**
-   * Ooyala managed ads plugin manages ooyala and vast ads.
+   * Ooyala Managed Ads Plugin manages VAST and Ooyala ads
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     super();
@@ -65,7 +65,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * called when plugin should be resumed
-   * 
+   *
    * @param timeInMilliSecond
    *          playhead time to seek after resume
    * @param stateToResume
@@ -100,6 +100,14 @@ public class OoyalaManagedAdsPlugin extends
       _adSpotManager.setAlignment(10000);
     }
     return false;
+  }
+
+  /**
+   * Insert an Ooyala Managed Ad into the plugin's list of ads
+   * @param adSpot either an OoyalaAdSpot or VASTAdSpot
+   */
+  public void insertAd(OoyalaManagedAdSpot adSpot) {
+    _adSpotManager.insertAd(adSpot);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, OoyalaManagedAdSpot ad) {
@@ -211,7 +219,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * get the ad player, used to update UI controls
-   * 
+   *
    * @return the ad player
    */
   @Override
