@@ -1247,8 +1247,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          the notification
    */
   private void processContentNotifications(Player player, String notification) {
+    if (_player == null) {
+      DebugMode.logE(TAG,  "Accepting notifications when there is no player: " + notification);
+    }
+    if (_player != player) {
+      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
+    }
+
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
-      sendNotification(TIME_CHANGED_NOTIFICATION);
         // send analytics ping
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
@@ -1256,6 +1262,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
+
+      sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
       switch (state) {
