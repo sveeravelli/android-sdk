@@ -3,6 +3,8 @@ package com.ooyala.android;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
+
 /**
  * thread safe queue of collections of bytes.
  */
@@ -17,28 +19,31 @@ public class ID3TagNotifier {
     void onTag( byte[] tag );
   }
 
-  private final Set<ID3TagNotifierListener> listeners;
+  private final Set<WeakReferencePassThroughEquals<ID3TagNotifierListener>> listeners;
 
   public ID3TagNotifier() {
-    this.listeners = new HashSet<ID3TagNotifierListener>();
+    this.listeners = new HashSet<WeakReferencePassThroughEquals<ID3TagNotifierListener>>();
   }
 
-  public void addListener( ID3TagNotifierListener listener ) {
+  public void addWeakListener( ID3TagNotifierListener listener ) {
     synchronized( listeners ) {
-      listeners.add( listener );
+      listeners.add( new WeakReferencePassThroughEquals<ID3TagNotifierListener>(listener) );
     }
   }
 
-  public void removeListener( ID3TagNotifierListener listener ) {
+  public void removeWeakListener( ID3TagNotifierListener listener ) {
     synchronized( listeners ) {
-      listeners.remove( listener );
+      listeners.remove( new WeakReferencePassThroughEquals<ID3TagNotifierListener>(listener) );
     }
   }
 
   public void onTag( byte[] tag ) {
     synchronized( listeners ) {
-      for( ID3TagNotifierListener l : listeners ) {
-        l.onTag( tag );
+      for( WeakReferencePassThroughEquals<ID3TagNotifierListener> wl : listeners ) {
+        final ID3TagNotifierListener l = wl.get();
+        if( l != null ) {
+          l.onTag( tag );
+        }
       }
     }
   }

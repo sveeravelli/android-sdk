@@ -162,6 +162,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
+  private NielsenAnalytics _nielsenAnalytics;
   private String _language = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
@@ -228,6 +229,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager = new AdPluginManager(this);
     _managedAdsPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_managedAdsPlugin);
+
+    _nielsenAnalytics = new NielsenAnalytics(); // todo: rework this for a production design. just here now for easier development.
 
     DebugMode.logI(this.getClass().getName(),
         "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -366,6 +369,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     _queuedSeekTime = 0;
     cleanupPlayers();
     _adManager.resetManager();
+    if( _nielsenAnalytics != null ) {
+      _nielsenAnalytics.onStop();
+    }
 
     // request content tree
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
@@ -834,6 +840,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (currentPlayer() != null) {
       currentPlayer().pause();
     }
+    if( _nielsenAnalytics != null ) {
+      _nielsenAnalytics.onStop();
+    }
   }
 
   /**
@@ -896,6 +905,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_authHeartbeat != null) {
       _suspendTime = System.currentTimeMillis();
       _authHeartbeat.stop();
+    }
+
+    if( _nielsenAnalytics != null ) {
+      _nielsenAnalytics.onStop();
     }
 
     setState(State.SUSPENDED);
@@ -1253,6 +1266,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
+      if( _nielsenAnalytics != null ) {
+        _nielsenAnalytics.onPlayheadUpdate( _player.currentTime() / 1000 );
+      }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
@@ -1340,6 +1356,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (state != _state) {
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
+    }
+    if( state == State.ERROR && _nielsenAnalytics != null ) {
+      _nielsenAnalytics.onStop();
     }
   }
 
@@ -2093,6 +2112,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _analytics.reportPlayStarted();
     } else {
       DebugMode.logE(TAG, "analytics is null when playing");
+    }
+    if( _nielsenAnalytics != null ) {
+      _nielsenAnalytics.onPlay();
     }
   }
 }

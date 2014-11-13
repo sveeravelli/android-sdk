@@ -15,7 +15,7 @@ public class ID3TagNotifierTest extends AndroidTestCase {
       }
     };
     final ID3TagNotifier q = new ID3TagNotifier();
-    q.addListener( l );
+    q.addWeakListener( l );
     q.onTag( new byte[]{} );
     assertTrue( seen.get() );
   }
