@@ -862,6 +862,10 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (!initialContentPlay() || !this.processAdModes(AdMode.InitialPlay, 0)) {
         currentPlayer().play();
       }
+
+      if( _nielsenAnalytics != null ) {
+        _nielsenAnalytics.onPlay();
+      }
     } else {
       queuePlay();
     }
@@ -2114,9 +2118,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       _analytics.reportPlayStarted();
     } else {
       DebugMode.logE(TAG, "analytics is null when playing");
-    }
-    if( _nielsenAnalytics != null ) {
-      _nielsenAnalytics.onPlay();
     }
   }
 }
