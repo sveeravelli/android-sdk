@@ -18,7 +18,6 @@ import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 /**
  * This application shows a way to locally generate Ooyala Player Tokens.  This method is for debugging
  * only, as this will expose your API Secret publicly if used in an application.
- * @author michael.len
  *
  */
 public class LocalOPTSampleApp extends Activity implements EmbedTokenGenerator{

@@ -6,7 +6,6 @@ import com.ooyala.android.OoyalaPlayer.State;
  * The interface that must be implemented in order to receive control events
  * from Ooyala UI
  * 
- * @author michael.len
  * 
  */
 public interface PlayerInterface {

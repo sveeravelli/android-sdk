@@ -15,7 +15,6 @@ import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
- * @author michael.len
  *
  */
 public class Player extends Observable implements PlayerInterface,

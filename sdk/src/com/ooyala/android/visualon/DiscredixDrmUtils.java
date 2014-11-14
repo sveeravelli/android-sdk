@@ -23,7 +23,6 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
  * Static methods that are used to perform DRM related activities in the VisualOn Stream Player.
  * The class was created to abstract the VisualOnStreamPlayer from all DRM code, to make it compilable
  * without errors when DRM is disabled
- * @author michael.len
  *
  */
 class DiscredixDrmUtils {

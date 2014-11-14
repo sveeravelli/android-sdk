@@ -4,7 +4,6 @@ package com.ooyala.android.configuration;
 /**
  * VisualOnConfiguration is a bundle that holds application-defined properties that configure
  * Ooyala Player's use of VisualOn and SecurePlayer
- * @author michael.len
  *
  */
 public class VisualOnConfiguration {
@@ -13,7 +12,6 @@ public class VisualOnConfiguration {
 
   /**
    * Build the object of VisualOn configurations
-   * @author michael.len
    *
    */
   public static class Builder {

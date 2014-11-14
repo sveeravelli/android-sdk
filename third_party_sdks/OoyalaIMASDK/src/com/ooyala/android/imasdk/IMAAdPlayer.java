@@ -15,7 +15,6 @@ import com.ooyala.android.player.AdMoviePlayer;
 /**
  * This class represents the Base Movie Player that plays IMA Ad spots.
  *
- * @author michael.len
  *
  */
 public class IMAAdPlayer extends AdMoviePlayer {
