@@ -374,7 +374,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager.resetManager();
     if( _nielsenAnalytics != null ) {
       _nielsenAnalytics.onStop();
-      _nielsenAnalytics.setChannelName( TextUtils.join( "-", embedCodes ) );
+      _nielsenAnalytics.setChannelName( TextUtils.join( ";", embedCodes ) );
     }
 
     // request content tree

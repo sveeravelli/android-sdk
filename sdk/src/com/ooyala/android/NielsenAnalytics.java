@@ -58,8 +58,14 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
 
   public void setChannelName( String channelName ) {
     DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
-    this.channelName = channelName;
-    this.channelNameJson = "{\"channelName\":\"" + this.channelName + "\"}";
+    JSONObject json = new JSONObject();
+    try {
+      json.put( "channelName", channelName );
+      this.channelNameJson = json.toString();
+      this.channelName = channelName;
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, e.toString() );
+    }
   }
 
   public String getChannelName() {
