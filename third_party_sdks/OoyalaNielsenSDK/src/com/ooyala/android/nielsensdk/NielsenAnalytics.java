@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.nielsensdk;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,6 +6,9 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.nielsen.app.sdk.AppSdk;
+import com.ooyala.android.AnalyticsPluginInterface;
+import com.ooyala.android.DebugMode;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 
 // general ugliness in here is forced upon us by the design of Nielsen's SDK.
