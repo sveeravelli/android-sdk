@@ -16,10 +16,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.NielsenAnalytics;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
