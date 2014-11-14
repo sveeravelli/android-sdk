@@ -58,7 +58,6 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     player = playerLayoutController.getPlayer();
 
     final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
-    nielsenAnalytics.setChannelName( EMBED_CODE );
     player.setNielsenAnalytics( nielsenAnalytics );
 
     player.addObserver(this);
@@ -68,7 +67,8 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
 
       @Override
       public void onClick(View v) {
-        if (player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()))) {
+        final String embed = embedMap.get(embedSpinner.getSelectedItem());
+        if (player.setEmbedCode(embed)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
           OoyalaPlayer.enableCustomHLSPlayer = true;

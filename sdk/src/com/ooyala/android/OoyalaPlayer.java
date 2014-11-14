@@ -16,6 +16,7 @@ import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -373,6 +374,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager.resetManager();
     if( _nielsenAnalytics != null ) {
       _nielsenAnalytics.onStop();
+      _nielsenAnalytics.setChannelName( TextUtils.join( "-", embedCodes ) );
     }
 
     // request content tree
