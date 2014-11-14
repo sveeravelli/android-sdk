@@ -44,6 +44,15 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
   }
 
   /**
+   * Provides the AppSdk reference for use cases that aren't covered by this Class's interface.
+   * @return our cached AppSdk ref, originally obtained by calling AppSdk.getInstance() in our constructor.
+   * @see AppSdk#getInstance(Context, String)
+   */
+  public AppSdk getNielsenAppSdk() {
+    return this.nielsenApp;
+  }
+
+  /**
    * See the Nielsen SDK documentation around AppSdk.getInstance(),
    * in particular regarding the backgrounding of the app.
    */
@@ -74,7 +83,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
 
   /**
    * Effectively, a wrapper around Nielsen's static AppSdk.isValid().
-   * @return
    */
   public synchronized boolean isValid() {
     return nielsenApp != null && AppSdk.isValid();
@@ -115,7 +123,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
 
   public synchronized void onPlayheadUpdate( int playheadMsec ) {
     DebugMode.logV( TAG, "onPlayheadUpdate(): playheadMsec=" + playheadMsec );
-    if( playheadMsec > 0 && playheadMsec - lastPlayheadMsec > 2000 ) {
+    if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
       lastPlayheadMsec = playheadMsec;
       DebugMode.logV( TAG, "onPlayheadUpdate(): updating" );
       if( isValid() ) {
