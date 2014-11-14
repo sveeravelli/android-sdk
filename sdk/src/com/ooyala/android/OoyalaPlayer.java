@@ -163,7 +163,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
-  private NielsenAnalytics _nielsenAnalytics;
+  private AnalyticsPluginInterface _nielsenAnalytics;
   private String _language = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
@@ -254,7 +254,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playerAPIClient.setContext(getLayout().getContext());
   }
 
-  public void setNielsenAnalytics( NielsenAnalytics nielsenAnalytics ) {
+  public void setNielsenAnalytics( AnalyticsPluginInterface nielsenAnalytics ) {
     this._nielsenAnalytics = nielsenAnalytics;
   }
 

@@ -10,7 +10,7 @@ import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 
 // general ugliness in here is forced upon us by the design of Nielsen's SDK.
 
-public class NielsenAnalytics implements ID3TagNotifierListener {
+public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPluginInterface {
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
   private AppSdk nielsenApp;
@@ -52,10 +52,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     return this.nielsenApp;
   }
 
-  /**
-   * See the Nielsen SDK documentation around AppSdk.getInstance(),
-   * in particular regarding the backgrounding of the app.
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#destroy()
    */
+  @Override
   public synchronized void destroy() {
     DebugMode.logV( TAG, "destroy()" );
     if( isValid() ) {
@@ -65,6 +65,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#setChannelName(java.lang.String)
+   */
+  @Override
   public void setChannelName( String channelName ) {
     DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
     JSONObject json = new JSONObject();
@@ -88,6 +92,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     return nielsenApp != null && AppSdk.isValid();
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#onMetadata(java.lang.String)
+   */
+  @Override
   public synchronized void onMetadata( String json ) {
     DebugMode.logV( TAG, "onMetadata(): json=" + json );
     if( isValid() ) {
@@ -95,6 +103,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#onTag(byte[])
+   */
   @Override
   public synchronized void onTag( byte[] tag ) {
     if( isValid() ) {
@@ -107,6 +118,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#onPlay()
+   */
+  @Override
   public synchronized void onPlay() {
     DebugMode.logV( TAG, "onPlay()" );
     if( isValid() ) {
@@ -114,6 +129,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#onStop()
+   */
+  @Override
   public synchronized void onStop() {
     DebugMode.logV( TAG, "onStop()" );
     if( isValid() ) {
@@ -121,6 +140,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
     }
   }
 
+  /* (non-Javadoc)
+   * @see com.ooyala.android.AnalyticsPluginInterface#onPlayheadUpdate(int)
+   */
+  @Override
   public synchronized void onPlayheadUpdate( int playheadMsec ) {
     DebugMode.logV( TAG, "onPlayheadUpdate(): playheadMsec=" + playheadMsec );
     if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
