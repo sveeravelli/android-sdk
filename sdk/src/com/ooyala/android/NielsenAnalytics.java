@@ -12,52 +12,58 @@ import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 
 public class NielsenAnalytics implements ID3TagNotifierListener {
   private static final String TAG = "NielsenAnalytics";
+  private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
+  private AppSdk nielsenApp;
+  private String channelName;
+  private String channelNameJson;
+  private int lastPlayheadMsec;
 
   /**
-   * This should only be called once e.g. during app startup.
-   * Should be called before NielsenAnalytics constructor.
+   * Convenience wrapper around Nielsen AppSdk.
+   * See the Nielsen SDK documentation around AppSdk.getInstance().
    * @param context Android Context.
    * @param appName per Nielsen SDK docs.
    * @param appVersion per Nielsen SDK docs.
    * @param sfCode per Nielsen SDK docs.
    * @param appID per Nielsen SDK docs.
-   * @see #NielsenAnalytics(String)
+   * @see AppSdk
    */
-  private static Boolean s_configured = Boolean.FALSE;
-  private static AppSdk s_instance;
-  public synchronized static final void s_setNielsenConfiguration( Context context, String appName, String appVersion, String sfCode, String appID ) {
-    DebugMode.logV( TAG, "getMeterVersion=" + AppSdk.getMeterVersion() );
-    synchronized( s_configured ) {
-      if( DebugMode.assertCondition( s_configured.equals(Boolean.FALSE), TAG, "setInstanceConfiguration(): was already previously set! Ignoring call." ) ) {
-        try {
-          JSONObject configJson = new JSONObject();
-          configJson.put( "appName", appName );
-          configJson.put( "appVersion", appVersion );
-          configJson.put( "sfcode", sfCode );
-          configJson.put( "appId", appID );
-          s_instance = AppSdk.getInstance( context, configJson.toString() );
-          DebugMode.logV( TAG, "s_instance=" + s_instance + " valid=" + AppSdk.isValid() );
-          s_configured = Boolean.TRUE;
-        } catch (JSONException e) {
-          DebugMode.logE( TAG, e.toString() );
-        }
-      }
+  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID ) {
+    JSONObject configJson = new JSONObject();
+    try {
+      configJson.put( "appName", appName );
+      configJson.put( "appVersion", appVersion );
+      configJson.put( "sfcode", sfCode );
+      configJson.put( "appId", appID );
+      this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
+      ID3TagNotifier.s_getInstance().addWeakListener( this );
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, e.toString() );
+    }
+    setChannelName( UNKNOWN_CHANNEL_NAME );
+  }
+
+  /**
+   * See the Nielsen SDK documentation around AppSdk.getInstance(),
+   * in particular regarding the backgrounding of the app.
+   */
+  public synchronized void destroy() {
+    DebugMode.logV( TAG, "destroy()" );
+    if( isValid() ) {
+      setChannelName( UNKNOWN_CHANNEL_NAME );
+      nielsenApp.suspend();
+      nielsenApp = null;
     }
   }
 
-  private int lastPlayheadMsec;
-  private final AppSdk nielsenApp; // can be null, always check.
-  private final String channelNameJson;
+  public void setChannelName( String channelName ) {
+    DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
+    this.channelName = channelName;
+    this.channelNameJson = "{\"channelName\":\"" + this.channelName + "\"}";
+  }
 
-  /**
-   * Should be called after s_setNielsenConfiguration().
-   * @param channelName
-   * @see #s_setNielsenConfiguration(Context, String, String, String, String)
-   */
-  public NielsenAnalytics( String channelName ) {
-    this.nielsenApp = NielsenAnalytics.s_instance;
-    this.channelNameJson = "{\"channelName\":\"" + channelName + "\"}";
-    ID3TagNotifier.s_getInstance().addWeakListener( this );
+  public String getChannelName() {
+    return channelName;
   }
 
   /**
@@ -69,6 +75,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener {
   }
 
   public synchronized void onMetadata( String json ) {
+    DebugMode.logV( TAG, "onMetadata(): json=" + json );
     if( isValid() ) {
       nielsenApp.loadMetadata( json );
     }

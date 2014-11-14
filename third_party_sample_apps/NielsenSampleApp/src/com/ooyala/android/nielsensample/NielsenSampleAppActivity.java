@@ -28,8 +28,9 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   HashMap<String, String> embedMap;
   ArrayAdapter<String> embedAdapter;
 
-  final String PCODE  = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
-  final String DOMAIN = "http://www.ooyala.com";
+  private final String PCODE = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
+  private final String EMBED_CODE = "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a";
+  private final String DOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     //Populate the embed map
     embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("nielsen", "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
+    embedMap.put("nielsen", EMBED_CODE);
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
     //Update the spinner with the embed map
@@ -56,8 +57,9 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
-    NielsenAnalytics.s_setNielsenConfiguration(this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
-    player.setNielsenAnalytics( new NielsenAnalytics( "testChannel" ) );
+    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, "NielsenSampleApp", "0.1", "sfcode-unknown", "appid-unknown" );
+    nielsenAnalytics.setChannelName( EMBED_CODE );
+    player.setNielsenAnalytics( nielsenAnalytics );
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
