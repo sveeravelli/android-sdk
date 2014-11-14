@@ -18,7 +18,6 @@ import com.ooyala.android.configuration.Options;
  * Because of this, playback will be suspended and subsequently resumed during this process. As a result,
  * fullscreening is slower than if the OoyalaPlayerLayout is embeded directly in the Activity's base layout,
  * that base layout is a FrameLayout, and the LayoutController used is FastOoyalaPlayerLayoutController.
- * @author jigish
  */
 public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
 

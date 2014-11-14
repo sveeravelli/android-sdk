@@ -20,7 +20,6 @@ import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
  * 1. Create the test activity in com.ooyala.test.cases
  * 2. Create the string for the activity's name in res/strings
  * 3. Add that activity to these maps, with proper information
- * @author michael.len
  *
  */
 public class InternalTestApplication extends Application {

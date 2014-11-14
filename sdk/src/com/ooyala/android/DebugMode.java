@@ -7,7 +7,6 @@ import android.util.Log;
  * to force runtime exceptions on assertions throughout the Ooyala SDK.
  *
  * You can set your desired mode by calling DebugMode.setMode(DebugMode.mode);
- * @author jonslenk
  *
  */
 public final class DebugMode {

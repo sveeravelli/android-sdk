@@ -16,7 +16,6 @@ import com.ooyala.android.configuration.Options;
  * LayoutController uses basic controls and allows additional overlays to be added. Fullscreening is done by
  * simply resizing the OoyalaPlayerLayout to fill the entire screen, which does not trigger a player reload
  * thus causing this to be much faster at Fullscreening than OoyalaPlayerLayoutController.
- * @author jigish
  */
 public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
   private boolean _fullscreen = false;

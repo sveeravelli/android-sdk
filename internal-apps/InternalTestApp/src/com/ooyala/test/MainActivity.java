@@ -14,7 +14,6 @@ import android.widget.ListView;
 
 /**
  * This is the opening activity for the app.
- * @author michael.len
  *
  */
 public class MainActivity extends Activity implements OnItemClickListener {

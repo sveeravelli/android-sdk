@@ -8,7 +8,6 @@ import com.ooyala.android.player.PlayerInterface;
  * The interface that must be implemented in order to plug into OoyalaPlayer to
  * play ads.
  * 
- * @author michael.len
  * 
  */
 public interface AdPluginInterface extends LifeCycleInterface {

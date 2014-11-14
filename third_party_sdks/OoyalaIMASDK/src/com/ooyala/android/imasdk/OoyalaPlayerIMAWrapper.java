@@ -14,7 +14,6 @@ import com.ooyala.android.item.OoyalaManagedAdSpot;
 /**
  * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.
  *
- * @author michael.len
  *
  */
 class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
@@ -30,7 +29,6 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer {
 
   /**
    * A simple interface to allow for a callback when content is completed
-   * @author michael.len
    *
    */
   interface CompleteCallback {

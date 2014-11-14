@@ -35,7 +35,6 @@ import com.ooyala.android.plugin.AdPluginInterface;
  *
  * The OoyalaIMAManager works most completely with an OptimizedOoyalaPlayerLayoutController.  If you do not
  * use this layout controller, you will not see IMA's "Learn More" button when in fullscreen mode.
- * @author michael.len
  *
  */
 public class OoyalaIMAManager implements AdPluginInterface {
