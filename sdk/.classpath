@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs-not-for-export/appsdk.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/assets.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSBasePlayer.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSDataSource.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSEngine.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSHDMICheck.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSPlayer.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSStreamingDownloader.jar"/>
+	<classpathentry kind="lib" path="libs-not-for-export/voOSUtils.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -3,7 +3,6 @@
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
 OONSDK_DIR=${BASE_DIR}/third_party_sdks/OoyalaNielsenSDK
-APP_DIR=${BASE_DIR}/sdk
 APP_DIR=${BASE_DIR}/third_party_sample_apps/NielsenSampleApp
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 

@@ -17,6 +17,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
   private AppSdk nielsenApp;
+  private ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
   private int lastPlayheadMsec;
@@ -31,7 +32,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @param appID per Nielsen SDK docs.
    * @see AppSdk
    */
-  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID ) {
+  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, ID3TagNotifier id3TagNotifier ) {
     JSONObject configJson = new JSONObject();
     try {
       configJson.put( "appName", appName );
@@ -39,7 +40,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
       configJson.put( "sfcode", sfCode );
       configJson.put( "appId", appID );
       this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
-      ID3TagNotifier.s_getInstance().addWeakListener( this );
+      this.id3TagNotifier = id3TagNotifier;
+      id3TagNotifier.addWeakListener( this );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
@@ -62,6 +64,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
   public synchronized void destroy() {
     DebugMode.logV( TAG, "destroy()" );
     if( isValid() ) {
+      id3TagNotifier.removeWeakListener( this );
       setChannelName( UNKNOWN_CHANNEL_NAME );
       nielsenApp.suspend();
       nielsenApp = null;

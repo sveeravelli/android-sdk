@@ -2122,4 +2122,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logE(TAG, "analytics is null when playing");
     }
   }
+
+  public ID3TagNotifier getID3TagNotifier() {
+    return ID3TagNotifier.s_getInstance();
+  }
 }
