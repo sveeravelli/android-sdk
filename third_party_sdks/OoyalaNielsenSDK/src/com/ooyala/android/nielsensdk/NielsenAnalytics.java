@@ -42,6 +42,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
       configJson.put( "appId", appID );
       this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
       this.id3TagNotifier = id3TagNotifier;
+      this.lastPlayheadMsec = Integer.MIN_VALUE;
       id3TagNotifier.addWeakListener( this );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
