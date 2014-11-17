@@ -17,7 +17,11 @@ import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPluginInterface, IAppNotifier {
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
+
   private AppSdk nielsenApp;
+  private String clientID;
+  private String vcID;
+  private String pd;
   private ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
@@ -26,20 +30,30 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
   /**
    * Convenience wrapper around Nielsen AppSdk.
    * See the Nielsen SDK documentation around AppSdk.getInstance().
-   * @param context Android Context.
-   * @param appName per Nielsen SDK docs.
-   * @param appVersion per Nielsen SDK docs.
-   * @param sfCode per Nielsen SDK docs.
-   * @param appID per Nielsen SDK docs.
+   * @param context Android Context. Not null.
+   * @param appName per Nielsen SDK docs. Not null.
+   * @param appVersion per Nielsen SDK docs. Not null.
+   * @param sfCode per Nielsen SDK docs. Not null.
+   * @param appID per Nielsen SDK docs. Not null.
+   * @param dma per Nielsen SDK docs. Optional, can be null to omit it.
+   * @param ccode per Nielsen SDK docs. Optional, can be null to omit it.
+   * @param clientID per Nielsen SDK docs. Not null.
+   * @param vcID per Nielsen SDK docs. Not null.
+   * @param pd per Nielsen SDK docs. Not null.
    * @see AppSdk
    */
-  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, ID3TagNotifier id3TagNotifier ) {
+  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
     JSONObject configJson = new JSONObject();
     try {
       configJson.put( "appName", appName );
       configJson.put( "appVersion", appVersion );
       configJson.put( "sfcode", sfCode );
       configJson.put( "appId", appID );
+      if( dma != null ) { configJson.put( "dma", dma ); }
+      if( ccode != null ) { configJson.put( "ccode", ccode ); }
+      this.clientID = clientID;
+      this.vcID = vcID;
+      this.pd = pd;
       this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
       this.id3TagNotifier = id3TagNotifier;
       this.lastPlayheadMsec = Integer.MIN_VALUE;
@@ -109,6 +123,27 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     if( isValid() ) {
       nielsenApp.loadMetadata( json );
     }
+  }
+
+  public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
+    JSONObject json = new JSONObject();
+    try {
+      json.put( "assetid", assetID );
+      json.put( "clientid", this.clientID );
+      json.put( "vcid", this.vcID );
+      json.put( "length", String.valueOf(lengthSec) );
+      json.put( "type", type );
+      json.put( "category", category );
+      json.put( "ocrtag", ocrTag );
+      json.put( "tv", tv );
+      json.put( "prod", prod );
+      json.put( "pd", this.pd );
+      json.put( "tfid", tfID );
+      json.put( "sid", sID );
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
+    }
+    return json.toString();
   }
 
   /* (non-Javadoc)
