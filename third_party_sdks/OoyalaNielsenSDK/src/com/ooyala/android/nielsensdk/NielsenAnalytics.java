@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.nielsen.app.sdk.AppSdk;
+import com.nielsen.app.sdk.IAppNotifier;
 import com.ooyala.android.AnalyticsPluginInterface;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
@@ -13,7 +14,7 @@ import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 
 // general ugliness in here is forced upon us by the design of Nielsen's SDK.
 
-public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPluginInterface {
+public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPluginInterface, IAppNotifier {
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
   private AppSdk nielsenApp;
@@ -159,5 +160,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
         nielsenApp.setPlayheadPosition( playheadMsec/1000 );
       }
     }
+  }
+
+  @Override
+  public void onAppSdkEvent( long timestamp, int code, String description ) {
+    DebugMode.logV( TAG, "onAppSdkEvent(): timestamp=" + timestamp + ", code=" + code + ", description=" + description );
   }
 }
