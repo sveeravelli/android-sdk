@@ -163,7 +163,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
-  private AnalyticsPluginInterface _nielsenAnalytics;
+  private AnalyticsPluginInterface _analyticsPlugin;
   private String _language = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
@@ -255,7 +255,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   public void setNielsenAnalytics( AnalyticsPluginInterface nielsenAnalytics ) {
-    this._nielsenAnalytics = nielsenAnalytics;
+    this._analyticsPlugin = nielsenAnalytics;
   }
 
   public void setHook() {
@@ -372,9 +372,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     _queuedSeekTime = 0;
     cleanupPlayers();
     _adManager.resetManager();
-    if( _nielsenAnalytics != null ) {
-      _nielsenAnalytics.onStop();
-      _nielsenAnalytics.setChannelName( TextUtils.join( ";", embedCodes ) );
+    if( _analyticsPlugin != null ) {
+      _analyticsPlugin.onStop();
+      _analyticsPlugin.setChannelName( TextUtils.join( ";", embedCodes ) );
     }
 
     // request content tree
@@ -742,6 +742,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     cleanupPlayer(_player);
     _player = null;
+    if( _analyticsPlugin != null ) {
+      _analyticsPlugin.onStop();
+    }
 
     removeClosedCaptionsView();
   }
@@ -844,8 +847,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (currentPlayer() != null) {
       currentPlayer().pause();
     }
-    if( _nielsenAnalytics != null ) {
-      _nielsenAnalytics.onStop();
+    if( _analyticsPlugin != null ) {
+      _analyticsPlugin.onStop();
     }
   }
 
@@ -865,8 +868,8 @@ public class OoyalaPlayer extends Observable implements Observer,
         currentPlayer().play();
       }
 
-      if( _nielsenAnalytics != null ) {
-        _nielsenAnalytics.onPlay();
+      if( _analyticsPlugin != null ) {
+        _analyticsPlugin.onPlay();
       }
     } else {
       queuePlay();
@@ -915,8 +918,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       _authHeartbeat.stop();
     }
 
-    if( _nielsenAnalytics != null ) {
-      _nielsenAnalytics.onStop();
+    if( _analyticsPlugin != null ) {
+      _analyticsPlugin.onStop();
     }
 
     setState(State.SUSPENDED);
@@ -1274,8 +1277,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
-      if( _nielsenAnalytics != null ) {
-        _nielsenAnalytics.onPlayheadUpdate( _player.currentTime() );
+      if( _analyticsPlugin != null ) {
+        _analyticsPlugin.onPlayheadUpdate( _player.currentTime() );
       }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
@@ -1286,6 +1289,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       case COMPLETED:
         DebugMode.logE(TAG, "content finished! should check for post-roll");
         processAdModes(AdMode.ContentFinished, 0);
+        if( _analyticsPlugin != null ) {
+          _analyticsPlugin.onStop();
+        }
         break;
 
       case ERROR:
@@ -1365,8 +1371,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
-    if( state == State.ERROR && _nielsenAnalytics != null ) {
-      _nielsenAnalytics.onStop();
+    if( state == State.ERROR && _analyticsPlugin != null ) {
+      _analyticsPlugin.onStop();
     }
   }
 
