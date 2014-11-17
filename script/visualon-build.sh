@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
 VO_ZIP_BASE="OoyalaVisualOnIntegration-${PLATFORM_NAME}"
@@ -23,20 +25,24 @@ function gen_vo {
 
   mkdir ${VO_ZIP_BASE}/libs
   mkdir ${VO_ZIP_BASE}/libs/armeabi
+  mkdir ${VO_ZIP_BASE}/libs/x86
   mkdir ${VO_ZIP_BASE}/assets
 
   cp ${BASE_DIR}/vendor/VisualOn/Assets/* ${BASE_DIR}/${VO_ZIP_BASE}/assets
   cp ${BASE_DIR}/vendor/VisualOn/Jar/* ${BASE_DIR}/${VO_ZIP_BASE}/libs
   cp ${BASE_DIR}/vendor/VisualOn/Libs/* ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi
+  cp ${BASE_DIR}/vendor/VisualOn/Libs_x86/* ${BASE_DIR}/${VO_ZIP_BASE}/libs/x86
 
   mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs
   mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi
+  mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/x86
   mkdir ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
 
   #Copy libs for sample app
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
   cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/
   cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/armeabi/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/armeabi/
+  cp ${BASE_DIR}/${VO_ZIP_BASE}/libs/x86/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/libs/x86/
 
   #Copy assets for sample app
   cp ${BASE_DIR}/${VO_ZIP_BASE}/assets/* ${BASE_DIR}/third_party_sample_apps/VisualOnSampleApp/assets
