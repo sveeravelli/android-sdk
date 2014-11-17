@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
 VO_ZIP_BASE="OoyalaVisualOnIntegration-${PLATFORM_NAME}"
