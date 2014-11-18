@@ -64,6 +64,27 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     setChannelName( UNKNOWN_CHANNEL_NAME );
   }
 
+  public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
+    JSONObject json = new JSONObject();
+    try {
+      json.put( "assetid", assetID );
+      json.put( "clientid", this.clientID );
+      json.put( "vcid", this.vcID );
+      json.put( "length", String.valueOf(lengthSec) );
+      json.put( "type", type );
+      json.put( "category", category );
+      json.put( "ocrtag", ocrTag );
+      json.put( "tv", tv );
+      json.put( "prod", prod );
+      json.put( "pd", this.pd );
+      json.put( "tfid", tfID );
+      json.put( "sid", sID );
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
+    }
+    return json.toString();
+  }
+
   /**
    * Provides the AppSdk reference for use cases that aren't covered by this Class's interface.
    * @return our cached AppSdk ref, originally obtained by calling AppSdk.getInstance() in our constructor.
@@ -123,27 +144,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     if( isValid() ) {
       nielsenApp.loadMetadata( json );
     }
-  }
-
-  public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
-    JSONObject json = new JSONObject();
-    try {
-      json.put( "assetid", assetID );
-      json.put( "clientid", this.clientID );
-      json.put( "vcid", this.vcID );
-      json.put( "length", String.valueOf(lengthSec) );
-      json.put( "type", type );
-      json.put( "category", category );
-      json.put( "ocrtag", ocrTag );
-      json.put( "tv", tv );
-      json.put( "prod", prod );
-      json.put( "pd", this.pd );
-      json.put( "tfid", tfID );
-      json.put( "sid", sID );
-    } catch (JSONException e) {
-      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
-    }
-    return json.toString();
   }
 
   /* (non-Javadoc)
