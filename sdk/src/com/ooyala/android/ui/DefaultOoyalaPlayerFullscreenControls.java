@@ -301,7 +301,11 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
       _isPlayerReady = true;
-      updateButtonStates();
+      if (_player.options().getShowAdsControls() == false) {
+        hide();
+      } else {
+        updateButtonStates();
+      }
     }
 
     if(arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION ||

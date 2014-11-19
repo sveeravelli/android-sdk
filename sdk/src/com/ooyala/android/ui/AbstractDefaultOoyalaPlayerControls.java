@@ -180,7 +180,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
   @Override
   public void show() {
-    if (!_isVisible) return;
+    if (!_isVisible || _player.showingAdWithHiddenControlls()) return;
 
     if (_hideTimer != null) {
       _hideTimer.cancel();
