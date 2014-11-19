@@ -612,9 +612,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    if (!processAdModes(AdMode.ContentChanged, 0)) {
-      switchToContent(false);
-    }
+    processAdModes(AdMode.ContentChanged, 0);
     return true;
   }
 
