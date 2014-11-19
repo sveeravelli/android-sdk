@@ -204,6 +204,20 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
+   * 
+   * @param pcode
+   *          Your Provider Code
+   * @param domain
+   *          Your Embed Domain
+   * @param options
+   *          Extra settings
+   */
+  public OoyalaPlayer(String pcode, PlayerDomain domain, Options options) {
+    this(pcode, domain, null, options);
+  }
+
+  /**
+   * Initialize an OoyalaPlayer with the given parameters
    *
    * @param pcode
    *          Your Provider Code, must be non-null.
@@ -2066,14 +2080,18 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public Set<Integer> getCuePointsInMilliSeconds() {
-    return _adManager.getCuePointsInMilliSeconds();
+    if (_options.getShowCuePoints()) {
+      return _adManager.getCuePointsInMilliSeconds();
+    } else {
+      return new HashSet<Integer>();
+    }
   }
 
   public Set<Integer> getCuePointsInPercentage() {
     Set<Integer> cuePoints = new HashSet<Integer>();
     int duration = getDuration();
 
-    if (isShowingAd() || duration <= 0) {
+    if (!shouldShowCuePoints()) {
       return cuePoints;
     }
 
@@ -2085,8 +2103,19 @@ public class OoyalaPlayer extends Observable implements Observer,
       int point = (i >= duration) ? 100 : (i * 100 / duration);
       cuePoints.add(point);
     }
-
     return cuePoints;
+  }
+
+  private boolean shouldShowCuePoints() {
+    if (isShowingAd()) {
+      return false;
+    }
+
+    if (getDuration() <= 0) {
+      return false;
+    }
+
+    return _options.getShowCuePoints();
   }
 
   private void markCurrentItemAsPlayed() {
@@ -2108,5 +2137,9 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public OoyalaManagedAdsPlugin getManagedAdsPlugin() {
     return _managedAdsPlugin;
+  }
+
+  public ReadonlyOptionsInterface options() {
+    return _options;
   }
 }
