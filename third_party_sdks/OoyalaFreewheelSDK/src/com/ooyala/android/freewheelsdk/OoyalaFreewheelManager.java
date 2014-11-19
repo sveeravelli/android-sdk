@@ -243,11 +243,14 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     _fwContext.setActivity(_parent);
 
     // Set parameters to use control panels
-    _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(), "false",
+    if (_player.getOptions().getShowAdsControls()) {
+      _fwContext.setParameter(_fwConstants.PARAMETER_CLICK_DETECTION(),
+          "false",
         _fwConstants.PARAMETER_LEVEL_OVERRIDE());
-    // TODO: use USE_CONTROL_PANEL from fwConstants when it is made public
-    _fwContext.setParameter("renderer.video.useControlPanel", "true",
+      // TODO: use USE_CONTROL_PANEL from fwConstants when it is made public
+      _fwContext.setParameter("renderer.video.useControlPanel", "true",
         _fwConstants.PARAMETER_LEVEL_OVERRIDE());
+    }
 
     //parse FRMSegment to put into the context
     if (_fwFRMSegment != "" && _fwFRMSegment != null) {

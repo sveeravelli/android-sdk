@@ -30,7 +30,26 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param domain the embed domain to use
    */
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain) {
-    this(l, pcode, domain, DefaultControlStyle.AUTO);
+    this(l, new OoyalaPlayer(pcode, domain, null, null),
+        DefaultControlStyle.AUTO);
+  }
+
+  /**
+   * Instantiate an OoyalaPlayerLayoutController
+   * 
+   * @param l
+   *          the layout to use
+   * @param pcode
+   *          the provider code to use
+   * @param domain
+   *          the embed domain to use
+   * @param options
+   *          extra settings
+   */
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l,
+      String pcode, PlayerDomain domain, Options options) {
+    this(l, new OoyalaPlayer(pcode, domain, null, options),
+        DefaultControlStyle.AUTO);
   }
 
   /**
