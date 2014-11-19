@@ -843,11 +843,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void pause() {
     _playQueued = false;
-    if (currentPlayer() != null) {
+    if (currentPlayer() != null && showingAdWithHiddenControlls() == false) {
       currentPlayer().pause();
     }
   }
-
+  
+  public boolean showingAdWithHiddenControlls() {
+    return (isShowingAd() && (options().getShowAdsControls() == false));
+  }
   /**
    * Play the current video
    */
