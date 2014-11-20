@@ -373,7 +373,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
     _adManager.resetManager();
     if( _analyticsPlugin != null ) {
-      _analyticsPlugin.onStop();
+      _analyticsPlugin.stop();
       _analyticsPlugin.setChannelName( TextUtils.join( ";", embedCodes ) );
     }
 
@@ -743,7 +743,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayer(_player);
     _player = null;
     if( _analyticsPlugin != null ) {
-      _analyticsPlugin.onStop();
+      _analyticsPlugin.stop();
     }
 
     removeClosedCaptionsView();
@@ -848,7 +848,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       currentPlayer().pause();
     }
     if( _analyticsPlugin != null ) {
-      _analyticsPlugin.onStop();
+      _analyticsPlugin.stop();
     }
   }
 
@@ -869,7 +869,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       }
 
       if( _analyticsPlugin != null ) {
-        _analyticsPlugin.onPlay();
+        _analyticsPlugin.play();
       }
     } else {
       queuePlay();
@@ -919,7 +919,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     if( _analyticsPlugin != null ) {
-      _analyticsPlugin.onStop();
+      _analyticsPlugin.stop();
     }
 
     setState(State.SUSPENDED);
@@ -1278,7 +1278,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
       if( _analyticsPlugin != null ) {
-        _analyticsPlugin.onPlayheadUpdate( _player.currentTime() );
+        _analyticsPlugin.reportPlayheadUpdate( _player.currentTime() );
       }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
@@ -1290,7 +1290,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         DebugMode.logE(TAG, "content finished! should check for post-roll");
         processAdModes(AdMode.ContentFinished, 0);
         if( _analyticsPlugin != null ) {
-          _analyticsPlugin.onStop();
+          _analyticsPlugin.stop();
         }
         break;
 
@@ -1372,7 +1372,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
     if( state == State.ERROR && _analyticsPlugin != null ) {
-      _analyticsPlugin.onStop();
+      _analyticsPlugin.stop();
     }
   }
 

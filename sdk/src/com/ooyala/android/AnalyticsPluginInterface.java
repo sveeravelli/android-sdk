@@ -15,10 +15,10 @@ public interface AnalyticsPluginInterface {
 
   public abstract void onTag(byte[] tag);
 
-  public abstract void onPlay();
+  public abstract void play();
 
-  public abstract void onStop();
+  public abstract void stop();
 
-  public abstract void onPlayheadUpdate(int playheadMsec);
+  public abstract void reportPlayheadUpdate(int playheadMsec);
 
 }
