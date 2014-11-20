@@ -96,10 +96,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       case PAUSED:
       case READY:
       case COMPLETED:
-        _player.start();
-        _view.setBackgroundColor(Color.TRANSPARENT);
-        setState(State.PLAYING);
-        startPlayheadTimer();
+        DebugMode.logD(TAG, "BaseStreamPlayer.play() has been called when _playerPrepared = " + _playerPrepared);
+        if (_playerPrepared) { 
+          _player.start();
+          _view.setBackgroundColor(Color.TRANSPARENT);
+          setState(State.PLAYING);
+          startPlayheadTimer();
+        } else {
+          queuePlay();
+        }
       default:
         break;
     }
@@ -221,6 +226,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void onPrepared(MediaPlayer mp) {
+    DebugMode.logD(TAG, "MediaPlayer is prepared.");
     if (_width == 0 && _height == 0) {
       if (mp.getVideoHeight() > 0 && mp.getVideoWidth() > 0) {
         setVideoSize(mp.getVideoWidth(), mp.getVideoHeight());
