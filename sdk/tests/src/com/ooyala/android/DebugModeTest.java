@@ -2,7 +2,7 @@ package com.ooyala.android;
 
 import android.test.AndroidTestCase;
 
-public class DebugModeTests extends AndroidTestCase {
+public class DebugModeTest extends AndroidTestCase {
 
   public void test_assertEquals_true_returns() {
     DebugMode.setMode( DebugMode.Mode.LogOnly );

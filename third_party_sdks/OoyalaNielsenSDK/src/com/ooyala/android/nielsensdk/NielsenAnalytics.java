@@ -19,10 +19,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
 
   private AppSdk nielsenApp;
-  private String clientID;
-  private String vcID;
-  private String pd;
-  private ID3TagNotifier id3TagNotifier;
+  private final NielsenJSONFilter jsonFilter;
+  private final String clientID;
+  private final String vcID;
+  private final String pd;
+  private final ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
   private int lastPlayheadMsec;
@@ -37,26 +38,31 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @param appID per Nielsen SDK docs. Not null.
    * @param dma per Nielsen SDK docs. Optional, can be null to omit it.
    * @param ccode per Nielsen SDK docs. Optional, can be null to omit it.
+   * @param longitude per Nielsen SDK docs. Optional, can be null to omit it.
+   * @param latitude per Nielsen SDK docs. Optional, can be null to omit it.
    * @param clientID per Nielsen SDK docs. Not null.
    * @param vcID per Nielsen SDK docs. Not null.
    * @param pd per Nielsen SDK docs. Not null.
    * @see AppSdk
    */
-  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
+  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
+    this.clientID = clientID;
+    this.vcID = vcID;
+    this.pd = pd;
+    this.id3TagNotifier = id3TagNotifier;
+    this.lastPlayheadMsec = Integer.MIN_VALUE;
+    this.jsonFilter = new NielsenJSONFilter();
     JSONObject configJson = new JSONObject();
     try {
-      configJson.put( "appName", appName );
-      configJson.put( "appVersion", appVersion );
-      configJson.put( "sfcode", sfCode );
-      configJson.put( "appId", appID );
-      if( dma != null ) { configJson.put( "dma", dma ); }
-      if( ccode != null ) { configJson.put( "ccode", ccode ); }
-      this.clientID = clientID;
-      this.vcID = vcID;
-      this.pd = pd;
+      configJson.put( "appname", jsonFilter.filter(appName) );
+      configJson.put( "appversion", jsonFilter.filter(appVersion) );
+      configJson.put( "sfcode", jsonFilter.filter(sfCode) );
+      configJson.put( "appid", jsonFilter.filter(appID) );
+      if( dma != null ) { configJson.put( "dma", jsonFilter.filter(dma) ); }
+      if( ccode != null ) { configJson.put( "ccode", jsonFilter.filter(ccode) ); }
+      if( longitude != null ) { configJson.put( "longitude", jsonFilter.filter(longitude) ); }
+      if( latitude != null ) { configJson.put( "latitude", jsonFilter.filter(latitude) ); }
       this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
-      this.id3TagNotifier = id3TagNotifier;
-      this.lastPlayheadMsec = Integer.MIN_VALUE;
       id3TagNotifier.addWeakListener( this );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
@@ -67,18 +73,18 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
   public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
     JSONObject json = new JSONObject();
     try {
-      json.put( "assetid", assetID );
-      json.put( "clientid", this.clientID );
-      json.put( "vcid", this.vcID );
-      json.put( "length", String.valueOf(lengthSec) );
-      json.put( "type", type );
-      json.put( "category", category );
-      json.put( "ocrtag", ocrTag );
+      json.put( "assetid", jsonFilter.filter(assetID) );
+      json.put( "clientid", jsonFilter.filter(this.clientID) );
+      json.put( "vcid", jsonFilter.filter(this.vcID) );
+      json.put( "length", jsonFilter.filter(String.valueOf(lengthSec)) );
+      json.put( "type", jsonFilter.filter(type) );
+      json.put( "category", jsonFilter.filter(category) );
+      json.put( "ocrtag", jsonFilter.filter(ocrTag) );
       json.put( "tv", tv );
-      json.put( "prod", prod );
-      json.put( "pd", this.pd );
-      json.put( "tfid", tfID );
-      json.put( "sid", sID );
+      json.put( "prod", jsonFilter.filter(prod) );
+      json.put( "pd", jsonFilter.filter(this.pd) );
+      json.put( "tfid", jsonFilter.filter(tfID) );
+      json.put( "sid", jsonFilter.filter(sID) );
     } catch (JSONException e) {
       DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
     }
@@ -87,8 +93,12 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
 
   /**
    * Provides the AppSdk reference for use cases that aren't covered by this Class's interface.
+   * In particular, the 3rd party application must register themselves as a listener on the AppSdk
+   * in order to wait for the EVENT_STARTUP event, after which the opt in/out URL will be available
+   * from the AppSdk.
    * @return our cached AppSdk ref, originally obtained by calling AppSdk.getInstance() in our constructor.
    * @see AppSdk#getInstance(Context, String)
+   * @see AppSdk#EVENT_STARTUP
    */
   public AppSdk getNielsenAppSdk() {
     return this.nielsenApp;
@@ -116,7 +126,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
     JSONObject json = new JSONObject();
     try {
-      json.put( "channelName", channelName );
+      json.put( "channelName", jsonFilter.filter(channelName) );
       this.channelNameJson = json.toString();
       this.channelName = channelName;
     } catch (JSONException e) {
@@ -135,10 +145,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     return nielsenApp != null && AppSdk.isValid();
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#onMetadata(java.lang.String)
+  /**
+   * Currently only intended for use internally, immediately after play().
    */
-  @Override
   public synchronized void onMetadata( String json ) {
     DebugMode.logV( TAG, "onMetadata(): json=" + json );
     if( isValid() ) {

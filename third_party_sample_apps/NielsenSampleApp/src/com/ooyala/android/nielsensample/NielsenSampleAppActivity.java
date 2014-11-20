@@ -57,7 +57,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
-    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, "NielsenSampleApp", "0.1", "US", "appid-unknown", "dma", "ccode", "clientid-unknown", "vcid-unknown", "pd-unknown", player.getID3TagNotifier() );
+    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, "NielsenSampleApp", "0.1", "uat-cert", "appid-unknown", null, null, null, null, "clientid-unknown", "vcid-unknown", "pd-unknown", player.getID3TagNotifier() );
     player.setNielsenAnalytics( nielsenAnalytics );
 
     player.addObserver(this);

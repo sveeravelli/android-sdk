@@ -1,5 +1,8 @@
 package com.ooyala.android;
 
+/**
+ * Currently pretty hard-coded to Nielsen requirements.
+ */
 public interface AnalyticsPluginInterface {
 
   /**
@@ -9,8 +12,6 @@ public interface AnalyticsPluginInterface {
   public abstract void destroy();
 
   public abstract void setChannelName(String channelName);
-
-  public abstract void onMetadata(String json);
 
   public abstract void onTag(byte[] tag);
 
