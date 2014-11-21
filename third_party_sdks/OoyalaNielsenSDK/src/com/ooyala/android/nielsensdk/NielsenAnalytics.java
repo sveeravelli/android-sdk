@@ -174,8 +174,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @see com.ooyala.android.AnalyticsPluginInterface#onPlay()
    */
   @Override
-  public synchronized void onPlay() {
-    DebugMode.logV( TAG, "onPlay()" );
+  public synchronized void play() {
+    DebugMode.logV( TAG, "play()" );
     if( isValid() ) {
       nielsenApp.play( channelNameJson );
     }
@@ -185,8 +185,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @see com.ooyala.android.AnalyticsPluginInterface#onStop()
    */
   @Override
-  public synchronized void onStop() {
-    DebugMode.logV( TAG, "onStop()" );
+  public synchronized void stop() {
+    DebugMode.logV( TAG, "stop()" );
     if( isValid() ) {
       nielsenApp.stop();
     }
@@ -196,11 +196,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @see com.ooyala.android.AnalyticsPluginInterface#onPlayheadUpdate(int)
    */
   @Override
-  public synchronized void onPlayheadUpdate( int playheadMsec ) {
-    DebugMode.logV( TAG, "onPlayheadUpdate(): playheadMsec=" + playheadMsec );
+  public synchronized void reportPlayheadUpdate( int playheadMsec ) {
+    DebugMode.logV( TAG, "reportPlayheadUpdate(): playheadMsec=" + playheadMsec );
     if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
       lastPlayheadMsec = playheadMsec;
-      DebugMode.logV( TAG, "onPlayheadUpdate(): updating" );
+      DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       if( isValid() ) {
         nielsenApp.setPlayheadPosition( playheadMsec/1000 );
       }

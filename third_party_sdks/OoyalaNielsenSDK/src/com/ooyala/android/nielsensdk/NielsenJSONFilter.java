@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
 import android.util.Pair;
 
 public class NielsenJSONFilter {
@@ -29,7 +28,6 @@ public class NielsenJSONFilter {
     for( Pair<Pattern,String> ps : psz ) {
       final Matcher backspaceMatcher = ps.first.matcher( r );
       r = backspaceMatcher.replaceAll( ps.second );
-      Log.v( "NielsenJSONFilter", json + " -> " + ps.first.pattern() + " -> " + r );
     }
 
     return r;
