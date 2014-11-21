@@ -1,14 +1,22 @@
 #!/bin/bash
 
+set -x
+
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/../
 SP_ZIP_BASE="OoyalaSecurePlayerIntegration-${PLATFORM_NAME}"
 SP_ZIP_NAME=${SP_ZIP_BASE}.zip
+SP_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
+SP_SAMPLE_LIB_DIR=${SP_SAMPLE_DIR}/libs
+SP_SAMPLE_ASSETS_DIR=${SP_SAMPLE_DIR}/assets
 
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
 function gen_secureplayer {
   echo "Building SecurePlayer zip"
+
+  cd ${SP_SAMPLE_DIR}
+  ant clean
 
   cd ${BASE_DIR}
   mkdir ${SP_ZIP_BASE}
@@ -22,20 +30,17 @@ function gen_secureplayer {
   echo "Created On: ${DATE}" >> ${SP_ZIP_BASE}/VERSION
 
   cp -r ${BASE_DIR}/vendor/SecurePlayer/assets ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/GENERAL_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/SIGNATURES_ANDR_VOP_PROB_RC_02_00_208_1168/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${BASE_DIR}/vendor/SecurePlayer/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
 
-  mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs
-  mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi
-  mkdir ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/assets
-
-  #Copy libs for sample app
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/libs/armeabi/
-
-  #Copy assets for sample app
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/assets/* ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp/assets/
+  mkdir -p ${SP_SAMPLE_LIB_DIR}
+  mkdir -p ${SP_SAMPLE_LIB_DIR}/armeabi
+  mkdir -p ${SP_SAMPLE_LIB_DIR}/armeabi-v7a
+  mkdir -p ${SP_SAMPLE_ASSETS_DIR}
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SP_SAMPLE_LIB_DIR}
+  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/* ${SP_SAMPLE_LIB_DIR}
+  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi/* ${SP_SAMPLE_LIB_DIR}/armeabi
+  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi-v7a/* ${SP_SAMPLE_LIB_DIR}/armeabi-v7a
+  cp ${BASE_DIR}/${SP_ZIP_BASE}/assets/* ${SP_SAMPLE_ASSETS_DIR}
 
   cp -r ${BASE_DIR}/vendor/SecurePlayer/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
   cp -r ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp ${BASE_DIR}/${SP_ZIP_BASE}/
