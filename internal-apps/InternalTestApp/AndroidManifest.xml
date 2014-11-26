@@ -40,6 +40,11 @@
             android:label="@string/customItemName"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
+        <activity
+            android:name="com.ooyala.test.cases.OptionsInternalTestAppActivity"
+            android:label="@string/optionsItemName"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
         
         <activity
             android:name="com.ooyala.test.MainActivity"
