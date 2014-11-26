@@ -96,7 +96,7 @@ function cut_branch {
   target_branch="master"
   check_if_in_clean_target_branch
 
-  echo -e "${white}Publishing Android Release RC for Release-${release_date}..."
+  echo -e "${white}Publishing Android Release RC for Release- ${release_date} version ${release_version} ..."
   ~/repos/android-sdk/script/android-sdk pub -rc -v${release_version} -push
   build_script_result=$?
   check_build_result
@@ -208,6 +208,7 @@ function fetch_release_info {
 function check_if_in_clean_target_branch {
   echo -e "${white}Checking ${target_branch}..."
   if [[ "`git rev-parse --abbrev-ref HEAD`" != "${target_branch}" ]]; then
+      echo -e "${red}Error: current branch is not target branch: ${target_branch}"
       exit 1
   else
     LOCAL=$(git rev-parse ${target_branch})
@@ -215,6 +216,7 @@ function check_if_in_clean_target_branch {
     BASE=$(git merge-base ${target_branch} origin/${target_branch})
     if [ ${LOCAL} = ${REMOTE} ]; then
       if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
+          echo -e "${red}Error: diff was bad. Is your working copy dirty?"
           exit 1
       fi
     elif [ ${LOCAL} = ${BASE} ]; then
