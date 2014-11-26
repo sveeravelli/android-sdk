@@ -233,14 +233,14 @@ function check_if_in_clean_target_branch {
 function get_release_date {
   if [ "${release_date}" = "" ]; then
     echo -e "${white}Trying to get the ticket name for ${new_ticket_num}"
-    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed "s/Android SDK Release Ticket //g"`
+    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed -E "s/Android SDK [0-9]+.[0-9]+.[0-9]+ Release Ticket //g"`
     check_release_date_format
   fi
 }
 
 function check_release_date_format {
   if ! [[ $release_date =~ ^20[1-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$ ]]; then
-    1>&2 echo -e "${red}Error: Not a valid date format. Please make sure the main release ticket name is in correct format: Android SDK Release Ticket YYYY-MM-DD"
+    1>&2 echo -e "${red}Error: Not a valid date format. Please make sure the main release ticket name is in correct format: Android SDK #.#.# Release Ticket YYYY-MM-DD"
     exit 1
   fi
   echo -e "${green}Get release date = ${release_date}"
