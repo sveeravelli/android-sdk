@@ -234,8 +234,8 @@ function check_if_in_clean_target_branch {
 
 function get_release_date {
   if [ "${release_date}" = "" ]; then
-    echo -e "${white}Trying to get the ticket name for ${new_ticket_num}"
-    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed -E "s/Android SDK [0-9]+.[0-9]+.[0-9]+ Release Ticket //g"`
+    echo -e "${white}Trying to get the release date for ${new_ticket_num}"
+    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed -E "s/Android SDK [0-9]+\.[0-9]+\.[0-9]+ Release Ticket //g"`
     check_release_date_format
   fi
 }
@@ -249,9 +249,9 @@ function check_release_date_format {
 }
 
 function get_release_version {
-  if [ "${release_date}" = "" ]; then
-    echo -e "${white}Trying to get the ticket name for ${new_ticket_num}"
-    release_version=`ruby ~/repos/ios-sdk/deploy/jira_info.rb ${new_ticket_num} -n | egrep -o '[0-9].[0-9].[0-9]'`
+  if [ "${release_version}" = "" ]; then
+    echo -e "${white}Trying to get the release version for ${new_ticket_num}"
+    release_version=`ruby ~/repos/ios-sdk/deploy/jira_info.rb ${new_ticket_num} -n | egrep -o '[0-9]\.[0-9]\.[0-9]'`
     check_release_version_format
   fi
 }
