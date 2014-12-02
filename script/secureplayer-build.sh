@@ -4,19 +4,27 @@ SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR=${SCRIPT_DIR}/..
 SP_ZIP_BASE="OoyalaSecurePlayerIntegration-${PLATFORM_NAME}"
 SP_ZIP_NAME=${SP_ZIP_BASE}.zip
-VSP_DIR=${BASE_DIR}/vendor/SecurePlayer
-TPSA_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
+SP_VENDOR_DIR=${BASE_DIR}/vendor/SecurePlayer
+SP_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
 function gen_secureplayer {
-  echo "Building SecurePlayer zip"
+  # these calls should be kept in this order.
   cd ${BASE_DIR}
   mkdir ${SP_ZIP_BASE}
-  # these calls should be kept in this order.
+  echo "Building SecurePlayer zip"
+  sp_ant_sample_app
   sp_gen_version_file
   sp_copy_assets_and_libs_to_zip
   sp_copy_assets_and_libs_to_sample_app
   sp_copy_others_to_zip
+}
+
+function sp_ant_sample_app {
+  echo "(Cleaning out old '`basename ${SP_SAMPLE_DIR}`' build results)"
+  pushd ${SP_SAMPLE_DIR}
+  ant clean
+  popd
 }
 
 function sp_gen_version_file {
@@ -40,7 +48,7 @@ function cp_dir {
 
 function copy_assets_and_libs_to_dst {
   for me in assets General/SecurePlayerSDK/libs SecurePlayerSDK/libs; do
-      cp_dir ${VSP_DIR}/${me} ${1}/`basename ${me}`
+      cp_dir ${SP_VENDOR_DIR}/${me} ${1}/`basename ${me}`
   done
 }
 
@@ -49,14 +57,14 @@ function sp_copy_assets_and_libs_to_zip {
 }
 
 function sp_copy_assets_and_libs_to_sample_app {
-  copy_assets_and_libs_to_dst ${TPSA_DIR}
+  copy_assets_and_libs_to_dst ${SP_SAMPLE_DIR}
   # also add in the (presumably just-built-by-other-scripts) Ooyala SDK.
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${TPSA_DIR}/libs/
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SP_SAMPLE_DIR}/libs/
 }
 
 function sp_copy_others_to_zip {
-  cp -r ${VSP_DIR}/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${TPSA_DIR} ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${SP_VENDOR_DIR}/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${SP_SAMPLE_DIR} ${BASE_DIR}/${SP_ZIP_BASE}/
 }
 
 function zip_secureplayer {
