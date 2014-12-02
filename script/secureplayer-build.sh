@@ -1,26 +1,25 @@
 #!/bin/bash
 
-set -x
-
 SCRIPT_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BASE_DIR=${SCRIPT_DIR}/../
+BASE_DIR=${SCRIPT_DIR}/..
 SP_ZIP_BASE="OoyalaSecurePlayerIntegration-${PLATFORM_NAME}"
 SP_ZIP_NAME=${SP_ZIP_BASE}.zip
-SP_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
-SP_SAMPLE_LIB_DIR=${SP_SAMPLE_DIR}/libs
-SP_SAMPLE_ASSETS_DIR=${SP_SAMPLE_DIR}/assets
-
+VSP_DIR=${BASE_DIR}/vendor/SecurePlayer
+TPSA_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
 function gen_secureplayer {
   echo "Building SecurePlayer zip"
-
-  cd ${SP_SAMPLE_DIR}
-  ant clean
-
   cd ${BASE_DIR}
   mkdir ${SP_ZIP_BASE}
+  # these calls should be kept in this order.
+  sp_gen_version_file
+  sp_copy_assets_and_libs_to_zip
+  sp_copy_assets_and_libs_to_sample_app
+  sp_copy_others_to_zip
+}
 
+function sp_gen_version_file {
   version=$(get_version)
   saved_rc=$(get_rc)
   git_rev=`git rev-parse HEAD`
@@ -28,22 +27,36 @@ function gen_secureplayer {
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${SP_ZIP_BASE}/VERSION
   echo "Git SHA: ${git_rev}" >> ${SP_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${SP_ZIP_BASE}/VERSION
+}
 
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/assets ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/SecurePlayerSDK/libs ${BASE_DIR}/${SP_ZIP_BASE}/
+function cp_dir {
+    SRC=$1
+    DST=$2
+    if ! [  -e ${DST} ] ; then
+        mkdir -p ${DST}
+    fi
+    cp -rf ${SRC} `dirname ${DST}`
+}
 
-  mkdir -p ${SP_SAMPLE_LIB_DIR}
-  mkdir -p ${SP_SAMPLE_LIB_DIR}/armeabi
-  mkdir -p ${SP_SAMPLE_LIB_DIR}/armeabi-v7a
-  mkdir -p ${SP_SAMPLE_ASSETS_DIR}
-  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${SP_SAMPLE_LIB_DIR}
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/* ${SP_SAMPLE_LIB_DIR}
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi/* ${SP_SAMPLE_LIB_DIR}/armeabi
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/libs/armeabi-v7a/* ${SP_SAMPLE_LIB_DIR}/armeabi-v7a
-  cp ${BASE_DIR}/${SP_ZIP_BASE}/assets/* ${SP_SAMPLE_ASSETS_DIR}
+function copy_assets_and_libs_to_dst {
+  for me in assets General/SecurePlayerSDK/libs SecurePlayerSDK/libs; do
+      cp_dir ${VSP_DIR}/${me} ${1}/`basename ${me}`
+  done
+}
 
-  cp -r ${BASE_DIR}/vendor/SecurePlayer/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
-  cp -r ${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp ${BASE_DIR}/${SP_ZIP_BASE}/
+function sp_copy_assets_and_libs_to_zip {
+  copy_assets_and_libs_to_dst ${BASE_DIR}/${SP_ZIP_BASE}
+}
+
+function sp_copy_assets_and_libs_to_sample_app {
+  copy_assets_and_libs_to_dst ${TPSA_DIR}
+  # also add in the (presumably just-built-by-other-scripts) Ooyala SDK.
+  cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${TPSA_DIR}/libs/
+}
+
+function sp_copy_others_to_zip {
+  cp -r ${VSP_DIR}/HOW_TO_INTEGRATE_WITH_SECUREPLAYER.txt ${BASE_DIR}/${SP_ZIP_BASE}/
+  cp -r ${TPSA_DIR} ${BASE_DIR}/${SP_ZIP_BASE}/
 }
 
 function zip_secureplayer {
