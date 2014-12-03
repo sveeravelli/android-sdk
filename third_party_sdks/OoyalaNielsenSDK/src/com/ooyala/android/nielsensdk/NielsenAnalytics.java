@@ -30,7 +30,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private final ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
-  private int lastPlayheadMsec;
+  private long lastReportedMsec;
 
   /**
    * Convenience wrapper around Nielsen AppSdk.
@@ -56,7 +56,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.vcID = vcID;
     this.pd = pd;
     this.id3TagNotifier = id3TagNotifier;
-    this.lastPlayheadMsec = Integer.MIN_VALUE;
+    this.lastReportedMsec = Long.MIN_VALUE;
     this.jsonFilter = new NielsenJSONFilter();
     JSONObject configJson = new JSONObject();
     try {
@@ -174,15 +174,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
     DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
-    if( item.isLive() ) {
-      nielsenApp.setPlayheadPosition( System.currentTimeMillis()/1000 );
-    }
-    else if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
-      lastPlayheadMsec = playheadMsec;
+    long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
+    if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
       DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
-      if( isValid() ) {
-        nielsenApp.setPlayheadPosition( playheadMsec/1000 );
-      }
+      nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
+      lastReportedMsec = reportingMsec;
     }
   }
 
