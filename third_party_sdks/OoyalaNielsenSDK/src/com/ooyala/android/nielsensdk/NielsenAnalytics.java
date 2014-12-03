@@ -22,6 +22,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
 
+  private OoyalaPlayer player;
   private AppSdk nielsenApp;
   private final NielsenJSONFilter jsonFilter;
   private final String clientID;
@@ -51,7 +52,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @see AppSdk
    */
   public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
-    player.addObserver( this );
+    this.player = player;
     this.clientID = clientID;
     this.vcID = vcID;
     this.pd = pd;
@@ -68,12 +69,13 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       if( ccode != null ) { configJson.put( "ccode", jsonFilter.filter(ccode) ); }
       if( longitude != null ) { configJson.put( "longitude", jsonFilter.filter(longitude) ); }
       if( latitude != null ) { configJson.put( "latitude", jsonFilter.filter(latitude) ); }
-      this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
-      id3TagNotifier.addWeakListener( this );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
+    this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
+    id3TagNotifier.addWeakListener( this );
     setChannelName( UNKNOWN_CHANNEL_NAME );
+    this.player.addObserver( this );
   }
 
   public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
@@ -98,7 +100,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   /**
-   * Provides the AppSdk reference for use cases that aren't covered by this Class's interface.
+   * Provides the AppSdk reference we internally use: for use cases that aren't covered by this Class's interface.
    * In particular, the 3rd party application must register themselves as a listener on the AppSdk
    * in order to wait for the EVENT_STARTUP event, after which the opt in/out URL will be available
    * from the AppSdk.
@@ -112,9 +114,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   public void destroy() {
     DebugMode.logV( TAG, "destroy()" );
+    player.deleteObserver( this );
+    id3TagNotifier.removeWeakListener( this );
+    setChannelName( UNKNOWN_CHANNEL_NAME );
     if( isValid() ) {
-      id3TagNotifier.removeWeakListener( this );
-      setChannelName( UNKNOWN_CHANNEL_NAME );
       nielsenApp.suspend();
       nielsenApp = null;
     }
@@ -202,7 +205,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   public void update( Observable o, Object arg ) {
-    OoyalaPlayer player = (OoyalaPlayer)o;
+    DebugMode.assertEquals( o, player, TAG, "not our player?!" );
     if( arg == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION ) {
       itemChanged( player.getCurrentItem() );
     }
