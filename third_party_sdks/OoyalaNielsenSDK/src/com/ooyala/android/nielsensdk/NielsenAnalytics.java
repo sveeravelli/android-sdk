@@ -1,5 +1,8 @@
 package com.ooyala.android.nielsensdk;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -7,14 +10,15 @@ import android.content.Context;
 
 import com.nielsen.app.sdk.AppSdk;
 import com.nielsen.app.sdk.IAppNotifier;
-import com.ooyala.android.AnalyticsPluginInterface;
 import com.ooyala.android.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.item.Video;
 
 // general ugliness in here is forced upon us by the design of Nielsen's SDK.
 
-public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPluginInterface, IAppNotifier {
+public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = "NielsenAnalytics";
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
 
@@ -32,6 +36,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * Convenience wrapper around Nielsen AppSdk.
    * See the Nielsen SDK documentation around AppSdk.getInstance().
    * @param context Android Context. Not null.
+   * @param player OoyalaPlayer. Not null.
    * @param appName per Nielsen SDK docs. Not null.
    * @param appVersion per Nielsen SDK docs. Not null.
    * @param sfCode per Nielsen SDK docs. Not null.
@@ -45,7 +50,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
    * @param pd per Nielsen SDK docs. Not null.
    * @see AppSdk
    */
-  public NielsenAnalytics( Context context, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
+    player.addObserver( this );
     this.clientID = clientID;
     this.vcID = vcID;
     this.pd = pd;
@@ -104,11 +110,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     return this.nielsenApp;
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#destroy()
-   */
-  @Override
-  public synchronized void destroy() {
+  public void destroy() {
     DebugMode.logV( TAG, "destroy()" );
     if( isValid() ) {
       id3TagNotifier.removeWeakListener( this );
@@ -118,11 +120,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#setChannelName(java.lang.String)
-   */
-  @Override
-  public void setChannelName( String channelName ) {
+  private void setChannelName( String channelName ) {
     DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
     JSONObject json = new JSONObject();
     try {
@@ -134,32 +132,22 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     }
   }
 
-  public String getChannelName() {
+  private String getChannelName() {
     return channelName;
   }
 
-  /**
-   * Effectively, a wrapper around Nielsen's static AppSdk.isValid().
-   */
-  public synchronized boolean isValid() {
+  public boolean isValid() {
     return nielsenApp != null && AppSdk.isValid();
   }
 
-  /**
-   * Currently only intended for use internally, immediately after play().
-   */
-  public synchronized void onMetadata( String json ) {
+  private void onMetadata( String json ) {
     DebugMode.logV( TAG, "onMetadata(): json=" + json );
     if( isValid() ) {
       nielsenApp.loadMetadata( json );
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#onTag(byte[])
-   */
-  @Override
-  public synchronized void onTag( byte[] tag ) {
+  public void onTag( byte[] tag ) {
     if( isValid() ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
@@ -170,35 +158,26 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#onPlay()
-   */
-  @Override
-  public synchronized void play() {
+  private void play() {
     DebugMode.logV( TAG, "play()" );
     if( isValid() ) {
       nielsenApp.play( channelNameJson );
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#onStop()
-   */
-  @Override
-  public synchronized void stop() {
+  private void stop() {
     DebugMode.logV( TAG, "stop()" );
     if( isValid() ) {
       nielsenApp.stop();
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.ooyala.android.AnalyticsPluginInterface#onPlayheadUpdate(int)
-   */
-  @Override
-  public synchronized void reportPlayheadUpdate( int playheadMsec ) {
-    DebugMode.logV( TAG, "reportPlayheadUpdate(): playheadMsec=" + playheadMsec );
-    if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
+  private void reportPlayheadUpdate( Video item, int playheadMsec ) {
+    DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
+    if( item.isLive() ) {
+      nielsenApp.setPlayheadPosition( System.currentTimeMillis()/1000 );
+    }
+    else if( playheadMsec > 0 && Math.abs(playheadMsec - lastPlayheadMsec) > 2000 ) {
       lastPlayheadMsec = playheadMsec;
       DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       if( isValid() ) {
@@ -207,7 +186,38 @@ public class NielsenAnalytics implements ID3TagNotifierListener, AnalyticsPlugin
     }
   }
 
-  @Override
+  private void stateUpdate( OoyalaPlayer.State state ) {
+    switch( state ) {
+    case PLAYING:
+      play();
+      break;
+    case PAUSED:
+    case COMPLETED:
+    case ERROR:
+      stop();
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void itemChanged( Video item ) {
+    setChannelName( item.getEmbedCode() ); // todo: what's really the best channel name source?
+  }
+
+  public void update( Observable o, Object arg ) {
+    OoyalaPlayer player = (OoyalaPlayer)o;
+    if( arg == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION ) {
+      itemChanged( player.getCurrentItem() );
+    }
+    else if( arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION ) {
+      stateUpdate( player.getState() );
+    }
+    else if( arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION ) {
+      reportPlayheadUpdate( player.getCurrentItem(), player.getPlayheadTime() );
+    }
+  }
+
   public void onAppSdkEvent( long timestamp, int code, String description ) {
     DebugMode.logV( TAG, "onAppSdkEvent(): timestamp=" + timestamp + ", code=" + code + ", description=" + description );
   }

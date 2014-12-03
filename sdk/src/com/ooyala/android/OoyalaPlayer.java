@@ -16,7 +16,6 @@ import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -163,7 +162,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private ClosedCaptionsView _closedCaptionsView = null;
   private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
-  private AnalyticsPluginInterface _analyticsPlugin;
   private String _language = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
@@ -252,10 +250,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setLayoutController(LayoutController layoutController) {
     _layoutController = layoutController;
     _playerAPIClient.setContext(getLayout().getContext());
-  }
-
-  public void setNielsenAnalytics( AnalyticsPluginInterface nielsenAnalytics ) {
-    this._analyticsPlugin = nielsenAnalytics;
   }
 
   public void setHook() {
@@ -372,10 +366,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _queuedSeekTime = 0;
     cleanupPlayers();
     _adManager.resetManager();
-    if( _analyticsPlugin != null ) {
-      _analyticsPlugin.stop();
-      _analyticsPlugin.setChannelName( TextUtils.join( ";", embedCodes ) );
-    }
 
     // request content tree
     final String taskKey = "setEmbedCodes" + System.currentTimeMillis();
@@ -742,9 +732,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     cleanupPlayer(_player);
     _player = null;
-    if( _analyticsPlugin != null ) {
-      _analyticsPlugin.stop();
-    }
 
     removeClosedCaptionsView();
   }
@@ -847,9 +834,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (currentPlayer() != null) {
       currentPlayer().pause();
     }
-    if( _analyticsPlugin != null ) {
-      _analyticsPlugin.stop();
-    }
   }
 
   /**
@@ -866,10 +850,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
       if (!initialContentPlay() || !this.processAdModes(AdMode.InitialPlay, 0)) {
         currentPlayer().play();
-      }
-
-      if( _analyticsPlugin != null ) {
-        _analyticsPlugin.play();
       }
     } else {
       queuePlay();
@@ -916,10 +896,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_authHeartbeat != null) {
       _suspendTime = System.currentTimeMillis();
       _authHeartbeat.stop();
-    }
-
-    if( _analyticsPlugin != null ) {
-      _analyticsPlugin.stop();
     }
 
     setState(State.SUSPENDED);
@@ -1277,9 +1253,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
-      if( _analyticsPlugin != null ) {
-        _analyticsPlugin.reportPlayheadUpdate( _player.currentTime() );
-      }
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
@@ -1289,9 +1262,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       case COMPLETED:
         DebugMode.logE(TAG, "content finished! should check for post-roll");
         processAdModes(AdMode.ContentFinished, 0);
-        if( _analyticsPlugin != null ) {
-          _analyticsPlugin.stop();
-        }
         break;
 
       case ERROR:
@@ -1370,9 +1340,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (state != _state) {
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
-    }
-    if( state == State.ERROR && _analyticsPlugin != null ) {
-      _analyticsPlugin.stop();
     }
   }
 
