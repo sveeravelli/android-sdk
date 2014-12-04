@@ -31,6 +31,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private final ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
+  private String metadataJson;
   private long lastReportedMsec;
 
   /**
@@ -78,27 +79,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.player.addObserver( this );
   }
 
-  public String buildMetadataJson( String assetID, int lengthSec, String type, String category, String ocrTag, boolean tv, String prod, String tfID, String sID ) {
-    JSONObject json = new JSONObject();
-    try {
-      json.put( "assetid", jsonFilter.filter(assetID) );
-      json.put( "clientid", jsonFilter.filter(this.clientID) );
-      json.put( "vcid", jsonFilter.filter(this.vcID) );
-      json.put( "length", jsonFilter.filter(String.valueOf(lengthSec)) );
-      json.put( "type", jsonFilter.filter(type) );
-      json.put( "category", jsonFilter.filter(category) );
-      json.put( "ocrtag", jsonFilter.filter(ocrTag) );
-      json.put( "tv", tv );
-      json.put( "prod", jsonFilter.filter(prod) );
-      json.put( "pd", jsonFilter.filter(this.pd) );
-      json.put( "tfid", jsonFilter.filter(tfID) );
-      json.put( "sid", jsonFilter.filter(sID) );
-    } catch (JSONException e) {
-      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
-    }
-    return json.toString();
-  }
-
   /**
    * Provides the AppSdk reference we internally use: for use cases that aren't covered by this Class's interface.
    * In particular, the 3rd party application must register themselves as a listener on the AppSdk
@@ -121,22 +101,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       nielsenApp.suspend();
       nielsenApp = null;
     }
-  }
-
-  private void setChannelName( String channelName ) {
-    DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
-    JSONObject json = new JSONObject();
-    try {
-      json.put( "channelName", jsonFilter.filter(channelName) );
-      this.channelNameJson = json.toString();
-      this.channelName = channelName;
-    } catch (JSONException e) {
-      DebugMode.logE( TAG, e.toString() );
-    }
-  }
-
-  private String getChannelName() {
-    return channelName;
   }
 
   public boolean isValid() {
@@ -181,6 +145,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
       DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
+      nielsenApp.loadMetadata( this.metadataJson );
       lastReportedMsec = reportingMsec;
     }
   }
@@ -202,6 +167,36 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void itemChanged( Video item ) {
     setChannelName( item.getEmbedCode() ); // todo: what's really the best channel name source?
+    setMetadataJson( item );
+  }
+
+  private void setChannelName( String channelName ) {
+    DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
+    JSONObject json = new JSONObject();
+    try {
+      json.put( "channelName", jsonFilter.filter(channelName) );
+      this.channelNameJson = json.toString();
+      this.channelName = channelName;
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, e.toString() );
+    }
+  }
+
+  private String getChannelName() {
+    return channelName;
+  }
+
+  private void setMetadataJson( Video item ) {
+    JSONObject json = new JSONObject();
+    try {
+      json.put( "assetid", jsonFilter.filter(item.getEmbedCode()) );
+      json.put( "length", jsonFilter.filter(String.valueOf(item.getDuration())) );
+      json.put( "title", jsonFilter.filter(item.getTitle()) );
+      // todo: all the others.
+    } catch (JSONException e) {
+      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
+    }
+    metadataJson = json.toString();
   }
 
   public void update( Observable o, Object arg ) {
