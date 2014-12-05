@@ -19,19 +19,19 @@ import com.ooyala.android.item.Video;
 // general ugliness in here is forced upon us by the design of Nielsen's SDK.
 
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
-  private static final String TAG = "NielsenAnalytics";
+  private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
+  private static final String METADATA_PREFIX = "nielsen_";
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
   private final NielsenJSONFilter jsonFilter;
   private final String clientID;
   private final String vcID;
-  private final String pd;
   private final ID3TagNotifier id3TagNotifier;
   private String channelName;
   private String channelNameJson;
-  private String metadataJson;
+  private JSONObject metadataJson;
   private long lastReportedMsec;
 
   /**
@@ -49,14 +49,12 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @param latitude per Nielsen SDK docs. Optional, can be null to omit it.
    * @param clientID per Nielsen SDK docs. Not null.
    * @param vcID per Nielsen SDK docs. Not null.
-   * @param pd per Nielsen SDK docs. Not null.
    * @see AppSdk
    */
-  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, String pd, ID3TagNotifier id3TagNotifier ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier ) {
     this.player = player;
     this.clientID = clientID;
     this.vcID = vcID;
-    this.pd = pd;
     this.id3TagNotifier = id3TagNotifier;
     this.lastReportedMsec = Long.MIN_VALUE;
     this.jsonFilter = new NielsenJSONFilter();
@@ -140,14 +138,31 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
+    reportPlayhead( item, playheadMsec );
+    reportMetadata();
+  }
+
+  private void reportPlayhead( Video item, int playheadMsec ) {
     DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
     if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
       DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
-      nielsenApp.loadMetadata( this.metadataJson );
       lastReportedMsec = reportingMsec;
     }
+  }
+
+  private void reportMetadata() {
+    try {
+      // todo: we can't yet distinguish pre, mid, post-rolls
+      // so the "ad" value here is incorrect/unsupported
+      // according to the nielsen docs.
+      metadataJson.put( "type", player.isAdPlaying() ? "ad" : "content" );
+    }
+    catch( JSONException e ) {
+      DebugMode.logE( TAG, e.toString() );
+    }
+    nielsenApp.loadMetadata( metadataJson.toString() );
   }
 
   private void stateUpdate( OoyalaPlayer.State state ) {
@@ -187,16 +202,39 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void setMetadataJson( Video item ) {
-    JSONObject json = new JSONObject();
+    metadataJson = new JSONObject();
     try {
-      json.put( "assetid", jsonFilter.filter(item.getEmbedCode()) );
-      json.put( "length", jsonFilter.filter(String.valueOf(item.getDuration())) );
-      json.put( "title", jsonFilter.filter(item.getTitle()) );
+      metadataJson.put( "assetid", jsonFilter.filter(item.getEmbedCode()) );
+      metadataJson.put( "length", jsonFilter.filter(String.valueOf(item.getDuration())) );
+      metadataJson.put( "title", jsonFilter.filter(item.getTitle()) );
+      // todo: type? has to dynamically change as we're in-and-out of advertisements.
       // todo: all the others.
+      if( clientID != null ) { metadataJson.put( "clientid", jsonFilter.filter(clientID) ); }
+      if( vcID != null ) { metadataJson.put( "vcid", jsonFilter.filter(vcID) ); }
+      setMetadataHelper( metadataJson, item, "category" );
+      setMetadataHelper( metadataJson, item, "censuscategory" );
+      setMetadataHelper( metadataJson, item, "tv" );
+      setMetadataHelper( metadataJson, item, "prod" );
+      setMetadataHelper( metadataJson, item, "pd" );
+      setMetadataHelper( metadataJson, item, "tfid" );
+      setMetadataHelper( metadataJson, item, "sid" );
+      // explicitly leaving out 'ocrtag' at the moment as unimplemented.
     } catch (JSONException e) {
-      DebugMode.logE( TAG, "buildMetadataJson(): " + e.toString() );
+      DebugMode.logE( TAG, e.toString() );
     }
-    metadataJson = json.toString();
+  }
+
+  private void setMetadataHelper( JSONObject json, Video item, String key ) {
+    final String metadataKey = METADATA_PREFIX + key;
+    if( item.getMetadata().containsKey( metadataKey ) ) {
+      final String value = item.getMetadata().get( metadataKey );
+      try {
+        json.put( key, jsonFilter.filter(value) );
+      }
+      catch (JSONException e) {
+        DebugMode.logE( TAG, "setMetadataHelper(): " + e.toString() );
+      }
+    }
   }
 
   public void update( Observable o, Object arg ) {
