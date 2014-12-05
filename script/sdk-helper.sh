@@ -135,12 +135,12 @@ function tests {
 function verify {
   verify_currdir=`pwd`
   cd ${BASE_DIR}
-  if [[ ! ( -d "${ZIP_BASE}/Documentation" ) ]]; then
+  if [[ ! ( -d "${ZIP_BASE}/APIDocs" ) ]]; then
     echo "ERROR: docs not included"
     exit 1
   fi
 
-  if [[ ! ( -f "${ZIP_BASE}/Documentation/index.html" ) ]]; then 
+  if [[ ! ( -f "${ZIP_BASE}/APIDocs/index.html" ) ]]; then 
       echo "ERROR: docs are empty"
       exit 1
   fi
@@ -281,9 +281,9 @@ function gen {
 
   #docs
   doc
-  cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
-  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
-  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/Documentation
+  cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/APIDocs
+  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/APIDocs
+  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/APIDocs
 
   #zip Base SDK
   cd ${BASE_DIR}
