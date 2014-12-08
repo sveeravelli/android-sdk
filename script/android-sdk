@@ -128,6 +128,8 @@ function custom_gen {
 
   #create IMA jar
   cd ${IMA_SDK_DIR}
+  echo "Copying IMA libraries into IMA SDK"
+  cp ${BASE_DIR}/vendor/GoogleIMA/*.jar ${IMA_SDK_DIR}/libs/
   ant clean
   if [ $? != 0 ] ; then
     echo "Error: ant failed with error code $?"
@@ -143,6 +145,7 @@ function custom_gen {
   #update IMA Sample App
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  cp "${BASE_DIR}/vendor/Google IMA/*.jar" ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
 

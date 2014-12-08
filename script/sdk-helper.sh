@@ -270,6 +270,8 @@ function gen {
 
   #IMA version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  ima_filename=`find ./vendor/GoogleIMA -name "*.jar" -type f -exec basename {} \;`
+  echo "Tested with Google IMA SDK Library ${ima_filename}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Git SHA: ${git_rev}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
 
