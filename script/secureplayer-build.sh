@@ -56,7 +56,7 @@ function cp_dir {
 }
 
 function copy_assets_and_libs_to_dst {
-  for me in assets General/SecurePlayerSDK/libs SecurePlayerSDK/libs; do
+  for me in assets SecurePlayerSDK/libs SecurePlayerSDK/libs; do
       cp_dir ${SP_VENDOR_DIR}/${me} ${1}/`basename ${me}`
   done
 }
