@@ -760,6 +760,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _videoWidth = param1;
       _videoHeight = param2;
       DebugMode.logV(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+      _view.requestLayout();
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
