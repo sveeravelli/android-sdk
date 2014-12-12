@@ -7,12 +7,16 @@ public class Options implements ReadonlyOptionsInterface {
     private VisualOnConfiguration visualOnConfiguration;
     private boolean showCuePoints;
     private boolean showAdsControls;
+    private boolean preloadContent;
+    private boolean showPromoImage;
 
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
       this.visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
       this.showCuePoints = true;
       this.showAdsControls = true;
+      this.preloadContent = true;
+      this.showPromoImage = true;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -35,9 +39,19 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    public Builder setPreloadContent(boolean preloadContent) {
+      this.preloadContent = preloadContent;
+      return this;
+    }
+
+    public Builder setShowPromoImage(boolean showPromoImage) {
+      this.showPromoImage = showPromoImage;
+      return this;
+    }
+
     public Options build() {
       return new Options(tvRatingConfiguration, visualOnConfiguration,
-          showCuePoints, showAdsControls);
+          showCuePoints, showAdsControls, preloadContent, showPromoImage);
     }
   }
 
@@ -45,12 +59,18 @@ public class Options implements ReadonlyOptionsInterface {
   private final VisualOnConfiguration visualOnConfiguration;
   private final boolean showCuePoints;
   private final boolean showAdsControls;
+  private final boolean preloadContent;
+  private final boolean showPromoImage;
 
-  private Options(FCCTVRatingConfiguration tvRatingConfiguration, VisualOnConfiguration visualOnConfiguration, boolean showCuePoints, boolean showAdsControls) {
+  private Options(FCCTVRatingConfiguration tvRatingConfiguration,
+      VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
+      boolean showAdsControls, boolean preloadContent, boolean showPromoImage) {
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
     this.showCuePoints = showCuePoints;
     this.showAdsControls = showAdsControls;
+    this.preloadContent = preloadContent;
+    this.showPromoImage = showPromoImage;
   }
 
   @Override
@@ -71,5 +91,15 @@ public class Options implements ReadonlyOptionsInterface {
   @Override
   public boolean getShowCuePoints() {
     return showCuePoints;
+  }
+
+  @Override
+  public boolean getPreloadContent() {
+    return preloadContent;
+  }
+
+  @Override
+  public boolean getShowPromoImage() {
+    return showPromoImage;
   }
 }
