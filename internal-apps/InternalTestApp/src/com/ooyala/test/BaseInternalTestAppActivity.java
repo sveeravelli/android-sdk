@@ -55,7 +55,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     PlayerDomain domain = new PlayerDomain(DOMAIN);
     Options options = new Options.Builder().setShowAdsControls(false)
-        .setShowCuePoints(false).build();
+        .setShowCuePoints(false).setShowPromoImage(true)
+        .setPreloadContent(false).build();
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain, options);
     player = playerLayoutController.getPlayer();
     player.addObserver(this);
