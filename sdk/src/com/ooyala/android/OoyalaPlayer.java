@@ -2186,6 +2186,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (_promoImageView != null) {
         _promoImageView.setImageBitmap(result);
       }
+      if (_state == State.LOADING) {
+        setState(State.READY);
+      }
     }
   }
 
