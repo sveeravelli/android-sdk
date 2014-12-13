@@ -744,6 +744,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_SEEK_COMPLETE:
       // If first param is 0, seek is actaully complete
       if (param1 <= 0) {
+        setChanged();
+        notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION);
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
