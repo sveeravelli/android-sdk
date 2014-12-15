@@ -145,7 +145,7 @@ function custom_gen {
   #update IMA Sample App
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
-  cp "${BASE_DIR}/vendor/Google IMA/*.jar" ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  cp ${BASE_DIR}/vendor/GoogleIMA/*.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
 
