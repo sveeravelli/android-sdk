@@ -12,7 +12,7 @@ test_results.txt
 */tests/bin
 */gen
 */tests/gen
-*/local.properties
+**/local.properties
 **/lint.xml
 sample-apps/*/local.properties
 sample-apps/keys
