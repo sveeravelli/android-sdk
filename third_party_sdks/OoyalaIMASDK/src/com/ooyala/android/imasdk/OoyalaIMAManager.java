@@ -201,6 +201,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
     DebugMode.logD(TAG, "IMA Managaer: Requesting ads: " + url);
     AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
+    request.setContentProgressProvider(_ooyalaPlayerWrapper);
 
     if (_companionAdSlots != null) {
       _container.setCompanionSlots(_companionAdSlots);
