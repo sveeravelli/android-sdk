@@ -43,7 +43,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Initializing");
     _player = player;
     _imaManager = imaManager;
-    _videoProgressCalculator = new VideoProgressCalculator( _player );
+    _videoProgressCalculator = new VideoProgressCalculator( _player, false, 0, 0 );
   }
 
   private VideoProgressCalculatorRunningState getVideoProgressState() {

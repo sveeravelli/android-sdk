@@ -10,12 +10,16 @@ import com.ooyala.android.OoyalaPlayer.State;
 public class VideoProgressCalculator {
 
   private final static String TAG = VideoProgressCalculator.class.getSimpleName();
+
+  private static boolean s_debug = false; // set this to true e.g. in the debugger to generate logs.
+  private static void logV( String message ) { if(s_debug) { DebugMode.logV( TAG, message ); } }
+
   private OoyalaPlayer _player;
   private VideoProgressCalculatorRunningState _runningState;
 
-  public VideoProgressCalculator( OoyalaPlayer _player ) {
-    this._player = _player;
-    this._runningState = new VideoProgressCalculatorRunningState( false, 0, 0 );
+  public VideoProgressCalculator( OoyalaPlayer player, boolean isPlayingIMAAd, int lastPausedMs, int liveContentTimePlayed ) {
+    this._player = player;
+    this._runningState = new VideoProgressCalculatorRunningState( isPlayingIMAAd, lastPausedMs, liveContentTimePlayed );
   }
 
   public VideoProgressCalculatorRunningState getRunningState() {
@@ -24,9 +28,9 @@ public class VideoProgressCalculator {
 
   public VideoProgressUpdate getContentProgress() {
     final boolean isContent = ! _player.isAdPlaying();
-    DebugMode.logV( TAG, "getContentProgress(): isContent=" + isContent );
+    logV( "getContentProgress(): isContent=" + isContent );
     final VideoProgressUpdate vpu = isContent ? calculateContentProgress() : VideoProgressUpdate.VIDEO_TIME_NOT_READY;
-    DebugMode.logV( TAG, "getContentProgress(): " + vpu );
+    logV( "getContentProgress(): " + vpu );
     return vpu;
   }
 
@@ -34,7 +38,7 @@ public class VideoProgressCalculator {
     Pair<Integer, Integer> playheadAndDuration = calculateBasicPlayheadAndDuration();
     final int playheadMs = playheadAndDuration.first;
     final int durationMs = playheadAndDuration.second;
-    DebugMode.logV( TAG, "calculateContentProgress(): playheadAndDuration=" + playheadAndDuration );
+    logV( "calculateContentProgress(): playheadAndDuration=" + playheadAndDuration );
     if( durationMs == 0 ) {
       return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
     }
@@ -45,9 +49,9 @@ public class VideoProgressCalculator {
 
   private VideoProgressUpdate calculateReadyContentProgress( int playheadMs, int durationMs ) {
     final boolean isPaused = _player.getState() == State.PAUSED;
-    DebugMode.logV( TAG, "calculateReadyContentProgress(): isPaused=" + isPaused );
+    logV( "calculateReadyContentProgress(): isPaused=" + isPaused );
     playheadMs = _runningState.getLiveContentTimePlayed() + (isPaused ? _runningState.getLastPausedMs() : playheadMs);
-    DebugMode.logV( TAG, "calculateReadyContentProgress(): playheadMs=" + playheadMs );
+    logV( "calculateReadyContentProgress(): playheadMs=" + playheadMs );
     _runningState.setLastPausedMs( playheadMs );
     return new VideoProgressUpdate( playheadMs, durationMs );
   }
@@ -55,7 +59,7 @@ public class VideoProgressCalculator {
   public VideoProgressUpdate getAdProgress() {
     final boolean isIMAad = _player.isAdPlaying() && _runningState.isPlayingIMAAd();
     final VideoProgressUpdate vpu = isIMAad ? calculateAdProgress() : VideoProgressUpdate.VIDEO_TIME_NOT_READY;
-    DebugMode.logV( TAG, "getAdProgress(): " + vpu );
+    logV( "getAdProgress(): " + vpu );
     return vpu;
   }
 
