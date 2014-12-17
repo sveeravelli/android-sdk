@@ -98,6 +98,13 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
 
+  public enum ContentOrAdType {
+    MainContent,
+    PreRollAd,
+    MidRollAd,
+    PostRollAd,
+  }
+
   static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
 
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
@@ -1558,6 +1565,32 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (isShowingAd()) {
       sendNotification(AD_SKIPPED_NOTIFICATION);
       _adManager.skipAd();
+    }
+  }
+
+  /**
+   * @return the kind of content that is on the video display right now.
+   */
+  public ContentOrAdType getPlayingContentOrAdType() {
+    ContentOrAdType t = _getPlayingContentOrAdType();
+    //DebugMode.logV( TAG, "getContentOrAdType(): " + t );
+    return t;
+  }
+  private ContentOrAdType _getPlayingContentOrAdType() {
+    if( isShowingAd() ) {
+      // fyi: don't use getPlayer() here since we want to only check the 'content' player, never the 'ad' one.
+      if( _player == null || _player.currentTime() <= 0 ) {
+        return ContentOrAdType.PreRollAd;
+      }
+      else if( _player.getState() == State.COMPLETED ) {
+        return ContentOrAdType.PostRollAd;
+      }
+      else {
+        return ContentOrAdType.MidRollAd;
+      }
+    }
+    else {
+      return ContentOrAdType.MainContent;
     }
   }
 

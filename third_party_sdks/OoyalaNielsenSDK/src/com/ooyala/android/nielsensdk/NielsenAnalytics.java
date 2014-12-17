@@ -95,21 +95,16 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     player.deleteObserver( this );
     id3TagNotifier.removeWeakListener( this );
     setChannelName( UNKNOWN_CHANNEL_NAME );
-    if( isValid() ) {
+    if( nielsenApp != null ) {
       nielsenApp.suspend();
       nielsenApp = null;
     }
   }
 
   public boolean isValid() {
-    return nielsenApp != null && AppSdk.isValid();
-  }
-
-  private void onMetadata( String json ) {
-    DebugMode.logV( TAG, "onMetadata(): json=" + json );
-    if( isValid() ) {
-      nielsenApp.loadMetadata( json );
-    }
+    final boolean isValid = nielsenApp != null && AppSdk.isValid();
+    DebugMode.logV( TAG, "isValid(): " + isValid );
+    return isValid;
   }
 
   public void onTag( byte[] tag ) {
@@ -127,6 +122,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     DebugMode.logV( TAG, "play()" );
     if( isValid() ) {
       nielsenApp.play( channelNameJson );
+      reportMetadata();
     }
   }
 
@@ -143,26 +139,37 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void reportPlayhead( Video item, int playheadMsec ) {
-    DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
+    DebugMode.logV( TAG, "reportPlayhead(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
     if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
-      DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
+      DebugMode.logV( TAG, "reportPlayhead(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
       lastReportedMsec = reportingMsec;
     }
   }
 
   private void reportMetadata() {
+    updateContentTypeMetadata();
+    DebugMode.logV( TAG, "reportMetadata(): " + metadataJson );
+    nielsenApp.loadMetadata( metadataJson.toString() );
+  }
+
+  private void updateContentTypeMetadata() {
+    OoyalaPlayer.ContentOrAdType type = player.getPlayingContentOrAdType();
+    String typeMetadata;
+    switch( type ) {
+    case MainContent: typeMetadata = "content"; break;
+    case PreRollAd: typeMetadata = "preroll"; break;
+    case MidRollAd: typeMetadata = "midroll"; break;
+    case PostRollAd: typeMetadata = "postroll"; break;
+    default: typeMetadata = "content"; break;
+    }
     try {
-      // todo: we can't yet distinguish pre, mid, post-rolls
-      // so the "ad" value here is incorrect/unsupported
-      // according to the nielsen docs.
-      metadataJson.put( "type", player.isAdPlaying() ? "ad" : "content" );
+      metadataJson.put( "type", typeMetadata );
     }
     catch( JSONException e ) {
       DebugMode.logE( TAG, e.toString() );
     }
-    nielsenApp.loadMetadata( metadataJson.toString() );
   }
 
   private void stateUpdate( OoyalaPlayer.State state ) {
