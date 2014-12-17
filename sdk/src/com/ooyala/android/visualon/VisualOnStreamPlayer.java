@@ -55,7 +55,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
   private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
-  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.11.0-B65078";
+  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.13.10-B72949";
   private VisualOnConfiguration _visualOnConfiguration = null;
 
   protected VOCommonPlayer _player = null;
@@ -744,6 +744,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_SEEK_COMPLETE:
       // If first param is 0, seek is actaully complete
       if (param1 <= 0) {
+        setChanged();
+        notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION);
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
@@ -760,6 +762,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _videoWidth = param1;
       _videoHeight = param2;
       DebugMode.logV(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+      _view.requestLayout();
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
@@ -884,7 +887,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       setState(State.ERROR);
     }
     else if (returnedException != null) {
-      DebugMode.logE(TAG, "Personalization resulted in an exception!" + returnedException);
+      DebugMode.logE(TAG, "Personalization resulted in an exception! " + returnedException);
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
       setState(State.ERROR);
     }

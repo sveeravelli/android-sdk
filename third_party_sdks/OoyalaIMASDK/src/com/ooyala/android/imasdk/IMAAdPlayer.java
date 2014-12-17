@@ -18,14 +18,14 @@ import com.ooyala.android.player.AdMoviePlayer;
  *
  */
 public class IMAAdPlayer extends AdMoviePlayer {
-  private static String TAG = "IMAAdPlayer";
+  private static String TAG = IMAAdPlayer.class.getSimpleName();
   private AdSpot _ad;
   private OoyalaIMAManager _imaManager;
 
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
     super.init(parent, ad, notifier);
-    DebugMode.logD(TAG, "IMA Ad Player: Initializing");
+    DebugMode.logD(TAG, "init()");
     if ( ! (ad instanceof IMAAdSpot) ) {
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Ad");
       setState(State.ERROR);
@@ -40,10 +40,15 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void play() {
+    DebugMode.logD(TAG, "play(): Playing indirectly through AdsManager");
+    _imaManager._adsManager.resume();
+  }
+
+  public void playIMA() {
     if (_ad != null) {
       // We do not update the State to PLAYING until we hear the callback from IMA SDK
       // since there could be a while between message sent and callback received
-      DebugMode.logD(TAG, "IMA Ad Player: Playing");
+      DebugMode.logD(TAG, "playIMA(): Playing");
       super.play();
       _imaManager._ooyalaPlayerWrapper.fireVideoStartCallback();
     }
@@ -51,14 +56,19 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void pause() {
-    DebugMode.logD(TAG, "IMA Ad Player: Pausing");
+    DebugMode.logD(TAG, "pause(): Pausing indirectly through AdsManager");
+    _imaManager._adsManager.pause();
+  }
+
+  public void pauseIMA() {
+    DebugMode.logD(TAG, "pauseIMA(): Pausing");
     super.pause();
     _imaManager._ooyalaPlayerWrapper.fireVideoPauseCallback();
   }
 
   @Override
   public void destroy() {
-    DebugMode.logD(TAG, "IMA Ad Player: Destroy");
+    DebugMode.logD(TAG, "destroy()");
     super.destroy();
   }
 
@@ -73,7 +83,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
     // and start playing back content.  Ooyala Player expects the ad manager to resume content.
     if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && getState() == State.COMPLETED) {
       arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
-      DebugMode.logD(TAG, "Ad complete!");
+      DebugMode.logD(TAG, "update(): Ad complete!");
       _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();
     }
 

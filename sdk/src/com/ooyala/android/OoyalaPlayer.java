@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,12 +14,16 @@ import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -55,7 +60,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "3.1.0_RC7";
+  static final String SDK_VERSION = "3.2.1_RC2";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -179,6 +184,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
+  private ImageView _promoImageView = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -204,7 +210,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -626,9 +632,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    if (!processAdModes(AdMode.ContentChanged, 0)) {
-      switchToContent(false);
-    }
+    processAdModes(AdMode.ContentChanged, 0);
     return true;
   }
 
@@ -748,6 +752,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _player = null;
 
     removeClosedCaptionsView();
+    hidePromoImage();
   }
 
   private void cleanupPlayer(Player p) {
@@ -849,7 +854,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       currentPlayer().pause();
     }
   }
-  
+
   public boolean showingAdWithHiddenControlls() {
     return (isShowingAd() && (options().getShowAdsControls() == false));
   }
@@ -860,16 +865,19 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_analytics != null) {
       _analytics.reportPlayRequested();
     }
-    if (currentPlayer() != null && isPlayable(currentPlayer().getState())) {
-      if (isAdPlaying()) {
-        sendNotification(AD_STARTED_NOTIFICATION);
-      }
 
-      if (!initialContentPlay() || !this.processAdModes(AdMode.InitialPlay, 0)) {
-        currentPlayer().play();
-      }
+    if (needPlayAdsOnInitialContentPlay()) {
+      return;
+    }
+
+    if (currentPlayer() != null && isPlayable(currentPlayer().getState())) {
+      _playQueued = false;
+      currentPlayer().play();
     } else {
       queuePlay();
+      if (_player == null) {
+        this.prepareContent(false);
+      }
     }
   }
 
@@ -883,13 +891,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *
    * @return true if it is initial play
    */
-  private boolean initialContentPlay() {
-    if (_player.getState() == State.READY) {
-      return true;
+  private boolean needPlayAdsOnInitialContentPlay() {
+    if (_currentItemPlayed || this.isShowingAd()) {
+      return false;
     }
 
-    return false;
+    return this.processAdModes(AdMode.InitialPlay, 0);
   }
+
 
   /**
    * Play the current video with an initialTime
@@ -1298,6 +1307,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         break;
       case PLAYING:
         markCurrentItemAsPlayed();
+        hidePromoImage();
         setState(State.PLAYING);
         break;
       case READY:
@@ -1818,7 +1828,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       //TODO: the PlayerInterface may need getSeekStyle();
       return SeekStyle.BASIC;
     } else {
-      Log.w(this.getClass().toString(), "We are seeking without a MoviePlayer!");
+      DebugMode.logW(this.getClass().toString(), "We are seeking without a MoviePlayer!");
       return SeekStyle.NONE;
     }
   }
@@ -1990,7 +2000,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     switch (mode) {
     case ContentChanged:
-      switchToContent(false);
+      if (_options.getPreloadContent()) {
+        switchToContent(false);
+      }
+      if (_options.getShowPromoImage()) {
+        showPromoImage();
+      }
       break;
     case InitialPlay:
     case Playhead:
@@ -2073,6 +2088,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION;
       sendNotification(_tvRatingAdNotification);
     } else if (newState == State.PLAYING) {
+      hidePromoImage();
       if (oldState != State.PAUSED) {
         sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION);
       }
@@ -2146,5 +2162,49 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public ReadonlyOptionsInterface options() {
     return _options;
+  }
+
+  private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    public DownloadImageTask() {
+    }
+
+    @Override
+    protected Bitmap doInBackground(String... args) {
+      String url = args[0];
+      Bitmap bitmap = null;
+      try {
+        InputStream in = new java.net.URL(url).openStream();
+        bitmap = BitmapFactory.decodeStream(in);
+      } catch (Exception e) {
+        DebugMode.logE("Error", e.getMessage());
+        e.printStackTrace();
+      }
+      return bitmap;
+    }
+
+    protected void onPostExecute(Bitmap result) {
+      if (_promoImageView != null) {
+        _promoImageView.setImageBitmap(result);
+      }
+      if (_state == State.LOADING) {
+        setState(State.READY);
+      }
+    }
+  }
+
+  private void showPromoImage() {
+    if (_currentItem != null && _currentItem.getPromoImageURL(0, 0) != null) {
+      hidePromoImage();
+      _promoImageView = new ImageView(getLayout().getContext());
+      getLayout().addView(_promoImageView);
+      new DownloadImageTask().execute(_currentItem.getPromoImageURL(0, 0));
+    }
+  }
+
+  private void hidePromoImage() {
+    if (_promoImageView != null) {
+      getLayout().removeView(_promoImageView);
+      _promoImageView = null;
+    }
   }
 }

@@ -135,12 +135,12 @@ function tests {
 function verify {
   verify_currdir=`pwd`
   cd ${BASE_DIR}
-  if [[ ! ( -d "${ZIP_BASE}/Documentation" ) ]]; then
+  if [[ ! ( -d "${ZIP_BASE}/APIDocs" ) ]]; then
     echo "ERROR: docs not included"
     exit 1
   fi
 
-  if [[ ! ( -f "${ZIP_BASE}/Documentation/index.html" ) ]]; then 
+  if [[ ! ( -f "${ZIP_BASE}/APIDocs/index.html" ) ]]; then 
       echo "ERROR: docs are empty"
       exit 1
   fi
@@ -153,12 +153,8 @@ function verify {
     echo "ERROR: VERSION file not included"
     exit 1
   fi
-  if [[ ! ( -f "${ZIP_BASE}/ReleaseNotes.txt" ) ]]; then
-    echo "ERROR: ReleaseNotes.txt file not included"
-    exit 1
-  fi
-  if [[ ! ( -f "${ZIP_BASE}/getting_started.pdf" ) ]]; then
-    echo "ERROR: getting started guide not included"
+  if [[ ! ( -f "${ZIP_BASE}/README.txt" ) ]]; then
+    echo "ERROR: README.txt file not included"
     exit 1
   fi
   custom_verify
@@ -258,9 +254,8 @@ function gen {
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp ${IMA_ZIP_BASE}/IMASampleApp
   cp -R ${THIRD_PARTY_SAMPLE_DIR}/FreewheelSampleApp ${FW_ZIP_BASE}/FreewheelSampleApp
 
-  #getting started guide and release notes
-  cp getting_started.pdf ${ZIP_BASE}/
-  cp ReleaseNotes.txt ${ZIP_BASE}/
+  #release notes
+  cp README.txt ${ZIP_BASE}/
   if [[ -f "WhyYourCodeDoesntCompile.txt" ]]; then
     cp WhyYourCodeDoesntCompile.txt ${ZIP_BASE}/
   fi
@@ -275,6 +270,8 @@ function gen {
 
   #IMA version file
   echo "This was built with OoyalaSDK v${version}_RC${saved_rc}" >> ${IMA_ZIP_BASE}/VERSION
+  ima_filename=`find ./vendor/GoogleIMA -name "*.jar" -type f -exec basename {} \;`
+  echo "Tested with Google IMA SDK Library ${ima_filename}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Git SHA: ${git_rev}" >> ${IMA_ZIP_BASE}/VERSION
   echo "Created On: ${DATE}" >> ${IMA_ZIP_BASE}/VERSION
 
@@ -286,9 +283,9 @@ function gen {
 
   #docs
   doc
-  cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/Documentation
-  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/Documentation
-  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/Documentation
+  cp -R ${SDK_DIR}/Documentation/public ${ZIP_BASE}/APIDocs
+  cp -R ${IMA_SDK_DIR}/Documentation/public ${IMA_ZIP_BASE}/APIDocs
+  cp -R ${FW_SDK_DIR}/Documentation/public ${FW_ZIP_BASE}/APIDocs
 
   #zip Base SDK
   cd ${BASE_DIR}
@@ -363,8 +360,8 @@ function pub {
     version=$(get_version)
   fi
 
-  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 ReleaseNotes.txt`" =~ ${version} ) ]]; then
-    echo "ERROR: Please update ReleaseNotes.txt before pushing a version"
+  if [[ ! ( "${version}" = "" ) && ! ( "`head -1 README.txt`" =~ ${version} ) ]]; then
+    echo "ERROR: Please update README.txt before pushing a version"
     cd "${pub_currdir}"
     usage
   fi

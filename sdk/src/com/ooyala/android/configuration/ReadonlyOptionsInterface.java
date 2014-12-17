@@ -9,4 +9,8 @@ public interface ReadonlyOptionsInterface {
   boolean getShowAdsControls();
 
   boolean getShowCuePoints();
+
+  boolean getPreloadContent();
+
+  boolean getShowPromoImage();
 }

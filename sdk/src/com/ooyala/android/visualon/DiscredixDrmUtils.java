@@ -27,7 +27,7 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
  */
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
-  private static final String DISCREDIX_VERSION = "Drm Core Version : GENERAL_ANDR_VOP_PROB_RC_02_00_208_1168;Dlc Adaptation Version : MAIN_DLC_ANDR_VOP_PROB_RC_02_00_208_1168";
+  private static final String SECURE_PLAYER_VERSION = "03_00_05_0962";
   /**
    * Checks if the device has been personalized
    * @return true if personalized, false if not
@@ -82,8 +82,10 @@ class DiscredixDrmUtils {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
       DebugMode.logD(TAG, "isDiscredixVersionCorrect. Discredix Version: " + dlc.getDrmVersion());
 
-      if (DISCREDIX_VERSION.compareTo(dlc.getDrmVersion()) != 0) {
-        DebugMode.logE(TAG, "Discredix Version was not expected! Expected: " + DISCREDIX_VERSION + ", Actual: " + dlc.getDrmVersion());
+      final String runningVersion = dlc.getDrmVersion();
+      final boolean foundExpectedVersion = runningVersion.contains( SECURE_PLAYER_VERSION );
+      if (!foundExpectedVersion) {
+        DebugMode.logE(TAG, "Discredix Version was not expected! Looking for: " + SECURE_PLAYER_VERSION + ", Actual: " + dlc.getDrmVersion());
         DebugMode.logE(TAG, "Please ask your CSM for updated versions of the Discredix/SecurePlayer Libraries");
           return false;
       }

@@ -22,6 +22,7 @@ import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.configuration.Options;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener, Observer {
@@ -53,8 +54,10 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     //Initialize the player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
     PlayerDomain domain = new PlayerDomain(DOMAIN);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(
-        playerLayout, PCODE, domain);
+    Options options = new Options.Builder().setShowAdsControls(false)
+        .setShowCuePoints(false).setShowPromoImage(true)
+        .setPreloadContent(false).build();
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain, options);
     player = playerLayoutController.getPlayer();
     player.addObserver(this);
 

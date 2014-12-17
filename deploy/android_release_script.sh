@@ -46,9 +46,13 @@ function clone_ticket {
 
   read -p "Enter release date in YYYY-MM-DD format: " release_date
   check_release_date_format
+
+  read -p "Enter release version: " release_version
+  check_release_version_format
+
   echo -e "${white}Cloning stub ticket PBA-664..."
 
-  new_ticket_num=`ruby ~/repos/android-sdk/deploy/jira_clone.rb PBA-664 "Android SDK Release Ticket ${release_date}" true`
+  new_ticket_num=`ruby ~/repos/android-sdk/deploy/jira_clone.rb PBA-664 "Android SDK ${release_version} Release Ticket ${release_date}" true`
   check_ticket_number_format
   receiver="playback-app-oncall@ooyala.com"
   body="New Release Ticket for ${new_ticket_num} has been generated"
@@ -92,11 +96,7 @@ function cut_branch {
   target_branch="master"
   check_if_in_clean_target_branch
 
-  echo -e "${white}"
-  read -p "Enter release version: " release_version
-  check_release_version_format ${release_version}
-
-  echo -e "${white}Publishing Android Release RC for Release-${release_date}..."
+  echo -e "${white}Publishing Android Release RC for Release- ${release_date} version ${release_version} ..."
   ~/repos/android-sdk/script/android-sdk pub -rc -v${release_version} -push
   build_script_result=$?
   check_build_result
@@ -202,11 +202,13 @@ function fetch_release_info {
   check_ticket_number_format
   can_move_on
   get_release_date
+  get_release_version
 }
 
 function check_if_in_clean_target_branch {
   echo -e "${white}Checking ${target_branch}..."
   if [[ "`git rev-parse --abbrev-ref HEAD`" != "${target_branch}" ]]; then
+      echo -e "${red}Error: current branch is not target branch: ${target_branch}"
       exit 1
   else
     LOCAL=$(git rev-parse ${target_branch})
@@ -214,6 +216,7 @@ function check_if_in_clean_target_branch {
     BASE=$(git merge-base ${target_branch} origin/${target_branch})
     if [ ${LOCAL} = ${REMOTE} ]; then
       if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
+          echo -e "${red}Error: diff was bad. Is your working copy dirty?"
           exit 1
       fi
     elif [ ${LOCAL} = ${BASE} ]; then
@@ -231,26 +234,35 @@ function check_if_in_clean_target_branch {
 
 function get_release_date {
   if [ "${release_date}" = "" ]; then
-    echo -e "${white}Trying to get the ticket name for ${new_ticket_num}"
-    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed "s/Android SDK Release Ticket //g"`
+    echo -e "${white}Trying to get the release date for ${new_ticket_num}"
+    release_date=`ruby ~/repos/android-sdk/deploy/jira_info.rb ${new_ticket_num} -n | sed -E "s/Android SDK [0-9]+\.[0-9]+\.[0-9]+ Release Ticket //g"`
     check_release_date_format
   fi
 }
 
-function check_release_version_format () {
-    if ! [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    1>&2 echo -e "${red}Error: Not a valid release version (expected xx.xx.xx)."
-    exit 1
-  fi
-  echo -e "${green}Get release version = $1"
-}
-
 function check_release_date_format {
   if ! [[ $release_date =~ ^20[1-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$ ]]; then
-    1>&2 echo -e "${red}Error: Not a valid date format. Please make sure the main release ticket name is in correct format: Android SDK Release Ticket YYYY-MM-DD"
+    1>&2 echo -e "${red}Error: Not a valid date format. Please make sure the main release ticket name is in correct format: Android SDK #.#.# Release Ticket YYYY-MM-DD"
     exit 1
   fi
   echo -e "${green}Get release date = ${release_date}"
+}
+
+function get_release_version {
+  if [ "${release_version}" = "" ]; then
+    echo -e "${white}Trying to get the release version for ${new_ticket_num}"
+    release_version=`ruby ~/repos/ios-sdk/deploy/jira_info.rb ${new_ticket_num} -n | egrep -o '[0-9]\.[0-9]\.[0-9]'`
+    check_release_version_format
+  fi
+}
+
+
+function check_release_version_format () {
+    if ! [[ ${release_version} =~ ^[3-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    1>&2 echo -e "${red}Error: Not a valid release version (expected xx.xx.xx)."
+    exit 1
+  fi
+  echo -e "${green}Get release version = ${release_version}"
 }
 
 function can_move_on {

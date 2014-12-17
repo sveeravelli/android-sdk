@@ -111,22 +111,22 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      // Listen to state changed notification to set correct video states
+    DebugMode.logD(TAG, "update: ad ?= " + _player.isShowingAd() + ", null context ?= " + (_fwContext==null) );
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && !_player.isShowingAd() && _fwContext != null) {
       State state = _player.getState();
-      boolean isShowingAd = _player.isShowingAd();
-      DebugMode.logD(TAG, "State changed to: " + state.toString());
+      DebugMode.logD(TAG, "update: State changed to: " + state.toString());
       switch (state) {
       case PLAYING:
-        if (_fwContext != null && isShowingAd) {
-          _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
-        }
+        DebugMode.logD(TAG, "update: PLAYING");
+        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PLAYING());
         break;
       case PAUSED:
+        DebugMode.logD(TAG, "update: PAUSED");
+        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
+        break;
       case SUSPENDED:
-        if (_fwContext != null && isShowingAd) {
-          _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED());
-        }
+        DebugMode.logD(TAG, "update: SUSPENDED");
+        _fwContext.setVideoState(_fwConstants.VIDEO_STATE_STOPPED());
         break;
       default:
         break;
@@ -232,7 +232,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     fwAdManager.setNetwork(_fwNetworkId);
     _fwContext = fwAdManager.newContext();
     _fwConstants = _fwContext.getConstants();
-    
+
     //Set up profile, site section, and video asset info
     _fwContext.setProfile(_fwProfile, null, null, null);
     _fwContext.setSiteSection(_fwSiteSectionId, random(), 0, _fwConstants.ID_TYPE_CUSTOM(), 0);
