@@ -1571,12 +1571,12 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * @return the kind of content that is on the video display right now.
    */
-  public ContentOrAdType getPlayingContentOrAdType() {
-    ContentOrAdType t = _getPlayingContentOrAdType();
+  public ContentOrAdType getPlayingType() {
+    ContentOrAdType t = _getPlayingType();
     //DebugMode.logV( TAG, "getContentOrAdType(): " + t );
     return t;
   }
-  private ContentOrAdType _getPlayingContentOrAdType() {
+  private ContentOrAdType _getPlayingType() {
     if( isShowingAd() ) {
       // fyi: don't use getPlayer() here since we want to only check the 'content' player, never the 'ad' one.
       if( _player == null || _player.currentTime() <= 0 ) {

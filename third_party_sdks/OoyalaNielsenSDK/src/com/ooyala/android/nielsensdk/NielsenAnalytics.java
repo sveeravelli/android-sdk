@@ -155,7 +155,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void updateContentTypeMetadata() {
-    OoyalaPlayer.ContentOrAdType type = player.getPlayingContentOrAdType();
+    OoyalaPlayer.ContentOrAdType type = player.getPlayingType();
     String typeMetadata;
     switch( type ) {
     case MainContent: typeMetadata = "content"; break;
