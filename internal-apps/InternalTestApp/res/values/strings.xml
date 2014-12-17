@@ -8,6 +8,7 @@
     <string name="ooyalaItemName">Ooyala Managed Ad Testing</string>
     <string name="freewheelItemName">Freewheel Testing</string>
     <string name="customItemName">Custom Embed Testing</string>
+    <string name="optionsItemName">Options Testing</string>
     <string name="btn_load_case">Load</string>
     <string name="btn_set_case">Set Embed and Pcode</string>
     <string name="text_embed_code">Embed</string>

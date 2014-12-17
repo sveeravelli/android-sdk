@@ -11,6 +11,7 @@ import com.ooyala.test.cases.CustomEmbedInternalTestAppActivity;
 import com.ooyala.test.cases.FreewheelInternalTestAppActivity;
 import com.ooyala.test.cases.IMAInternalTestAppActivity;
 import com.ooyala.test.cases.OoyalaAdsInternalTestAppActivity;
+import com.ooyala.test.cases.OptionsInternalTestAppActivity;
 import com.ooyala.test.cases.PlaybackInternalTestAppActivity;
 
 /**
@@ -54,6 +55,12 @@ public class InternalTestApplication extends Application {
 
     activityMap.put(getString(R.string.customItemName), CustomEmbedInternalTestAppActivity.class);
     condensedActivityNameMap.put(getString(R.string.customItemName), "Custom Embed");
+
+    activityMap.put(getString(R.string.optionsItemName),
+        OptionsInternalTestAppActivity.class);
+    condensedActivityNameMap
+        .put(getString(R.string.optionsItemName), "Options");
+
   }
 
   public static Map<String, Class<? extends Activity>> getActivityMap() {
