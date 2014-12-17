@@ -1085,7 +1085,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void seek(int timeInMillis) {
     DebugMode.logV(TAG, "seek()...: msec=" + timeInMillis);
-    if (seekable()) {
+    if (seekable() && currentPlayer() != null) {
       currentPlayer().seekToTime(timeInMillis);
       _queuedSeekTime = 0;
     } else {
@@ -1634,7 +1634,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void dequeuePlay() {
-    if (_playQueued && currentPlayer() != null) {
+    if (_playQueued) {
       _playQueued = false;
       play();
     }
