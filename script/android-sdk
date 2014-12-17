@@ -115,25 +115,52 @@ function custom_gen {
   #create jar
   cd ${SDK_DIR}
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   ant release
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   cp bin/classes.jar ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME}
 
   #create IMA jar
   cd ${IMA_SDK_DIR}
+  echo "Copying IMA libraries into IMA SDK"
+  cp ${BASE_DIR}/vendor/GoogleIMA/*.jar ${IMA_SDK_DIR}/libs/
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   ant release
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   cp bin/classes.jar OoyalaIMASDK.jar
   cp OoyalaIMASDK.jar ${BASE_DIR}/${IMA_ZIP_BASE}/
   #update IMA Sample App
   mkdir ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp OoyalaIMASDK.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
+  cp ${BASE_DIR}/vendor/GoogleIMA/*.jar ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   cp ${BASE_DIR}/${ZIP_BASE}/${JAR_NAME} ${THIRD_PARTY_SAMPLE_DIR}/IMASampleApp/libs/
   rm OoyalaIMASDK.jar
 
   #create Freewheel jar
   cd ${FW_SDK_DIR}
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   ant release
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   cp bin/classes.jar OoyalaFreewheelSDK.jar
   cp OoyalaFreewheelSDK.jar ${BASE_DIR}/${FW_ZIP_BASE}/
   #update Freewheel Sample App
@@ -205,12 +232,28 @@ function custom_tests {
   currdir=`pwd`
   cd ${SDK_DIR}
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   cd test-app
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   cd ..
   cd tests
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   ant debug
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   if [[ `${ADB} devices |grep -v "devices" |grep -v "daemon" |grep -v -e "^$" |wc |awk '{print $1}'` < 1 ]]; then
     # We have to do this because sometimes ADB is stupid.
     echo "Restarting ADB..."
@@ -264,6 +307,8 @@ function setup {
   cp ${BASE_DIR}/sdk/local.properties ${IMA_SDK_DIR}/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${FW_SDK_DIR}/local.properties
   cp ${BASE_DIR}/sdk/local.properties ${BASE_DIR}/vendor/google_play_services/libproject/google-play-services_lib/local.properties
+
+  sp_setup
 
   if [[ ${noavd} = true ]]; then
     echo "Not creating a new AVD..."

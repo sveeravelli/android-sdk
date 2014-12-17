@@ -8,6 +8,11 @@ SP_VENDOR_DIR=${BASE_DIR}/vendor/SecurePlayer
 SP_SAMPLE_DIR=${BASE_DIR}/third_party_sample_apps/SecurePlayerSampleApp
 LICENSE_MD5="1a04be214fa2ffcb4c562a225cf57534"
 
+function sp_setup {
+  echo "Adding local.properties to Sample app"
+  cp ${BASE_DIR}/sdk/local.properties ${SP_SAMPLE_DIR}/local.properties
+}
+
 function gen_secureplayer {
   # these calls should be kept in this order.
   cd ${BASE_DIR}
@@ -24,6 +29,10 @@ function sp_ant_sample_app {
   echo "(Cleaning out old '`basename ${SP_SAMPLE_DIR}`' build results)"
   pushd ${SP_SAMPLE_DIR}
   ant clean
+  if [ $? != 0 ] ; then
+    echo "Error: ant failed with error code $?"
+    exit 1
+  fi
   popd
 }
 
@@ -47,7 +56,7 @@ function cp_dir {
 }
 
 function copy_assets_and_libs_to_dst {
-  for me in assets General/SecurePlayerSDK/libs SecurePlayerSDK/libs; do
+  for me in assets SecurePlayerSDK/libs SecurePlayerSDK/libs; do
       cp_dir ${SP_VENDOR_DIR}/${me} ${1}/`basename ${me}`
   done
 }

@@ -67,6 +67,24 @@ public final class DebugMode {
   }
 
   /**
+   * a DebugMode wrapper to Log.w
+   * @param tag a Log tag
+   * @param message the Log message
+   */
+  public static void logW( String tag, String message ) {
+    if( DebugMode.mode != Mode.None ) { Log.w( tag, message ); }
+  }
+  /**
+   * a DebugMode wrapper to Log.w
+   * @param tag a Log tag
+   * @param message the Log message
+   * @param throwable a throwable to connect with the message
+   */
+  public static void logW( String tag, String message, Throwable throwable ) {
+    if( DebugMode.mode != Mode.None ) { Log.w( tag, message, throwable ); }
+  }
+
+  /**
    * a DebugMode wrapper to Log.d
    * @param tag a Log tag
    * @param message the Log message
@@ -123,7 +141,7 @@ public final class DebugMode {
       DebugMode.assertCondition( left.equals(right), tag, preMessage+message );
     }
   }
-  
+
   /**
    * Assert that the condition returns true.  If not, perform an action based on the DebugMode.Mode
    * @param condition The boolean condition to assert on

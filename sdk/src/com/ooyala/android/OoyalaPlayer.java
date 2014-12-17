@@ -60,7 +60,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "3.2.1_RC1";
+  static final String SDK_VERSION = "3.2.1_RC2";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -213,7 +213,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
-   * 
+   *
    * @param pcode
    *          Your Provider Code
    * @param domain
@@ -860,7 +860,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       currentPlayer().pause();
     }
   }
-  
+
   public boolean showingAdWithHiddenControlls() {
     return (isShowingAd() && (options().getShowAdsControls() == false));
   }
@@ -1842,7 +1842,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       //TODO: the PlayerInterface may need getSeekStyle();
       return SeekStyle.BASIC;
     } else {
-      Log.w(this.getClass().toString(), "We are seeking without a MoviePlayer!");
+      DebugMode.logW(this.getClass().toString(), "We are seeking without a MoviePlayer!");
       return SeekStyle.NONE;
     }
   }
@@ -2190,7 +2190,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         InputStream in = new java.net.URL(url).openStream();
         bitmap = BitmapFactory.decodeStream(in);
       } catch (Exception e) {
-        Log.e("Error", e.getMessage());
+        DebugMode.logE("Error", e.getMessage());
         e.printStackTrace();
       }
       return bitmap;
