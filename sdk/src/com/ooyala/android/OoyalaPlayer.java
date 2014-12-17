@@ -76,6 +76,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     NONE, BASIC, ENHANCED
   };
 
+  static enum InitPlayState {
+    NONE, PluginQueried, ContentPlayed
+  };
   /**
    * Used by previousVideo and nextVideo. When passed to them, it will cause the
    * video to be played after it is set.
@@ -155,7 +158,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private final Handler _handler = new Handler();
   private Video _currentItem = null;
-  private boolean _currentItemPlayed = false;
+  private InitPlayState _currentItemInitPlayState = InitPlayState.NONE;
   private ContentItem _rootItem = null;
   private final JSONObject _metadata = null;
   private OoyalaException _error = null;
@@ -497,7 +500,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
 
     _currentItem = video;
-    _currentItemPlayed = false;
+    _currentItemInitPlayState = InitPlayState.NONE;
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
@@ -644,7 +647,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     _rootItem = tree;
     _currentItem = tree.firstVideo();
-    _currentItemPlayed = false;
+    _currentItemInitPlayState = InitPlayState.NONE;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -842,7 +845,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public State getState() {
     PlayerInterface p = currentPlayer();
-    return p == null ? _state : p.getState();
+    if (p == null || _state == State.READY) {
+      return _state;
+    }
+    return p.getState();
   }
 
   /**
@@ -866,17 +872,23 @@ public class OoyalaPlayer extends Observable implements Observer,
       _analytics.reportPlayRequested();
     }
 
-    if (needPlayAdsOnInitialContentPlay()) {
-      return;
-    }
-
     if (currentPlayer() != null && isPlayable(currentPlayer().getState())) {
       _playQueued = false;
+      if (!isShowingAd() && _queuedSeekTime > 0) {
+        seek(_queuedSeekTime);
+        _queuedSeekTime = 0;
+      }
+
+      if (!needPlayAdsOnInitialContentPlay()) {
+        currentPlayer().play();
+      }
       currentPlayer().play();
     } else {
       queuePlay();
-      if (_player == null) {
-        this.prepareContent(false);
+      if (_player == null && _state == State.READY) {
+        if (!needPlayAdsOnInitialContentPlay()) {
+          prepareContent(false);
+        }
       }
     }
   }
@@ -892,10 +904,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if it is initial play
    */
   private boolean needPlayAdsOnInitialContentPlay() {
-    if (_currentItemPlayed || this.isShowingAd()) {
+    if ((_currentItemInitPlayState != InitPlayState.NONE) || this.isShowingAd()) {
       return false;
     }
-
+    _currentItemInitPlayState = InitPlayState.PluginQueried;
     return this.processAdModes(AdMode.InitialPlay, 0);
   }
 
@@ -1040,7 +1052,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public int getPlayheadTime() {
     if (currentPlayer() == null) {
-      return -1;
+      return _queuedSeekTime > 0 ? _queuedSeekTime : -1;
     }
     return currentPlayer().currentTime();
   }
@@ -1062,7 +1074,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public boolean seekable() {
     DebugMode.logV(TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable="
         + (currentPlayer() == null ? "false" : currentPlayer().seekable()));
-    return currentPlayer() != null && currentPlayer().seekable();
+    return currentPlayer() != null ? currentPlayer().seekable() : _seekable;
   }
 
   /**
@@ -1073,7 +1085,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void seek(int timeInMillis) {
     DebugMode.logV(TAG, "seek()...: msec=" + timeInMillis);
-    if (seekable()) {
+    if (seekable() && currentPlayer() != null) {
       currentPlayer().seekToTime(timeInMillis);
       _queuedSeekTime = 0;
     } else {
@@ -1292,6 +1304,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
+      DebugMode.logD(TAG, "content player state change to " + state);
       switch (state) {
       case COMPLETED:
         DebugMode.logE(TAG, "content finished! should check for post-roll");
@@ -1306,7 +1319,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        markCurrentItemAsPlayed();
+        _currentItemInitPlayState = InitPlayState.ContentPlayed;
         hidePromoImage();
         setState(State.PLAYING);
         break;
@@ -1373,6 +1386,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void setState(State state) {
     if (state != _state) {
+      DebugMode.logD(TAG, "player set state, new state is " + _state);
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
@@ -1620,7 +1634,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void dequeuePlay() {
-    if (_playQueued && currentPlayer() != null) {
+    if (_playQueued) {
       _playQueued = false;
       play();
     }
@@ -2000,12 +2014,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     switch (mode) {
     case ContentChanged:
-      if (_options.getPreloadContent()) {
-        switchToContent(false);
-      }
-      if (_options.getShowPromoImage()) {
-        showPromoImage();
-      }
+      postContentChanged();
       break;
     case InitialPlay:
     case Playhead:
@@ -2032,6 +2041,24 @@ public class OoyalaPlayer extends Observable implements Observer,
  + "adsDidPlay "
               + String.valueOf(adsDidPlay));
       break;
+    }
+  }
+
+  private void postContentChanged() {
+    DebugMode.logD(TAG, "post content changed");
+    cleanupPlayers();
+    if (_options.getPreloadContent()) {
+      prepareContent(false);
+    }
+
+    if (_options.getShowPromoImage()) {
+      showPromoImage();
+    } else if (!_options.getPreloadContent()) {
+      // state will be set to ready by either prepare content or load promo
+      // image
+      // if both of them are disabled, directly set state to ready
+      setState(State.READY);
+      dequeuePlay();
     }
   }
 
@@ -2139,19 +2166,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     return _options.getShowCuePoints();
   }
 
-  private void markCurrentItemAsPlayed() {
-    if (_currentItemPlayed) {
-      return;
-    }
-    _currentItemPlayed = true;
-    sendNotification(PLAY_STARTED_NOTIFICATION);
-    if (_analytics != null) {
-      _analytics.reportPlayStarted();
-    } else {
-      DebugMode.logE(TAG, "analytics is null when playing");
-    }
-  }
-
   /**
    * Get the Ooyala Managed Ads Plugin, which maintains VAST and Ooyala Advertisements
    * @return the ManagedAdsPlugin
@@ -2185,15 +2199,20 @@ public class OoyalaPlayer extends Observable implements Observer,
     protected void onPostExecute(Bitmap result) {
       if (_promoImageView != null) {
         _promoImageView.setImageBitmap(result);
+        _promoImageView.setAdjustViewBounds(true);
       }
+      DebugMode.logD(TAG, "promoimage loaded, state is" + _state);
       if (_state == State.LOADING) {
         setState(State.READY);
+        dequeuePlay();
       }
     }
   }
 
   private void showPromoImage() {
     if (_currentItem != null && _currentItem.getPromoImageURL(0, 0) != null) {
+      DebugMode.logD(TAG,
+          "loading promoimage , url is " + _currentItem.getPromoImageURL(0, 0));
       hidePromoImage();
       _promoImageView = new ImageView(getLayout().getContext());
       getLayout().addView(_promoImageView);
