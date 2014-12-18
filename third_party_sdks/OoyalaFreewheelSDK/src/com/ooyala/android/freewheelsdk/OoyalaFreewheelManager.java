@@ -111,7 +111,6 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    DebugMode.logD(TAG, "update: ad ?= " + _player.isShowingAd() + ", null context ?= " + (_fwContext==null) );
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && !_player.isShowingAd() && _fwContext != null) {
       State state = _player.getState();
       DebugMode.logD(TAG, "update: State changed to: " + state.toString());

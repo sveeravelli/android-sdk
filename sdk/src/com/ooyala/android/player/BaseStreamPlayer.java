@@ -114,8 +114,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void stop() {
     stopPlayheadTimer();
     _playQueued = false;
-    _player.stop();
+    if (_playerPrepared) {
+      _player.stop();
+    }
     _player.release();
+    _player = null;
+    _playerPrepared = false;
   }
 
   @Override
@@ -182,13 +186,12 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   protected void createMediaPlayer() {
     try {
-      if (_player == null) {
-        _player = new MediaPlayer();
-      } else {
-        stopPlayheadTimer();
-        _player.stop();
-        _player.reset();
+      if (_player != null) {
+        DebugMode
+            .logD(TAG, "createMediaPlayer: reset the existing mediaplayer");
+        stop();
       }
+      _player = new MediaPlayer();
       // Set cookies if they exist for 4.0+ Secure HLS Support
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
         _player.setDataSource(_parent.getLayout().getContext(), Uri.parse(_streamUrl));
@@ -217,7 +220,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       DebugMode.logE(TAG, "Unsupported video type given to base media player");
     }
     if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-      this.stop();
+      stop();
     }
 
     setState(State.ERROR);
@@ -374,10 +377,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       _timeBeforeSuspend = millisToResume;
       _stateBeforeSuspend = stateToResume;
 
-      _player.stop();
-      _player.release();
-      _player = null;
-      _playerPrepared = false;
+      stop();
     }
     removeView();
     _width = 0;
@@ -405,8 +405,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void destroy() {
     if (_player != null) {
       stop();
-      _player = null;
-      _playerPrepared = false;
     }
     removeView();
     _parent = null;
