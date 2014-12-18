@@ -20,7 +20,6 @@ import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -1319,7 +1318,10 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        _currentItemInitPlayState = InitPlayState.ContentPlayed;
+        if (_currentItemInitPlayState != InitPlayState.ContentPlayed) {
+          _currentItemInitPlayState = InitPlayState.ContentPlayed;
+          sendNotification(PLAY_STARTED_NOTIFICATION);
+        }
         hidePromoImage();
         setState(State.PLAYING);
         break;
