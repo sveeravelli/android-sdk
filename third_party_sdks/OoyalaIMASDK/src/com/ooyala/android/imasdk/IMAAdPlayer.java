@@ -41,7 +41,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
   @Override
   public void play() {
     DebugMode.logD(TAG, "play(): Playing indirectly through AdsManager");
-    _imaManager._adsManager.resume();
+    if (_imaManager != null && _imaManager._adsManager != null) {
+      _imaManager._adsManager.resume();
+    } else {
+      DebugMode.logD(TAG, "play() ignored due to null adsManager");
+    }
   }
 
   public void playIMA() {
@@ -57,7 +61,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
   @Override
   public void pause() {
     DebugMode.logD(TAG, "pause(): Pausing indirectly through AdsManager");
-    _imaManager._adsManager.pause();
+    if (_imaManager != null && _imaManager._adsManager != null) {
+      _imaManager._adsManager.pause();
+    } else {
+      DebugMode.logD(TAG, "pause() ignored due to null adsManager");
+    }
   }
 
   public void pauseIMA() {
