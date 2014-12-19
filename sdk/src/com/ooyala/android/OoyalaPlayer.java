@@ -1930,6 +1930,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         _player.suspend();
     }
     removeClosedCaptionsView();
+    hidePromoImage();
     _adManager.onAdModeEntered();
   }
 
@@ -2117,7 +2118,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION;
       sendNotification(_tvRatingAdNotification);
     } else if (newState == State.PLAYING) {
-      hidePromoImage();
       if (oldState != State.PAUSED) {
         sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION);
       }
