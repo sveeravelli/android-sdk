@@ -54,7 +54,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
       // since there could be a while between message sent and callback received
       DebugMode.logD(TAG, "playIMA(): Playing");
       super.play();
-      _imaManager._ooyalaPlayerWrapper.fireVideoStartCallback();
+      if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
+        _imaManager._ooyalaPlayerWrapper.fireVideoStartCallback();
+      } else {
+        DebugMode.logD(TAG, "playIMA() ignored due to null adsManager");
+      }
     }
   }
 
@@ -71,7 +75,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
   public void pauseIMA() {
     DebugMode.logD(TAG, "pauseIMA(): Pausing");
     super.pause();
-    _imaManager._ooyalaPlayerWrapper.fireVideoPauseCallback();
+    if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
+      _imaManager._ooyalaPlayerWrapper.fireVideoPauseCallback();
+    } else {
+      DebugMode.logD(TAG, "pauseIMA() ignored due to null adsManager");
+    }
   }
 
   @Override
@@ -92,7 +100,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
     if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && getState() == State.COMPLETED) {
       arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
       DebugMode.logD(TAG, "update(): Ad complete!");
-      _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();
+      if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
+        _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();
+      } else {
+        DebugMode.logD(TAG, "AD_COMPLETED ignored due to null adsManager");
+      }
     }
 
     super.update(arg0, arg);
