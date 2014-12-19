@@ -16,7 +16,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showCuePoints = true;
       this.showAdsControls = true;
       this.preloadContent = true;
-      this.showPromoImage = true;
+      this.showPromoImage = false;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
