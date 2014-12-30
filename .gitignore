@@ -51,3 +51,5 @@ vendor/google_play_services/libproject/google-play-services_lib/local.properties
 **/Documentation
 **/OoyalaFreewheelSDK.jar
 **/OoyalaIMASDK.jar
+script/android_*
+deploy/android_deploy
