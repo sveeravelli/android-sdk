@@ -28,6 +28,7 @@ import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
+import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
@@ -75,6 +76,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private int _lastPlayhead = -1;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
+  private boolean _isVisualOnOpenFinished = false;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 1000;
@@ -124,6 +126,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     setState(State.LOADING);
+    _isVisualOnOpenFinished = false;
     _streamUrl = _stream.decodedURL().toString();
     setParent(parent);
 
@@ -728,13 +731,40 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     return strTextAll;
   }
 
+  private void handleSubtitles() {
+    if (_player == null) {
+      DebugMode.logE(TAG, "handleSubtitles: player is null");
+      return;
+    }
+
+    VOCommonPlayerAssetSelection asset = _player;
+    int subtitleCount = asset.getSubtitleCount();
+    DebugMode.logD(TAG, "handleSubtitles: subtitle count " + subtitleCount);
+    if (subtitleCount <= 0) {
+      return;
+    }
+
+    int selectedSubtitleIndex = asset.getPlayingAsset().getSubtitleIndex();
+    DebugMode.logD(TAG, "handleSubtitles: selected subtitle "
+        + selectedSubtitleIndex);
+    if (_isLiveClosedCaptionsEnabled) {
+      VO_OSMP_RETURN_CODE returnValue = asset.selectSubtitle(0);
+      if (returnValue != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+        DebugMode.logD(TAG, "handleSubtitles: select subtitle failed: "
+            + returnValue.toString());
+      }
+    }
+  }
+
   @Override
   public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj) {
 
     switch (id) {
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
+      _isVisualOnOpenFinished = true;
       setState(State.READY);
+      handleSubtitles();
       break;
 
     case VO_OSMP_CB_PLAY_COMPLETE:
@@ -793,21 +823,23 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       onError(_player, null, id.getValue());
       break;
 
-    case VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE:
-      // Remember if we have received live closed captions at some point during playback
-      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
-      voSubtitleInfo info = (voSubtitleInfo)obj;
-      String cc = GetCCString(info);
-      if (!cc.equals("")) {
-        _isLiveClosedCaptionsAvailable = true;
-      }
-
-      // Show closed captions if someone enabled them
-      if (_isLiveClosedCaptionsEnabled) {
-        _parent.displayClosedCaptionText(cc);
-      }
-
-      break;
+    // case VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE:
+    // // Remember if we have received live closed captions at some point during
+    // playback
+    // // NOTE: Some reason we might receive false alarm for Closed Captions
+    // check if it's empty here
+    // voSubtitleInfo info = (voSubtitleInfo)obj;
+    // String cc = GetCCString(info);
+    // if (!cc.equals("")) {
+    // _isLiveClosedCaptionsAvailable = true;
+    // }
+    //
+    // // Show closed captions if someone enabled them
+    // if (_isLiveClosedCaptionsEnabled) {
+    // _parent.displayClosedCaptionText(cc);
+    // }
+    //
+    // break;
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
@@ -836,7 +868,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
-
+    case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
+      if (_isVisualOnOpenFinished) {
+        handleSubtitles();
+      }
+      break;
     default:
       break;
     }
