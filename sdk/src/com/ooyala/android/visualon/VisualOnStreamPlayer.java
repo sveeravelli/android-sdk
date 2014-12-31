@@ -768,9 +768,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       _subtitleDescriptions.add(description);
     }
-    
-    DebugMode.logV(TAG, "handleSubtitles: subtitle descriptions"
-        + _subtitleDescriptions.toString());
+
     int selectedSubtitleIndex = asset.getPlayingAsset().getSubtitleIndex();
     DebugMode.logD(TAG, "handleSubtitles: selected subtitle "
         + selectedSubtitleIndex);
