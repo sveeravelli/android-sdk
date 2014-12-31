@@ -732,6 +732,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   private void handleSubtitles() {
+    DebugMode.logD(TAG, "handleSubtitles");
     if (_player == null) {
       DebugMode.logE(TAG, "handleSubtitles: player is null");
       return;
@@ -762,6 +763,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     switch (id) {
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_OPEN_FINISHED");
       _isVisualOnOpenFinished = true;
       setState(State.READY);
       handleSubtitles();
@@ -869,6 +871,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
     case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
+      DebugMode.logV(TAG,
+          "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED, isVisualOnOpenFinished: "
+              + String.valueOf(_isVisualOnOpenFinished));
       if (_isVisualOnOpenFinished) {
         handleSubtitles();
       }
