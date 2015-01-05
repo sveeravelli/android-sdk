@@ -79,7 +79,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private int _lastPlayhead = -1;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
-  private boolean _isVisualOnOpenFinished = false;
   private int _selectedSubtitleIndex = 0;
   private List<String> _subtitleDescriptions = null;
 
@@ -131,7 +130,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     setState(State.LOADING);
-    _isVisualOnOpenFinished = false;
     _streamUrl = _stream.decodedURL().toString();
     _subtitleDescriptions = new ArrayList<String>();
     setParent(parent);
@@ -808,7 +806,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
       DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_OPEN_FINISHED");
-      _isVisualOnOpenFinished = true;
       setState(State.READY);
       handleSubtitles();
       break;
@@ -872,38 +869,50 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
-        break;
-      }
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is "
+                    + param2);
+          break;
+        }
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
-
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is"
+                    + param2);
         switch (param2) {
         case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
           break;
         }
         }
-        break;
-      }
+          break;
+        }
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
     case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
-      DebugMode.logV(TAG,
-          "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED, isVisualOnOpenFinished: "
-              + String.valueOf(_isVisualOnOpenFinished));
-      if (_isVisualOnOpenFinished) {
-        handleSubtitles();
-      }
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED");
+      handleSubtitles();
       break;
     default:
       break;
