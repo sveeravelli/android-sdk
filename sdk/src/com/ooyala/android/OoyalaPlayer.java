@@ -1419,12 +1419,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       mp.setLiveClosedCaptionsEnabled(true);
       return;
     }
-    if (_language == null
-        || _language.equals(LocalizationSupport.localizedStringFor("None"))) {
-      mp.setLiveClosedCaptionsEnabled(false);
-    }
-    if (_closedCaptionsView != null)
+
+    mp.setLiveClosedCaptionsEnabled(false);
+    if (_closedCaptionsView != null) {
       _closedCaptionsView.setCaption(null);
+    }
     displayCurrentClosedCaption();
   }
 
@@ -1456,18 +1455,23 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return a Set of Strings containing the available closed captions languages
    */
   public Set<String> getAvailableClosedCaptionsLanguages() {
+    Set<String> languages = new HashSet<String>();
+    if (_currentItem != null && _currentItem.getClosedCaptions() != null) {
+      languages.addAll(_currentItem.getClosedCaptions().getLanguages());
+    }
 
-    // If our player found live closed captions, only show option for CC.
+    if (languages.size() <= 0) {
+      this.getLiveClosedCaptionsLanguages(languages);
+    }
+
+    return languages;
+  }
+
+  private void getLiveClosedCaptionsLanguages(Set<String> languages) {
     if (_player != null && (_player instanceof MoviePlayer)
         && _player.isLiveClosedCaptionsAvailable()) {
-      Set<String> retval = new HashSet<String>();
-      retval.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
-      return retval;
+      languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
     }
-    if (_currentItem == null || _currentItem.getClosedCaptions() == null) {
-      return new HashSet<String>();
-    }
-    return getCurrentItem().getClosedCaptions().getLanguages();
   }
 
   /**
