@@ -16,8 +16,6 @@ import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Video;
 
-// general ugliness in here is forced upon us by the design of Nielsen's SDK.
-
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
@@ -72,6 +70,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       DebugMode.logE( TAG, e.toString() );
     }
     this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
+    DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     id3TagNotifier.addWeakListener( this );
     setChannelName( UNKNOWN_CHANNEL_NAME );
     this.player.addObserver( this );
