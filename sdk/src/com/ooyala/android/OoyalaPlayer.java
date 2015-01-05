@@ -1419,7 +1419,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       mp.setLiveClosedCaptionsEnabled(true);
       return;
     }
-    if (_language == null) {
+    if (_language == null
+        || _language.equals(LocalizationSupport.localizedStringFor("None"))) {
       mp.setLiveClosedCaptionsEnabled(false);
     }
     if (_closedCaptionsView != null)

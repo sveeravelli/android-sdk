@@ -2,6 +2,8 @@ package com.ooyala.android.visualon;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +30,8 @@ import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
+import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection;
+import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection.VOOSMPAssetProperty;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
@@ -75,6 +79,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private int _lastPlayhead = -1;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
+  private boolean _isVisualOnOpenFinished = false;
+  private int _selectedSubtitleIndex = 0;
+  private List<String> _subtitleDescriptions = null;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 1000;
@@ -124,7 +131,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     setState(State.LOADING);
+    _isVisualOnOpenFinished = false;
     _streamUrl = _stream.decodedURL().toString();
+    _subtitleDescriptions = new ArrayList<String>();
     setParent(parent);
 
     // Copy license file,
@@ -272,6 +281,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void setLiveClosedCaptionsEnabled(boolean enabled) {
     _isLiveClosedCaptionsEnabled = enabled;
+    applySubtitleSettings();
   }
 
   @Override
@@ -728,13 +738,79 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     return strTextAll;
   }
 
+  private void handleSubtitles() {
+    VO_OSMP_RETURN_CODE returnValue;
+    if (_player == null) {
+      DebugMode.logE(TAG, "handleSubtitles: player is null");
+      return;
+    }
+
+    applySubtitleSettings();
+    // retrieve subtitle descriptions.
+    // TODO: expose it via UI.
+    VOCommonPlayerAssetSelection asset = _player;
+    int subtitleCount = asset.getSubtitleCount();
+    _subtitleDescriptions.clear();
+    _isLiveClosedCaptionsAvailable = false;
+    for (int index = 0; index < subtitleCount; ++index) {
+      VOOSMPAssetProperty property = asset.getSubtitleProperty(index);
+      
+      String description;
+      int propertyCount = property.getPropertyCount();
+      if (propertyCount == 0) {
+        description = "CC" + String.valueOf(index);
+      } else {
+        final int KEY_DESCRIPTION_INDEX = 1;
+        description = (String) property.getValue(KEY_DESCRIPTION_INDEX);
+      }
+      if (asset.isSubtitleAvailable(index)) {
+        _isLiveClosedCaptionsAvailable = true;
+      }
+      _subtitleDescriptions.add(description);
+    }
+
+    int selectedSubtitleIndex = asset.getPlayingAsset().getSubtitleIndex();
+    DebugMode.logD(TAG, "handleSubtitles: selected subtitle "
+        + selectedSubtitleIndex);
+
+    if (_isLiveClosedCaptionsEnabled && this._isLiveClosedCaptionsAvailable) {
+      returnValue = asset.selectSubtitle(_selectedSubtitleIndex);
+      if (returnValue != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+      DebugMode.logD(
+          TAG,
+            "handleSubtitles: selectSubtitle("
+                + String.valueOf(_selectedSubtitleIndex)
+                + ") failed with error: "
+              + returnValue.toString());
+      }
+    }
+  }
+
+  private void applySubtitleSettings() {
+    if (_player == null) {
+      DebugMode.logE(TAG, "enableSubtitles: player is null");
+      return;
+    }
+
+    VO_OSMP_RETURN_CODE returnValue = _player
+        .enableSubtitle(_isLiveClosedCaptionsEnabled);
+    if (returnValue != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+      DebugMode.logE(TAG,
+          "enable subtitles(" + String.valueOf(_isLiveClosedCaptionsEnabled)
+              + ") failed with error:" + returnValue.toString());
+    }
+  }
+
   @Override
   public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj) {
 
     switch (id) {
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_OPEN_FINISHED");
+      _isVisualOnOpenFinished = true;
       setState(State.READY);
+      handleSubtitles();
       break;
 
     case VO_OSMP_CB_PLAY_COMPLETE:
@@ -793,21 +869,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       onError(_player, null, id.getValue());
       break;
 
-    case VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE:
-      // Remember if we have received live closed captions at some point during playback
-      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
-      voSubtitleInfo info = (voSubtitleInfo)obj;
-      String cc = GetCCString(info);
-      if (!cc.equals("")) {
-        _isLiveClosedCaptionsAvailable = true;
-      }
-
-      // Show closed captions if someone enabled them
-      if (_isLiveClosedCaptionsEnabled) {
-        _parent.displayClosedCaptionText(cc);
-      }
-
-      break;
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
@@ -836,7 +897,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
-
+    case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
+      DebugMode.logV(TAG,
+          "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED, isVisualOnOpenFinished: "
+              + String.valueOf(_isVisualOnOpenFinished));
+      if (_isVisualOnOpenFinished) {
+        handleSubtitles();
+      }
+      break;
     default:
       break;
     }
