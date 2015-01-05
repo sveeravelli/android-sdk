@@ -32,6 +32,10 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   private final String EMBED_CODE = "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a";
   private final String DOMAIN = "http://www.ooyala.com";
 
+  // Nielsen IDs for Ooyala Univision test apps.
+  private final String NIELSEN_SFCODE = "UAT-CERT";
+  private final String NIELSEN_APPID = "T70BC66D4-C904-4DA1-AB9D-BB658F70E9A7";
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -57,7 +61,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
-    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", "uat-cert", "Tappid-unknown", null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier() );
+    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier() );
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
