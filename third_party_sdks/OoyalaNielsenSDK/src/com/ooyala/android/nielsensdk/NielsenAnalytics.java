@@ -20,6 +20,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
   private static final String METADATA_PREFIX = "nielsen_";
+  private static final boolean NIELSEN_DEBUG = false;
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
@@ -27,7 +28,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private final String clientID;
   private final String vcID;
   private final ID3TagNotifier id3TagNotifier;
-  private String channelName;
   private String channelNameJson;
   private JSONObject metadataJson;
   private long lastReportedMsec;
@@ -53,6 +53,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @see #destroy()
    */
   public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier ) {
+    this.metadataJson = new JSONObject();
     this.player = player;
     this.clientID = clientID;
     this.vcID = vcID;
@@ -69,6 +70,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       if( ccode != null ) { configJson.put( "ccode", jsonFilter.filter(ccode) ); }
       if( longitude != null ) { configJson.put( "longitude", jsonFilter.filter(longitude) ); }
       if( latitude != null ) { configJson.put( "latitude", jsonFilter.filter(latitude) ); }
+
+      if( NIELSEN_DEBUG ) {
+        configJson.put( "nol_devDebug", Boolean.TRUE );
+        configJson.put( "nol_nslApiDbg", Boolean.TRUE );
+      }
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
@@ -116,6 +122,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       if( tagStr.contains("www.nielsen.com") ) {
         final String nielsenStr = tagStr.replaceFirst( ".*www.nielsen.com", "www.nielsen.com" );
         DebugMode.logV( TAG, "onTag(): nielsenStr=" + nielsenStr );
+        nielsenApp.sendID3( nielsenStr );
       }
     }
   }
@@ -200,14 +207,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     try {
       json.put( "channelName", jsonFilter.filter(channelName) );
       this.channelNameJson = json.toString();
-      this.channelName = channelName;
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
-  }
-
-  private String getChannelName() {
-    return channelName;
   }
 
   private void setMetadataJson( Video item ) {
@@ -228,6 +230,12 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       setMetadataHelper( metadataJson, item, "tfid" );
       setMetadataHelper( metadataJson, item, "sid" );
       // explicitly leaving out 'ocrtag' at the moment as unimplemented.
+
+      if( NIELSEN_DEBUG ) {
+        metadataJson.put( "nol_devDebug", Boolean.TRUE );
+        metadataJson.put( "nol_nslApiDbg", Boolean.TRUE );
+      }
+
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
