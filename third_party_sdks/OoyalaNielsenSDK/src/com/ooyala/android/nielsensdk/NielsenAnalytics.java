@@ -33,8 +33,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private long lastReportedMsec;
 
   /**
-   * Convenience wrapper around Nielsen AppSdk.
+   * Implementation of integration between Ooyala SDK and Nielsen AppSdk.
    * See the Nielsen SDK documentation around AppSdk.getInstance().
+   * Note: When the client app goes into / resumes from the background, the app should destroy() this instance
+   * and create a new one via the constructor. See the lifecycle diagram in the Nielsen Android Developer's Guide.
    * @param context Android Context. Not null.
    * @param player OoyalaPlayer. Not null.
    * @param appName per Nielsen SDK docs. Not null.
@@ -48,6 +50,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @param clientID per Nielsen SDK docs. Not null.
    * @param vcID per Nielsen SDK docs. Not null.
    * @see AppSdk
+   * @see #destroy()
    */
   public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier ) {
     this.player = player;
@@ -71,7 +74,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     }
     this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
-    id3TagNotifier.addWeakListener( this );
+    this.id3TagNotifier.addWeakListener( this );
     setChannelName( UNKNOWN_CHANNEL_NAME );
     this.player.addObserver( this );
   }
