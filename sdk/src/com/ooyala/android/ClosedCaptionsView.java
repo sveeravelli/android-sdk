@@ -73,14 +73,18 @@ public class ClosedCaptionsView extends TextView {
 	}
 
 	public void setCaption(Caption caption) {
-		this.caption = caption;
-		if (this.caption != null && !this.currentText.equals(this.caption.getText())) {
-			this.currentText = caption.getText();
-			setClosedCaptions(this.caption.getText(), false);
-		} else {
-			setBackgroundColor(Color.TRANSPARENT);
-			setText("");
-		}
+        double preBegin = -1;
+        if (this.caption != null) {
+          preBegin = this.caption.getBegin();
+        }
+        this.caption = caption;
+        if (this.caption != null && (!this.currentText.equals(this.caption.getText()) || preBegin != this.caption.getBegin())) {
+          this.currentText = caption.getText();
+          setClosedCaptions(this.caption.getText(), false);
+        } else {
+          setBackgroundColor(Color.TRANSPARENT);
+          setText("");
+        }
 	}
 
 	// Set specific text on textview (shared by live streams and normal stream)
