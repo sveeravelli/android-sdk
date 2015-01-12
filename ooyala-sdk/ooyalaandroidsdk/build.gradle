@@ -1,0 +1,33 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.android.gms:play-services:+'
+    compile files('libs/DxDrmDlc.jar')
+    compile files('libs/WidevineDRM-5.0.0.12197.jar')
+    compile files('libs/assets.jar')
+    compile files('libs/voOSBasePlayer.jar')
+    compile files('libs/voOSDataSource.jar')
+    compile files('libs/voOSEngine.jar')
+    compile files('libs/voOSHDMICheck.jar')
+    compile files('libs/voOSPlayer.jar')
+    compile files('libs/voOSStreamingDownloader.jar')
+    compile files('libs/voOSUtils.jar')
+}

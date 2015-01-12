@@ -1,0 +1,3 @@
+include ':ooyalaandroidsdk'
+include ':ooyalaandroidtestapp'
+include ':ooyalaandroidtestapp'
