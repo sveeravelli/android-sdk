@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="voOSHDMICheck">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ooyalaCoreSDK/libs/voOSHDMICheck.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ooyalaAndroidSDKTests/ooyalaAndroidSDKTests.iml" filepath="$PROJECT_DIR$/ooyalaAndroidSDKTests/ooyalaAndroidSDKTests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" filepath="$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ooyalaFreewheelSDK/ooyalaFreewheelSDK.iml" filepath="$PROJECT_DIR$/ooyalaFreewheelSDK/ooyalaFreewheelSDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" filepath="$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ooyalaTestApp/ooyalaTestApp.iml" filepath="$PROJECT_DIR$/ooyalaTestApp/ooyalaTestApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/sdk.iml" filepath="$PROJECT_DIR$/sdk.iml" />
     </modules>
   </component>
