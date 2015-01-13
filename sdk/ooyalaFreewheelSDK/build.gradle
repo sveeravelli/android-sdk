@@ -18,6 +18,6 @@ android {
 }
 
 dependencies {
-    compile project(':ooyalaandroidsdk')
+    compile project(':ooyalaAndroidSDK')
     compile files('libs/FWAdManager.jar')
 }

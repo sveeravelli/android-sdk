@@ -15,8 +15,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    task copyTestResources(type: Copy) {
+        println "proj: ${projectDir}, biuld: ${buildDir}"
+        println "${projectDir}/src/main/java/com/ooyala/android/resources"
+        println "${buildDir}/intermediates/debug/com/ooyala/android/resources/"
+//        println sourceSets.main.runtimeClasspath
+        from "${projectDir}/src/main/java/com/ooyala/android/resources"
+        into "${buildDir}/intermediates/debug/com/ooyala/android/resources/"
+//            into "${buildDir}/classes/main"
+    }
+    build.dependsOn copyTestResources
 }
 
 dependencies {
-    compile project(':ooyalaandroidsdk')
+    compile project(':ooyalaAndroidSDK')
 }
