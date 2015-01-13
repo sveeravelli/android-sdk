@@ -22,6 +22,6 @@ android {
 }
 
 dependencies {
-    compile project(':ooyalaAndroidSDK')
+    compile project(':ooyalaCoreSDK')
     compile 'com.google.android.gms:play-services:+'
 }

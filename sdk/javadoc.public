@@ -6,7 +6,7 @@
 -bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>'
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
--sourcepath ooyalaandroidsdk/src/main/java/
+-sourcepath ooyalaCoreSDK/src/main/java/
 src/com/ooyala/android/Analytics.java
 src/com/ooyala/android/AdvertisingIdUtils.java
 src/com/ooyala/android/CurrentItemChangedCallback.java

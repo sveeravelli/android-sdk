@@ -86,7 +86,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="ima-android-sdk-beta9" level="project" />
-    <orderEntry type="module" module-name="ooyalaAndroidSDK" exported="" />
+    <orderEntry type="module" module-name="ooyalaCoreSDK" exported="" />
   </component>
 </module>
 
