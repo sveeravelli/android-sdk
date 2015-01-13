@@ -8,8 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/ooyalaAndroidSDKTests" />
             <option value="$PROJECT_DIR$/ooyalaCoreSDK" />
+            <option value="$PROJECT_DIR$/ooyalaCoreSDKTests" />
             <option value="$PROJECT_DIR$/ooyalaFreewheelSDK" />
             <option value="$PROJECT_DIR$/ooyalaIMASDK" />
             <option value="$PROJECT_DIR$/ooyalaTestApp" />
