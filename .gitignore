@@ -52,5 +52,5 @@ script/android_*
 deploy/android_deploy
 
 **/build
-**/.idea
 **/.gradle
+**/workspace.xml
