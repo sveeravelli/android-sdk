@@ -1,5 +1,13 @@
 package com.ooyala.android.item;
 
+import android.test.AndroidTestCase;
+
+import com.ooyala.android.TestConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -7,14 +15,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import android.test.AndroidTestCase;
-
-import com.ooyala.android.TestConstants;
 
 public class ClosedCaptionsTest extends AndroidTestCase {
   public ClosedCaptionsTest() {
@@ -36,7 +36,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
    */
   public void testInitializers() {
     ClosedCaptions cc = new ClosedCaptions(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
     assertEquals("http://ak.c.ooyala.com/1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p/cc/148094784", cc.getURL()
         .toString());
     assertEquals("", cc.getDefaultLanguage());
@@ -48,7 +48,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
    */
   public void testFetchAndGet() {
     ClosedCaptions cc = new ClosedCaptions(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_CLOSED_CAPTIONS));
     assertEquals("http://ak.c.ooyala.com/1ndnAxMzpxA4MFMw8G-F7frGiDYD_15p/cc/148094784", cc.getURL()
         .toString());
     assertEquals("", cc.getDefaultLanguage());

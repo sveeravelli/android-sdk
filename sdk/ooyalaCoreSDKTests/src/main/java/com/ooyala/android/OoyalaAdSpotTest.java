@@ -22,7 +22,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
    */
   public void testInitializers() {
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
     assertNotNull(adSpot);
     assertEquals(OoyalaAdSpot.class, adSpot.getClass());
     assertEquals("JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B", adSpot.getEmbedCode());
@@ -37,7 +37,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
    */
   public void testEmbedCodesToAuthorize() {
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_OOYALA), null);
     assertEquals(1, adSpot.embedCodesToAuthorize().size());
     assertEquals(adSpot.getEmbedCode(), adSpot.embedCodesToAuthorize().get(0));
   }
@@ -49,7 +49,7 @@ public class OoyalaAdSpotTest extends AndroidTestCase {
     PlayerDomain domain = new PlayerDomain("http://www.ooyala.com");
     PlayerAPIClient api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
     OoyalaAdSpot adSpot = new OoyalaAdSpot(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA), new OoyalaAPIClient(api));
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_OOYALA), new OoyalaAPIClient(api));
     assertTrue(adSpot.fetchPlaybackInfo());
     // FIXME: This test asset has multiple streams with the same resolution and bitrate...
     String url = adSpot.getStream().decodedURL().toString();

@@ -1,11 +1,11 @@
 package com.ooyala.android.ads.vast;
 
-import java.util.UUID;
-
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.AdvertisingIdUtils;
 import com.ooyala.android.TestConstants;
+
+import java.util.UUID;
 
 public class VASTAdSpotTest extends AndroidTestCase {
   public VASTAdSpotTest() {
@@ -22,7 +22,7 @@ public class VASTAdSpotTest extends AndroidTestCase {
    * @test Test VASTAdSpot.initWithDictionary:api: and VASTAdSpot.updateWithDictionary:
    */
   public void testInitializer() {
-    VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST));
+    VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_VAST));
     assertEquals(
         vast.getVASTURL().toString(),
         "http://www.daveproxy.co.uk/browse.php/Oi8vYWZlMi5zcGVjaWZpY2NsaWNrLm5ldC9hZHNlcnZlLz9sPTIwNTE3JnQ9eCZybmQ9YkFvcnJxSyxiaGxhZnNvaGRsQXg_3D/b13/fnorefer/");
@@ -51,7 +51,7 @@ public class VASTAdSpotTest extends AndroidTestCase {
   }
   
   public void testTimestampMacro() {
-    final VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST_TIMESTAMP));
+    final VASTAdSpot vast = new VASTAdSpot(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_VAST_TIMESTAMP));
     assertFalse( vast.getVASTURL().toExternalForm().contains("[TIMESTAMP]") );
   }
   
@@ -59,7 +59,7 @@ public class VASTAdSpotTest extends AndroidTestCase {
     AdvertisingIdUtils.setAdvertisingId(UUID.randomUUID().toString());
     final VASTAdSpot vast = new VASTAdSpot(
         TestConstants
-            .getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST_LR_DEVICEID));
+            .getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_VAST_LR_DEVICEID));
     assertFalse(vast.getVASTURL().toExternalForm().contains("[LR_DEVICEID]"));
   }
 }

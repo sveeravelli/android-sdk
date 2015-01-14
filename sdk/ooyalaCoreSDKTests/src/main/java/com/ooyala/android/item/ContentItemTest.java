@@ -1,12 +1,12 @@
 package com.ooyala.android.item;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.OrderedMap;
 import com.ooyala.android.TestConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContentItemTest extends AndroidTestCase {
   public ContentItemTest() {
@@ -30,7 +30,7 @@ public class ContentItemTest extends AndroidTestCase {
   public void testCreateVideo() {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_VIDEO);
-    ContentItem video = ContentItem.create(TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_VIDEO),
+    ContentItem video = ContentItem.create(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_VIDEO),
         embeds, null);
     assertNotNull(video);
     assertEquals(TestConstants.TEST_VIDEO, video.getEmbedCode());
@@ -50,7 +50,7 @@ public class ContentItemTest extends AndroidTestCase {
     List<String> embeds = new ArrayList<String>();
     embeds.add("B0eHAxMzqsbVRm0ZJROXw1Yaj73roQu6");
     ContentItem channel = ContentItem.create(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_CHANNEL), embeds, null);
     assertNotNull(channel);
     assertEquals(TestConstants.TEST_CHANNEL, channel.getEmbedCode());
     assertEquals("Bhangra Empire", channel.getTitle());
@@ -79,7 +79,7 @@ public class ContentItemTest extends AndroidTestCase {
     List<String> embeds = new ArrayList<String>();
     embeds.add(TestConstants.TEST_CHANNEL_SET);
     ContentItem channelSet = ContentItem.create(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_CHANNEL_SET), embeds, null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_CHANNEL_SET), embeds, null);
     assertNotNull(channelSet);
     assertEquals(TestConstants.TEST_CHANNEL_SET, channelSet.getEmbedCode());
     assertEquals("All My Channels", channelSet.getTitle());
@@ -120,7 +120,7 @@ public class ContentItemTest extends AndroidTestCase {
     embeds.add(TestConstants.TEST_VIDEO);
     embeds.add(TestConstants.TEST_VIDEO_WITH_AD_OOYALA);
     ContentItem dynamicChannel = ContentItem.create(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_DYNAMIC_CHANNEL), embeds, null);
     assertNotNull(dynamicChannel);
     assertNull(dynamicChannel.getEmbedCode());
     assertNull(dynamicChannel.getTitle());

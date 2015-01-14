@@ -1,12 +1,14 @@
 package com.ooyala.android;
 
-import java.io.InputStream;
-import java.util.Scanner;
+import android.content.Context;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.io.InputStream;
+import java.util.Scanner;
 
 public class TestConstants {
   public static final String TEST_API_KEY = "l1am06xhbSxa0OtyZsBTshW2DMtp.6Le2A";
@@ -26,23 +28,23 @@ public class TestConstants {
   public static final String TEST_DOMAIN = "http://www.ooyala.com";
   public static final String TEST_AD_OOYALA = "JzdHAxMzoJXCByNhz6UQrL5GjIiUrr_B";
 
-  public static final String TEST_DICTIONARY_VIDEO = "resources/test_video.json";
-  public static final String TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA = "resources/test_video_ooyala_ad.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS = "resources/test_video_auth_hls.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_MP4 = "resources/test_video_auth_mp4.json";
-  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS_MP4 = "resources/test_video_auth_hls+mp4.json";
-  public static final String TEST_DICTIONARY_CHANNEL = "resources/test_channel.json";
-  public static final String TEST_DICTIONARY_CHANNEL_SET = "resources/test_channel_set.json";
-  public static final String TEST_DICTIONARY_DYNAMIC_CHANNEL = "resources/test_dynamic_channel.json";
-  public static final String TEST_DICTIONARY_AD_OOYALA = "resources/test_ooyala_ad.json";
-  public static final String TEST_DICTIONARY_AD_VAST = "resources/test_vast_ad.json";
-  public static final String TEST_DICTIONARY_AD_VAST_LR_DEVICEID = "resources/test_vast_ad_lr_deviceid.json";
-  public static final String TEST_DICTIONARY_AD_VAST_TIMESTAMP = "resources/test_vast_ad_timestamp.json";
-  public static final String TEST_DICTIONARY_STREAM_HLS = "resources/test_stream_hls.json";
-  public static final String TEST_DICTIONARY_STREAM_MP4 = "resources/test_stream_mp4.json";
-  public static final String TEST_DICTIONARY_STREAMS_MP4 = "resources/test_streams_mp4.json";
-  public static final String TEST_DICTIONARY_CLOSED_CAPTIONS = "resources/test_closed_captions.json";
-  public static final String TEST_XML_CLOSED_CAPTIONS = "resources/test_closed_captions_timeline.xml";
+  public static final String TEST_DICTIONARY_VIDEO = "test_video.json";
+  public static final String TEST_DICTIONARY_VIDEO_WITH_AD_OOYALA = "test_video_ooyala_ad.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS = "test_video_auth_hls.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_MP4 = "test_video_auth_mp4.json";
+  public static final String TEST_DICTIONARY_VIDEO_AUTH_HLS_MP4 = "test_video_auth_hls+mp4.json";
+  public static final String TEST_DICTIONARY_CHANNEL = "test_channel.json";
+  public static final String TEST_DICTIONARY_CHANNEL_SET = "test_channel_set.json";
+  public static final String TEST_DICTIONARY_DYNAMIC_CHANNEL = "test_dynamic_channel.json";
+  public static final String TEST_DICTIONARY_AD_OOYALA = "test_ooyala_ad.json";
+  public static final String TEST_DICTIONARY_AD_VAST = "test_vast_ad.json";
+  public static final String TEST_DICTIONARY_AD_VAST_LR_DEVICEID = "test_vast_ad_lr_deviceid.json";
+  public static final String TEST_DICTIONARY_AD_VAST_TIMESTAMP = "test_vast_ad_timestamp.json";
+  public static final String TEST_DICTIONARY_STREAM_HLS = "test_stream_hls.json";
+  public static final String TEST_DICTIONARY_STREAM_MP4 = "test_stream_mp4.json";
+  public static final String TEST_DICTIONARY_STREAMS_MP4 = "test_streams_mp4.json";
+  public static final String TEST_DICTIONARY_CLOSED_CAPTIONS = "test_closed_captions.json";
+  public static final String TEST_XML_CLOSED_CAPTIONS = "test_closed_captions_timeline.xml";
 
   public static final String TEST_ANALYTICS_HTML = "resources/test_analytics.html";
   public static final String TEST_ANALYTICS_HTML_FAIL = "resources/test_analytics_fail.html";
@@ -53,8 +55,17 @@ public class TestConstants {
     return TestConstants.class.getResourceAsStream(res);
   }
 
-  public static JSONObject getTestJSON(String file) {
-    InputStream inputStream = getTestResourceAsStream(file);
+  public static InputStream getTestAssetAsStream(Context c, String name) {
+      try {
+          InputStream i = c.getAssets().open(name);
+          return i;
+      } catch (Exception e) {
+          return null;
+      }
+  }
+
+  public static JSONObject getTestJSON(Context c, String file) {
+    InputStream inputStream = getTestAssetAsStream(c, file);
     String json = new Scanner(inputStream).useDelimiter("\\A").next();
     try {
       return (JSONObject) new JSONTokener(json).nextValue();
@@ -64,14 +75,14 @@ public class TestConstants {
     }
   }
 
-  public static JSONArray getTestJSONArray(String file) {
-    InputStream inputStream = getTestResourceAsStream(file);
-    String json = new Scanner(inputStream).useDelimiter("\\A").next();
-    try {
-      return new JSONArray(json);
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      return null;
+  public static JSONArray getTestJSONArray(Context c, String file) {
+        InputStream inputStream = getTestAssetAsStream(c, file);
+        String json = new Scanner(inputStream).useDelimiter("\\A").next();
+        try {
+            return new JSONArray(json);
+        } catch (JSONException exception) {
+            System.out.println("JSONException: " + exception);
+            return null;
+        }
     }
-  }
 }

@@ -26,7 +26,7 @@ public class OoyalaManagedAdSpotTest extends AndroidTestCase {
    */
   public void testCreate() {
     OoyalaManagedAdSpot ad = OoyalaManagedAdSpot.create(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_OOYALA),
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_OOYALA),
         null);
     assertNotNull(ad);
     assertEquals(OoyalaAdSpot.class, ad.getClass());
@@ -38,7 +38,7 @@ public class OoyalaManagedAdSpotTest extends AndroidTestCase {
     assertEquals("http://www.ooyala.com/track", adSpot.getTrackingURLs().get(0).toString());
 
     ad = OoyalaManagedAdSpot.create(
-        TestConstants.getTestJSON(TestConstants.TEST_DICTIONARY_AD_VAST), null);
+        TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_AD_VAST), null);
     assertEquals(VASTAdSpot.class, ad.getClass());
     assertEquals(
         "http://www.daveproxy.co.uk/browse.php/Oi8vYWZlMi5zcGVjaWZpY2NsaWNrLm5ldC9hZHNlcnZlLz9sPTIwNTE3JnQ9eCZybmQ9YkFvcnJxSyxiaGxhZnNvaGRsQXg_3D/b13/fnorefer/",
