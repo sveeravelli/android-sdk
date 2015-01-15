@@ -60,7 +60,14 @@ public interface PlayerInterface {
    */
   public State getState();
   
+  /**
+   * @return the percentage of the cursor should be on scrubber for live stream playback
+   */
   public int livePlayheadPercentage();
   
+  /**
+   * Seek to the given percent position of scrubber for live stream playback
+   * @param percent The percent of scrubber the cursor ends after seek 
+   */
   public void seekToPercentLive(int percent);
 }

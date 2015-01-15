@@ -170,8 +170,6 @@ public class MoviePlayer extends Player implements Observer {
     if (_basePlayer != null) {
     _basePlayer.init(_parent, _streams);
 
-//    if(_live) millisToResume = 0;
-
     DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
     }
