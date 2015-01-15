@@ -109,7 +109,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
 
     Document doc = null;
     InputStream is = TestConstants
-        .getTestResourceAsStream(TestConstants.TEST_XML_CLOSED_CAPTIONS);
+        .getTestAssetAsStream(getContext(), TestConstants.TEST_XML_CLOSED_CAPTIONS);
     try {
       doc = db.parse(is);
     } catch (SAXException e) {

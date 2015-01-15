@@ -15,12 +15,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
-    task copyTestResources(type: Copy) {
-        from "${projectDir}/src/main/java/com/ooyala/android/resources"
-        into "${buildDir}/classes/test"
-    }
-    build.dependsOn copyTestResources
 }
 
 dependencies {

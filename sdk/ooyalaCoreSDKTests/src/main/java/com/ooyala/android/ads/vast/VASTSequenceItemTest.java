@@ -1,16 +1,16 @@
 package com.ooyala.android.ads.vast;
 
-import java.io.InputStream;
+import android.test.AndroidTestCase;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.ooyala.android.TestConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import android.test.AndroidTestCase;
+import java.io.InputStream;
 
-import com.ooyala.android.TestConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class VASTSequenceItemTest extends AndroidTestCase {
   public VASTSequenceItemTest() {
@@ -29,7 +29,7 @@ public class VASTSequenceItemTest extends AndroidTestCase {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      InputStream is = TestConstants.getTestResourceAsStream(TestConstants.TEST_XML_VAST_AD);
+      InputStream is = TestConstants.getTestAssetAsStream(getContext(), TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
       Element il = (Element) adXML.getElementsByTagName("InLine").item(0);

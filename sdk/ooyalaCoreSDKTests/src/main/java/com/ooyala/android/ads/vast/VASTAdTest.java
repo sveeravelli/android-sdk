@@ -1,16 +1,16 @@
 package com.ooyala.android.ads.vast;
 
-import java.io.InputStream;
+import android.test.AndroidTestCase;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.ooyala.android.TestConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.ooyala.android.TestConstants;
+import java.io.InputStream;
 
-import android.test.AndroidTestCase;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class VASTAdTest extends AndroidTestCase {
   public VASTAdTest() {
@@ -27,7 +27,7 @@ public class VASTAdTest extends AndroidTestCase {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      InputStream is = TestConstants.getTestResourceAsStream(TestConstants.TEST_XML_VAST_AD);
+      InputStream is = TestConstants.getTestAssetAsStream(getContext(), TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
       VASTAd ad = new VASTAd(adXML);

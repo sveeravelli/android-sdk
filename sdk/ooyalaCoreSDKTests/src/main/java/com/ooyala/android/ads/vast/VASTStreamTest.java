@@ -1,17 +1,17 @@
 package com.ooyala.android.ads.vast;
 
-import java.io.InputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
 import com.ooyala.android.item.Stream;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.InputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class VASTStreamTest extends AndroidTestCase {
   public VASTStreamTest() {
@@ -28,7 +28,7 @@ public class VASTStreamTest extends AndroidTestCase {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      InputStream is = TestConstants.getTestResourceAsStream(TestConstants.TEST_XML_VAST_AD);
+      InputStream is = TestConstants.getTestAssetAsStream(getContext(), TestConstants.TEST_XML_VAST_AD);
       Document doc = db.parse(is);
       Element adXML = doc.getDocumentElement();
       Element il = (Element) adXML.getElementsByTagName("InLine").item(0);

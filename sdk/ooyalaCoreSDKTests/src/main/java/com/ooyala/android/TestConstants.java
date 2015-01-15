@@ -46,14 +46,9 @@ public class TestConstants {
   public static final String TEST_DICTIONARY_CLOSED_CAPTIONS = "test_closed_captions.json";
   public static final String TEST_XML_CLOSED_CAPTIONS = "test_closed_captions_timeline.xml";
 
-  public static final String TEST_ANALYTICS_HTML = "resources/test_analytics.html";
-  public static final String TEST_ANALYTICS_HTML_FAIL = "resources/test_analytics_fail.html";
-
-  public static final String TEST_XML_VAST_AD = "resources/test_vast_ad.xml";
-
-  public static InputStream getTestResourceAsStream(String res) {
-    return TestConstants.class.getResourceAsStream(res);
-  }
+  public static final String TEST_ANALYTICS_HTML = "test_analytics.html";
+  public static final String TEST_ANALYTICS_HTML_FAIL = "test_analytics_fail.html";
+  public static final String TEST_XML_VAST_AD = "test_vast_ad.xml";
 
   public static InputStream getTestAssetAsStream(Context c, String name) {
       try {
