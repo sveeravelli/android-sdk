@@ -59,4 +59,8 @@ public interface PlayerInterface {
    * @return the state
    */
   public State getState();
+  
+  public int livePlayheadPercentage();
+  
+  public void seekToPercentLive(int percent);
 }

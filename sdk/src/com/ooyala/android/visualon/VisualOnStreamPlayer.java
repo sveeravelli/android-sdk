@@ -73,7 +73,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
-  private int _timeBeforeSuspend = -1;
+  private Integer _timeBeforeSuspend = null;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
@@ -124,7 +124,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     try {
       getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
       DebugMode.logD(TAG, "This app has the ability to play protected content");
-      _hasDiscredix = true;
+      _hasDiscredix = false;
     } catch(Exception e) {
       DebugMode.logD(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
@@ -187,9 +187,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case READY:
     case COMPLETED:
       DebugMode.logV(TAG, "Play: ready - about to start");
-      if (_timeBeforeSuspend >= 0 ) {
+      if (_timeBeforeSuspend == null) {
+        if (_stream.isLiveStream()) {
+          _timeBeforeSuspend = 1;
+        } else {
+          _timeBeforeSuspend = -1;
+        }
+      } else if (_timeBeforeSuspend >= 0  && !_stream.isLiveStream()) {
         seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
+      } else if (_timeBeforeSuspend <= 0 && _stream.isLiveStream()) {
+        // current item is a Live stream, which can only seek to where playhead is less or equals to zero
+        seekToTime(_timeBeforeSuspend);
+        _timeBeforeSuspend = 1;
       }
 
       VO_OSMP_RETURN_CODE nRet = _player.start();
@@ -311,7 +321,32 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 //    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
 //    setState(State.LOADING);
   }
+  
+  @Override
+  public void seekToPercentLive(int percent) {
+    int max = (int)_player.getMaxPosition();
+    int min = (int)_player.getMinPosition();
+    int duration = max - min;
+    int newPosition = (int)(duration * percent / 100 + min);
+    if (_player.setPosition((long)newPosition) < 0) {
+      DebugMode.logE(TAG, "setPosition failed.");
+    }
+  }
 
+  @Override 
+  public int livePlayheadPercentage() {
+    if (_player != null) {
+      long max = _player.getMaxPosition();
+      long min = _player.getMinPosition();
+      long cur = _player.getPosition();
+  
+      float fPercent = (((float) (cur - min)) / ((float) max - min)) * (100f);
+      DebugMode.logD(TAG, "Inside LivePlayheadPercentage = " + fPercent);
+      return (int)fPercent;
+    }
+    return 100;
+  }
+  
   protected void createMediaPlayer() {
     try {
       if (!_surfaceExists) {

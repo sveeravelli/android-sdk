@@ -1528,7 +1528,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       return;
     }
     if (seekable()) {
-      seek(percentToMillis(percent));
+      if (getCurrentItem().isLive()) {
+        currentPlayer().seekToPercentLive(percent);
+      } else {
+        seek(percentToMillis(percent));
+      }
     }
     DebugMode.logV(TAG, "...seekToPercent()");
   }
@@ -1571,6 +1575,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public int getPlayheadPercentage() {
     if (currentPlayer() == null) {
       return 0;
+    } else if (getCurrentItem().isLive() && !isAdPlaying()) {
+      return currentPlayer().livePlayheadPercentage();
     }
     return millisToPercent(currentPlayer().currentTime());
   }

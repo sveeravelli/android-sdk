@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ooyala.android.DebugMode;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
@@ -30,15 +31,19 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private LinearLayout _topBar = null;
   private LinearLayout _seekWrapper = null;
   private LinearLayout _liveWrapper = null;
+  private LinearLayout _liveSliderModeWrapper = null;
   private PlayPauseButton _playPause = null;
   private NextButton _next = null;
   private PreviousButton _previous = null;
   private FullscreenButton _fullscreen = null;
   private ClosedCaptionsButton _closedCaptions = null;
   private CuePointsSeekBar _seek = null;
+  private CuePointsSeekBar _seekLive = null;
   private TextView _currTime = null;
+  private TextView _currTimeLive = null;
   private TextView _duration = null;
   private TextView _liveIndicator = null;
+  private TextView _liveDVRIndicator = null;
   private ProgressBar _spinner = null;
   private boolean _wasPlaying;
   private boolean _seeking;
@@ -77,9 +82,16 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     }
 
     if (_liveWrapper != null && _player.getCurrentItem() != null) {
-      _liveWrapper.setVisibility(_player.getCurrentItem().isLive() ? View.VISIBLE : View.GONE);
+      _liveWrapper.setVisibility((_player.getCurrentItem().isLive() && !_player.options().getShowLiveControls()) ? View.VISIBLE : View.GONE);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
         _liveWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
+      }
+    }
+    
+    if (_liveSliderModeWrapper != null && _player.getCurrentItem() != null) {
+      _liveSliderModeWrapper.setVisibility((_player.getCurrentItem().isLive() && _player.options().getShowLiveControls()) ? View.VISIBLE : View.GONE);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        _liveSliderModeWrapper.setAlpha(_player.isShowingAd() ? 0.4f : 1f); // supported only 11+
       }
     }
 
@@ -201,6 +213,44 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
         + PREFERRED_BUTTON_WIDTH_DP);
     liveWrapperLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
     _liveWrapper.setLayoutParams(liveWrapperLP);
+    
+    
+    _liveSliderModeWrapper = new LinearLayout(_topBar.getContext());
+    _liveSliderModeWrapper.setOrientation(LinearLayout.HORIZONTAL);
+    // CurrentTime TextView
+    _currTimeLive = new TextView(_liveSliderModeWrapper.getContext());
+    _currTimeLive.setText("00:00:00");
+    LinearLayout.LayoutParams currTimeLiveLP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
+    currTimeLiveLP.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
+    _currTimeLive.setLayoutParams(currTimeLiveLP);
+    // Scrubber
+    _seekLive = new CuePointsSeekBar(_liveSliderModeWrapper.getContext());
+    LinearLayout.LayoutParams seekLiveLP = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT,
+        1f);
+    seekLiveLP.gravity = Gravity.CENTER;
+    seekLiveLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
+    seekLiveLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
+    _seekLive.setLayoutParams(seekLiveLP);
+    _seekLive.setOnSeekBarChangeListener(this);
+    // Live Indicator
+    _liveDVRIndicator = new TextView(_liveSliderModeWrapper.getContext());
+    _liveDVRIndicator.setText(LocalizationSupport.localizedStringFor("LIVE"));
+    LinearLayout.LayoutParams liveDVRIndicatorLP = new LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT);
+    liveDVRIndicatorLP.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+    _liveDVRIndicator.setLayoutParams(liveDVRIndicatorLP);
+    _liveSliderModeWrapper.addView(_currTimeLive);
+    _liveSliderModeWrapper.addView(_seekLive);
+    _liveSliderModeWrapper.addView(_liveDVRIndicator);
+    LinearLayout.LayoutParams seekWrapperLiveLP = new LinearLayout.LayoutParams(0,
+        ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+    seekWrapperLiveLP.gravity = Gravity.CENTER;
+    seekWrapperLiveLP.leftMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
+    seekWrapperLiveLP.rightMargin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP);
+    _liveSliderModeWrapper.setLayoutParams(seekWrapperLiveLP);
+    
 
     _fullscreen = new FullscreenButton(_topBar.getContext());
     _fullscreen.setFullscreen(_player.isFullscreen());
@@ -220,6 +270,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
     _topBar.addView(_seekWrapper);
     _topBar.addView(_liveWrapper);
+    _topBar.addView(_liveSliderModeWrapper);
     _topBar.addView(_closedCaptions);
     _topBar.addView(_fullscreen);
     FrameLayout.LayoutParams topBarLP = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
@@ -298,6 +349,23 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _duration.setText(DateUtils.formatElapsedTime(_player.getDuration()/ 1000));
     _currTime.setText(DateUtils.formatElapsedTime(_player.getPlayheadTime()/ 1000));
 
+    if (_seekLive != null && !_seeking) {
+      DebugMode.logD("", "SetProgressBar to percent = " + _player.getPlayheadPercentage());
+      _seekLive.setProgress(_player.getPlayheadPercentage());
+      _seekLive.setSecondaryProgress(_player.getBufferPercentage());
+      _seekLive.setCuePoints(_player.getCuePointsInPercentage());
+    }
+ 
+    if (_currTimeLive != null) {
+      String currentTime = DateUtils.formatElapsedTime(Math.abs(_player.getPlayheadTime()) / 1000);
+      if (_player.getPlayheadTime() < 0) {
+        currentTime = "-" + currentTime;
+      }
+      _currTimeLive.setText(currentTime);
+    }
+
+    
+    
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
       _isPlayerReady = true;

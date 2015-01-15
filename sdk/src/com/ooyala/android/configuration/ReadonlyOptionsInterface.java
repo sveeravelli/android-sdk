@@ -13,4 +13,6 @@ public interface ReadonlyOptionsInterface {
   boolean getPreloadContent();
 
   boolean getShowPromoImage();
+
+  boolean getShowLiveControls();
 }

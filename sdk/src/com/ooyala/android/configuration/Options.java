@@ -7,6 +7,7 @@ public class Options implements ReadonlyOptionsInterface {
     private VisualOnConfiguration visualOnConfiguration;
     private boolean showCuePoints;
     private boolean showAdsControls;
+    private boolean showLiveControls;
     private boolean preloadContent;
     private boolean showPromoImage;
 
@@ -17,6 +18,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showAdsControls = true;
       this.preloadContent = true;
       this.showPromoImage = false;
+      this.showLiveControls = false;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -48,10 +50,15 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = showPromoImage;
       return this;
     }
+    
+    public Builder setShowLiveControls(boolean showLiveControls) {
+      this.showLiveControls = showLiveControls;
+      return this;
+    }
 
     public Options build() {
       return new Options(tvRatingConfiguration, visualOnConfiguration,
-          showCuePoints, showAdsControls, preloadContent, showPromoImage);
+          showCuePoints, showAdsControls, preloadContent, showPromoImage, showLiveControls);
     }
   }
 
@@ -61,16 +68,18 @@ public class Options implements ReadonlyOptionsInterface {
   private final boolean showAdsControls;
   private final boolean preloadContent;
   private final boolean showPromoImage;
+  private final boolean showLiveControls;
 
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
       VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
-      boolean showAdsControls, boolean preloadContent, boolean showPromoImage) {
+      boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls) {
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
     this.showCuePoints = showCuePoints;
     this.showAdsControls = showAdsControls;
     this.preloadContent = preloadContent;
     this.showPromoImage = showPromoImage;
+    this.showLiveControls = showLiveControls;
   }
 
   @Override
@@ -102,4 +111,10 @@ public class Options implements ReadonlyOptionsInterface {
   public boolean getShowPromoImage() {
     return showPromoImage;
   }
+  
+  @Override
+  public boolean getShowLiveControls() {
+    return showLiveControls;
+  }
+  
 }
