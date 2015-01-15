@@ -26,5 +26,5 @@ update-submodules:
 	git submodule update
 
 temp-update-sdk:
-	echo "sdk.dir=${ANDROID_SDKS}" > ./ooyala-sdk/local.properties
+	echo "sdk.dir=${ANDROID_SDKS}" > ./sdk/local.properties
 
