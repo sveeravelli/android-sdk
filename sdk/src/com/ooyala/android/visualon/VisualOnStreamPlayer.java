@@ -437,6 +437,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // Register SDK event listener
       _player.setOnEventListener(this);
+      
+      // Set specific bitrate and buffering time configuration
+      setVisualOnConfigurations();
 
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
@@ -516,6 +519,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _player.stop();
       _player.setView(null);
     }
+  }
+  
+  private void setVisualOnConfigurations() {
+    _player.setInitialBitrate(this._visualOnConfiguration.getInitialBitrate());
+    _player.setMaxBufferingTime(this._visualOnConfiguration.getMaxBufferingTime());
+    _player.setBitrateThreshold(this._visualOnConfiguration.getUpperBitrateThreshold(), this._visualOnConfiguration.getLowerBitrateThreshold());
+    _player.setInitialBufferingTime(this._visualOnConfiguration.getInitialBufferingTime());
+    _player.setPlaybackBufferingTime(this._visualOnConfiguration.getPlaybackBufferingTime());
   }
 
   private void setupView() {
