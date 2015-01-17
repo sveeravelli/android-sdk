@@ -18,12 +18,6 @@ public class VisualOnConfiguration {
   
   // Check the default number for these fields
   private static boolean DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS = false;
-  private static int DEFAULT_UPPER_BITRATE_THRESHOLD;
-  private static int DEFAULT_LOWER_BITRATE_THRESHOLD;
-  private static int DEFAULT_INITIAL_BITRATE;
-  private static int DEFAULT_INITIAL_BUFFERING_TIME;
-  private static int DEFAULT_MAX_BUFFERING_TIME;
-  private static int DEFAULT_PLAYBACK_BUFFERING_TIME;
 
   /**
    * Build the object of VisualOn configurations
@@ -58,31 +52,62 @@ public class VisualOnConfiguration {
       return this;
     }
     
+    /**
+     * Set the upper bit rate threshold
+     * @param upperBitrateThreshold 
+     * @return the Builder object to continue building
+     */
     public Builder setUpperBitrateThreshold(int upperBitrateThreshold) {
       this.upperBitrateThreshold = upperBitrateThreshold;
       return this;
     }
     
+    /**
+     * Set the lower bit rate threshold
+     * @param lowerBitrateThreshold
+     * @return the Builder object to continue building
+     */
     public Builder setLowerBitrateThreshold(int lowerBitrateThreshold) {
       this.lowerBitrateThreshold = lowerBitrateThreshold;
       return this;
     }
     
+    /**
+     * Set initial bit rate
+     * @param initialBitrate
+     * @return the Builder object to continue building
+     */
     public Builder setInitialBitrate(int initialBitrate) {
       this.initialBitrate = initialBitrate;
       return this;
     }
     
+    /**
+     * Set initial buffering time
+     * @param initialBufferingTime
+     * @return the Builder object to continue building
+     */
     public Builder setInitialBufferingTime(int initialBufferingTime) {
       this.initialBufferingTime = initialBufferingTime;
       return this;
     }
     
+    /**
+     * Set max buffering time
+     * @param maxBufferingTime
+     * @return the Builder object to continue building
+     * 
+     */
     public Builder setMaxBufferingTime(int maxBufferingTime) {
       this.maxBufferingTime = maxBufferingTime;
       return this;
     }
     
+    /**
+     * Set the buffering time when re-buffering is needed during playback
+     * @param playbackBufferingTime
+     * @return the Builder object to continue building
+     */
     public Builder setPlaybackBufferingTime(int playbackBufferingTime) {
       this.playbackBufferingTime = playbackBufferingTime;
       return this;
@@ -129,26 +154,50 @@ public class VisualOnConfiguration {
     this.playbackBufferingTime = playbackBufferingTime;
   }
   
+  /**
+   * 
+   * @return upper bit rate threshold
+   */
   public int getUpperBitrateThreshold() {
     return this.upperBitrateThreshold;
   }
   
+  /**
+   * 
+   * @return lower bit rate threshold
+   */
   public int getLowerBitrateThreshold() {
     return this.lowerBitrateThreshold;
   }
   
+  /**
+   * 
+   * @return initial bit rate
+   */
   public int getInitialBitrate() {
     return this.initialBitrate;
   }
   
+  /**
+   * 
+   * @return max buffering time
+   */
   public int getMaxBufferingTime() {
     return this.maxBufferingTime;
   }
   
+  /**
+   * 
+   * @return initial buffering time
+   */
   public int getInitialBufferingTime() {
     return this.initialBufferingTime;
   }
   
+  /**
+   * 
+   * @return the buffering time when re-buffering is needed during playback
+   */
   public int getPlaybackBufferingTime() {
     return this.playbackBufferingTime;
   }
