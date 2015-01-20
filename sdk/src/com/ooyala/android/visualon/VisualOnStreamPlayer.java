@@ -522,11 +522,13 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
   
   private void setVisualOnConfigurations() {
-    _player.setInitialBitrate(this._visualOnConfiguration.getInitialBitrate());
-    _player.setMaxBufferingTime(this._visualOnConfiguration.getMaxBufferingTime());
-    _player.setBitrateThreshold(this._visualOnConfiguration.getUpperBitrateThreshold(), this._visualOnConfiguration.getLowerBitrateThreshold());
-    _player.setInitialBufferingTime(this._visualOnConfiguration.getInitialBufferingTime());
-    _player.setPlaybackBufferingTime(this._visualOnConfiguration.getPlaybackBufferingTime());
+    if (this._visualOnConfiguration != null) {
+      _player.setInitialBitrate(this._visualOnConfiguration.getInitialBitrate());
+      _player.setMaxBufferingTime(this._visualOnConfiguration.getMaxBufferingTime());
+      _player.setBitrateThreshold(this._visualOnConfiguration.getUpperBitrateThreshold(), this._visualOnConfiguration.getLowerBitrateThreshold());
+      _player.setInitialBufferingTime(this._visualOnConfiguration.getInitialBufferingTime());
+      _player.setPlaybackBufferingTime(this._visualOnConfiguration.getPlaybackBufferingTime());
+    }  
   }
 
   private void setupView() {

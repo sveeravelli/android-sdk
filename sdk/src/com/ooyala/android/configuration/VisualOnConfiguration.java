@@ -15,8 +15,8 @@ public class VisualOnConfiguration {
   private int maxBufferingTime;
   private int playbackBufferingTime;
   
+  //TODO: Figure out default number or disable when user does not init
   
-  // Check the default number for these fields
   private static boolean DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS = false;
 
   /**
