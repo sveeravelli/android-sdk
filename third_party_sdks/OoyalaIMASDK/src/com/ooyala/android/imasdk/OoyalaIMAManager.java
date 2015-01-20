@@ -53,7 +53,7 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
 
   protected OoyalaPlayerIMAWrapper _ooyalaPlayerWrapper;
   protected List<CompanionAdSlot> _companionAdSlots;
-  protected List<Integer> _cuePoints;
+  protected Set<Integer> _cuePoints;
   protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
   private String _adUrlOverride;
@@ -129,14 +129,13 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
               int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
               _ooyalaPlayerWrapper.pauseContent();
               if (_cuePoints != null && _cuePoints.size() > 0) {
-                for (int i = 0; i < _cuePoints.size(); i++) {
-                  if (_cuePoints.get(i) <= currentContentPlayheadTime) {
-                    _cuePoints.remove(i);
-                    i--;
-                  } else {
-                    break;
+                Set<Integer> newCuePoints = new HashSet<Integer>();
+                for (Integer cuePoint : _cuePoints) {
+                  if (cuePoint > currentContentPlayheadTime) {
+                    newCuePoints.add(cuePoint);
                   }
                 }
+                _cuePoints = newCuePoints;
               }
               break;
             case CONTENT_RESUME_REQUESTED:
@@ -238,10 +237,14 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
     // Get Metadata, load ads, and check if pre-roll ad is available
     DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
     if (_adsManager != null && _cuePoints == null) {
-      _cuePoints = new LinkedList<Integer>();
+      _cuePoints = new HashSet<Integer>();
       List<Float> cuePointsFloat = _adsManager.getAdCuePoints();
       for (Float cuePoint : cuePointsFloat) {
-        _cuePoints.add(cuePoint.intValue()  * 1000);
+        if (cuePoint < 0) {
+          _cuePoints.add(Integer.MAX_VALUE);
+        } else {
+          _cuePoints.add(cuePoint.intValue()  * 1000);
+        }
       }
       DebugMode.logD(TAG, "Cue Point List = " + _cuePoints);
     }
@@ -378,7 +381,6 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
   public void update(Observable observable, Object data) {
     // TODO Auto-generated method stub
     if (observable == _player && OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION.equals(data)) {
-      
       destroy();
       Video currentItem = _player.getCurrentItem();
 
