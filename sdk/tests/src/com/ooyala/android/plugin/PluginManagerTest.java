@@ -139,6 +139,18 @@ class TestAdPlayer implements PlayerInterface {
     // TODO Auto-generated method stub
     return null;
   }
+
+@Override
+public int livePlayheadPercentage() {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public void seekToPercentLive(int percent) {
+	// TODO Auto-generated method stub
+	
+}
 }
 
 public class PluginManagerTest extends AndroidTestCase {
