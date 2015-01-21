@@ -5,7 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ooyala.android.DebugMode;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
@@ -23,6 +28,7 @@ import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
+
   OoyalaPlayer player;
   Spinner embedSpinner;
   HashMap<String, String> embedMap;
@@ -61,7 +67,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
-    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier() );
+    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
@@ -103,5 +109,13 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
   @Override
   public void update(Observable observable, Object data) {
     // TODO Implement to listen to Ooyala Notifications
+  }
+
+  private JSONObject getCustomConfig() {
+    return null;
+  }
+
+  private JSONObject getCustomMetadata() {
+    return null;
   }
 }

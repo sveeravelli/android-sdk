@@ -14,13 +14,13 @@ import com.ooyala.android.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.Utils;
 import com.ooyala.android.item.Video;
 
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
   private static final String METADATA_PREFIX = "nielsen_";
-  private static final boolean NIELSEN_DEBUG = false;
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
@@ -31,6 +31,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private String channelNameJson;
   private JSONObject metadataJson;
   private long lastReportedMsec;
+  private final JSONObject customMetadata;
 
   /**
    * Implementation of integration between Ooyala SDK and Nielsen AppSdk.
@@ -49,11 +50,16 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @param latitude per Nielsen SDK docs. Optional, can be null to omit it.
    * @param clientID per Nielsen SDK docs. Not null.
    * @param vcID per Nielsen SDK docs. Not null.
+   * @param customConfig, optionally null, is any custom JSON you want added into the config for Nielsen's AppSdk. (Note that
+   * Nielsen requires data to meet certain restrictions for valid strings.)
+   * @param customMetadata, optionally null, is any custom JSON you want added into the metadata for Nielsen's loadMetadata. (Note that
+   * Nielsen requires data to meet certain restrictions for valid strings.)
    * @see AppSdk
    * @see #destroy()
    */
-  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
     this.metadataJson = new JSONObject();
+    this.customMetadata = customMetadata;
     this.player = player;
     this.clientID = clientID;
     this.vcID = vcID;
@@ -70,15 +76,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       if( ccode != null ) { configJson.put( "ccode", jsonFilter.filter(ccode) ); }
       if( longitude != null ) { configJson.put( "longitude", jsonFilter.filter(longitude) ); }
       if( latitude != null ) { configJson.put( "latitude", jsonFilter.filter(latitude) ); }
-
-      if( NIELSEN_DEBUG ) {
-        configJson.put( "nol_devDebug", Boolean.TRUE );
-        configJson.put( "nol_nslApiDbg", Boolean.TRUE );
-      }
+      Utils.overwriteJSONObject( customConfig, configJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
-    this.nielsenApp = AppSdk.getInstance( context, configJson.toString() );
+    this.nielsenApp = AppSdk.getInstance( context, configJson.toString(), null );
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     this.id3TagNotifier.addWeakListener( this );
     setChannelName( UNKNOWN_CHANNEL_NAME );
@@ -230,12 +232,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       setMetadataHelper( metadataJson, item, "tfid" );
       setMetadataHelper( metadataJson, item, "sid" );
       // explicitly leaving out 'ocrtag' at the moment as unimplemented.
-
-      if( NIELSEN_DEBUG ) {
-        metadataJson.put( "nol_devDebug", Boolean.TRUE );
-        metadataJson.put( "nol_nslApiDbg", Boolean.TRUE );
-      }
-
+      Utils.overwriteJSONObject( customMetadata, metadataJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
