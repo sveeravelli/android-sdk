@@ -123,7 +123,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     try {
       getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
       DebugMode.logD(TAG, "This app has the ability to play protected content");
-      _hasDiscredix = false;
+      _hasDiscredix = true;
     } catch(Exception e) {
       DebugMode.logD(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
@@ -319,32 +319,32 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 //    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
 //    setState(State.LOADING);
   }
-  
+
   @Override
   public void seekToPercentLive(int percent) {
     int max = (int)_player.getMaxPosition();
     int min = (int)_player.getMinPosition();
     int duration = max - min;
-    int newPosition = (int)(duration * percent / 100 + min);
-    if (_player.setPosition((long)newPosition) < 0) {
+    int newPosition = duration * percent / 100 + min;
+    if (_player.setPosition(newPosition) < 0) {
       DebugMode.logE(TAG, "setPosition failed.");
     }
   }
 
-  @Override 
+  @Override
   public int livePlayheadPercentage() {
     if (_player != null) {
       long max = _player.getMaxPosition();
       long min = _player.getMinPosition();
       long cur = _player.getPosition();
-  
-      float fPercent = (((float) (cur - min)) / ((float) max - min)) * (100f);
+
+      float fPercent = ((cur - min) / ((float) max - min)) * (100f);
       DebugMode.logD(TAG, "Inside LivePlayheadPercentage = " + fPercent);
       return (int)fPercent;
     }
     return 100;
   }
-  
+
   protected void createMediaPlayer() {
     try {
       if (!_surfaceExists) {
@@ -787,7 +787,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _isLiveClosedCaptionsAvailable = false;
     for (int index = 0; index < subtitleCount; ++index) {
       VOOSMPAssetProperty property = asset.getSubtitleProperty(index);
-      
+
       String description;
       int propertyCount = property.getPropertyCount();
       if (propertyCount == 0) {
