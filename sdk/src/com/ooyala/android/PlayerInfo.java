@@ -4,7 +4,6 @@ import java.util.Set;
 
 /**
  * PlayerInfo is a collection of information that describes the capabilities of the playback device
- * @author michael.len
  *
  */
 public interface PlayerInfo {

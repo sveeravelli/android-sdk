@@ -16,7 +16,6 @@ import com.ooyala.android.configuration.Options;
  * LayoutController uses basic controls and allows additional overlays to be added. Fullscreening is done by
  * simply resizing the OoyalaPlayerLayout to fill the entire screen, which does not trigger a player reload
  * thus causing this to be much faster at Fullscreening than OoyalaPlayerLayoutController.
- * @author jigish
  */
 public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
   private boolean _fullscreen = false;
@@ -31,7 +30,26 @@ public class OptimizedOoyalaPlayerLayoutController extends AbstractOoyalaPlayerL
    * @param domain the embed domain to use
    */
   public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain) {
-    this(l, pcode, domain, DefaultControlStyle.AUTO);
+    this(l, new OoyalaPlayer(pcode, domain, null, null),
+        DefaultControlStyle.AUTO);
+  }
+
+  /**
+   * Instantiate an OoyalaPlayerLayoutController
+   * 
+   * @param l
+   *          the layout to use
+   * @param pcode
+   *          the provider code to use
+   * @param domain
+   *          the embed domain to use
+   * @param options
+   *          extra settings
+   */
+  public OptimizedOoyalaPlayerLayoutController(OoyalaPlayerLayout l,
+      String pcode, PlayerDomain domain, Options options) {
+    this(l, new OoyalaPlayer(pcode, domain, null, options),
+        DefaultControlStyle.AUTO);
   }
 
   /**

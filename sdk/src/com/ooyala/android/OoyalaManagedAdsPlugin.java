@@ -1,6 +1,5 @@
 package com.ooyala.android;
 
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,15 +21,15 @@ public class OoyalaManagedAdsPlugin extends
   private static final String TAG = OoyalaManagedAdsPlugin.class.getName();
   private AdMoviePlayer _adPlayer;
   private boolean _seekable = false;
-  protected WeakReference<OoyalaPlayer> _player;
+  protected OoyalaPlayer _player;
   private StateNotifier _stateNotifier;
 
   /**
-   * Ooyala managed ads plugin manages ooyala and vast ads.
+   * Ooyala Managed Ads Plugin manages VAST and Ooyala ads
    */
   public OoyalaManagedAdsPlugin(OoyalaPlayer player) {
     super();
-    _player = new WeakReference<OoyalaPlayer>(player);
+    _player = player;
     _stateNotifier = player.createStateNotifier();
     _stateNotifier.addListener(this);
   }
@@ -66,7 +65,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * called when plugin should be resumed
-   * 
+   *
    * @param timeInMilliSecond
    *          playhead time to seek after resume
    * @param stateToResume
@@ -95,12 +94,20 @@ public class OoyalaManagedAdsPlugin extends
   @Override
   public boolean onContentChanged() {
     super.onContentChanged();
-    _adSpotManager.insertAds(_player.get().getCurrentItem().getAds());
-    if (Stream.streamSetContainsDeliveryType(_player.get().getCurrentItem()
+    _adSpotManager.insertAds(_player.getCurrentItem().getAds());
+    if (Stream.streamSetContainsDeliveryType(_player.getCurrentItem()
         .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
       _adSpotManager.setAlignment(10000);
     }
     return false;
+  }
+
+  /**
+   * Insert an Ooyala Managed Ad into the plugin's list of ads
+   * @param adSpot either an OoyalaAdSpot or VASTAdSpot
+   */
+  public void insertAd(OoyalaManagedAdSpot adSpot) {
+    _adSpotManager.insertAd(adSpot);
   }
 
   private boolean initializeAdPlayer(AdMoviePlayer p, OoyalaManagedAdSpot ad) {
@@ -113,7 +120,7 @@ public class OoyalaManagedAdsPlugin extends
       return false;
     }
 
-    p.init(_player.get(), ad, _stateNotifier);
+    p.init(_player, ad, _stateNotifier);
     // if (p.getError() != null) {
     // return false;
     // }
@@ -128,7 +135,7 @@ public class OoyalaManagedAdsPlugin extends
 
     AdMoviePlayer adPlayer = null;
     try {
-      Class<? extends AdMoviePlayer> adPlayerClass = _player.get()
+      Class<? extends AdMoviePlayer> adPlayerClass = _player
           .getAdPlayerClass(ad);
       if (adPlayerClass != null) {
         adPlayer = adPlayerClass.newInstance();
@@ -175,13 +182,13 @@ public class OoyalaManagedAdsPlugin extends
     case COMPLETED:
       if (!playAdsBeforeTime()) {
         cleanupPlayer(_adPlayer);
-        _player.get().exitAdMode(this);
+        _player.exitAdMode(this);
       }
       break;
     case ERROR:
       DebugMode.logE(TAG, "Error recieved from Ad.  Cleaning up everything");
       cleanupPlayer(_adPlayer);
-      _player.get().exitAdMode(this);
+      _player.exitAdMode(this);
       break;
     default:
       break;
@@ -212,7 +219,7 @@ public class OoyalaManagedAdsPlugin extends
 
   /**
    * get the ad player, used to update UI controls
-   * 
+   *
    * @return the ad player
    */
   @Override

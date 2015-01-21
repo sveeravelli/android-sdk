@@ -12,7 +12,6 @@ import com.ooyala.test.BaseInternalTestAppActivity;
 /**
  * This is the test cases for Freewheel Ad Manager integration
  * NOTE: Only the first request will properly show ads.
- * @author hannah.kang
  *
  */
 public class FreewheelInternalTestAppActivity extends BaseInternalTestAppActivity {

@@ -7,6 +7,7 @@ import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,6 +98,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   protected void setupControls() {
+    Log.d("", "The current fullscreen controls is " + this);
     if (_layout == null) { return; }
     _baseLayout = new FrameLayout(_layout.getContext());
     _baseLayout.setBackgroundColor(Color.TRANSPARENT);

@@ -29,7 +29,6 @@ import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
  *
  * http://developer.android.com/google/play-services/setup.html
  *
- * @author michael.len
  *
  */
 public class IMASampleAppActivity extends Activity implements Observer {

@@ -35,7 +35,6 @@ import com.ooyala.android.plugin.AdPluginInterface;
  *
  * The OoyalaIMAManager works most completely with an OptimizedOoyalaPlayerLayoutController.  If you do not
  * use this layout controller, you will not see IMA's "Learn More" button when in fullscreen mode.
- * @author michael.len
  *
  */
 public class OoyalaIMAManager implements AdPluginInterface {
@@ -60,6 +59,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private boolean _allAdsCompeleted = false; // Help to check if post-roll is available for content finished
   private boolean _adsLoaded = false; // Help the timer to check if there is a pre-roll
   private boolean _adsPlayed = false;
+  private boolean _browserOpened = false;
 
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
@@ -144,6 +144,14 @@ public class OoyalaIMAManager implements AdPluginInterface {
               _adPlayer.setState(State.PAUSED);
               break;
             case RESUMED:
+              if (_browserOpened) {
+                _adPlayer.play();
+                _browserOpened = false;
+              }
+              break;
+            case CLICKED:
+              _adPlayer.pause();
+              _browserOpened = true;
               break;
             default:
               break;
@@ -202,6 +210,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
     DebugMode.logD(TAG, "IMA Managaer: Requesting ads: " + url);
     AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
+    request.setContentProgressProvider(_ooyalaPlayerWrapper);
 
     if (_companionAdSlots != null) {
       _container.setCompanionSlots(_companionAdSlots);

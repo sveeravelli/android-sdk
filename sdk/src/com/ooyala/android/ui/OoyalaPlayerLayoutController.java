@@ -18,7 +18,6 @@ import com.ooyala.android.configuration.Options;
  * Because of this, playback will be suspended and subsequently resumed during this process. As a result,
  * fullscreening is slower than if the OoyalaPlayerLayout is embeded directly in the Activity's base layout,
  * that base layout is a FrameLayout, and the LayoutController used is FastOoyalaPlayerLayoutController.
- * @author jigish
  */
 public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutController {
 
@@ -29,7 +28,26 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param domain the embed domain to use
    */
   public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain) {
-    this(l, pcode, domain, DefaultControlStyle.AUTO);
+    this(l, new OoyalaPlayer(pcode, domain, null, null),
+        DefaultControlStyle.AUTO);
+  }
+
+  /**
+   * Instantiate an OoyalaPlayerLayoutController
+   * 
+   * @param l
+   *          the layout to use
+   * @param pcode
+   *          the provider code to use
+   * @param domain
+   *          the embed domain to use
+   * @param options
+   *          extra settings
+   */
+  public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode,
+      PlayerDomain domain, Options options) {
+    this(l, new OoyalaPlayer(pcode, domain, null, options),
+        DefaultControlStyle.AUTO);
   }
 
   /**
@@ -60,7 +78,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
    * @param dcs the DefaultControlStyle to use (AUTO is default controls, NONE has no controls)
    */
   public OoyalaPlayerLayoutController(OoyalaPlayerLayout l, String pcode, PlayerDomain domain, DefaultControlStyle dcs) {
-    this(l, pcode, domain, dcs, null);
+    this(l, new OoyalaPlayer(pcode, domain, null, null), dcs);
   }
 
   /**

@@ -15,7 +15,6 @@ import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer and Ooyala UI
- * @author michael.len
  *
  */
 public class Player extends Observable implements PlayerInterface,
@@ -162,5 +161,17 @@ public class Player extends Observable implements PlayerInterface,
   public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  public int livePlayheadPercentage() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToPercentLive(int percent) {
+    // TODO Auto-generated method stub
+    
   }
 }

@@ -2,6 +2,8 @@ package com.ooyala.android.visualon;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -24,9 +27,12 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
+import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection;
+import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection.VOOSMPAssetProperty;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
@@ -53,6 +59,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static boolean didCleanupLocalFiles = false;
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
+  private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
+  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.13.10-B72949";
+  private VisualOnConfiguration _visualOnConfiguration = null;
+
   protected VOCommonPlayer _player = null;
   protected SurfaceHolder _holder = null;
   protected String _streamUrl = "";
@@ -64,12 +74,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
-  private int _timeBeforeSuspend = -1;
+  private Integer _timeBeforeSuspend = null;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
+  private int _selectedSubtitleIndex = 0;
+  private List<String> _subtitleDescriptions = null;
 
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 1000;
@@ -103,6 +115,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
+    _visualOnConfiguration = parent.getOptions().getVisualOnConfiguration();
+
     if (!isDiscredixNeeded()) {
       DebugMode.logD(TAG, "This asset doesn't need Discredix");
     }
@@ -110,7 +124,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     try {
       getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
       DebugMode.logD(TAG, "This app has the ability to play protected content");
-      _hasDiscredix = true;
+      _hasDiscredix = false;
     } catch(Exception e) {
       DebugMode.logD(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
@@ -118,6 +132,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     setState(State.LOADING);
     _streamUrl = _stream.decodedURL().toString();
+    _subtitleDescriptions = new ArrayList<String>();
     setParent(parent);
 
     // Copy license file,
@@ -131,6 +146,22 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
+
+      // Check if the Discredix version string matches what we expect
+      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(_parent.getLayout().getContext())) {
+        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+          this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "SecurePlayer Initialization error: Unexpected Discredix Version");
+          setState(State.ERROR);
+          return;
+        }
+        else {
+          DebugMode.logE(TAG, "Disabled Library version checks. Attempting to continue playback");
+        }
+      }
+      else {
+        DebugMode.logI(TAG, "Discredix Version correct for this SDK version");
+      }
+
       FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
@@ -155,9 +186,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case READY:
     case COMPLETED:
       DebugMode.logV(TAG, "Play: ready - about to start");
-      if (_timeBeforeSuspend >= 0 ) {
+      if (_timeBeforeSuspend == null) {
+        if (_stream.isLiveStream()) {
+          _timeBeforeSuspend = 1;
+        } else {
+          _timeBeforeSuspend = -1;
+        }
+      } else if (_timeBeforeSuspend >= 0  && !_stream.isLiveStream()) {
         seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
+      } else if (_timeBeforeSuspend <= 0 && _stream.isLiveStream()) {
+        // current item is a Live stream, which can only seek to where playhead is less or equals to zero
+        seekToTime(_timeBeforeSuspend);
+        _timeBeforeSuspend = 1;
       }
 
       VO_OSMP_RETURN_CODE nRet = _player.start();
@@ -249,6 +290,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void setLiveClosedCaptionsEnabled(boolean enabled) {
     _isLiveClosedCaptionsEnabled = enabled;
+    applySubtitleSettings();
   }
 
   @Override
@@ -278,7 +320,32 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 //    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
 //    setState(State.LOADING);
   }
+  
+  @Override
+  public void seekToPercentLive(int percent) {
+    int max = (int)_player.getMaxPosition();
+    int min = (int)_player.getMinPosition();
+    int duration = max - min;
+    int newPosition = (int)(duration * percent / 100 + min);
+    if (_player.setPosition((long)newPosition) < 0) {
+      DebugMode.logE(TAG, "setPosition failed.");
+    }
+  }
 
+  @Override 
+  public int livePlayheadPercentage() {
+    if (_player != null) {
+      long max = _player.getMaxPosition();
+      long min = _player.getMinPosition();
+      long cur = _player.getPosition();
+  
+      float fPercent = (((float) (cur - min)) / ((float) max - min)) * (100f);
+      DebugMode.logD(TAG, "Inside LivePlayheadPercentage = " + fPercent);
+      return (int)fPercent;
+    }
+    return 100;
+  }
+  
   protected void createMediaPlayer() {
     try {
       if (!_surfaceExists) {
@@ -327,6 +394,38 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         return;
       }
 
+      String visualOnVersion = _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK);
+      DebugMode.logI(TAG, "VisualOn Version: " + visualOnVersion);
+
+      String expectedVersion = isDiscredixLoaded() ? EXPECTED_SECUREPLAYER_VO_VERSION : EXPECTED_VISUALON_VERSION;
+      String libraryUsed = isDiscredixLoaded() ? "SecurePlayer" : "VisualOn";
+      if (expectedVersion.compareTo(visualOnVersion) != 0) {
+        DebugMode.logE(TAG, libraryUsed + " Version was not expected! Expected: " + expectedVersion + ", Actual: " + visualOnVersion);
+        DebugMode.logE(TAG, "Please ask your CSM for updated versions of the " + libraryUsed + " libraries");
+
+        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+          // Errors here cannot be run on async thread - This is run in SurfaceCreated, and erroring will nullpointer exception SurfaceChanged
+          Handler mainHandler = new Handler(Looper.getMainLooper());
+          Runnable runner =  new Runnable() {
+            @Override
+            public void run() {
+              setState(State.ERROR);
+            }
+
+          };
+          this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, libraryUsed + " Initialization error: Unexpected VisualOn Player Version");
+          mainHandler.post(runner);
+          return;
+        }
+        else {
+          DebugMode.logE(TAG, "Disabled Library version checks. Attempting to continue playback");
+        }
+      }
+      else {
+        DebugMode.logI(TAG, libraryUsed + " libraries version correct for this SDK version");
+      }
+
+
       DisplayMetrics dm  = new DisplayMetrics();
       WindowManager wm = (WindowManager) _view.getContext().getSystemService(Context.WINDOW_SERVICE);
       Display display = wm.getDefaultDisplay();
@@ -343,7 +442,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (!isDiscredixLoaded()) {
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
-      DebugMode.logI(TAG, "VisualOn Version: " + _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK));
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
       _player.setPreAgreedLicense(licenseText);
@@ -674,13 +772,78 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     return strTextAll;
   }
 
+  private void handleSubtitles() {
+    VO_OSMP_RETURN_CODE returnValue;
+    if (_player == null) {
+      DebugMode.logE(TAG, "handleSubtitles: player is null");
+      return;
+    }
+
+    applySubtitleSettings();
+    // retrieve subtitle descriptions.
+    // TODO: expose it via UI.
+    VOCommonPlayerAssetSelection asset = _player;
+    int subtitleCount = asset.getSubtitleCount();
+    _subtitleDescriptions.clear();
+    _isLiveClosedCaptionsAvailable = false;
+    for (int index = 0; index < subtitleCount; ++index) {
+      VOOSMPAssetProperty property = asset.getSubtitleProperty(index);
+      
+      String description;
+      int propertyCount = property.getPropertyCount();
+      if (propertyCount == 0) {
+        description = "CC" + String.valueOf(index);
+      } else {
+        final int KEY_DESCRIPTION_INDEX = 1;
+        description = (String) property.getValue(KEY_DESCRIPTION_INDEX);
+      }
+      if (asset.isSubtitleAvailable(index)) {
+        _isLiveClosedCaptionsAvailable = true;
+      }
+      _subtitleDescriptions.add(description);
+    }
+
+    int selectedSubtitleIndex = asset.getPlayingAsset().getSubtitleIndex();
+    DebugMode.logD(TAG, "handleSubtitles: selected subtitle "
+        + selectedSubtitleIndex);
+
+    if (_isLiveClosedCaptionsEnabled && this._isLiveClosedCaptionsAvailable) {
+      returnValue = asset.selectSubtitle(_selectedSubtitleIndex);
+      if (returnValue != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+      DebugMode.logD(
+          TAG,
+            "handleSubtitles: selectSubtitle("
+                + String.valueOf(_selectedSubtitleIndex)
+                + ") failed with error: "
+              + returnValue.toString());
+      }
+    }
+  }
+
+  private void applySubtitleSettings() {
+    if (_player == null) {
+      DebugMode.logE(TAG, "enableSubtitles: player is null");
+      return;
+    }
+
+    VO_OSMP_RETURN_CODE returnValue = _player
+        .enableSubtitle(_isLiveClosedCaptionsEnabled);
+    if (returnValue != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+      DebugMode.logE(TAG,
+          "enable subtitles(" + String.valueOf(_isLiveClosedCaptionsEnabled)
+              + ") failed with error:" + returnValue.toString());
+    }
+  }
+
   @Override
   public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj) {
 
     switch (id) {
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_OPEN_FINISHED");
       setState(State.READY);
+      handleSubtitles();
       break;
 
     case VO_OSMP_CB_PLAY_COMPLETE:
@@ -690,6 +853,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_SEEK_COMPLETE:
       // If first param is 0, seek is actaully complete
       if (param1 <= 0) {
+        setChanged();
+        notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION);
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
@@ -706,6 +871,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _videoWidth = param1;
       _videoHeight = param2;
       DebugMode.logV(TAG, "onEvent: Video Size Changed, " + _videoWidth + ", " + _videoHeight);
+      _view.requestLayout();
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
@@ -736,52 +902,58 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       onError(_player, null, id.getValue());
       break;
 
-    case VO_OSMP_CB_LANGUAGE_INFO_AVAILABLE:
-      // Remember if we have received live closed captions at some point during playback
-      // NOTE: Some reason we might receive false alarm for Closed Captions check if it's empty here
-      voSubtitleInfo info = (voSubtitleInfo)obj;
-      String cc = GetCCString(info);
-      if (!cc.equals("")) {
-        _isLiveClosedCaptionsAvailable = true;
-      }
-
-      // Show closed captions if someone enabled them
-      if (_isLiveClosedCaptionsEnabled) {
-        _parent.displayClosedCaptionText(cc);
-      }
-
-      break;
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
-        break;
-      }
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is "
+                    + param2);
+          break;
+        }
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
-
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is"
+                    + param2);
         switch (param2) {
         case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
           break;
         }
         }
-        break;
-      }
+          break;
+        }
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
 
     case VO_OSMP_SRC_CB_CUSTOMER_TAG:
       handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( id, param1, param2, obj );
+      break;
+
+    case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED");
+      handleSubtitles();
       break;
 
     default:
@@ -849,7 +1021,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       setState(State.ERROR);
     }
     else if (returnedException != null) {
-      DebugMode.logE(TAG, "Personalization resulted in an exception!" + returnedException);
+      DebugMode.logE(TAG, "Personalization resulted in an exception! " + returnedException);
       _error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, returnedException);
       setState(State.ERROR);
     }

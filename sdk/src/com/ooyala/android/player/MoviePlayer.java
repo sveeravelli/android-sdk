@@ -170,8 +170,6 @@ public class MoviePlayer extends Player implements Observer {
     if (_basePlayer != null) {
     _basePlayer.init(_parent, _streams);
 
-    if(_live) millisToResume = 0;
-
     DebugMode.logD(this.getClass().toString(), "Movie Player Resuming. ms to resume: " + millisToResume + ". State to resume: " + stateToResume);
     _basePlayer.resume(millisToResume, stateToResume);
     }
@@ -257,6 +255,16 @@ public class MoviePlayer extends Player implements Observer {
   public int buffer() { return _basePlayer != null ? _basePlayer.buffer() : 0; }
   @Override
   public int getBufferPercentage() { return _basePlayer != null ? _basePlayer.getBufferPercentage() : 0; }
+  
+  @Override
+  public int livePlayheadPercentage() { return _basePlayer != null ? _basePlayer.livePlayheadPercentage() : 0; }
+  
+  @Override
+  public void seekToPercentLive(int percent) {
+    if (_basePlayer != null) {
+      _basePlayer.seekToPercentLive(percent);
+    }
+  }
 
   @Override
   public boolean seekable() { return _seekable; }

@@ -121,7 +121,7 @@ public class VideoTest extends AndroidTestCase {
     assertEquals("http://www.bhangraempire.com", video.getAds().get(0).getClickURL().toString());
     assertEquals(1, video.getAds().get(0).getTrackingURLs().size());
     assertEquals("http://www.ooyala.com/track", video.getAds().get(0).getTrackingURLs().get(0).toString());
-    video.insertAd(new OoyalaAdSpot(1000, null, null, "hello"));
+    video.insertAd(new OoyalaAdSpot(1000, null, null, "hello", null));
     assertEquals(1000, video.getAds().get(1).getTime());
   }
 

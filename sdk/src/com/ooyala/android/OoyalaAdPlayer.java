@@ -18,6 +18,8 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
   private OoyalaAdSpot _ad;
   private Object _fetchTask;
+  private boolean _playQueued = false;
+
 
   private int _topMargin;
   private FrameLayout _playerLayout;
@@ -86,6 +88,28 @@ class OoyalaAdPlayer extends AdMoviePlayer {
         ping(url);
       }
     }
+
+    dequeuePlay();
+  }
+
+  private void dequeuePlay() {
+    if (_playQueued) {
+      _playQueued = false;
+      play();
+    }
+  }
+
+  private void queuePlay() {
+    _playQueued = true;
+  }
+
+  @Override
+  public void play() {
+    if (this.getBasePlayer() == null) {
+      queuePlay();
+      return;
+    }
+    super.play();
   }
 
   @Override

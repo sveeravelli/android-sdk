@@ -12,8 +12,8 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
-import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.AuthorizableItem;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
@@ -23,6 +23,7 @@ import com.ooyala.android.player.StreamPlayer;
  *
  */
 public class OoyalaAdSpot extends OoyalaManagedAdSpot implements AuthorizableItem, PlayableItem {
+  private static final String TAG = OoyalaAdSpot.class.getSimpleName();
   static final String KEY_AUTHORIZED = "authorized";
   static final String KEY_CODE = "code";
   static final String KEY_STREAMS = "streams";  //OoyalaAdSpot, Video
@@ -41,9 +42,10 @@ public class OoyalaAdSpot extends OoyalaManagedAdSpot implements AuthorizableIte
    * @param trackingURLs the tracking URLs that should be pinged when this ad plays
    * @param embedCode the embed code associated with this OoyalaAdSpot
    */
-  public OoyalaAdSpot(int time, URL clickURL, List<URL> trackingURLs, String embedCode) {
+  public OoyalaAdSpot(int time, URL clickURL, List<URL> trackingURLs, String embedCode, OoyalaAPIClient api) {
     super(time, clickURL, trackingURLs);
     _embedCode = embedCode;
+    _api = api;
   }
 
   /**
@@ -128,7 +130,7 @@ public class OoyalaAdSpot extends OoyalaManagedAdSpot implements AuthorizableIte
     try {
       return _api.authorize(this, info);
     } catch (OoyalaException e) {
-      System.out.println("Unable to fetch playback info: " + e.getMessage());
+      DebugMode.logE(TAG, "Unable to fetch playback info: " + e.getMessage());
       return false;
     }
   }

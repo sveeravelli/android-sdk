@@ -23,11 +23,11 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
  * Static methods that are used to perform DRM related activities in the VisualOn Stream Player.
  * The class was created to abstract the VisualOnStreamPlayer from all DRM code, to make it compilable
  * without errors when DRM is disabled
- * @author michael.len
  *
  */
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
+  private static final String SECURE_PLAYER_VERSION = "03_00_05_0962";
   /**
    * Checks if the device has been personalized
    * @return true if personalized, false if not
@@ -58,6 +58,7 @@ class DiscredixDrmUtils {
     try {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
       DebugMode.logD(TAG, "isStreamProtected. Discredix Version: " + dlc.getDrmVersion());
+
       isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -69,6 +70,34 @@ class DiscredixDrmUtils {
     return isDrmContent;
   }
 
+  /**
+   * Compares the loaded Discredix library's version, and compares it with expected value
+   * @param context
+   * @return true if version is expected value, false otherwise
+   */
+  public static boolean isDiscredixVersionCorrect(Context context) {
+    DxLogConfig config = null;
+    IDxDrmDlc dlc;
+    try {
+      dlc = DxDrmDlc.getDxDrmDlc(context, config);
+      DebugMode.logD(TAG, "isDiscredixVersionCorrect. Discredix Version: " + dlc.getDrmVersion());
+
+      final String runningVersion = dlc.getDrmVersion();
+      final boolean foundExpectedVersion = runningVersion.contains( SECURE_PLAYER_VERSION );
+      if (!foundExpectedVersion) {
+        DebugMode.logE(TAG, "Discredix Version was not expected! Looking for: " + SECURE_PLAYER_VERSION + ", Actual: " + dlc.getDrmVersion());
+        DebugMode.logE(TAG, "Please ask your CSM for updated versions of the Discredix/SecurePlayer Libraries");
+          return false;
+      }
+    } catch (DrmGeneralFailureException e) {
+      e.printStackTrace();
+      return false;
+    } catch (DrmClientInitFailureException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
   /**
    * Checks if the file is DRM enabled, and if it is, if the file's DRM rights are valid.
    * @param localFilename file path to locally downloaded file
@@ -84,6 +113,7 @@ class DiscredixDrmUtils {
     boolean areRightsVerified = false;
     try {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
+
       areRightsVerified = dlc.verifyRights(localFilename);
 
     } catch (DrmClientInitFailureException e) {
@@ -151,6 +181,7 @@ class DiscredixDrmUtils {
       IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, null);
       try {
         DebugMode.logD(TAG, "Discredix Version: " + dlc.getDrmVersion());
+
       } catch (DrmGeneralFailureException e) {
         DebugMode.logE(TAG, "Failed trying to get discredix version");
         e.printStackTrace();

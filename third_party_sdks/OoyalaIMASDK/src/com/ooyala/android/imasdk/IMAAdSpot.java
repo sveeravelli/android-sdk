@@ -9,7 +9,6 @@ import com.ooyala.android.item.Stream;
 
 /**
  * The ad spot that holds the single video stream for an IMA ad spot
- * @author michael.len
  *
  */
 class IMAAdSpot extends OoyalaManagedAdSpot {

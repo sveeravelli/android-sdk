@@ -1,5 +1,6 @@
 package com.ooyala.android;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,12 +14,15 @@ import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -55,7 +59,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "3.1.0_RC7";
+  static final String SDK_VERSION = "3.3.0_RC6";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -71,6 +75,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     NONE, BASIC, ENHANCED
   };
 
+  static enum InitPlayState {
+    NONE, PluginQueried, ContentPlayed
+  };
   /**
    * Used by previousVideo and nextVideo. When passed to them, it will cause the
    * video to be played after it is set.
@@ -157,7 +164,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private final Handler _handler = new Handler();
   private Video _currentItem = null;
-  private boolean _currentItemPlayed = false;
+  private InitPlayState _currentItemInitPlayState = InitPlayState.NONE;
   private ContentItem _rootItem = null;
   private final JSONObject _metadata = null;
   private OoyalaException _error = null;
@@ -186,6 +193,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private AdPluginManager _adManager = null;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
+  private ImageView _promoImageView = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -207,6 +215,20 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public OoyalaPlayer(String pcode, PlayerDomain domain) {
     this(pcode, domain, null, null);
+  }
+
+  /**
+   * Initialize an OoyalaPlayer with the given parameters
+   *
+   * @param pcode
+   *          Your Provider Code
+   * @param domain
+   *          Your Embed Domain
+   * @param options
+   *          Extra settings
+   */
+  public OoyalaPlayer(String pcode, PlayerDomain domain, Options options) {
+    this(pcode, domain, null, options);
   }
 
   /**
@@ -484,7 +506,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
 
     _currentItem = video;
-    _currentItemPlayed = false;
+    _currentItemInitPlayState = InitPlayState.NONE;
     if (_currentItemChangedCallback != null) {
       _currentItemChangedCallback.callback(_currentItem);
     }
@@ -619,9 +641,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _analytics.initializeVideo(_currentItem.getEmbedCode(),
         _currentItem.getDuration());
-    if (!processAdModes(AdMode.ContentChanged, 0)) {
-      switchToContent(false);
-    }
+    processAdModes(AdMode.ContentChanged, 0);
     return true;
   }
 
@@ -633,7 +653,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     _rootItem = tree;
     _currentItem = tree.firstVideo();
-    _currentItemPlayed = false;
+    _currentItemInitPlayState = InitPlayState.NONE;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
     PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -741,6 +761,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _player = null;
 
     removeClosedCaptionsView();
+    hidePromoImage();
   }
 
   private void cleanupPlayer(Player p) {
@@ -830,7 +851,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public State getState() {
     PlayerInterface p = currentPlayer();
-    return p == null ? _state : p.getState();
+    if (p == null || _state == State.READY) {
+      return _state;
+    }
+    return p.getState();
   }
 
   /**
@@ -838,11 +862,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void pause() {
     _playQueued = false;
-    if (currentPlayer() != null) {
+    if (currentPlayer() != null && showingAdWithHiddenControlls() == false) {
       currentPlayer().pause();
     }
   }
 
+  public boolean showingAdWithHiddenControlls() {
+    return (isShowingAd() && (options().getShowAdsControls() == false));
+  }
   /**
    * Play the current video
    */
@@ -850,16 +877,25 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_analytics != null) {
       _analytics.reportPlayRequested();
     }
+
     if (currentPlayer() != null && isPlayable(currentPlayer().getState())) {
-      if (isAdPlaying()) {
-        sendNotification(AD_STARTED_NOTIFICATION);
+      _playQueued = false;
+      if (!isShowingAd() && _queuedSeekTime > 0) {
+        seek(_queuedSeekTime);
+        _queuedSeekTime = 0;
       }
 
-      if (!initialContentPlay() || !this.processAdModes(AdMode.InitialPlay, 0)) {
+      if (!needPlayAdsOnInitialContentPlay()) {
         currentPlayer().play();
       }
+      currentPlayer().play();
     } else {
       queuePlay();
+      if (_player == null && _state == State.READY) {
+        if (!needPlayAdsOnInitialContentPlay()) {
+          prepareContent(false);
+        }
+      }
     }
   }
 
@@ -873,13 +909,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *
    * @return true if it is initial play
    */
-  private boolean initialContentPlay() {
-    if (_player.getState() == State.READY) {
-      return true;
+  private boolean needPlayAdsOnInitialContentPlay() {
+    if ((_currentItemInitPlayState != InitPlayState.NONE) || this.isShowingAd()) {
+      return false;
     }
-
-    return false;
+    _currentItemInitPlayState = InitPlayState.PluginQueried;
+    return this.processAdModes(AdMode.InitialPlay, 0);
   }
+
 
   /**
    * Play the current video with an initialTime
@@ -1021,7 +1058,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public int getPlayheadTime() {
     if (currentPlayer() == null) {
-      return -1;
+      return _queuedSeekTime > 0 ? _queuedSeekTime : -1;
     }
     return currentPlayer().currentTime();
   }
@@ -1043,7 +1080,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public boolean seekable() {
     DebugMode.logV(TAG, "seekable(): !null=" + (currentPlayer() != null) + ", seekable="
         + (currentPlayer() == null ? "false" : currentPlayer().seekable()));
-    return currentPlayer() != null && currentPlayer().seekable();
+    return currentPlayer() != null ? currentPlayer().seekable() : _seekable;
   }
 
   /**
@@ -1054,7 +1091,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void seek(int timeInMillis) {
     DebugMode.logV(TAG, "seek()...: msec=" + timeInMillis);
-    if (seekable()) {
+    if (seekable() && currentPlayer() != null) {
       currentPlayer().seekToTime(timeInMillis);
       _queuedSeekTime = 0;
     } else {
@@ -1254,8 +1291,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          the notification
    */
   private void processContentNotifications(Player player, String notification) {
+    if (_player == null) {
+      DebugMode.logE(TAG,  "Accepting notifications when there is no player: " + notification);
+    }
+    if (_player != player) {
+      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
+    }
+
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
-      sendNotification(TIME_CHANGED_NOTIFICATION);
         // send analytics ping
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
@@ -1263,8 +1306,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       processAdModes(AdMode.Playhead, _player.currentTime());
       // closed captions
       displayCurrentClosedCaption();
+
+      sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
+      DebugMode.logD(TAG, "content player state change to " + state);
       switch (state) {
       case COMPLETED:
         DebugMode.logE(TAG, "content finished! should check for post-roll");
@@ -1279,7 +1325,11 @@ public class OoyalaPlayer extends Observable implements Observer,
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
       case PLAYING:
-        markCurrentItemAsPlayed();
+        if (_currentItemInitPlayState != InitPlayState.ContentPlayed) {
+          _currentItemInitPlayState = InitPlayState.ContentPlayed;
+          sendNotification(PLAY_STARTED_NOTIFICATION);
+        }
+        hidePromoImage();
         setState(State.PLAYING);
         break;
       case READY:
@@ -1345,6 +1395,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void setState(State state) {
     if (state != _state) {
+      DebugMode.logD(TAG, "player set state, new state is " + _state);
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
@@ -1375,11 +1426,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       mp.setLiveClosedCaptionsEnabled(true);
       return;
     }
-    if (_language == null) {
-      mp.setLiveClosedCaptionsEnabled(false);
-    }
-    if (_closedCaptionsView != null)
+
+    mp.setLiveClosedCaptionsEnabled(false);
+    if (_closedCaptionsView != null) {
       _closedCaptionsView.setCaption(null);
+    }
     displayCurrentClosedCaption();
   }
 
@@ -1411,18 +1462,23 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return a Set of Strings containing the available closed captions languages
    */
   public Set<String> getAvailableClosedCaptionsLanguages() {
+    Set<String> languages = new HashSet<String>();
+    if (_currentItem != null && _currentItem.getClosedCaptions() != null) {
+      languages.addAll(_currentItem.getClosedCaptions().getLanguages());
+    }
 
-    // If our player found live closed captions, only show option for CC.
+    if (languages.size() <= 0) {
+      this.getLiveClosedCaptionsLanguages(languages);
+    }
+
+    return languages;
+  }
+
+  private void getLiveClosedCaptionsLanguages(Set<String> languages) {
     if (_player != null && (_player instanceof MoviePlayer)
         && _player.isLiveClosedCaptionsAvailable()) {
-      Set<String> retval = new HashSet<String>();
-      retval.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
-      return retval;
+      languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
     }
-    if (_currentItem == null || _currentItem.getClosedCaptions() == null) {
-      return new HashSet<String>();
-    }
-    return getCurrentItem().getClosedCaptions().getLanguages();
   }
 
   /**
@@ -1479,7 +1535,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       return;
     }
     if (seekable()) {
-      seek(percentToMillis(percent));
+      if (getCurrentItem().isLive()) {
+        currentPlayer().seekToPercentLive(percent);
+      } else {
+        seek(percentToMillis(percent));
+      }
     }
     DebugMode.logV(TAG, "...seekToPercent()");
   }
@@ -1522,6 +1582,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public int getPlayheadPercentage() {
     if (currentPlayer() == null) {
       return 0;
+    } else if (getCurrentItem().isLive() && !isAdPlaying()) {
+      return currentPlayer().livePlayheadPercentage();
     }
     return millisToPercent(currentPlayer().currentTime());
   }
@@ -1618,7 +1680,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void dequeuePlay() {
-    if (_playQueued && currentPlayer() != null) {
+    if (_playQueued) {
       _playQueued = false;
       play();
     }
@@ -1826,7 +1888,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       //TODO: the PlayerInterface may need getSeekStyle();
       return SeekStyle.BASIC;
     } else {
-      Log.w(this.getClass().toString(), "We are seeking without a MoviePlayer!");
+      DebugMode.logW(this.getClass().toString(), "We are seeking without a MoviePlayer!");
       return SeekStyle.NONE;
     }
   }
@@ -1912,6 +1974,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         _player.suspend();
     }
     removeClosedCaptionsView();
+    hidePromoImage();
     _adManager.onAdModeEntered();
   }
 
@@ -1998,7 +2061,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     switch (mode) {
     case ContentChanged:
-      switchToContent(false);
+      postContentChanged();
       break;
     case InitialPlay:
     case Playhead:
@@ -2025,6 +2088,24 @@ public class OoyalaPlayer extends Observable implements Observer,
  + "adsDidPlay "
               + String.valueOf(adsDidPlay));
       break;
+    }
+  }
+
+  private void postContentChanged() {
+    DebugMode.logD(TAG, "post content changed");
+    cleanupPlayers();
+    if (_options.getPreloadContent()) {
+      prepareContent(false);
+    }
+
+    if (_options.getShowPromoImage()) {
+      showPromoImage();
+    } else if (!_options.getPreloadContent()) {
+      // state will be set to ready by either prepare content or load promo
+      // image
+      // if both of them are disabled, directly set state to ready
+      setState(State.READY);
+      dequeuePlay();
     }
   }
 
@@ -2093,14 +2174,18 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   @Override
   public Set<Integer> getCuePointsInMilliSeconds() {
-    return _adManager.getCuePointsInMilliSeconds();
+    if (_options.getShowCuePoints()) {
+      return _adManager.getCuePointsInMilliSeconds();
+    } else {
+      return new HashSet<Integer>();
+    }
   }
 
   public Set<Integer> getCuePointsInPercentage() {
     Set<Integer> cuePoints = new HashSet<Integer>();
     int duration = getDuration();
 
-    if (isShowingAd() || duration <= 0) {
+    if (!shouldShowCuePoints()) {
       return cuePoints;
     }
 
@@ -2112,20 +2197,79 @@ public class OoyalaPlayer extends Observable implements Observer,
       int point = (i >= duration) ? 100 : (i * 100 / duration);
       cuePoints.add(point);
     }
-
     return cuePoints;
   }
 
-  private void markCurrentItemAsPlayed() {
-    if (_currentItemPlayed) {
-      return;
+  private boolean shouldShowCuePoints() {
+    if (isShowingAd()) {
+      return false;
     }
-    _currentItemPlayed = true;
-    sendNotification(PLAY_STARTED_NOTIFICATION);
-    if (_analytics != null) {
-      _analytics.reportPlayStarted();
-    } else {
-      DebugMode.logE(TAG, "analytics is null when playing");
+
+    if (getDuration() <= 0) {
+      return false;
+    }
+
+    return _options.getShowCuePoints();
+  }
+
+  /**
+   * Get the Ooyala Managed Ads Plugin, which maintains VAST and Ooyala Advertisements
+   * @return the ManagedAdsPlugin
+   */
+  public OoyalaManagedAdsPlugin getManagedAdsPlugin() {
+    return _managedAdsPlugin;
+  }
+
+  public ReadonlyOptionsInterface options() {
+    return _options;
+  }
+
+  private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    public DownloadImageTask() {
+    }
+
+    @Override
+    protected Bitmap doInBackground(String... args) {
+      String url = args[0];
+      Bitmap bitmap = null;
+      try {
+        InputStream in = new java.net.URL(url).openStream();
+        bitmap = BitmapFactory.decodeStream(in);
+      } catch (Exception e) {
+        DebugMode.logE("Error", e.getMessage());
+        e.printStackTrace();
+      }
+      return bitmap;
+    }
+
+    protected void onPostExecute(Bitmap result) {
+      if (_promoImageView != null) {
+        _promoImageView.setImageBitmap(result);
+        _promoImageView.setAdjustViewBounds(true);
+      }
+      DebugMode.logD(TAG, "promoimage loaded, state is" + _state);
+      if (_state == State.LOADING) {
+        setState(State.READY);
+        dequeuePlay();
+      }
+    }
+  }
+
+  private void showPromoImage() {
+    if (_currentItem != null && _currentItem.getPromoImageURL(0, 0) != null) {
+      DebugMode.logD(TAG,
+          "loading promoimage , url is " + _currentItem.getPromoImageURL(0, 0));
+      hidePromoImage();
+      _promoImageView = new ImageView(getLayout().getContext());
+      getLayout().addView(_promoImageView);
+      new DownloadImageTask().execute(_currentItem.getPromoImageURL(0, 0));
+    }
+  }
+
+  private void hidePromoImage() {
+    if (_promoImageView != null) {
+      getLayout().removeView(_promoImageView);
+      _promoImageView = null;
     }
   }
 
