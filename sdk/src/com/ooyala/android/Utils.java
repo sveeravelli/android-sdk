@@ -18,11 +18,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import android.graphics.Rect;
 import android.os.Build;
 import android.util.Base64;
 
-class Utils {
+public class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */
   static final String DEVICE_ANDROID_HLS_SDK = "android_3plus_sdk";
@@ -134,6 +133,17 @@ class Utils {
     } catch (ClassCastException exception) {
       System.out.println("ClassCastException: " + exception);
       return null;
+    }
+  }
+
+  public static void overwriteJSONObject( JSONObject src, JSONObject dst ) throws JSONException {
+    if( src != null && dst != null ) {
+      final Iterator<?> ccks = src.keys();
+      while( ccks.hasNext() ) {
+        final String ck = String.valueOf( ccks.next() );
+        final Object cv = src.get( ck );
+        dst.put( ck, cv );
+      }
     }
   }
 

@@ -105,6 +105,13 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
 
+  public enum ContentOrAdType {
+    MainContent,
+    PreRollAd,
+    MidRollAd,
+    PostRollAd,
+  }
+
   static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
 
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
@@ -1624,6 +1631,32 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
+   * @return the kind of content that is on the video display right now.
+   */
+  public ContentOrAdType getPlayingType() {
+    ContentOrAdType t = _getPlayingType();
+    //DebugMode.logV( TAG, "getContentOrAdType(): " + t );
+    return t;
+  }
+  private ContentOrAdType _getPlayingType() {
+    if( isShowingAd() ) {
+      // fyi: don't use getPlayer() here since we want to only check the 'content' player, never the 'ad' one.
+      if( _player == null || _player.currentTime() <= 0 ) {
+        return ContentOrAdType.PreRollAd;
+      }
+      else if( _player.getState() == State.COMPLETED ) {
+        return ContentOrAdType.PostRollAd;
+      }
+      else {
+        return ContentOrAdType.MidRollAd;
+      }
+    }
+    else {
+      return ContentOrAdType.MainContent;
+    }
+  }
+
+  /**
    * @return true if the OoyalaPlayer is currently showing an ad (in any state).
    *         false if not.
    */
@@ -2238,5 +2271,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       getLayout().removeView(_promoImageView);
       _promoImageView = null;
     }
+  }
+
+  public ID3TagNotifier getID3TagNotifier() {
+    return ID3TagNotifier.s_getInstance();
   }
 }

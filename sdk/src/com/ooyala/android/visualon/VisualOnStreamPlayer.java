@@ -21,6 +21,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.ooyala.android.DebugMode;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -945,15 +946,36 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
+
+    case VO_OSMP_SRC_CB_CUSTOMER_TAG:
+      handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( id, param1, param2, obj );
+      break;
+
     case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
       DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED");
       handleSubtitles();
       break;
+
     default:
       break;
     }
     DebugMode.logV(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
+  }
+
+  private void handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj ) {
+    VO_OSMP_SRC_CUSTOMERTAGID tag = VO_OSMP_SRC_CUSTOMERTAGID.valueOf( param1 );
+    switch (tag) {
+    case VO_OSMP_SRC_CUSTOMERTAGID_TIMEDTAG:
+      // todo: emit the tags in a generic way?
+      int time = param2;
+      byte[] b = (byte[]) obj;
+      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
+      ID3TagNotifier.s_getInstance().onTag( b );
+      break;
+    default:
+      break;
+    }
   }
 
   @Override

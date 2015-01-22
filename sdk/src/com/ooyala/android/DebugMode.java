@@ -133,13 +133,16 @@ public final class DebugMode {
     if( DebugMode.mode != Mode.None ) { Log.e( tag, message, throwable ); }
   }
 
-  public static void assertEquals( Object a, Object b, String tag, String message ) {
+  public static boolean assertEquals( Object a, Object b, String tag, String message ) {
+    boolean equals = false;
     if( a != null || b != null ) {
       Object left = a == null ? b : a;
       Object right = a == null ? a : b;
       String preMessage = "(" + left + "?=" + right + ") ";
-      DebugMode.assertCondition( left.equals(right), tag, preMessage+message );
+      equals = left.equals(right);
+      DebugMode.assertCondition( equals, tag, preMessage+message );
     }
+    return equals;
   }
 
   /**
@@ -148,7 +151,7 @@ public final class DebugMode {
    * @param tag the Log tag
    * @param message the Log message
    */
-  public static void assertCondition( boolean condition, String tag, String message ) {
+  public static boolean assertCondition( boolean condition, String tag, String message ) {
     if (!condition) {
       switch( getMode() ) {
       case None:
@@ -162,6 +165,7 @@ public final class DebugMode {
         break;
       }
     }
+    return condition;
   }
 
   /**
