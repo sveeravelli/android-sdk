@@ -3,6 +3,7 @@ package com.ooyala.android.imasdk;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +52,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   protected OoyalaPlayerIMAWrapper _ooyalaPlayerWrapper;
   protected List<CompanionAdSlot> _companionAdSlots;
+  protected List<Integer> _cuePoints;
   protected Map<String,String> _adTagParameters;
   protected OoyalaPlayer _player;
   private String _adUrlOverride;
@@ -100,6 +102,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
         _adsManager = event.getAdsManager();
         _adsManager.init();
+        _cuePoints = null;
         _adsManager.addAdErrorListener(new AdErrorListener() {
 
           @Override
@@ -126,6 +129,16 @@ public class OoyalaIMAManager implements AdPluginInterface {
               break;
             case CONTENT_PAUSE_REQUESTED:
               _ooyalaPlayerWrapper.pauseContent();
+              int playheadTime = _player.getPlayheadTime();
+              if (_cuePoints != null && _cuePoints.size() > 0) {
+                for (int i = 0; i < _cuePoints.size() - 1; i++) {
+                  if (_cuePoints.get(i) <= playheadTime) {
+                    _cuePoints.remove(i);
+                  } else {
+                    break;
+                  }
+                }
+              }
               break;
             case CONTENT_RESUME_REQUESTED:
               _ooyalaPlayerWrapper.playContent();
@@ -226,7 +239,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public boolean onInitialPlay() {
     // Get Metadata, load ads, and check if pre-roll ad is available
     DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
-
     // If we have played the pre-roll already, we do not need to play again
     if (_adsPlayed) {
       return false;
@@ -385,6 +397,18 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   @Override
   public Set<Integer> getCuePointsInMilliSeconds() {
+    DebugMode.logD(TAG, "Current Cue Points1 = " + _cuePoints);
+    if (_adsManager != null && _cuePoints ==  null) {
+      _cuePoints = new LinkedList<Integer>();
+      List<Float> cuePointsFloat = _adsManager.getAdCuePoints();
+      for (Float cuePoint : cuePointsFloat) {
+        _cuePoints.add(cuePoint.intValue()  * 1000);
+      }
+      DebugMode.logD(TAG, "Current Cue Points2 = " + _cuePoints);
+      return new HashSet<Integer>(_cuePoints);
+    } else if (_cuePoints != null) {
+      return new HashSet<Integer>(_cuePoints);
+    }
     return new HashSet<Integer>();
   }
 }
