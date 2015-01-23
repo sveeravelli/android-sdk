@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.apis;
 
 public interface FetchPlaybackInfoCallback {
   /**

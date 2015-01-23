@@ -10,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ooyala.android.FCCTVRating;
-import com.ooyala.android.ModuleData;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OrderedMapValue;
 

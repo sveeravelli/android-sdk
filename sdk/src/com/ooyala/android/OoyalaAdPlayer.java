@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.player.AdMoviePlayer;
