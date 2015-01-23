@@ -1,4 +1,6 @@
-package com.ooyala.android;
+package com.ooyala.android.apis;
+
+import com.ooyala.android.OoyalaException;
 
 public interface MetadataFetchedCallback {
   /**

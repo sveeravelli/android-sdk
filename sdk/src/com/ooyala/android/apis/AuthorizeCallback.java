@@ -1,6 +1,8 @@
-package com.ooyala.android;
+package com.ooyala.android.apis;
 
-interface AuthorizeCallback {
+import com.ooyala.android.OoyalaException;
+
+public interface AuthorizeCallback {
   /**
    * This callback is used for asynchronous authorize calls
    * @param result true if the authorize call succeeded, false otherwise

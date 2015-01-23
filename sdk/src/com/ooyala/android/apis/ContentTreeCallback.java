@@ -1,5 +1,6 @@
-package com.ooyala.android;
+package com.ooyala.android.apis;
 
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.item.ContentItem;
 
 public interface ContentTreeCallback {

@@ -13,9 +13,9 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 
 /**
  * Stores the info and metatdata for the specified movie.
