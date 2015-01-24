@@ -40,7 +40,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
  * use this layout controller, you will not see IMA's "Learn More" button when in fullscreen mode.
  *
  */
-public class OoyalaIMAManager implements AdPluginInterface, Observer {
+public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
 
   public boolean _onAdError;
@@ -71,7 +71,6 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
    */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
     _player = ooyalaPlayer;
-    _player.addObserver(this);
     _adPlayer = new IMAAdPlayer();
     _adPlayer.setIMAManager(this);
     _companionAdSlots = new ArrayList<CompanionAdSlot>();
@@ -256,6 +255,19 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
     DebugMode.logD(TAG, "IMA Ads Manager: onContentChanged");
     destroy();
     resetFields();
+    Video currentItem = _player.getCurrentItem();
+
+    final boolean isBacklotIMA = currentItem.getModuleData() != null &&
+        currentItem.getModuleData().get("google-ima-ads-manager") != null &&
+        currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
+    final boolean isOverrideIMA = _adUrlOverride != null;
+    if ( isBacklotIMA || isOverrideIMA ) {
+      String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
+      if(url != null) {
+        DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
+        loadAds(url);
+      }
+    }
     return false;  //True if you want to block, false otheriwse
   }
 
@@ -370,31 +382,9 @@ public class OoyalaIMAManager implements AdPluginInterface, Observer {
 
   @Override
   public Set<Integer> getCuePointsInMilliSeconds() {
-    DebugMode.logD(TAG, "Current Cue Points1 = " + _cuePoints);
     if (_cuePoints != null) {
       return new HashSet<Integer>(_cuePoints);
     }
     return new HashSet<Integer>();
-  }
-
-  @Override
-  public void update(Observable observable, Object data) {
-    // TODO Auto-generated method stub
-    if (observable == _player && OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION.equals(data)) {
-      destroy();
-      Video currentItem = _player.getCurrentItem();
-
-      final boolean isBacklotIMA = currentItem.getModuleData() != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager") != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
-      final boolean isOverrideIMA = _adUrlOverride != null;
-      if ( isBacklotIMA || isOverrideIMA ) {
-        String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
-        if(url != null) {
-          DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
-          loadAds(url);
-        }
-      }
-    }
   }
 }
