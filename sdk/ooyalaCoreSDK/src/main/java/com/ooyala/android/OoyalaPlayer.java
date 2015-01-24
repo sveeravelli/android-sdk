@@ -237,7 +237,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    *          Extra settings, can be null in which case default values are used.
    */
   public OoyalaPlayer(String pcode, PlayerDomain domain, EmbedTokenGenerator generator, Options options) {
-    _playerAPIClient = new PlayerAPIClient(pcode, domain, generator);
+    _playerAPIClient = new PlayerAPIClient(pcode, domain, generator, options);
     _actionAtEnd = ActionAtEnd.CONTINUE;
     _options = options == null ? new Options.Builder().build() : options;
 
