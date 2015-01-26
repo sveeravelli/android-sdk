@@ -1,26 +1,18 @@
-SDK_DIR=$(shell pwd)
-GOPATH=$(shell pwd)/submodules/mobile_sdk_build_packaging_scripts
-SUBMODULE_BUILD_PATH=submodules/mobile_sdk_build_packaging_scripts/src/mobile.ooyala.com/build
-SUBMODULE_DEPLOY_PATH=submodules/mobile_sdk_build_packaging_scripts/src/mobile.ooyala.com/deploy
-
-GIT_SHA=$(shell git -C $(GOPATH) rev-parse HEAD)
-GIT_DIRTY=$(shell git -C $(GOPATH) diff-index --quiet HEAD -- ; echo $$?)
-INSTALL_FLAGS=-ldflags "-X mobile.ooyala.com/build/common/git.BuildRepoGitSHA $(GIT_SHA) -X mobile.ooyala.com/build/common/git.BuildRepoGitDirty $(GIT_DIRTY)"
-
-all: update-submodules install
+MAKEFILE_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+EXES = android_test android_build android_publish_rc android_publish_release android_deploy
+SCRIPT_SUBMODULE_DIR = $(MAKEFILE_DIR)/submodules/mobile_sdk_build_packaging_scripts
+SCRIPT_SUBMODULE_BIN_DIR = $(SCRIPT_SUBMODULE_DIR)/bin
+SCRIPT_SDK_BIN_DIR = $(MAKEFILE_DIR)/script
 
 install:
-	export GOPATH=$(GOPATH) && \
-	cd $(SUBMODULE_BUILD_PATH)/android_test && go build $(INSTALL_FLAGS) -o $(SDK_DIR)/script/android_test && go clean
-	export GOPATH=$(GOPATH) && \
-	cd $(SUBMODULE_BUILD_PATH)/android_build && go build $(INSTALL_FLAGS) -o $(SDK_DIR)/script/android_build && go clean
-	export GOPATH=$(GOPATH) && \
-	cd $(SUBMODULE_BUILD_PATH)/android_publish_rc && go build $(INSTALL_FLAGS) -o $(SDK_DIR)/script/android_publish_rc && go clean
-	export GOPATH=$(GOPATH) && \
-	cd $(SUBMODULE_BUILD_PATH)/android_publish_release && go build $(INSTALL_FLAGS) -o $(SDK_DIR)/script/android_publish_release && go clean
-	export GOPATH=$(GOPATH) && \
-	cd $(SUBMODULE_DEPLOY_PATH)/android_deploy && go build $(INSTALL_FLAGS) -o $(SDK_DIR)/deploy/android_deploy && go clean
+	@pushd $(SCRIPT_SUBMODULE_DIR); make test && make install
+	@for me in $(EXES); do \
+		cp $(SCRIPT_SUBMODULE_BIN_DIR)/$$me $(SCRIPT_SDK_BIN_DIR)/$$me; \
+		if ! [ -e $(SCRIPT_SDK_BIN_DIR)/$$me ] ; then echo missing $(SCRIPT_SDK_BIN_DIR)/$$me; exit 1; fi; \
+	done
 
 update-submodules:
 	git submodule init
 	git submodule update
+
+all: update-submodules install
