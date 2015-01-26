@@ -11,6 +11,8 @@ install:
 		if ! [ -e $(SCRIPT_SDK_BIN_DIR)/$$me ] ; then echo missing $(SCRIPT_SDK_BIN_DIR)/$$me; exit 1; fi; \
 	done
 
+all: update-submodules install
+
 update-submodules:
 	git submodule init
 	git submodule update
