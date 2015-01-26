@@ -74,6 +74,10 @@ class PlayerAPIClient {
 
   public PlayerAPIClient() {}
 
+  public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator) {
+    this(pcode, domain, embedTokenGenerator, null);
+  }
+
   public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator, Options options) {
     _pcode = pcode;
     _domain = domain;

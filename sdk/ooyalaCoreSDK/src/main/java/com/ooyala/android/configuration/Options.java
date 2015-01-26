@@ -53,11 +53,21 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    /**
+     * Set the connection timeout value used by networking operations
+     * @param connectionTimeoutInMillisecond the connection timeout in millisecond
+     * default value is 0, which means never time out
+     */
     public Builder setConnectionTimeout(int connectionTimeoutInMillisecond) {
       this.connectionTimeoutInMillisecond = connectionTimeoutInMillisecond;
       return this;
     }
 
+    /**
+     * Set the stream read timeout value used by networking operations
+     * @param readTimeoutInMillisecond the read timeout in millisecond
+     * default value is 0, which means never time out
+     */
     public Builder setReadTimeout(int readTimeoutInMillisecond) {
       this.readTimeoutInMillisecond = readTimeoutInMillisecond;
       return this;

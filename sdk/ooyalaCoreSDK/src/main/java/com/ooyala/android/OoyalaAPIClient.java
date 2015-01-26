@@ -23,6 +23,18 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain) {
+    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, null);
+  }
+
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiKey the API Key to use for secured APIs
+   * @param secret the Secret to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   * @param options the options to use
+   */
   public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain, Options options) {
     this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, options);
   }
