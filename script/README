@@ -1,0 +1,28 @@
+The original build scripts (e.g. android-sdk, sdk-helper.sh) have been replaced.
+Please use the following:
+
+    android_build             : generate the release
+      options:
+        -h                : show full help text
+        -nt               : do not run the unit tests
+        -v=<VERSION>      : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+
+        -rc=<CANDIDATE>   : set the release candidate number to <CANDIDATE>
+
+    android_publish_rc        : publish the generated RC to Box
+      options:
+        -h                : show full help text
+        -v=<VERSION>      : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+
+        -rc=<CANDIDATE>   : set the release candidate number to <CANDIDATE>
+        -box-dir=<BOXDIR> : the directory of your local synced Box account
+
+    android_publish_release   : promote the latest published RC to Full Release
+        -h                : show full help text
+        -v=<VERSION>      : update the version to <VERSION> where <VERSION> is in the form [0-9]+.[0-9]+.[0-9]+
+        -rc=<CANDIDATE>   : set the release candidate number to <CANDIDATE>
+        -box-dir=<BOXDIR> : the directory of your local synced Box account
+
+If these scripts don't exist, run 'make all' from the SDK root
+directory (the one just above this current 'script' directory).
+
+If you getting a doxygen error, try (re) installing doxygen e.g.
+$ brew install doxygen
