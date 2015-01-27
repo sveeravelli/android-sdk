@@ -2,6 +2,8 @@ package com.ooyala.android;
 
 import android.os.AsyncTask;
 
+import com.ooyala.android.apis.ContentTreeCallback;
+import com.ooyala.android.apis.ContentTreeNextCallback;
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.PaginatedParentItem;

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.PlayableItem;

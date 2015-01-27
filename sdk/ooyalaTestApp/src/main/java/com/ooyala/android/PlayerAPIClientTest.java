@@ -7,6 +7,7 @@ import com.ooyala.android.item.Channel;
 import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.DynamicChannel;
+import com.ooyala.android.item.ModuleData;
 import com.ooyala.android.item.Video;
 
 import java.util.ArrayList;

@@ -33,6 +33,10 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.apis.AuthorizeCallback;
+import com.ooyala.android.apis.ContentTreeCallback;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
+import com.ooyala.android.apis.MetadataFetchedCallback;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
@@ -104,6 +108,13 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
+
+  public enum ContentOrAdType {
+    MainContent,
+    PreRollAd,
+    MidRollAd,
+    PostRollAd,
+  }
 
   static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
 
@@ -1528,7 +1539,11 @@ public class OoyalaPlayer extends Observable implements Observer,
       return;
     }
     if (seekable()) {
-      seek(percentToMillis(percent));
+      if (getCurrentItem().isLive()) {
+        currentPlayer().seekToPercentLive(percent);
+      } else {
+        seek(percentToMillis(percent));
+      }
     }
     DebugMode.logV(TAG, "...seekToPercent()");
   }
@@ -1571,6 +1586,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public int getPlayheadPercentage() {
     if (currentPlayer() == null) {
       return 0;
+    } else if (getCurrentItem().isLive() && !isAdPlaying()) {
+      return currentPlayer().livePlayheadPercentage();
     }
     return millisToPercent(currentPlayer().currentTime());
   }
@@ -1614,6 +1631,32 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (isShowingAd()) {
       sendNotification(AD_SKIPPED_NOTIFICATION);
       _adManager.skipAd();
+    }
+  }
+
+  /**
+   * @return the kind of content that is on the video display right now.
+   */
+  public ContentOrAdType getPlayingType() {
+    ContentOrAdType t = _getPlayingType();
+    //DebugMode.logV( TAG, "getContentOrAdType(): " + t );
+    return t;
+  }
+  private ContentOrAdType _getPlayingType() {
+    if( isShowingAd() ) {
+      // fyi: don't use getPlayer() here since we want to only check the 'content' player, never the 'ad' one.
+      if( _player == null || _player.currentTime() <= 0 ) {
+        return ContentOrAdType.PreRollAd;
+      }
+      else if( _player.getState() == State.COMPLETED ) {
+        return ContentOrAdType.PostRollAd;
+      }
+      else {
+        return ContentOrAdType.MidRollAd;
+      }
+    }
+    else {
+      return ContentOrAdType.MainContent;
     }
   }
 
@@ -2232,5 +2275,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       getLayout().removeView(_promoImageView);
       _promoImageView = null;
     }
+  }
+
+  public ID3TagNotifier getID3TagNotifier() {
+    return ID3TagNotifier.s_getInstance();
   }
 }

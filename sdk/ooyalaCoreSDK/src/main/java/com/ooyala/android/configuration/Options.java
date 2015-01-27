@@ -7,6 +7,7 @@ public class Options implements ReadonlyOptionsInterface {
     private VisualOnConfiguration visualOnConfiguration;
     private boolean showCuePoints;
     private boolean showAdsControls;
+    private boolean showLiveControls;
     private boolean preloadContent;
     private boolean showPromoImage;
     private int connectionTimeoutInMillisecond;
@@ -21,6 +22,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = false;
       this.connectionTimeoutInMillisecond = 0;
       this.readTimeoutInMillisecond = 0;
+      this.showLiveControls = false;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -52,6 +54,11 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = showPromoImage;
       return this;
     }
+    
+    public Builder setShowLiveControls(boolean showLiveControls) {
+      this.showLiveControls = showLiveControls;
+      return this;
+    }
 
     /**
      * Set the connection timeout value used by networking operations
@@ -75,7 +82,7 @@ public class Options implements ReadonlyOptionsInterface {
 
     public Options build() {
       return new Options(tvRatingConfiguration, visualOnConfiguration,
-          showCuePoints, showAdsControls, preloadContent, showPromoImage,
+          showCuePoints, showAdsControls, preloadContent, showPromoImage, showLiveControls,
               connectionTimeoutInMillisecond, readTimeoutInMillisecond);
     }
   }
@@ -88,17 +95,20 @@ public class Options implements ReadonlyOptionsInterface {
   private final boolean showPromoImage;
   private final int connectionTimeoutInMillisecond;
   private final int readTimeoutInMillisecond;
+  private final boolean showLiveControls;
 
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
       VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
-      boolean showAdsControls, boolean preloadContent, boolean showPromoImage,
+      boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls,
       int connectionTimeoutInMillisecond, int readTimeoutInMillisecond) {
+
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
     this.showCuePoints = showCuePoints;
     this.showAdsControls = showAdsControls;
     this.preloadContent = preloadContent;
     this.showPromoImage = showPromoImage;
+    this.showLiveControls = showLiveControls;
     this.connectionTimeoutInMillisecond = connectionTimeoutInMillisecond;
     this.readTimeoutInMillisecond = readTimeoutInMillisecond;
   }
@@ -131,6 +141,11 @@ public class Options implements ReadonlyOptionsInterface {
   @Override
   public boolean getShowPromoImage() {
     return showPromoImage;
+  }
+
+  @Override
+  public boolean getShowLiveControls() {
+    return showLiveControls;
   }
 
   @Override

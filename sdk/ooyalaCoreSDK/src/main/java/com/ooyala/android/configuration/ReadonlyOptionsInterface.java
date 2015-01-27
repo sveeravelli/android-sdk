@@ -14,7 +14,10 @@ public interface ReadonlyOptionsInterface {
 
   boolean getShowPromoImage();
 
+  boolean getShowLiveControls();
+
   int getConnectionTimeoutInMillisecond();
 
   int getReadTimeoutInMillisecond();
+
 }
