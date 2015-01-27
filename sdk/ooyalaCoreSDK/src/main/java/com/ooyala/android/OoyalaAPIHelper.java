@@ -47,7 +47,6 @@ class OoyalaAPIHelper {
       while ((line = rd.readLine()) != null) {
         sb.append(line);
       }
-      rd.close();
 
       String headerName = null;
       for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
