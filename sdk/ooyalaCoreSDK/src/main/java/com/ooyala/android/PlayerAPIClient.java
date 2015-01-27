@@ -294,44 +294,9 @@ class PlayerAPIClient {
   }
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
-      throws OoyalaException {
-    String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
-        Utils.join(embedCodes, SEPARATOR_URL_IDS));
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST,
-            uri, authorizeParams(embedCodes),
-            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
-    JSONObject authData = null;
-    try {
-      authData = verifyAuthorizeJSON(json, embedCodes);
-
-      //parse out and save auth token and heartbeat data
-      if (!json.isNull(KEY_AUTH_TOKEN)) {
-        setAuthToken(json.getString(KEY_AUTH_TOKEN));
-      }
-
-      if (!json.isNull(KEY_HEARTBEAT_DATA)) {
-        JSONObject heartbeatData = json.getJSONObject(KEY_HEARTBEAT_DATA);
-        if (!heartbeatData.isNull(KEY_HEARTBEAT_INTERVAL)) {
-          _heartbeatInterval = heartbeatData.getInt(KEY_HEARTBEAT_INTERVAL);
-        }
-      }
-
-      if (!json.isNull(KEY_USER_INFO)) {
-        _userInfo = new UserInfo(json.getJSONObject(KEY_USER_INFO));
-      }
-    } catch (OoyalaException e) {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
-          "Authorization response invalid (exception).");
-    }
-
-    if (parent != null) {
-      parent.update(authData);
-    }
-    return true;
+          throws OoyalaException {
+    PlayerInfo playerInfo = null;
+    return authorizeEmbedCodes(embedCodes, parent, playerInfo);
   }
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent, PlayerInfo playerInfo)
@@ -341,24 +306,30 @@ class PlayerAPIClient {
     Map<String, String> params = authorizeParams(embedCodes);
     params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
 
-    if (playerInfo.getSupportedFormats() != null)
-      params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
+    if (playerInfo != null) {
+      if (playerInfo.getSupportedFormats() != null)
+        params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
 
-    if (playerInfo.getSupportedProfiles() != null)
-      params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
+      if (playerInfo.getSupportedProfiles() != null)
+        params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
 
-    if (playerInfo.getMaxHeight() > 0)
-      params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
+      if (playerInfo.getMaxHeight() > 0)
+        params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
 
-    if (playerInfo.getMaxWidth() > 0)
-      params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
+      if (playerInfo.getMaxWidth() > 0)
+        params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
 
-    if (playerInfo.getMaxBitrate() > 0) {
-      params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+      if (playerInfo.getMaxBitrate() > 0) {
+        params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+      }
     }
 
     JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, params,
             _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
+    if (json == null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED,
+              "Authorization connection timed out.");
+    }
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
@@ -713,13 +684,15 @@ class PlayerAPIClient {
         return fetchMetadata(taskParams[0].item);
       } catch (OoyalaException e) {
         _error = e;
-        return null;
+        return false;
       }
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-      _callback.callback(result, _error);
+      if (_callback != null) {
+        _callback.callback(result, _error);
+      }
     }
   }
 
