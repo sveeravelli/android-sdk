@@ -3,11 +3,8 @@ package com.ooyala.android.imasdk;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 
 import android.view.ViewGroup;
@@ -59,7 +56,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private String _adUrlOverride;
   
   protected IMAAdPlayer _adPlayer = null;
-  private boolean _allAdsCompeleted = false; // Help to check if post-roll is available for content finished
   private boolean _browserOpened = false;
 
   /**
@@ -100,7 +96,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
         _adsManager = event.getAdsManager();
-        _adsManager.init();
+        _player.exitAdMode(_adPlayer.getIMAManager());
         _adsManager.addAdErrorListener(new AdErrorListener() {
 
           @Override
@@ -110,7 +106,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
             _onAdError = true;
             _ooyalaPlayerWrapper.onAdError();
           }
-        } );
+        });
 
         _adsManager.addAdEventListener(new AdEventListener() {
 
@@ -119,10 +115,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
             DebugMode.logD(TAG,"IMA AdsManager Event: " + event.getType());
             switch (event.getType()) {
             case LOADED:
-              DebugMode.logD(TAG,"IMA Ad Manager: Starting ad");
-              if( _adsManager != null ) {
-                _adsManager.start();
-              }
+              DebugMode.logD(TAG,"IMA Ad Manager: Ads Loaded");
               break;
             case CONTENT_PAUSE_REQUESTED:
               int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
@@ -130,7 +123,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
               if (_cuePoints != null && _cuePoints.size() > 0) {
                 Set<Integer> newCuePoints = new HashSet<Integer>();
                 for (Integer cuePoint : _cuePoints) {
-                  if (cuePoint > currentContentPlayheadTime) {
+                  if (cuePoint >= currentContentPlayheadTime) {
                     newCuePoints.add(cuePoint);
                   }
                 }
@@ -145,7 +138,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
               _adPlayer.setState(State.PLAYING);
               break;
             case ALL_ADS_COMPLETED:
-              _allAdsCompeleted = true;
               break;
             case COMPLETED:
               break;
@@ -228,25 +220,31 @@ public class OoyalaIMAManager implements AdPluginInterface {
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
   }
-
-  // Implement AdPluginInterface
-
-  @Override
-  public boolean onInitialPlay() {
-    // Get Metadata, load ads, and check if pre-roll ad is available
-    DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
+  
+  private void fetchCuePoint() {
     if (_adsManager != null && _cuePoints == null) {
       _cuePoints = new HashSet<Integer>();
       List<Float> cuePointsFloat = _adsManager.getAdCuePoints();
       for (Float cuePoint : cuePointsFloat) {
         if (cuePoint < 0) {
-          _cuePoints.add(Integer.MAX_VALUE);
+          _cuePoints.add(_player.getCurrentItem().getDuration());
         } else {
           _cuePoints.add(cuePoint.intValue()  * 1000);
         }
       }
       DebugMode.logD(TAG, "Cue Point List = " + _cuePoints);
     }
+  }
+
+  // Implement AdPluginInterface
+
+  // Return true if has pre-roll
+  @Override
+  public boolean onInitialPlay() {
+    DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
+    _adsManager.init();
+    fetchCuePoint();
+    _adsManager.start();
     return (_cuePoints != null && _cuePoints.contains(0));
   }
 
@@ -255,20 +253,8 @@ public class OoyalaIMAManager implements AdPluginInterface {
     DebugMode.logD(TAG, "IMA Ads Manager: onContentChanged");
     destroy();
     resetFields();
-    Video currentItem = _player.getCurrentItem();
-
-    final boolean isBacklotIMA = currentItem.getModuleData() != null &&
-        currentItem.getModuleData().get("google-ima-ads-manager") != null &&
-        currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
-    final boolean isOverrideIMA = _adUrlOverride != null;
-    if ( isBacklotIMA || isOverrideIMA ) {
-      String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
-      if(url != null) {
-        DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
-        loadAds(url);
-      }
-    }
-    return false;  //True if you want to block, false otheriwse
+    
+    return true;  //True if you want to block, false otheriwse
   }
 
   @Override
@@ -282,7 +268,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public boolean onContentFinished() {
     // This is the time we need to check should we play post-roll
     DebugMode.logD(TAG, "IMA Ads Manager: onContentFinished");
-    if (!_allAdsCompeleted) {
+    if (_cuePoints.size() != 0 && _cuePoints.contains(_player.getCurrentItem().getDuration())) {
       _adsLoader.contentComplete();
       return true;
     }
@@ -307,6 +293,21 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public void onAdModeEntered() {
     // nothing need to be done here for Google IMA since we fire the AdModeEnter request first
     DebugMode.logD(TAG, "IMA Ads Manager: onAdModeEntered");
+    if (_adsManager == null) {
+      Video currentItem = _player.getCurrentItem();
+
+      final boolean isBacklotIMA = currentItem.getModuleData() != null &&
+          currentItem.getModuleData().get("google-ima-ads-manager") != null &&
+          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
+      final boolean isOverrideIMA = _adUrlOverride != null;
+      if ( isBacklotIMA || isOverrideIMA ) {
+        String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
+        if(url != null) {
+          DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
+          loadAds(url);
+        }
+      }
+    }
   }
 
   @Override
@@ -370,7 +371,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   private void resetFields() {
     DebugMode.logD(TAG, "IMA Ads Manager: resetFields");
-    _allAdsCompeleted = false;
+    _cuePoints = null;
   }
 
 
