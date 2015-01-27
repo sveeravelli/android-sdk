@@ -12,12 +12,12 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.DebugMode;
-import com.ooyala.android.FetchPlaybackInfoCallback;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;

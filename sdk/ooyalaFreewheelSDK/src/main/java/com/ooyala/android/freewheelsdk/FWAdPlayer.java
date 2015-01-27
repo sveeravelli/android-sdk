@@ -278,4 +278,16 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   public StateNotifier getNotifier() {
     return _notifier;
   }
+
+  @Override
+  public int livePlayheadPercentage() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToPercentLive(int percent) {
+    // TODO Auto-generated method stub
+
+  }
 }

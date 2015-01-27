@@ -5,6 +5,9 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.test.AndroidTestCase;
 
 public class UtilsTest extends AndroidTestCase {
@@ -44,6 +47,41 @@ public class UtilsTest extends AndroidTestCase {
     URL url = Utils.makeURL("http://hello.com", "/omggggggg/omg", params);
     String expected = "http://hello.com/omggggggg/omg?otherParamName=otherParamVal&paramName=paramVal";
     assertEquals(url.toString(), expected);
+  }
+
+  public void testOverwriteJSONObject_overwrites() {
+    try {
+      final String key1 = "key1";
+
+      final JSONObject src = new JSONObject();
+      src.put( key1, new Integer(1) );
+
+      final JSONObject dst = new JSONObject();
+      dst.put( key1, new Integer(42) );
+
+      Utils.overwriteJSONObject( src, dst );
+      assertEquals( src.get(key1), dst.get(key1) );
+    } catch (JSONException e) {
+      fail(e.toString());
+    }
+  }
+
+  public void testOverwriteJSONObject_doesNotOverwrite() {
+    try {
+      final String key1 = "key1";
+      final String key2 = "key2";
+
+      final JSONObject src = new JSONObject();
+      src.put( key1, new Integer(1) );
+
+      final JSONObject dst = new JSONObject();
+      dst.put( key2, new Integer(42) );
+
+      Utils.overwriteJSONObject( src, dst );
+      assertEquals( dst.get(key2), dst.get(key2) );
+    } catch (JSONException e) {
+      fail(e.toString());
+    }
   }
 
 }

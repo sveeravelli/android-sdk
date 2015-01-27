@@ -162,4 +162,16 @@ public class Player extends Observable implements PlayerInterface,
     // TODO Auto-generated method stub
     return false;
   }
+
+  @Override
+  public int livePlayheadPercentage() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToPercentLive(int percent) {
+    // TODO Auto-generated method stub
+    
+  }
 }

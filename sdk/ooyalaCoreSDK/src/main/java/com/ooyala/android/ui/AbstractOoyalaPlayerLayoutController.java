@@ -360,32 +360,34 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
    */
   @Override
   public void showClosedCaptionsMenu() {
-    Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
-    List<String> languageList = new ArrayList<String>(languageSet);
-    Collections.sort(languageList);
-    languageList.add(0, LocalizationSupport.localizedStringFor("None"));
-
-    final Context context = _layout.getContext();
-
-    if (this.optionList == null) {
-      this.optionList = new ArrayList<String>();
-      this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
-      this.optionList.addAll(languageList);
-      //this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
-      //this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
-      //this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
-      //this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
-      this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
+    if (this.dialog == null || (this.dialog != null && !this.dialog.isShowing())) {
+      Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
+      List<String> languageList = new ArrayList<String>(languageSet);
+      Collections.sort(languageList);
+      languageList.add(0, LocalizationSupport.localizedStringFor("None"));
+  
+      final Context context = _layout.getContext();
+  
+      if (this.optionList == null) {
+        this.optionList = new ArrayList<String>();
+        this.optionList.add(LocalizationSupport.localizedStringFor("Languages"));
+        this.optionList.addAll(languageList);
+        //this.optionList.add(LocalizationSupport.localizedStringFor("Presentation Styles"));
+        //this.optionList.add(LocalizationSupport.localizedStringFor("Roll-Up"));
+        //this.optionList.add(LocalizationSupport.localizedStringFor("Paint-On"));
+        //this.optionList.add(LocalizationSupport.localizedStringFor("Pop-On"));
+        this.optionList.add(LocalizationSupport.localizedStringFor("Done"));
+      }
+  
+      listView = new ListView(context);
+      ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context,
+          android.R.layout.simple_list_item_checked, this.optionList, this);
+      listView.setAdapter(optionAdapter);
+      AlertDialog.Builder builder = new AlertDialog.Builder(context);
+      builder.setView(listView);
+      this.dialog = builder.create();
+      this.dialog.show();
     }
-
-    listView = new ListView(context);
-    ClosedCaptionArrayAdapter optionAdapter = new ClosedCaptionArrayAdapter(context,
-        android.R.layout.simple_list_item_checked, this.optionList, this);
-    listView.setAdapter(optionAdapter);
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setView(listView);
-    this.dialog = builder.create();
-    this.dialog.show();
   }
 
   /**
@@ -405,7 +407,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   private void radioButtonClicked(int position) {
 
     if (position == (this.optionList.size() - 1)) {
-      this.dialog.hide();
+      // Done button clicked
+      this.dialog.dismiss();
     } else {
       if (this.selectedLanguageIndex != 0 && this.selectedLanguageIndex != position) {
         int langIndexOnScreen = this.selectedLanguageIndex - listView.getFirstVisiblePosition();

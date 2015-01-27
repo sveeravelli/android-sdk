@@ -21,6 +21,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.ooyala.android.DebugMode;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -73,13 +74,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   private boolean _playQueued = false;
   private boolean _completedQueued = false;
-  private int _timeBeforeSuspend = -1;
+  private Integer _timeBeforeSuspend = null;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
   private int _lastPlayhead = -1;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
-  private boolean _isVisualOnOpenFinished = false;
   private int _selectedSubtitleIndex = 0;
   private List<String> _subtitleDescriptions = null;
 
@@ -131,7 +131,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     setState(State.LOADING);
-    _isVisualOnOpenFinished = false;
     _streamUrl = _stream.decodedURL().toString();
     _subtitleDescriptions = new ArrayList<String>();
     setParent(parent);
@@ -187,9 +186,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case READY:
     case COMPLETED:
       DebugMode.logV(TAG, "Play: ready - about to start");
-      if (_timeBeforeSuspend >= 0 ) {
+      if (_timeBeforeSuspend == null) {
+        if (_stream.isLiveStream()) {
+          _timeBeforeSuspend = 1;
+        } else {
+          _timeBeforeSuspend = -1;
+        }
+      } else if (_timeBeforeSuspend >= 0  && !_stream.isLiveStream()) {
         seekToTime(_timeBeforeSuspend);
         _timeBeforeSuspend = -1;
+      } else if (_timeBeforeSuspend <= 0 && _stream.isLiveStream()) {
+        // current item is a Live stream, which can only seek to where playhead is less or equals to zero
+        seekToTime(_timeBeforeSuspend);
+        _timeBeforeSuspend = 1;
       }
 
       VO_OSMP_RETURN_CODE nRet = _player.start();
@@ -310,6 +319,31 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 //    TODO: setting this will cause initialTime to fail.  For some reason initialTime is saved in two places, and this causes the issue to manifest
 //    setState(State.LOADING);
+  }
+
+  @Override
+  public void seekToPercentLive(int percent) {
+    int max = (int)_player.getMaxPosition();
+    int min = (int)_player.getMinPosition();
+    int duration = max - min;
+    int newPosition = duration * percent / 100 + min;
+    if (_player.setPosition(newPosition) < 0) {
+      DebugMode.logE(TAG, "setPosition failed.");
+    }
+  }
+
+  @Override
+  public int livePlayheadPercentage() {
+    if (_player != null) {
+      long max = _player.getMaxPosition();
+      long min = _player.getMinPosition();
+      long cur = _player.getPosition();
+
+      float fPercent = ((cur - min) / ((float) max - min)) * (100f);
+      DebugMode.logD(TAG, "Inside LivePlayheadPercentage = " + fPercent);
+      return (int)fPercent;
+    }
+    return 100;
   }
 
   protected void createMediaPlayer() {
@@ -754,7 +788,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _isLiveClosedCaptionsAvailable = false;
     for (int index = 0; index < subtitleCount; ++index) {
       VOOSMPAssetProperty property = asset.getSubtitleProperty(index);
-      
+
       String description;
       int propertyCount = property.getPropertyCount();
       if (propertyCount == 0) {
@@ -808,7 +842,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_OPEN_FINISHED:
       // After createMediaPlayer is complete, mark as ready
       DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_OPEN_FINISHED");
-      _isVisualOnOpenFinished = true;
       setState(State.READY);
       handleSubtitles();
       break;
@@ -872,44 +905,77 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO:
       switch (param1) {
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is %d . " + param2);
-        break;
-      }
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is "
+                    + param2);
+          break;
+        }
       case voOSType.VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE: {
-        DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is %d . " + param2);
-
+        DebugMode
+            .logV(
+                TAG,
+            "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, param2 is"
+                    + param2);
         switch (param2) {
         case voOSType.VOOSMP_AVAILABLE_PUREAUDIO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREAUDIO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_PUREVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_PUREVIDEO");
           break;
         }
         case voOSType.VOOSMP_AVAILABLE_AUDIOVIDEO: {
-          DebugMode.logV(TAG, "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
+          DebugMode
+              .logV(
+                  TAG,
+                  "OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_MEDIATYPE_CHANGE, VOOSMP_AVAILABLE_AUDIOVIDEO");
           break;
         }
         }
-        break;
-      }
+          break;
+        }
       }
       //Return now to avoid constant messages
       return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
-    case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
-      DebugMode.logV(TAG,
-          "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED, isVisualOnOpenFinished: "
-              + String.valueOf(_isVisualOnOpenFinished));
-      if (_isVisualOnOpenFinished) {
-        handleSubtitles();
-      }
+
+    case VO_OSMP_SRC_CB_CUSTOMER_TAG:
+      handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( id, param1, param2, obj );
       break;
+
+    case VO_OSMP_SRC_CB_PROGRAM_CHANGED:
+      DebugMode.logV(TAG, "OnEvent VO_OSMP_SRC_CB_PROGRAM_CHANGED");
+      handleSubtitles();
+      break;
+
     default:
       break;
     }
     DebugMode.logV(TAG, "VisualOn Message: " + id + ". param is " + param1 + ", " + param2);
     return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;
+  }
+
+  private void handle_VO_OSMP_SRC_CB_CUSTOMER_TAG( VO_OSMP_CB_EVENT_ID id, int param1, int param2, Object obj ) {
+    VO_OSMP_SRC_CUSTOMERTAGID tag = VO_OSMP_SRC_CUSTOMERTAGID.valueOf( param1 );
+    switch (tag) {
+    case VO_OSMP_SRC_CUSTOMERTAGID_TIMEDTAG:
+      // todo: emit the tags in a generic way?
+      int time = param2;
+      byte[] b = (byte[]) obj;
+      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
+      ID3TagNotifier.s_getInstance().onTag( b );
+      break;
+    default:
+      break;
+    }
   }
 
   @Override
