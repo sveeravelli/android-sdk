@@ -118,6 +118,10 @@ public class IMAAdPlayer extends AdMoviePlayer {
   public void setIMAManager(OoyalaIMAManager imaManager) {
     _imaManager = imaManager;
   }
+  
+  public OoyalaIMAManager getIMAManager() {
+    return _imaManager;
+  }
 
   @Override
   public void setState(State state) {
