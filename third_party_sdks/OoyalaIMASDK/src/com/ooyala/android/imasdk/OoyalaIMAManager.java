@@ -62,8 +62,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
    * Module Metadata.
-   * @param context The context of the activity, which will be used to redirect end users to the browser
-   * @param layoutController The Ooyala layout controller you initialized
+   * @param ooyalaPlayer
    */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
     _player = ooyalaPlayer;
@@ -165,7 +164,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   /**
    * Specify a list of views that the IMA Manager can use to show companion ads.
-   * @param _companionAdSlots
+   * @param companionAdView The AdView to hold the companion ad slot
+   * @param width
+   * @param height
    */
   public void addCompanionSlot(ViewGroup companionAdView, int width, int height) {
     CompanionAdSlot adSlot = _sdkFactory.createCompanionAdSlot();
