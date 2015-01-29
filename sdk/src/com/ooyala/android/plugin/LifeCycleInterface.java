@@ -21,12 +21,11 @@ public interface LifeCycleInterface {
   /**
    * This is called when plugin should be resumed
    * 
-   * @param timeInMillisecond
-   *          the playhead time to set
+   * @param timeInMillisecond the playhead time to set
    * @param stateToResume
    *          the player state after resume
    */
-  public void resume(int timeInMilliSecond, State stateToResume);
+  public void resume(int timeInMillisecond, State stateToResume);
 
   /**
    * This is called when plugin should be destryed
