@@ -22,7 +22,7 @@ public class FWAdSpot extends AdSpot {
   /**
    * Initialize a Freewheel Ad Spot. Note that this AdSpot does not actually have a stream like other AdSpots
    * @param ad the ISlot to play
-   * @param adManager the Freewheel ad manager
+   * @param isPostRoll if this is a post roll spot
    */
   public static FWAdSpot create(ISlot ad, boolean isPostRoll) {
     if (ad == null) {
