@@ -1,20 +1,9 @@
 package com.ooyala.android;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Semaphore;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.ContentTreeNextCallback;
@@ -22,6 +11,18 @@ import com.ooyala.android.apis.MetadataFetchedCallback;
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.PaginatedParentItem;
+import com.ooyala.android.configuration.Options;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 class PlayerAPIClient {
   //private static String TAG = PlayerAPIClient.class.getName();
@@ -72,13 +73,23 @@ class PlayerAPIClient {
   protected int _heartbeatInterval = 300;
   protected Context _context;
   private UserInfo _userInfo;
+  private int _connectionTimeoutInMillisecond = 0;
+  private int _readTimeoutInMillisecond = 0;
 
   public PlayerAPIClient() {}
 
   public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator) {
+    this(pcode, domain, embedTokenGenerator, null);
+  }
+
+  public PlayerAPIClient(String pcode, PlayerDomain domain, EmbedTokenGenerator embedTokenGenerator, Options options) {
     _pcode = pcode;
     _domain = domain;
     _embedTokenGenerator = embedTokenGenerator;
+    if (options != null) {
+      _connectionTimeoutInMillisecond = options.getConnectionTimeoutInMillisecond();
+      _readTimeoutInMillisecond = options.getReadTimeoutInMillisecond();
+    }
   }
 
   private JSONObject verifyAuthorizeJSON(JSONObject authResult, List<String> embedCodes) throws OoyalaException {
@@ -287,42 +298,9 @@ class PlayerAPIClient {
   }
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
-      throws OoyalaException {
-    String uri = String.format(AUTHORIZE_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
-        Utils.join(embedCodes, SEPARATOR_URL_IDS));
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, authorizeParams(embedCodes));
-    JSONObject authData = null;
-    try {
-      authData = verifyAuthorizeJSON(json, embedCodes);
-
-      //parse out and save auth token and heartbeat data
-      if (!json.isNull(KEY_AUTH_TOKEN)) {
-        setAuthToken(json.getString(KEY_AUTH_TOKEN));
-      }
-
-      if (!json.isNull(KEY_HEARTBEAT_DATA)) {
-        JSONObject heartbeatData = json.getJSONObject(KEY_HEARTBEAT_DATA);
-        if (!heartbeatData.isNull(KEY_HEARTBEAT_INTERVAL)) {
-          _heartbeatInterval = heartbeatData.getInt(KEY_HEARTBEAT_INTERVAL);
-        }
-      }
-
-      if (!json.isNull(KEY_USER_INFO)) {
-        _userInfo = new UserInfo(json.getJSONObject(KEY_USER_INFO));
-      }
-    } catch (OoyalaException e) {
-      System.out.println("Unable to authorize: " + e);
-      throw e;
-    } catch (JSONException exception) {
-      System.out.println("JSONException: " + exception);
-      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_INVALID,
-          "Authorization response invalid (exception).");
-    }
-
-    if (parent != null) {
-      parent.update(authData);
-    }
-    return true;
+          throws OoyalaException {
+    PlayerInfo playerInfo = null;
+    return authorizeEmbedCodes(embedCodes, parent, playerInfo);
   }
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent, PlayerInfo playerInfo)
@@ -332,23 +310,30 @@ class PlayerAPIClient {
     Map<String, String> params = authorizeParams(embedCodes);
     params.put("device", playerInfo.getDevice() + (_isHook ? HOOK : ""));
 
-    if (playerInfo.getSupportedFormats() != null)
-      params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
+    if (playerInfo != null) {
+      if (playerInfo.getSupportedFormats() != null)
+        params.put("supportedFormats", Utils.join(playerInfo.getSupportedFormats(), ","));
 
-    if (playerInfo.getSupportedProfiles() != null)
-      params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
+      if (playerInfo.getSupportedProfiles() != null)
+        params.put("profiles", Utils.join(playerInfo.getSupportedProfiles(), ","));
 
-    if (playerInfo.getMaxHeight() > 0)
-      params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
+      if (playerInfo.getMaxHeight() > 0)
+        params.put("maxHeight", Integer.toString(playerInfo.getMaxHeight()));
 
-    if (playerInfo.getMaxWidth() > 0)
-      params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
+      if (playerInfo.getMaxWidth() > 0)
+        params.put("maxWidth", Integer.toString(playerInfo.getMaxWidth()));
 
-    if (playerInfo.getMaxBitrate() > 0) {
-      params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+      if (playerInfo.getMaxBitrate() > 0) {
+        params.put("br", Integer.toString(playerInfo.getMaxBitrate()));
+      }
     }
 
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, params);
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, params,
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
+    if (json == null) {
+      throw new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED,
+              "Authorization connection timed out.");
+    }
     JSONObject authData = null;
     try {
       authData = verifyAuthorizeJSON(json, embedCodes);
@@ -433,7 +418,8 @@ class PlayerAPIClient {
   // boolean here refers to the response.
   public boolean authorizeHeartbeat() throws OoyalaException {
     String uri = String.format(AUTHORIZE_HEARTBEAT_URI, OoyalaPlayer.API_VERSION, _pcode, getAuthToken());
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, null);
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, null,
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
     try {
       return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
     } catch (OoyalaException e) {
@@ -572,7 +558,8 @@ class PlayerAPIClient {
 
     String uri = String.format(CONTENT_TREE_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(embedCodes, SEPARATOR_URL_IDS));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(params));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(params),
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
     JSONObject contentTree = null;
     try {
       contentTree = verifyContentTreeObject(obj, embedCodes);
@@ -602,7 +589,8 @@ class PlayerAPIClient {
   public ContentItem contentTreeByExternalIds(List<String> externalIds) throws OoyalaException {
     String uri = String.format(CONTENT_TREE_BY_EXTERNAL_ID_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(externalIds, SEPARATOR_URL_IDS));
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null),
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
     if (obj == null) { return null; }
     List<String> embedCodes = new ArrayList<String>(); // will be filled in by verifyContentTreeObject call
                                                        // below
@@ -636,7 +624,8 @@ class PlayerAPIClient {
     if (!parent.hasMoreChildren()) { return null; }
     String uri = String.format(CONTENT_TREE_NEXT_URI, OoyalaPlayer.API_VERSION, _pcode,
         parent.getNextChildren());
-    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null));
+    JSONObject obj = OoyalaAPIHelper.objectForAPI(Environment.CONTENT_TREE_HOST, uri, contentTreeParams(null),
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
     if (obj == null) { return null; }
     JSONObject contentTree = null;
     List<String> keys = new ArrayList<String>();
@@ -699,13 +688,15 @@ class PlayerAPIClient {
         return fetchMetadata(taskParams[0].item);
       } catch (OoyalaException e) {
         _error = e;
-        return null;
+        return false;
       }
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-      _callback.callback(result, _error);
+      if (_callback != null) {
+        _callback.callback(result, _error);
+      }
     }
   }
 
@@ -713,7 +704,8 @@ class PlayerAPIClient {
     // fetch metadata
     String uri = String.format(METADATA_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(embedCodes, SEPARATOR_URL_IDS));
-    JSONObject root = OoyalaAPIHelper.objectForAPI(Environment.METADATA_HOST, uri, contentTreeParams(null));
+    JSONObject root = OoyalaAPIHelper.objectForAPI(Environment.METADATA_HOST, uri, contentTreeParams(null),
+            _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
 
     // validate the result
     if (root == null) {
@@ -856,5 +848,13 @@ class PlayerAPIClient {
   @SuppressWarnings("rawtypes")
   public void cancel(Object task) {
     ((AsyncTask) task).cancel(true);
+  }
+
+  public int getConnectionTimeoutInMillisecond() {
+    return _connectionTimeoutInMillisecond;
+  }
+
+  public int getReadTimeoutInMillisecond() {
+    return _readTimeoutInMillisecond;
   }
 }

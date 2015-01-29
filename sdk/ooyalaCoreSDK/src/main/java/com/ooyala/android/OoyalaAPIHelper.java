@@ -1,41 +1,52 @@
 package com.ooyala.android;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 class OoyalaAPIHelper {
+  private static final String TAG = OoyalaAPIHelper.class.getName();
 
   // Static context and cookies to be used for MoviePlayer instantiation for 4.0+
   public static Map<String, String> cookies = new HashMap<String, String>();
 
-  public static JSONObject objectForAPI(String host, String uri, Map<String, String> params) {
+  public static JSONObject objectForAPI(String host, String uri, Map<String, String> params,
+                                        int connectionTimeoutInMillisecond,
+                                        int readTimeoutInMillisecond) {
     URL url = Utils.makeURL(host, uri, params);
     if (url == null) { return null; }
-    return objectForAPI(url);
+    return objectForAPI(url, connectionTimeoutInMillisecond, readTimeoutInMillisecond);
   }
 
-  public static JSONObject objectForAPI(URL url) {
-    return Utils.objectFromJSON(jsonForAPI(url));
+  public static JSONObject objectForAPI(URL url,
+                                        int connectionTimeoutInMillisecond,
+                                        int readTimeoutInMillisecond) {
+    return Utils.objectFromJSON(jsonForAPI(url,
+            connectionTimeoutInMillisecond, readTimeoutInMillisecond));
   }
 
-  private static String jsonForAPI(URL url) {
-    DebugMode.logD(OoyalaAPIHelper.class.getName(), "Sending Request: " + url.toString());
+  private static String jsonForAPI(URL url,
+                                   int connectionTimeoutInMillisecond,
+                                   int readTimeoutInMillisecond) {
+    DebugMode.logD(TAG, "Sending Request: " + url.toString());
     StringBuffer sb = new StringBuffer();
+    BufferedReader rd = null;
     try {
       URLConnection conn = url.openConnection();
-
-      BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
+      conn.setConnectTimeout(connectionTimeoutInMillisecond);
+      conn.setReadTimeout(readTimeoutInMillisecond);
+      rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
       String line;
       while ((line = rd.readLine()) != null) {
         sb.append(line);
       }
-      rd.close();
 
       String headerName = null;
       for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
@@ -50,8 +61,18 @@ class OoyalaAPIHelper {
           }
         }
       }
-    } catch (Exception e) {
+    } catch (SocketTimeoutException e) {
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+    } catch (IOException e) {
       e.printStackTrace();
+    } finally {
+      if (rd != null) {
+        try {
+         rd.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
 
     return sb.toString();

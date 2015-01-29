@@ -1,11 +1,5 @@
 package com.ooyala.android;
 
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONObject;
-
 import android.os.AsyncTask;
 
 import com.ooyala.android.apis.ContentTreeCallback;
@@ -13,6 +7,12 @@ import com.ooyala.android.apis.ContentTreeNextCallback;
 import com.ooyala.android.item.AuthorizableItem;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.PaginatedParentItem;
+import com.ooyala.android.configuration.Options;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 public class OoyalaAPIClient {
   private PlayerAPIClient _playerAPI = null;
@@ -26,7 +26,19 @@ public class OoyalaAPIClient {
    * @param domain the Embed Domain to use
    */
   public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain) {
-    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain);
+    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, null);
+  }
+
+  /**
+   * Instantiate an OoyalaAPIClient
+   * @param apiKey the API Key to use for secured APIs
+   * @param secret the Secret to use for secured APIs
+   * @param pcode the Provider Code
+   * @param domain the Embed Domain to use
+   * @param options the options to use
+   */
+  public OoyalaAPIClient(String apiKey, String secret, String pcode, PlayerDomain domain, Options options) {
+    this(new EmbeddedSecureURLGenerator(apiKey, secret), pcode, domain, options);
   }
 
   /**
@@ -36,8 +48,8 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, PlayerDomain domain) {
-    this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain);
+  public OoyalaAPIClient(String apiKey, SignatureGenerator signatureGenerator, String pcode, PlayerDomain domain, Options options) {
+    this(new EmbeddedSecureURLGenerator(apiKey, signatureGenerator), pcode, domain, options);
   }
 
   /**
@@ -46,8 +58,8 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, PlayerDomain domain) {
-    this(pcode, domain);
+  public OoyalaAPIClient(SecureURLGenerator secureURLGenerator, String pcode, PlayerDomain domain, Options options) {
+    this(pcode, domain, options);
     _secureUrlGenerator = secureURLGenerator;
   }
 
@@ -56,8 +68,8 @@ public class OoyalaAPIClient {
    * @param pcode the Provider Code
    * @param domain the Embed Domain to use
    */
-  public OoyalaAPIClient(String pcode, PlayerDomain domain) {
-    this(new PlayerAPIClient(pcode, domain, null));
+  public OoyalaAPIClient(String pcode, PlayerDomain domain, Options options) {
+    this(new PlayerAPIClient(pcode, domain, null, options));
   }
 
   /**
@@ -192,7 +204,7 @@ public class OoyalaAPIClient {
       return null;
     }
     URL url = _secureUrlGenerator.secureURL(Environment.BACKLOT_HOST, PlayerAPIClient.BACKLOT_URI_PREFIX + uri, params);
-    return OoyalaAPIHelper.objectForAPI(url);
+    return OoyalaAPIHelper.objectForAPI(url, _playerAPI.getConnectionTimeoutInMillisecond(), _playerAPI.getReadTimeoutInMillisecond());
   }
 
   private class ObjectFromBacklotAPITask extends AsyncTask<Object, Integer, JSONObject> {
