@@ -17,7 +17,7 @@ final public class TemporaryInternalStorageFile {
 
   /**
    * Please create these via TemporaryInternalStorageFileManager to avoid file name collisions.
-   * @see TemporaryInternalStorageFileManager#next(Context, String, String)
+   * @see com.ooyala.android.TemporaryInternalStorageFileManager#next
    */
   public TemporaryInternalStorageFile( final Context context, final String prefix, final String ext ) throws IOException {
     final File dir = context.getCacheDir();
