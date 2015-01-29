@@ -202,7 +202,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Initialize an OoyalaPlayer with the given parameters
    *
-   * @param ooyalaAPIClient
+   * @param apiClient
    *          an initialized OoyalaApiClient
    */
   public OoyalaPlayer(OoyalaAPIClient apiClient) {
@@ -314,8 +314,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * These callbacks will be invoked on the main thread.
    * @param context must be non-null.
    * @param listener must be non-null.
-   * @see http://developer.android.com/google/play-services/setup.html
-   * @see http://developer.android.com/reference/com/google/android/gms/common/GooglePlayServicesUtil.html#isGooglePlayServicesAvailable(android.content.Context)
+   * @see <a href="http://developer.android.com/google/play-services/setup.html">http://developer.android.com/google/play-services/setup.html</a>
+   * @see <a href="http://developer.android.com/reference/com/google/android/gms/common/GooglePlayServicesUtil.html">http://developer.android.com/reference/com/google/android/gms/common/GooglePlayServicesUtil.html</a>#isGooglePlayServicesAvailable(android.content.Context)
    * @see com.ooyala.android.OoyalaException#getCode()
    * @return status code, can be one of following in ConnectionResult: SUCCESS, SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED, SERVICE_DISABLED, SERVICE_INVALID, DATE_INVALID.
    */
@@ -841,7 +841,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Set the customDRMData for the current player.
    *
-   * @return _customDRMData
    */
   public void setCustomDRMData(String data) {
       _customDRMData = data;
@@ -1019,11 +1018,15 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Set fullscreen mode (will only work if fullscreenLayout is set) This will
    * call the setFullscreen method on the associated LayoutController. If you
    * are implementing your own LayoutController here are some things to keep in
-   * mind: <li>If the setFullscreen method of your LayoutController creates a
+   * mind: 
+   * <ul>
+   * <li>If the setFullscreen method of your LayoutController creates a
    * new OoyalaPlayerLayout or switches to a different one, you *must* call
    * OoyalaPlayer.suspend() before doing so and call OoyalaPlayer.resume() after
-   * doing so. <li>If the setFullscreen method of your LayoutController uses the
+   * doing so. 
+   * <li>If the setFullscreen method of your LayoutController uses the
    * same OoyalaPlayerLayout, you do not need to do any special handling.
+   * </ul>
    *
    * @param fullscreen
    *          true to switch to fullscreen, false to switch out of fullscreen
@@ -1912,7 +1915,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * For internal Ooyala use only.
-   * @param view
+   * @param videoView
    */
   public void addVideoView( View videoView ) {
     _layoutController.addVideoView( videoView );

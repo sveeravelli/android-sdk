@@ -12,7 +12,7 @@ public class ClientId {
   
   /**
    * Get a client ID
-   * @returns the UUID that persists across launch
+   * @return the UUID that persists across launch
    */
   public static String getId(Context context) {
     if (_clientId == null || _clientId.length() <= 0) {
@@ -25,7 +25,7 @@ public class ClientId {
    * Set the id that overrides the default value
    * Ooyala WILL NOT persist this id so user needs to call this
    * every time the app is launched
-   * @param[in] clientId the id string customer like to use
+   * @param clientId the id string customer like to use
    */
   public static void setId(String clientId) {
     _clientId = clientId;
