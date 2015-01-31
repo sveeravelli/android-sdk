@@ -119,10 +119,11 @@ public class OoyalaIMAManager implements AdPluginInterface {
             case CONTENT_PAUSE_REQUESTED:
               int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
               _ooyalaPlayerWrapper.pauseContent();
+              Set<Integer> newCuePoints = new HashSet<Integer>();
               if (_cuePoints != null && _cuePoints.size() > 0) {
-                Set<Integer> newCuePoints = new HashSet<Integer>();
                 for (Integer cuePoint : _cuePoints) {
-                  if (cuePoint >= currentContentPlayheadTime) {
+                  // When pausing content for post-roll the current playhead is ZERO instead of content duration
+                  if (cuePoint >= currentContentPlayheadTime && !(_cuePoints.size() == 1 && cuePoint == _player.getCurrentItem().getDuration())) {
                     newCuePoints.add(cuePoint);
                   }
                 }
@@ -243,9 +244,11 @@ public class OoyalaIMAManager implements AdPluginInterface {
   @Override
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
-    _adsManager.init();
-    fetchCuePoint();
-    _adsManager.start();
+    if (_adsManager != null) {
+      _adsManager.init();
+      fetchCuePoint();
+      _adsManager.start();
+    }
     return (_cuePoints != null && _cuePoints.contains(0));
   }
 
