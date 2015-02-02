@@ -299,7 +299,7 @@ class PlayerAPIClient {
 
   public boolean authorizeEmbedCodes(List<String> embedCodes, AuthorizableItem parent)
           throws OoyalaException {
-    PlayerInfo playerInfo = null;
+    PlayerInfo playerInfo = new DefaultPlayerInfo();
     return authorizeEmbedCodes(embedCodes, parent, playerInfo);
   }
 
