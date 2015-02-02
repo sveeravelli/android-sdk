@@ -123,9 +123,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
               if (_cuePoints != null && _cuePoints.size() > 1) {
                 for (Integer cuePoint : _cuePoints) {
                   // When pausing content for post-roll the current playhead is ZERO instead of content duration
-                  if (cuePoint != 0 &&
-                      cuePoint >= currentContentPlayheadTime && 
-                      !(_cuePoints.size() == 1 && cuePoint == _player.getCurrentItem().getDuration())) {
+                  // Do not show cue points for the following three cases
+                  if (cuePoint != 0 &&                                                                                              // do not show cue point for pre-roll
+                      cuePoint >= currentContentPlayheadTime &&                                                                     // do not show cue points before current playhead
+                      !(_cuePoints.size() == 1 && cuePoint == _player.getCurrentItem().getDuration())) {                            // do not show cue point for post-roll if this is the last cue point
                     newCuePoints.add(cuePoint);
                   }
                 }
