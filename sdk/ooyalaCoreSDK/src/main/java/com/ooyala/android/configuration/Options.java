@@ -22,7 +22,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = false;
       this.connectionTimeoutInMillisecond = 0;
       this.readTimeoutInMillisecond = 0;
-      this.showLiveControls = false;
+      this.showLiveControls = true;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {

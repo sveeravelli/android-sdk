@@ -436,6 +436,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // Register SDK event listener
       _player.setOnEventListener(this);
+      
+      // Set specific bitrate and buffering time configuration
+      setVisualOnConfigurations();
 
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
@@ -515,6 +518,16 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _player.stop();
       _player.setView(null);
     }
+  }
+  
+  private void setVisualOnConfigurations() {
+    if (this._visualOnConfiguration != null) {
+      _player.setInitialBitrate(this._visualOnConfiguration.getInitialBitrate());
+      _player.setMaxBufferingTime(this._visualOnConfiguration.getMaxBufferingTime());
+      _player.setBitrateThreshold(this._visualOnConfiguration.getUpperBitrateThreshold(), this._visualOnConfiguration.getLowerBitrateThreshold());
+      _player.setInitialBufferingTime(this._visualOnConfiguration.getInitialBufferingTime());
+      _player.setPlaybackBufferingTime(this._visualOnConfiguration.getPlaybackBufferingTime());
+    }  
   }
 
   private void setupView() {
@@ -875,7 +888,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       break;
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
-      DebugMode.logD(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2);
+      DebugMode.logD(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2 + " with current playhead = " + _player.getPosition() + " and buffer duration = " + _player.getValidBufferDuration());
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
