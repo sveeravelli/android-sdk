@@ -4,7 +4,7 @@ SCRIPT_SUBMODULE_DIR = $(MAKEFILE_DIR)/submodules/mobile_sdk_build_packaging_scr
 SCRIPT_SUBMODULE_BIN_DIR = $(SCRIPT_SUBMODULE_DIR)/bin
 SCRIPT_SDK_BIN_DIR = $(MAKEFILE_DIR)/script
 
-install:
+generate-build-tools:
 	@pushd $(SCRIPT_SUBMODULE_DIR); make test && make install
 	@for me in $(EXES); do \
 		cp $(SCRIPT_SUBMODULE_BIN_DIR)/$$me $(SCRIPT_SDK_BIN_DIR)/$$me; \
@@ -14,8 +14,3 @@ install:
 update-submodules:
 	git submodule init
 	git submodule update
-
-temp-update-sdk:
-	echo "sdk.dir=${ANDROID_SDKS}" > ./sdk/local.properties
-
-all: update-submodules install
