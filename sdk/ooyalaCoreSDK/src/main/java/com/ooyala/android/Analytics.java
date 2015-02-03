@@ -21,6 +21,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.util.TemporaryInternalStorageFile;
+import com.ooyala.android.util.TemporaryInternalStorageFileManager;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class Analytics {

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 
 import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.IMatchObjectPredicate;
+import com.ooyala.android.util.IMatchObjectPredicate;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 

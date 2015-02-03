@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ final public class TemporaryInternalStorageFile {
 
   /**
    * Please create these via TemporaryInternalStorageFileManager to avoid file name collisions.
-   * @see com.ooyala.android.TemporaryInternalStorageFileManager#next
+   * @see TemporaryInternalStorageFileManager#next
    */
   public TemporaryInternalStorageFile( final Context context, final String prefix, final String ext ) throws IOException {
     final File dir = context.getCacheDir();

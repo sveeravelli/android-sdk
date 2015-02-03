@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

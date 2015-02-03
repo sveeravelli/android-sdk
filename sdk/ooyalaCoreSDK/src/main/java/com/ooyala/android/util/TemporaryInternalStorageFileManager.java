@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.util;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.Context;
-
-import com.ooyala.android.util.DebugMode;
 
 /**
  * Help create and cleanup automatically uniquely named files in the given Context's internal cache directory.
