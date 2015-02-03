@@ -13,7 +13,7 @@ import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmNotProtectedException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 /**
  * Perform DRM rights acquisition on a provided local file

@@ -2,7 +2,7 @@ package com.ooyala.android.item;
 
 import org.json.JSONObject;
 
-import com.ooyala.android.OrderedMap;
+import com.ooyala.android.util.OrderedMap;
 
 public interface PaginatedParentItem extends JSONUpdatableItem {
 

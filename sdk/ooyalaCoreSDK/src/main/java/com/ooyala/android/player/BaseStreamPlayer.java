@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.view.SurfaceHolder;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;

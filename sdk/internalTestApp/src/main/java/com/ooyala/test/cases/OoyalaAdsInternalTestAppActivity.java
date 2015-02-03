@@ -3,7 +3,7 @@ package com.ooyala.test.cases;
 import android.os.Bundle;
 
 import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.test.BaseInternalTestAppActivity;
 

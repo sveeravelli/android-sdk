@@ -2,7 +2,7 @@ package com.ooyala.android.plugin;
 
 import java.util.Set;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AdSpotManager;
 

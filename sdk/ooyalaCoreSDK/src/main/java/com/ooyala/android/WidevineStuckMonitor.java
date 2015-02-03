@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.Player;
+import com.ooyala.android.util.DebugMode;
 
 public final class WidevineStuckMonitor implements Observer {
 
@@ -39,7 +40,7 @@ public final class WidevineStuckMonitor implements Observer {
     if( oi != null ) {
       this.ooyalaPlayer.addObserver( this );
       this.monitorAfterMsec = oi.intValue();
-      DebugMode.logV( TAG, "Constructor(): enabled, monitorAfterMsec=" + monitorAfterMsec );
+      DebugMode.logV(TAG, "Constructor(): enabled, monitorAfterMsec=" + monitorAfterMsec);
     }
     else {
       this.monitorAfterMsec = Integer.MAX_VALUE;

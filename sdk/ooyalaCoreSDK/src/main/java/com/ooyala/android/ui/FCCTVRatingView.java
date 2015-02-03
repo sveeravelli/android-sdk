@@ -19,7 +19,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 

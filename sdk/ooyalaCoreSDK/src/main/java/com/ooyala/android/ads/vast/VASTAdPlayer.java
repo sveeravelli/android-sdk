@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;

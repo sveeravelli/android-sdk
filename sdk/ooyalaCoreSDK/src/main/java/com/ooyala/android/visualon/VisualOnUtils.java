@@ -9,7 +9,7 @@ import java.net.URLConnection;
 
 import android.content.Context;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 public class VisualOnUtils {
   // --- Network constants --------------------------------------------------

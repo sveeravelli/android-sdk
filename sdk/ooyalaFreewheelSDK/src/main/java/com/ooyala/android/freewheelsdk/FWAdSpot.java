@@ -2,7 +2,7 @@ package com.ooyala.android.freewheelsdk;
 
 import tv.freewheel.ad.interfaces.ISlot;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.item.AdSpot;
 
 /**

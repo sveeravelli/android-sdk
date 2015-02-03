@@ -6,7 +6,7 @@ import java.io.IOException;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
   protected String TAG = this.getClass().toString();

@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.OoyalaAPIClient;
-import com.ooyala.android.OrderedMapValue;
+import com.ooyala.android.util.OrderedMapValue;
 
 /**
  * Stores the info and metadata for the specified content item.

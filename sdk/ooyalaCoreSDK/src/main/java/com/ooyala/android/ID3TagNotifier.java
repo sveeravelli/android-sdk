@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.util.WeakReferencePassThroughEquals;
+
 import java.util.HashSet;
 import java.util.Set;
 

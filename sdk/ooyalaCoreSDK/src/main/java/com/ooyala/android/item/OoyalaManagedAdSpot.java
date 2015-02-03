@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
 import com.ooyala.android.ads.vast.VASTAdSpot;

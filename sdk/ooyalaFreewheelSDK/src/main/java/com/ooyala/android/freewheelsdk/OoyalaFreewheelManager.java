@@ -14,7 +14,7 @@ import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
 import android.app.Activity;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;

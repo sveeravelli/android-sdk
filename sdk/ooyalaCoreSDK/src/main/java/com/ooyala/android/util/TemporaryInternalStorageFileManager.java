@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.util;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -34,7 +34,7 @@ final public class TemporaryInternalStorageFileManager {
    */
   public void cleanup( final Context context ) {
     final File dir = context.getCacheDir();
-    DebugMode.logD( TAG, "cleanup(): dir=" + dir );
+    DebugMode.logD(TAG, "cleanup(): dir=" + dir);
     if( dir != null && dir.isDirectory() ) {
       final long now = new Date().getTime();
       for( final File f : dir.listFiles( new FileFilter() {

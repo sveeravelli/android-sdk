@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.util;
 
 import android.util.Log;
 

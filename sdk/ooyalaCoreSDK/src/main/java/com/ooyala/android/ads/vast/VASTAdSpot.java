@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
 
 import android.os.AsyncTask;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 /**
  * A helper class help us to manage ad spots

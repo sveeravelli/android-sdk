@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ooyala.android.OoyalaAPIClient;
-import com.ooyala.android.OrderedMap;
+import com.ooyala.android.util.OrderedMap;
 
 public class ChannelSet extends ContentItem implements PaginatedParentItem {
   protected OrderedMap<String, Channel> _channels = new OrderedMap<String, Channel>();
