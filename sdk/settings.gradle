@@ -1,0 +1,4 @@
+include ':ooyalaCoreSDK', ':ooyalaFreewheelSDK', ':ooyalaIMASDK'
+
+include ':ooyalaTestApp'
+include ':internalTestApp'

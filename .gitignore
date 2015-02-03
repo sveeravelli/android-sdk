@@ -17,9 +17,6 @@ test_results.txt
 sample-apps/*/local.properties
 sample-apps/keys
 sdk/Documentation
-sdk/*/bin
-sdk/*/gen
-sdk/*/local.properties
 sample-apps/*/bin
 sample-apps/*/gen
 internal-apps/*/bin
@@ -53,3 +50,7 @@ vendor/google_play_services/libproject/google-play-services_lib/local.properties
 **/OoyalaIMASDK.jar
 script/android_*
 deploy/android_deploy
+
+**/build
+**/.gradle
+**/workspace.xml
