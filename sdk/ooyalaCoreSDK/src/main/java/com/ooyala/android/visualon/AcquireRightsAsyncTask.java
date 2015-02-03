@@ -19,7 +19,7 @@ import com.ooyala.android.DebugMode;
  * Perform DRM rights acquisition on a provided local file
  *
  */
-public class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
+class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected String TAG = this.getClass().toString();
   protected AcquireRightsCallback _callback = null;
   protected Context _context;

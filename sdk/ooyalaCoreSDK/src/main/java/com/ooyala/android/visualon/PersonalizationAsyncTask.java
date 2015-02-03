@@ -14,7 +14,7 @@ import com.ooyala.android.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaPlayer;
 
-public class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
+class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   private static final String TAG = PersonalizationAsyncTask.class.getClass().toString();
   protected static final String PERSONALIZATION_URI = "/discretix/personalization.svc/personalize/%s";
   protected static final String SESSION_ID = "session";
