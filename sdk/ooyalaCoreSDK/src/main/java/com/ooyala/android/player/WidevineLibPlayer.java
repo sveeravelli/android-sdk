@@ -7,7 +7,7 @@ import java.util.Set;
 import android.os.Handler;
 import android.os.Message;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;

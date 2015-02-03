@@ -13,6 +13,7 @@ import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.StreamPlayer;
+import com.ooyala.android.util.DebugMode;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
   private static String TAG = OoyalaAdPlayer.class.getName();

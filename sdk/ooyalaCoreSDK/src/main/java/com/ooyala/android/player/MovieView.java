@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceView;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 class MovieView extends SurfaceView {
   private float _aspectRatio = -1;

@@ -21,6 +21,8 @@ import org.json.JSONTokener;
 import android.os.Build;
 import android.util.Base64;
 
+import com.ooyala.android.util.DebugMode;
+
 public class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
   /** TODO[jigish] change to android_hls_sdk when SAS is pushed */

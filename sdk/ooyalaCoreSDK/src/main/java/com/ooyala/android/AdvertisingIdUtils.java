@@ -10,6 +10,7 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.util.DebugMode;
 
 public class AdvertisingIdUtils {
 
@@ -23,7 +24,7 @@ public class AdvertisingIdUtils {
 
   public static synchronized void setAdvertisingId( String advertisingId ) {
     s_advertisingId = advertisingId;
-    DebugMode.logD( TAG, "s_advertisingId = " + s_advertisingId );
+    DebugMode.logD(TAG, "s_advertisingId = " + s_advertisingId);
   }
   public static synchronized String getAdvertisingId() {
     return s_advertisingId;

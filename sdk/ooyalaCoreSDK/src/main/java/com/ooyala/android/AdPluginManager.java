@@ -9,6 +9,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
+import com.ooyala.android.util.DebugMode;
 
 /**
  * The plugin that manage ad plugins. AdPlugin manager handles content/ad switch

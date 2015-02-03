@@ -11,6 +11,7 @@ import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.ManagedAdsPlugin;
+import com.ooyala.android.util.DebugMode;
 
 /**
  * Ooyala managed ads plugin manages ooyala and vast ads.

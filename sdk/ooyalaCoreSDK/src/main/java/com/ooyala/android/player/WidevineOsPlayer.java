@@ -16,7 +16,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings.Secure;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;

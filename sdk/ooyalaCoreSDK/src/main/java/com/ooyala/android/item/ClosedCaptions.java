@@ -22,7 +22,7 @@ import org.xml.sax.InputSource;
 
 import android.annotation.SuppressLint;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 public class ClosedCaptions implements JSONUpdatableItem {
   static final String KEY_LANGUAGES = "languages";

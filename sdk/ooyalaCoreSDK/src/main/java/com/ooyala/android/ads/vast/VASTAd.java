@@ -7,7 +7,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 public class VASTAd {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;

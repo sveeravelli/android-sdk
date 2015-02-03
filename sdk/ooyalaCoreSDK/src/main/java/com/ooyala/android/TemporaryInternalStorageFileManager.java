@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.Context;
 
+import com.ooyala.android.util.DebugMode;
+
 /**
  * Help create and cleanup automatically uniquely named files in the given Context's internal cache directory.
  * The first use case was for Analytics.java javascript loading, where we do not have a good way of knowing when it is
@@ -34,7 +36,7 @@ final public class TemporaryInternalStorageFileManager {
    */
   public void cleanup( final Context context ) {
     final File dir = context.getCacheDir();
-    DebugMode.logD( TAG, "cleanup(): dir=" + dir );
+    DebugMode.logD(TAG, "cleanup(): dir=" + dir);
     if( dir != null && dir.isDirectory() ) {
       final long now = new Date().getTime();
       for( final File f : dir.listFiles( new FileFilter() {

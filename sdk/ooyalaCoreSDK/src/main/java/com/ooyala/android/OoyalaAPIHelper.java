@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.util.DebugMode;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

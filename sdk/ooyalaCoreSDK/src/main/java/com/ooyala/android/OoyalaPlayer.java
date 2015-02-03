@@ -56,6 +56,7 @@ import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
+import com.ooyala.android.util.DebugMode;
 
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener, AdPluginManagerInterface {
@@ -263,7 +264,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager.registerPlugin(_managedAdsPlugin);
 
     DebugMode.logI(this.getClass().getName(),
-        "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
+            "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
   }
 
   /**

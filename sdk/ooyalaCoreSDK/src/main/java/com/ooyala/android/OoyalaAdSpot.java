@@ -18,6 +18,7 @@ import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
+import com.ooyala.android.util.DebugMode;
 
 /**
  * Stores the info and metadata for an Ooyala Managed Adspot.

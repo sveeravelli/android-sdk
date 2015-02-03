@@ -7,7 +7,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 class ItemUtils {
   static final String SEPARATOR_TIME = ":";

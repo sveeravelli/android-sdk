@@ -20,6 +20,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.ooyala.android.util.DebugMode;
+
 @SuppressLint("SetJavaScriptEnabled")
 public class Analytics {
 

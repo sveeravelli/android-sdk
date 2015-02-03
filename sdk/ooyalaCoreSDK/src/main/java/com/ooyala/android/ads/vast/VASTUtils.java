@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.ooyala.android.AdvertisingIdUtils;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 
 public class VASTUtils {
   private static final String TAG = "VASTUtils";

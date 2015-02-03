@@ -10,7 +10,7 @@ import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaPlayer;
 
