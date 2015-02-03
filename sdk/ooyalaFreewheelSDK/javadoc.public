@@ -7,4 +7,4 @@
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
 -sourcepath src/main/java
-src/com/ooyala/android/freewheelsdk/OoyalaFreewheelManager.java
+com/ooyala/android/freewheelsdk/OoyalaFreewheelManager.java

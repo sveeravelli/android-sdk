@@ -9,3 +9,10 @@
 -sourcepath ooyalaCoreSDK/src/main/java/
 com.ooyala.android
 com.ooyala.android.player
+com.ooyala.android.ads
+com.ooyala.android.apis
+com.ooyala.android.configuration
+com.ooyala.android.item
+com.ooyala.android.plugin
+com.ooyala.android.ui
+com.ooyala.android.visualon

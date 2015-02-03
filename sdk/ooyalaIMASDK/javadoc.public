@@ -7,4 +7,4 @@
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
 -sourcepath src/main/java
-src/com/ooyala/android/imasdk/OoyalaIMAManager.java
+com/ooyala/android/imasdk/OoyalaIMAManager.java
