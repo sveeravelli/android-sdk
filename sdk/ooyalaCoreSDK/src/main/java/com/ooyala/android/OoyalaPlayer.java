@@ -190,7 +190,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private String _lastAccountId = null;
   private ClosedCaptionsStyle _closedCaptionsStyle;
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
-  private CurrentItemChangedCallback _currentItemChangedCallback = null;
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
   private StreamPlayer _basePlayer = null;
@@ -514,9 +513,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     _currentItem = video;
     _currentItemInitPlayState = InitPlayState.NONE;
-    if (_currentItemChangedCallback != null) {
-      _currentItemChangedCallback.callback(_currentItem);
-    }
     cancelOpenTasks();
 
     // request metadata
@@ -1788,17 +1784,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   PlayerAPIClient getPlayerAPIClient() {
     return this._playerAPIClient;
-  }
-
-  /**
-   * Set the callback that will be called every time the current item changes
-   *
-   * @param callback
-   *          the CurrentItemChangedCallback that should be called every time
-   *          the current item changes
-   */
-  public void setCurrentItemChangedCallback(CurrentItemChangedCallback callback) {
-    _currentItemChangedCallback = callback;
   }
 
   public StreamPlayer getBasePlayer() {
