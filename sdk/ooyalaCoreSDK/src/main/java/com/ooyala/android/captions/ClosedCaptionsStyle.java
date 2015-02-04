@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.captions;
 
 import android.content.Context;
 import android.graphics.Color;

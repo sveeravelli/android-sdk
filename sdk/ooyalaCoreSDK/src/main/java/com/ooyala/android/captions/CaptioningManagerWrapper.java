@@ -1,10 +1,10 @@
-package com.ooyala.android;
+package com.ooyala.android.captions;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.accessibility.CaptioningManager;
 
-public class CaptioningManagerWrapper {
+class CaptioningManagerWrapper {
 
   @SuppressLint("NewApi")
   public static void updateClosedCaptionsStyleFromCaptioningManager(ClosedCaptionsStyle style, Context context) {

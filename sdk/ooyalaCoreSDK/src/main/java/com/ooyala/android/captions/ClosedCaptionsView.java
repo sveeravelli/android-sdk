@@ -1,4 +1,4 @@
-package com.ooyala.android;
+package com.ooyala.android.captions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,6 @@ import android.widget.FrameLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
-import com.ooyala.android.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.item.Caption;
 
 public class ClosedCaptionsView extends TextView {
@@ -282,7 +281,7 @@ public class ClosedCaptionsView extends TextView {
 
 		// If we always use fix size frame for roll-up
 		// For paint-on and pop-on we change the frame size based on how long the text is and the font size
-		if (this.style.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
+		if (this.style.presentationStyle != ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionRollUp) {
 			// Set 150 as the smallest width for shortest text
 			this.setLayoutParams(new FrameLayout.LayoutParams(Math.max(150, width * 10 / 9 + this.getPaddingLeft() + this.getPaddingRight()), (int)(lineNum * this.textHeight + (this.getPaddingBottom() + this.getPaddingTop())),  Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
 			this.updateBottomMargin();
@@ -305,7 +304,7 @@ public class ClosedCaptionsView extends TextView {
 					int leftPadding = (int) ((this.getWidth() - this.textBounds.width()) * 0.5); // Center the text
 
 					// Paint-on always starts from left
-					if (this.style.presentationStyle == OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
+					if (this.style.presentationStyle == ClosedCaptionsStyle.OOClosedCaptionPresentation.OOClosedCaptionPaintOn) {
 						leftPadding = 25;
 					}
 					canvas.drawText(line, leftPadding, currentVeriticalOffset, this.StrokePaint);
