@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 
 import com.ooyala.android.util.DebugMode;
 
-public class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
+class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
   protected String TAG = this.getClass().toString();
   protected FileDownloadCallback _callback = null;
   protected String _contentDir;

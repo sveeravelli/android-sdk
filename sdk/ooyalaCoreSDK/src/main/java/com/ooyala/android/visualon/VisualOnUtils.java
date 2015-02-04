@@ -11,7 +11,7 @@ import android.content.Context;
 
 import com.ooyala.android.util.DebugMode;
 
-public class VisualOnUtils {
+class VisualOnUtils {
   // --- Network constants --------------------------------------------------
   private static final String TAG = VisualOnUtils.class.getName();
   public static final int CONNECTION_TIMEOUT = 60000;
