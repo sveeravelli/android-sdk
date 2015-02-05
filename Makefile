@@ -14,3 +14,5 @@ generate-build-tools:
 update-submodules:
 	git submodule init
 	git submodule update
+
+all: update-submodules generate-build-tools
