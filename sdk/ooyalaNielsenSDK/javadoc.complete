@@ -7,4 +7,5 @@
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
 -sourcepath src/main/java
-com.ooyala.android.imasdk
+com.ooyala.android.nielsensdk
+
