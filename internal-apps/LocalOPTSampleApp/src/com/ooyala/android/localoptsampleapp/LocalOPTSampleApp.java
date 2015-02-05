@@ -42,8 +42,9 @@ public class LocalOPTSampleApp extends Activity implements EmbedTokenGenerator{
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN), this);
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN), this, null);
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
+
     if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {

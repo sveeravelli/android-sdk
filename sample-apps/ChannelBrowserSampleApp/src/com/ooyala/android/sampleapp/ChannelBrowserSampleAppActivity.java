@@ -14,10 +14,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-import com.ooyala.android.ContentTreeCallback;
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.item.Channel;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.Video;

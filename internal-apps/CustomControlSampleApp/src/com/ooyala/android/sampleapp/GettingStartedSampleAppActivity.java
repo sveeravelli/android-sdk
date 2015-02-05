@@ -24,9 +24,8 @@ public class GettingStartedSampleAppActivity extends Activity {
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(
-        playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
 
     MyInlineControls ic = new MyInlineControls(player, playerLayout);
     playerLayoutController.setInlineControls(ic);

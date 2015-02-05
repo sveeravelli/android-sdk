@@ -41,6 +41,7 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
     parent.addView(this);
     _stateNotifier = notifier;
     _timerHandler = new Handler() {
+      @Override
       public void handleMessage(Message msg) {
         refresh();
       }
@@ -150,6 +151,18 @@ public class SampleAdPlayer extends TextView implements PlayerInterface,
     }
     this.setText(_adText);
     _stateNotifier.setState(State.READY);
+  }
+
+  @Override
+  public int livePlayheadPercentage() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void seekToPercentLive(int arg0) {
+    // TODO Auto-generated method stub
+
   }
 
 }

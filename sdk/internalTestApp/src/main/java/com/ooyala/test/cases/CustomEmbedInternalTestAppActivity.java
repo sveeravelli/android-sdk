@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
@@ -67,8 +68,8 @@ public class CustomEmbedInternalTestAppActivity extends BaseInternalTestAppActiv
       //Set the pcode and embed code
       Log.i(TAG, "Pcode: " + pcodeText.getText().toString() + "" + "Embed Code: " + embedCodeText.getText().toString());
       PlayerDomain domain = new PlayerDomain(DOMAIN);
-      playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, pcodeText.getText().toString(), domain);
-      player = playerLayoutController.getPlayer();
+      player = new OoyalaPlayer(pcodeText.getText().toString(), domain);
+      playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
       player.setEmbedCode(embedCodeText.getText().toString());
     }
   }

@@ -27,8 +27,8 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
     if (player.setEmbedCode(EMBED)) {
       player.play();

@@ -29,9 +29,9 @@ import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.sampleapp.R;
+import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class DeviceManagementSampleAppActivity extends Activity implements EmbedTokenGenerator, Observer{
 
@@ -51,8 +51,8 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN), this);
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN), this, null);
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
     if (player.setEmbedCode(EMBED)) {
       player.play();

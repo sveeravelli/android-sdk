@@ -1,5 +1,7 @@
 package com.ooyala.demo;
 
+import java.net.URLEncoder;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,8 +24,8 @@ import android.widget.ViewFlipper;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.demo.dao.DBAdapter;
 import com.ooyala.demo.social.DialogError;
 import com.ooyala.demo.social.DialogListener;
@@ -31,8 +33,6 @@ import com.ooyala.demo.social.FacebookError;
 import com.ooyala.demo.social.LikeWebClient;
 import com.ooyala.demo.social.TwitterActivity;
 import com.ooyala.demo.utils.TwitterUtils;
-
-import java.net.URLEncoder;
 
 public class PlayerActivity extends Activity {
 
@@ -166,7 +166,8 @@ public class PlayerActivity extends Activity {
             }
         });
 
-        playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, Constants.OOYALA_P_CODE, new PlayerDomain(Constants.OOYALA_PLAYER_DOMAIN));
+        player = new OoyalaPlayer(Constants.OOYALA_P_CODE, new PlayerDomain(Constants.OOYALA_PLAYER_DOMAIN));
+        playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
         playerLayoutController.getLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -195,8 +196,6 @@ public class PlayerActivity extends Activity {
                 }
             }
         });
-
-        player = playerLayoutController.getPlayer();
 
         final ImageView thumb = (ImageView) findViewById(R.id.video_thumb);
         thumb.setVisibility(View.VISIBLE);

@@ -1,13 +1,14 @@
 package com.ooyala.AdobePassDemoApp;
 
-import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.PlayerDomain;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class AdobePassDemoAppActivity extends Activity implements OnAuthorizationChangedListener {
   private static final String PROVIDER_CODE = "pqdHc6rN2_wYW2z-pOmDqkUmMnI1";
@@ -26,8 +27,8 @@ public class AdobePassDemoAppActivity extends Activity implements OnAuthorizatio
         getResources().openRawResource(R.raw.adobepass), "adobepass", this);
     adobePassController.checkAuth();
 
-    ooController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), PROVIDER_CODE, new PlayerDomain(DOMAIN), adobePassController);
+    OoyalaPlayer player = new OoyalaPlayer (PROVIDER_CODE, new PlayerDomain(DOMAIN), adobePassController, null);
+    ooController = new OptimizedOoyalaPlayerLayoutController((OoyalaPlayerLayout) findViewById(R.id.player), player);
   }
 
   public void onLoginClick(View v) {

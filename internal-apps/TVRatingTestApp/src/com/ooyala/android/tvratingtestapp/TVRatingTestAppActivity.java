@@ -110,8 +110,8 @@ public class TVRatingTestAppActivity extends Activity implements Observer {
     LinearLayout.LayoutParams pllp = new LinearLayout.LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT );
     mainLayout.addView( playerLayout, pllp );
     Options options = tvRatingConfiguration == null ? null : new Options.Builder().setTVRatingConfiguration(tvRatingConfiguration).build();
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController( playerLayout, PCODE, new PlayerDomain(DOMAIN), DefaultControlStyle.AUTO, null, options );
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN), options);
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController( playerLayout, player, DefaultControlStyle.AUTO );
     player.addObserver(this);
   }
 

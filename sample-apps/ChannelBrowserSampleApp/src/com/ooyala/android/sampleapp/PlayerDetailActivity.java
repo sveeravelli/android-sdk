@@ -8,8 +8,8 @@ import android.util.Log;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class PlayerDetailActivity extends Activity {
   private static final String TAG = "PlayerDetailActivity";
@@ -29,10 +29,10 @@ public class PlayerDetailActivity extends Activity {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
-        (OoyalaPlayerLayout) findViewById(R.id.player), ChannelBrowserSampleAppActivity.PCODE,
+    player = new OoyalaPlayer(ChannelBrowserSampleAppActivity.PCODE,
         new PlayerDomain(ChannelBrowserSampleAppActivity.PLAYERDOMAIN));
-    player = layoutController.getPlayer();
+    OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
+        (OoyalaPlayerLayout) findViewById(R.id.player), player);
     if (player.setEmbedCode(embedCode)) {
       Log.d(TAG, "TEST - yay!");
       player.play();
@@ -75,6 +75,7 @@ public class PlayerDetailActivity extends Activity {
   }
 
   private Thread.UncaughtExceptionHandler onUncaughtException = new Thread.UncaughtExceptionHandler() {
+    @Override
     public void uncaughtException(Thread thread, Throwable ex) {
       Log.e(TAG, "Uncaught exception", ex);
       showErrorDialog(ex);

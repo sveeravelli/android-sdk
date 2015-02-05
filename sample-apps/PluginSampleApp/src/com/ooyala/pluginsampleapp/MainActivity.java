@@ -25,9 +25,9 @@ public class MainActivity extends Activity {
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(
-        playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+        playerLayout, player);
     SampleAdPlugin plugin = new SampleAdPlugin(this, player);
     player.registerPlugin(plugin);
     if (player.setEmbedCode(EMBED)) {

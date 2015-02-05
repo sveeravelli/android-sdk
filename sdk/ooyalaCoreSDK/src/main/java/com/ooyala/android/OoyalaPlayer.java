@@ -204,16 +204,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Initialize an OoyalaPlayer with the given parameters
    *
-   * @param apiClient
-   *          an initialized OoyalaApiClient
-   */
-  public OoyalaPlayer(OoyalaAPIClient apiClient) {
-    this(apiClient.getPcode(), apiClient.getDomain(), null, null);
-  }
-
-  /**
-   * Initialize an OoyalaPlayer with the given parameters
-   *
    * @param pcode
    *          Your Provider Code
    * @param domain

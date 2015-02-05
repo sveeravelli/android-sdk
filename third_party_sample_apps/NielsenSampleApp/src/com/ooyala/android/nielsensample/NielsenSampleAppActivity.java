@@ -5,11 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,13 +17,11 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ooyala.android.DebugMode;
-import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
-import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
 
@@ -63,9 +59,8 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     embedAdapter.notifyDataSetChanged();
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
 
     final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
 

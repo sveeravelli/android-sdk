@@ -17,7 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.ooyala.android.DebugMode;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
@@ -25,6 +24,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.ui.AbstractDefaultOoyalaPlayerControls;
 import com.ooyala.android.ui.CuePointsSeekBar;
+import com.ooyala.android.util.DebugMode;
 
 public class MyInlineControls extends AbstractDefaultOoyalaPlayerControls
     implements
