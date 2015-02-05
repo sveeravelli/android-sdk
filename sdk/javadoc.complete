@@ -6,6 +6,13 @@
 -bottom '<font size="-1">Copyright 2012 Ooyala, Inc. All Rights Reserved.</font>'
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
--sourcepath src
+-sourcepath ooyalaCoreSDK/src/main/java/
 com.ooyala.android
 com.ooyala.android.player
+com.ooyala.android.ads
+com.ooyala.android.apis
+com.ooyala.android.configuration
+com.ooyala.android.item
+com.ooyala.android.plugin
+com.ooyala.android.ui
+com.ooyala.android.visualon
