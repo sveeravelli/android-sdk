@@ -1,0 +1,10 @@
+-d Documentation/public
+-use
+-windowtitle 'Ooyala Android Nielsen SDK API Documentation'
+-doctitle 'Ooyala Android Nielsen SDK API Documentation'
+-header '<b>Ooyala Android Nielsen SDK</b>'
+-bottom '<font size="-1">Copyright 2014 Ooyala, Inc. All Rights Reserved.</font>'
+-link http://docs.oracle.com/javase/6/docs/api/
+-public
+-sourcepath src/main/java
+com/ooyala/android/nielsensdk/NielsenAnalytics.java

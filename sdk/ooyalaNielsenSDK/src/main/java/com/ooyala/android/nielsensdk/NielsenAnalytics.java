@@ -10,7 +10,7 @@ import android.content.Context;
 
 import com.nielsen.app.sdk.AppSdk;
 import com.nielsen.app.sdk.IAppNotifier;
-import com.ooyala.android.DebugMode;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 import com.ooyala.android.OoyalaPlayer;
