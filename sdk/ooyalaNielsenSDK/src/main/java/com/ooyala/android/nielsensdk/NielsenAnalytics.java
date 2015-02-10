@@ -185,7 +185,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void itemChanged( Video item ) {
-    setChannelName( jsonFilter.filter(item.getEmbedCode()) ); // todo: what's really the best channel name source?
     setMetadataJson( item );
   }
 
