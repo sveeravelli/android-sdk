@@ -25,8 +25,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
   private final NielsenJSONFilter jsonFilter;
-  private final String clientID;
-  private final String vcID;
   private final ID3TagNotifier id3TagNotifier;
   private String channelNameJson;
   private JSONObject metadataJson;
@@ -44,12 +42,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @param appVersion per Nielsen SDK docs. Not null.
    * @param sfCode per Nielsen SDK docs. Not null.
    * @param appID per Nielsen SDK docs. Not null.
-   * @param dma per Nielsen SDK docs. Optional, can be null to omit it.
-   * @param ccode per Nielsen SDK docs. Optional, can be null to omit it.
-   * @param longitude per Nielsen SDK docs. Optional, can be null to omit it.
-   * @param latitude per Nielsen SDK docs. Optional, can be null to omit it.
-   * @param clientID per Nielsen SDK docs. Not null.
-   * @param vcID per Nielsen SDK docs. Not null.
    * @param customConfig, optionally null, is any custom JSON you want added into the config for Nielsen's AppSdk. (Note that
    * Nielsen requires data to meet certain restrictions for valid strings.)
    * @param customMetadata, optionally null, is any custom JSON you want added into the metadata for Nielsen's loadMetadata. (Note that
@@ -57,12 +49,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @see AppSdk
    * @see #destroy()
    */
-  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
     this.metadataJson = new JSONObject();
     this.customMetadata = customMetadata;
     this.player = player;
-    this.clientID = clientID;
-    this.vcID = vcID;
     this.id3TagNotifier = id3TagNotifier;
     this.lastReportedMsec = Long.MIN_VALUE;
     this.jsonFilter = new NielsenJSONFilter();
@@ -72,10 +62,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       configJson.put( "appversion", jsonFilter.filter(appVersion) );
       configJson.put( "sfcode", jsonFilter.filter(sfCode) );
       configJson.put( "appid", jsonFilter.filter(appID) );
-      if( dma != null ) { configJson.put( "dma", jsonFilter.filter(dma) ); }
-      if( ccode != null ) { configJson.put( "ccode", jsonFilter.filter(ccode) ); }
-      if( longitude != null ) { configJson.put( "longitude", jsonFilter.filter(longitude) ); }
-      if( latitude != null ) { configJson.put( "latitude", jsonFilter.filter(latitude) ); }
       Utils.overwriteJSONObject( customConfig, configJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
@@ -83,7 +69,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.nielsenApp = AppSdk.getInstance( context, configJson.toString(), null );
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     this.id3TagNotifier.addWeakListener( this );
-    setChannelName( UNKNOWN_CHANNEL_NAME );
+    setChannelNameToUnknown();
     this.player.addObserver( this );
   }
 
@@ -104,11 +90,15 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     DebugMode.logV( TAG, "destroy()" );
     player.deleteObserver( this );
     id3TagNotifier.removeWeakListener( this );
-    setChannelName( UNKNOWN_CHANNEL_NAME );
+    setChannelNameToUnknown();
     if( nielsenApp != null ) {
       nielsenApp.suspend();
       nielsenApp = null;
     }
+  }
+
+  private void setChannelNameToUnknown() {
+    setChannelName( jsonFilter.filter(UNKNOWN_CHANNEL_NAME) );
   }
 
   public boolean isValid() {
@@ -145,15 +135,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
-    reportPlayhead( item, playheadMsec );
-    reportMetadata();
-  }
-
-  private void reportPlayhead( Video item, int playheadMsec ) {
-    DebugMode.logV( TAG, "reportPlayhead(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
+    DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
     if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
-      DebugMode.logV( TAG, "reportPlayhead(): updating" );
+      DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
       lastReportedMsec = reportingMsec;
     }
@@ -185,29 +170,33 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void stateUpdate( OoyalaPlayer.State state ) {
     switch( state ) {
-    case PLAYING:
-      play();
-      break;
-    case PAUSED:
-    case COMPLETED:
-    case ERROR:
-      stop();
-      break;
-    default:
-      break;
+      case PLAYING:
+        play();
+        break;
+      case PAUSED:
+      case SUSPENDED:
+      case COMPLETED:
+      case ERROR:
+        stop();
+        break;
+      default:
+        break;
     }
   }
 
   private void itemChanged( Video item ) {
-    setChannelName( item.getEmbedCode() ); // todo: what's really the best channel name source?
+    setChannelName( jsonFilter.filter(item.getEmbedCode()) ); // todo: what's really the best channel name source?
     setMetadataJson( item );
   }
 
-  private void setChannelName( String channelName ) {
+  /**
+   * @param channelName to be reported to Nielsen. (Note that Nielsen requires data to meet certain restrictions for valid strings.)
+   */
+  public void setChannelName( String channelName ) {
     DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
     JSONObject json = new JSONObject();
     try {
-      json.put( "channelName", jsonFilter.filter(channelName) );
+      json.put( "channelName", channelName );
       this.channelNameJson = json.toString();
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
@@ -221,9 +210,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       metadataJson.put( "length", jsonFilter.filter(String.valueOf(item.getDuration())) );
       metadataJson.put( "title", jsonFilter.filter(item.getTitle()) );
       // todo: type? has to dynamically change as we're in-and-out of advertisements.
-      // todo: all the others.
-      if( clientID != null ) { metadataJson.put( "clientid", jsonFilter.filter(clientID) ); }
-      if( vcID != null ) { metadataJson.put( "vcid", jsonFilter.filter(vcID) ); }
+
+      // these values come from Backlot.
       setMetadataHelper( metadataJson, item, "category" );
       setMetadataHelper( metadataJson, item, "censuscategory" );
       setMetadataHelper( metadataJson, item, "tv" );
@@ -231,7 +219,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       setMetadataHelper( metadataJson, item, "pd" );
       setMetadataHelper( metadataJson, item, "tfid" );
       setMetadataHelper( metadataJson, item, "sid" );
-      // explicitly leaving out 'ocrtag' at the moment as unimplemented.
+      // explicitly leaving out 'ocrtag' at the moment, we aren't supporting that yet.
       Utils.overwriteJSONObject( customMetadata, metadataJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );

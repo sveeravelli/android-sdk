@@ -1,15 +1,6 @@
 package com.ooyala.android.nielsensample;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Observable;
-import java.util.Observer;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,13 +10,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Observable;
+import java.util.Observer;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
 
