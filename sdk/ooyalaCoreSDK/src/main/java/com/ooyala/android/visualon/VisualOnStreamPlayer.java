@@ -914,8 +914,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_CONNECTION_REJECTED:
     case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
     case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
+    case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR:
       // Display error dialog and stop player
       DebugMode.logE(TAG, "onEvent: Error. " + param1);
+      destroyBasePlayer();
       onError(_player, null, id.getValue());
       break;
 
