@@ -257,8 +257,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     switch (getState()) {
     case INIT:
     case SUSPENDED:
-      return 0;
-    case LOADING:
+    case READY:
+      if (_timeBeforeSuspend != null && _timeBeforeSuspend > 0) {
+        return _timeBeforeSuspend;
+      } else {
+        return 0;
+      }
     default:
       break;
     }
@@ -580,7 +584,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void suspend() {
-    suspend(_player != null ? (int) _player.getPosition() : 0, getState());
+    suspend(currentTime(), getState());
   }
 
   private void suspend(int millisToResume, State stateToResume) {
