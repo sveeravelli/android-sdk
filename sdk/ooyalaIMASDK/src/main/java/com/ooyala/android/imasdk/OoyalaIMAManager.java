@@ -57,6 +57,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   
   protected IMAAdPlayer _adPlayer = null;
   private boolean _browserOpened = false;
+  private boolean _allAdsCompleted = false;
 
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
@@ -137,6 +138,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
               _adPlayer.setState(State.PLAYING);
               break;
             case ALL_ADS_COMPLETED:
+              _allAdsCompleted = true;
               break;
             case COMPLETED:
               break;
@@ -247,6 +249,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
       _adsManager.init();
       fetchCuePoint();
       _adsManager.start();
+      if (_cuePoints.size() == 0) {
+        // Non-ad-rules ima ads are always for pre-roll
+        return true;
+      }
     }
     return (_cuePoints != null && _cuePoints.contains(0));
   }
@@ -271,11 +277,11 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public boolean onContentFinished() {
     // This is the time we need to check should we play post-roll
     DebugMode.logD(TAG, "IMA Ads Manager: onContentFinished");
-    if (_cuePoints.size() != 0 && _cuePoints.contains(_player.getCurrentItem().getDuration())) {
+    if (_allAdsCompleted) {
       _adsLoader.contentComplete();
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   @Override
@@ -375,6 +381,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private void resetFields() {
     DebugMode.logD(TAG, "IMA Ads Manager: resetFields");
     _cuePoints = null;
+    _allAdsCompleted = false;
   }
 
 
