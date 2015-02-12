@@ -230,7 +230,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
     timeoutThread = new Thread() {
           @Override
           public void run() {
-            Thread.sleep(TIMEOUT);
+//            Thread.sleep(100);
             timeout();
           }
       };
