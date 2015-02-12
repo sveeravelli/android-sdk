@@ -39,6 +39,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
  */
 public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
+  private static final int TIMEOUT = 5000;
 
   public boolean _onAdError;
 
@@ -58,7 +59,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   protected IMAAdPlayer _adPlayer = null;
   private boolean _browserOpened = false;
   private boolean _allAdsCompleted = false;
-
+  private Thread timeoutThread;
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
@@ -95,6 +96,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
+        if(timeoutThread != null) {
+          timeoutThread.stop();
+        }
         _adsManager = event.getAdsManager();
         _player.exitAdMode(_adPlayer.getIMAManager());
         _adsManager.addAdErrorListener(new AdErrorListener() {
@@ -222,6 +226,15 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
+
+    timeoutThread = new Thread() {
+          @Override
+          public void run() {
+            Thread.sleep(TIMEOUT);
+            timeout();
+          }
+      };
+      timeoutThread.start();
   }
   
   private void fetchCuePoint() {
@@ -397,5 +410,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
       return new HashSet<Integer>(_cuePoints);
     }
     return new HashSet<Integer>();
+  }
+
+  private void timeout() {
+    DebugMode.logD(TAG, "Requesting ads timeout");
+    _player.exitAdMode(_adPlayer.getIMAManager());
   }
 }
