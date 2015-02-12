@@ -125,7 +125,7 @@ public class OoyalaAPIClient {
    * be videos. The ad set code specifies which ad set be used. As this method is not asynchronous it should
    * be used within an AsyncTask.
    * @param embedCodes the embed codes to fetch
-   * @param adSetCode the ad set code to assign
+   * @param adSetCode the ad set code to assign, can be null.
    * @return the root ContentItem representing embedCodes
    * @throws OoyalaException
    */
@@ -138,7 +138,7 @@ public class OoyalaAPIClient {
    * are given, the root item is assumed to be a Dynamic Channel and the embed codes are assumed to all be
    * videos. The ad set code specifies which ad set be used.
    * @param embedCodes the embed codes to fetch
-   * @param adSetCode the ad set code to assign
+   * @param adSetCode the ad set code to assign, can be null.
    * @param callback the ContentTreeCallback to execute when the response is received
    * @return an Object that can be used to cancel the asynchronous fetch using the cancel(Object task) method
    */

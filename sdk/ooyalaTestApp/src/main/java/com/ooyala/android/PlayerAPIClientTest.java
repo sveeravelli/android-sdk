@@ -252,7 +252,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
   public void testFetchMetadata() throws OoyalaException {
     ContentItem video = ContentItem.create(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_VIDEO),
         TestConstants.TEST_VIDEO, new OoyalaAPIClient(api));
-    assertTrue(api.fetchMetadata(video));
+    assertTrue(api.fetchMetadata(video, null));
 
     //Check Metadata
     assertEquals(video.getMetadata().get("location"), "boston");
