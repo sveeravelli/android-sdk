@@ -93,7 +93,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   private boolean isDiscredixNeeded() {
-    return "smooth".equals(_stream.getDeliveryType());
+    return
+      Stream.DELIVERY_TYPE_SMOOTH.equals(_stream.getDeliveryType()) ||
+      Stream.DELIVERY_TYPE_HLS.equals(_stream.getDeliveryType());
   }
 
   @Override
