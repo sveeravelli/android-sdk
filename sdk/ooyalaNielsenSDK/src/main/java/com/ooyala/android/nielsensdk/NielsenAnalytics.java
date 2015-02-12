@@ -1,5 +1,6 @@
 package com.ooyala.android.nielsensdk;
 
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,12 +20,11 @@ import com.ooyala.android.item.Video;
 
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
-  private static final String UNKNOWN_CHANNEL_NAME = "unknown_not_yet_set_by_app";
-  private static final String METADATA_PREFIX = "nielsen_";
+  private static final String BACKLOT_NIELSEN_KEY_PREFIX = "nielsen_";
+  private static final String CHANNEL_NAME_KEY = "channelName";
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
-  private final NielsenJSONFilter jsonFilter;
   private final ID3TagNotifier id3TagNotifier;
   private String channelNameJson;
   private JSONObject metadataJson;
@@ -55,13 +55,12 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.player = player;
     this.id3TagNotifier = id3TagNotifier;
     this.lastReportedMsec = Long.MIN_VALUE;
-    this.jsonFilter = new NielsenJSONFilter();
     JSONObject configJson = new JSONObject();
     try {
-      configJson.put( "appname", jsonFilter.filter(appName) );
-      configJson.put( "appversion", jsonFilter.filter(appVersion) );
-      configJson.put( "sfcode", jsonFilter.filter(sfCode) );
-      configJson.put( "appid", jsonFilter.filter(appID) );
+      configJson.put( "appname", appName );
+      configJson.put( "appversion", appVersion );
+      configJson.put( "sfcode", sfCode );
+      configJson.put( "appid", appID );
       Utils.overwriteJSONObject( customConfig, configJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
@@ -69,7 +68,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.nielsenApp = AppSdk.getInstance( context, configJson.toString(), null );
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     this.id3TagNotifier.addWeakListener( this );
-    setChannelNameToUnknown();
     this.player.addObserver( this );
   }
 
@@ -90,15 +88,12 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     DebugMode.logV( TAG, "destroy()" );
     player.deleteObserver( this );
     id3TagNotifier.removeWeakListener( this );
-    setChannelNameToUnknown();
-    if( nielsenApp != null ) {
+    if( isValid() ) {
       nielsenApp.suspend();
+    }
+    if( nielsenApp != null ) {
       nielsenApp = null;
     }
-  }
-
-  private void setChannelNameToUnknown() {
-    setChannelName( jsonFilter.filter(UNKNOWN_CHANNEL_NAME) );
   }
 
   public boolean isValid() {
@@ -137,7 +132,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
     DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
-    if( reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 && isValid() ) {
+    if( isValid() && reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 ) {
       DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
       lastReportedMsec = reportingMsec;
@@ -147,7 +142,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private void reportMetadata() {
     updateContentTypeMetadata();
     DebugMode.logV( TAG, "reportMetadata(): " + metadataJson );
-    nielsenApp.loadMetadata( metadataJson.toString() );
+    if( isValid() ) {
+      nielsenApp.loadMetadata( metadataJson.toString() );
+    }
   }
 
   private void updateContentTypeMetadata() {
@@ -185,55 +182,41 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void itemChanged( Video item ) {
+    setChannelNameJson( item );
     setMetadataJson( item );
   }
 
-  /**
-   * @param channelName to be reported to Nielsen. (Note that Nielsen requires data to meet certain restrictions for valid strings.)
-   */
-  public void setChannelName( String channelName ) {
-    DebugMode.logV( TAG, "setChannelName(): channelName=" + channelName );
-    JSONObject json = new JSONObject();
-    try {
-      json.put( "channelName", channelName );
-      this.channelNameJson = json.toString();
-    } catch (JSONException e) {
-      DebugMode.logE( TAG, e.toString() );
+  private void setChannelNameJson( Video item ) {
+    if( item.getMetadata().containsKey( BACKLOT_NIELSEN_KEY_PREFIX + CHANNEL_NAME_KEY ) ) {
+      JSONObject json = new JSONObject();
+      try {
+        json.put( CHANNEL_NAME_KEY, item.getMetadata().get( BACKLOT_NIELSEN_KEY_PREFIX + CHANNEL_NAME_KEY ) );
+        channelNameJson = json.toString();
+      } catch( JSONException e ) {
+        DebugMode.logE( TAG, e.toString() );
+      }
     }
   }
 
   private void setMetadataJson( Video item ) {
     metadataJson = new JSONObject();
     try {
-      metadataJson.put( "assetid", jsonFilter.filter(item.getEmbedCode()) );
-      metadataJson.put( "length", jsonFilter.filter(String.valueOf(item.getDuration())) );
-      metadataJson.put( "title", jsonFilter.filter(item.getTitle()) );
-      // todo: type? has to dynamically change as we're in-and-out of advertisements.
-
-      // these values come from Backlot.
-      setMetadataHelper( metadataJson, item, "category" );
-      setMetadataHelper( metadataJson, item, "censuscategory" );
-      setMetadataHelper( metadataJson, item, "tv" );
-      setMetadataHelper( metadataJson, item, "prod" );
-      setMetadataHelper( metadataJson, item, "pd" );
-      setMetadataHelper( metadataJson, item, "tfid" );
-      setMetadataHelper( metadataJson, item, "sid" );
-      // explicitly leaving out 'ocrtag' at the moment, we aren't supporting that yet.
+      metadataJson.put( "nielsen_length", NielsenJSONFilter.s_instance.filter( String.valueOf( item.getDuration() ) ) );
+      copyBacklotNielsenMetadata( metadataJson, item );
       Utils.overwriteJSONObject( customMetadata, metadataJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
     }
   }
 
-  private void setMetadataHelper( JSONObject json, Video item, String key ) {
-    final String metadataKey = METADATA_PREFIX + key;
-    if( item.getMetadata().containsKey( metadataKey ) ) {
-      final String value = item.getMetadata().get( metadataKey );
-      try {
-        json.put( key, jsonFilter.filter(value) );
-      }
-      catch (JSONException e) {
-        DebugMode.logE( TAG, "setMetadataHelper(): " + e.toString() );
+  private void copyBacklotNielsenMetadata( JSONObject metadataJson, Video item ) {
+    for( Map.Entry<String,String> kv : item.getMetadata().entrySet() ) {
+      if( kv.getKey().startsWith( BACKLOT_NIELSEN_KEY_PREFIX ) ) {
+        try {
+          metadataJson.put( kv.getKey(), kv.getValue() );
+        } catch (JSONException e) {
+          DebugMode.logE( TAG, e.toString() );
+        }
       }
     }
   }
