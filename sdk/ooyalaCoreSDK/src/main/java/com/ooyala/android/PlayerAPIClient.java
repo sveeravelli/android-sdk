@@ -549,6 +549,12 @@ class PlayerAPIClient {
     return contentTreeWithAdSet(embedCodes, null);
   }
 
+  /**
+   * @param embedCodes should be non-null and non-empty.
+   * @param adSetCode can be null.
+   * @return ContentItem instance.
+   * @throws OoyalaException
+   */
   public ContentItem contentTreeWithAdSet(List<String> embedCodes, String adSetCode) throws OoyalaException {
     Map<String, String> params = null;
     if (adSetCode != null) {
@@ -577,6 +583,12 @@ class PlayerAPIClient {
     return contentTreeWithAdSet(embedCodes, null, callback);
   }
 
+  /**
+   * @param embedCodes should be non-null and non-empty.
+   * @param adSetCode can be null.
+   * @param callback should be non-null.
+   * @return ContentTreeTask instance, after the instance's execute() has been invoked.
+   */
   public Object contentTreeWithAdSet(List<String> embedCodes, String adSetCode, ContentTreeCallback callback) {
     ContentTreeTask task = new ContentTreeTask(callback);
     ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
@@ -612,6 +624,12 @@ class PlayerAPIClient {
     return contentTreeByExternalIdsWithAdSetCode(externalIds, null, callback);
   }
 
+  /**
+   * @param externalIds should be non-null and non-empty.
+   * @param adSetCode can be null.
+   * @param callback should be non-null.
+   * @return ContentTreeByExternalIdsTask instance, after instance's execute() has been invoked.
+   */
   public Object contentTreeByExternalIdsWithAdSetCode(List<String> externalIds, String adSetCode, ContentTreeCallback callback) {
     ContentTreeByExternalIdsTask task = new ContentTreeByExternalIdsTask(callback);
     ContentTreeTaskParam taskParam = new ContentTreeTaskParam();
@@ -669,7 +687,16 @@ class PlayerAPIClient {
 
 
   private class MetadataFetchTaskParam {
-    public ContentItem item;
+    public final ContentItem item;
+    public final String adSetCode;
+    /**
+     * @param item should be non-null.
+     * @param adSetCode can be null.
+     */
+    private MetadataFetchTaskParam( final ContentItem item, final String adSetCode ) {
+      this.item = item;
+      this.adSetCode = adSetCode;
+    }
   }
 
   private class MetadataFetchTask extends AsyncTask<MetadataFetchTaskParam, Integer, Boolean> {
@@ -685,7 +712,7 @@ class PlayerAPIClient {
     protected Boolean doInBackground(MetadataFetchTaskParam... taskParams) {
       if (taskParams.length == 0 || taskParams[0] == null || taskParams[0].item == null) { return false; }
       try {
-        return fetchMetadata(taskParams[0].item);
+        return fetchMetadata(taskParams[0].item, taskParams[0].adSetCode);
       } catch (OoyalaException e) {
         _error = e;
         return false;
@@ -700,11 +727,24 @@ class PlayerAPIClient {
     }
   }
 
-  public boolean fetchMetadataForEmbedCodes(List<String> embedCodes, AuthorizableItem parent) throws OoyalaException {
+  /**
+   * @param embedCodes should be non-null and non-empty.
+   * @param adSetCode can be null.
+   * @param parent should be non-null.
+   * @return true when completed.
+   * @throws OoyalaException
+   */
+  public boolean fetchMetadataForEmbedCodesWithAdSet( List<String> embedCodes, String adSetCode, AuthorizableItem parent ) throws OoyalaException {
+    Map<String, String> params = null;
+    if (adSetCode != null) {
+      params = new HashMap<String, String>(1);
+      params.put(KEY_AD_SET_CODE, adSetCode);
+    }
+
     // fetch metadata
     String uri = String.format(METADATA_EMBED_CODE_URI, OoyalaPlayer.API_VERSION, _pcode,
         Utils.join(embedCodes, SEPARATOR_URL_IDS));
-    JSONObject root = OoyalaAPIHelper.objectForAPI(Environment.METADATA_HOST, uri, contentTreeParams(null),
+    JSONObject root = OoyalaAPIHelper.objectForAPI(Environment.METADATA_HOST, uri, contentTreeParams(params),
             _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
 
     // validate the result
@@ -728,14 +768,25 @@ class PlayerAPIClient {
     return true;
   }
 
-  public boolean fetchMetadata(ContentItem item) throws OoyalaException {
-    return fetchMetadataForEmbedCodes(item.embedCodesToAuthorize(), item);
+  /**
+   * @param item should be non-null.
+   * @param adSetCode can be null.
+   * @return true when completed.
+   * @throws OoyalaException
+   */
+  public boolean fetchMetadata( ContentItem item, String adSetCode ) throws OoyalaException {
+    return fetchMetadataForEmbedCodesWithAdSet( item.embedCodesToAuthorize(), adSetCode, item );
   }
 
-  public Object metadata(ContentItem item, MetadataFetchedCallback callback) {
+  /**
+   * @param item should be non-null.
+   * @param adSetCode can be null.
+   * @param callback should be non-null.
+   * @return MetadataFetchTask instance, after the instance's execute() has been invoked.
+    */
+  public Object metadata( ContentItem item, String adSetCode, MetadataFetchedCallback callback ) {
     MetadataFetchTask task = new MetadataFetchTask(callback);
-    MetadataFetchTaskParam taskParam = new MetadataFetchTaskParam();
-    taskParam.item = item;
+    MetadataFetchTaskParam taskParam = new MetadataFetchTaskParam(item, adSetCode);
     task.execute(taskParam);
     return task;
   }
@@ -785,7 +836,7 @@ class PlayerAPIClient {
           response.firstIndex, response.firstIndex + response.count));
       try {
         if (authorizeEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent) &&
-            fetchMetadataForEmbedCodes(childEmbedCodesToAuthorize, (ContentItem)_parent)) {
+            fetchMetadataForEmbedCodesWithAdSet( childEmbedCodesToAuthorize, null, (ContentItem) _parent )) {
           _listener.onItemsFetched(response.firstIndex, response.count, null);
         } else {
           _listener.onItemsFetched(response.firstIndex, response.count, new OoyalaException(
