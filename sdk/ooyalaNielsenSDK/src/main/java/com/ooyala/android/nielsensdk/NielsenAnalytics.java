@@ -1,6 +1,5 @@
 package com.ooyala.android.nielsensdk;
 
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,8 +19,12 @@ import com.ooyala.android.item.Video;
 
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
-  private static final String BACKLOT_NIELSEN_KEY_PREFIX = "nielsen_";
-  private static final String CHANNEL_NAME_KEY = "channelName";
+  private static final String BACKLOT_NIELSEN_PREFIX = "nielsen_";
+  private static final String NIELSEN_CHANNEL_NAME_KEY = "channelName";
+  private static final String NIELSEN_LENGTH_KEY = "nielsen_length";
+  private static boolean s_isBacklotNielsenKey(String backlotKey) { return backlotKey.startsWith( BACKLOT_NIELSEN_PREFIX ); }
+  private static String s_addBacklotPrefix(String nielsenKey) { return BACKLOT_NIELSEN_PREFIX + nielsenKey; }
+  private static String s_removeBacklotPrefix(String backlotKey) { return backlotKey.replaceFirst( BACKLOT_NIELSEN_PREFIX, "" ); }
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
@@ -130,10 +133,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
-    DebugMode.logV( TAG, "reportPlayheadUpdate(): isLive=" + item.isLive() + ", playheadMsec=" + playheadMsec );
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
     if( isValid() && reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 ) {
-      DebugMode.logV( TAG, "reportPlayheadUpdate(): updating" );
       nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
       lastReportedMsec = reportingMsec;
     }
@@ -187,21 +188,15 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void setChannelNameJson( Video item ) {
-    if( item.getMetadata().containsKey( BACKLOT_NIELSEN_KEY_PREFIX + CHANNEL_NAME_KEY ) ) {
-      JSONObject json = new JSONObject();
-      try {
-        json.put( CHANNEL_NAME_KEY, item.getMetadata().get( BACKLOT_NIELSEN_KEY_PREFIX + CHANNEL_NAME_KEY ) );
-        channelNameJson = json.toString();
-      } catch( JSONException e ) {
-        DebugMode.logE( TAG, e.toString() );
-      }
-    }
+    JSONObject json = new JSONObject();
+    copyBacklotNielsenMetadataByKey( json, item, NIELSEN_CHANNEL_NAME_KEY );
+    channelNameJson = json.toString();
   }
 
   private void setMetadataJson( Video item ) {
     metadataJson = new JSONObject();
     try {
-      metadataJson.put( "nielsen_length", NielsenJSONFilter.s_instance.filter( String.valueOf( item.getDuration() ) ) );
+      metadataJson.put( NIELSEN_LENGTH_KEY, NielsenJSONFilter.s_instance.filter( String.valueOf( item.getDuration() ) ) );
       copyBacklotNielsenMetadata( metadataJson, item );
       Utils.overwriteJSONObject( customMetadata, metadataJson );
     } catch (JSONException e) {
@@ -210,13 +205,20 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void copyBacklotNielsenMetadata( JSONObject metadataJson, Video item ) {
-    for( Map.Entry<String,String> kv : item.getMetadata().entrySet() ) {
-      if( kv.getKey().startsWith( BACKLOT_NIELSEN_KEY_PREFIX ) ) {
-        try {
-          metadataJson.put( kv.getKey(), kv.getValue() );
-        } catch (JSONException e) {
-          DebugMode.logE( TAG, e.toString() );
-        }
+    for( String backlotKey : item.getMetadata().keySet() ) {
+      if( s_isBacklotNielsenKey( backlotKey ) ) {
+        copyBacklotNielsenMetadataByKey( metadataJson, item, s_removeBacklotPrefix( backlotKey ) );
+      }
+    }
+  }
+
+  private void copyBacklotNielsenMetadataByKey( JSONObject json, Video item, String nielsenKey ) {
+    final String backlotKey = s_addBacklotPrefix( nielsenKey );
+    if( item.getMetadata().containsKey( backlotKey ) ) {
+      try {
+        json.put( nielsenKey, item.getMetadata().get( backlotKey ) );
+      } catch( JSONException e ) {
+        DebugMode.logE( TAG, e.toString() );
       }
     }
   }
