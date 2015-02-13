@@ -39,9 +39,9 @@ class DiscredixDrmUtils {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
       return dlc.personalizationVerify();
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return false;
   }
@@ -61,11 +61,11 @@ class DiscredixDrmUtils {
 
       isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return isDrmContent;
   }
@@ -90,10 +90,10 @@ class DiscredixDrmUtils {
           return false;
       }
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return false;
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return false;
     }
     return true;
@@ -117,15 +117,15 @@ class DiscredixDrmUtils {
       areRightsVerified = dlc.verifyRights(localFilename);
 
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmInvalidFormatException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return areRightsVerified;
   }
@@ -184,10 +184,10 @@ class DiscredixDrmUtils {
 
       } catch (DrmGeneralFailureException e) {
         DebugMode.logE(TAG, "Failed trying to get discredix version");
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

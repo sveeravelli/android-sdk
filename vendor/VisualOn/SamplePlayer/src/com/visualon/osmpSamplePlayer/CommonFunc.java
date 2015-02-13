@@ -84,7 +84,7 @@ public class CommonFunc {
             fos.flush();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
     }
     
@@ -112,11 +112,11 @@ public class CommonFunc {
                 fileread.close();
             } 
             catch (IOException e) {
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
         
         return true;

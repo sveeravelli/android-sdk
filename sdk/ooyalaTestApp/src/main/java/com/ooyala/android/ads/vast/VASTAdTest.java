@@ -3,6 +3,7 @@ package com.ooyala.android.ads.vast;
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
+import com.ooyala.android.util.DebugMode;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class VASTAdTest extends AndroidTestCase {
+  private static final String TAG = VASTAdTest.class.getSimpleName();
+
   public VASTAdTest() {
     super();
   }
@@ -60,7 +63,7 @@ public class VASTAdTest extends AndroidTestCase {
           "http://vindicoasset.edgesuite.net/Repository/CampaignCreative/Campaign_8759/INSTREAMAD/93084_scrambled_eggs_10_v2_audio_17_03_11_MP4_360p_4x3.mp4");
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
       fail();
     }
   }

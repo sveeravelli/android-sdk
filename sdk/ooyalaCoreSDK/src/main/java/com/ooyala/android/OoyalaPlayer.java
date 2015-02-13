@@ -2232,7 +2232,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         bitmap = BitmapFactory.decodeStream(in);
       } catch (Exception e) {
         DebugMode.logE("Error", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       return bitmap;
     }

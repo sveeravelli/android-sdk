@@ -8,11 +8,11 @@ package com.ooyala.demo.social;
 public abstract class BaseDialogListener implements DialogListener {
 
     public void onFacebookError(FacebookError e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
     public void onError(DialogError e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
     public void onCancel() {

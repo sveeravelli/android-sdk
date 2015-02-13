@@ -186,7 +186,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
       DebugMode.logD(TAG, "Opening brower to " + url);
     } catch (Exception e) {
       DebugMode.logE(TAG, "There was some exception on clickthrough!");
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

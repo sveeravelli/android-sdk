@@ -267,7 +267,7 @@ public abstract class GameChannel implements Cast.MessageReceivedCallback {
                         String opponentName = payload.getString(KEY_OPPONENT);
                         onGameJoined(player, opponentName);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        DebugMode.logE(TAG, "Caught!", e);
                     }
                 } else if (KEY_MOVED.equals(event)) {
                     Log.d(TAG, "MOVED");
@@ -278,7 +278,7 @@ public abstract class GameChannel implements Cast.MessageReceivedCallback {
                         boolean isGameOver = payload.getBoolean(KEY_GAME_OVER);
                         onGameMove(player, row, column, isGameOver);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        DebugMode.logE(TAG, "Caught!", e);
                     }
                 } else if (KEY_ENDGAME.equals(event)) {
                     Log.d(TAG, "ENDGAME");
@@ -290,7 +290,7 @@ public abstract class GameChannel implements Cast.MessageReceivedCallback {
                         }
                         onGameEnd(endState, winningLocation);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        DebugMode.logE(TAG, "Caught!", e);
                     }
                 } else if (KEY_ERROR.equals(event)) {
                     Log.d(TAG, "ERROR");
@@ -298,7 +298,7 @@ public abstract class GameChannel implements Cast.MessageReceivedCallback {
                         String errorMessage = payload.getString(KEY_MESSAGE);
                         onGameError(errorMessage);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        DebugMode.logE(TAG, "Caught!", e);
                     }
                 } else if (KEY_BOARD_LAYOUT_RESPONSE.equals(event)) {
                     Log.d(TAG, "Board Layout");
@@ -312,7 +312,7 @@ public abstract class GameChannel implements Cast.MessageReceivedCallback {
                         }
                         onGameBoardLayout(boardLayout);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        DebugMode.logE(TAG, "Caught!", e);
                     }
                 }
             } else {

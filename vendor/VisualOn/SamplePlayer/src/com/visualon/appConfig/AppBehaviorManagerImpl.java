@@ -309,7 +309,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
        try{
        initPreferenceValue();}
        catch(NumberFormatException e){
-           e.printStackTrace();
+           DebugMode.logE(TAG, "Caught!", e);
        }
       addPreview();
        
@@ -328,16 +328,16 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
         try {
             fis = new FileInputStream(filePath);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
         
         XMLAnalysis analysis = new XMLAnalysis();
         try {
             android.util.Xml.parse(fis, Xml.Encoding.UTF_8, analysis);
         } catch (IOException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         } catch (SAXException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
         mAppEventItems = analysis.getAppEventItems();
         mEventItems = analysis.getEventItems();
@@ -1060,7 +1060,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 player.setMaxBufferTime(num);
             }catch(NumberFormatException e){
                 voLog.d(TAG,"Input invalid value.");
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
             }
             
@@ -1104,7 +1104,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                     player.setRTSPOverHTTPConnectionPort(num);
                 }catch(NumberFormatException e){
                     voLog.d(TAG,"Input invalid value.");
-                    e.printStackTrace();
+                    DebugMode.logE(TAG, "Caught!", e);
                 }
            
             }else{
@@ -1167,7 +1167,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                     player.setHTTPRetryTimeout(retryTime);}
                 catch(NumberFormatException e){
                     voLog.d(TAG, "Input invalid value");
-                    e.printStackTrace();
+                    DebugMode.logE(TAG, "Caught!", e);
                 }
              }
             }
@@ -1230,7 +1230,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 num=Integer.parseInt(str);
                 player.setSubtitleFontSizeScale(num);
             }catch(NumberFormatException e){
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
             
         }
@@ -1254,7 +1254,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 player.setSubtitleFontOpacity(num);
             }
             }catch(NumberFormatException e){
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
         }
 
@@ -1287,7 +1287,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 player.setSubtitleFontBackgroundOpacity(num);
             }
             }catch(NumberFormatException e){
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
         }
 
@@ -1321,7 +1321,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 player.setSubtitleFontEdgeOpacity(num);
             }
             }catch(NumberFormatException e){
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
         }
         
@@ -1371,7 +1371,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 player.setSubtitleWindowBackgroundOpacity(num);
             }
             }catch(NumberFormatException e){
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
         }
         
@@ -1449,10 +1449,10 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                fileread.close();
                
            } catch (IOException e) {
-               e.printStackTrace();
+               DebugMode.logE(TAG, "Caught!", e);
            }
        } catch (FileNotFoundException e) {
-           e.printStackTrace();
+           DebugMode.logE(TAG, "Caught!", e);
        } 
        
    }
@@ -1552,7 +1552,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
             fos.flush();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
     }
    private void initSubtitle(){
@@ -1743,7 +1743,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                  fontSize=num;}
              catch(NumberFormatException e){
                  voLog.d(TAG, "Input invalid value");
-                 e.printStackTrace();
+                 DebugMode.logE(TAG, "Caught!", e);
              }
              
              initSubtitle();
@@ -1766,7 +1766,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
                 fontColorOpacity=num;}
             catch(NumberFormatException e){
                 voLog.d(TAG, "Input invalid value");
-                e.printStackTrace();
+                DebugMode.logE(TAG, "Caught!", e);
             }
            
             initSubtitle();
@@ -1806,7 +1806,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
             backgroundColorOpacity=num;}
         catch(NumberFormatException e){
             voLog.d(TAG, "Input invalid value");
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
         }
        
         initSubtitle();
@@ -1843,7 +1843,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
         edgeColorOpacity=num;}
     catch(NumberFormatException e){
         voLog.d(TAG, "Input invalid value");
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
     
     initSubtitle();
@@ -1902,7 +1902,7 @@ public class AppBehaviorManagerImpl extends PreferenceActivity implements AppBeh
         windowBackgroundColorOpacity=num;}
     catch(NumberFormatException e){
         voLog.d(TAG, "Input invalid value");
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
    
     initSubtitle();
@@ -2073,7 +2073,7 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
         Thread.sleep(100);
     } catch (InterruptedException e) {
         // TODO Auto-generated catch block
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
       this.finish();
     
@@ -2146,7 +2146,7 @@ private void getFiles(ArrayList<String> list,String url) {
             }
         }
     } catch (Exception e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 }
 
