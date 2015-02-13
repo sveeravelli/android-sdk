@@ -1152,7 +1152,7 @@ public class Player extends Activity
             is.read(b);
             is.close();
         } catch (IOException e) {
-            DebugMode.logE(TAG, "Caught!", e);
+            e.printStackTrace();
         }
         m_sdkPlayer.setLicenseContent(b);
         //m_sdkPlayer.setPreAgreedLicense("ABCDEF");
@@ -3039,7 +3039,7 @@ public class Player extends Activity
                 }
             }
         } catch (Exception e) {
-            DebugMode.logE(TAG, "Caught!", e);
+            e.printStackTrace();
         }
     }
     private void readURL() {
