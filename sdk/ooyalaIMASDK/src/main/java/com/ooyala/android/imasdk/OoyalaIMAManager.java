@@ -230,8 +230,12 @@ public class OoyalaIMAManager implements AdPluginInterface {
     timeoutThread = new Thread() {
           @Override
           public void run() {
-//            Thread.sleep(100);
-            timeout();
+            try {
+              Thread.sleep(TIMEOUT);
+              timeout();
+            } catch (InterruptedException e) {
+              DebugMode.logD(TAG, "InterruptedException " + e + "while waiting for IMA ads request response");
+            }
           }
       };
       timeoutThread.start();
