@@ -57,20 +57,20 @@ class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
         DebugMode.logD(TAG, "Device is already personalized");
       }
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       returnException = e;
     } catch (DrmUpdateRequiredException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       returnException = e;
     } catch (DrmNotSupportedException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       returnException = e;
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       returnException = e;
     } catch (Exception e) {
       DebugMode.logE(TAG, "Unknown exception thrown in Personalization Async Task");
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       returnException = e;
     }
     return returnException;

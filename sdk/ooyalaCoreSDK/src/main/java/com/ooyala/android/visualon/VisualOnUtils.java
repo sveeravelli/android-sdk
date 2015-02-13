@@ -120,7 +120,7 @@ class VisualOnUtils {
       fos.flush();
       fos.close();
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

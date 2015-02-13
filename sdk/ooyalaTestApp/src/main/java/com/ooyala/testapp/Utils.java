@@ -18,9 +18,10 @@ import org.json.JSONTokener;
 
 import android.text.format.DateUtils;
 import android.util.Log;
+import com.ooyala.android.util.DebugMode;
 
 class Utils {
-
+  private static final String TAG = Utils.class.getSimpleName();
   public static final String SEPARATOR_AMPERSAND = "&";
   public static final String SEPARATOR_COMMA = ",";
   public static final String SEPARATOR_EMPTY = "";
@@ -34,7 +35,7 @@ class Utils {
     try {
       return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
     }
     return null;
   }

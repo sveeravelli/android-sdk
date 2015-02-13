@@ -1,8 +1,10 @@
 package com.ooyala.android;
 
+import com.ooyala.android.util.DebugMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 class UserInfo {
+  private static final String TAG = UserInfo.class.getSimpleName();
   static final String KEY_USER_ACCOUNT_ID = "account_id";
   static final String KEY_USER_CONTINENT = "continent";
   static final String KEY_USER_COUNTRY = "country";
@@ -49,7 +51,7 @@ class UserInfo {
       }
     } catch (JSONException e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
     }
   }
 

@@ -3,6 +3,7 @@ package com.ooyala.android.item;
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
+import com.ooyala.android.util.DebugMode;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -17,6 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class ClosedCaptionsTest extends AndroidTestCase {
+  private static final String TAG = ClosedCaptionsTest.class.getSimpleName();
+
   public ClosedCaptionsTest() {
     super();
   }
@@ -103,7 +106,7 @@ public class ClosedCaptionsTest extends AndroidTestCase {
     try {
       db = dbf.newDocumentBuilder();
     } catch (ParserConfigurationException e1) {
-      e1.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e1 );
       assertNull(e1);
     }
 
@@ -113,10 +116,10 @@ public class ClosedCaptionsTest extends AndroidTestCase {
     try {
       doc = db.parse(is);
     } catch (SAXException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       assertNull(e);
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       assertNull(e);
     }
 

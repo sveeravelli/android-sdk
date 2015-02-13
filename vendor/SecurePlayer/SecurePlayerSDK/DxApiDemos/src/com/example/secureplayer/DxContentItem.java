@@ -199,9 +199,9 @@ public class DxContentItem {
 					}
 					br.close();
 				} catch (FileNotFoundException e) {
-					//e.printStackTrace();
+					DebugMode.logE(TAG, "Caught!", //e);
 				} catch (IOException e) {
-					//e.printStackTrace();
+					DebugMode.logE(TAG, "Caught!", //e);
 				}
 				br = null;
 				fis = null;		

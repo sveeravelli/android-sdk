@@ -9,6 +9,7 @@ import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.DynamicChannel;
 import com.ooyala.android.item.ModuleData;
 import com.ooyala.android.item.Video;
+import com.ooyala.android.util.DebugMode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public class PlayerAPIClientTest extends AndroidTestCase {
+  private static final String TAG = PlayerAPIClientTest.class.getSimpleName();
   public PlayerAPIClient api;
 
   public PlayerAPIClientTest() {
@@ -29,7 +31,7 @@ public class PlayerAPIClientTest extends AndroidTestCase {
       domain = new PlayerDomain("http://www.ooyala.com");
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
     }
     api = new PlayerAPIClient(TestConstants.TEST_PCODE, domain, null);
   }
