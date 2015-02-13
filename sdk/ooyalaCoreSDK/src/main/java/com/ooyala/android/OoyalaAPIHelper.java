@@ -66,13 +66,13 @@ class OoyalaAPIHelper {
     } catch (SocketTimeoutException e) {
       DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } finally {
       if (rd != null) {
         try {
          rd.close();
         } catch (IOException e) {
-          e.printStackTrace();
+          DebugMode.logE(TAG, "Caught!", e);
         }
       }
     }

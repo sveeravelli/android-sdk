@@ -470,7 +470,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         is.read(b);
         is.close();
       } catch (IOException e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       _player.setLicenseContent(b);
 

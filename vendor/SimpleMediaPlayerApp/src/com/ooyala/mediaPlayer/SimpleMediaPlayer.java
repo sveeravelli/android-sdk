@@ -83,7 +83,7 @@ public class SimpleMediaPlayer implements OnBufferingUpdateListener, OnCompletio
       _player.setOnVideoSizeChangedListener(this);
       _player.prepareAsync();
     } catch (Throwable t) {
-      t.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", t);
     }
   }
 

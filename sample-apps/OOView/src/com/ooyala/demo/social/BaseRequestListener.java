@@ -14,24 +14,24 @@ public abstract class BaseRequestListener implements AsyncFacebookRunner.Request
 
     public void onFacebookError(FacebookError e, final Object state) {
         Log.e("Facebook", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
     public void onFileNotFoundException(FileNotFoundException e,
                                         final Object state) {
         Log.e("Facebook", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
     public void onIOException(IOException e, final Object state) {
         Log.e("Facebook", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
     public void onMalformedURLException(MalformedURLException e,
                                         final Object state) {
         Log.e("Facebook", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
     }
 
 }

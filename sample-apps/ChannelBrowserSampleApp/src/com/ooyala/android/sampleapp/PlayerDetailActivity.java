@@ -27,7 +27,7 @@ public class PlayerDetailActivity extends Activity {
       setContentView(R.layout.main);
 
     } catch (Exception e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player), ChannelBrowserSampleAppActivity.PCODE,

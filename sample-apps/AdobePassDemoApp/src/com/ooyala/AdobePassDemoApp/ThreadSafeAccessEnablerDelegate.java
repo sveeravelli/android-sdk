@@ -69,9 +69,9 @@ public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessE
           try {
             deserializedMvpds.add(Mvpd.deserialze(mvpd));
           } catch (IOException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
           } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            DebugMode.logE(TAG, "Caught!", e);
           }
         }
         delegate.displayProviderDialog(deserializedMvpds);
@@ -100,7 +100,7 @@ public class ThreadSafeAccessEnablerDelegate extends Handler implements IAccessE
       try {
         serializedMvpds.add(mvpd.serialize());
       } catch (IOException e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
     }
     Bundle b = getBundle(DISPLAY_PROVIDER_DIALOG);

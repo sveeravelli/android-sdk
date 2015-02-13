@@ -42,7 +42,7 @@ class FileDownloadAsyncTask extends AsyncTask<Void, Void, String> {
       VisualOnUtils.DownloadFile(_streamUrl, _localFilePath);
       return _localFilePath;
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return null;
     }
   }
