@@ -51,10 +51,7 @@ public class MoviePlayer extends Player implements Observer {
     boolean isVisualOnHLSEnabled = OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls);
     boolean isVisualOnSmoothEnabled = OoyalaPlayer.enableCustomSmoothPlayer && (isSmooth || isRemoteSmooth);
 
-    if( streams == null || streams.size() == 0 ) {
-      player = new EmptyStreamPlayer();
-    }
-    else if (isVisualOnHLSEnabled || isVisualOnSmoothEnabled) {
+    if (isVisualOnHLSEnabled || isVisualOnSmoothEnabled) {
       try {
         player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
       } catch(Exception e) {
