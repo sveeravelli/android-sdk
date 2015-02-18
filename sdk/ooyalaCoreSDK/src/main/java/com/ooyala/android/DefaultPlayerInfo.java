@@ -25,7 +25,7 @@ public class DefaultPlayerInfo implements PlayerInfo {
         supportedFormats.add("m3u8");
       }
 
-      if (OoyalaPlayer.enableCustomSmoothPlayer) {
+      if (OoyalaPlayer.enableCustomPlayreadyPlayer) {
         supportedFormats.add("smooth");
         supportedFormats.add("playready_hls");
       }

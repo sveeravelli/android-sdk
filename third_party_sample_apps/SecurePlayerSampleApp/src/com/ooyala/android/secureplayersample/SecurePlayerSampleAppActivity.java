@@ -94,10 +94,10 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
 
           if(playerSpinner.getSelectedItem().toString()  == "Native Player") {
             OoyalaPlayer.enableCustomHLSPlayer = false;
-            OoyalaPlayer.enableCustomSmoothPlayer = false;
+            OoyalaPlayer.enableCustomPlayreadyPlayer = false;
           } else {
             OoyalaPlayer.enableCustomHLSPlayer = true;
-            OoyalaPlayer.enableCustomSmoothPlayer = true;
+            OoyalaPlayer.enableCustomPlayreadyPlayer = true;
           }
 
           player.play();

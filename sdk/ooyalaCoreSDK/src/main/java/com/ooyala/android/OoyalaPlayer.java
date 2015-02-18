@@ -150,12 +150,12 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static boolean enableCustomHLSPlayer = false;
 
   /**
-   * If set to true, Smooth content will be allowed using our custom Smooth
-   * implementation rather than native the Android one. This will have no
+   * If set to true, Smooth and HLS content (both Clear and Playready-encrypted) will be allowed
+   * using our custom Playready implementation rather than native the Android one. This will have no
    * affect unless the custom playback engine is linked and loaded in
    * addition to the standard Ooyala Android SDK
    */
-  public static boolean enableCustomSmoothPlayer = false;
+  public static boolean enableCustomPlayreadyPlayer = false;
 
   /**
    * If set to true, DRM enabled players will perform DRM requests in a debug environment if available
