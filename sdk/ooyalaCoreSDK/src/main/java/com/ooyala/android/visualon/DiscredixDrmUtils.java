@@ -130,7 +130,6 @@ class DiscredixDrmUtils {
    * @return true if file can now be played, false otherwise.
    */
   public static boolean canFileBePlayed(Context context, Stream stream, String localFilename) {
-    if (!Stream.DELIVERY_TYPE_SMOOTH.equals(stream.getDeliveryType())) return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(context, localFilename)) return true;
 
