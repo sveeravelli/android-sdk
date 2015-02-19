@@ -62,6 +62,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
   private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.13.10-B72949";
   private VisualOnConfiguration _visualOnConfiguration = null;
+  private static final boolean ENABLE_DEBUGGING = false;
+  private static final boolean EXTREME_DEBUGGING = false;
 
   protected VOCommonPlayer _player = null;
   protected SurfaceHolder _holder = null;
@@ -117,6 +119,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
+    final Context context = parent.getLayout().getContext();
     _visualOnConfiguration = parent.getOptions().getVisualOnConfiguration();
 
     if (!isDiscredixNeeded()) {
@@ -127,6 +130,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
       DebugMode.logD(TAG, "This app has the ability to play protected content");
       _hasDiscredix = true;
+      if( ENABLE_DEBUGGING ) {
+        DiscredixDrmUtils.enableDebugging( context, EXTREME_DEBUGGING );
+      }
     } catch(Exception e) {
       DebugMode.logD(TAG, "This app cannot play protected content");
       _hasDiscredix = false;
@@ -138,19 +144,19 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     setParent(parent);
 
     // Copy license file,
-    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
-    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
+    VisualOnUtils.copyFile(context, "voVidDec.dat", "voVidDec.dat");
+    VisualOnUtils.copyFile(context, "cap.xml", "cap.xml");
 
     // Do a cleanup of all saved manifests first open of the app
     if (!didCleanupLocalFiles) {
       didCleanupLocalFiles = true;
-      VisualOnUtils.cleanupLocalFiles(_parent.getLayout().getContext());
+      VisualOnUtils.cleanupLocalFiles(context);
     }
 
     if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
 
       // Check if the Discredix version string matches what we expect
-      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(_parent.getLayout().getContext())) {
+      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(context)) {
         if (!_visualOnConfiguration.disableLibraryVersionChecks) {
           this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "SecurePlayer Initialization error: Unexpected Discredix Version");
           setState(State.ERROR);
@@ -164,7 +170,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         DebugMode.logI(TAG, "Discredix Version correct for this SDK version");
       }
 
-      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
+      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(context, this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
     }
     if(isDiscredixNeeded() && !isDiscredixLoaded()) {
@@ -353,6 +359,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   protected void createMediaPlayer() {
+    final Context context = _parent.getLayout().getContext();
+
     try {
       if (!_surfaceExists) {
         DebugMode.logE(TAG, "Trying to create a player without a valid surface");
@@ -360,7 +368,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
 
       if (isDiscredixNeeded() && isDiscredixLoaded() &&
-          !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
+          !DiscredixDrmUtils.canFileBePlayed(context, _stream, _localFilePath)) {
         DebugMode.logE(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
       }
@@ -381,17 +389,17 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       VO_OSMP_PLAYER_ENGINE engine = VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER;
 
       // Location of libraries
-      String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
+      String apkPath = context.getFilesDir().getParentFile().getPath() + "/lib/";
 
       //This needs to be called at least once in order to initialize the video player
       if (isDiscredixLoaded()) {
-        DiscredixDrmUtils.warmDxDrmDlc(_parent.getLayout().getContext());
+        DiscredixDrmUtils.warmDxDrmDlc(context);
       }
 
       // Initialize SDK player
       VOOSMPInitParam initParam = new VOOSMPInitParam();
       initParam.setLibraryPath(apkPath);
-      initParam.setContext(_parent.getLayout().getContext());
+      initParam.setContext(context);
       VO_OSMP_RETURN_CODE nRet = _player.init(engine, initParam);
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         DebugMode.logV(TAG, "MediaPlayer is created.");
@@ -470,7 +478,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _player.enableAudioEffect(false);
 
       /* Processor-specific settings */
-      String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
+      String cfgPath = context.getFilesDir().getParentFile().getPath() + "/";
       String capFile = cfgPath + "cap.xml";
       _player.setDeviceCapabilityByFile(capFile);
 

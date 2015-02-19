@@ -1,5 +1,6 @@
 package com.ooyala.android.visualon;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -8,6 +9,7 @@ import android.content.Context;
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
+import com.discretix.drmdlc.api.IDxDrmDlcDebug;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
@@ -28,6 +30,30 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
   private static final String SECURE_PLAYER_VERSION = "03_00_05_0962";
+
+  public static void enableDebugging(Context context, boolean extreme) {
+    try {
+      DxLogConfig config;
+      if( extreme ) {
+        config = new DxLogConfig(
+          DxLogConfig.LogLevel.Verbose,
+          0,
+          new File( context.getExternalCacheDir(), "vo_dx.log" ).toString(),
+          true
+        );
+      }
+      else {
+        config = new DxLogConfig(
+          DxLogConfig.LogLevel.Verbose,
+          0
+        );
+      }
+      final IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, config);
+    } catch( DrmClientInitFailureException e ) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Checks if the device has been personalized
    * @return true if personalized, false if not
@@ -104,7 +130,6 @@ class DiscredixDrmUtils {
    * @return true if file can now be played, false otherwise.
    */
   public static boolean canFileBePlayed(Context context, Stream stream, String localFilename) {
-    if (!Stream.DELIVERY_TYPE_SMOOTH.equals(stream.getDeliveryType())) return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(context, localFilename)) return true;
 
