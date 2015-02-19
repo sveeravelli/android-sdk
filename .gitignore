@@ -5,6 +5,7 @@ OoyalaFreewheelSDK-Android.zip
 OoyalaSecurePlayerIntegration-Android.zip
 OoyalaVisualOnIntegration-Android.zip
 OoyalaSDKArchive-Android.zip
+OoyalaNielsenSDK-Android.zip
 test_results.txt
 *.class
 */javadoc
@@ -30,6 +31,11 @@ third_party_sample_apps/VisualOnSampleApp/libs
 third_party_sample_apps/VisualOnSampleApp/assets
 third_party_sample_apps/SecurePlayerSampleApp/libs
 third_party_sample_apps/SecurePlayerSampleApp/assets
+
+third_party_sample_apps/NielsenSampleApp/app/libs
+third_party_sample_apps/NielsenSampleApp/app/src/main/jniLibs
+third_party_sample_apps/NielsenSampleApp/app/src/main/assets
+
 third_party_sdks/*/local.properties
 internal-apps/*/bin
 internal-apps/*/gen
@@ -48,6 +54,7 @@ vendor/google_play_services/libproject/google-play-services_lib/local.properties
 **/Documentation
 **/OoyalaFreewheelSDK.jar
 **/OoyalaIMASDK.jar
+**/OoyalaNielsenSDK.jar
 script/android_*
 deploy/android_deploy
 

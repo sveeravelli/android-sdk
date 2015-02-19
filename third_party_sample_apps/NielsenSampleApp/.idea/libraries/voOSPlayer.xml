@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="OoyalaSDK">
+  <library name="voOSPlayer">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/OoyalaSDK.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/voOSPlayer.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
