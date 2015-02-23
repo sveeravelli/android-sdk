@@ -64,7 +64,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
         PCODE, new PlayerDomain(DOMAIN));
     player = playerLayoutController.getPlayer();
 
-    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, null, null, null, null, "clientid-unknown", "vcid-unknown", player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
+    final NielsenAnalytics nielsenAnalytics = new NielsenAnalytics( this, player, "NielsenTestApp", "0.1", NIELSEN_SFCODE, NIELSEN_APPID, player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
 
     player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
