@@ -3,14 +3,49 @@ package com.ooyala.android.configuration;
 public class Options implements ReadonlyOptionsInterface {
 
   public static class Builder {
+    /*
+    FCCTVRatingConfiguration; Default: default FCCTVRatingConfiguration object
+     */
     private FCCTVRatingConfiguration tvRatingConfiguration;
+
+    /*
+    VisualOnConfiguration; Default: default VisualOnConfiguration object
+     */
     private VisualOnConfiguration visualOnConfiguration;
+
+    /*
+     * Show cue points for ads if this is set to "true"; Default: true
+     */
     private boolean showCuePoints;
+
+    /*
+     * Show ads controls during ads playback if this is set to "true"; Default: true
+     */
     private boolean showAdsControls;
+
+    /*
+     * Show live controls for live content playback if this is set to "true" (live stream only); Default: true
+     */
     private boolean showLiveControls;
+
+    /*
+     * Load the content as soon as we have all the information and authorization we need if this is set to "true". Otherwise, we load the content after pre-roll (if we have one) if this is set to "false"; Default: true
+     */
     private boolean preloadContent;
+
+    /*
+     * Show promo image if there is one and this variable is set to "true"; Default: false
+     */
     private boolean showPromoImage;
+
+    /*
+     * Network connection timeout value used by networking operations; Default: 0
+     */
     private int connectionTimeoutInMillisecond;
+
+    /*
+     * Read timeout value used by networking operations; Default: 0
+     */
     private int readTimeoutInMillisecond;
 
     public Builder() {
@@ -18,11 +53,11 @@ public class Options implements ReadonlyOptionsInterface {
       this.visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
       this.showCuePoints = true;
       this.showAdsControls = true;
+      this.showLiveControls = true;
       this.preloadContent = true;
       this.showPromoImage = false;
       this.connectionTimeoutInMillisecond = 0;
       this.readTimeoutInMillisecond = 0;
-      this.showLiveControls = true;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -97,6 +132,19 @@ public class Options implements ReadonlyOptionsInterface {
   private final int readTimeoutInMillisecond;
   private final boolean showLiveControls;
 
+  /**
+   * Initialize an Options object with given params
+   * @param tvRatingConfiguration
+   * @param visualOnConfiguration
+   * @param showCuePoints
+   * @param showAdsControls
+   * @param preloadContent
+   * @param showPromoImage
+   * @param showLiveControls
+   * @param connectionTimeoutInMillisecond
+   * @param readTimeoutInMillisecond
+   * @return the initialized Options
+   */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
       VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
       boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls,
