@@ -17,6 +17,7 @@ import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.util.DebugMode;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -25,19 +26,16 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class NielsenSampleAppActivity extends Activity implements Observer {
+  private final static String TAG = NielsenSampleAppActivity.class.getSimpleName();
+  private final static String PCODE = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
+  private final static String DOMAIN = "http://www.ooyala.com";
+  private final static String NIELSEN_SFCODE = "UAT-CERT";
+  private final static String NIELSEN_APPID = "T70BC66D4-C904-4DA1-AB9D-BB658F70E9A7";
 
   OoyalaPlayer player;
   Spinner embedSpinner;
   HashMap<String, String> embedMap;
   ArrayAdapter<String> embedAdapter;
-
-  private final String PCODE = "42Zms6h4wdcI1R1uFzepD-KZ0kkk";
-  private final String EMBED_CODE = "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a";
-  private final String DOMAIN = "http://www.ooyala.com";
-
-  // Nielsen IDs for Ooyala Univision test apps.
-  private final String NIELSEN_SFCODE = "UAT-CERT";
-  private final String NIELSEN_APPID = "T70BC66D4-C904-4DA1-AB9D-BB658F70E9A7";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -46,14 +44,13 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
     DebugMode.setMode( DebugMode.Mode.LogAndAbort );
 
     setContentView(R.layout.main);
-    //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
-    //Populate the embed map
     embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("nielsen", EMBED_CODE);
+    embedMap.put("Linear", "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
+    embedMap.put("Dynamic", "M3bmM3czp1j9horxoTLGaJtgLmW57u4F");
+    embedMap.put("CMS", "ZhMmkycjr4jlHIjvpIIimQSf_CjaQs48");
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
-    //Update the spinner with the embed map
     for (String key : embedMap.keySet()) {
       embedAdapter.add(key);
     }
@@ -105,11 +102,19 @@ public class NielsenSampleAppActivity extends Activity implements Observer {
 
   @Override
   public void update(Observable observable, Object data) {
-    // TODO Implement to listen to Ooyala Notifications
+    Log.d( TAG, "update: " + data );
   }
 
   private JSONObject getCustomConfig() {
-    return null;
+    final JSONObject json = new JSONObject();
+    try {
+      json.put( "tv", "false" );
+      json.put( "nol_devDebug", "true" ); // do NOT do this for production apps!
+    }
+    catch( JSONException e ) {
+      Log.e( TAG, "getCustomConfig()", e );
+    }
+    return json;
   }
 
   private JSONObject getCustomMetadata() {
