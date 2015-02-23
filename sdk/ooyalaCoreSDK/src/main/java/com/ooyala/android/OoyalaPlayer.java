@@ -150,12 +150,12 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static boolean enableCustomHLSPlayer = false;
 
   /**
-   * If set to true, Smooth content will be allowed using our custom Smooth
-   * implementation rather than native the Android one. This will have no
+   * If set to true, Smooth and HLS content (both Clear and Playready-encrypted) will be allowed
+   * using our custom Playready implementation rather than native the Android one. This will have no
    * affect unless the custom playback engine is linked and loaded in
    * addition to the standard Ooyala Android SDK
    */
-  public static boolean enableCustomSmoothPlayer = false;
+  public static boolean enableCustomPlayreadyPlayer = false;
 
   /**
    * If set to true, DRM enabled players will perform DRM requests in a debug environment if available
@@ -368,8 +368,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * method has no effect and just returns false. An ad set can be dynamically
    * associated using the adSetCode param.
    *
-   * @param embedCode
-   * @param adSetCode
+   * @param embedCode should not be null.
+   * @param adSetCode can be null.
    * @return true if the embed code was successfully set, false if not.
    */
   public boolean setEmbedCodeWithAdSetCode(String embedCode, String adSetCode) {
@@ -386,12 +386,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    * null, this method has no effect and just returns false. An ad set can be
    * dynamically associated using the adSetCode param.
    *
-   * @param embedCodes
-   * @param adSetCode
+   * @param embedCodes should not be null.
+   * @param adSetCode can be null.
    * @return true if the embed codes were successfully set, false if not.
    */
   public boolean setEmbedCodesWithAdSetCode(List<String> embedCodes,
-      String adSetCode) {
+      final String adSetCode) {
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
@@ -416,7 +416,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            reinitialize(item);
+            reinitialize(item, adSetCode);
           }
         }));
 
@@ -466,7 +466,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            reinitialize(item);
+            reinitialize(item, null);
           }
         }));
     return true;
@@ -483,7 +483,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cancelOpenTasks();
     setState(State.LOADING);
     cleanupPlayers();
-    return reinitialize(rootItem);
+    return reinitialize(rootItem, null);
   }
 
   /**
@@ -493,17 +493,17 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if the change was successful, false if not
    */
   public boolean changeCurrentItem(String embedCode) {
-    return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode,
-        _currentItem));
+    return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem), null);
   }
 
   /**
    * Set the current video in a channel if the video is present.
    *
-   * @param video
+   * @param video should not be null.
+   * @param adSetCode can be null.
    * @return true if the change was successful, false if not
    */
-  public boolean changeCurrentItem(Video video) {
+  public boolean changeCurrentItem( Video video, String adSetCode ) {
     if (video == null) {
       cleanupPlayers();
       return false;
@@ -518,7 +518,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // request metadata
     final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
     taskStarted(metadataTaskKey,
-        _playerAPIClient.metadata(_rootItem, new MetadataFetchedCallback() {
+        _playerAPIClient.metadata(_rootItem, adSetCode, new MetadataFetchedCallback() {
           @Override
           public void callback(boolean result, OoyalaException error) {
             taskCompleted(metadataTaskKey);
@@ -533,7 +533,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               changeCurrentItemAfterAuth();
             }
           }
-        }));
+        } ));
 
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -648,7 +648,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private boolean reinitialize(ContentItem tree) {
+  /**
+   * @param tree should not be null.
+   * @param adSetCode can be null.
+   * @return success code.
+   */
+  private boolean reinitialize( ContentItem tree, final String adSetCode ) {
     if (tree == null) {
       _rootItem = null;
       _currentItem = null;
@@ -677,7 +682,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            changeCurrentItem(_rootItem.firstVideo());
+            changeCurrentItem(_rootItem.firstVideo(), adSetCode);
           }
         }));
     return true;
@@ -1170,7 +1175,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public boolean previousVideo(int what) {
     if (_currentItem.previousVideo() != null) {
-      changeCurrentItem(_currentItem.previousVideo());
+      changeCurrentItem(_currentItem.previousVideo(), null);
       if (what == DO_PLAY) {
         play();
       } else if (what == DO_PAUSE) {
@@ -1197,7 +1202,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // This is required because android enjoys making things difficult. talk to
     // jigish if you got issues.
     if (_currentItem.nextVideo() != null) {
-      changeCurrentItem(_currentItem.nextVideo());
+      changeCurrentItem(_currentItem.nextVideo(), null);
       if (what == DO_PLAY) {
         play();
       } else if (what == DO_PAUSE) {
@@ -1212,7 +1217,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             _handler.post(new Runnable() {
               @Override
               public void run() {
-                changeCurrentItem(_currentItem.nextVideo());
+                changeCurrentItem(_currentItem.nextVideo(), null);
                 play();
               }
             });
@@ -1227,7 +1232,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             _handler.post(new Runnable() {
               @Override
               public void run() {
-                changeCurrentItem(_currentItem.nextVideo());
+                changeCurrentItem(_currentItem.nextVideo(), null);
                 pause();
               }
             });
@@ -2232,7 +2237,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         bitmap = BitmapFactory.decodeStream(in);
       } catch (Exception e) {
         DebugMode.logE("Error", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       return bitmap;
     }

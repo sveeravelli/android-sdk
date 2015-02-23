@@ -64,25 +64,25 @@ class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
         dlc.setCookies(null);
       }
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     } catch (DrmNotProtectedException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     } catch (DrmInvalidFormatException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     } catch (DrmServerSoapErrorException e) {
       resultException = e;
     } catch (Exception e) {
     	DebugMode.logE(TAG, "Unknown exception caught in Acquire Rights");
-    	e.printStackTrace();
+    	DebugMode.logE(TAG, "Caught!", e);
       resultException = e;
     }
 

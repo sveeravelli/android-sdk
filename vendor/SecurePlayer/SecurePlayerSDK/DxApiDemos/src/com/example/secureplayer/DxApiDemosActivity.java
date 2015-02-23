@@ -73,10 +73,10 @@ public class DxApiDemosActivity extends PreferenceActivity implements
 			
 		} catch (DrmClientInitFailureException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		} catch (DrmGeneralFailureException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		}
 		
 		//Create content directory.

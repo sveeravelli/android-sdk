@@ -205,7 +205,7 @@ public class StreamingDownloaderActivity extends Activity implements VOOSMPStrea
 			fos.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		}
 	}
 
@@ -590,7 +590,7 @@ public class StreamingDownloaderActivity extends Activity implements VOOSMPStrea
 						//Log.v("file created: %s ", playlist.getAbsolutePath());
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					DebugMode.logE(TAG, "Caught!", e);
 				}
 				break;
 			}

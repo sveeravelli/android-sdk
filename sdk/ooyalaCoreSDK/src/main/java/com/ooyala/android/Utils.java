@@ -51,7 +51,7 @@ public class Utils {
     try {
       return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return null;
   }
@@ -155,7 +155,7 @@ public class Utils {
     try {
       digest = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return null;
     }
     digest.reset();

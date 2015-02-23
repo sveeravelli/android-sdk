@@ -39,6 +39,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
  */
 public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
+  private static final int TIMEOUT = 5000;
 
   public boolean _onAdError;
 
@@ -57,7 +58,8 @@ public class OoyalaIMAManager implements AdPluginInterface {
   
   protected IMAAdPlayer _adPlayer = null;
   private boolean _browserOpened = false;
-
+  private boolean _allAdsCompleted = false;
+  private Thread timeoutThread;
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
@@ -94,6 +96,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
+        if(timeoutThread != null) {
+          timeoutThread.stop();
+        }
         _adsManager = event.getAdsManager();
         _player.exitAdMode(_adPlayer.getIMAManager());
         _adsManager.addAdErrorListener(new AdErrorListener() {
@@ -137,6 +142,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
               _adPlayer.setState(State.PLAYING);
               break;
             case ALL_ADS_COMPLETED:
+              _allAdsCompleted = true;
               break;
             case COMPLETED:
               break;
@@ -220,6 +226,19 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
+
+    timeoutThread = new Thread() {
+          @Override
+          public void run() {
+            try {
+              Thread.sleep(TIMEOUT);
+              timeout();
+            } catch (InterruptedException e) {
+              DebugMode.logD(TAG, "InterruptedException " + e + "while waiting for IMA ads request response");
+            }
+          }
+      };
+      timeoutThread.start();
   }
   
   private void fetchCuePoint() {
@@ -247,6 +266,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
       _adsManager.init();
       fetchCuePoint();
       _adsManager.start();
+      if (_cuePoints.size() == 0) {
+        // Non-ad-rules ima ads are always for pre-roll
+        return true;
+      }
     }
     return (_cuePoints != null && _cuePoints.contains(0));
   }
@@ -271,11 +294,11 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public boolean onContentFinished() {
     // This is the time we need to check should we play post-roll
     DebugMode.logD(TAG, "IMA Ads Manager: onContentFinished");
-    if (_cuePoints.size() != 0 && _cuePoints.contains(_player.getCurrentItem().getDuration())) {
+    if (_allAdsCompleted) {
       _adsLoader.contentComplete();
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   @Override
@@ -375,6 +398,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private void resetFields() {
     DebugMode.logD(TAG, "IMA Ads Manager: resetFields");
     _cuePoints = null;
+    _allAdsCompleted = false;
   }
 
 
@@ -390,5 +414,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
       return new HashSet<Integer>(_cuePoints);
     }
     return new HashSet<Integer>();
+  }
+
+  private void timeout() {
+    DebugMode.logD(TAG, "Requesting ads timeout");
+    _player.exitAdMode(_adPlayer.getIMAManager());
   }
 }
