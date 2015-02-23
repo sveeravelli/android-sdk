@@ -28,7 +28,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
-  private final NielsenJSONFilter jsonFilter;
   private final ID3TagNotifier id3TagNotifier;
   private JSONObject metadataJson;
   private JSONObject channelJson;
@@ -61,10 +60,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     this.lastReportedMsec = Long.MIN_VALUE;
     JSONObject configJson = new JSONObject();
     try {
-      configJson.put( "appid", jsonFilter.filter(appID) );
-      configJson.put( "appversion", jsonFilter.filter(appVersion) );
-      configJson.put( "appname", jsonFilter.filter(appName) );
-      configJson.put( "sfcode", jsonFilter.filter(sfCode) );
+      configJson.put( "appid", NielsenJSONFilter.s_instance.filter(appID) );
+      configJson.put( "appversion", NielsenJSONFilter.s_instance.filter(appVersion) );
+      configJson.put( "appname", NielsenJSONFilter.s_instance.filter(appName) );
+      configJson.put( "sfcode", NielsenJSONFilter.s_instance.filter(sfCode) );
       Utils.overwriteJSONObject( customConfig, configJson );
     } catch (JSONException e) {
       DebugMode.logE( TAG, e.toString() );
@@ -74,6 +73,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     this.id3TagNotifier.addWeakListener( this );
     this.player.addObserver( this );
+    lastReportedMsec = -1;
   }
 
   /**
@@ -109,9 +109,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @return true if we are set up to report to Nielsen, false otherwise.
    */
   public boolean isValid() {
-    final boolean isValid = nielsenApp != null && AppSdk.isValid();
-    DebugMode.logV( TAG, "isValid(): " + isValid );
-    return isValid;
+    return
+      nielsenApp != null &&
+      AppSdk.isValid();
   }
 
   public void onTag( byte[] tag ) {
@@ -123,14 +123,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
         DebugMode.logV( TAG, "onTag(): nielsenStr=" + nielsenStr );
         nielsenApp.sendID3( nielsenStr );
       }
-    }
-  }
-
-  private void reportPlayheadUpdate( Video item, int playheadMsec ) {
-    long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
-    if( isValid() && reportingMsec > 0 && Math.abs(reportingMsec - lastReportedMsec) > 2000 ) {
-      nielsenApp.setPlayheadPosition( (int)(reportingMsec/1000) );
-      lastReportedMsec = reportingMsec;
     }
   }
 
@@ -149,6 +141,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     }
   }
 
+  private void itemChanged( Video item ) {
+    metadataJson = null;
+    channelJson = null;
+  }
+
   private void stateUpdate( OoyalaPlayer.State state ) {
     switch( state ) {
     case PLAYING:
@@ -165,12 +162,27 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     }
   }
 
+  private void reportPlayheadUpdate( Video item, int playheadMsec ) {
+    long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
+    if( isValid() ) {
+      final boolean notYetReported = lastReportedMsec < 0;
+      final boolean reportExpired = Math.abs(reportingMsec - lastReportedMsec) > 2000;
+      if( notYetReported || reportExpired ) {
+        nielsenApp.setPlayheadPosition( (int) (reportingMsec / 1000) );
+        lastReportedMsec = reportingMsec;
+      }
+    }
+  }
+
   private void sendPlay() {
     DebugMode.logV( TAG, "sendPlay()" );
     if( isValid() ) {
       updateMetadata();
+      DebugMode.logV( TAG, "sendPlay(): channelJson = " + channelJson );
       nielsenApp.play( channelJson.toString() );
+      DebugMode.logV( TAG, "sendPlay(): metadataJson = " + metadataJson );
       nielsenApp.loadMetadata( metadataJson.toString() );
+      lastReportedMsec = -1;
     }
   }
 
@@ -179,11 +191,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     if( isValid() ) {
       nielsenApp.stop();
     }
-  }
-
-  private void itemChanged( Video item ) {
-    metadataJson = null;
-    channelJson = null;
   }
 
   private void updateMetadata() {
