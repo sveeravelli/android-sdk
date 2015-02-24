@@ -4,47 +4,57 @@ public class Options implements ReadonlyOptionsInterface {
 
   public static class Builder {
     /*
-    FCCTVRatingConfiguration; Default: default FCCTVRatingConfiguration object
+    * FCCTVRatingConfiguration; 
+    * Default: default FCCTVRatingConfiguration object
      */
     private FCCTVRatingConfiguration tvRatingConfiguration;
 
     /*
-    VisualOnConfiguration; Default: default VisualOnConfiguration object
+    * VisualOnConfiguration
+    * Default: default VisualOnConfiguration object
      */
     private VisualOnConfiguration visualOnConfiguration;
 
     /*
-     * Show cue points for ads if this is set to "true"; Default: true
+     * If set to "true", show cuepoint markers for ads.
+     * Default: true
      */
     private boolean showCuePoints;
 
     /*
-     * Show ads controls during ads playback if this is set to "true"; Default: true
+     *If set to "true",  show ad controls during ads playback.
+     * Default: true
      */
     private boolean showAdsControls;
 
     /*
-     * Show live controls for live content playback if this is set to "true" (live stream only); Default: true
+     * If set to "true", show live controls for live content playback (live stream only).
+     * Default: true
      */
     private boolean showLiveControls;
 
     /*
-     * Load the content as soon as we have all the information and authorization we need if this is set to "true". Otherwise, we load the content after pre-roll (if we have one) if this is set to "false"; Default: true
+     * If set to "true", load the content when the rquired information and authorization is available. 
+     * If set to "false", load the content after pre-roll (if pre-roll is available).
+     *  Default: true
      */
     private boolean preloadContent;
 
     /*
-     * Show promo image if there is one and this variable is set to "true"; Default: false
+     * If set to "true", show a promo image if one is available. 
+     *  Default: false
      */
     private boolean showPromoImage;
 
     /*
-     * Network connection timeout value used by networking operations; Default: 0
+     * Network connection timeout value used by networking operations.
+     *  Default: 0
      */
     private int connectionTimeoutInMillisecond;
 
     /*
-     * Read timeout value used by networking operations; Default: 0
+     * Read timeout value used by networking operations.
+     * Default: 0
      */
     private int readTimeoutInMillisecond;
 
@@ -96,9 +106,9 @@ public class Options implements ReadonlyOptionsInterface {
     }
 
     /**
-     * Set the connection timeout value used by networking operations
-     * @param connectionTimeoutInMillisecond the connection timeout in millisecond
-     * default value is 0, which means never time out
+     * Set the connection timeout value used by networking operations.
+     * @param connectionTimeoutInMillisecond - The connection timeout in milliseconds.
+     * The default value is 0 (never times out).
      */
     public Builder setConnectionTimeout(int connectionTimeoutInMillisecond) {
       this.connectionTimeoutInMillisecond = connectionTimeoutInMillisecond;
@@ -106,9 +116,9 @@ public class Options implements ReadonlyOptionsInterface {
     }
 
     /**
-     * Set the stream read timeout value used by networking operations
-     * @param readTimeoutInMillisecond the read timeout in millisecond
-     * default value is 0, which means never time out
+     * Set the stream read timeout value used by networking operations.
+     * @param readTimeoutInMillisecond -  The read timeout in milliseconds.
+     *The default value is 0, (never times out).
      */
     public Builder setReadTimeout(int readTimeoutInMillisecond) {
       this.readTimeoutInMillisecond = readTimeoutInMillisecond;
@@ -133,17 +143,17 @@ public class Options implements ReadonlyOptionsInterface {
   private final boolean showLiveControls;
 
   /**
-   * Initialize an Options object with given params
-   * @param tvRatingConfiguration
-   * @param visualOnConfiguration
-   * @param showCuePoints
-   * @param showAdsControls
-   * @param preloadContent
-   * @param showPromoImage
-   * @param showLiveControls
-   * @param connectionTimeoutInMillisecond
-   * @param readTimeoutInMillisecond
-   * @return the initialized Options
+   * Initialize an Options object with given parameters:
+   * @param tvRatingConfiguration - Configure to use TV Ratings.
+   * @param visualOnConfiguration - Configure to use VisualOn ads.
+   * @param showCuePoints - Configure to show cue p oint markers.
+   * @param showAdsControls - Configure to show ad controls in the player.
+   * @param preloadContent - Configure to preload content before playback is initiated.
+   * @param showPromoImage - Configure to show a promo image if one is avaiable.
+   * @param showLiveControls - Configure to show live controls
+   * @param connectionTimeoutInMillisecond - Configure to set a connection timeout value.
+   * @param readTimeoutInMillisecond - Configure to set a read time out value.
+   * @return the initialized Options - Return the configured options.
    */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
       VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
