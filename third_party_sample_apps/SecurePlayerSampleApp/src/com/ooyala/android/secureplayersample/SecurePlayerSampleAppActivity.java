@@ -40,13 +40,16 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
   private String APIKEY = "Use this for testing, don't keep your secret in the application";
   private String SECRET = "Use this for testing, don't keep your secret in the application";
   private String ACCOUNT_ID = "accountID";
-  final String PCODE  = "FoeG863GnBL4IhhlFC1Q2jqbkH9m";
+  final String PCODE  = "N5dGEyOrMsKgdLgNp2B0wirtpqm7";
   final String DOMAIN = "http://www.ooyala.com";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+
+      OoyalaPlayer.setEnvironment(com.ooyala.android.Environment.EnvironmentType.STAGING);
+      OoyalaPlayer.enableCustomPlayreadyPlayer = true;
 
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
@@ -59,11 +62,12 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
 
     //Populate the embed map
     embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("Ooyala-Ingested Playready Smooth VOD",    "5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r");
-    embedMap.put("Ooyala-Ingested Playready HLS VOD",    "92eGNjcjpbo561vVTXE-8GDAk05LHYBh");
-    embedMap.put("Microsoft-Ingested Playready Smooth VOD",      "V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_");
-    embedMap.put("Microsoft-Ingested Clear Smooth VOD", "1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T");
-    embedMap.put("Ooyala-Ingested Clear HLS VOD",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
+    embedMap.put("Device Management - Device Bind to Entitlement", "Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL");
+    embedMap.put("Device Management - Device Limit", "0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY");
+    embedMap.put("OPL Test - A150 C500 U301", "01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F");
+    embedMap.put("OPL Test - A150 C500 U300", "0zNmpoczrbFOt-jK9wWNABrpKlSDduxN");
+    embedMap.put("OPL Test - A150 C500 U250", "15NWpoczoxGzZRc2g_rqNA7WSMrSrdak");
+    embedMap.put("OPL Test - A201 C500 U250", "13NWpoczpBVeg8eUyswxFioYmJIOzTje");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
