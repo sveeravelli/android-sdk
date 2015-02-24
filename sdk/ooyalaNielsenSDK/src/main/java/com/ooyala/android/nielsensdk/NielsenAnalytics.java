@@ -25,6 +25,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private static final int NIELSEN_VALUE_LENGTH_LIVE = 86400;
   private static final String NIELSEN_KEY_TYPE = "type";
   private static final String NIELSEN_KEY_CHANNEL_NAME = "channelName";
+  private static String n2b( final String nkey ) { return BACKLOT_NIELSEN_KEY_PREFIX + nkey; }
+  private static String b2n( final String bkey ) { return bkey.replaceFirst( BACKLOT_NIELSEN_KEY_PREFIX, "" ); }
 
   private OoyalaPlayer player;
   private AppSdk nielsenApp;
@@ -41,6 +43,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * and create a new one via the constructor. See the lifecycle diagram in the Nielsen Android Developer's Guide.
    * @param context Android Context. Not null.
    * @param player OoyalaPlayer. Not null.
+   * @param iappNotifier per Nielsen SDK docs, optionally null.
    * @param appID per Nielsen SDK docs. Not null.
    * @param appVersion per Nielsen SDK docs. Not null.
    * @param appName per Nielsen SDK docs. Not null.
@@ -52,7 +55,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * @see AppSdk
    * @see #destroy()
    */
-  public NielsenAnalytics( Context context, OoyalaPlayer player, String appID, String appVersion, String appName, String sfCode, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, IAppNotifier iappNotifier, String appID, String appVersion, String appName, String sfCode, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
     this.metadataJson = new JSONObject();
     this.customMetadata = customMetadata;
     this.player = player;
@@ -69,7 +72,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       DebugMode.logE( TAG, e.toString() );
     }
     DebugMode.logV( TAG, "<init>: json = " + configJson );
-    this.nielsenApp = AppSdk.getInstance( context, configJson.toString(), null );
+    this.nielsenApp = AppSdk.getInstance( context, configJson.toString(), iappNotifier );
     DebugMode.logV( TAG, "<init>(): isValid = " + AppSdk.isValid() );
     this.id3TagNotifier.addWeakListener( this );
     this.player.addObserver( this );
@@ -207,7 +210,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void extractChannelName() {
-    final String backlotKey = BACKLOT_NIELSEN_KEY_PREFIX + NIELSEN_KEY_CHANNEL_NAME;
+    final String backlotKey = n2b( NIELSEN_KEY_CHANNEL_NAME );
     if( metadataJson.has( backlotKey ) ) {
       try {
         final String channelName = metadataJson.getString( backlotKey );
@@ -222,8 +225,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private static JSONObject initMetadata( Video item, JSONObject customMetadata ) {
     final JSONObject json = new JSONObject();
-    copyBacklotNielsenMetadata( json, item.getMetadata() );
     copyModuleBacklotNielsenMetadata( json, item.getModuleData() );
+    copyBacklotNielsenMetadata( json, item.getMetadata() );
     updateLength( json, item );
     try {
       Utils.overwriteJSONObject( customMetadata, json );
@@ -234,21 +237,22 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     return json;
   }
 
+  private static void copyModuleBacklotNielsenMetadata( JSONObject json, Map<String, ModuleData> data ) {
+    for( ModuleData moduleData : data.values() ) {
+      copyBacklotNielsenMetadata( json, moduleData.getMetadata() );
+    }
+  }
+
   private static void copyBacklotNielsenMetadata( JSONObject json, Map<String, String> data ) {
     for( Map.Entry<String, String> kv : data.entrySet() ) {
       if( kv.getKey().startsWith( BACKLOT_NIELSEN_KEY_PREFIX ) ) {
         try {
-          json.put( kv.getKey(), kv.getValue() );
+          final String nkey = b2n( kv.getKey() );
+          json.put( nkey, kv.getValue() );
         } catch( JSONException e ) {
           DebugMode.logE( TAG, e.toString() );
         }
       }
-    }
-  }
-
-  private static void copyModuleBacklotNielsenMetadata( JSONObject json, Map<String, ModuleData> data ) {
-    for( ModuleData moduleData : data.values() ) {
-      copyBacklotNielsenMetadata( json, moduleData.getMetadata() );
     }
   }
 
@@ -264,7 +268,6 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private static void updateLength( JSONObject json, Video item ) {
     // it might have already been set into the json from static Backlot metadata.
     final boolean alreadySet = json.has( NIELSEN_KEY_LENGTH );
-    // todo: check if length really comes in with ID3 for nonCMS case.
     if( isCMS( json ) && !alreadySet ) {
       int length = item.isLive() ? NIELSEN_VALUE_LENGTH_LIVE : item.getDuration();
       try {
