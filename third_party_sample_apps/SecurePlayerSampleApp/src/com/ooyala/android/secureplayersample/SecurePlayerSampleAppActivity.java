@@ -10,6 +10,7 @@ import java.util.Observer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -29,18 +30,19 @@ import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControl
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
+  private static final String TAG = SecurePlayerSampleAppActivity.class.getSimpleName();
+
   OoyalaPlayer player;
   ArrayAdapter<String> playerAdapter;
   Spinner playerSpinner;
   Spinner embedSpinner;
-  HashMap<String, String> embedMap;
+  HashMap<String, Pair<String,String>> embedMap;
   ArrayAdapter<String> embedAdapter;
+  String pcode;
 
-
-  private String APIKEY = "Use this for testing, don't keep your secret in the application";
-  private String SECRET = "Use this for testing, don't keep your secret in the application";
-  private String ACCOUNT_ID = "accountID";
-  final String PCODE  = "N5dGEyOrMsKgdLgNp2B0wirtpqm7";
+  private final String APIKEY = "Use this for testing, don't keep your secret in the application";
+  private final String SECRET = "Use this for testing, don't keep your secret in the application";
+  private final String ACCOUNT_ID = "accountID";
   final String DOMAIN = "http://www.ooyala.com";
 
   @Override
@@ -48,8 +50,8 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-      OoyalaPlayer.setEnvironment(com.ooyala.android.Environment.EnvironmentType.STAGING);
-      OoyalaPlayer.enableCustomPlayreadyPlayer = true;
+    OoyalaPlayer.setEnvironment(com.ooyala.android.Environment.EnvironmentType.STAGING);
+    OoyalaPlayer.enableCustomPlayreadyPlayer = true;
 
     //Initialize the bottom controls
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
@@ -61,13 +63,18 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     playerAdapter.notifyDataSetChanged();
 
     //Populate the embed map
-    embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("Device Management - Device Bind to Entitlement", "Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL");
-    embedMap.put("Device Management - Device Limit", "0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY");
-    embedMap.put("OPL Test - A150 C500 U301", "01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F");
-    embedMap.put("OPL Test - A150 C500 U300", "0zNmpoczrbFOt-jK9wWNABrpKlSDduxN");
-    embedMap.put("OPL Test - A150 C500 U250", "15NWpoczoxGzZRc2g_rqNA7WSMrSrdak");
-    embedMap.put("OPL Test - A201 C500 U250", "13NWpoczpBVeg8eUyswxFioYmJIOzTje");
+    embedMap = new LinkedHashMap<String, Pair<String,String>>();
+    embedMap.put("Device Management - Device Bind to Entitlement", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL"));
+    embedMap.put("Device Management - Device Limit", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY"));
+    embedMap.put("OPL Test - A150 C500 U301", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F"));
+    embedMap.put("OPL Test - A150 C500 U300", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0zNmpoczrbFOt-jK9wWNABrpKlSDduxN"));
+    embedMap.put("OPL Test - A150 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","15NWpoczoxGzZRc2g_rqNA7WSMrSrdak"));
+    embedMap.put("OPL Test - A201 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","13NWpoczpBVeg8eUyswxFioYmJIOzTje"));
+    embedMap.put("old Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
+    embedMap.put("old Ooyala-Ingested Playready HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","92eGNjcjpbo561vVTXE-8GDAk05LHYBh"));
+    embedMap.put("old Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
+    embedMap.put("old Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
+    embedMap.put("old Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
@@ -76,26 +83,30 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedAdapter.addAll(embedMap.keySet());
     embedAdapter.notifyDataSetChanged();
 
-    VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
-    Options.Builder builder = new Options.Builder().setVisualOnConfiguration(visualOnConfiguration);
-    Options options = builder.build();
-    OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        PCODE, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, this, options);
-    player = playerLayoutController.getPlayer();
-
-    player.addObserver(this);
     Button setButton = (Button) findViewById(R.id.setButton);
 
     setButton.setOnClickListener(new OnClickListener() {
-
       @Override
       public void onClick(View v) {
-
-        if (player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()))) {
+        if( player != null ) {
+          player.suspend();
+          player.deleteObserver(SecurePlayerSampleAppActivity.this);
+          player = null;
+        }
+        final Pair<String,String> asset = embedMap.get(embedSpinner.getSelectedItem());
+        Log.d( TAG, "asset = " + asset );
+        SecurePlayerSampleAppActivity.this.pcode = asset.first;
+        final String embed = asset.second;
+        VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
+        Options.Builder builder = new Options.Builder().setVisualOnConfiguration(visualOnConfiguration);
+        Options options = builder.build();
+        OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
+        final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, pcode, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, SecurePlayerSampleAppActivity.this, options);
+        player = playerLayoutController.getPlayer();
+        player.addObserver(SecurePlayerSampleAppActivity.this);
+        if (player.setEmbedCode(embed)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
           urlText.setText("");
-
           if(playerSpinner.getSelectedItem().toString()  == "Native Player") {
             OoyalaPlayer.enableCustomHLSPlayer = false;
             OoyalaPlayer.enableCustomPlayreadyPlayer = false;
@@ -103,10 +114,9 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
             OoyalaPlayer.enableCustomHLSPlayer = true;
             OoyalaPlayer.enableCustomPlayreadyPlayer = true;
           }
-
           player.play();
         } else {
-          Log.d(this.getClass().getName(), "Something Went Wrong!");
+          Log.d(TAG, "Something Went Wrong!");
         }
       }
     });
@@ -148,7 +158,7 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     HashMap<String, String> params = new HashMap<String, String>();
     params.put("account_id", ACCOUNT_ID);
 
-    String uri = "/sas/embed_token/" + PCODE + "/" + embedCodesString;
+    String uri = "/sas/embed_token/" + pcode + "/" + embedCodesString;
     EmbeddedSecureURLGenerator urlGen = new EmbeddedSecureURLGenerator(APIKEY, SECRET);
 
     URL tokenUrl  = urlGen.secureURL("http://player.ooyala.com", uri, params);
