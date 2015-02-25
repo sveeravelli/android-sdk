@@ -28,6 +28,7 @@ import java.util.Observer;
 
 public class NielsenSampleAppActivity extends Activity implements Observer, IAppNotifier {
   public final static String OPT_OUT_URL_EXTRAS_KEY = "opt_out_url";
+  public final static String OPT_OUT_RESULT_KEY = "opt_out_result";
   public final static int OPTOUT_REQUEST_CODE = 100;
 
   private final static String TAG = NielsenSampleAppActivity.class.getSimpleName();
@@ -118,6 +119,18 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
         pars.putString(OPT_OUT_URL_EXTRAS_KEY, url);
         i.putExtras(pars);
         startActivityForResult( i, OPTOUT_REQUEST_CODE );
+      }
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult( requestCode, resultCode, data );
+    if( resultCode == RESULT_OK ) {
+      if( requestCode == OPTOUT_REQUEST_CODE ) {
+        final String uoo = data.getStringExtra( OPT_OUT_RESULT_KEY );
+        Log.d( TAG, "onActivityResult: uoo = " + uoo );
+        nielsenAnalytics.getNielsenAppSdk().userOptOut( uoo );
       }
     }
   }
