@@ -1406,7 +1406,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void setState(State state) {
     if (state != _state) {
-      DebugMode.logD(TAG, "player set state, new state is " + _state);
+      DebugMode.logD(TAG, "player set state, old state was " + _state);
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
