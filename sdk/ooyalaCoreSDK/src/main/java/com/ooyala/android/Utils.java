@@ -126,6 +126,17 @@ public class Utils {
     return string == null || string.equals("");
   }
 
+  public static Object getJSONValueOrElse( JSONObject json, String key, Object orElse ) {
+    Object value;
+    try {
+      value = json.get( key );
+    }
+    catch( JSONException e ) {
+      value = orElse;
+    }
+    return value;
+  }
+
   public static JSONObject objectFromJSON(String json) {
     try {
       return (JSONObject) new JSONTokener(json).nextValue();

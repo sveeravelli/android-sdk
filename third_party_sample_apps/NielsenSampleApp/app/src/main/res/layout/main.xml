@@ -27,6 +27,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Set EC" />
+
+        <Button
+            android:id="@+id/optInOutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Opt In/Out" />
+
     </LinearLayout>
 
     <TextView
