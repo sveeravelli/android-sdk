@@ -1,12 +1,12 @@
 package com.ooyala.android.item;
 
+import com.ooyala.android.util.DebugMode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.ooyala.android.util.DebugMode;
 
 /**
  * A helper class help us to manage ad spots
@@ -63,8 +63,8 @@ public class AdSpotManager<T extends AdSpot> {
   /**
    * Insert an adSpot
    * 
-   * @param ad
-   *          the adSpot to insert
+   * @param adSpots
+   *          the adSpot list to insert
    */
   public void insertAds(List<T> adSpots) {
     _ads.addAll(adSpots);
@@ -76,9 +76,7 @@ public class AdSpotManager<T extends AdSpot> {
    * 
    * @param time
    *          in millisecond
-   * @param timeAlignment
-   *          time unit to round up time, 0 if no alignment
-   * @returns the unplayed adspot before the specified time which, null if no
+   * @return the unplayed adspot before the specified time which, null if no
    *          such adspot
    */
   public T adBeforeTime(int time) {
@@ -125,7 +123,7 @@ public class AdSpotManager<T extends AdSpot> {
   /**
    * get the adspot list size
    * 
-   * @returns size
+   * @return size
    */
   public int size() {
     return _ads.size();
