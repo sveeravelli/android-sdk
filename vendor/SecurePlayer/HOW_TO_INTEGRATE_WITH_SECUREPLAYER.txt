@@ -20,9 +20,10 @@ SecurePlayerSampleApp is an example of this integration
 
 6. In your application, set the following STATIC property before calling setEmbedCode:
 
+    OoyalaPlayer.enableCustomPlayreadyPlayer = true;
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has smooth playback capablities (or a remote asset pointing at a manifest)
+7. play an embed code that has smooth or hls playback capablities (or a remote asset pointing at a manifest)
 
 
 === How to deal with Error codes ===
