@@ -1,8 +1,8 @@
 package com.ooyala.android.plugin;
 
-import java.util.Set;
-
 import com.ooyala.android.player.PlayerInterface;
+
+import java.util.Set;
 
 /**
  * The interface that must be implemented in order to plug into OoyalaPlayer to
@@ -55,9 +55,6 @@ public interface AdPluginInterface extends LifeCycleInterface {
 
   /**
    * This is called when control is handed over to the plugin
-   * 
-   * @param token
-   *          passed from plugin in previous calls.
    */
   public void onAdModeEntered();
 

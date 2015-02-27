@@ -1015,7 +1015,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   /**
    * After file download on init(), check the file for DRM.
-   * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
+   * If DRM'ed, move on to personalization - acquireRights.  Otherwise, continue video playback
    */
   @Override
   public void afterFileDownload(String localFilename) {

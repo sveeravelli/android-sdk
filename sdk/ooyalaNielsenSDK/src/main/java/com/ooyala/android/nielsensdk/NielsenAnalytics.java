@@ -52,7 +52,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * Nielsen requires data to meet certain restrictions for valid strings.)
    * @param customMetadata, optionally null, is any custom JSON you want added into the metadata for Nielsen's loadMetadata(). (Note that
    * Nielsen requires data to meet certain restrictions for valid strings.)
-   * @see AppSdk
+   * see AppSdk
    * @see #destroy()
    */
   public NielsenAnalytics( Context context, OoyalaPlayer player, IAppNotifier iappNotifier, String appID, String appVersion, String appName, String sfCode, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
@@ -86,8 +86,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * in order to wait for the EVENT_STARTUP event, after which the opt in/out URL will be available
    * from the AppSdk.
    * @return our cached AppSdk ref, originally obtained by calling AppSdk.getInstance() in our constructor.
-   * @see AppSdk#getInstance(Context, String)
-   * @see AppSdk#EVENT_STARTUP
+   * see AppSdk#getInstance(Context, String)
+   * see AppSdk#EVENT_STARTUP
    */
   public AppSdk getNielsenAppSdk() {
     return this.nielsenApp;

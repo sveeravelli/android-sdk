@@ -9,8 +9,7 @@
 -sourcepath ooyalaCoreSDK/src/main/java/
 ooyalaCoreSDK/src/main/java/com/ooyala/android/Analytics.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/AdvertisingIdUtils.java
-ooyalaCoreSDK/src/main/java/com/ooyala/android/CurrentItemChangedCallback.java
-ooyalaCoreSDK/src/main/java/com/ooyala/android/DebugMode.java
+ooyalaCoreSDK/src/main/java/com/ooyala/android/util/DebugMode.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/EmbeddedSecureURLGenerator.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/EmbeddedSignatureGenerator.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/EmbedTokenGenerator.java
@@ -20,7 +19,7 @@ ooyalaCoreSDK/src/main/java/com/ooyala/android/OoyalaAPIClient.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/OoyalaException.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/OoyalaPlayer.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/OoyalaPlayerLayout.java
-ooyalaCoreSDK/src/main/java/com/ooyala/android/OrderedMap.java
+ooyalaCoreSDK/src/main/java/com/ooyala/android/util/OrderedMap.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/PlayerDomain.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/PlayerInfo.java
 ooyalaCoreSDK/src/main/java/com/ooyala/android/StreamSelector.java

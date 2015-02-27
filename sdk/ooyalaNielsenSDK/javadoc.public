@@ -7,4 +7,4 @@
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
 -sourcepath src/main/java
-com/ooyala/android/nielsensdk/NielsenAnalytics.java
+src/main/java/com/ooyala/android/nielsensdk/NielsenAnalytics.java
