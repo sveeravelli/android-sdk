@@ -1,21 +1,21 @@
 package com.ooyala.android.nielsensdk;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 
 import com.nielsen.app.sdk.AppSdk;
 import com.nielsen.app.sdk.IAppNotifier;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.ID3TagNotifier.ID3TagNotifierListener;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.Utils;
 import com.ooyala.android.item.Video;
+import com.ooyala.android.util.DebugMode;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Observable;
+import java.util.Observer;
 
 public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
@@ -54,7 +54,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * Nielsen requires data to meet certain restrictions for valid strings.)
    * @param customMetadata, optionally null, is any custom JSON you want added into the metadata for Nielsen's loadMetadata. (Note that
    * Nielsen requires data to meet certain restrictions for valid strings.)
-   * @see AppSdk
+   * see AppSdk
    * @see #destroy()
    */
   public NielsenAnalytics( Context context, OoyalaPlayer player, String appName, String appVersion, String sfCode, String appID, String dma, String ccode, String longitude, String latitude, String clientID, String vcID, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
@@ -93,8 +93,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
    * in order to wait for the EVENT_STARTUP event, after which the opt in/out URL will be available
    * from the AppSdk.
    * @return our cached AppSdk ref, originally obtained by calling AppSdk.getInstance() in our constructor.
-   * @see AppSdk#getInstance(Context, String)
-   * @see AppSdk#EVENT_STARTUP
+   * see AppSdk#getInstance(Context, String)
+   * see AppSdk#EVENT_STARTUP
    */
   public AppSdk getNielsenAppSdk() {
     return this.nielsenApp;
