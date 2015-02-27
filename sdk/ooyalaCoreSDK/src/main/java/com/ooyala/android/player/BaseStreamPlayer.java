@@ -352,7 +352,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       try {
         Thread.sleep(500);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       _player.seekTo(_timeBeforeSuspend);
     }

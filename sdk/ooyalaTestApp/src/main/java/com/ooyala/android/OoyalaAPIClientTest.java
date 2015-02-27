@@ -4,8 +4,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.test.AndroidTestCase;
+import com.ooyala.android.util.DebugMode;
 
 public class OoyalaAPIClientTest extends AndroidTestCase {
+  private static final String TAG = OoyalaAPIClientTest.class.getSimpleName();
   public OoyalaAPIClient api;
 
   public OoyalaAPIClientTest() {
@@ -18,7 +20,7 @@ public class OoyalaAPIClientTest extends AndroidTestCase {
       domain = new PlayerDomain("http://www.ooyala.com");
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
     }
     api = new OoyalaAPIClient(TestConstants.TEST_API_KEY, TestConstants.TEST_SECRET,
         TestConstants.TEST_PCODE, domain);

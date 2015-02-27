@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -19,7 +20,10 @@ import org.json.JSONTokener;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.ooyala.android.util.DebugMode;
+
 class Utils {
+  private static final String TAG = Utils.class.getName();
 
   public static final String SEPARATOR_AMPERSAND = "&";
   public static final String SEPARATOR_COMMA = ",";
@@ -34,7 +38,7 @@ class Utils {
     try {
       return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return null;
   }

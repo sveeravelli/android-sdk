@@ -1,14 +1,15 @@
-package com.ooyala.android;
+package com.ooyala.android.player;
 
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.util.DebugMode;
 
-public final class WidevineStuckMonitor implements Observer {
+final class WidevineStuckMonitor implements Observer {
 
   public interface Listener {
     /**

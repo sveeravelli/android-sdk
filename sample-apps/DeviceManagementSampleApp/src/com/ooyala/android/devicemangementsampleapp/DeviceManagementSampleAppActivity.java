@@ -93,13 +93,13 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
           }
         }
         catch( ClientProtocolException cpe ) {
-          cpe.printStackTrace();
+          DebugMode.logE(TAG, "Caught!", cpe);
         }
         catch( IOException ioe ) {
-          ioe.printStackTrace();
+          DebugMode.logE(TAG, "Caught!", ioe);
         }
         catch( JSONException je ) {
-          je.printStackTrace();
+          DebugMode.logE(TAG, "Caught!", je);
         }
         return null;
       }
@@ -133,10 +133,10 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
                   Log.v( "DEVICE MANAGEMENT", "responseCode = " + responseCode );
                 } catch (ClientProtocolException e) {
                   // TODO Auto-generated catch block
-                  e.printStackTrace();
+                  DebugMode.logE(TAG, "Caught!", e);
                 } catch (IOException e) {
                   // TODO Auto-generated catch block
-                  e.printStackTrace();
+                  DebugMode.logE(TAG, "Caught!", e);
                 }
               }
             }.start();
@@ -191,13 +191,13 @@ public class DeviceManagementSampleAppActivity extends Activity implements Embed
             }
             catch (ClientProtocolException e) {
               // TODO Auto-generated catch block
-              e.printStackTrace();
+              DebugMode.logE(TAG, "Caught!", e);
             } catch (IOException e) {
               // TODO Auto-generated catch block
-              e.printStackTrace();
+              DebugMode.logE(TAG, "Caught!", e);
             } catch (JSONException e) {
               // TODO Auto-generated catch block
-              e.printStackTrace();
+              DebugMode.logE(TAG, "Caught!", e);
             }
           }
         }.start();

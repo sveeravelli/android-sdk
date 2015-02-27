@@ -51,7 +51,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
       spUrls.add("sp.auth-staging.adobe.com/adobe-services");
       accessEnabler.setRequestor(requestor, signedRequestorId, spUrls);
     } catch (AccessEnablerException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 
@@ -155,7 +155,7 @@ public class AdobePassLoginController implements IAccessEnablerDelegate, MvpdSel
       embedToken += "&resource=" + URLEncoder.encode(resource, "UTF-8");
 
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
 
     callback.setEmbedToken(embedToken);

@@ -3,6 +3,7 @@ package com.ooyala.android.ads.vast;
 import android.test.AndroidTestCase;
 
 import com.ooyala.android.TestConstants;
+import com.ooyala.android.util.DebugMode;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class VASTSequenceItemTest extends AndroidTestCase {
+  private static final String TAG = VASTSequenceItemTest.class.getSimpleName();
+
   public VASTSequenceItemTest() {
     super();
   }
@@ -39,7 +42,7 @@ public class VASTSequenceItemTest extends AndroidTestCase {
       item.setLinear(new VASTLinearAd(linearXML));
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
       fail();
     }
     assertTrue(item.hasLinear());

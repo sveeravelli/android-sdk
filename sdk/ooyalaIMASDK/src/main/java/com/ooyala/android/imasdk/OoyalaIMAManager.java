@@ -294,8 +294,8 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public boolean onContentFinished() {
     // This is the time we need to check should we play post-roll
     DebugMode.logD(TAG, "IMA Ads Manager: onContentFinished");
+    _adsLoader.contentComplete();
     if (_allAdsCompleted) {
-      _adsLoader.contentComplete();
       return false;
     }
     return true;

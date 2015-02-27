@@ -379,7 +379,7 @@ public class PlaybackControl extends LinearLayout implements SeekBar.OnSeekBarCh
 		} 
 		catch (InterruptedException e) 
 		{
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		}
 
 		showMediaController();

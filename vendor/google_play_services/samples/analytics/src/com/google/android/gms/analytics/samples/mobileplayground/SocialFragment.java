@@ -52,7 +52,7 @@ public class SocialFragment extends Fragment {
                     t.send(new HitBuilders.SocialBuilder().setNetwork(getSocialNetwork())
                             .setAction(getSocialAction()).setTarget(getSocialTarget()).build());
                 } catch (UserInputException e) {
-                    e.printStackTrace();
+                    DebugMode.logE(TAG, "Caught!", e);
                 }
             }
         });

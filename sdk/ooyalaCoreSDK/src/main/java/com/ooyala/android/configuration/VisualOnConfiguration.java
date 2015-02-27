@@ -44,7 +44,7 @@ public class VisualOnConfiguration {
 
     /**
      * Disables the version check when using the VisualOn or SecurePlayer libraries.
-     * @param DisableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
+     * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
      * @return the Builder object to continue building
      */
     public Builder setDisableLibraryVersionChecks( boolean disableLibraryVersionChecks ) {

@@ -9,6 +9,8 @@ import android.util.Pair;
 
 public class NielsenJSONFilter {
 
+  public static final NielsenJSONFilter s_instance = new NielsenJSONFilter();
+
   private Set<Pair<Pattern,String>> psz;
 
   public NielsenJSONFilter() {
