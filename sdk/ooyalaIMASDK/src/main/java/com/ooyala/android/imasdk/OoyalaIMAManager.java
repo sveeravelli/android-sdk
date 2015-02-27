@@ -1,12 +1,6 @@
 package com.ooyala.android.imasdk;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -22,12 +16,18 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
@@ -96,7 +96,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
-        if(timeoutThread.isAlive()) {
+        if(timeoutThread != null && timeoutThread.isAlive()) {
           timeoutThread.interrupt();
         }
         _adsManager = event.getAdsManager();
