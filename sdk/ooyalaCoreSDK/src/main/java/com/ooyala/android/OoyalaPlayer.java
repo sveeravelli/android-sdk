@@ -942,6 +942,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * layout can be changed.
    */
   public void suspend() {
+    if (getCurrentItem() == null) {
+      DebugMode.logI(TAG, "Suspend was called without a current item. Doing nothing");
+      return;
+    }
     suspendCurrentPlayer();
 
     if (_authHeartbeat != null) {
@@ -956,7 +960,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Resume the current video from a suspended state
    */
   public void resume() {
-    if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
+    if (getCurrentItem() == null) {
+      DebugMode.logI(TAG, "Resume was called without a current item. Doing nothing");
+      return;
+    }
+
+    if (getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
         PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -996,7 +1005,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (currentPlayer() != null) {
       resumeCurrentPlayer();
-    } else if (_currentItem != null && _currentItem.isAuthorized()) {
+    } else if (getCurrentItem().isAuthorized()) {
       prepareContent(false);
     } else {
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
