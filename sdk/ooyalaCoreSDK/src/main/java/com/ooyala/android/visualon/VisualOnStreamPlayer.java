@@ -90,10 +90,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   protected boolean _isDiscredixLoaded = false;
 
-  private static boolean checkForDiscredixLibrary(Context context) {
+  private boolean checkForDiscredixLibrary(Context context) {
     boolean hasDiscredix;
     try {
-      context.getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
+      this.getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
       DebugMode.logD(TAG, "This app has the ability to play protected content");
       hasDiscredix = true;
       if( ENABLE_DEBUGGING ) {
