@@ -1,6 +1,8 @@
 package com.ooyala.android.nielsensample;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -110,7 +112,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
   private void showOptInOutUI() {
     final String url = getOptOutUrl();
     if( url == null || url.trim().length() == 0 ) {
-      Toast.makeText( this, "No valid OptOut URL found yet", Toast.LENGTH_LONG ).show();
+      showRestartRequiredMessage();
     }
     else {
       Intent i = new Intent(this, OptOutActivity.class);
@@ -121,6 +123,19 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
         startActivityForResult( i, OPTOUT_REQUEST_CODE );
       }
     }
+  }
+
+  private void showRestartRequiredMessage() {
+    AlertDialog.Builder builder = new AlertDialog.Builder( this );
+    builder.setTitle( "No Opt-Out URL" );
+    builder.setMessage( "If networking was disabled, please enable networking & restart this app." );
+    builder.setNeutralButton( "OK", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick( DialogInterface dialog, int which ) {
+        dialog.dismiss();
+      }
+    } );
+    builder.show();
   }
 
   @Override
