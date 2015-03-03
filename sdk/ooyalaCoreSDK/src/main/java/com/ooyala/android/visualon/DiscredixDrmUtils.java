@@ -169,7 +169,13 @@ class DiscredixDrmUtils {
       error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, exception);
     }
     else {
-      String description =  ((DrmServerSoapErrorException)exception).getCustomData().replaceAll("<[^>]+>", "");
+      String customData = ((DrmServerSoapErrorException)exception).getCustomData();
+      String soapMessage = ((DrmServerSoapErrorException)exception).getSoapMessage();
+      if (customData == null) {
+        DebugMode.logE(TAG, "Unknown SOAP error from DRM server: " + soapMessage);
+        return new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, soapMessage);
+      }
+      String description =  customData.replaceAll("<[^>]+>", "");
 
       if ("invalid token".equals(description)) {
         DebugMode.logE(TAG, "VisualOn Rights error: Invalid token");
