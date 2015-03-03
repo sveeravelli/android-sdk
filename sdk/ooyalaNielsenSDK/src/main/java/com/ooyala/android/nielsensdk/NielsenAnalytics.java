@@ -210,16 +210,19 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void extractChannelName() {
+    channelJson = new JSONObject();
+    String channelName = "";
+
     final String backlotKey = n2b( NIELSEN_KEY_CHANNEL_NAME );
     if( metadataJson.has( backlotKey ) ) {
-      try {
-        final String channelName = metadataJson.getString( backlotKey );
-        channelJson = new JSONObject();
-        channelJson.put( NIELSEN_KEY_CHANNEL_NAME, channelName );
-      }
-      catch( JSONException e ) {
-        e.printStackTrace();
-      }
+      channelName = (String)Utils.getJSONValueOrElse( metadataJson, backlotKey, "" );
+    }
+
+    try {
+      channelJson.put( NIELSEN_KEY_CHANNEL_NAME, channelName );
+    }
+    catch( JSONException e ) {
+      DebugMode.logE( TAG, e.toString() );
     }
   }
 
