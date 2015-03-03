@@ -1,6 +1,12 @@
 package com.ooyala.android.imasdk;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -16,18 +22,12 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.util.DebugMode;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
@@ -59,6 +59,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   protected IMAAdPlayer _adPlayer = null;
   private boolean _browserOpened = false;
   private boolean _allAdsCompleted = false;
+  private Thread timeoutThread;
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
@@ -95,6 +96,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
+        if(timeoutThread.isAlive()) {
+          timeoutThread.interrupt();
+        }
         _adsManager = event.getAdsManager();
         _player.exitAdMode(_adPlayer.getIMAManager());
         _adsManager.addAdErrorListener(new AdErrorListener() {
@@ -222,6 +226,19 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
     request.setAdDisplayContainer(_container);
     _adsLoader.requestAds(request);
+
+    timeoutThread = new Thread() {
+          @Override
+          public void run() {
+            try {
+              Thread.sleep(TIMEOUT);
+              timeout();
+            } catch (InterruptedException e) {
+              DebugMode.logD(TAG, "InterruptedException " + e + "while waiting for IMA ads request response");
+            }
+          }
+      };
+      timeoutThread.start();
   }
   
   private void fetchCuePoint() {
@@ -397,5 +414,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
       return new HashSet<Integer>(_cuePoints);
     }
     return new HashSet<Integer>();
+  }
+
+  private void timeout() {
+    DebugMode.logD(TAG, "Requesting ads timeout");
+    _player.exitAdMode(_adPlayer.getIMAManager());
   }
 }

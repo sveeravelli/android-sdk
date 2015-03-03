@@ -1,8 +1,5 @@
 package com.ooyala.android;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
@@ -226,11 +223,5 @@ public class OoyalaManagedAdsPlugin extends
   @Override
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
-  }
-
-  static Set<Integer> dummyCuePoints = new HashSet<Integer>();
-  @Override
-  public Set<Integer> getCuePointsInMilliSeconds() {
-    return dummyCuePoints;
   }
 }
