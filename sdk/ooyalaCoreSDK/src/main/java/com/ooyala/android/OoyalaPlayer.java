@@ -1,17 +1,5 @@
 package com.ooyala.android;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
-import org.json.JSONObject;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,8 +16,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
-import com.ooyala.android.captions.ClosedCaptionsStyle;
-import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
@@ -38,6 +24,8 @@ import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
+import com.ooyala.android.captions.ClosedCaptionsStyle;
+import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
@@ -60,13 +48,25 @@ import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
 
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener, AdPluginManagerInterface {
   /**
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v3.5.0_RC1";
+  static final String SDK_VERSION = "v3.5.0_RC5";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -858,10 +858,15 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public State getState() {
     PlayerInterface p = currentPlayer();
-    if (p == null || _state == State.READY) {
+    if (p == null) {
       return _state;
+    } else if (isShowingAd()) {
+      return p.getState();
+    } else {
+      // current player is content player. If promo image is loaded, set state to ready and stop
+      // the spinning wheel.
+      return _state == State.READY ? State.READY : p.getState();
     }
-    return p.getState();
   }
 
   /**

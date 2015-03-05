@@ -1,7 +1,17 @@
 package com.ooyala.android.freewheelsdk;
 
+import android.widget.FrameLayout;
+
+import com.ooyala.android.AdsLearnMoreButton;
+import com.ooyala.android.AdsLearnMoreInterface;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.LifeCycleInterface;
+import com.ooyala.android.util.DebugMode;
+
 import java.util.ArrayList;
-import java.util.List;
 
 import tv.freewheel.ad.interfaces.IAdContext;
 import tv.freewheel.ad.interfaces.IAdInstance;
@@ -9,16 +19,6 @@ import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
-import android.widget.FrameLayout;
-
-import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.AdsLearnMoreInterface;
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.StateNotifier;
-import com.ooyala.android.player.PlayerInterface;
-import com.ooyala.android.plugin.LifeCycleInterface;
 
 /**
  * This class represents the Base Movie Player that plays Freewheel ad spots.
@@ -28,7 +28,6 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   private static String TAG = "FWAdPlayer";
   private OoyalaFreewheelManager _adManager;
   private ISlot _currentAd;
-  private List<IAdInstance> _adInstances;
   private IAdInstance _currentAdInstance;
 
   private IAdContext _fwContext;
@@ -49,13 +48,24 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   private IEventListener _adStartedEventListener = new IEventListener() {
     @Override
     public void run(IEvent e) {
-      if (_adInstances.size() > 0) {
-        _currentAdInstance = _adInstances.remove(0);
-        ArrayList<String> clickThrough = _currentAdInstance.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK());
+      String customId = (String) e.getData().get(_fwConstants.INFO_KEY_CUSTOM_ID());
+      ISlot slot = _fwContext.getSlotByCustomId(customId);
+      int adId = (Integer) e.getData().get(_fwConstants.INFO_KEY_AD_ID());
+      _currentAdInstance = null;
 
-        //First remove the Learn More button from the view
-        _playerLayout.removeView(_learnMore);
+      DebugMode.logD(TAG, "Ad event type: " + e.getType() + " slot customID: " + customId + " adId: " + adId);
+      for (IAdInstance ad : slot.getAdInstances()) {
+        if (ad.getAdId() == adId) {
+          _currentAdInstance = ad;
+          break;
+        }
+      }
 
+      //First remove the Learn More button from the view
+      _playerLayout.removeView(_learnMore);
+      if (_currentAdInstance != null) {
+        ArrayList<String> clickThrough =
+          _currentAdInstance.getEventCallbackURLs(_fwConstants.EVENT_AD_CLICK(), _fwConstants.EVENT_TYPE_CLICK());
         //If there is a click through URL, add the Learn More button
         if (clickThrough != null && clickThrough.size() > 0) {
           _playerLayout.addView(_learnMore);
@@ -149,7 +159,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   @Override
   public void processClickThrough() {
     //Use Freewheel's renderer controller to send pings and open browser
-    _currentAdInstance.getRendererController().processEvent(_fwConstants.EVENT_AD_CLICK());
+    if (_currentAdInstance != null) {
+      _currentAdInstance.getRendererController().processEvent(_fwConstants.EVENT_AD_CLICK());
+    }
   }
 
   @Override
@@ -162,7 +174,6 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
       _playQueued = true;
     } else {
       _adManager.adsPlaying();
-      _adInstances = _currentAd.getAdInstances();
 
       DebugMode.logD(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
       setState(State.PLAYING);

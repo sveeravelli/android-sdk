@@ -83,11 +83,7 @@ public class AdSpotManager<T extends AdSpot> {
     T candidate = null;
     int candidateTime = 0;
     for (T ad : _ads) {
-      int adTime = ad.getTime();
-      if (_timeAlignment > 0) {
-        adTime = ((adTime + _timeAlignment / 2) / _timeAlignment)
-            * _timeAlignment;
-      }
+      int adTime = alignedAdTime(ad.getTime());
       if (time < adTime) {
         break;
       } else {
@@ -158,8 +154,18 @@ public class AdSpotManager<T extends AdSpot> {
       if (_playedAds.contains(ad)) {
         continue;
       }
-      cuePoints.add(ad.getTime());
+
+      cuePoints.add(alignedAdTime(ad.getTime()));
     }
     return cuePoints;
+  }
+
+  private int alignedAdTime(int adTime) {
+    if (_timeAlignment > 0) {
+      return ((adTime + _timeAlignment / 2) / _timeAlignment)
+          * _timeAlignment;
+    } else {
+      return adTime;
+    }
   }
 }
