@@ -4,7 +4,7 @@ import org.w3c.dom.Element;
 
 import com.ooyala.android.item.Stream;
 
-public class VASTStream extends Stream {
+class VASTStream extends Stream {
   /** if this stream is scalable */
   private boolean _scalable;
   /** if this stream must maintain the aspect ratio */

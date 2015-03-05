@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
 
-public class VASTLinearAd implements PlayableItem {
+class VASTLinearAd implements PlayableItem {
   /** The duration of the ad in seconds */
   private double _duration;
   /** The tracking events in a HashMap of event name to Set of String */
