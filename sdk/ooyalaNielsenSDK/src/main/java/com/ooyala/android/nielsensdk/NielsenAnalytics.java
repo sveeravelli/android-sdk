@@ -178,8 +178,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void sendPlay() {
-    DebugMode.logV( TAG, "sendPlay()" );
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
+      DebugMode.logV( TAG, "sendPlay()" );
       updateMetadata();
       DebugMode.logV( TAG, "sendPlay(): channelJson = " + channelJson );
       nielsenApp.play( channelJson.toString() );
@@ -187,6 +187,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
       nielsenApp.loadMetadata( metadataJson.toString() );
       lastReportedMsec = -1;
     }
+  }
+
+  private boolean isContent() {
+    return OoyalaPlayer.ContentOrAdType.MainContent == player.getPlayingType();
   }
 
   private void sendStop() {
