@@ -12,6 +12,7 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.util.DebugMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,6 +26,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   private static final int NIELSEN_VALUE_LENGTH_LIVE = 86400;
   private static final String NIELSEN_KEY_TYPE = "type";
   private static final String NIELSEN_KEY_CHANNEL_NAME = "channelName";
+  private static final String NIELSEN_ASSET_ID_KEY = "assetid";
   private static String n2b( final String nkey ) { return BACKLOT_NIELSEN_KEY_PREFIX + nkey; }
   private static String b2n( final String bkey ) { return bkey.replaceFirst( BACKLOT_NIELSEN_KEY_PREFIX, "" ); }
 
@@ -178,8 +180,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   }
 
   private void sendPlay() {
+    DebugMode.logV( TAG, "sendPlay(): valid=" + isValid() + ", content=" + isContent() );
     if( isValid() && isContent() ) {
-      DebugMode.logV( TAG, "sendPlay()" );
       updateMetadata();
       DebugMode.logV( TAG, "sendPlay(): channelJson = " + channelJson );
       nielsenApp.play( channelJson.toString() );
@@ -194,7 +196,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   }
 
   private void sendStop() {
-    DebugMode.logV( TAG, "sendStop()" );
+    DebugMode.logV( TAG, "sendStop(): valid=" + isValid() + ", content=" + isContent() );
     if( isValid() && isContent() ) {
       nielsenApp.stop();
     }
@@ -210,6 +212,23 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     if( metadataJson == null ) {
       metadataJson = initMetadata( item, customMetadata );
       extractChannelName();
+      logMetadataWarnings();
+    }
+  }
+
+  // I wish Backlot had validation in the UI but noooooo.
+  private void logMetadataWarnings() {
+    final String assetIdValue = (String)Utils.getJSONValueOrElse( metadataJson, NIELSEN_ASSET_ID_KEY, "" );
+    if( assetIdValue.matches( "\\s+") ) {
+      DebugMode.logE( TAG, "logMetadataWarnings(): whitespace not allowed in assetid, was '" + assetIdValue + "'" );
+    }
+    final Iterator<String> keys = metadataJson.keys();
+    while ( keys.hasNext() ) {
+      final String k = keys.next();
+      final String v = (String)Utils.getJSONValueOrElse( metadataJson, k, null );
+      if( v != null && NielsenJSONFilter.s_instance.filter( v ) != v ) {
+        DebugMode.logE( TAG, "logMetadataWarnings(): perhaps invalid format, was '" + v + "'" );
+      }
     }
   }
 
