@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
+public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String BACKLOT_NIELSEN_KEY_PREFIX = "nielsen_";
   private static final String NIELSEN_KEY_DATASRC = "dataSrc";
@@ -303,9 +303,5 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
         DebugMode.logE( TAG, e.toString() );
       }
     }
-  }
-
-  public void onAppSdkEvent( long timestamp, int code, String description ) {
-    DebugMode.logV( TAG, "onAppSdkEvent(): timestamp=" + timestamp + ", code=" + code + ", description=" + description );
   }
 }
