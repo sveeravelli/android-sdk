@@ -118,7 +118,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   public void onTag( byte[] tag ) {
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
       if( tagStr.contains("www.nielsen.com") ) {
@@ -167,7 +167,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
       final boolean notYetReported = lastReportedMsec < 0;
       final boolean reportExpired = Math.abs(reportingMsec - lastReportedMsec) > 2000;
       if( notYetReported || reportExpired ) {
@@ -195,7 +195,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void sendStop() {
     DebugMode.logV( TAG, "sendStop()" );
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
       nielsenApp.stop();
     }
   }
