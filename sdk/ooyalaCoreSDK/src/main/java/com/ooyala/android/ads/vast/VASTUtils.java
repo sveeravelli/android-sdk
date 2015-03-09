@@ -8,7 +8,7 @@ import java.util.List;
 import com.ooyala.android.AdvertisingIdUtils;
 import com.ooyala.android.util.DebugMode;
 
-public class VASTUtils {
+class VASTUtils {
   private static final String TAG = "VASTUtils";
   private static final String SEPARATOR_TIME = ":";
   private static final List<String> TIMESTAMP_MACROS_TO_REPLACE = Arrays.asList("%5BPlace_Random_Number_Here%5D",

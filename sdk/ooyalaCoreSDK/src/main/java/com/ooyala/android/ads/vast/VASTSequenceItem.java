@@ -2,7 +2,7 @@ package com.ooyala.android.ads.vast;
 
 import org.w3c.dom.Element;
 
-public class VASTSequenceItem implements Comparable<VASTSequenceItem> {
+class VASTSequenceItem implements Comparable<VASTSequenceItem> {
   /** The sequence number associated with this item in the sequence */
   private int _number = -1;
   /** The Linear Ad associated with this item in the sequence */
