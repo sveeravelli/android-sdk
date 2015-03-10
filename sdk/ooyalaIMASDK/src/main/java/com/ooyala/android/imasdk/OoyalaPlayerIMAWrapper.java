@@ -1,20 +1,21 @@
 package com.ooyala.android.imasdk;
 
+import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
+import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
+import com.ooyala.android.util.DebugMode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
-import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
-import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.item.OoyalaManagedAdSpot;
-
 /**
- * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and the OoyalaPlayer.
- *
+ * The OoyalaPlayerIMAWrapper provides the interface between the OoyalaAdManager and IMA SDK.
+ * IMA SDK and OoyalaIMAManager manage the playback through OoyalaPlayerIMAWrapper, including
+ * loading ads, play/pause ads playback, and sync playback events.
  *
  */
 class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
@@ -37,7 +38,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
   /**
    * Wrap an instantiated OoyalaPlayer to provide the IMA interface
    * @param player the OoyalaPlayer to use
-   * @param callback a callback for when content is completed
+   * @param imaManager the current OoyalaIMAManager
    */
   public OoyalaPlayerIMAWrapper(OoyalaPlayer player, OoyalaIMAManager imaManager){
     DebugMode.logD(TAG, "IMA Ad Wrapper: Initializing");
@@ -51,6 +52,11 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
   }
 
   // Methods implementing VideoAdPlayer interface.
+
+  /**
+   * Play or resume IMA Ads playback.
+   * This method will be called from IMA SDK when it wants to play/resume IMA Ads playback
+   */
   @Override
   public void playAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Playing Ad");
@@ -58,6 +64,10 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     getVideoProgressState().setPlayingIMAAd( true );
   }
 
+  /**
+   * Stop IMA Ads playback.
+   * This method will be called from IMA SDK when it wants to stop IMA Ads playback
+   */
   @Override
   public void stopAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Stopping Ad");
@@ -69,6 +79,10 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     }
   }
 
+  /**
+   * Load the given url into IMAAdPlayer for playback
+   * @param url the ad url to be played
+   */
   @Override
   public void loadAd(String url) {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Loading Ad: " + url);
@@ -77,6 +91,10 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     _imaManager._adPlayer.init(_player, _adSpot, _player.createStateNotifier());
   }
 
+  /**
+   * Pause IMA Ads playback
+   * This method will be called from IMA SDK when it wants to pause IMA Ads playback
+   */
   @Override
   public void pauseAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Pausing Ad");
@@ -88,6 +106,10 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     }
   }
 
+  /**
+   * Resume ads playback from suspended state
+   * This method will be called from IMA SDK
+   */
   @Override
   public void resumeAd() {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Resuming Ad");
@@ -99,21 +121,37 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     }
   }
 
+  /**
+   * Add a callback to IMA  VideoAdPlayer.VideoAdPlayerCallback
+   * @param callback the callback to be added
+   */
   @Override
   public void addCallback(VideoAdPlayerCallback callback) {
     _adCallbacks.add(callback);
   }
 
+  /**
+   * Remove a callback to IMA  VideoAdPlayer.VideoAdPlayerCallback
+   * @param callback the callback to be added
+   */
   @Override
   public void removeCallback(VideoAdPlayerCallback callback) {
     _adCallbacks.remove(callback);
   }
 
+  /**
+   * Get current VideoProgressUpdate of content video
+   * @return current VideoProgressUpdate
+   */
   @Override
   public VideoProgressUpdate getContentProgress() {
     return _videoProgressCalculator.getContentProgress();
   }
 
+  /**
+   * Get current VideoProgressUpdate of current ads
+   * @return current VideoProgressUpdate
+   */
   @Override
   public VideoProgressUpdate getAdProgress() {
     return _videoProgressCalculator.getAdProgress();
@@ -151,6 +189,11 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     _player.exitAdMode(_imaManager);
   }
 
+  /**
+   * Update ad playback events and state changes
+   * @param arg0
+   * @param arg
+   */
   public void update(Observable arg0, Object arg) {
     OoyalaPlayer player = (OoyalaPlayer) arg0;
     String notification = arg.toString();
