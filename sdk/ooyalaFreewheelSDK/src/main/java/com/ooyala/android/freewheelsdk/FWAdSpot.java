@@ -33,6 +33,11 @@ public class FWAdSpot extends AdSpot {
   }
 
   public ISlot getAd() {
+  /**
+   * Fetch the ISlot to play.
+   * @return the ISlot to play
+   */
+   public ISlot getAd() {
     return _ad;
   }
 
@@ -47,6 +52,11 @@ public class FWAdSpot extends AdSpot {
     return (int) (_ad.getTimePosition() * 1000);
   }
 
+  /**
+   * Overrides the equal method of the FWAdSpot class.
+   * @param obj the object compared with current FWAdSpot
+   * @return true if the object is the current FWAdSpot, otherwise false
+   */
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof FWAdSpot)) {
