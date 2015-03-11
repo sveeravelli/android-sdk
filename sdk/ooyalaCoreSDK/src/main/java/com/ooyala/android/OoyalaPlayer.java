@@ -111,6 +111,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
+  public static final String BUFFERING_STARTED_NOTIFICATION = "bufferingStarted";
+  public static final String BUFFERING_COMPLETED_NOTIFICATION = "bufferingCompleted";
+  public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
+  public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
+
 
   public enum ContentOrAdType {
     MainContent,
@@ -1374,6 +1379,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     else if (notification.equals(SEEK_COMPLETED_NOTIFICATION)) {
       sendNotification(SEEK_COMPLETED_NOTIFICATION);
+    }
+    else if (notification.equals(BUFFERING_COMPLETED_NOTIFICATION)) {
+      sendNotification(BUFFERING_COMPLETED_NOTIFICATION);
+    }
+    else if (notification.equals(BUFFERING_STARTED_NOTIFICATION)) {
+      sendNotification(BUFFERING_STARTED_NOTIFICATION);
+    }
+    else if (notification.equals(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION)) {
+      sendNotification(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
+    }
+    else if (notification.equals(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION)) {
+      sendNotification(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
     }
   }
 
