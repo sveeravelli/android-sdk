@@ -173,7 +173,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
       final boolean notYetReported = lastReportedMsec < 0;
       final boolean reportExpired = Math.abs(reportingMsec - lastReportedMsec) > 2000;
       if( notYetReported || reportExpired ) {
-        nielsenApp.setPlayheadPosition( (int) (reportingMsec / 1000) );
+        int playheadPosition = (int) (reportingMsec / 1000);
+//        DebugMode.logV(TAG, "set playhead position: " + playheadPosition);
+        nielsenApp.setPlayheadPosition( playheadPosition );
         lastReportedMsec = reportingMsec;
       }
     }
@@ -218,9 +220,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
 
   // I wish Backlot had validation in the UI but noooooo.
   private void logMetadataWarnings() {
-    final String assetIdValue = (String)Utils.getJSONValueOrElse( metadataJson, NIELSEN_ASSET_ID_KEY, "" );
+    String assetIdValue = (String)Utils.getJSONValueOrElse( metadataJson, NIELSEN_ASSET_ID_KEY, "" );
     if( assetIdValue.matches( "\\s+") ) {
       DebugMode.logE( TAG, "logMetadataWarnings(): whitespace not allowed in assetid, was '" + assetIdValue + "'" );
+      assetIdValue = assetIdValue.replaceAll( "\\s+", "" );
     }
     final Iterator<String> keys = metadataJson.keys();
     while ( keys.hasNext() ) {

@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.nielsen.app.sdk.AppSdk;
 import com.nielsen.app.sdk.IAppNotifier;
 import com.ooyala.android.OoyalaPlayer;
@@ -21,8 +21,10 @@ import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.nielsensdk.NielsenAnalytics;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.util.DebugMode;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Observable;
@@ -60,7 +62,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     embedMap.put("ID3-TravelLive", "w3MXlyczp03XOkXoGecg4L8xLIyOiPnR");
     embedMap.put("ID3-FoodEast1", "12YnlyczrWcZvPbIJJTV7TmeVi3tgGPa");
     embedMap.put("ID3-FoodEast2", "B1YXlyczpFZhH6GgBSrrO6VWI6aiMKw0");
-    embedMap.put("CMS-Demo", "M3bmM3czp1j9horxoTLGaJtgLmW57u4F");
+    embedMap.put("CMS-Demo", "ZhMmkycjr4jlHIjvpIIimQSf_CjaQs48");
     embedMap.put("CMS-NoAds", "FzYjJzczo3_M3OjkeIta-IIFcPGSGxci");
     embedMap.put("CMS-WithAds", "x3YjJzczqREV-5RDiemsrdqki1FYu2NT");
 
@@ -191,13 +193,12 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
 
   @Override
   public void update(Observable observable, Object data) {
-    Log.d( TAG, "update: " + data );
+//    Log.d( TAG, "update: " + data );
   }
 
   private JSONObject getCustomConfig() {
     final JSONObject json = new JSONObject();
     try {
-      json.put( "tv", "false" );
       json.put( "nol_devDebug", "true" ); // do NOT do this for production apps!
     }
     catch( JSONException e ) {
