@@ -32,7 +32,6 @@ public class FWAdSpot extends AdSpot {
     return new FWAdSpot(ad, isPostRoll);
   }
 
-  public ISlot getAd() {
   /**
    * Fetch the ISlot to play.
    * @return the ISlot to play
