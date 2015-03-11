@@ -55,9 +55,15 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     setContentView(R.layout.main);
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     embedMap = new LinkedHashMap<String, String>();
-    embedMap.put("Linear", "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
-    embedMap.put("Dynamic", "M3bmM3czp1j9horxoTLGaJtgLmW57u4F");
-    embedMap.put("CMS", "ZhMmkycjr4jlHIjvpIIimQSf_CjaQs48");
+    embedMap.put("ID3-Demo", "84aDVmcTqN3FrdLXClZgJq-GfFEDhS1a");
+    embedMap.put("ID3-TravelEast", "Y5aHlyczqJaJ2Mh6BNWLXfpcmxOaKzcx");
+    embedMap.put("ID3-TravelLive", "w3MXlyczp03XOkXoGecg4L8xLIyOiPnR");
+    embedMap.put("ID3-FoodEast1", "12YnlyczrWcZvPbIJJTV7TmeVi3tgGPa");
+    embedMap.put("ID3-FoodEast2", "B1YXlyczpFZhH6GgBSrrO6VWI6aiMKw0");
+    embedMap.put("CMS-Demo", "M3bmM3czp1j9horxoTLGaJtgLmW57u4F");
+    embedMap.put("CMS-NoAds", "FzYjJzczo3_M3OjkeIta-IIFcPGSGxci");
+    embedMap.put("CMS-WithAds", "x3YjJzczqREV-5RDiemsrdqki1FYu2NT");
+
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
     for (String key : embedMap.keySet()) {
