@@ -1,7 +1,4 @@
-package com.ooyala.android.sampleapp;
-
-import java.util.Observable;
-import java.util.Observer;
+package com.ooyala.pluginsampleapp;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,12 +9,13 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
-public class GettingStartedSampleAppActivity extends Activity implements Observer{
-
-  final String EMBED  = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe";  //Embed Code, or Content ID
-  final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
+public class MainActivity extends Activity {
+  final String EMBED = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe"; // Embed Code, or
+                                                           // Content ID
+  final String PCODE = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
   final String DOMAIN = "http://www.ooyala.com";
   OoyalaPlayer player;
+
   /**
    * Called when the activity is first created.
    */
@@ -27,9 +25,11 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
-    player.addObserver(this);
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(
+        playerLayout, player);
+    SampleAdPlugin plugin = new SampleAdPlugin(this, player);
+    player.registerPlugin(plugin);
     if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {
@@ -53,11 +53,4 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     }
   }
 
-  @Override
-  public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      return;
-    }
-    Log.d(GettingStartedSampleAppActivity.class.getSimpleName(), "Notification Received: " + arg1 + " - state: " + player.getState());
-  }
 }

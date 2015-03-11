@@ -57,8 +57,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     Options options = new Options.Builder().setShowAdsControls(false)
         .setShowCuePoints(false).setShowPromoImage(true)
         .setPreloadContent(false).build();
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, domain, options);
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, domain, options);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
 
     //Initialize the bottom controls

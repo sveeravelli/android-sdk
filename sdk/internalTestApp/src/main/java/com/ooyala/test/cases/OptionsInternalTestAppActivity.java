@@ -116,9 +116,8 @@ public class OptionsInternalTestAppActivity extends Activity implements
         + " showCuePoints: " + showCuePoints);
     Options options = new Options.Builder().setShowAdsControls(showAdsControls)
         .setShowCuePoints(showCuePoints).build();
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(
-        playerLayout, PCODE, domain, options);
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, domain, options);
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
 
     OoyalaFreewheelManager freewheelManager = new OoyalaFreewheelManager(this,

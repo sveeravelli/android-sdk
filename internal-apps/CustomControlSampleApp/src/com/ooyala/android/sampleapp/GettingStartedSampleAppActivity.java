@@ -1,8 +1,5 @@
 package com.ooyala.android.sampleapp;
 
-import java.util.Observable;
-import java.util.Observer;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +9,7 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
-public class GettingStartedSampleAppActivity extends Activity implements Observer{
+public class GettingStartedSampleAppActivity extends Activity {
 
   final String EMBED  = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe";  //Embed Code, or Content ID
   final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
@@ -27,9 +24,15 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
-    player.addObserver(this);
+
+    MyInlineControls ic = new MyInlineControls(player, playerLayout);
+    playerLayoutController.setInlineControls(ic);
+
+    MyFullscreenControls fc = new MyFullscreenControls(player, null);
+    playerLayoutController.setFullscreenControls(fc);
+
     if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {
@@ -51,13 +54,5 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     if (player != null) {
       player.resume();
     }
-  }
-
-  @Override
-  public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
-      return;
-    }
-    Log.d(GettingStartedSampleAppActivity.class.getSimpleName(), "Notification Received: " + arg1 + " - state: " + player.getState());
   }
 }
