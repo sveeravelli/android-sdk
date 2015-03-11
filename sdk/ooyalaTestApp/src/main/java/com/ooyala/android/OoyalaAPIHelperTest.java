@@ -2,12 +2,15 @@ package com.ooyala.android;
 
 import android.test.AndroidTestCase;
 
+import com.ooyala.android.util.DebugMode;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class OoyalaAPIHelperTest extends AndroidTestCase {
+  private static final String TAG = OoyalaAPIHelperTest.class.getSimpleName();
+
   public OoyalaAPIHelper apiHelper;
 
   public OoyalaAPIHelperTest() {
@@ -40,7 +43,7 @@ public class OoyalaAPIHelperTest extends AndroidTestCase {
           json.getJSONObject("content_tree").getJSONObject(TestConstants.TEST_VIDEO).getString("embed_code"),
           TestConstants.TEST_VIDEO);
     } catch (Exception e) {
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
       fail();
     }
   }

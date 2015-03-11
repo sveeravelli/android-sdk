@@ -1,17 +1,5 @@
 package com.ooyala.android;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
-import org.json.JSONObject;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,8 +16,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.ooyala.android.AdvertisingIdUtils.IAdvertisingIdListener;
 import com.ooyala.android.AuthHeartbeat.OnAuthHeartbeatErrorListener;
-import com.ooyala.android.captions.ClosedCaptionsStyle;
-import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
@@ -38,6 +24,8 @@ import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
+import com.ooyala.android.captions.ClosedCaptionsStyle;
+import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
@@ -60,13 +48,25 @@ import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
 
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener, AdPluginManagerInterface {
   /**
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v3.4.0_RC1";
+  static final String SDK_VERSION = "v3.5.0_RC5";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -150,12 +150,12 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static boolean enableCustomHLSPlayer = false;
 
   /**
-   * If set to true, Smooth content will be allowed using our custom Smooth
-   * implementation rather than native the Android one. This will have no
+   * If set to true, Smooth and HLS content (both Clear and Playready-encrypted) will be allowed
+   * using our custom Playready implementation rather than native the Android one. This will have no
    * affect unless the custom playback engine is linked and loaded in
    * addition to the standard Ooyala Android SDK
    */
-  public static boolean enableCustomSmoothPlayer = false;
+  public static boolean enableCustomPlayreadyPlayer = false;
 
   /**
    * If set to true, DRM enabled players will perform DRM requests in a debug environment if available
@@ -358,8 +358,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * method has no effect and just returns false. An ad set can be dynamically
    * associated using the adSetCode param.
    *
-   * @param embedCode
-   * @param adSetCode
+   * @param embedCode should not be null.
+   * @param adSetCode can be null.
    * @return true if the embed code was successfully set, false if not.
    */
   public boolean setEmbedCodeWithAdSetCode(String embedCode, String adSetCode) {
@@ -376,12 +376,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    * null, this method has no effect and just returns false. An ad set can be
    * dynamically associated using the adSetCode param.
    *
-   * @param embedCodes
-   * @param adSetCode
+   * @param embedCodes should not be null.
+   * @param adSetCode can be null.
    * @return true if the embed codes were successfully set, false if not.
    */
   public boolean setEmbedCodesWithAdSetCode(List<String> embedCodes,
-      String adSetCode) {
+      final String adSetCode) {
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
@@ -406,7 +406,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            reinitialize(item);
+            reinitialize(item, adSetCode);
           }
         }));
 
@@ -456,7 +456,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            reinitialize(item);
+            reinitialize(item, null);
           }
         }));
     return true;
@@ -473,7 +473,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     cancelOpenTasks();
     setState(State.LOADING);
     cleanupPlayers();
-    return reinitialize(rootItem);
+    return reinitialize(rootItem, null);
   }
 
   /**
@@ -483,17 +483,17 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if the change was successful, false if not
    */
   public boolean changeCurrentItem(String embedCode) {
-    return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode,
-        _currentItem));
+    return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem), null);
   }
 
   /**
    * Set the current video in a channel if the video is present.
    *
-   * @param video
+   * @param video should not be null.
+   * @param adSetCode can be null.
    * @return true if the change was successful, false if not
    */
-  public boolean changeCurrentItem(Video video) {
+  public boolean changeCurrentItem( Video video, String adSetCode ) {
     if (video == null) {
       cleanupPlayers();
       return false;
@@ -508,7 +508,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // request metadata
     final String metadataTaskKey = "getMetadata" + System.currentTimeMillis();
     taskStarted(metadataTaskKey,
-        _playerAPIClient.metadata(_rootItem, new MetadataFetchedCallback() {
+        _playerAPIClient.metadata(_rootItem, adSetCode, new MetadataFetchedCallback() {
           @Override
           public void callback(boolean result, OoyalaException error) {
             taskCompleted(metadataTaskKey);
@@ -523,7 +523,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               changeCurrentItemAfterAuth();
             }
           }
-        }));
+        } ));
 
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
       PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -638,7 +638,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private boolean reinitialize(ContentItem tree) {
+  /**
+   * @param tree should not be null.
+   * @param adSetCode can be null.
+   * @return success code.
+   */
+  private boolean reinitialize( ContentItem tree, final String adSetCode ) {
     if (tree == null) {
       _rootItem = null;
       _currentItem = null;
@@ -667,7 +672,7 @@ public class OoyalaPlayer extends Observable implements Observer,
               sendNotification(ERROR_NOTIFICATION);
               return;
             }
-            changeCurrentItem(_rootItem.firstVideo());
+            changeCurrentItem(_rootItem.firstVideo(), adSetCode);
           }
         }));
     return true;
@@ -843,10 +848,15 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public State getState() {
     PlayerInterface p = currentPlayer();
-    if (p == null || _state == State.READY) {
+    if (p == null) {
       return _state;
+    } else if (isShowingAd()) {
+      return p.getState();
+    } else {
+      // current player is content player. If promo image is loaded, set state to ready and stop
+      // the spinning wheel.
+      return _state == State.READY ? State.READY : p.getState();
     }
-    return p.getState();
   }
 
   /**
@@ -927,6 +937,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * layout can be changed.
    */
   public void suspend() {
+    if (getCurrentItem() == null) {
+      DebugMode.logI(TAG, "Suspend was called without a current item. Doing nothing");
+      return;
+    }
     suspendCurrentPlayer();
 
     if (_authHeartbeat != null) {
@@ -941,7 +955,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Resume the current video from a suspended state
    */
   public void resume() {
-    if (getCurrentItem() != null && getCurrentItem().isHeartbeatRequired()) {
+    if (getCurrentItem() == null) {
+      DebugMode.logI(TAG, "Resume was called without a current item. Doing nothing");
+      return;
+    }
+
+    if (getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
         PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
@@ -981,7 +1000,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (currentPlayer() != null) {
       resumeCurrentPlayer();
-    } else if (_currentItem != null && _currentItem.isAuthorized()) {
+    } else if (getCurrentItem().isAuthorized()) {
       prepareContent(false);
     } else {
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
@@ -1160,7 +1179,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public boolean previousVideo(int what) {
     if (_currentItem.previousVideo() != null) {
-      changeCurrentItem(_currentItem.previousVideo());
+      changeCurrentItem(_currentItem.previousVideo(), null);
       if (what == DO_PLAY) {
         play();
       } else if (what == DO_PAUSE) {
@@ -1187,7 +1206,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // This is required because android enjoys making things difficult. talk to
     // jigish if you got issues.
     if (_currentItem.nextVideo() != null) {
-      changeCurrentItem(_currentItem.nextVideo());
+      changeCurrentItem(_currentItem.nextVideo(), null);
       if (what == DO_PLAY) {
         play();
       } else if (what == DO_PAUSE) {
@@ -1202,7 +1221,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             _handler.post(new Runnable() {
               @Override
               public void run() {
-                changeCurrentItem(_currentItem.nextVideo());
+                changeCurrentItem(_currentItem.nextVideo(), null);
                 play();
               }
             });
@@ -1217,7 +1236,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             _handler.post(new Runnable() {
               @Override
               public void run() {
-                changeCurrentItem(_currentItem.nextVideo());
+                changeCurrentItem(_currentItem.nextVideo(), null);
                 pause();
               }
             });
@@ -1391,7 +1410,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void setState(State state) {
     if (state != _state) {
-      DebugMode.logD(TAG, "player set state, new state is " + _state);
+      DebugMode.logD(TAG, "player set state, old state was " + _state);
       this._state = state;
       sendNotification(STATE_CHANGED_NOTIFICATION);
     }
@@ -2222,7 +2241,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         bitmap = BitmapFactory.decodeStream(in);
       } catch (Exception e) {
         DebugMode.logE("Error", e.getMessage());
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       return bitmap;
     }

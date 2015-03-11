@@ -73,7 +73,7 @@ public class IMASampleAppActivity extends Activity implements Observer {
 
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-        android.R.layout.simple_spinner_item);
+        R.layout.spinner_layout);
     for (String key : embedMap.keySet()) {
       adapter.add(key);
     }

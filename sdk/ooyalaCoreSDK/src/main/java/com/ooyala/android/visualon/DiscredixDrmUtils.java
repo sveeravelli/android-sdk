@@ -1,5 +1,6 @@
 package com.ooyala.android.visualon;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -8,6 +9,7 @@ import android.content.Context;
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
+import com.discretix.drmdlc.api.IDxDrmDlcDebug;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
@@ -28,6 +30,30 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
   private static final String SECURE_PLAYER_VERSION = "03_00_05_0962";
+
+  public static void enableDebugging(Context context, boolean extreme) {
+    try {
+      DxLogConfig config;
+      if( extreme ) {
+        config = new DxLogConfig(
+          DxLogConfig.LogLevel.Verbose,
+          0,
+          new File( context.getExternalCacheDir(), "vo_dx.log" ).toString(),
+          true
+        );
+      }
+      else {
+        config = new DxLogConfig(
+          DxLogConfig.LogLevel.Verbose,
+          0
+        );
+      }
+      final IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, config);
+    } catch( DrmClientInitFailureException e ) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Checks if the device has been personalized
    * @return true if personalized, false if not
@@ -39,9 +65,9 @@ class DiscredixDrmUtils {
       dlc = DxDrmDlc.getDxDrmDlc(context, config);
       return dlc.personalizationVerify();
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return false;
   }
@@ -61,11 +87,11 @@ class DiscredixDrmUtils {
 
       isDrmContent = dlc.isDrmContent(localFilePath);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return isDrmContent;
   }
@@ -90,10 +116,10 @@ class DiscredixDrmUtils {
           return false;
       }
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return false;
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
       return false;
     }
     return true;
@@ -104,7 +130,6 @@ class DiscredixDrmUtils {
    * @return true if file can now be played, false otherwise.
    */
   public static boolean canFileBePlayed(Context context, Stream stream, String localFilename) {
-    if (!Stream.DELIVERY_TYPE_SMOOTH.equals(stream.getDeliveryType())) return true;
     if (localFilename == null) return false;
     if (!isStreamProtected(context, localFilename)) return true;
 
@@ -117,15 +142,15 @@ class DiscredixDrmUtils {
       areRightsVerified = dlc.verifyRights(localFilename);
 
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmGeneralFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmInvalidFormatException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return areRightsVerified;
   }
@@ -144,7 +169,13 @@ class DiscredixDrmUtils {
       error = new OoyalaException(OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE, exception);
     }
     else {
-      String description =  ((DrmServerSoapErrorException)exception).getCustomData().replaceAll("<[^>]+>", "");
+      String customData = ((DrmServerSoapErrorException)exception).getCustomData();
+      String soapMessage = ((DrmServerSoapErrorException)exception).getSoapMessage();
+      if (customData == null) {
+        DebugMode.logE(TAG, "Unknown SOAP error from DRM server: " + soapMessage);
+        return new OoyalaException(OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR, soapMessage);
+      }
+      String description =  customData.replaceAll("<[^>]+>", "");
 
       if ("invalid token".equals(description)) {
         DebugMode.logE(TAG, "VisualOn Rights error: Invalid token");
@@ -184,10 +215,10 @@ class DiscredixDrmUtils {
 
       } catch (DrmGeneralFailureException e) {
         DebugMode.logE(TAG, "Failed trying to get discredix version");
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
     } catch (DrmClientInitFailureException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

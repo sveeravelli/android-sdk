@@ -22,6 +22,9 @@ import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
 
+/**
+ * A MoviePlayer which helps render VAST advertisements
+ */
 public class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
@@ -332,7 +335,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       DebugMode.logD(TAG, "Opening brower to " + url);
     } catch (Exception e) {
       DebugMode.logE(TAG, "There was some exception on clickthrough!");
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

@@ -504,7 +504,7 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		}
 	}
 	
@@ -527,7 +527,7 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			if(mPlayer != null)
 				mPlayer.setDeviceCapabilityByFile(filePath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			DebugMode.logE(TAG, "Caught!", e);
 		}
 	}
 

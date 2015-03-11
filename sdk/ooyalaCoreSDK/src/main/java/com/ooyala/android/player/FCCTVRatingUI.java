@@ -64,8 +64,7 @@ public class FCCTVRatingUI implements Observer {
 
     // add into parent.
     FrameLayout.LayoutParams paramsForRelative = new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT );
-    this._parentLayout.addView( this._relativeLayout, paramsForRelative );
-
+    this._parentLayout.addView( this._relativeLayout, 0, paramsForRelative );
     this._player.addObserver( this );
   }
 

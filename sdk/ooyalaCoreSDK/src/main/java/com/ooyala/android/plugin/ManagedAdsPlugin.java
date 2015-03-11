@@ -1,10 +1,10 @@
 package com.ooyala.android.plugin;
 
-import java.util.Set;
-
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.item.AdSpotManager;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.Set;
 
 public abstract class ManagedAdsPlugin<T extends AdSpot> implements
     AdPluginInterface {
@@ -87,8 +87,6 @@ public abstract class ManagedAdsPlugin<T extends AdSpot> implements
 
   /**
    * called on content
-   * 
-   * @return true if plugin needs to play postroll ads, false otherwise
    */
   @Override
   public void onAdModeEntered() {

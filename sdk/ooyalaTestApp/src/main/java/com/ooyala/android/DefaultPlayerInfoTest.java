@@ -16,7 +16,7 @@ public class DefaultPlayerInfoTest extends AndroidTestCase {
   @Override
   protected void setUp() {
     OoyalaPlayer.enableHLS = false;
-    OoyalaPlayer.enableCustomSmoothPlayer = false;
+    OoyalaPlayer.enableCustomPlayreadyPlayer = false;
   }
 
   @Override
@@ -30,15 +30,17 @@ public class DefaultPlayerInfoTest extends AndroidTestCase {
     assertTrue(formats.contains("wv_mp4"));
 
     assertFalse(formats.contains("smooth"));
+    assertFalse(formats.contains("playready_hls"));
   }
 
   public void testEnableSmooth() {
-    OoyalaPlayer.enableCustomSmoothPlayer = true;
+    OoyalaPlayer.enableCustomPlayreadyPlayer = true;
     Set<String> formats = info.getSupportedFormats();
     assertTrue(formats.contains("mp4"));
     assertTrue(formats.contains("wv_mp4"));
 
     assertTrue(formats.contains("smooth"));
+    assertTrue(formats.contains("playready_hls"));
   }
   public void testEnableHls() {
     OoyalaPlayer.enableHLS = true;
@@ -48,18 +50,20 @@ public class DefaultPlayerInfoTest extends AndroidTestCase {
 
     assertTrue(formats.contains("m3u8"));
     assertFalse(formats.contains("smooth"));
+    assertFalse(formats.contains("playready_hls"));
   }
 
 
   public void testEnableHlsAndSmooth() {
     OoyalaPlayer.enableHLS = true;
-    OoyalaPlayer.enableCustomSmoothPlayer = true;
+    OoyalaPlayer.enableCustomPlayreadyPlayer = true;
     Set<String> formats = info.getSupportedFormats();
     assertTrue(formats.contains("mp4"));
     assertTrue(formats.contains("wv_mp4"));
 
     assertTrue(formats.contains("m3u8"));
     assertTrue(formats.contains("smooth"));
+    assertTrue(formats.contains("playready_hls"));
   }
 
   @SuppressLint("NewApi")
@@ -71,12 +75,14 @@ public class DefaultPlayerInfoTest extends AndroidTestCase {
       assertTrue(formats.contains("wv_wvm"));
       assertTrue(formats.contains("wv_hls"));
       assertFalse(formats.contains("smooth"));
+      assertFalse(formats.contains("playready_hls"));
     }
     else {
       assertFalse(formats.contains("m3u8"));
       assertFalse(formats.contains("wv_wvm"));
       assertFalse(formats.contains("wv_hls"));
       assertFalse(formats.contains("smooth"));
+      assertFalse(formats.contains("playready_hls"));
     }
   }
 }

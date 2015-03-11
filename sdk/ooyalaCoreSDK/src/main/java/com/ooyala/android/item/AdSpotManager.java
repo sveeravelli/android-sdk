@@ -1,12 +1,12 @@
 package com.ooyala.android.item;
 
+import com.ooyala.android.util.DebugMode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.ooyala.android.util.DebugMode;
 
 /**
  * A helper class help us to manage ad spots
@@ -63,8 +63,8 @@ public class AdSpotManager<T extends AdSpot> {
   /**
    * Insert an adSpot
    * 
-   * @param ad
-   *          the adSpot to insert
+   * @param adSpots
+   *          the adSpot list to insert
    */
   public void insertAds(List<T> adSpots) {
     _ads.addAll(adSpots);
@@ -76,20 +76,14 @@ public class AdSpotManager<T extends AdSpot> {
    * 
    * @param time
    *          in millisecond
-   * @param timeAlignment
-   *          time unit to round up time, 0 if no alignment
-   * @returns the unplayed adspot before the specified time which, null if no
+   * @return the unplayed adspot before the specified time which, null if no
    *          such adspot
    */
   public T adBeforeTime(int time) {
     T candidate = null;
     int candidateTime = 0;
     for (T ad : _ads) {
-      int adTime = ad.getTime();
-      if (_timeAlignment > 0) {
-        adTime = ((adTime + _timeAlignment / 2) / _timeAlignment)
-            * _timeAlignment;
-      }
+      int adTime = alignedAdTime(ad.getTime());
       if (time < adTime) {
         break;
       } else {
@@ -125,7 +119,7 @@ public class AdSpotManager<T extends AdSpot> {
   /**
    * get the adspot list size
    * 
-   * @returns size
+   * @return size
    */
   public int size() {
     return _ads.size();
@@ -160,8 +154,18 @@ public class AdSpotManager<T extends AdSpot> {
       if (_playedAds.contains(ad)) {
         continue;
       }
-      cuePoints.add(ad.getTime());
+
+      cuePoints.add(alignedAdTime(ad.getTime()));
     }
     return cuePoints;
+  }
+
+  private int alignedAdTime(int adTime) {
+    if (_timeAlignment > 0) {
+      return ((adTime + _timeAlignment / 2) / _timeAlignment)
+          * _timeAlignment;
+    } else {
+      return adTime;
+    }
   }
 }

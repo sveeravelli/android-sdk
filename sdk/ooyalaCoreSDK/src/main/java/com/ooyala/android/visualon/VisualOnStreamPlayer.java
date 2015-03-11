@@ -62,6 +62,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
   private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.13.10-B72949";
   private VisualOnConfiguration _visualOnConfiguration = null;
+  private static final boolean ENABLE_DEBUGGING = false;
+  private static final boolean EXTREME_DEBUGGING = false;
 
   protected VOCommonPlayer _player = null;
   protected SurfaceHolder _holder = null;
@@ -86,14 +88,22 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   protected static final long TIMER_DELAY = 0;
   protected static final long TIMER_PERIOD = 1000;
 
-  protected boolean _hasDiscredix = false;
+  protected boolean _isDiscredixLoaded = false;
 
-  private boolean isDiscredixLoaded() {
-    return _hasDiscredix;
-  }
-
-  private boolean isDiscredixNeeded() {
-    return "smooth".equals(_stream.getDeliveryType());
+  private boolean checkForDiscredixLibrary(Context context) {
+    boolean hasDiscredix;
+    try {
+      this.getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
+      DebugMode.logD(TAG, "This app has the ability to play protected content");
+      hasDiscredix = true;
+      if( ENABLE_DEBUGGING ) {
+        DiscredixDrmUtils.enableDebugging( context, EXTREME_DEBUGGING );
+      }
+    } catch(Exception e) {
+      DebugMode.logD(TAG, "This app cannot play protected content");
+      hasDiscredix = false;
+    }
+    return hasDiscredix;
   }
 
   @Override
@@ -115,20 +125,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
+    final Context context = parent.getLayout().getContext();
     _visualOnConfiguration = parent.getOptions().getVisualOnConfiguration();
 
-    if (!isDiscredixNeeded()) {
-      DebugMode.logD(TAG, "This asset doesn't need Discredix");
-    }
-
-    try {
-      getClass().getClassLoader().loadClass(DISCREDIX_MANAGER_CLASS);
-      DebugMode.logD(TAG, "This app has the ability to play protected content");
-      _hasDiscredix = true;
-    } catch(Exception e) {
-      DebugMode.logD(TAG, "This app cannot play protected content");
-      _hasDiscredix = false;
-    }
+    _isDiscredixLoaded = checkForDiscredixLibrary(context);
+    DebugMode.logD(TAG, (_isDiscredixLoaded ? "Using" : "Not using") + " Discredix");
 
     setState(State.LOADING);
     _streamUrl = _stream.decodedURL().toString();
@@ -136,19 +137,18 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     setParent(parent);
 
     // Copy license file,
-    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "voVidDec.dat", "voVidDec.dat");
-    VisualOnUtils.copyFile(_parent.getLayout().getContext(), "cap.xml", "cap.xml");
+    VisualOnUtils.copyFile(context, "voVidDec.dat", "voVidDec.dat");
+    VisualOnUtils.copyFile(context, "cap.xml", "cap.xml");
 
     // Do a cleanup of all saved manifests first open of the app
     if (!didCleanupLocalFiles) {
       didCleanupLocalFiles = true;
-      VisualOnUtils.cleanupLocalFiles(_parent.getLayout().getContext());
+      VisualOnUtils.cleanupLocalFiles(context);
     }
 
-    if(isDiscredixNeeded() && isDiscredixLoaded() && _localFilePath == null) {
-
+    if(_isDiscredixLoaded && _localFilePath == null) {
       // Check if the Discredix version string matches what we expect
-      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(_parent.getLayout().getContext())) {
+      if (!DiscredixDrmUtils.isDiscredixVersionCorrect(context)) {
         if (!_visualOnConfiguration.disableLibraryVersionChecks) {
           this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "SecurePlayer Initialization error: Unexpected Discredix Version");
           setState(State.ERROR);
@@ -162,13 +162,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         DebugMode.logI(TAG, "Discredix Version correct for this SDK version");
       }
 
-      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(_parent.getLayout().getContext(), this, parent.getEmbedCode(), _streamUrl);
+      FileDownloadAsyncTask downloadTask = new FileDownloadAsyncTask(context, this, parent.getEmbedCode(), _streamUrl);
       downloadTask.execute();
-    }
-    if(isDiscredixNeeded() && !isDiscredixLoaded()) {
-      this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to play protected content without DRM-capable Libraries");
-      setState(State.ERROR);
-      return;
     }
     setupView();
   }
@@ -257,8 +252,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     switch (getState()) {
     case INIT:
     case SUSPENDED:
-      return 0;
-    case LOADING:
+    case READY:
+      if (_timeBeforeSuspend != null && _timeBeforeSuspend > 0) {
+        return _timeBeforeSuspend;
+      } else {
+        return 0;
+      }
     default:
       break;
     }
@@ -347,14 +346,16 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   protected void createMediaPlayer() {
+    final Context context = _parent.getLayout().getContext();
+
     try {
       if (!_surfaceExists) {
         DebugMode.logE(TAG, "Trying to create a player without a valid surface");
         return;
       }
 
-      if (isDiscredixNeeded() && isDiscredixLoaded() &&
-          !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
+      if (_isDiscredixLoaded &&
+          !DiscredixDrmUtils.canFileBePlayed(context, _stream, _localFilePath)) {
         DebugMode.logE(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
       }
@@ -364,7 +365,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player != null) {
         DebugMode.logE(TAG, "DANGER: Creating a Media player when one already exists");
       }
-      else if (isDiscredixNeeded() && isDiscredixLoaded()) {
+      else if (_isDiscredixLoaded) {
         _player = DiscredixDrmUtils.getVODXPlayerImpl();
       }
       else {
@@ -375,17 +376,17 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       VO_OSMP_PLAYER_ENGINE engine = VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER;
 
       // Location of libraries
-      String apkPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/lib/";
+      String apkPath = context.getFilesDir().getParentFile().getPath() + "/lib/";
 
       //This needs to be called at least once in order to initialize the video player
-      if (isDiscredixLoaded()) {
-        DiscredixDrmUtils.warmDxDrmDlc(_parent.getLayout().getContext());
+      if (_isDiscredixLoaded) {
+        DiscredixDrmUtils.warmDxDrmDlc(context);
       }
 
       // Initialize SDK player
       VOOSMPInitParam initParam = new VOOSMPInitParam();
       initParam.setLibraryPath(apkPath);
-      initParam.setContext(_parent.getLayout().getContext());
+      initParam.setContext(context);
       VO_OSMP_RETURN_CODE nRet = _player.init(engine, initParam);
       if (nRet == VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
         DebugMode.logV(TAG, "MediaPlayer is created.");
@@ -397,8 +398,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       String visualOnVersion = _player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK);
       DebugMode.logI(TAG, "VisualOn Version: " + visualOnVersion);
 
-      String expectedVersion = isDiscredixLoaded() ? EXPECTED_SECUREPLAYER_VO_VERSION : EXPECTED_VISUALON_VERSION;
-      String libraryUsed = isDiscredixLoaded() ? "SecurePlayer" : "VisualOn";
+      String expectedVersion = _isDiscredixLoaded ? EXPECTED_SECUREPLAYER_VO_VERSION : EXPECTED_VISUALON_VERSION;
+      String libraryUsed = _isDiscredixLoaded ? "SecurePlayer" : "VisualOn";
       if (expectedVersion.compareTo(visualOnVersion) != 0) {
         DebugMode.logE(TAG, libraryUsed + " Version was not expected! Expected: " + expectedVersion + ", Actual: " + visualOnVersion);
         DebugMode.logE(TAG, "Please ask your CSM for updated versions of the " + libraryUsed + " libraries");
@@ -442,7 +443,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
-      if (!isDiscredixLoaded()) {
+      if (!_isDiscredixLoaded) {
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
       /* Set the license */
@@ -456,7 +457,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         is.read(b);
         is.close();
       } catch (IOException e) {
-        e.printStackTrace();
+        DebugMode.logE(TAG, "Caught!", e);
       }
       _player.setLicenseContent(b);
 
@@ -464,7 +465,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _player.enableAudioEffect(false);
 
       /* Processor-specific settings */
-      String cfgPath = _parent.getLayout().getContext().getFilesDir().getParentFile().getPath() + "/";
+      String cfgPath = context.getFilesDir().getParentFile().getPath() + "/";
       String capFile = cfgPath + "cap.xml";
       _player.setDeviceCapabilityByFile(capFile);
 
@@ -580,7 +581,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void suspend() {
-    suspend(_player != null ? (int) _player.getPosition() : 0, getState());
+    suspend(currentTime(), getState());
   }
 
   private void suspend(int millisToResume, State stateToResume) {
@@ -612,7 +613,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     DebugMode.logV(TAG, "Player Resume");
 
-    if (isDiscredixNeeded() && isDiscredixLoaded() &&
+    if (_isDiscredixLoaded &&
         DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath) &&
         !DiscredixDrmUtils.canFileBePlayed(_parent.getLayout().getContext(), _stream, _localFilePath)) {
       tryToAcquireRights();
@@ -910,8 +911,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_SRC_CB_CONNECTION_REJECTED:
     case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
     case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
+    case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR:
       // Display error dialog and stop player
       DebugMode.logE(TAG, "onEvent: Error. " + param1);
+      destroyBasePlayer();
       onError(_player, null, id.getValue());
       break;
 
@@ -999,7 +1002,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   /**
    * After file download on init(), check the file for DRM.
-   * If DRM'ed, move on to personalization -> acquireRights.  Otherwise, continue video playback
+   * If DRM'ed, move on to personalization - acquireRights.  Otherwise, continue video playback
    */
   @Override
   public void afterFileDownload(String localFilename) {
@@ -1010,7 +1013,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       setState(State.ERROR);
     }
     else {
-      if (isDiscredixNeeded() && isDiscredixLoaded() &&
+      if (_isDiscredixLoaded &&
           DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
         DebugMode.logD(TAG, "File Download Succeeded: Need to acquire rights");
         PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode());
@@ -1028,7 +1031,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    */
   @Override
   public void afterPersonalization(Exception returnedException) {
-    if (!isDiscredixLoaded()) {
+    if (!_isDiscredixLoaded) {
       DebugMode.logE(TAG, "Personalzied without Discredix loaded");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Personalzied without Discredix loaded");
       setState(State.ERROR);
@@ -1070,7 +1073,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    * then try to acquire rights.
    */
   public void tryToAcquireRights() {
-    if (!isDiscredixLoaded()) {
+    if (!_isDiscredixLoaded) {
       DebugMode.logE(TAG, "Trying to acquire rights when Discredix doesn't exist");
       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Trying to acquire rights when Discredix doesn't exist");
       setState(State.ERROR);

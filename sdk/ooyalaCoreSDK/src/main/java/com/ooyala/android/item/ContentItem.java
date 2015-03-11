@@ -1,17 +1,17 @@
 package com.ooyala.android.item;
 
+import com.ooyala.android.FCCTVRating;
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.util.OrderedMapValue;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.ooyala.android.FCCTVRating;
-import com.ooyala.android.OoyalaAPIClient;
-import com.ooyala.android.util.OrderedMapValue;
 
 /**
  * Stores the info and metadata for the specified content item.
@@ -313,7 +313,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
 
   /**
    * Generate the authorization error of a video item.
-   * @param currentItem
+   * @param authCode
    * @return a properly described OoyalaException
    */
   public static String getAuthError(int authCode) {

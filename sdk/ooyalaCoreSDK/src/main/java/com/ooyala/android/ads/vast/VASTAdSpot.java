@@ -19,6 +19,9 @@ import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 
+/**
+ * A model of an VAST Ad spot, which can be played during video playback
+ */
 public class VASTAdSpot extends OoyalaManagedAdSpot {
   static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
   static final String KEY_SIGNATURE = "signature"; // embedded, VAST

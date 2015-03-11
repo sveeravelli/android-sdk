@@ -9,7 +9,10 @@ import org.w3c.dom.Node;
 
 import com.ooyala.android.util.DebugMode;
 
-public class VASTAd {
+/**
+ * A representation of VAST advertisement, and the data that can be stored in it
+ */
+class VASTAd {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
   static final String ELEMENT_VAST = "VAST";
   static final String ELEMENT_AD = "Ad";

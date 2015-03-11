@@ -34,7 +34,7 @@ class Utils {
     try {
       return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return null;
   }

@@ -351,7 +351,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     } catch (Exception e) {
       DebugMode.logE(TAG,
           "Error in adding ad slots to the list of ads to play", e);
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 

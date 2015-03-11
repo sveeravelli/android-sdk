@@ -1,5 +1,5 @@
 MAKEFILE_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-EXES = android_test android_build android_publish_rc android_publish_release android_deploy
+EXES = android_test android_build android_publish_rc android_publish_release android_deploy android_update_candidate_sample_app_rc
 SCRIPT_SUBMODULE_DIR = $(MAKEFILE_DIR)/submodules/mobile_sdk_build_packaging_scripts
 SCRIPT_SUBMODULE_BIN_DIR = $(SCRIPT_SUBMODULE_DIR)/bin
 SCRIPT_SDK_BIN_DIR = $(MAKEFILE_DIR)/script
@@ -14,3 +14,5 @@ generate-build-tools:
 update-submodules:
 	git submodule init
 	git submodule update
+
+all: update-submodules generate-build-tools

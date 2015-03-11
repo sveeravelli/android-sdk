@@ -26,6 +26,7 @@ import com.ooyala.android.configuration.Options;
 import com.ooyala.android.testapp.R;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
 
 public class OoyalaAndroidTestAppActivity extends Activity implements OnClickListener, Observer, EmbedTokenGenerator, AdvertisingIdUtils.IAdvertisingIdListener {
   private static final String TAG = "OoyalaSampleApp";
@@ -50,7 +51,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     try {
       setContentView(R.layout.main);
     } catch (Exception e) {
-      e.printStackTrace();
+      DebugMode.logE( TAG, "Caught!", e );
     }
 
     skipAd = (Button) findViewById(R.id.skipAd);
@@ -67,7 +68,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
       domain = new PlayerDomain(PLAYERDOMAIN);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Caught!", e);
     }
 
     final FCCTVRatingConfiguration tvRatingConfiguration = new FCCTVRatingConfiguration.Builder().setDurationSeconds(5).build();
