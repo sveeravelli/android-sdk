@@ -12,11 +12,12 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.util.DebugMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, Observer {
+public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   private static final String TAG = NielsenAnalytics.class.getSimpleName();
   private static final String BACKLOT_NIELSEN_KEY_PREFIX = "nielsen_";
   private static final String NIELSEN_KEY_DATASRC = "dataSrc";
@@ -25,6 +26,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   private static final int NIELSEN_VALUE_LENGTH_LIVE = 86400;
   private static final String NIELSEN_KEY_TYPE = "type";
   private static final String NIELSEN_KEY_CHANNEL_NAME = "channelName";
+  private static final String NIELSEN_ASSET_ID_KEY = "assetid";
   private static String n2b( final String nkey ) { return BACKLOT_NIELSEN_KEY_PREFIX + nkey; }
   private static String b2n( final String bkey ) { return bkey.replaceFirst( BACKLOT_NIELSEN_KEY_PREFIX, "" ); }
 
@@ -118,7 +120,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   public void onTag( byte[] tag ) {
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
       if( tagStr.contains("www.nielsen.com") ) {
@@ -167,7 +169,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
 
   private void reportPlayheadUpdate( Video item, int playheadMsec ) {
     long reportingMsec = item.isLive() ? System.currentTimeMillis() : playheadMsec;
-    if( isValid() ) {
+    if( isValid() && isContent() ) {
       final boolean notYetReported = lastReportedMsec < 0;
       final boolean reportExpired = Math.abs(reportingMsec - lastReportedMsec) > 2000;
       if( notYetReported || reportExpired ) {
@@ -178,8 +180,8 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
   }
 
   private void sendPlay() {
-    DebugMode.logV( TAG, "sendPlay()" );
-    if( isValid() ) {
+    DebugMode.logV( TAG, "sendPlay(): valid=" + isValid() + ", content=" + isContent() );
+    if( isValid() && isContent() ) {
       updateMetadata();
       DebugMode.logV( TAG, "sendPlay(): channelJson = " + channelJson );
       nielsenApp.play( channelJson.toString() );
@@ -189,9 +191,13 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     }
   }
 
+  private boolean isContent() {
+    return OoyalaPlayer.ContentOrAdType.MainContent == player.getPlayingType();
+  }
+
   private void sendStop() {
-    DebugMode.logV( TAG, "sendStop()" );
-    if( isValid() ) {
+    DebugMode.logV( TAG, "sendStop(): valid=" + isValid() + ", content=" + isContent() );
+    if( isValid() && isContent() ) {
       nielsenApp.stop();
     }
   }
@@ -206,20 +212,40 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
     if( metadataJson == null ) {
       metadataJson = initMetadata( item, customMetadata );
       extractChannelName();
+      logMetadataWarnings();
+    }
+  }
+
+  // I wish Backlot had validation in the UI but noooooo.
+  private void logMetadataWarnings() {
+    final String assetIdValue = (String)Utils.getJSONValueOrElse( metadataJson, NIELSEN_ASSET_ID_KEY, "" );
+    if( assetIdValue.matches( "\\s+") ) {
+      DebugMode.logE( TAG, "logMetadataWarnings(): whitespace not allowed in assetid, was '" + assetIdValue + "'" );
+    }
+    final Iterator<String> keys = metadataJson.keys();
+    while ( keys.hasNext() ) {
+      final String k = keys.next();
+      final String v = (String)Utils.getJSONValueOrElse( metadataJson, k, null );
+      if( v != null && NielsenJSONFilter.s_instance.filter( v ) != v ) {
+        DebugMode.logE( TAG, "logMetadataWarnings(): perhaps invalid format, was '" + v + "'" );
+      }
     }
   }
 
   private void extractChannelName() {
+    channelJson = new JSONObject();
+    String channelName = "";
+
     final String backlotKey = n2b( NIELSEN_KEY_CHANNEL_NAME );
     if( metadataJson.has( backlotKey ) ) {
-      try {
-        final String channelName = metadataJson.getString( backlotKey );
-        channelJson = new JSONObject();
-        channelJson.put( NIELSEN_KEY_CHANNEL_NAME, channelName );
-      }
-      catch( JSONException e ) {
-        e.printStackTrace();
-      }
+      channelName = (String)Utils.getJSONValueOrElse( metadataJson, backlotKey, "" );
+    }
+
+    try {
+      channelJson.put( NIELSEN_KEY_CHANNEL_NAME, channelName );
+    }
+    catch( JSONException e ) {
+      DebugMode.logE( TAG, e.toString() );
     }
   }
 
@@ -296,9 +322,5 @@ public class NielsenAnalytics implements ID3TagNotifierListener, IAppNotifier, O
         DebugMode.logE( TAG, e.toString() );
       }
     }
-  }
-
-  public void onAppSdkEvent( long timestamp, int code, String description ) {
-    DebugMode.logV( TAG, "onAppSdkEvent(): timestamp=" + timestamp + ", code=" + code + ", description=" + description );
   }
 }
