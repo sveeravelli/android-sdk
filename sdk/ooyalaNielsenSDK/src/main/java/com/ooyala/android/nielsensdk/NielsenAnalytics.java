@@ -174,7 +174,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
       final boolean reportExpired = Math.abs(reportingMsec - lastReportedMsec) > 2000;
       if( notYetReported || reportExpired ) {
         int playheadPosition = (int) (reportingMsec / 1000);
-        DebugMode.logV(TAG, "set playhead position: " + playheadPosition);
+//        DebugMode.logV(TAG, "set playhead position: " + playheadPosition);
         nielsenApp.setPlayheadPosition( playheadPosition );
         lastReportedMsec = reportingMsec;
       }
