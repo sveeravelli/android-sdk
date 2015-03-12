@@ -94,11 +94,12 @@ public class IMAAdPlayer extends AdMoviePlayer {
     if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       getNotifier().notifyPlayheadChange(); // Notify to update the UI
     }
+
+    super.update(arg0, arg);
     // This ad is managed by a third party, not OoyalaPlayer's ad manager! That means that this player
     // does not fire a normal "State Changed: Completed". This is so Ooyala's ad manager does not take over
     // and start playing back content.  Ooyala Player expects the ad manager to resume content.
     if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && getState() == State.COMPLETED) {
-      arg = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
       DebugMode.logD(TAG, "update(): Ad complete!");
       if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
         _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();
@@ -107,7 +108,6 @@ public class IMAAdPlayer extends AdMoviePlayer {
       }
     }
 
-    super.update(arg0, arg);
   }
 
   @Override
@@ -130,5 +130,9 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void processClickThrough() {
+  }
+
+  public void notifyAdSkipped() {
+    getNotifier().notifyAdSkipped();
   }
 }

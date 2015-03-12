@@ -138,8 +138,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
               _ooyalaPlayerWrapper.playContent();
               break;
             case STARTED:
-              // This is the right moment to update the State
-              _adPlayer.setState(State.PLAYING);
               break;
             case ALL_ADS_COMPLETED:
               _allAdsCompleted = true;
@@ -147,7 +145,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
             case COMPLETED:
               break;
             case PAUSED:
-              _adPlayer.setState(State.PAUSED);
+              break;
+            case SKIPPED:
+              skipAd();
               break;
             case RESUMED:
               if (_browserOpened) {
@@ -392,6 +392,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
   public void skipAd() {
     DebugMode.logD(TAG, "IMA Ads Manager: skipAd");
     // TODO Auto-generated method stub
+    _adPlayer.notifyAdSkipped();
     _adsManager.skip();
   }
 

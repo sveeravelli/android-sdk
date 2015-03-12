@@ -2185,6 +2185,10 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
+    if (oldState == newState) {
+      DebugMode.logI(TAG, "State change reported, but state has not changed: " + newState);
+      return;
+    }
     sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
     if (newState == State.COMPLETED) {
       _tvRatingAdNotification = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
