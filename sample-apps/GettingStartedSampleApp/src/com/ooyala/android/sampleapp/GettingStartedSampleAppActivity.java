@@ -14,10 +14,12 @@ import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 
 public class GettingStartedSampleAppActivity extends Activity implements Observer{
 
-  final String EMBED  = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe";  //Embed Code, or Content ID
-  final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
-  final String DOMAIN = "http://www.ooyala.com";
-  OoyalaPlayer player;
+  private static final String TAG = GettingStartedSampleAppActivity.class.getSimpleName();
+  private static final String EMBED  = "lrZmRiMzrr8cP77PPW0W8AsjjhMJ1BBe";  //Embed Code, or Content ID
+  private static final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
+  private static final String DOMAIN = "http://www.ooyala.com";
+  private OoyalaPlayer player;
+
   /**
    * Called when the activity is first created.
    */
@@ -27,13 +29,14 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    new OoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
+
     if (player.setEmbedCode(EMBED)) {
       player.play();
     } else {
-      Log.d(this.getClass().getName(), "Something Went Wrong!");
+      Log.d(TAG, "Asset failed");
     }
   }
 
@@ -55,9 +58,25 @@ public class GettingStartedSampleAppActivity extends Activity implements Observe
 
   @Override
   public void update(Observable arg0, Object arg1) {
+    if (arg0 != player) {
+      return;
+    }
+
     if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       return;
     }
+
+    if (arg1 == OoyalaPlayer.ERROR_NOTIFICATION) {
+      final String msg = "Error event received";
+      if (player != null && player.getError() != null) {
+        Log.e(TAG, msg, player.getError());
+      }
+      else {
+        Log.e(TAG, msg);
+      }
+      return;
+    }
+
     Log.d(GettingStartedSampleAppActivity.class.getSimpleName(), "Notification Received: " + arg1 + " - state: " + player.getState());
   }
 }
