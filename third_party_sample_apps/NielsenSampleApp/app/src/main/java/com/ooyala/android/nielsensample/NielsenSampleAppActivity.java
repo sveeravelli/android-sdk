@@ -74,8 +74,8 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     embedAdapter.notifyDataSetChanged();
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        PCODE, new PlayerDomain(DOMAIN));
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
     player = playerLayoutController.getPlayer();
 
     nielsenAnalytics = new NielsenAnalytics( this, player, this, NIELSEN_APPID, "0.1", "NielsenTestApp", NIELSEN_SFCODE, player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
