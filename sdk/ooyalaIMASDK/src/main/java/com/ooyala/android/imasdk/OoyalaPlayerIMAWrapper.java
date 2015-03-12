@@ -73,7 +73,6 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
   public void loadAd(String url) {
     DebugMode.logD(TAG, "IMA Ad Wrapper: Loading Ad: " + url);
     _adSpot = new IMAAdSpot(url, _imaManager);
-    _imaManager._adPlayer.setState(State.LOADING);
     _imaManager._adPlayer.init(_player, _adSpot, _player.createStateNotifier());
   }
 
@@ -304,7 +303,6 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     getVideoProgressState().setPlayingIMAAd( false );
     for (VideoAdPlayerCallback callback : _adCallbacks) {
       callback.onEnded();
-      _imaManager._adPlayer.destroy();
     }
   }
 

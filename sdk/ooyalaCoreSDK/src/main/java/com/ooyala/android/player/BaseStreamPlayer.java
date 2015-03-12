@@ -371,12 +371,15 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   private void suspend(int millisToResume, State stateToResume) {
     if (getState() == State.SUSPENDED) {
-      return;
+      DebugMode.logD(TAG, "Suspending an already suspended player");
     }
-    if (_player != null) {
-      _timeBeforeSuspend = millisToResume;
-      _stateBeforeSuspend = stateToResume;
+    if (_player == null) {
+      DebugMode.logD(TAG, "Suspending with a null player");
+    }
+    _timeBeforeSuspend = millisToResume;
+    _stateBeforeSuspend = stateToResume;
 
+    if (_player != null) {
       stop();
     }
     removeView();
@@ -393,6 +396,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void resume(int millisToResume, State stateToResume) {
+    DebugMode.logD(TAG, "Resuming. time to resume: " + millisToResume + ", state to resume: " + stateToResume);
     _timeBeforeSuspend = millisToResume;
     if (stateToResume == State.PLAYING) {
       queuePlay();

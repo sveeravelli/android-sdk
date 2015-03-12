@@ -890,6 +890,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
       DebugMode.logD(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2 + " with current playhead = " + _player.getPosition() + " and buffer duration = " + _player.getValidBufferDuration());
+      setChanged();
+      notifyObservers(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION);
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
@@ -897,9 +899,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         dequeuePlay();
       }
       break;
-
     case VO_OSMP_CB_VIDEO_START_BUFFER:
       DebugMode.logD(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
+      setChanged();
+      notifyObservers(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION);
       setState(State.LOADING);
       break;
 
@@ -1057,6 +1060,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
    */
   @Override
   public void afterAcquireRights(Exception returnedException) {
+    setChanged();
+    notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
     if (returnedException != null) {
       DebugMode.logE(TAG, "Acquire Rights failed: " + returnedException.getClass());
       _error = DiscredixDrmUtils.handleDRMError(returnedException);
@@ -1091,6 +1096,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         String customDRMData = _parent.getCustomDRMData();
         AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath,
             authToken, customDRMData);
+        setChanged();
+        notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
         acquireRightsTask.execute();
       }
     }
