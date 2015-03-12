@@ -1,0 +1,153 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .idea/
+* .idea/.name
+* .idea/SecurePlayerSampleApp.iml
+* .idea/compiler.xml
+* .idea/copyright/
+* .idea/copyright/profiles_settings.xml
+* .idea/encodings.xml
+* .idea/misc.xml
+* .idea/modules.xml
+* .idea/scopes/
+* .idea/scopes/scope_settings.xml
+* .idea/vcs.xml
+* .idea/workspace.xml
+* ant.properties
+* build.xml
+* proguard.cfg
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app/src/main/AndroidManifest.xml
+* assets/ => app/src/main/assets/
+* libs/DxDrmDlc.jar => app/libs/DxDrmDlc.jar
+* libs/OoyalaSDK.jar => app/libs/OoyalaSDK.jar
+* libs/armeabi-v7a/libDxDrmDlcCore.so => app/src/main/jniLibs/armeabi-v7a/libDxDrmDlcCore.so
+* libs/armeabi-v7a/libDxSig.so => app/src/main/jniLibs/armeabi-v7a/libDxSig.so
+* libs/armeabi-v7a/libDxSig.so.info => app/src/main/jniLibs/armeabi-v7a/libDxSig.so.info
+* libs/armeabi-v7a/libvoAACDec_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAACDec_OSMP.so
+* libs/armeabi-v7a/libvoAMediaCodec_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAMediaCodec_OSMP.so
+* libs/armeabi-v7a/libvoAdaptiveStreamController_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAdaptiveStreamController_OSMP.so
+* libs/armeabi-v7a/libvoAdaptiveStreamHLS_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAdaptiveStreamHLS_OSMP.so
+* libs/armeabi-v7a/libvoAdaptiveStreamISS_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAdaptiveStreamISS_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S16_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S16_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S20_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S20_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S22_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S22_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S23_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S23_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S40_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S40_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S41_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S41_OSMP.so
+* libs/armeabi-v7a/libvoAndroidVR_S43_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAndroidVR_S43_OSMP.so
+* libs/armeabi-v7a/libvoAudioFR_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAudioFR_OSMP.so
+* libs/armeabi-v7a/libvoAudioMCDec_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAudioMCDec_OSMP.so
+* libs/armeabi-v7a/libvoAudioSpeed_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoAudioSpeed_OSMP.so
+* libs/armeabi-v7a/libvoCaptionParser_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoCaptionParser_OSMP.so
+* libs/armeabi-v7a/libvoDRM_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoDRM_OSMP.so
+* libs/armeabi-v7a/libvoH264Dec_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoH264Dec_OSMP.so
+* libs/armeabi-v7a/libvoH264Dec_v7_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoH264Dec_v7_OSMP.so
+* libs/armeabi-v7a/libvoH265Dec_v7_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoH265Dec_v7_OSMP.so
+* libs/armeabi-v7a/libvoIOMXDec_ics_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoIOMXDec_ics_OSMP.so
+* libs/armeabi-v7a/libvoIOMXDec_jb_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoIOMXDec_jb_OSMP.so
+* libs/armeabi-v7a/libvoIOMXDec_kk_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoIOMXDec_kk_OSMP.so
+* libs/armeabi-v7a/libvoLogSys.so => app/src/main/jniLibs/armeabi-v7a/libvoLogSys.so
+* libs/armeabi-v7a/libvoMMCCRRS_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoMMCCRRS_OSMP.so
+* libs/armeabi-v7a/libvoMMCCRRS_v7_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoMMCCRRS_v7_OSMP.so
+* libs/armeabi-v7a/libvoMP4FR_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoMP4FR_OSMP.so
+* libs/armeabi-v7a/libvoOMXALWrap_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoOMXALWrap_OSMP.so
+* libs/armeabi-v7a/libvoOSEng_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoOSEng_OSMP.so
+* libs/armeabi-v7a/libvoOSSource_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoOSSource_OSMP.so
+* libs/armeabi-v7a/libvoSTRMDownloaderJni_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoSTRMDownloaderJni_OSMP.so
+* libs/armeabi-v7a/libvoSmthParser_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoSmthParser_OSMP.so
+* libs/armeabi-v7a/libvoSourceIO_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoSourceIO_OSMP.so
+* libs/armeabi-v7a/libvoStreamingDownloader_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoStreamingDownloader_OSMP.so
+* libs/armeabi-v7a/libvoSubtitleParser_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoSubtitleParser_OSMP.so
+* libs/armeabi-v7a/libvoTsFW_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoTsFW_OSMP.so
+* libs/armeabi-v7a/libvoTsParser_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoTsParser_OSMP.so
+* libs/armeabi-v7a/libvoVersion_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoVersion_OSMP.so
+* libs/armeabi-v7a/libvoVidDec_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoVidDec_OSMP.so
+* libs/armeabi-v7a/libvoXMLParser_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvoXMLParser_OSMP.so
+* libs/armeabi-v7a/libvodl.so => app/src/main/jniLibs/armeabi-v7a/libvodl.so
+* libs/armeabi-v7a/libvompEngn_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvompEngn_OSMP.so
+* libs/armeabi-v7a/libvossl_OSMP.so => app/src/main/jniLibs/armeabi-v7a/libvossl_OSMP.so
+* libs/armeabi/libDxDrmDlcCore.so => app/src/main/jniLibs/armeabi/libDxDrmDlcCore.so
+* libs/armeabi/libDxSig.so => app/src/main/jniLibs/armeabi/libDxSig.so
+* libs/armeabi/libDxSig.so.info => app/src/main/jniLibs/armeabi/libDxSig.so.info
+* libs/armeabi/libvoAACDec_OSMP.so => app/src/main/jniLibs/armeabi/libvoAACDec_OSMP.so
+* libs/armeabi/libvoAMediaCodec_OSMP.so => app/src/main/jniLibs/armeabi/libvoAMediaCodec_OSMP.so
+* libs/armeabi/libvoAdaptiveStreamController_OSMP.so => app/src/main/jniLibs/armeabi/libvoAdaptiveStreamController_OSMP.so
+* libs/armeabi/libvoAdaptiveStreamHLS_OSMP.so => app/src/main/jniLibs/armeabi/libvoAdaptiveStreamHLS_OSMP.so
+* libs/armeabi/libvoAdaptiveStreamISS_OSMP.so => app/src/main/jniLibs/armeabi/libvoAdaptiveStreamISS_OSMP.so
+* libs/armeabi/libvoAndroidVR_S16_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S16_OSMP.so
+* libs/armeabi/libvoAndroidVR_S20_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S20_OSMP.so
+* libs/armeabi/libvoAndroidVR_S22_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S22_OSMP.so
+* libs/armeabi/libvoAndroidVR_S23_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S23_OSMP.so
+* libs/armeabi/libvoAndroidVR_S40_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S40_OSMP.so
+* libs/armeabi/libvoAndroidVR_S41_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S41_OSMP.so
+* libs/armeabi/libvoAndroidVR_S43_OSMP.so => app/src/main/jniLibs/armeabi/libvoAndroidVR_S43_OSMP.so
+* libs/armeabi/libvoAudioFR_OSMP.so => app/src/main/jniLibs/armeabi/libvoAudioFR_OSMP.so
+* libs/armeabi/libvoAudioMCDec_OSMP.so => app/src/main/jniLibs/armeabi/libvoAudioMCDec_OSMP.so
+* libs/armeabi/libvoAudioSpeed_OSMP.so => app/src/main/jniLibs/armeabi/libvoAudioSpeed_OSMP.so
+* libs/armeabi/libvoCaptionParser_OSMP.so => app/src/main/jniLibs/armeabi/libvoCaptionParser_OSMP.so
+* libs/armeabi/libvoDRM_OSMP.so => app/src/main/jniLibs/armeabi/libvoDRM_OSMP.so
+* libs/armeabi/libvoH264Dec_OSMP.so => app/src/main/jniLibs/armeabi/libvoH264Dec_OSMP.so
+* libs/armeabi/libvoH264Dec_v7_OSMP.so => app/src/main/jniLibs/armeabi/libvoH264Dec_v7_OSMP.so
+* libs/armeabi/libvoH265Dec_v7_OSMP.so => app/src/main/jniLibs/armeabi/libvoH265Dec_v7_OSMP.so
+* libs/armeabi/libvoIOMXDec_ics_OSMP.so => app/src/main/jniLibs/armeabi/libvoIOMXDec_ics_OSMP.so
+* libs/armeabi/libvoIOMXDec_jb_OSMP.so => app/src/main/jniLibs/armeabi/libvoIOMXDec_jb_OSMP.so
+* libs/armeabi/libvoIOMXDec_kk_OSMP.so => app/src/main/jniLibs/armeabi/libvoIOMXDec_kk_OSMP.so
+* libs/armeabi/libvoLogSys.so => app/src/main/jniLibs/armeabi/libvoLogSys.so
+* libs/armeabi/libvoMMCCRRS_OSMP.so => app/src/main/jniLibs/armeabi/libvoMMCCRRS_OSMP.so
+* libs/armeabi/libvoMMCCRRS_v7_OSMP.so => app/src/main/jniLibs/armeabi/libvoMMCCRRS_v7_OSMP.so
+* libs/armeabi/libvoMP4FR_OSMP.so => app/src/main/jniLibs/armeabi/libvoMP4FR_OSMP.so
+* libs/armeabi/libvoOMXALWrap_OSMP.so => app/src/main/jniLibs/armeabi/libvoOMXALWrap_OSMP.so
+* libs/armeabi/libvoOSEng_OSMP.so => app/src/main/jniLibs/armeabi/libvoOSEng_OSMP.so
+* libs/armeabi/libvoOSSource_OSMP.so => app/src/main/jniLibs/armeabi/libvoOSSource_OSMP.so
+* libs/armeabi/libvoSTRMDownloaderJni_OSMP.so => app/src/main/jniLibs/armeabi/libvoSTRMDownloaderJni_OSMP.so
+* libs/armeabi/libvoSmthParser_OSMP.so => app/src/main/jniLibs/armeabi/libvoSmthParser_OSMP.so
+* libs/armeabi/libvoSourceIO_OSMP.so => app/src/main/jniLibs/armeabi/libvoSourceIO_OSMP.so
+* libs/armeabi/libvoStreamingDownloader_OSMP.so => app/src/main/jniLibs/armeabi/libvoStreamingDownloader_OSMP.so
+* libs/armeabi/libvoSubtitleParser_OSMP.so => app/src/main/jniLibs/armeabi/libvoSubtitleParser_OSMP.so
+* libs/armeabi/libvoTsFW_OSMP.so => app/src/main/jniLibs/armeabi/libvoTsFW_OSMP.so
+* libs/armeabi/libvoTsParser_OSMP.so => app/src/main/jniLibs/armeabi/libvoTsParser_OSMP.so
+* libs/armeabi/libvoVersion_OSMP.so => app/src/main/jniLibs/armeabi/libvoVersion_OSMP.so
+* libs/armeabi/libvoVidDec_OSMP.so => app/src/main/jniLibs/armeabi/libvoVidDec_OSMP.so
+* libs/armeabi/libvoXMLParser_OSMP.so => app/src/main/jniLibs/armeabi/libvoXMLParser_OSMP.so
+* libs/armeabi/libvodl.so => app/src/main/jniLibs/armeabi/libvodl.so
+* libs/armeabi/libvompEngn_OSMP.so => app/src/main/jniLibs/armeabi/libvompEngn_OSMP.so
+* libs/armeabi/libvossl_OSMP.so => app/src/main/jniLibs/armeabi/libvossl_OSMP.so
+* libs/assets.jar => app/libs/assets.jar
+* libs/voOSBasePlayer.jar => app/libs/voOSBasePlayer.jar
+* libs/voOSDataSource.jar => app/libs/voOSDataSource.jar
+* libs/voOSEngine.jar => app/libs/voOSEngine.jar
+* libs/voOSHDMICheck.jar => app/libs/voOSHDMICheck.jar
+* libs/voOSPlayer.jar => app/libs/voOSPlayer.jar
+* libs/voOSStreamingDownloader.jar => app/libs/voOSStreamingDownloader.jar
+* libs/voOSUtils.jar => app/libs/voOSUtils.jar
+* lint.xml => app/lint.xml
+* res/ => app/src/main/res/
+* src/ => app/src/main/java/
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

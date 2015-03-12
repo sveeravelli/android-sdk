@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 15
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.ooyala.android.secureplayersample"
+        minSdkVersion 11
+        targetSdkVersion 11
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/DxDrmDlc.jar')
+    compile files('libs/OoyalaSDK.jar')
+    compile files('libs/assets.jar')
+    compile files('libs/voOSBasePlayer.jar')
+    compile files('libs/voOSDataSource.jar')
+    compile files('libs/voOSEngine.jar')
+    compile files('libs/voOSHDMICheck.jar')
+    compile files('libs/voOSPlayer.jar')
+    compile files('libs/voOSStreamingDownloader.jar')
+    compile files('libs/voOSUtils.jar')
+}
