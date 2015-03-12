@@ -13,6 +13,9 @@ public class NielsenJSONFilter {
 
   private Set<Pair<Pattern,String>> psz;
 
+  /**
+   * Handle invalid spaces of strings and put them to the set.
+   */
   public NielsenJSONFilter() {
     this.psz = new HashSet<Pair<Pattern,String>>();
 
@@ -24,6 +27,11 @@ public class NielsenJSONFilter {
     psz.add( new Pair<Pattern,String>( Pattern.compile( "\\\\'" ), "'" ) );
   }
 
+  /**
+   * Replace and filter unnecessary strings in the set.
+   * @param json the string to be filtered
+   * @return the filtered string
+   */
   public String filter( String json ) {
     String r = json;
 
