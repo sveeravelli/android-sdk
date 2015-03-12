@@ -51,8 +51,8 @@ public class IMASampleAppActivity extends Activity implements Observer {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
 
     //Initialize IMA classes

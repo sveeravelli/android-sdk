@@ -43,9 +43,9 @@ public class FreewheelSampleAppActivity extends Activity implements Observer {
     setContentView(R.layout.main);
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
+    player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(
-        playerLayout, PCODE, new PlayerDomain(DOMAIN));
-    player = playerLayoutController.getPlayer();
+        playerLayout, player);
     player.addObserver(this);
 
     embedMap = new HashMap<String, String>();
