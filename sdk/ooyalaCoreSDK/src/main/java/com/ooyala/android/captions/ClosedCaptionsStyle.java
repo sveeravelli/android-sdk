@@ -21,16 +21,6 @@ public class ClosedCaptionsStyle {
 	public int edgeType;
 	public int edgeColor;
 
-	public OOClosedCaptionPresentation presentationStyle;
-	public enum OOClosedCaptionPresentation {
-		/** text that appears all at once */
-		OOClosedCaptionPopOn,
-		/** text that scrolls up as new text appears */
-		OOClosedCaptionRollUp,
-		/** text where each new letter or word is displayed as it arrives */
-		OOClosedCaptionPaintOn
-	};
-
   public ClosedCaptionsStyle(Context context) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
 		  CaptioningManagerWrapper.updateClosedCaptionsStyleFromCaptioningManager(this, context);
@@ -44,6 +34,5 @@ public class ClosedCaptionsStyle {
 			this.edgeType = 0;
 			this.edgeColor = Color.TRANSPARENT;
 		}
-		this.presentationStyle = OOClosedCaptionPresentation.OOClosedCaptionPopOn; // default style
 	}
 }
