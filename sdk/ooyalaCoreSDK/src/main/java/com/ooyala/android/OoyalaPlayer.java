@@ -25,7 +25,6 @@ import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
 import com.ooyala.android.captions.ClosedCaptionsStyle;
-import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
@@ -1124,19 +1123,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     removeClosedCaptionsView();
     if (_currentItem != null && _currentItem.hasClosedCaptions()
         || _streamBasedCC) {
-      // Initialize ClosedCaptionsStyle
-      OOClosedCaptionPresentation presentation = OOClosedCaptionPresentation.OOClosedCaptionPopOn;
-
-      // If enter the if statement then it means this "addClosedCaptionsView" is
-      // called during resuming
-      if (_closedCaptionsStyle != null
-          && _closedCaptionsStyle.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionPopOn) {
-        // This closed caption view had other presentation when the app went to
-        // background
-        presentation = _closedCaptionsStyle.presentationStyle;
-      }
       _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
-      _closedCaptionsStyle.presentationStyle = presentation;
       _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
@@ -1466,12 +1453,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     displayCurrentClosedCaption();
   }
 
-  public void setClosedCaptionsPresentationStyle(
-      OOClosedCaptionPresentation presentationStyle) {
+  public void setClosedCaptionsPresentationStyle() {
     removeClosedCaptionsView();
     _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
     if( _closedCaptionsStyle != null ) {
-      _closedCaptionsStyle.presentationStyle = presentationStyle;
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
     }
     getLayout().addView(_closedCaptionsView);
