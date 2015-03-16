@@ -1,10 +1,5 @@
 package com.ooyala.test;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +19,11 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 public class BaseInternalTestAppActivity extends Activity implements OnClickListener, Observer {
 
@@ -72,18 +72,18 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   }
 
   @Override
-  protected void onStop() {
-    super.onStop();
-    Log.d(TAG, "App Stopped");
+  protected void onPause() {
+    super.onPause();
+    Log.d(TAG, "App Paused");
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().suspend();
     }
   }
 
   @Override
-  protected void onRestart() {
-    super.onRestart();
-    Log.d(TAG, "App Restarted");
+  protected void onResume() {
+    super.onResume();
+    Log.d(TAG, "App Resumed");
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().resume();
     }
