@@ -26,8 +26,10 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.VisualOnConfiguration;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
   private static final String TAG = SecurePlayerSampleAppActivity.class.getSimpleName();
@@ -54,7 +56,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     OoyalaPlayer.enableCustomPlayreadyPlayer = true;
 
     //Initialize the bottom controls
-    embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
@@ -75,12 +76,10 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedMap.put("old Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
     embedMap.put("old Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
     embedMap.put("old Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
-
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
+    embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     embedSpinner.setAdapter(embedAdapter);
-
-    //Update the spinner with the embed map
-    embedAdapter.addAll(embedMap.keySet());
+    embedAdapter.addAll( embedMap.keySet() );
     embedAdapter.notifyDataSetChanged();
 
     Button setButton = (Button) findViewById(R.id.setButton);
@@ -98,11 +97,12 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         SecurePlayerSampleAppActivity.this.pcode = asset.first;
         final String embed = asset.second;
         VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
-        Options.Builder builder = new Options.Builder().setVisualOnConfiguration(visualOnConfiguration);
+        Options.Builder builder = new Options.Builder().setVisualOnConfiguration( visualOnConfiguration );
         Options options = builder.build();
         OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-        final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, pcode, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, SecurePlayerSampleAppActivity.this, options);
-        player = playerLayoutController.getPlayer();
+        PlayerDomain domain = new PlayerDomain(DOMAIN);
+        player = new OoyalaPlayer(pcode, domain, options);
+        final AbstractOoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
         player.addObserver(SecurePlayerSampleAppActivity.this);
         if (player.setEmbedCode(embed)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);

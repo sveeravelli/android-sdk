@@ -18,12 +18,14 @@
             <Spinner
                 android:id="@+id/embedSpinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Holo.Light.Spinner"/>
 
             <Spinner
                 android:id="@+id/playerSpinner"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Holo.Light.Spinner"/>
         </LinearLayout>
 
         <Button
@@ -39,10 +41,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
-    <com.ooyala.android.OoyalaPlayerLayout
-        android:id="@+id/ooyalaPlayer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </com.ooyala.android.OoyalaPlayerLayout>
-
+        android:layout_height="match_parent">
+        <com.ooyala.android.OoyalaPlayerLayout
+            android:id="@+id/ooyalaPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </com.ooyala.android.OoyalaPlayerLayout>
+    </FrameLayout>
 </LinearLayout>

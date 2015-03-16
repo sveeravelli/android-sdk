@@ -79,19 +79,24 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 15 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 14 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="assets" level="project" />
-    <orderEntry type="library" exported="" name="voOSHDMICheck" level="project" />
-    <orderEntry type="library" exported="" name="voOSUtils" level="project" />
+    <orderEntry type="library" exported="" name="OoyalaSecurePlayerSDK" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-21.0.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="voOSPlayer" level="project" />
     <orderEntry type="library" exported="" name="voOSEngine" level="project" />
-    <orderEntry type="library" exported="" name="voOSDataSource" level="project" />
+    <orderEntry type="library" exported="" name="OoyalaSDK" level="project" />
+    <orderEntry type="library" exported="" name="assets" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-21.0.0" level="project" />
+    <orderEntry type="library" exported="" name="voOSHDMICheck" level="project" />
+    <orderEntry type="library" exported="" name="voOSUtils" level="project" />
     <orderEntry type="library" exported="" name="DxDrmDlc" level="project" />
+    <orderEntry type="library" exported="" name="voOSDataSource" level="project" />
     <orderEntry type="library" exported="" name="voOSStreamingDownloader" level="project" />
     <orderEntry type="library" exported="" name="voOSBasePlayer" level="project" />
-    <orderEntry type="library" exported="" name="OoyalaSDK" level="project" />
   </component>
 </module>
 

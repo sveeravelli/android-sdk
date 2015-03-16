@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 15
+    compileSdkVersion 14
     buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.ooyala.android.secureplayersample"
         minSdkVersion 11
-        targetSdkVersion 11
+        targetSdkVersion 10
     }
 
     buildTypes {
@@ -19,8 +19,10 @@ android {
 }
 
 dependencies {
+    compile 'com.google.android.gms:play-services:6.5.87'
     compile files('libs/DxDrmDlc.jar')
     compile files('libs/OoyalaSDK.jar')
+    compile files('libs/OoyalaSecurePlayerSDK.jar')
     compile files('libs/assets.jar')
     compile files('libs/voOSBasePlayer.jar')
     compile files('libs/voOSDataSource.jar')
