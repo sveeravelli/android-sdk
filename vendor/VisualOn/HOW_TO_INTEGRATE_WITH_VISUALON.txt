@@ -2,8 +2,6 @@ How to integrate your app with VisualOn for HLS playback
 
   -- Android Studio --
 
-VisualOnSampleApp is an example of this integration for Eclipse
-
 1. Copy all of the zip/libs/*.jar files into the project/app/libs/ folder.
 2. Copy all of the zip/libs/armeabi/*.so files into the project/app/src/main/jniLibs/armeabi/ folder.
 3. Copy all of the the zip/assets/* files into the project/app/src/main/assets/ folder.
