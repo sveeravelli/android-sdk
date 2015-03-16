@@ -25,7 +25,6 @@ import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
 import com.ooyala.android.captions.ClosedCaptionsStyle;
-import com.ooyala.android.captions.ClosedCaptionsStyle.OOClosedCaptionPresentation;
 import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
@@ -111,6 +110,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
+  public static final String BUFFERING_STARTED_NOTIFICATION = "bufferingStarted";
+  public static final String BUFFERING_COMPLETED_NOTIFICATION = "bufferingCompleted";
+  public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
+  public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
+
 
   public enum ContentOrAdType {
     MainContent,
@@ -1119,19 +1123,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     removeClosedCaptionsView();
     if (_currentItem != null && _currentItem.hasClosedCaptions()
         || _streamBasedCC) {
-      // Initialize ClosedCaptionsStyle
-      OOClosedCaptionPresentation presentation = OOClosedCaptionPresentation.OOClosedCaptionPopOn;
-
-      // If enter the if statement then it means this "addClosedCaptionsView" is
-      // called during resuming
-      if (_closedCaptionsStyle != null
-          && _closedCaptionsStyle.presentationStyle != OOClosedCaptionPresentation.OOClosedCaptionPopOn) {
-        // This closed caption view had other presentation when the app went to
-        // background
-        presentation = _closedCaptionsStyle.presentationStyle;
-      }
       _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
-      _closedCaptionsStyle.presentationStyle = presentation;
       _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
       getLayout().addView(_closedCaptionsView);
@@ -1365,6 +1357,18 @@ public class OoyalaPlayer extends Observable implements Observer,
     else if (notification.equals(SEEK_COMPLETED_NOTIFICATION)) {
       sendNotification(SEEK_COMPLETED_NOTIFICATION);
     }
+    else if (notification.equals(BUFFERING_COMPLETED_NOTIFICATION)) {
+      sendNotification(BUFFERING_COMPLETED_NOTIFICATION);
+    }
+    else if (notification.equals(BUFFERING_STARTED_NOTIFICATION)) {
+      sendNotification(BUFFERING_STARTED_NOTIFICATION);
+    }
+    else if (notification.equals(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION)) {
+      sendNotification(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
+    }
+    else if (notification.equals(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION)) {
+      sendNotification(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
+    }
   }
 
   /**
@@ -1449,12 +1453,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     displayCurrentClosedCaption();
   }
 
-  public void setClosedCaptionsPresentationStyle(
-      OOClosedCaptionPresentation presentationStyle) {
+  public void setClosedCaptionsPresentationStyle() {
     removeClosedCaptionsView();
     _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
     if( _closedCaptionsStyle != null ) {
-      _closedCaptionsStyle.presentationStyle = presentationStyle;
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
     }
     getLayout().addView(_closedCaptionsView);
@@ -2158,6 +2160,10 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
+    if (oldState == newState) {
+      DebugMode.logI(TAG, "State change reported, but state has not changed: " + newState);
+      return;
+    }
     sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
     if (newState == State.COMPLETED) {
       _tvRatingAdNotification = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
