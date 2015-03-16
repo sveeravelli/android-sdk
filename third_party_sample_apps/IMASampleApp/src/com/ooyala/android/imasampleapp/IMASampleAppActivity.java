@@ -100,16 +100,16 @@ public class IMASampleAppActivity extends Activity implements Observer {
   }
 
   @Override
-  protected void onStop() {
-    super.onStop();
+  protected void onPause() {
+    super.onPause();
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().suspend();
     }
   }
 
   @Override
-  protected void onRestart() {
-    super.onRestart();
+  protected void onResume() {
+    super.onResume();
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().resume();
     }
