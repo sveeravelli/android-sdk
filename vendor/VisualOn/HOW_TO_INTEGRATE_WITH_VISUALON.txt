@@ -1,13 +1,12 @@
-How to integrate your app with VisualOn for HLS playback
+VisualOnSampleApp is an example of this integration using Android Studio.
 
-VisualOnSampleApp is an example of this integration for Eclipse.
 
-  -- Android Studio --
+———————— Using Android Studio: How to integrate your app with VisualOn for HLS playback ————————
 
 1. Copy all of the zip/libs/*.jar files into the project/app/libs/ folder.
 2. Copy all of the zip/libs/armeabi/*.so files into the project/app/src/main/jniLibs/armeabi/ folder.
 3. Copy all of the the zip/assets/* files into the project/app/src/main/assets/ folder.
-4. Ensure your OoyalaSDK.jar file is up to date in project/app/libs.
+4. Ensure your OoyalaSDK.jar file is up to date in your project
 5. Make sure the following permissions are enabled in your application:
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
   <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
@@ -18,9 +17,12 @@ VisualOnSampleApp is an example of this integration for Eclipse.
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has HLS playback capablities (or a remote asset pointing at an .m3u8 file)
+7. play an embed code that has HLS playback capabilities (or a remote asset pointing at an .m3u8 file)
 
-  -- Eclipse --
+
+
+
+———————— Using Eclipse: How to integrate your app with VisualOn for HLS playback ————————
 
 1. Copy all of the zip/libs/*.jar files into the project/libs/ folder.
 2. Copy all of the zip/libs/armeabi/*.so files into the project/libs/armeabi/ folder.
@@ -36,4 +38,5 @@ VisualOnSampleApp is an example of this integration for Eclipse.
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has HLS playback capablities (or a remote asset pointing at an .m3u8 file)
+7. play an embed code that has HLS playback capabilities (or a remote asset pointing at an .m3u8 file)
+
