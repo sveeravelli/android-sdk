@@ -101,7 +101,8 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         Options.Builder builder = new Options.Builder().setVisualOnConfiguration(visualOnConfiguration);
         Options options = builder.build();
         OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
-        final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, pcode, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, SecurePlayerSampleAppActivity.this, options);
+        OoyalaPlayer ooPlayer = new OoyalaPlayer(pcode, new PlayerDomain(DOMAIN), SecurePlayerSampleAppActivity.this, options);
+        final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, ooPlayer, DefaultControlStyle.AUTO);
         player = playerLayoutController.getPlayer();
         player.addObserver(SecurePlayerSampleAppActivity.this);
         if (player.setEmbedCode(embed)) {

@@ -67,8 +67,9 @@ public class VisualOnSampleAppActivity extends Activity implements Observer {
     Options options = builder.build();
 
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
+    OoyalaPlayer ooPlayer = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN), null, options);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout,
-        PCODE, new PlayerDomain(DOMAIN),DefaultControlStyle.AUTO, null, options);
+    		ooPlayer, DefaultControlStyle.AUTO);
 
     player = playerLayoutController.getPlayer();
 
