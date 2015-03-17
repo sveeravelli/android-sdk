@@ -298,7 +298,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     // it might have already been set into the json from static Backlot metadata.
     final boolean alreadySet = json.has( NIELSEN_KEY_LENGTH );
     if( isCMS( json ) && !alreadySet ) {
-      int length = item.isLive() ? NIELSEN_VALUE_LENGTH_LIVE : item.getDuration();
+      int itemDurationMsec = item.getDuration();
+      int itemDurationSeconds = itemDurationMsec / 1000;
+      int length = item.isLive() ? NIELSEN_VALUE_LENGTH_LIVE : itemDurationSeconds;
       try {
         json.put( NIELSEN_KEY_LENGTH, String.valueOf( length ) );
       }
