@@ -60,7 +60,8 @@ public class Options implements ReadonlyOptionsInterface {
 
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
-      this.visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
+      VisualOnConfiguration.Builder visualOnBuilder = new VisualOnConfiguration.Builder();
+      this.visualOnConfiguration = visualOnBuilder.build();
       this.showCuePoints = true;
       this.showAdsControls = true;
       this.showLiveControls = true;
