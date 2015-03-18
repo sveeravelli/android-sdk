@@ -117,7 +117,16 @@ public class VisualOnConfiguration {
       return new VisualOnConfiguration(this.disableLibraryVersionChecks, this.upperBitrateThreshold, this.lowerBitrateThreshold, this.initialBitrate,  this.maxBufferingTime, this.initialBufferingTime, this.playbackBufferingTime);
     }
   }
-  
+
+  /**
+   * Provides the default VisualOn configuration
+   * @return the default VisualOn configuration
+   */
+  public static final VisualOnConfiguration s_getDefaultVisualOnConfiguration() {
+    VisualOnConfiguration.Builder visualOnBuilder = new VisualOnConfiguration.Builder();
+    return  visualOnBuilder.build();
+  }
+
   /**
    * Initialize a VisualOnConfiguration. Private in favor of the Builder class
    * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
