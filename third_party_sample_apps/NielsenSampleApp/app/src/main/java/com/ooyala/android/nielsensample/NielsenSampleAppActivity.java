@@ -86,6 +86,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     embedMap.put("CMS-Demo", "ZhMmkycjr4jlHIjvpIIimQSf_CjaQs48");
     embedMap.put("CMS-NoAds", "FzYjJzczo3_M3OjkeIta-IIFcPGSGxci");
     embedMap.put("CMS-WithAds", "x3YjJzczqREV-5RDiemsrdqki1FYu2NT");
+    embedMap.put("CMS-14Minutes", "JyanIxdDoj9MhKbVEmTJEG8O4QF5xExb");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
