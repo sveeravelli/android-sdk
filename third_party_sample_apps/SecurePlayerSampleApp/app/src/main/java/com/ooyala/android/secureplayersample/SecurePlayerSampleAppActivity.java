@@ -26,6 +26,8 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.VisualOnConfiguration;
+import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
+import com.ooyala.android.imasdk.OoyalaIMAManager;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
@@ -52,7 +54,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    OoyalaPlayer.setEnvironment(com.ooyala.android.Environment.EnvironmentType.STAGING);
     OoyalaPlayer.enableCustomPlayreadyPlayer = true;
 
     //Initialize the bottom controls
@@ -67,15 +68,18 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedMap = new LinkedHashMap<String, Pair<String,String>>();
     embedMap.put("Device Management - Device Bind to Entitlement", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL"));
     embedMap.put("Device Management - Device Limit", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY"));
+    embedMap.put("Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
+    embedMap.put("Playready HLS VOD with IMA Ads", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xpcGYydDpUfj8eOSFSm7-Hr8-Eaag52i"));
+    embedMap.put("Playready HLS VOD with Freewheel Ads", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xtcGYydDrhnBc9InRIjM4w7ig6w3ay9E"));
+    embedMap.put("Playready HLS VOD with Closed Captions", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xrcGYydDq1wU7nSmX7AQB3Uq4Fu3BjuE"));
+    embedMap.put("Ooyala-Ingested Playready HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","92eGNjcjpbo561vVTXE-8GDAk05LHYBh"));
+    embedMap.put("Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
+    embedMap.put("Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
+    embedMap.put("Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
     embedMap.put("OPL Test - A150 C500 U301", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F"));
     embedMap.put("OPL Test - A150 C500 U300", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0zNmpoczrbFOt-jK9wWNABrpKlSDduxN"));
     embedMap.put("OPL Test - A150 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","15NWpoczoxGzZRc2g_rqNA7WSMrSrdak"));
     embedMap.put("OPL Test - A201 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","13NWpoczpBVeg8eUyswxFioYmJIOzTje"));
-    embedMap.put("old Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
-    embedMap.put("old Ooyala-Ingested Playready HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","92eGNjcjpbo561vVTXE-8GDAk05LHYBh"));
-    embedMap.put("old Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
-    embedMap.put("old Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
-    embedMap.put("old Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     embedSpinner.setAdapter(embedAdapter);
@@ -98,11 +102,17 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         final String embed = asset.second;
         VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
         Options.Builder builder = new Options.Builder().setVisualOnConfiguration( visualOnConfiguration );
-        Options options = builder.build();
+        Options options = builder.setPreloadContent(false).build();
         OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
         OoyalaPlayer ooPlayer = new OoyalaPlayer(pcode, new PlayerDomain(DOMAIN), SecurePlayerSampleAppActivity.this, options);
         final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, ooPlayer, DefaultControlStyle.AUTO);
         player = playerLayoutController.getPlayer();
+
+        OoyalaFreewheelManager fwManager = new OoyalaFreewheelManager(SecurePlayerSampleAppActivity.this, playerLayoutController);
+        if (((String)embedSpinner.getSelectedItem()).contains("IMA")) {
+          OoyalaIMAManager imaManager = new OoyalaIMAManager(player);
+        }
+
         player.addObserver(SecurePlayerSampleAppActivity.this);
         if (player.setEmbedCode(embed)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
