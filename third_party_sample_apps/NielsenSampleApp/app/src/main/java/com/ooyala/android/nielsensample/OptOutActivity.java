@@ -13,6 +13,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import com.ooyala.android.util.DebugMode;
 import java.util.Arrays;
 
 public class OptOutActivity extends Activity {
@@ -65,6 +66,20 @@ public class OptOutActivity extends Activity {
   public void onBackPressed()
   {
     bailOut(null);
+  }
+
+  @Override
+  protected void onStop() {
+    DebugMode.logD( TAG, "onStop" );
+    super.onStop();
+    NielsenSampleAppActivity.decrementRunningActivityCount();
+  }
+
+  @Override
+  protected void onStart() {
+    DebugMode.logD( TAG, "onStart" );
+    super.onStart();
+    NielsenSampleAppActivity.incrementRunningActivityCount();
   }
 
   private class MonitorWebView extends WebViewClient
