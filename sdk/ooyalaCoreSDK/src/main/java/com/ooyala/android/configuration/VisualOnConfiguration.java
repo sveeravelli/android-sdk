@@ -14,10 +14,6 @@ public class VisualOnConfiguration {
   private int initialBufferingTime;
   private int maxBufferingTime;
   private int playbackBufferingTime;
-  
-  //TODO: Figure out default number or disable when user does not init
-  
-  private static boolean DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS = false;
 
   /**
    * Build the object of VisualOn configurations
@@ -112,7 +108,6 @@ public class VisualOnConfiguration {
       this.playbackBufferingTime = playbackBufferingTime;
       return this;
     }
-    
 
     /**
      * Generates a fully initialized VisualOnConfiguration
@@ -121,7 +116,6 @@ public class VisualOnConfiguration {
     public VisualOnConfiguration build() {
       return new VisualOnConfiguration(this.disableLibraryVersionChecks, this.upperBitrateThreshold, this.lowerBitrateThreshold, this.initialBitrate,  this.maxBufferingTime, this.initialBufferingTime, this.playbackBufferingTime);
     }
-
   }
 
   /**
@@ -129,17 +123,10 @@ public class VisualOnConfiguration {
    * @return the default VisualOn configuration
    */
   public static final VisualOnConfiguration s_getDefaultVisualOnConfiguration() {
-    return new VisualOnConfiguration( DEFAULT_DISABLE_LIBRARY_VERSION_CHECKS );
+    VisualOnConfiguration.Builder visualOnBuilder = new VisualOnConfiguration.Builder();
+    return  visualOnBuilder.build();
   }
 
-  /**
-   * Initialize a VisualOnConfiguration. Private in favor of the Builder class
-   * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
-   */
-  private VisualOnConfiguration(boolean disableLibraryVersionChecks) {
-    this.disableLibraryVersionChecks = disableLibraryVersionChecks;
-  }
-  
   /**
    * Initialize a VisualOnConfiguration. Private in favor of the Builder class
    * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
