@@ -1,12 +1,6 @@
 package com.ooyala.android.imasdk;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -22,14 +16,24 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
+ * The OoyalaIMAManager works with OoyalaPlayer to manage IMA ads playback. It also provides methods configure IMA ads
+ * playback, including companion ad slot and custom ad tag url.
+ *
+ *
  * The OoyalaIMAManager will play back all IMA ads affiliated with any playing Ooyala asset. This will
  * automatically be configured, as long as the VAST URL is properly configured in Third Module Metadata.
  *
@@ -41,6 +45,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private static String TAG = "OoyalaIMAManager";
   private static final int TIMEOUT = 5000;
 
+  /**
+   * True if encounter error during ad playback
+   */
   public boolean _onAdError;
 
   protected AdsLoader _adsLoader;
@@ -64,7 +71,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
    * Module Metadata.
-   * @param ooyalaPlayer
+   * @param ooyalaPlayer current OoyalaPlayer
    */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
     _player = ooyalaPlayer;
@@ -171,8 +178,8 @@ public class OoyalaIMAManager implements AdPluginInterface {
   /**
    * Specify a list of views that the IMA Manager can use to show companion ads.
    * @param companionAdView The AdView to hold the companion ad slot
-   * @param width
-   * @param height
+   * @param width the width of companion ad view
+   * @param height the height of companion ad view
    */
   public void addCompanionSlot(ViewGroup companionAdView, int width, int height) {
     CompanionAdSlot adSlot = _sdkFactory.createCompanionAdSlot();
@@ -258,7 +265,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   // Implement AdPluginInterface
 
-  // Return true if has pre-roll
+  /**
+   * @return true if no pre-roll, false otherwise
+   */
   @Override
   public boolean onInitialPlay() {
     DebugMode.logD(TAG, "IMA Ads Manager: onInitialPlay");
@@ -274,15 +283,23 @@ public class OoyalaIMAManager implements AdPluginInterface {
     return (_cuePoints != null && _cuePoints.contains(0));
   }
 
+  /**
+   * Always return true for initializing IMA Ads
+   * @return true
+   */
   @Override
   public boolean onContentChanged() {
     DebugMode.logD(TAG, "IMA Ads Manager: onContentChanged");
     destroy();
     resetFields();
-    
     return true;  //True if you want to block, false otheriwse
   }
 
+  /**
+   * Always return false since we only play ads when IMA SDK sends notification
+   * @param playhead current playhead time
+   * @return false
+   */
   @Override
   public boolean onPlayheadUpdate(int playhead) {
     // We do not know when to play ads until the IMAAdManager send the notification
@@ -290,6 +307,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     return false;
   }
 
+  /**
+   * @return true if has post-roll, flase otherwise
+   */
   @Override
   public boolean onContentFinished() {
     // This is the time we need to check should we play post-roll
@@ -301,12 +321,22 @@ public class OoyalaIMAManager implements AdPluginInterface {
     return true;
   }
 
+  /**
+   * Always return false for IMA Ads since we only play ads when IMA SDK sends notification
+   * @param cuePointIndex (never used)
+   * @return false
+   */
   @Override
   public boolean onCuePoint(int cuePointIndex) {
     // TODO Auto-generated method stub
     return false;
   }
 
+  /**
+   * Fire a IMAAdErrorCallback to IMA SDK
+   * @param errorCode (never used)
+   * @return false
+   */
   @Override
   public boolean onContentError(int errorCode) {
     // Handled by call back
@@ -315,6 +345,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     return false;
   }
 
+  /**
+   * Load current IMA ad if no ad loaded and a IMA ad tag url is available
+   */
   @Override
   public void onAdModeEntered() {
     // nothing need to be done here for Google IMA since we fire the AdModeEnter request first
@@ -336,6 +369,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     }
   }
 
+  /**
+   * Suspend ads playback
+   */
   @Override
   public void suspend() {
     // TODO Auto-generated method stub
@@ -344,6 +380,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     _ooyalaPlayerWrapper.fireVideoSuspendCallback();
   }
 
+  /**
+   * Resume suspended ads playback
+   */
   @Override
   public void resume() {
     // TODO Auto-generated method stub
@@ -354,6 +393,11 @@ public class OoyalaIMAManager implements AdPluginInterface {
     _ooyalaPlayerWrapper.fireIMAAdResumeCallback();
   }
 
+  /**
+   * Resume from given time with given state, but does not work for IMA Ads Playback
+   * @param timeInMilliSecond (never used)
+   * @param stateToResume (never used)
+   */
   @Override
   public void resume(int timeInMilliSecond, State stateToResume) {
     // TODO Auto-generated method stub
@@ -362,6 +406,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     resume();
   }
 
+  /**
+   * Destroy IMAAdsManager and all related fields.
+   */
   @Override
   public void destroy() {
     DebugMode.logD(TAG, "IMA Ads Manager: destroy");
@@ -374,12 +421,18 @@ public class OoyalaIMAManager implements AdPluginInterface {
     _adsManager = null;
   }
 
+  /**
+   * @return current IMAAdPlayer
+   */
   @Override
   public PlayerInterface getPlayerInterface() {
     // TODO Auto-generated method stub
     return _adPlayer;
   }
 
+  /**
+   * Reset all IMA Ads Playback related fields and restart ads Playback
+   */
   @Override
   public void resetAds() {
     DebugMode.logD(TAG, "IMA Ads Manager: reset");
@@ -388,6 +441,9 @@ public class OoyalaIMAManager implements AdPluginInterface {
     onInitialPlay();
   }
 
+  /**
+   * Skip current ad playback
+   */
   @Override
   public void skipAd() {
     DebugMode.logD(TAG, "IMA Ads Manager: skipAd");
@@ -402,13 +458,18 @@ public class OoyalaIMAManager implements AdPluginInterface {
     _allAdsCompleted = false;
   }
 
-
+  /**
+   * Reset all IMA Ads Playback related fields and restart ads Playback
+   */
   @Override
   public void reset() {
     // TODO Auto-generated method stub
     resetAds();
   }
 
+  /**
+   * Fetch cue points for current ad tag url
+   */
   @Override
   public Set<Integer> getCuePointsInMilliSeconds() {
     if (_cuePoints != null) {

@@ -3,6 +3,9 @@ package com.ooyala.android.imasdk;
 
 import com.ooyala.android.item.Stream;
 
+/**
+ * A stream contains deliveryType(mp4) and ad url.
+ */
 class IMAStream extends Stream {
   /**
    *  Initialize an IMA Stream that is used to playback an IMA ad spot

@@ -1,11 +1,11 @@
 package com.ooyala.android.imasdk;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The ad spot that holds the single video stream for an IMA ad spot
@@ -31,12 +31,20 @@ class IMAAdSpot extends OoyalaManagedAdSpot {
     return true;
   }
 
+  /**
+   *
+   * @return current a set of current streams
+   */
   public Set<Stream> getStreams() {
     Set<Stream> retVal = new HashSet<Stream>();
     retVal.add(_stream);
     return retVal;
   }
 
+  /**
+   *
+   * @return current OoyalaIMAManager
+   */
   public OoyalaIMAManager getImaManager() {
     return _imaManager;
   }

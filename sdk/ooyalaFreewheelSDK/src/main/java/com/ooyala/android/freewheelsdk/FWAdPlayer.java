@@ -104,6 +104,13 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     }
   };
 
+  /**
+   * Initialize everything for the FWAdPlayer
+   * @param manager the OoyalaFreewheelManager
+   * @param parent the OoyalaPlayer layout
+   * @param ad the ad to be loaded
+   * @param notifier the notifier to be loaded
+   */
   public void init(OoyalaFreewheelManager manager, OoyalaPlayer parent,
       FWAdSpot ad, StateNotifier notifier) {
     setManager(manager);
@@ -138,6 +145,10 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     }
   }
 
+  /**
+   * Initialize the ad of FWAdPlayer.
+   * @param ad the ad to be loaded
+   */
   public void initAd(FWAdSpot ad) {
     _playQueued = false;
     _adError = false;
@@ -145,6 +156,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     _currentAd = ad.getAd();
   }
 
+  /**
+   * Set state to handle different error situations.
+   */
   public void onError() {
     //If play() has already been called, set state to error to resume content. Else, we set state to ready and
     //wait until play() is called to error out (or else, content may play when we haven't called play() yet).
@@ -156,14 +170,19 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     }
   }
 
+  /**
+   * Use Freewheel's renderer controller to send pings and open browser
+   */
   @Override
   public void processClickThrough() {
-    //Use Freewheel's renderer controller to send pings and open browser
     if (_currentAdInstance != null) {
       _currentAdInstance.getRendererController().processEvent(_fwConstants.EVENT_AD_CLICK());
     }
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   */
   @Override
   public void play() {
     if (_adError) {
@@ -181,6 +200,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     }
   }
 
+  /**
+   * Implements the LifeCycleInterface method.
+   */
   @Override
   public void resume() {
     DebugMode.logD(TAG, "FW Ad Player: Resuming activity, pauseAfterResume "
@@ -192,6 +214,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     setState(State.PLAYING);
   }
 
+  /**
+   * Implements the LifeCycleInterface method.
+   */
   @Override
   public void suspend() {
     _pauseAfterResume = (getState() == State.PAUSED);
@@ -201,6 +226,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     setState(State.SUSPENDED);
   }
 
+  /**
+   * Implements the LifeCycleInterface method.
+   */
   @Override
   public void destroy() {
     //Remove Learn More button if it exists
@@ -227,65 +255,108 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     _notifier.setState(state);
   }
 
+  /**
+   * Implements the LifeCycleInterface method.
+   */
   @Override
   public void reset() {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Implements the LifeCycleInterface method.
+   * @param timeInMilliSecond the playhead time to set
+   * @param stateToResume the player state after resume
+   */
   @Override
   public void resume(int timeInMilliSecond, State stateToResume) {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   */
   @Override
   public void pause() {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   */
   @Override
   public void stop() {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Implements the the PlayerInterface method.
+   * @return current time
+   */
   @Override
   public int currentTime() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @return duration
+   */
   @Override
   public int duration() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @return the buffer percentage (between 0 and 100 inclusive)
+   */
   @Override
   public int buffer() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @return true if the current player is seekable, false if there is no
+   *         current player or it is not seekable
+   */
   @Override
   public boolean seekable() {
     // TODO Auto-generated method stub
     return false;
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @param timeInMillis time in milliseconds
+   */
   @Override
   public void seekToTime(int timeInMillis) {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @return the state
+   */
   @Override
   public State getState() {
     return _notifier.getState();
   }
 
+  /**
+   * Fetch the StateNotifier of current FWAdPlayer.
+   * @return StateNotifier
+   */
   public StateNotifier getNotifier() {
     return _notifier;
   }
@@ -296,6 +367,10 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     return 0;
   }
 
+  /**
+   * Implements the PlayerInterface method.
+   * @param percent The percent of scrubber the cursor ends after seek
+   */
   @Override
   public void seekToPercentLive(int percent) {
     // TODO Auto-generated method stub

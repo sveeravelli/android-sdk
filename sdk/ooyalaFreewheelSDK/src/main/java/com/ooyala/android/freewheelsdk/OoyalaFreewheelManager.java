@@ -109,6 +109,11 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     _layoutController.getControls().setVisible(false); //disable our controllers
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @param arg0
+   * @param arg1 notification passed by OoyalaPlayer
+   */
   @Override
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && !_player.isShowingAd() && _fwContext != null) {
@@ -371,11 +376,17 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     return (int)Math.floor(Math.random() * Integer.MAX_VALUE);
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   */
   @Override
   public void reset() {
     resetAds();
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   */
   @Override
   public void suspend() {
     if (_adPlayer != null) {
@@ -383,6 +394,9 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     }
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   */
   @Override
   public void resume() {
     if (_adPlayer != null) {
@@ -390,6 +404,11 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     }
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @param timeInMilliSecond time in millisecond
+   * @param stateToResume state to resume
+   */
   @Override
   public void resume(int timeInMilliSecond, State stateToResume) {
     if (_adPlayer != null) {
@@ -397,6 +416,9 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     }
   }
 
+  /**
+   * destroy the current adPlayer
+   */
   @Override
   public void destroy() {
 
@@ -405,29 +427,52 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     }
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @return true if current content changes, otherwise false
+   */
   @Override
   public boolean onContentChanged() {
     super.onContentChanged();
     return currentItemChanged(_player.getCurrentItem());
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @param playhead
+   *          the current content playhead
+   * @return true if plugin needs to play midroll ads, false otherwise
+   */
   @Override
   public boolean onPlayheadUpdate(int playhead) {
     checkPlayableAds(playhead);
     return super.onPlayheadUpdate(playhead);
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @param cuePointIndex the index of cuePoint
+   * @return false
+   */
   @Override
   public boolean onCuePoint(int cuePointIndex) {
     return false;
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   * @param errorCode the code number of the error
+   * @return false
+   */
   @Override
   public boolean onContentError(int errorCode) {
     this.cleanupOnError();
     return false;
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin manager
+   */
   @Override
   public void onAdModeEntered() {
     if (getLastAdModeTime() < 0) {
@@ -437,11 +482,18 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     }
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin manager
+   * @return the adPlayer
+   */
   @Override
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin managed
+   */
   @Override
   public void resetAds() {
     _adSpotManager.resetAds();
@@ -490,6 +542,10 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
     return true;
   }
 
+  /**
+   * @internal implements the interface method, should only be called by ad plugin manager
+   * @param notifier state notifier
+   */
   @Override
   public void onStateChange(StateNotifier notifier) {
     if (_adPlayer == null || _adPlayer.getNotifier() != notifier) {

@@ -14,8 +14,7 @@ public abstract class AdSpot implements Comparable<AdSpot> {
    * compare two ad spots based on time, which is required to properly sort ad
    * spots.
    * 
-   * @param ad
-   *          the ad to be compared
+   * @param ad the ad to be compared
    */
   public int compareTo(AdSpot ad) {
     return this.getTime() - ad.getTime();

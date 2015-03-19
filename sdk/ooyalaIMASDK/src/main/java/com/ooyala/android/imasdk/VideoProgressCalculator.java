@@ -7,6 +7,11 @@ import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
+/**
+ * This class helps OoyalaPlayerIMAWrapper to calculate VideoProgressUpdate for both content and ad playback
+ * so that IMA SDK can keep track of the content and ad playback
+ */
+
 public class VideoProgressCalculator {
 
   private final static String TAG = VideoProgressCalculator.class.getSimpleName();
@@ -17,15 +22,30 @@ public class VideoProgressCalculator {
   private OoyalaPlayer _player;
   private VideoProgressCalculatorRunningState _runningState;
 
+  /**
+   * Initialize a VideoProgressCalculator
+   * @param player the current OoyalaPlayer
+   * @param isPlayingIMAAd true if an IMA ad is playing, false other wise
+   * @param lastPausedMs the time that content video is paused last time in millisecond
+   * @param liveContentTimePlayed the played time of the current Live content in millisecond
+   */
   public VideoProgressCalculator( OoyalaPlayer player, boolean isPlayingIMAAd, int lastPausedMs, int liveContentTimePlayed ) {
     this._player = player;
     this._runningState = new VideoProgressCalculatorRunningState( isPlayingIMAAd, lastPausedMs, liveContentTimePlayed );
   }
 
+  /**
+   * Fetch current VideoProgressCalculatorRunningState
+   * @return current VideoProgressCalculatorRunningState
+   */
   public VideoProgressCalculatorRunningState getRunningState() {
     return _runningState;
   }
 
+  /**
+   * Calculate and return the VideoProgressUpdate for current content
+   * @return VideoProgressUpdate for current content
+   */
   public VideoProgressUpdate getContentProgress() {
     final boolean isContent = ! _player.isAdPlaying();
     logV( "getContentProgress(): isContent=" + isContent );
@@ -56,6 +76,10 @@ public class VideoProgressCalculator {
     return new VideoProgressUpdate( playheadMs, durationMs );
   }
 
+  /**
+   * Calculate and return the VideoProgressUpdate for current IMA Ad
+    * @return the VideoProgressUpdate for current IMA Ad
+   */
   public VideoProgressUpdate getAdProgress() {
     final boolean isIMAad = _player.isAdPlaying() && _runningState.isPlayingIMAAd();
     final VideoProgressUpdate vpu = isIMAad ? calculateAdProgress() : VideoProgressUpdate.VIDEO_TIME_NOT_READY;

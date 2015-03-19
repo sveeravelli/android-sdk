@@ -95,6 +95,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     return this.nielsenApp;
   }
 
+  /**
+   * Destroy the current NielsenAnalytics object.
+   */
   public void destroy() {
     DebugMode.logV( TAG, "destroy()" );
     player.deleteObserver( this );
@@ -119,6 +122,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
       AppSdk.isValid();
   }
 
+  /**
+   * Handle the original tag and send Nielsen ID3 tag data
+   * @param tag
+   */
   public void onTag( byte[] tag ) {
     if( isValid() && isContent() ) {
       final String tagStr = new String(tag);
@@ -131,6 +138,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     }
   }
 
+  /**
+   * update the player according to notification
+   * @param o the player
+   * @param arg notification of the player
+   */
   public void update( Observable o, Object arg ) {
     if( o != player ) {
       DebugMode.logE( TAG, "not our player!" );
