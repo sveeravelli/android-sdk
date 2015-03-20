@@ -6,6 +6,12 @@ import java.util.Set;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
+/**
+ * Connect State changing objects with listeners thereof.
+ * There are two kinds of listeners:
+ * (1) OoyalaPlayer, which is updated via notifyPluginStateChange.
+ * (2) StateNotifierListener, which is updated via onStateChange.
+ */
 public class StateNotifier {
   private WeakReference<OoyalaPlayer> _player;
   private State _state;

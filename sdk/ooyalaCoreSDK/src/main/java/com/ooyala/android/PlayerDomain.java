@@ -3,6 +3,9 @@ package com.ooyala.android;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * Represents the domain under which Ooyala analytics will be recorded.
+ */
 public class PlayerDomain {
   private static final String[] schemes = {"http://","https://"};
   private URL _domainUrl = null;
@@ -18,7 +21,7 @@ public class PlayerDomain {
   
   /**
    * Construct a PlayerDomain
-   * @param domainString a valid domain string starts with http: or https:
+   * @param domainString a parseable URL in the form of a string, starting with either http:// or https://.
    */
   public PlayerDomain(String domainString) {
     if (!PlayerDomain.isValid(domainString)) {
