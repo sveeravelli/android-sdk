@@ -2,10 +2,12 @@ package com.ooyala.android.secureplayersample;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -18,16 +20,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.ooyala.android.DefaultPlayerInfo;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.EmbedTokenGeneratorCallback;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.PlayerInfo;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.freewheelsdk.OoyalaFreewheelManager;
 import com.ooyala.android.imasdk.OoyalaIMAManager;
+import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
@@ -107,7 +112,16 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         OoyalaPlayer ooPlayer = new OoyalaPlayer(pcode, new PlayerDomain(DOMAIN), SecurePlayerSampleAppActivity.this, options);
         final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, ooPlayer, DefaultControlStyle.AUTO);
         player = playerLayoutController.getPlayer();
+        StreamPlayer.defaultPlayerInfo = new DefaultPlayerInfo() {
 
+            @Override
+            public Set<String> getSupportedFormats() {
+              Set set = new HashSet<String>();
+                      set.add("playready_hls");
+              return set;
+            }
+
+          };
         OoyalaFreewheelManager fwManager = new OoyalaFreewheelManager(SecurePlayerSampleAppActivity.this, playerLayoutController);
         if (((String)embedSpinner.getSelectedItem()).contains("IMA")) {
           OoyalaIMAManager imaManager = new OoyalaIMAManager(player);
