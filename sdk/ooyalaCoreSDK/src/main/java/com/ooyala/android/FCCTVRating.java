@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 import android.text.TextUtils;
 
+/**
+ * Encapsulates the UI-relevant rating data of an asset.
+ */
 public class FCCTVRating {
 
   public final String ageRestriction;

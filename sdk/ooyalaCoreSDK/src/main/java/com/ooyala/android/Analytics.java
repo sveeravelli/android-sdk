@@ -24,6 +24,9 @@ import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.util.TemporaryInternalStorageFile;
 import com.ooyala.android.util.TemporaryInternalStorageFileManager;
 
+/**
+ * Integration of Ooyala client-side player with Ooyala server-side analytics collection.
+ */
 @SuppressLint("SetJavaScriptEnabled")
 public class Analytics {
 

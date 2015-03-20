@@ -61,8 +61,8 @@ import java.util.Set;
 
 /**
  * The OoyalaPlayer is the heart of the playback system.
- * Use it to control asset playback, and to be aware of changes
- * in the state of the playback as well.
+ * Use it to configure and control asset playback,
+ * and to be aware of playback state changes.
  */
 public class OoyalaPlayer extends Observable implements Observer,
     OnAuthHeartbeatErrorListener, AdPluginManagerInterface {
