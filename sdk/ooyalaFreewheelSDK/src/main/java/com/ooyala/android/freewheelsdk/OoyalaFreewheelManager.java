@@ -1,5 +1,19 @@
 package com.ooyala.android.freewheelsdk;
 
+import android.app.Activity;
+
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.StateNotifier;
+import com.ooyala.android.StateNotifierListener;
+import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.Video;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.ManagedAdsPlugin;
+import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -12,19 +26,6 @@ import tv.freewheel.ad.interfaces.IConstants;
 import tv.freewheel.ad.interfaces.IEvent;
 import tv.freewheel.ad.interfaces.IEventListener;
 import tv.freewheel.ad.interfaces.ISlot;
-import android.app.Activity;
-
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.StateNotifier;
-import com.ooyala.android.StateNotifierListener;
-import com.ooyala.android.item.Stream;
-import com.ooyala.android.item.Video;
-import com.ooyala.android.player.PlayerInterface;
-import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.ManagedAdsPlugin;
-import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 
 /**
  * The OoyalaFreewheelManager will play back all Freewheel ads affiliated with any playing Ooyala asset. It will
@@ -110,7 +111,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @param arg0
    * @param arg1 notification passed by OoyalaPlayer
    */
@@ -377,7 +378,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    */
   @Override
   public void reset() {
@@ -385,7 +386,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   *  Implements the interface method, should only be called by ad plugin managed
    */
   @Override
   public void suspend() {
@@ -395,7 +396,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    */
   @Override
   public void resume() {
@@ -405,7 +406,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @param timeInMilliSecond time in millisecond
    * @param stateToResume state to resume
    */
@@ -428,7 +429,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @return true if current content changes, otherwise false
    */
   @Override
@@ -438,7 +439,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @param playhead
    *          the current content playhead
    * @return true if plugin needs to play midroll ads, false otherwise
@@ -450,7 +451,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @param cuePointIndex the index of cuePoint
    * @return false
    */
@@ -460,7 +461,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    * @param errorCode the code number of the error
    * @return false
    */
@@ -471,7 +472,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin manager
+   * Implements the interface method, should only be called by ad plugin manager
    */
   @Override
   public void onAdModeEntered() {
@@ -483,7 +484,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin manager
+   * Implements the interface method, should only be called by ad plugin manager
    * @return the adPlayer
    */
   @Override
@@ -492,7 +493,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin managed
+   * Implements the interface method, should only be called by ad plugin managed
    */
   @Override
   public void resetAds() {
@@ -543,7 +544,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   }
 
   /**
-   * @internal implements the interface method, should only be called by ad plugin manager
+   * Implements the interface method, should only be called by ad plugin manager
    * @param notifier state notifier
    */
   @Override
