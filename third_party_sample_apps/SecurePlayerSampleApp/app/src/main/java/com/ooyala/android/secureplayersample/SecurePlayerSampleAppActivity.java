@@ -10,6 +10,7 @@ import java.util.Observer;
 import java.util.Set;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -37,6 +38,7 @@ import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
 
 public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
   private static final String TAG = SecurePlayerSampleAppActivity.class.getSimpleName();
@@ -65,7 +67,7 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("VisualOn/SecurePlayer");
+    playerAdapter.add( "VisualOn/SecurePlayer" );
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
@@ -165,7 +167,15 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
 
   @Override
   public void update(Observable observable, Object data) {
-    // TODO Implement to listen to Ooyala Notifications
+    DebugMode.logV( TAG, "update: " + observable + ", " + data );
+    if( data == OoyalaPlayer.ERROR_NOTIFICATION ) {
+      new AlertDialog.Builder(this)
+        .setTitle( "Error" )
+        .setMessage( "An error was encountered: " + player.getError().toString() )
+        .setIcon( android.R.drawable.ic_dialog_alert )
+        .setNeutralButton( android.R.string.ok, null )
+        .show();
+    }
   }
 
   // This is a local method of generating an embed token for debugging.
