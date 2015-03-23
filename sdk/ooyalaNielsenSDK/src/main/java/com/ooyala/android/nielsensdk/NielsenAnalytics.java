@@ -95,6 +95,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     return this.nielsenApp;
   }
 
+  /**
+   * Destroy the current NielsenAnalytics object.
+   */
   public void destroy() {
     DebugMode.logV( TAG, "destroy()" );
     player.deleteObserver( this );
@@ -119,6 +122,10 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
       AppSdk.isValid();
   }
 
+  /**
+   * Handle the original tag and send Nielsen ID3 tag data
+   * @param tag
+   */
   public void onTag( byte[] tag ) {
     if( isValid() && isContent() ) {
       final String tagStr = new String(tag);
@@ -131,6 +138,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     }
   }
 
+  /**
+   * update the player according to notification
+   * @param o the player
+   * @param arg notification of the player
+   */
   public void update( Observable o, Object arg ) {
     if( o != player ) {
       DebugMode.logE( TAG, "not our player!" );
@@ -298,7 +310,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     // it might have already been set into the json from static Backlot metadata.
     final boolean alreadySet = json.has( NIELSEN_KEY_LENGTH );
     if( isCMS( json ) && !alreadySet ) {
-      int length = item.isLive() ? NIELSEN_VALUE_LENGTH_LIVE : item.getDuration();
+      int itemDurationMsec = item.getDuration();
+      int itemDurationSeconds = itemDurationMsec / 1000;
+      int length = item.isLive() ? NIELSEN_VALUE_LENGTH_LIVE : itemDurationSeconds;
       try {
         json.put( NIELSEN_KEY_LENGTH, String.valueOf( length ) );
       }

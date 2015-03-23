@@ -6,6 +6,9 @@ import android.os.Handler;
 
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 
+/**
+ * Monitor, maintain authorization for an asset.
+ */
 class AuthHeartbeat {
   private Timer _timer = new Timer("AuthHeartbeat");
   private PlayerAPIClient _apiClient;

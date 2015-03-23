@@ -1,9 +1,6 @@
 package com.ooyala.android.imasdk;
 
 
-import java.util.Observable;
-
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -11,10 +8,13 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.Observable;
 
 /**
  * This class represents the Base Movie Player that plays IMA Ad spots.
- *
+ * And it is also a interface between OoyalaPlayer and IMA SDK for IMA ads playabck
  *
  */
 public class IMAAdPlayer extends AdMoviePlayer {
@@ -22,6 +22,13 @@ public class IMAAdPlayer extends AdMoviePlayer {
   private AdSpot _ad;
   private OoyalaIMAManager _imaManager;
 
+
+  /**
+   * Initialize an IMAAdPlayer
+   * @param parent an current OoyalaPlayer
+   * @param ad an AdSpot that holds the current ads information
+   * @param notifier a notifier which sends notification to OoyalaPlayer or UI Controls for state change or playback events
+   */
   @Override
   public void init(final OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
     super.init(parent, ad, notifier);
@@ -38,6 +45,10 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
   }
 
+  /**
+   * Start or resume the current ad playback.
+   * This "play" is called from OoyalaPlayer.play() and also responses to UI play button click.
+   */
   @Override
   public void play() {
     DebugMode.logD(TAG, "play(): Playing indirectly through AdsManager");
@@ -48,6 +59,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
   }
 
+  /**
+   * Start or resume the current ad playback.
+   * This "playIMA" is called from OoyalaPlayerIMAWrapper.playAd() when IMA SDK wants to play/resume
+   * the ad playback.
+   */
   public void playIMA() {
     if (_ad != null) {
       // We do not update the State to PLAYING until we hear the callback from IMA SDK
@@ -62,6 +78,10 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
   }
 
+  /**
+   * Pause the current ad playback.
+   * This "pause" is called from OoyalaPlayer.pause() and also responses to UI pause button click.
+   */
   @Override
   public void pause() {
     DebugMode.logD(TAG, "pause(): Pausing indirectly through AdsManager");
@@ -72,6 +92,11 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
   }
 
+  /**
+   * Pause the current ad playback.
+   * This "pauseIMA" is called from OoyalaPlayerIMAWrapper.pauseAd() when IMA SDK wants to pause
+   * the ad playback.
+   */
   public void pauseIMA() {
     DebugMode.logD(TAG, "pauseIMA(): Pausing");
     super.pause();
@@ -82,12 +107,20 @@ public class IMAAdPlayer extends AdMoviePlayer {
     }
   }
 
+  /**
+   * Destroy this IMAAdPlayer
+   */
   @Override
   public void destroy() {
     DebugMode.logD(TAG, "destroy()");
     super.destroy();
   }
 
+  /**
+   * Send notification when playhead changed or ad completed
+   * @param arg0 the Observable object
+   * @param arg current notification
+   */
   @Override
   public void update(Observable arg0, Object arg) {
     String notification = arg.toString();
@@ -110,24 +143,43 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   }
 
+  /**
+   * Fetch the current AdSpot
+   * @return current AdSpot
+   */
   @Override
   public AdSpot getAd() {
     return _ad;
   }
 
+  /**
+   * Set current OoyalaIMAManager to be the given OoyalaIMAManager
+   * @param imaManager the OoyalaIMAManager to be set
+   */
   public void setIMAManager(OoyalaIMAManager imaManager) {
     _imaManager = imaManager;
   }
-  
+
+  /**
+   * Fetch the current
+   * @return current OoyalaIMAManager
+   */
   public OoyalaIMAManager getIMAManager() {
     return _imaManager;
   }
 
+  /**
+   * Set current sate to be the given state
+   * @param state state of ad playback
+   */
   @Override
   public void setState(State state) {
     super.setState(state);
   }
 
+  /**
+   * Do nothing since IMA SDK take care of click through
+   */
   @Override
   public void processClickThrough() {
   }

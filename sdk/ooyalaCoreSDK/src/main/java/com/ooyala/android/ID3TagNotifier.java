@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * thread safe queue of collections of bytes.
+ * Connect objects which can read ID3 tags from asset streams,
+ * to objects that want to perform some action (e.g. update analytics)
+ * when an ID3 tag is seen.
  */
 public class ID3TagNotifier {
 
@@ -16,6 +18,8 @@ public class ID3TagNotifier {
   public static interface ID3TagNotifierListener {
     /**
      * Not guaranteed to be called on the main UI thread.
+     * When you implement this, consider posting a runnable on the main UI thread
+     * to do the actual work.
      */
     void onTag( byte[] tag );
   }

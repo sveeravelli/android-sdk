@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,8 +30,29 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NielsenSampleAppActivity extends Activity implements Observer, IAppNotifier {
+  private static NielsenAnalytics s_nielsenAnalytics;
+  public static AtomicInteger s_activityCount = new AtomicInteger();
+  public static void incrementRunningActivityCount() {
+    s_activityCount.incrementAndGet();
+  }
+  public static void decrementRunningActivityCount() {
+    int v = s_activityCount.decrementAndGet();
+    if( v == 0 && s_nielsenAnalytics != null ) {
+      new Handler().post(
+        new Runnable() {
+          @Override
+          public void run() {
+            DebugMode.logD( TAG, "onStop: we appear to be 'backgrounded'." );
+            s_nielsenAnalytics.getNielsenAppSdk().stop();
+          }
+        }
+      );
+    }
+  }
+
   public final static String OPT_OUT_URL_EXTRAS_KEY = "opt_out_url";
   public final static String OPT_OUT_RESULT_KEY = "opt_out_result";
   public final static int OPTOUT_REQUEST_CODE = 100;
@@ -44,7 +66,6 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
   private Spinner embedSpinner;
   private HashMap<String, String> embedMap;
   private ArrayAdapter<String> embedAdapter;
-  private NielsenAnalytics nielsenAnalytics;
   private String optOutUrl;
   private OoyalaPlayer player;
 
@@ -65,6 +86,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     embedMap.put("CMS-Demo", "ZhMmkycjr4jlHIjvpIIimQSf_CjaQs48");
     embedMap.put("CMS-NoAds", "FzYjJzczo3_M3OjkeIta-IIFcPGSGxci");
     embedMap.put("CMS-WithAds", "x3YjJzczqREV-5RDiemsrdqki1FYu2NT");
+    embedMap.put("CMS-14Minutes", "JyanIxdDoj9MhKbVEmTJEG8O4QF5xExb");
 
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner.setAdapter(embedAdapter);
@@ -78,7 +100,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
     player = playerLayoutController.getPlayer();
 
-    nielsenAnalytics = new NielsenAnalytics( this, player, this, NIELSEN_APPID, "0.1", "NielsenTestApp", NIELSEN_SFCODE, player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
+    s_nielsenAnalytics = new NielsenAnalytics( this, player, this, NIELSEN_APPID, "0.1", "NielsenTestApp", NIELSEN_SFCODE, player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
 
     player.addObserver(this);
 
@@ -109,8 +131,8 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
   }
 
   private String getOptOutUrl() {
-    if( nielsenAnalytics != null && nielsenAnalytics.isValid() ) {
-      return nielsenAnalytics.getNielsenAppSdk().userOptOutURLString();
+    if( s_nielsenAnalytics != null && s_nielsenAnalytics.isValid() ) {
+      return s_nielsenAnalytics.getNielsenAppSdk().userOptOutURLString();
     }
     else {
       return null;
@@ -150,10 +172,10 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult( requestCode, resultCode, data );
     if( resultCode == RESULT_OK ) {
-      if( requestCode == OPTOUT_REQUEST_CODE ) {
+      if( requestCode == OPTOUT_REQUEST_CODE && s_nielsenAnalytics != null ) {
         final String uoo = data.getStringExtra( OPT_OUT_RESULT_KEY );
         Log.d( TAG, "onActivityResult: uoo = " + uoo );
-        nielsenAnalytics.getNielsenAppSdk().userOptOut( uoo );
+        s_nielsenAnalytics.getNielsenAppSdk().userOptOut( uoo );
       }
     }
   }
@@ -184,11 +206,25 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
   }
 
   @Override
+  protected void onStop() {
+    DebugMode.logD( TAG, "onStop" );
+    super.onStop();
+    NielsenSampleAppActivity.decrementRunningActivityCount();
+  }
+
+  @Override
   protected void onResume() {
     super.onResume();
     if (player != null && player.getState() == OoyalaPlayer.State.SUSPENDED) {
       player.resume();
     }
+  }
+
+  @Override
+  protected void onStart() {
+    DebugMode.logD( TAG, "onStart" );
+    super.onStart();
+    NielsenSampleAppActivity.incrementRunningActivityCount();
   }
 
   @Override

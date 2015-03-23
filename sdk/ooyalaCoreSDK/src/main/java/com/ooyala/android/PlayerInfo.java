@@ -3,8 +3,9 @@ package com.ooyala.android;
 import java.util.Set;
 
 /**
- * PlayerInfo is a collection of information that describes the capabilities of the playback device
- *
+ * PlayerInfo is a collection of information that describes the capabilities of the playback device.
+ * These are used e.g. when negotiating with servers so they can choose the most appropriate
+ * asset encodings.
  */
 public interface PlayerInfo {
   /**

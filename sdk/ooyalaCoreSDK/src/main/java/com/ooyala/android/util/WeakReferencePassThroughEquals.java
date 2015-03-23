@@ -2,12 +2,19 @@ package com.ooyala.android.util;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * A standard WeakReference, but with equality implemented
+ * by calling the underlying objects.
+ */
 public final class WeakReferencePassThroughEquals<T> extends WeakReference<T> {
 
   public WeakReferencePassThroughEquals( T t ) {
     super( t );
   }
 
+  /**
+   * Uses the underlying references' implementations of equals.
+   */
   @Override
   public boolean equals( Object other ) {
     boolean e = false;

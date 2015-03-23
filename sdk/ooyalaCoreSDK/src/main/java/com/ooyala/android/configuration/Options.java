@@ -2,9 +2,12 @@ package com.ooyala.android.configuration;
 
 public class Options implements ReadonlyOptionsInterface {
 
+  /**
+   * Supports a fluid syntax for configuration.
+   */
   public static class Builder {
     /*
-    * FCCTVRatingConfiguration; 
+    * FCCTVRatingConfiguration;
     * Default: default FCCTVRatingConfiguration object
      */
     private FCCTVRatingConfiguration tvRatingConfiguration;
@@ -16,16 +19,16 @@ public class Options implements ReadonlyOptionsInterface {
     private VisualOnConfiguration visualOnConfiguration;
 
     /*
-     * If set to "true", show cuepoint markers for ads.
-     * Default: true
-     */
-    private boolean showCuePoints;
-
-    /*
      *If set to "true",  show ad controls during ads playback.
      * Default: true
      */
     private boolean showAdsControls;
+
+    /*
+     * If set to "true", show cuepoint markers for ads.
+     * Default: true
+     */
+    private boolean showCuePoints;
 
     /*
      * If set to "true", show live controls for live content playback (live stream only).
@@ -58,6 +61,18 @@ public class Options implements ReadonlyOptionsInterface {
      */
     private int readTimeoutInMillisecond;
 
+    /**
+     * Defaults to the following values:
+     * tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
+     * visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
+     * showCuePoints = true;
+     * showAdsControls = true;
+     * showLiveControls = true;
+     * preloadContent = true;
+     * showPromoImage = false;
+     * connectionTimeoutInMillisecond = 0;
+     * readTimeoutInMillisecond = 0;
+     */
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
       this.visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
@@ -99,7 +114,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = showPromoImage;
       return this;
     }
-    
+
     public Builder setShowLiveControls(boolean showLiveControls) {
       this.showLiveControls = showLiveControls;
       return this;
@@ -127,8 +142,8 @@ public class Options implements ReadonlyOptionsInterface {
 
     public Options build() {
       return new Options(tvRatingConfiguration, visualOnConfiguration,
-          showCuePoints, showAdsControls, preloadContent, showPromoImage, showLiveControls,
-              connectionTimeoutInMillisecond, readTimeoutInMillisecond);
+        showCuePoints, showAdsControls, preloadContent, showPromoImage, showLiveControls,
+        connectionTimeoutInMillisecond, readTimeoutInMillisecond);
     }
   }
 
@@ -156,9 +171,9 @@ public class Options implements ReadonlyOptionsInterface {
    * @return the initialized Options - Return the configured options.
    */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
-      VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
-      boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls,
-      int connectionTimeoutInMillisecond, int readTimeoutInMillisecond) {
+                  VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
+                  boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls,
+                  int connectionTimeoutInMillisecond, int readTimeoutInMillisecond) {
 
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
@@ -180,7 +195,7 @@ public class Options implements ReadonlyOptionsInterface {
   public VisualOnConfiguration getVisualOnConfiguration() {
     return visualOnConfiguration;
   }
-  
+
   @Override
   public boolean getShowAdsControls() {
     return showAdsControls;
