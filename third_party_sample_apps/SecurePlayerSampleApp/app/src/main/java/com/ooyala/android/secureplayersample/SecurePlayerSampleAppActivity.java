@@ -171,7 +171,7 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     if( data == OoyalaPlayer.ERROR_NOTIFICATION ) {
       new AlertDialog.Builder(this)
         .setTitle( "Error" )
-        .setMessage( "An error was encountered: " + player.getError().toString() )
+        .setMessage( "An error was encountered: " + player.getError().getCode() )
         .setIcon( android.R.drawable.ic_dialog_alert )
         .setNeutralButton( android.R.string.ok, null )
         .show();
