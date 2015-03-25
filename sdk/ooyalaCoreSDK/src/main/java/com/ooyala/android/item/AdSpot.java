@@ -11,12 +11,26 @@ public abstract class AdSpot implements Comparable<AdSpot> {
   public abstract int getTime();
 
   /**
+   * Fetch the priority for the adspots that have same time.
+   * The ad spot with higher priority(smaller value) will be played first.
+   * subclass should override the default implementation.
+   * @return The priority .
+   */
+  public int getPriority() {
+    return 0;
+  };
+
+  /**
    * compare two ad spots based on time, which is required to properly sort ad
    * spots.
    * 
    * @param ad the ad to be compared
    */
   public int compareTo(AdSpot ad) {
-    return this.getTime() - ad.getTime();
+    int result = this.getTime() - ad.getTime();
+    if (result == 0) {
+      result = ad.getPriority() - this.getPriority();
+    }
+    return result;
   }
 }
