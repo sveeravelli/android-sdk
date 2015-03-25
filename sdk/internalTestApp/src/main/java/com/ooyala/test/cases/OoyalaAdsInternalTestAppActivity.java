@@ -25,6 +25,7 @@ public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivit
     super.onCreate(savedInstanceState);
 
     //Populate the embed map
+    embedMap.put("Multiple Preroll", "05YTk2dDqypdJJWoiynnCM_Bx6ukRnBg");
     embedMap.put("Ooyala Preroll",    "M4cmp0ZDpYdy8kiL4UD910Rw_DWwaSnU");
     embedMap.put("Ooyala Midroll",    "xhcmp0ZDpnDB2-hXvH7TsYVQKEk_89di");
     embedMap.put("Ooyala Postroll", "Rjcmp0ZDr5yFbZPEfLZKUveR_2JzZjMO");
