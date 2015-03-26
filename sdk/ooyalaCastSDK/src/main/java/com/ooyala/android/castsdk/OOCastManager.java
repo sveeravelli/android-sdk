@@ -368,12 +368,12 @@ public class OOCastManager extends DataCastManager {
     notificationView.setTextColor(R.id.titleView, Color.WHITE);
     notificationView.setTextColor(R.id.subTitleView, Color.WHITE);
     notificationView.setImageViewBitmap(R.id.iconView, getCurrentCastPlayer().getCastImageBitmap());
-    notificationView.setImageViewBitmap(R.id.removeView, Images.getChromecastNotificationCloseButton());
+    notificationView.setImageViewBitmap(R.id.removeView, OOCastUtils.getChromecastNotificationCloseButton());
   
     if (shouldDisplayPlayButton) {
-      notificationView.setImageViewBitmap(R.id.playPauseView, Images.getDarkChromecastPlayButton());
+      notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPlayButton());
     } else {
-      notificationView.setImageViewBitmap(R.id.playPauseView, Images.getDarkChromecastPauseButton());
+      notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPauseButton());
     }
     Intent resultIntent = new Intent(context, targetActivity);
     resultIntent.putExtra("embedcode", castPlayer.getEmbedCode());
@@ -429,7 +429,7 @@ public class OOCastManager extends DataCastManager {
           // Request permanent focus.
           AudioManager.AUDIOFOCUS_GAIN);
 
-      ComponentName myEventReceiver = new ComponentName(context, com.ooyala.android.cast.OOBroadcastReceiver.class);
+      ComponentName myEventReceiver = new ComponentName(context, com.ooyala.android.castsdk.OOBroadcastReceiver.class);
       audioManager.registerMediaButtonEventReceiver(myEventReceiver);
       if (remoteControlClient == null) {
           Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);

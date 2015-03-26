@@ -1,11 +1,10 @@
-package com.ooyala.android.cast;
-
-import com.ooyala.android.OoyalaPlayer.State;
+package com.ooyala.android.castsdk;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RemoteControlClient;
+
+import com.ooyala.android.OoyalaPlayer.State;
 
 public class OOBroadcastReceiver extends BroadcastReceiver {
   

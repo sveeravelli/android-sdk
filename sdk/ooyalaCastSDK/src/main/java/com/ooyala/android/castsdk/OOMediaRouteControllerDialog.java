@@ -20,9 +20,8 @@ import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDi
 import com.google.sample.castcompanionlibrary.utils.LogUtils;
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.ui.Images;
 
-public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog implements com.ooyala.android.cast.OOMiniController {
+public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog implements com.ooyala.android.castsdk.OOMiniController {
   
   private static final String TAG = LogUtils.makeLogTag(MediaRouteControllerDialog.class);
   
@@ -147,7 +146,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     layoutParams.setMargins(0, 0, 9 * DP, 0);
-    pausePlay.setImageBitmap(Images.getDarkChromecastPauseButton());
+    pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
     pausePlay.setLayoutParams(layoutParams);
     mainContainer.addView(pausePlay);
   }
@@ -253,10 +252,10 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   public void updatePlayPauseState(State state) {
     if (castManager.getCurrentCastPlayer() != null) {
       if (state == State.PLAYING) {
-        pausePlay.setImageBitmap(Images.getDarkChromecastPauseButton());                
+        pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
         pausePlay.setVisibility(View.VISIBLE);
       } else {
-        pausePlay.setImageBitmap(Images.getDarkChromecastPlayButton());             
+        pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPlayButton());
         pausePlay.setVisibility(View.VISIBLE);
       }
     } else {

@@ -17,7 +17,6 @@ import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDi
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.ui.Images;
 
 public class OODefaultMiniController extends RelativeLayout implements com.ooyala.android.castsdk.OOMiniController {
 
@@ -41,8 +40,8 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
     
     this.DP = (int)context.getResources().getDisplayMetrics().density;
     
-    pauseImageBitmap = Images.getDarkChromecastPauseButton();
-    playImageBitmap = Images.getDarkChromecastPlayButton();
+    pauseImageBitmap = OOCastUtils.getDarkChromecastPauseButton();
+    playImageBitmap = OOCastUtils.getDarkChromecastPlayButton();
 
     constructContainer(context);
     setupCallbacks();

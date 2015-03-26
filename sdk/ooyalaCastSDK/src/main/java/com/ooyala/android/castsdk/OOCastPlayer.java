@@ -14,7 +14,6 @@ import android.view.View;
 
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.R;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
@@ -55,14 +54,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   public void pause() {
     DebugMode.logD(TAG, "pause()");
     setState(State.PAUSED);
-    sendMessage(CastUtils.makeActionJSON("pause"));
+    sendMessage(OOCastUtils.makeActionJSON("pause"));
   }
 
   @Override
   public void play() {
     DebugMode.logD(TAG, "play()");
     setState(State.PLAYING);
-    sendMessage(CastUtils.makeActionJSON("play"));
+    sendMessage(OOCastUtils.makeActionJSON("play"));
   }
 
   @Override
@@ -271,7 +270,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   private void getReceiverPlayerState() {
     DebugMode.logD(TAG, "getReceiverPlayerState");
-    sendMessage(CastUtils.makeActionJSON("getstatus"));
+    sendMessage(OOCastUtils.makeActionJSON("getstatus"));
   }
   
   public void receivedMessage(String message) {
@@ -381,5 +380,13 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   @Override
   public void destroy() {
+  }
+
+  public int livePlayheadPercentage() {
+    return 0;
+  }
+
+  public void seekToPercentLive(int percent) {
+
   }
 }
