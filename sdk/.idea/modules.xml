@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/internalTestApp/internalTestApp.iml" filepath="$PROJECT_DIR$/internalTestApp/internalTestApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ooyalaCastSDK/ooyalaCastSDK.iml" filepath="$PROJECT_DIR$/ooyalaCastSDK/ooyalaCastSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" filepath="$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaFreewheelSDK/ooyalaFreewheelSDK.iml" filepath="$PROJECT_DIR$/ooyalaFreewheelSDK/ooyalaFreewheelSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" filepath="$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" />

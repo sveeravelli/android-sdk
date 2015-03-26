@@ -1,4 +1,4 @@
-include ':ooyalaCoreSDK', ':ooyalaFreewheelSDK', ':ooyalaIMASDK'
+include ':ooyalaCoreSDK', ':ooyalaFreewheelSDK', ':ooyalaIMASDK', ':ooyalaCastSDK'
 
 include ':ooyalaTestApp'
 include ':internalTestApp'
