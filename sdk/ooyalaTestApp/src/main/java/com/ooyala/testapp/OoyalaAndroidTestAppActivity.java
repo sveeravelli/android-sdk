@@ -73,7 +73,7 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
 
     final FCCTVRatingConfiguration tvRatingConfiguration = new FCCTVRatingConfiguration.Builder().setDurationSeconds(5).build();
 
-    OoyalaPlayer player = new OoyalaPlayer(PCODE, domain, this, new Options.Builder().setTVRatingConfiguration( tvRatingConfiguration ).build());
+    player = new OoyalaPlayer(PCODE, domain, this, new Options.Builder().setTVRatingConfiguration( tvRatingConfiguration ).build());
     OptimizedOoyalaPlayerLayoutController layoutController = new OptimizedOoyalaPlayerLayoutController(
         (OoyalaPlayerLayout) findViewById(R.id.player),
         player,
