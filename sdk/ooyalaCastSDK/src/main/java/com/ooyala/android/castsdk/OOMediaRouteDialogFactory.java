@@ -7,7 +7,7 @@ public class OOMediaRouteDialogFactory extends MediaRouteDialogFactory {
   private OOCastManager castManager;
 
   
-  public OOMediaRouteDialogFactory(OOCastManager castManager, CastPlayer castPlayer) {
+  public OOMediaRouteDialogFactory(OOCastManager castManager) {
     super();
     this.castManager = castManager;
   }

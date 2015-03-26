@@ -19,7 +19,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.ui.Images;
 
-public class OODefaultMiniController extends RelativeLayout implements com.ooyala.android.cast.OOMiniController {
+public class OODefaultMiniController extends RelativeLayout implements com.ooyala.android.castsdk.OOMiniController {
 
   private static final String TAG = "OODefaultMiniController";
 
