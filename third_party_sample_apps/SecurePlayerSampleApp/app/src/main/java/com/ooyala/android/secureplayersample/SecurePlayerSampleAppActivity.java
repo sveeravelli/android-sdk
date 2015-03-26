@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -26,10 +27,9 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.VisualOnConfiguration;
-import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController.DefaultControlStyle;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
-import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
+import com.ooyala.android.util.DebugMode;
 
 public class SecurePlayerSampleAppActivity extends Activity implements Observer, EmbedTokenGenerator {
   private static final String TAG = SecurePlayerSampleAppActivity.class.getSimpleName();
@@ -52,14 +52,13 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    OoyalaPlayer.setEnvironment(com.ooyala.android.Environment.EnvironmentType.STAGING);
     OoyalaPlayer.enableCustomPlayreadyPlayer = true;
 
     //Initialize the bottom controls
     playerSpinner = (Spinner) findViewById(R.id.playerSpinner);
     playerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     playerSpinner.setAdapter(playerAdapter);
-    playerAdapter.add("VisualOn/SecurePlayer");
+    playerAdapter.add( "VisualOn/SecurePlayer" );
     playerAdapter.add("Native Player");
     playerAdapter.notifyDataSetChanged();
 
@@ -67,15 +66,11 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedMap = new LinkedHashMap<String, Pair<String,String>>();
     embedMap.put("Device Management - Device Bind to Entitlement", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL"));
     embedMap.put("Device Management - Device Limit", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY"));
-    embedMap.put("OPL Test - A150 C500 U301", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F"));
-    embedMap.put("OPL Test - A150 C500 U300", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0zNmpoczrbFOt-jK9wWNABrpKlSDduxN"));
-    embedMap.put("OPL Test - A150 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","15NWpoczoxGzZRc2g_rqNA7WSMrSrdak"));
-    embedMap.put("OPL Test - A201 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","13NWpoczpBVeg8eUyswxFioYmJIOzTje"));
-    embedMap.put("old Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
-    embedMap.put("old Ooyala-Ingested Playready HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","92eGNjcjpbo561vVTXE-8GDAk05LHYBh"));
-    embedMap.put("old Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
-    embedMap.put("old Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
-    embedMap.put("old Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
+    embedMap.put("Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
+    embedMap.put("Playready HLS VOD with Closed Captions", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xrcGYydDq1wU7nSmX7AQB3Uq4Fu3BjuE"));
+    embedMap.put("Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
+    embedMap.put("Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
+    embedMap.put("Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     embedSpinner.setAdapter(embedAdapter);
@@ -98,11 +93,12 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         final String embed = asset.second;
         VisualOnConfiguration visualOnConfiguration = new VisualOnConfiguration.Builder().setDisableLibraryVersionChecks(false).build();
         Options.Builder builder = new Options.Builder().setVisualOnConfiguration( visualOnConfiguration );
-        Options options = builder.build();
+        Options options = builder.setPreloadContent(false).build();
         OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
         OoyalaPlayer ooPlayer = new OoyalaPlayer(pcode, new PlayerDomain(DOMAIN), SecurePlayerSampleAppActivity.this, options);
         final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, ooPlayer, DefaultControlStyle.AUTO);
         player = playerLayoutController.getPlayer();
+
         player.addObserver(SecurePlayerSampleAppActivity.this);
         if (player.setEmbedCode(embed)) {
           TextView urlText = (TextView) findViewById(R.id.urlText);
@@ -141,7 +137,15 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
 
   @Override
   public void update(Observable observable, Object data) {
-    // TODO Implement to listen to Ooyala Notifications
+    DebugMode.logV( TAG, "update: " + observable + ", " + data );
+    if( data == OoyalaPlayer.ERROR_NOTIFICATION ) {
+      new AlertDialog.Builder(this)
+        .setTitle( "Error" )
+        .setMessage( "An error was encountered: " + player.getError().getCode() )
+        .setIcon( android.R.drawable.ic_dialog_alert )
+        .setNeutralButton( android.R.string.ok, null )
+        .show();
+    }
   }
 
   // This is a local method of generating an embed token for debugging.
