@@ -1,18 +1,18 @@
 package com.ooyala.android.item;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.util.DebugMode;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.OoyalaAPIClient;
-import com.ooyala.android.OoyalaAdSpot;
-import com.ooyala.android.ads.vast.VASTAdSpot;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatableItem {
   protected static final String KEY_TYPE = "type";  //AdSpot
@@ -26,6 +26,7 @@ public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatabl
   static final int DEFAULT_AD_TIME_SECONDS = 0;
 
   protected int _time = -1;
+  protected int _priority = 0;
   protected URL _clickURL = null;
   protected List<URL> _trackingURLs = null;
 
@@ -128,11 +129,23 @@ public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatabl
 
   /**
    * Fetch the list of tracking URLs to ping when this AdSpot is played.
-   * @return the list of tracking URLs
+   * @return the priority
    */
   public List<URL> getTrackingURLs() {
     return _trackingURLs;
   }
 
+  @Override
+  public int getPriority() {
+    return _priority;
+  }
 
+  /**
+   * set the priority of the ad spot.
+   * if two adspot have the same time, the one with higher priority(smaller value)
+   * will be played first.
+   */
+  public void setPriority(int priority) {
+    _priority = priority;
+  }
 }
