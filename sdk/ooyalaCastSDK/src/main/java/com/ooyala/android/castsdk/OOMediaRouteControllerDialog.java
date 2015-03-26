@@ -21,7 +21,7 @@ import com.google.sample.castcompanionlibrary.utils.LogUtils;
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer.State;
 
-public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog implements com.ooyala.android.castsdk.OOMiniController {
+public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog implements OOMiniController {
   
   private static final String TAG = LogUtils.makeLogTag(MediaRouteControllerDialog.class);
   

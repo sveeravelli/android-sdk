@@ -32,6 +32,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
+import com.ooyala.android.CastManager;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -42,7 +43,7 @@ import java.util.Set;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class OOCastManager extends DataCastManager {
+public class OOCastManager extends DataCastManager implements CastManager {
   private static final String TAG = "CastManager";
   
   private static OOCastManager castManager;
@@ -64,8 +65,8 @@ public class OOCastManager extends DataCastManager {
   private int notificationImageResourceId = -1;
   private Bitmap miniControllerImageBitmap;
   private OoyalaPlayer ooyalaPlayer;
-  private com.ooyala.android.castsdk.OOCastPlayer castPlayer;
-  private Set<com.ooyala.android.castsdk.OOMiniController> miniControllers;
+  private OOCastPlayer castPlayer;
+  private Set<OOMiniController> miniControllers;
   public boolean isShowingPlayButton;
   private int notificationMiniControllerResourceId = -1;
   
@@ -130,24 +131,28 @@ public class OOCastManager extends DataCastManager {
     unregisterBroadcastReceiver(context);
   }
   
-  public com.ooyala.android.castsdk.OOCastPlayer createNewCastPlayer(String embedCode) {
+  public OOCastPlayer createNewCastPlayer(String embedCode) {
     DebugMode.logD(TAG, "Create new CastPlayer");
     if (castPlayer == null || (castPlayer.getEmbedCode() != null && !castPlayer.getEmbedCode().equals(embedCode))) {
-      castPlayer = new com.ooyala.android.castsdk.OOCastPlayer(this, ooyalaPlayer);
+      castPlayer = new OOCastPlayer(this, ooyalaPlayer);
     } 
     castPlayer.setCastView(castView);
     // This method can only be called from ooyalaPlayer
     // We do not need to show any mini controller for a activity with ooyalaPlayer
     removeAllMiniControllers();
+    castPlayer.addObserver(this.ooyalaPlayer);
     return castPlayer;
   }
 
-  public com.ooyala.android.castsdk.OOCastPlayer getCurrentCastPlayer() {
+  public OOCastPlayer getCurrentCastPlayer() {
     return castPlayer;
   }
   
   public void destroyCurrentCastPlayer() {
     DebugMode.logD(TAG, "Destroy current CastPlayer");
+    if (castPlayer != null && this.ooyalaPlayer != null) {
+      castPlayer.deleteObserver(this.ooyalaPlayer);
+    }
     castPlayer = null;
   }
   
@@ -163,13 +168,13 @@ public class OOCastManager extends DataCastManager {
     MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider)
             MenuItemCompat.getActionProvider(mediaRouteMenuItem);
     mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
-    mediaRouteActionProvider.setDialogFactory(new com.ooyala.android.castsdk.OOMediaRouteDialogFactory(this));
+    mediaRouteActionProvider.setDialogFactory(new OOMediaRouteDialogFactory(this));
   }
   
   public void connectOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     DebugMode.logD(TAG, "Connect to OoyalaPlayer " + ooyalaPlayer);
     this.ooyalaPlayer = ooyalaPlayer;
-    ooyalaPlayer.setCastManager(this);
+    ooyalaPlayer.registerCastManager(this);
   }
   
   public void disconnectOoyalaPlayer() {
@@ -242,16 +247,16 @@ public class OOCastManager extends DataCastManager {
     notificationMiniControllerResourceId = recourceId;
   }
   
-  public void addMiniController(com.ooyala.android.castsdk.OOMiniController miniController) {
+  public void addMiniController(OOMiniController miniController) {
     DebugMode.logD(TAG, "Add mini controller " + miniController);
     if (miniControllers == null) {
-      miniControllers = new HashSet<com.ooyala.android.castsdk.OOMiniController>();
+      miniControllers = new HashSet<OOMiniController>();
     }
     miniControllers.add(miniController);
     miniController.setCastManager(castManager);
   }
   
-  public void removeMiniController(com.ooyala.android.castsdk.OOMiniController miniController) {
+  public void removeMiniController(OOMiniController miniController) {
     DebugMode.logD(TAG, "Remove mini controller " + miniController);
     miniControllers.remove(miniController);
   }
@@ -264,7 +269,7 @@ public class OOCastManager extends DataCastManager {
   public void updateMiniControllersState() {
     DebugMode.logD(TAG, "Update mini controllers state");
     if (miniControllers != null &&  castPlayer != null) {
-      for (com.ooyala.android.castsdk.OOMiniController miniController : miniControllers) {
+      for (OOMiniController miniController : miniControllers) {
         miniController.updatePlayPauseState(castPlayer.getState());
       }
     }
@@ -273,7 +278,7 @@ public class OOCastManager extends DataCastManager {
   public void updateMiniControllersVisibility() {
     DebugMode.logD(TAG, "Update mini controllers visibility");
     if (miniControllers != null) {
-      for (com.ooyala.android.castsdk.OOMiniController miniController : miniControllers) {
+      for (OOMiniController miniController : miniControllers) {
         miniController.updateVisibility();
       }
     }
@@ -429,7 +434,7 @@ public class OOCastManager extends DataCastManager {
           // Request permanent focus.
           AudioManager.AUDIOFOCUS_GAIN);
 
-      ComponentName myEventReceiver = new ComponentName(context, com.ooyala.android.castsdk.OOBroadcastReceiver.class);
+      ComponentName myEventReceiver = new ComponentName(context, OOBroadcastReceiver.class);
       audioManager.registerMediaButtonEventReceiver(myEventReceiver);
       if (remoteControlClient == null) {
           Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);

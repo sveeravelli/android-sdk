@@ -1,24 +1,23 @@
 package com.ooyala.android.castsdk;
 
-import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
-
-import java.net.URL;
-import java.util.Observable;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
 
-import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.CastPlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
-import com.ooyala.android.player.PlayerInterface;
-import com.ooyala.android.plugin.LifeCycleInterface;
+import com.ooyala.android.util.DebugMode;
 
-public class OOCastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.Observable;
+
+import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
+
+public class OOCastPlayer extends Observable implements CastPlayer {
   private static final String TAG = "OOCastPlayer";
  
   private static OOCastManager castManager;
