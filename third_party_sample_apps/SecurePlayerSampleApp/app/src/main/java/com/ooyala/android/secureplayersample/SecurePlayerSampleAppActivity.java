@@ -76,17 +76,10 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
     embedMap.put("Device Management - Device Bind to Entitlement", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","Q3NmpoczpUH__SVSKRI0BbFl3A9CtHSL"));
     embedMap.put("Device Management - Device Limit", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0xNmpoczpeNkx6Pq8ZOPwPUu6CuzFKeY"));
     embedMap.put("Ooyala-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","5jNzJuazpFtKmloYZQmgPeC_tqDKHX9r"));
-    embedMap.put("Playready HLS VOD with IMA Ads", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xpcGYydDpUfj8eOSFSm7-Hr8-Eaag52i"));
-    embedMap.put("Playready HLS VOD with Freewheel Ads", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xtcGYydDrhnBc9InRIjM4w7ig6w3ay9E"));
     embedMap.put("Playready HLS VOD with Closed Captions", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","xrcGYydDq1wU7nSmX7AQB3Uq4Fu3BjuE"));
-    embedMap.put("Ooyala-Ingested Playready HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","92eGNjcjpbo561vVTXE-8GDAk05LHYBh"));
     embedMap.put("Microsoft-Ingested Playready Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","V2NWk2bTpI1ac0IaicMaFuMcIrmE9U-_"));
     embedMap.put("Microsoft-Ingested Clear Smooth VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","1nNGk2bTq5ECsz5cRlZ4ONAAk96drr6T"));
     embedMap.put("Ooyala-Ingested Clear HLS VOD", new Pair<String,String>("FoeG863GnBL4IhhlFC1Q2jqbkH9m","Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1"));
-    embedMap.put("OPL Test - A150 C500 U301", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","01Nmpoczq_GLtFUuTyy6mfQzkGjTIl9F"));
-    embedMap.put("OPL Test - A150 C500 U300", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","0zNmpoczrbFOt-jK9wWNABrpKlSDduxN"));
-    embedMap.put("OPL Test - A150 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","15NWpoczoxGzZRc2g_rqNA7WSMrSrdak"));
-    embedMap.put("OPL Test - A201 C500 U250", new Pair<String,String>("N5dGEyOrMsKgdLgNp2B0wirtpqm7","13NWpoczpBVeg8eUyswxFioYmJIOzTje"));
     embedAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item);
     embedSpinner = (Spinner) findViewById(R.id.embedSpinner);
     embedSpinner.setAdapter(embedAdapter);
@@ -114,20 +107,6 @@ public class SecurePlayerSampleAppActivity extends Activity implements Observer,
         OoyalaPlayer ooPlayer = new OoyalaPlayer(pcode, new PlayerDomain(DOMAIN), SecurePlayerSampleAppActivity.this, options);
         final OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, ooPlayer, DefaultControlStyle.AUTO);
         player = playerLayoutController.getPlayer();
-        StreamPlayer.defaultPlayerInfo = new DefaultPlayerInfo() {
-
-            @Override
-            public Set<String> getSupportedFormats() {
-              Set set = new HashSet<String>();
-                      set.add("playready_hls");
-              return set;
-            }
-
-          };
-        OoyalaFreewheelManager fwManager = new OoyalaFreewheelManager(SecurePlayerSampleAppActivity.this, playerLayoutController);
-        if (((String)embedSpinner.getSelectedItem()).contains("IMA")) {
-          OoyalaIMAManager imaManager = new OoyalaIMAManager(player);
-        }
 
         player.addObserver(SecurePlayerSampleAppActivity.this);
         if (player.setEmbedCode(embed)) {
