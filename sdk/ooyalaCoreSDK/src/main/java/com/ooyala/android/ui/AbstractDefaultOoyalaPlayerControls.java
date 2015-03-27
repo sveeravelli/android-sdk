@@ -1,8 +1,5 @@
 package com.ooyala.android.ui;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,15 +9,19 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import com.ooyala.android.captions.ClosedCaptionsStyle;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
+import com.ooyala.android.captions.ClosedCaptionsStyle;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlayerControls {
   protected OoyalaPlayerLayout _layout = null;
   protected OoyalaPlayer _player = null;
   protected Timer _hideTimer = null;
   protected FrameLayout _baseLayout = null;
+  protected AbstractOoyalaPlayerLayoutController _playerLayoutController = null;
 
   protected static final int HIDE_AFTER_MILLIS = 5000;
 
@@ -32,6 +33,8 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
   protected boolean _isPlayerReady = false;
   protected boolean _isVisible = true;
+
+
 
   protected class HideTimerTask extends TimerTask {
     @Override
@@ -171,6 +174,13 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   @Override
   public void setParentLayout(OoyalaPlayerLayout layout) {
     _layout = layout;
+    _playerLayoutController = null;
+    if (_layout != null  &&
+        (_layout.getLayoutController() instanceof AbstractOoyalaPlayerLayoutController)) {
+      _playerLayoutController = (AbstractOoyalaPlayerLayoutController)_layout.getLayoutController();
+    } else {
+      _playerLayoutController = null;
+    }
   }
 
   @Override
@@ -191,21 +201,21 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     updateButtonStates();
     _hideTimer = new Timer();
     _hideTimer.schedule(new HideTimerTask(), HIDE_AFTER_MILLIS);
-    if (_player != null && _isPlayerReady) {
-      ClosedCaptionsStyle ccStyle = _player.getClosedCaptionsStyle();
+    if (_playerLayoutController != null && _isPlayerReady) {
+      ClosedCaptionsStyle ccStyle = _playerLayoutController.getClosedCaptionsStyle();
       if (ccStyle != null) {
         ccStyle.bottomMargin = this.bottomBarOffset();
-        _player.setClosedCaptionsBottomMargin(this.bottomBarOffset());
+        _playerLayoutController.setClosedCaptionsBottomMargin(this.bottomBarOffset());
       }
     }
   }
 
   @Override
   public void hide() {
-    if (_player != null && _isPlayerReady) {
-      ClosedCaptionsStyle ccStyle = _player.getClosedCaptionsStyle();
+    if (_playerLayoutController != null && _isPlayerReady) {
+      ClosedCaptionsStyle ccStyle = _playerLayoutController.getClosedCaptionsStyle();
       if (ccStyle != null) {
-        _player.setClosedCaptionsBottomMargin(MARGIN_SIZE_DP * 4);
+        _playerLayoutController.setClosedCaptionsBottomMargin(MARGIN_SIZE_DP * 4);
       }
     }
     if (_hideTimer != null) {
