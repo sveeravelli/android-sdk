@@ -1,10 +1,5 @@
 package com.ooyala.android.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,14 +16,24 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.captions.ClosedCaptionsStyle;
+import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
+import com.ooyala.android.item.Caption;
+import com.ooyala.android.item.Video;
 import com.ooyala.android.player.FCCTVRatingUI;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
@@ -49,9 +54,15 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected ListView listView;
   protected AlertDialog dialog;
   private FCCTVRatingUI _tvRatingUI;
+  private ClosedCaptionsView _closedCaptionsView;
+  private String _closedCaptionLanguage = null;
+  private boolean _streamBasedCC = false;
+  private ClosedCaptionsStyle _closedCaptionsStyle = null;
 
   private int selectedLanguageIndex;
   private int selectedPresentationIndex;
+
+  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
 
   public int getSelectedLanguageIndex() {
     return this.selectedLanguageIndex;
@@ -152,6 +163,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _inlineControls.hide();
       _player.addObserver(_inlineControls);
     }
+
   }
 
   @Override
@@ -361,7 +373,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void showClosedCaptionsMenu() {
     if (this.dialog == null || (this.dialog != null && !this.dialog.isShowing())) {
-      Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
+      Set<String> languageSet = this.getAvailableClosedCaptionsLanguages();
       List<String> languageList = new ArrayList<String>(languageSet);
       Collections.sort(languageList);
       languageList.add(0, LocalizationSupport.localizedStringFor("None"));
@@ -421,7 +433,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
       this.selectedLanguageIndex = position;
-      _player.setClosedCaptionsLanguage(this.optionList.get(position));
+      this.setClosedCaptionsLanguage(this.optionList.get(position));
     }
 
     /*else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
@@ -460,6 +472,161 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       }
     }*/
   }
+
+  /**
+   * Set the displayed closed captions language
+   *
+   * @param language
+   *          2 letter country code of the language to display or nil to hide
+   *          closed captions
+   */
+  public void setClosedCaptionsLanguage(String language) {
+    _closedCaptionLanguage = language;
+
+    // If we're given the "cc" language, we know it's live closed captions
+    if (_player != null) {
+      if (_closedCaptionLanguage.equals(LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+        _player.setLiveClosedCaptionsEnabled(true);
+        return;
+      } else if (_player.isLiveClosedCaptionsAvailable()) {
+        _player.setLiveClosedCaptionsEnabled(false);
+      }
+    };
+
+
+    if (_closedCaptionsView != null) {
+      _closedCaptionsView.setCaption(null);
+    }
+    displayCurrentClosedCaption();
+  }
+
+  public void setClosedCaptionsPresentationStyle() {
+    removeClosedCaptionsView();
+    _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    }
+    _layout.addView(_closedCaptionsView);
+    _closedCaptionsView.setCaption(null);
+    displayCurrentClosedCaption();
+  }
+
+  private void removeClosedCaptionsView() {
+    if (_closedCaptionsView != null) {
+      _layout.removeView(_closedCaptionsView);
+      _closedCaptionsView = null;
+    }
+  }
+
+  /**
+   * Get the current closed caption language
+   *
+   * @return the current closed caption language
+   */
+  public String getClosedCaptionsLanguage() {
+    return _closedCaptionLanguage;
+  }
+
+  /**
+   * @return the current ClosedCaptionsStyle
+   */
+  public ClosedCaptionsStyle getClosedCaptionsStyle() {
+    return _closedCaptionsStyle;
+  }
+
+  /**
+   * Set the ClosedCaptionsStyle
+   *
+   * @param closedCaptionsStyle
+   *          the ClosedCaptionsStyle to use
+   */
+  public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
+    _closedCaptionsStyle = closedCaptionsStyle;
+    if (_closedCaptionsStyle != null) {
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
+    }
+    displayCurrentClosedCaption();
+  }
+
+  /**
+   * Set the bottomMargin of closedCaptions view
+   *
+   * @param bottomMargin
+   *          the bottom margin to use
+   */
+  public void setClosedCaptionsBottomMargin(int bottomMargin) {
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsStyle.bottomMargin = bottomMargin;
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
+    }
+  }
+
+  void displayCurrentClosedCaption() {
+    if (_closedCaptionsView == null || _player == null || _player.getCurrentItem() == null)
+      return;
+    if (_streamBasedCC)
+      return;
+
+    Video currentItem = _player.getCurrentItem();
+
+    // PB-3090: we currently only support captions for the main content, not
+    // also the advertisements.
+    if (_closedCaptionLanguage != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
+      double currT = _player.getPlayheadTime() / 1000d;
+      if (_closedCaptionsView.getCaption() == null
+          || currT > _closedCaptionsView.getCaption().getEnd()
+          || currT < _closedCaptionsView.getCaption().getBegin()) {
+        Caption caption = currentItem.getClosedCaptions().getCaption(
+            _closedCaptionLanguage, currT);
+        if (caption != null && caption.getBegin() <= currT
+            && caption.getEnd() >= currT) {
+          _closedCaptionsView.setCaption(caption);
+        } else {
+          _closedCaptionsView.setCaption(null);
+        }
+      }
+    } else {
+      _closedCaptionsView.setCaption(null);
+    }
+  }
+
+  private void displayClosedCaptionText(String text) {
+    _streamBasedCC = true;
+    if (_closedCaptionsView == null) {
+      _closedCaptionsStyle = new ClosedCaptionsStyle(_layout.getContext());
+      _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      _layout.addView(_closedCaptionsView);
+    }
+    _closedCaptionsView.setCaptionText(text);
+  }
+
+  /**
+   * Get the available closed captions languages
+   *
+   * @return a Set of Strings containing the available closed captions languages
+   */
+  public Set<String> getAvailableClosedCaptionsLanguages() {
+    Set<String> languages = new HashSet<String>();
+    if (_player != null) {
+      Video currentItem = _player.getCurrentItem();
+      if (currentItem != null && currentItem.getClosedCaptions() != null) {
+        languages.addAll(currentItem.getClosedCaptions().getLanguages());
+      }
+
+      if (languages.size() <= 0 && _player.isLiveClosedCaptionsAvailable()) {
+        languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
+      }
+    }
+
+    return languages;
+  }
+
 
   class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
 
