@@ -33,9 +33,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
-public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
+public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController, Observer {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
   public static enum DefaultControlStyle {
     NONE, AUTO
@@ -56,7 +58,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   private FCCTVRatingUI _tvRatingUI;
   private ClosedCaptionsView _closedCaptionsView;
   private String _closedCaptionLanguage = null;
-  private boolean _streamBasedCC = false;
   private ClosedCaptionsStyle _closedCaptionsStyle = null;
 
   private int selectedLanguageIndex;
@@ -163,6 +164,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _inlineControls.hide();
       _player.addObserver(_inlineControls);
     }
+    _player.addObserver(this);
 
   }
 
@@ -518,6 +520,17 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     }
   }
 
+  private void addClosedCaptionsView() {
+    removeClosedCaptionsView();
+    if (_player != null && _player.getCurrentItem() != null &&
+        _player.getCurrentItem().hasClosedCaptions()) {
+      _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
+      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      _layout.addView(_closedCaptionsView);
+    }
+  }
+
   /**
    * Get the current closed caption language
    *
@@ -569,8 +582,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   void displayCurrentClosedCaption() {
     if (_closedCaptionsView == null || _player == null || _player.getCurrentItem() == null)
       return;
-    if (_streamBasedCC)
-      return;
 
     Video currentItem = _player.getCurrentItem();
 
@@ -593,17 +604,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     } else {
       _closedCaptionsView.setCaption(null);
     }
-  }
-
-  private void displayClosedCaptionText(String text) {
-    _streamBasedCC = true;
-    if (_closedCaptionsView == null) {
-      _closedCaptionsStyle = new ClosedCaptionsStyle(_layout.getContext());
-      _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      _layout.addView(_closedCaptionsView);
-    }
-    _closedCaptionsView.setCaptionText(text);
   }
 
   /**
@@ -695,6 +695,23 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       });
       return radioButton;
+    }
+  }
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      if (_player.isPlaying() && !_player.isShowingAd()) {
+        addClosedCaptionsView();
+      }
+    }
+
+    if (arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+      removeClosedCaptionsView();
+    }
+    
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      displayCurrentClosedCaption();
     }
   }
 }
