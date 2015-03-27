@@ -1,21 +1,21 @@
 package com.ooyala.android.item;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import android.os.AsyncTask;
+
+import com.ooyala.android.OoyalaAPIClient;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
+import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.util.IMatchObjectPredicate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.AsyncTask;
-
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.util.IMatchObjectPredicate;
-import com.ooyala.android.OoyalaAPIClient;
-import com.ooyala.android.apis.FetchPlaybackInfoCallback;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Stores the info and metatdata for the specified movie.
@@ -83,6 +83,7 @@ public class Video extends ContentItem implements PlayableItem {
           _ads.clear();
           for (int i = 0; i < ads.length(); i++) {
             OoyalaManagedAdSpot ad = OoyalaManagedAdSpot.create(ads.getJSONObject(i), _api);
+            ad.setPriority(i);
             if (ad != null) {
               _ads.add(ad);
             } else {
