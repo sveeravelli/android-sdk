@@ -406,10 +406,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
         show();
       }
     }
-
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION && _playerLayoutController != null) {
-      _playerLayoutController.displayCurrentClosedCaption();
-    }
   }
 
   @Override
