@@ -127,6 +127,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
+  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
+
   /**
    * If set to true, this will allow HLS streams regardless of the Android
    * version. WARNING: Ooyala's internal testing has shown that Android 3.x HLS
@@ -1405,6 +1407,23 @@ public class OoyalaPlayer extends Observable implements Observer,
     return false;
   }
 
+  /**
+   * Get the available closed captions languages
+   *
+   * @return a Set of Strings containing the available closed captions languages
+   */
+  public Set<String> getAvailableClosedCaptionsLanguages() {
+    Set<String> languages = new HashSet<String>();
+    if (_currentItem != null && _currentItem.getClosedCaptions() != null) {
+      languages.addAll(_currentItem.getClosedCaptions().getLanguages());
+    }
+
+    if (languages.size() <= 0 && _player.isLiveClosedCaptionsAvailable()) {
+      languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
+    }
+
+    return languages;
+  }
   /**
    * turn on or turn off live closed captions, it available
    * @param enabled true to enable live closed caption, false to disable.

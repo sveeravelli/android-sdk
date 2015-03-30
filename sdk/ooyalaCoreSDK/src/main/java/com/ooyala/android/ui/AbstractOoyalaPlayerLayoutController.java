@@ -63,12 +63,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   private int selectedLanguageIndex;
   private int selectedPresentationIndex;
 
-  public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
-
   public int getSelectedLanguageIndex() {
     return this.selectedLanguageIndex;
   }
-
   public int getSelectedPresentationIndex() {
     return this.selectedPresentationIndex;
   }
@@ -375,7 +372,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void showClosedCaptionsMenu() {
     if (this.dialog == null || (this.dialog != null && !this.dialog.isShowing())) {
-      Set<String> languageSet = this.getAvailableClosedCaptionsLanguages();
+      Set<String> languageSet = _player.getAvailableClosedCaptionsLanguages();
       List<String> languageList = new ArrayList<String>(languageSet);
       Collections.sort(languageList);
       languageList.add(0, LocalizationSupport.localizedStringFor("None"));
@@ -487,7 +484,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     // If we're given the "cc" language, we know it's live closed captions
     if (_player != null) {
-      if (_closedCaptionLanguage.equals(LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+      if (_closedCaptionLanguage.equals(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE)) {
         _player.setLiveClosedCaptionsEnabled(true);
         return;
       } else if (_player.isLiveClosedCaptionsAvailable()) {
@@ -605,28 +602,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _closedCaptionsView.setCaption(null);
     }
   }
-
-  /**
-   * Get the available closed captions languages
-   *
-   * @return a Set of Strings containing the available closed captions languages
-   */
-  public Set<String> getAvailableClosedCaptionsLanguages() {
-    Set<String> languages = new HashSet<String>();
-    if (_player != null) {
-      Video currentItem = _player.getCurrentItem();
-      if (currentItem != null && currentItem.getClosedCaptions() != null) {
-        languages.addAll(currentItem.getClosedCaptions().getLanguages());
-      }
-
-      if (languages.size() <= 0 && _player.isLiveClosedCaptionsAvailable()) {
-        languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
-      }
-    }
-
-    return languages;
-  }
-
 
   class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
 
