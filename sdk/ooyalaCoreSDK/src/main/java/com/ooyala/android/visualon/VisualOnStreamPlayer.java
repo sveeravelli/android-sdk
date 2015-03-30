@@ -59,7 +59,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static boolean didCleanupLocalFiles = false;
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
-  private static final String EXPECTED_VISUALON_VERSION = "3.14.12-B76704";
+  private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
   private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.14.12-B76704";
   private VisualOnConfiguration _visualOnConfiguration = null;
   private static final boolean ENABLE_DEBUGGING = false;
