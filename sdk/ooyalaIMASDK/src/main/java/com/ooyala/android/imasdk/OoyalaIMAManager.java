@@ -1,6 +1,8 @@
 package com.ooyala.android.imasdk;
 
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.ViewGroup;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -239,7 +241,12 @@ public class OoyalaIMAManager implements AdPluginInterface {
           public void run() {
             try {
               Thread.sleep(TIMEOUT);
-              timeout();
+              new Handler( Looper.getMainLooper() ).post( new Runnable() {
+                @Override
+                public void run() {
+                  timeout();
+                }
+              } );
             } catch (InterruptedException e) {
               DebugMode.logD(TAG, "InterruptedException " + e + "while waiting for IMA ads request response");
             }
