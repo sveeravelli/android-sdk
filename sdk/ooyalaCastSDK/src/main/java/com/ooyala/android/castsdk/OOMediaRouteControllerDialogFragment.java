@@ -7,12 +7,10 @@ import android.support.v7.app.MediaRouteControllerDialogFragment;
 public class OOMediaRouteControllerDialogFragment extends MediaRouteControllerDialogFragment {
 
   private OOMediaRouteControllerDialog mCustomControllerDialog;
-  private OOCastManager castManager;
+  public OOCastManager castManager;
 
-  
-  public OOMediaRouteControllerDialogFragment(OOCastManager castManager) {
+  public OOMediaRouteControllerDialogFragment() {
     super();
-    this.castManager = castManager;
   }
   
   @Override

@@ -14,7 +14,9 @@ public class OOMediaRouteDialogFactory extends MediaRouteDialogFactory {
   
   @Override
   public OOMediaRouteControllerDialogFragment onCreateControllerDialogFragment() {
-      return new OOMediaRouteControllerDialogFragment(this.castManager);
+    OOMediaRouteControllerDialogFragment mediarouteControllerDialogFragment =  new OOMediaRouteControllerDialogFragment();
+    mediarouteControllerDialogFragment.castManager = this.castManager;
+    return mediarouteControllerDialogFragment;
   }
 
 }
