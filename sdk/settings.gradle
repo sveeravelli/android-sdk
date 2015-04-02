@@ -1,5 +1,8 @@
-include ':ooyalaCoreSDK', ':ooyalaFreewheelSDK', ':ooyalaIMASDK', ':ooyalaCastSDK', ':CastCompanionLibrary'
+include ':ooyalaCoreSDK', ':ooyalaFreewheelSDK', ':ooyalaIMASDK', ':ooyalaCastSDK'
 
 include ':ooyalaTestApp'
 include ':internalTestApp'
 include ':ooyalaNielsenSDK'
+include ':CastCompanionLibrary'
+
+project(':CastCompanionLibrary').projectDir = new File(settingsDir, '../vendor/CastCompanionLibrary')
