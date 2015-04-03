@@ -5,6 +5,31 @@
     android:background="@android:color/transparent" >
 
     <LinearLayout
+        android:id="@+id/playbackInfoLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="false"
+        android:background="#00000000"
+        android:orientation="vertical"
+        android:paddingTop="20dp" 
+        android:paddingRight="20dp">
+        
+
+        <TextView
+            android:id="@+id/playback_info_bps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playback_information_BPS_tView_header" />
+
+        <TextView
+            android:id="@+id/playback_info_res"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playback_information_Resolution_tView_header" />
+
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/layout4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
