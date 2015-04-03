@@ -90,6 +90,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   protected boolean _isDiscredixLoaded = false;
 
+  public static void warmDxDrmDlc(Context context) {
+    DiscredixDrmUtils.warmDxDrmDlc(context);
+  }
+
   private boolean checkForDiscredixLibrary(Context context) {
     boolean hasDiscredix;
     try {
