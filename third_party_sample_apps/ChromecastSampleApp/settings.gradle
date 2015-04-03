@@ -12,4 +12,4 @@ include ':ooyalaCastSDK'
 project(':ooyalaCastSDK').projectDir=new File(settingsDir, '../../sdk/ooyalaCastSDK')
 
 include ':CastCompanionLibrary'
-project(':CastCompanionLibrary').projectDir=new File(settingsDir, '../../sdk/CastCompanionLibrary')
+project(':CastCompanionLibrary').projectDir=new File(settingsDir, '../../vendor/CastCompanionLibrary')
