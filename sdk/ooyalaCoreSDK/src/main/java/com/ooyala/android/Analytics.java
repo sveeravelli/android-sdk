@@ -37,7 +37,7 @@ public class Analytics {
       "<html><head><script src=\"_HOST__URI_\"></script><script>function _init() {reporter = new Ooyala.Reporter('_PCODE_',_MODULE_PARAMS_);console.log('...onLoad: domain='+document.domain);};</script></script></head><body onLoad=\"_init();\"></body></html>";
 
   private static final String JS_ANALYTICS_URI = "/reporter.js";
-  private static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK v%s [%s]";
+  private static final String JS_ANALYTICS_USER_AGENT = "Ooyala Android SDK %s [%s]";
   private static final String JS_ANALYTICS_ACCOUNT_ID = "accountId";
   private static final String JS_ANALYTICS_GUID = "guid";
   private static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
