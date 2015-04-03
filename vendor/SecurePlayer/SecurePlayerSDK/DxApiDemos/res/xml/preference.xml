@@ -4,11 +4,11 @@
     <PreferenceCategory android:title="@string/settings_category_personalization" >
         <Preference
             android:key="select_pic_pref"
-            android:title="Perform Peronalization" >
+            android:title="Perform Personalization" >
             <intent android:action="com.discretix.PERSONALIZATION" >
             </intent>
         </Preference>
-        <Preference android:title="Delete Peronalization" >
+        <Preference android:title="Delete Personalization" >
             <intent android:action="com.discretix.DELETE_PERSONALIZATION" >
             </intent>
         </Preference>

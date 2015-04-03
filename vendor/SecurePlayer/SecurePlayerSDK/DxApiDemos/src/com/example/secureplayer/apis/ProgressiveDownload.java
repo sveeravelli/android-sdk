@@ -207,13 +207,13 @@ public class ProgressiveDownload extends Activity implements VOCommonPlayerListe
 							}
 						} catch (DrmGeneralFailureException e) {
 							failure = true;
-							DebugMode.logE(TAG, "Caught!", e);
+							e.printStackTrace();
 						} catch (DrmInvalidFormatException e) {
 							failure = true;
-							DebugMode.logE(TAG, "Caught!", e);
+							e.printStackTrace();
 						} catch (DrmClientInitFailureException e) {
 							failure = true;
-							DebugMode.logE(TAG, "Caught!", e);
+							e.printStackTrace();
 						}
 						if (failure) {
 							Log.e("Download progress:",
@@ -263,7 +263,7 @@ public class ProgressiveDownload extends Activity implements VOCommonPlayerListe
 				Log.i("Download progress:", "Download was completed");
 
 			} catch (IOException e) {
-				DebugMode.logE(TAG, "Caught!", e);
+				e.printStackTrace();
 			}
 		}
 	}
@@ -476,7 +476,7 @@ public class ProgressiveDownload extends Activity implements VOCommonPlayerListe
 			}
 			
 		} catch (IOException e) {
-			DebugMode.logE(TAG, "Caught!", e);
+			e.printStackTrace();
 		}
 	}
 	

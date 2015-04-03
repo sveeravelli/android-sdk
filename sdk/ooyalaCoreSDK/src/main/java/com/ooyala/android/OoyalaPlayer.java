@@ -44,6 +44,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.visualon.VisualOnStreamPlayer;
 
 import org.json.JSONObject;
 
@@ -619,6 +620,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   private boolean changeCurrentItemAfterFetch() {
     String accountId = _playerAPIClient.getUserInfo().getAccountId();
+
+    //SecurePlayer GENERAL_ANDR_VOP_PROB_RC_03_01_03_0631 on Android 5.0 requires DxDrmDlc to be
+    // "warmed" or initialized before any webview is initialized.  This has to be done before analytics
+    if(OoyalaPlayer.enableCustomPlayreadyPlayer) {
+      VisualOnStreamPlayer.warmDxDrmDlc(getLayout().getContext());
+    }
 
     // If analytics is uninitialized, OR
     // If has account ID that was different than before, OR

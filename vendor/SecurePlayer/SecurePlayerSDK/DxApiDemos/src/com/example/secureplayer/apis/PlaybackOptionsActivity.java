@@ -15,10 +15,11 @@ import com.example.secureplayer.R;
 public class PlaybackOptionsActivity extends PreferenceActivity implements
 OnSharedPreferenceChangeListener{
 	
-	ListPreference     subtitlesList = null;
-	EditTextPreference subtitlesCustom = null;
-	CheckBoxPreference checkBoxSubtitles = null;
-	ListPreference     audioLanguageList = null;
+	ListPreference     subtitlesList        = null;
+	EditTextPreference subtitlesCustom      = null;
+	CheckBoxPreference checkBoxSubtitles    = null;
+	ListPreference     audioLanguageList    = null;
+	CheckBoxPreference checkBoxPlaybackInfo = null;
 	
 	
 	@Override
@@ -31,6 +32,7 @@ OnSharedPreferenceChangeListener{
 		subtitlesCustom        = (EditTextPreference)findPreference(getString(R.string.key_custom_subtitles));
 		checkBoxSubtitles      = (CheckBoxPreference)findPreference(getString(R.string.key_checkbox_subtitles));
 		audioLanguageList      = (ListPreference)    findPreference(getString(R.string.key_list_audio_languages));		
+		checkBoxPlaybackInfo   = (CheckBoxPreference)findPreference(getString(R.string.key_display_playback_information));
 		
 		
 		int iIndex;
@@ -39,7 +41,7 @@ OnSharedPreferenceChangeListener{
 		subtitlesCustom.setText(DxConstants.getSubtitleCustom());
 		checkBoxSubtitles.setChecked(DxConstants.getSubtitleUse());
 		
-		
+		checkBoxPlaybackInfo.setChecked(DxConstants.getDisplayPlaybackInformation());
 		
 		iLength = DxConstants.getSubtitleArrayLength();
 	
@@ -126,7 +128,11 @@ OnSharedPreferenceChangeListener{
 		getPreferenceScreen().getSharedPreferences()
 		.unregisterOnSharedPreferenceChangeListener(this);
 		
-		if (key.equals(getString(R.string.key_checkbox_subtitles))) {
+		if (key.equals(getString(R.string.key_display_playback_information))) {
+			boolean bIsChecked = checkBoxPlaybackInfo.isChecked();
+			DxConstants.setDisplayPlaybackInformation(bIsChecked);
+		}
+		else if (key.equals(getString(R.string.key_checkbox_subtitles))) {
 			boolean bIsChecked = checkBoxSubtitles.isChecked();
 			
 			// Enable Subtitles (in general)
