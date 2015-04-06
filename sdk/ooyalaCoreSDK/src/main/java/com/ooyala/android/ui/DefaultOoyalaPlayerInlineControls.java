@@ -1,5 +1,8 @@
 package com.ooyala.android.ui;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -15,15 +18,12 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.util.DebugMode;
-
-import java.util.Observable;
-import java.util.Observer;
 
 public class DefaultOoyalaPlayerInlineControls extends AbstractDefaultOoyalaPlayerControls implements
 SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
