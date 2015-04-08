@@ -100,7 +100,7 @@ public class NielsenSampleAppActivity extends Activity implements Observer, IApp
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
     player = playerLayoutController.getPlayer();
 
-    s_nielsenAnalytics = new NielsenAnalytics( this, player, this, NIELSEN_APPID, "0.1", "NielsenTestApp", NIELSEN_SFCODE, player.getID3TagNotifier(), getCustomConfig(), getCustomMetadata() );
+    s_nielsenAnalytics = new NielsenAnalytics( this, player, this, NIELSEN_APPID, "0.1", "NielsenTestApp", NIELSEN_SFCODE, getCustomConfig(), getCustomMetadata() );
 
     player.addObserver(this);
 
