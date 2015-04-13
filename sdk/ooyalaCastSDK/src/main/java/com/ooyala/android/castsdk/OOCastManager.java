@@ -33,6 +33,7 @@ import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastManager;
+import com.ooyala.android.CastPlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -79,7 +80,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
             throw new RuntimeException(msg);
         }
         castManager = new OOCastManager(context, applicationId, namespaces);
-        mCastManager = castManager;
+        mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
     }
     OOCastManager.currentActivity = context.getClass();
     currentContext = context;
@@ -133,15 +134,24 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public OOCastPlayer createNewCastPlayer(String embedCode) {
     DebugMode.logD(TAG, "Create new CastPlayer");
-    if (castPlayer == null || (castPlayer.getEmbedCode() != null && !castPlayer.getEmbedCode().equals(embedCode))) {
-      castPlayer = new OOCastPlayer(this, ooyalaPlayer);
-    } 
+    DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be nil");
+    if (isCastingFromCurrentCastPlayer()) {
+      castPlayer.suspend();
+    }
+
+    castPlayer = new OOCastPlayer(this, ooyalaPlayer);
+    castPlayer.addObserver(ooyalaPlayer);
     castPlayer.setCastView(castView);
-    // This method can only be called from ooyalaPlayer
-    // We do not need to show any mini controller for a activity with ooyalaPlayer
     removeAllMiniControllers();
-    castPlayer.addObserver(this.ooyalaPlayer);
     return castPlayer;
+  }
+
+  private boolean isCastingFromCurrentCastPlayer() {
+    return castPlayer != null;
+  }
+
+  public void setCastPlayer(CastPlayer castPlayerFromOoyalaPlayer) {
+    this.castPlayer = (OOCastPlayer)castPlayerFromOoyalaPlayer;
   }
 
   public OOCastPlayer getCurrentCastPlayer() {
@@ -176,12 +186,19 @@ public class OOCastManager extends DataCastManager implements CastManager {
     this.ooyalaPlayer = ooyalaPlayer;
     ooyalaPlayer.registerCastManager(this);
   }
-  
+
+  /**
+   * Disconnect the current OoyalaPlayer from the OOCastManager
+   * Called from App level when right before the connected OoyalaPlayer is destroyed
+   */
   public void disconnectOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer);
     ooyalaPlayer = null;
   }
 
+  /**
+   *
+   */
   public void onResume() {
     DebugMode.logD(TAG, "onResume()");
     updateMiniControllersVisibility();
@@ -220,9 +237,12 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public void exitCastMode() {
     DebugMode.logD(TAG, "Exit Cast Mode");
     clearCastView();
-    if (ooyalaPlayer != null && castPlayer != null) {
-      ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
-    }
+
+    DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be null");
+    DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
+
+    destroyCurrentCastPlayer();
+    ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
     updateMiniControllersVisibility();
     removeAllMiniControllers();
   }
@@ -439,7 +459,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
       if (remoteControlClient == null) {
           Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
           intent.setComponent(myEventReceiver);
-          remoteControlClient = new RemoteControlClient(PendingIntent.getBroadcast(context, 0, intent, 0));
+          remoteControlClient = new RemoteControlClient(PendingIntent.getBroadcast(context, 0, intent, 0)); // grant the remoteControlClient the right to perform broadcast
           audioManager.registerRemoteControlClient(remoteControlClient);
       }
       remoteControlClient.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PAUSE);
