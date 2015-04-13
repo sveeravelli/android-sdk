@@ -631,25 +631,26 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
-    boolean needToLoadAnalytics = _analytics == null;
-    needToLoadAnalytics |= accountId != null
-        && !accountId.equals(_lastAccountId);
-    needToLoadAnalytics |= accountId == null && _lastAccountId != null;
-
-    if (needToLoadAnalytics) {
-      _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
-    }
-
-    // last account ID seen. Could be null
-    _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
-
-    _analytics.initializeVideo(_currentItem.getEmbedCode(),
-        _currentItem.getDuration());
-    // If the Receiver is turned on, use Cast Mode.
     if (_castManager != null && _castManager.isConnected()) {
       switchToCastMode(_currentItem.getEmbedCode());
-    } else if (!processAdModes(AdMode.ContentChanged, 0)) {
-      switchToContent(false);
+    } else {
+      boolean needToLoadAnalytics = _analytics == null;
+      needToLoadAnalytics |= accountId != null
+              && !accountId.equals(_lastAccountId);
+      needToLoadAnalytics |= accountId == null && _lastAccountId != null;
+
+      if (needToLoadAnalytics) {
+        _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+      }
+
+      // last account ID seen. Could be null
+      _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
+
+      _analytics.initializeVideo(_currentItem.getEmbedCode(),
+              _currentItem.getDuration());
+      if (!processAdModes(AdMode.ContentChanged, 0)) {
+        switchToContent(false);
+      }
     }
     return true;
   }
@@ -2103,19 +2104,17 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void switchToCastMode(String embedCode) {
     DebugMode.logD(TAG, "Switch to Cast Mode");
-    int currentPlayheadTime = 0;
-    State currentState = State.INIT;
-    if (_player != null) {
-      currentPlayheadTime = _player.currentTime();
-      currentState = _player.getState();
-      suspendCurrentPlayer();
-    }
+    suspendCurrentPlayer();
     _castPlayer = _castManager.createNewCastPlayer(embedCode);
     _castPlayer.setSeekable(_seekable);
-    if (_playQueued) {
-      currentState = State.PLAYING;
+    _castPlayer.initReceiverPlayer(embedCode, getCurrentPlayheadForCastMode(), isPlaying());
+  }
+
+  private int getCurrentPlayheadForCastMode() {
+    if (_player != null) {
+      return _player.currentTime();
     }
-    _castPlayer.initReceiverPlayer(embedCode, currentPlayheadTime, currentState);
+    return 0;
   }
 
   public void exitCastMode(int exitPlayheadTime, State exitState, String ec) {
@@ -2123,17 +2122,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _castManager.destroyCurrentCastPlayer();
     _castPlayer = null;
     switchToContent(true, exitPlayheadTime, exitState);
-    if (_player == null) {
-      List<String> embedCodes = new ArrayList<String>();
-      embedCodes.add(ec);
-      // TODO: CastModule might need to accept a list, and accept an ad set code
-      // setEmbedcodeContinued(embedCodes, null);
-      if (exitState != State.PLAYING) {
-        seek(exitPlayheadTime);
-      } else {
-        play(exitPlayheadTime);
-      }
-    }
   }
 
   private boolean prepareContent(boolean forcePlay) {
@@ -2236,7 +2224,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_adManager.inAdMode()) {
       _adManager.suspend();
     } else if (_castPlayer != null && _castManager != null) {
-      _castManager.disconnectOoyalaPlayer();
       _castPlayer.suspend();
     } else if (_player != null) {
       _player.suspend();
