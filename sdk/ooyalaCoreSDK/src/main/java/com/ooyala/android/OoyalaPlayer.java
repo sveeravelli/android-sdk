@@ -2006,6 +2006,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void registerCastManager(CastManager castManager) {
     _castManager = castManager;
+    _castManager.setCastPlayer(_castPlayer);
   }
 
   /**
@@ -2104,6 +2105,8 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void switchToCastMode(String embedCode) {
     DebugMode.logD(TAG, "Switch to Cast Mode");
+    DebugMode.assertCondition(_castPlayer == null, TAG, "castPlayer should be null");
+    DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
     suspendCurrentPlayer();
     _castPlayer = _castManager.createNewCastPlayer(embedCode);
     _castPlayer.setSeekable(_seekable);
@@ -2119,7 +2122,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void exitCastMode(int exitPlayheadTime, State exitState, String ec) {
     DebugMode.logD(TAG, "Exit Cast Mode");
-    _castManager.destroyCurrentCastPlayer();
     _castPlayer = null;
     switchToContent(true, exitPlayheadTime, exitState);
   }
@@ -2143,6 +2145,10 @@ public class OoyalaPlayer extends Observable implements Observer,
       dequeuePlay();
     }
     return true;
+  }
+
+  public boolean isInCastMode() {
+    return (_castPlayer != null);
   }
 
   void processExitAdModes(AdMode mode, boolean adsDidPlay) {
@@ -2223,9 +2229,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void suspendCurrentPlayer() {
     if (_adManager.inAdMode()) {
       _adManager.suspend();
-    } else if (_castPlayer != null && _castManager != null) {
-      _castPlayer.suspend();
-    } else if (_player != null) {
+    } else if (_player != null && !isInCastMode()) {
       _player.suspend();
       removeClosedCaptionsView();
     }
@@ -2234,7 +2238,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   private void resumeCurrentPlayer() {
     if (_adManager.inAdMode()) {
       _adManager.resume();
-    } else if (_castPlayer != null) {
+    } else if (shouldResumeCastMode()) {
+      _castManager.connectOoyalaPlayer(this);
       _castPlayer.resume();
     } else if (_player != null) {
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
@@ -2247,6 +2252,10 @@ public class OoyalaPlayer extends Observable implements Observer,
         this.addClosedCaptionsView();
       }
     }
+  }
+
+  private boolean shouldResumeCastMode() {
+    return _castPlayer != null;
   }
 
   void notifyPluginEvent(StateNotifier notifier, String event) {
