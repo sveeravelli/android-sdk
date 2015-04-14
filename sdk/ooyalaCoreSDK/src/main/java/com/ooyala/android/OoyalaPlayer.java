@@ -631,7 +631,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
-    if (_castManager != null && _castManager.isConnected()) {
+    if (_castManager != null && _castManager.isConnectedToChromecast()) {
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
       boolean needToLoadAnalytics = _analytics == null;
@@ -2239,12 +2239,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_adManager.inAdMode()) {
       _adManager.resume();
     } else if (shouldResumeCastMode()) {
-      _castManager.connectOoyalaPlayer(this);
+      _castManager.registerWithOoyalaPlayer(this);
       _castPlayer.resume();
     } else if (_player != null) {
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
       // In this case we need to check should we switch to cast mode
-      if (_castManager != null && _castManager.isConnected()) {
+      if (_castManager != null && _castManager.isConnectedToChromecast()) {
         switchToCastMode(_currentItem.getEmbedCode());
       } else {
         _player.resume();

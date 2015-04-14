@@ -8,7 +8,7 @@ public interface CastManager {
   /**
    * Returns <code>true</code> only if application is connected to the Cast service.
    */
-  public boolean isConnected();
+  public boolean isConnectedToChromecast();
 
   /**
    * Create CastPlayer with given embedcode
@@ -17,7 +17,7 @@ public interface CastManager {
    */
   public CastPlayer createNewCastPlayer(String embedCode);
 
-  public void destroyCurrentCastPlayer();
+  public void setCastPlayer(CastPlayer castPlayer);
 
-  public void disconnectOoyalaPlayer();
+  public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer);
 }

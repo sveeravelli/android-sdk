@@ -10,5 +10,5 @@ public interface CastPlayer extends PlayerInterface, LifeCycleInterface {
 
   public void setSeekable(boolean seekable);
 
-  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, OoyalaPlayer.State currentState);
+  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying);
 }

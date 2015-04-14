@@ -142,14 +142,21 @@ public class OOCastManager extends DataCastManager implements CastManager {
     castPlayer = new OOCastPlayer(this, ooyalaPlayer);
     castPlayer.addObserver(ooyalaPlayer);
     castPlayer.setCastView(castView);
-    removeAllMiniControllers();
     return castPlayer;
+  }
+
+  public boolean isConnectedToChromecast() {
+    return isConnected();
   }
 
   private boolean isCastingFromCurrentCastPlayer() {
     return castPlayer != null;
   }
 
+  /**
+   * Called from OoyalaPlayer to set the related CastPlayer
+   * @param castPlayerFromOoyalaPlayer
+   */
   public void setCastPlayer(CastPlayer castPlayerFromOoyalaPlayer) {
     this.castPlayer = (OOCastPlayer)castPlayerFromOoyalaPlayer;
   }
@@ -180,8 +187,13 @@ public class OOCastManager extends DataCastManager implements CastManager {
     mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
     mediaRouteActionProvider.setDialogFactory(new OOMediaRouteDialogFactory(this));
   }
-  
-  public void connectOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+
+  /**
+   * Init this.ooyalaPlayer with given ooyalaPlayer
+   * Register the OOCastManager of the given ooyalaPlayer with "this"
+   * @param ooyalaPlayer
+   */
+  public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     DebugMode.logD(TAG, "Connect to OoyalaPlayer " + ooyalaPlayer);
     this.ooyalaPlayer = ooyalaPlayer;
     ooyalaPlayer.registerCastManager(this);
@@ -197,7 +209,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   /**
-   *
+   * Update the mini controllers when activity with mini controllers resumes
    */
   public void onResume() {
     DebugMode.logD(TAG, "onResume()");
@@ -227,7 +239,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
       boolean setDefaultRoute) {
     DebugMode.logD(TAG, "disconnectDevice called");
     super.disconnectDevice(stopAppOnExit, clearPersistedConnectionData, setDefaultRoute);
-    exitCastMode();
+    if (castPlayer != null) {
+      exitCastMode();
+    }
   }
   
   public boolean isInCastMode() {
@@ -241,8 +255,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be null");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
 
-    destroyCurrentCastPlayer();
     ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
+    destroyCurrentCastPlayer();
     updateMiniControllersVisibility();
     removeAllMiniControllers();
   }

@@ -14,7 +14,6 @@ import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
-import com.ooyala.chromecastsampleapp.R;
 
 public class PlayerStartingActivity extends ActionBarActivity {
   
@@ -47,7 +46,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     String[] namespaces = {"urn:x-cast:ooyala"};
     castManager = OOCastManager.initialize(this, "F3A32677", namespaces);
     castManager.destroyNotificationService(this);
-    castManager.connectOoyalaPlayer(player);
+    castManager.registerWithOoyalaPlayer(player);
     castManager.setTargetActivity(PlayerStartingActivity.class);
     
     // Initialize action bar
@@ -95,6 +94,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     Log.d(TAG, "onDestroy()");
     castManager.destroyNotificationService(this);
     castManager.unregisterLockScreenControls();
+    castManager.disconnectOoyalaPlayer();
 //    castManager.clearCastView();
     super.onDestroy();
   }

@@ -28,7 +28,11 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   private int duration;
   private int currentTime;
   private State state = State.INIT;
-  
+
+  private int playheadToResume;
+  private boolean autoPlayerWhenResume;
+  private  boolean suspended;
+
   private boolean isSeeking;
   private boolean seekable;
  
@@ -67,6 +71,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   public int currentTime() {
     return currentTime;
   }
+
   private void setCurrentTime(int curTime) {
     currentTime = curTime;
     onPlayHeadChanged();
@@ -177,31 +182,34 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, State currentState) {
-    DebugMode.logD(TAG, "On Cast Mode Entered with playhead time: " + playheadTimeInMillis + ", state: "
-        + currentState);
-    updateMetadataFromOoyalaPlayer(ooyalaPlayer);
-    if (this.embedCode != null && this.embedCode.equals(embedCode)) {
+  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    DebugMode.logD(TAG, "On Cast Mode Entered with playhead time: " + playheadTimeInMillis + ", isPlaying: "
+        + isPlaying);
+    if (initWithTheCastingContent(embedCode)) {
       getReceiverPlayerState(); // for updating UI controls
       displayCastView();
       return;
     }
-    displayCastView();
     this.embedCode = embedCode;
-    String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, currentState);
+    updateMetadataFromOoyalaPlayer(ooyalaPlayer);
+    displayCastView();
+    String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
     sendMessage(initialPlayMessage);
     setCurrentTime(playheadTimeInMillis);
   }
+
+  private boolean initWithTheCastingContent(String embedCode) {
+    return this.embedCode != null && this.embedCode.equals(embedCode);
+  }
   
-  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis,
-      State initialState) {
+  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying) {
     float playheadTime = playheadTimeInMillis / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
     JSONObject wrap = new JSONObject();
     try {
       playerParams.put("initialTime", playheadTime);
-      if (initialState == State.PLAYING) {
+      if (isPlaying) {
         playerParams.put("autoplay", true);
       } else {
         playerParams.put("autoplay", false);
@@ -354,11 +362,16 @@ public class OOCastPlayer extends Observable implements CastPlayer {
 
   @Override
   public void resume() {
-    if (castManager != null && castManager.isConnected()) {
-      initReceiverPlayer(embedCode, currentTime, state);
-    } else {
+    if (!shouldResumeToCastMode()) {
       ooyalaPlayer.exitCastMode(currentTime, state, embedCode);
+    } else if (suspended) {
+      suspended = false;
+      initReceiverPlayer(embedCode, playheadToResume, autoPlayerWhenResume);
     }
+  }
+
+  private boolean shouldResumeToCastMode() {
+    return castManager != null && castManager.isConnected();
   }
 
   @Override
@@ -369,8 +382,14 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   public void reset() {
   }
 
+  /**
+   * Only called from OOCastManager.createNewCastPlayer
+   */
   @Override
   public void suspend() {
+    autoPlayerWhenResume = (getState() == State.PLAYING);
+    playheadToResume = currentTime;
+    suspended = true;
   }
 
   @Override
