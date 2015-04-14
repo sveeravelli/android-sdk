@@ -159,6 +159,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   }
 
   private void itemChanged( Video item ) {
+    sendStop();
     metadataJson = null;
     channelJson = null;
   }
