@@ -8,7 +8,7 @@ public interface CastManager {
   /**
    * Returns <code>true</code> only if application is connected to the Cast service.
    */
-  public boolean isConnectedToChromecast();
+  public boolean isConnectedToReceiverApp();
 
   /**
    * Create CastPlayer with given embedcode

@@ -69,6 +69,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private OOCastPlayer castPlayer;
   private Set<OOMiniController> miniControllers;
   public boolean isShowingPlayButton;
+  private boolean isConnectedToReceiverApp;
   private int notificationMiniControllerResourceId = -1;
   
   public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
@@ -136,6 +137,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.logD(TAG, "Create new CastPlayer");
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be nil");
     if (isCastingFromCurrentCastPlayer()) {
+      if (isCastingTheSameContent(embedCode)) {
+        DebugMode.logD(TAG, "Return existing castPlayer in castManager as the current player");
+        castPlayer.addObserver(ooyalaPlayer);
+        return castPlayer;
+      }
       castPlayer.suspend();
     }
 
@@ -145,8 +151,12 @@ public class OOCastManager extends DataCastManager implements CastManager {
     return castPlayer;
   }
 
-  public boolean isConnectedToChromecast() {
-    return isConnected();
+  public boolean isConnectedToReceiverApp() {
+    return isConnectedToReceiverApp;
+  }
+
+  private boolean isCastingTheSameContent(String embedCode) {
+    return castPlayer.getEmbedCode().equals(embedCode);
   }
 
   private boolean isCastingFromCurrentCastPlayer() {
@@ -222,6 +232,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
           String sessionId, boolean wasLaunched) {
     DebugMode.logD(TAG, "onApplicationConnected called");
     super.onApplicationConnected(appMetadata, applicationStatus, sessionId, wasLaunched);
+    this.isConnectedToReceiverApp = true;
     if (ooyalaPlayer != null && ooyalaPlayer.getCurrentItem() != null) {
       ooyalaPlayer.switchToCastMode(ooyalaPlayer.getEmbedCode());
     }
@@ -231,6 +242,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public void onApplicationDisconnected(int errorCode) {
     DebugMode.logD(TAG, "onApplicationDisconnected called");
     super.onApplicationDisconnected(errorCode);
+    this.isConnectedToReceiverApp = false;
     exitCastMode();
   }
   
@@ -401,6 +413,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (this.notificationMiniControllerResourceId == -1) {
       return;
     }
+
+    // Create notification View
     RemoteViews notificationView = new RemoteViews(context.getPackageName(), this.notificationMiniControllerResourceId);
     notificationView.setTextViewText(R.id.titleView, getCurrentCastPlayer().getCastItemTitle());
     notificationView.setTextViewText(R.id.subTitleView, getDeviceName());
@@ -408,22 +422,25 @@ public class OOCastManager extends DataCastManager implements CastManager {
     notificationView.setTextColor(R.id.subTitleView, Color.WHITE);
     notificationView.setImageViewBitmap(R.id.iconView, getCurrentCastPlayer().getCastImageBitmap());
     notificationView.setImageViewBitmap(R.id.removeView, OOCastUtils.getChromecastNotificationCloseButton());
-  
+
     if (shouldDisplayPlayButton) {
       notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPlayButton());
     } else {
       notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPauseButton());
     }
+
+    // Set the result intent so the user can navigate to the target activity by clicking the notification view
     Intent resultIntent = new Intent(context, targetActivity);
+//    resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
     resultIntent.putExtra("embedcode", castPlayer.getEmbedCode());
     resultIntent.putExtra("castState", "casting");
-    
+
+    // Build the stack for PendingIntent to make sure the user can navigate back to the parent acitvity
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
     stackBuilder.addParentStack(targetActivity);
     stackBuilder.addNextIntent(resultIntent);
 
     PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
     if (castManager.notificationBuilder == null) {
       castManager.notificationBuilder = new NotificationCompat.Builder(context).
           setSmallIcon(notificationImageResourceId).

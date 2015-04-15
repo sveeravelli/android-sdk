@@ -9,16 +9,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name="com.ooyala.chromecastsampleapp.PlayerStartingActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name" android:textColor="#ffffff"
-            android:parentActivityName="com.ooyala.chromecastsampleapp.ChromecastSampleAppActivity"
-            android:launchMode="singleInstance">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ooyala.chromecastsampleapp.ChromecastSampleAppActivity"/>
-        </activity>
         <activity android:name="com.ooyala.chromecastsampleapp.ChromecastSampleAppActivity"
                   android:label="@string/app_name" android:textColor="#ffffff">
             <intent-filter>
@@ -26,6 +16,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".PlayerStartingActivity"
+            android:label="@string/app_name" android:textColor="#ffffff"
+            android:parentActivityName=".ChromecastSampleAppActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ChromecastSampleAppActivity"/>
         </activity>
 
         <receiver android:name="com.ooyala.android.castsdk.OOBroadcastReceiver" >

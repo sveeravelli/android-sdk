@@ -631,7 +631,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
-    if (_castManager != null && _castManager.isConnectedToChromecast()) {
+    if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
       boolean needToLoadAnalytics = _analytics == null;
@@ -893,6 +893,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Play the current video
    */
   public void play() {
+    if (isInCastMode()) {
+      _castPlayer.play();
+    } else {
+      playLocally();
+    }
+  }
+
+  private void playLocally() {
     if (_analytics != null) {
       _analytics.reportPlayRequested();
     }
@@ -2006,7 +2014,11 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void registerCastManager(CastManager castManager) {
     _castManager = castManager;
-    _castManager.setCastPlayer(_castPlayer);
+    // Do not override the current castPlayer in castManager unless this ooyalaPlayer is already
+    // in cast mode.
+    if (_castPlayer != null) {
+      _castManager.setCastPlayer(_castPlayer);
+    }
   }
 
   /**
@@ -2107,10 +2119,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "Switch to Cast Mode");
     DebugMode.assertCondition(_castPlayer == null, TAG, "castPlayer should be null");
     DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
+    boolean isPlaying = isPlaying();
+    int currentPlayhead = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
     _castPlayer = _castManager.createNewCastPlayer(embedCode);
     _castPlayer.setSeekable(_seekable);
-    _castPlayer.initReceiverPlayer(embedCode, getCurrentPlayheadForCastMode(), isPlaying());
+    _castPlayer.initReceiverPlayer(embedCode, currentPlayhead, isPlaying);
   }
 
   private int getCurrentPlayheadForCastMode() {
@@ -2244,7 +2258,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (_player != null) {
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
       // In this case we need to check should we switch to cast mode
-      if (_castManager != null && _castManager.isConnectedToChromecast()) {
+      if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
         switchToCastMode(_currentItem.getEmbedCode());
       } else {
         _player.resume();
