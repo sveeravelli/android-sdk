@@ -7,20 +7,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.castsdk.OOMiniController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ChromecastSampleAppActivity extends ActionBarActivity {
@@ -36,7 +30,6 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   private OOMiniController customizedMiniController;
   private List<Integer> castViewImages;
   ListView _listView;
-  private View castView;
 
   /** Called when the activity is first created. */
   @Override
@@ -50,14 +43,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     castManager.setNotificationMiniControllerLayout(R.layout.custom_notification);
     castManager.setNotificationImageResourceId(R.drawable.ic_ooyala);
     
-    castViewImages = new ArrayList<Integer>();
-    castViewImages.add(R.drawable.test1);
-    castViewImages.add(R.drawable.test2);
-    castViewImages.add(R.drawable.test3);
-    castViewImages.add(R.drawable.test4);
-    castViewImages.add(R.drawable.test5);
-    
-    Video video_list[] = new Video[] {
+    Video videoList[] = new Video[] {
         new Video(R.drawable.test1, "Ooyala Mexico Harlem Shake"),
         new Video(R.drawable.test2, "Super Corgi"),
         new Video(R.drawable.test3, "Arcade Fire - Reflecktor"),
@@ -65,7 +51,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
         new Video(R.drawable.test5, "Sweater Weather")
     };
 
-    VideoListAdapter adapter = new VideoListAdapter(this, R.layout.listview_item_row, video_list);
+    VideoListAdapter adapter = new VideoListAdapter(this, R.layout.listview_item_row, videoList);
     
     _listView = (ListView) findViewById(R.id.listView);
     _listView.setAdapter(adapter);
@@ -90,15 +76,6 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
         } else {
           intent.putExtra("embedcode", "o0OWg3bzrLBNfadaXSaCA7HbknPLFRPP");
         }
-
-        // Setup castView
-        LayoutInflater inflater = getLayoutInflater();
-        castView = inflater.inflate(R.layout.cast_video_view, null);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
-        castView.setLayoutParams(layoutParams);
-        updateCastUI(position);
-        castManager.setCastView(castView);
-
         startActivity(intent);
       }
     });
@@ -116,16 +93,6 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     castManager.addMiniController(customizedMiniController);
   }
 
-  private void updateCastUI(int position) {
-    Log.d(TAG, "update cast mode UI infos");
-    final ImageView castBackgroundImage = (ImageView) castView.findViewById(R.id.castBackgroundImage);
-    castBackgroundImage.setImageResource(castViewImages.get(position));
-    TextView videoTitle = (TextView) castView.findViewById(R.id.videoTitle);
-    videoTitle.setText("TITLE");
-    TextView videoDescription = (TextView) castView.findViewById(R.id.videoDescription);
-    videoDescription.setText("VIDEO DESCRIPTION");
-  }
-
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
@@ -137,7 +104,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   protected void onStop() {
     Log.d(TAG, "onStop()");
     super.onStop();
-    if (ChromecastSampleAppActivity.activatedActivity == 0 && castManager != null) {
+    if (ChromecastSampleAppActivity.activatedActivity == 0 && castManager != null && castManager.isInCastMode()) {
       castManager.createNotificationService(this, PlayerStartingActivity.class);
       castManager.registerLockScreenControls(this);
     }
@@ -164,6 +131,13 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     castManager.destroy(this);
     castManager = null;
     super.onDestroy();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    ChromecastSampleAppActivity.activatedActivity++;
+    Log.d(TAG, "onResume()");
   }
   
   @Override

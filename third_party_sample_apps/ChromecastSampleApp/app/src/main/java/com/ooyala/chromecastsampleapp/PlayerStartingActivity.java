@@ -7,12 +7,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.ui.OoyalaPlayerLayoutController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerStartingActivity extends ActionBarActivity {
   
@@ -23,6 +29,8 @@ public class PlayerStartingActivity extends ActionBarActivity {
   final String DOMAIN = "http://www.ooyala.com";
   private OoyalaPlayer player;
   private OOCastManager castManager;
+  private View castView;
+  private Map<String, Integer> thumbnailMap;
 
   /**
    * Called when the activity is first created.
@@ -33,7 +41,6 @@ public class PlayerStartingActivity extends ActionBarActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
     embedCode = getIntent().getExtras().getString("embedcode");
-    String castState = getIntent().getExtras().getString("castState");
     
     // Initialize Ooyala Player
     OoyalaPlayerLayout playerLayout = (OoyalaPlayerLayout) findViewById(R.id.ooyalaPlayer);
@@ -41,6 +48,8 @@ public class PlayerStartingActivity extends ActionBarActivity {
     player = new OoyalaPlayer(PCODE, domain);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
 
+
+    // Initialize CastManager
     String[] namespaces = {"urn:x-cast:ooyala"};
     castManager = OOCastManager.initialize(this, "F3A32677", namespaces);
     castManager.destroyNotificationService(this);
@@ -54,10 +63,38 @@ public class PlayerStartingActivity extends ActionBarActivity {
     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
     actionBar.setTitle(R.string.app_name);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
-    
+
+    // Setup castView
+    buildThumbnailMap();
+
+    setupCastView();
+
     player.setEmbedCode(embedCode);
     player.play();
   }
+
+  private void buildThumbnailMap() {
+    thumbnailMap = new HashMap<String, Integer>();
+    thumbnailMap.put("wxaWd5bTrJFI--Ga7TgbJtzcPrbzENBV", R.drawable.test1);
+    thumbnailMap.put("IzNGg3bzoHHjEfnJP-fj2jB0-oci0Jnm", R.drawable.test2);
+    thumbnailMap.put("xiNmg3bzpFkkwsYqkb5UtGvNOpcwiOCS", R.drawable.test3);
+    thumbnailMap.put("Y4OWg3bzoNtSZ9TOg3wl9BPUspXZiMYc", R.drawable.test4);
+    thumbnailMap.put("o0OWg3bzrLBNfadaXSaCA7HbknPLFRPP", R.drawable.test5);
+  }
+
+  private void setupCastView() {
+    castView = getLayoutInflater().inflate(R.layout.cast_video_view, null);
+
+    final ImageView castBackgroundImage = (ImageView) castView.findViewById(R.id.castBackgroundImage);
+    castBackgroundImage.setImageResource(thumbnailMap.get(embedCode));
+    TextView videoTitle = (TextView) castView.findViewById(R.id.videoTitle);
+    videoTitle.setText("TITLE");
+    TextView videoDescription = (TextView) castView.findViewById(R.id.videoDescription);
+    videoDescription.setText("VIDEO DESCRIPTION");
+
+    castManager.setCastView(castView);
+  }
+
 
   @Override
   public void onPause() {
@@ -105,12 +142,10 @@ public class PlayerStartingActivity extends ActionBarActivity {
     if (castManager != null && castManager.getCurrentCastPlayer() != null) {
       castManager.destroyNotificationService(this);
       castManager.unregisterLockScreenControls();
-      castManager.onResume();
     } else if (player != null) {
       player.resume();
     }  
   super.onResume();
-    
   }
 
   @Override
@@ -144,7 +179,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
       return;
     }
     try {
-      Log.w(TAG, "Increase DeviceVolume!!!!!!!!!!!" + volumeIncrement);
+      Log.d(TAG, "Increase DeviceVolume!!!!!!!!!!!" + volumeIncrement);
       castManager.incrementDeviceVolume(volumeIncrement);
     } catch (Exception e) {
       Log.e(TAG, "onVolumeChange() Failed to change volume", e);

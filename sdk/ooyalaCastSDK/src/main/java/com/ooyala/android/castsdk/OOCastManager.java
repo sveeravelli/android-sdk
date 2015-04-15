@@ -105,7 +105,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     castView = view;
   }
   
-  public void clearCastView() {
+  private void clearCastView() {
     DebugMode.logD(TAG, "Clear cast view");
     if (castPlayer != null) {
       castPlayer.clearCastView();
