@@ -113,12 +113,13 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   }
   
   public void updateVisibility() {
-    DebugMode.logD(TAG, "Update Mini Controller Visibility");
     if (castManager != null && castManager.getCurrentCastPlayer() != null) {
+      DebugMode.logD(TAG, "Show customizedMiniController");
       super.setVisibility(VISIBLE);
       hideControls(false);
       updateUIInfo();
     } else {
+      DebugMode.logD(TAG, "Hide customizedMiniController");
       super.setVisibility(GONE);
     }
   }

@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.View;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
@@ -24,7 +23,6 @@ public class PlayerStartingActivity extends ActionBarActivity {
   final String DOMAIN = "http://www.ooyala.com";
   private OoyalaPlayer player;
   private OOCastManager castManager;
-  private View _view;
 
   /**
    * Called when the activity is first created.
@@ -48,7 +46,8 @@ public class PlayerStartingActivity extends ActionBarActivity {
     castManager.destroyNotificationService(this);
     castManager.registerWithOoyalaPlayer(player);
     castManager.setTargetActivity(PlayerStartingActivity.class);
-    
+
+
     // Initialize action bar
     ActionBar actionBar = getSupportActionBar();
     actionBar.setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
@@ -95,7 +94,6 @@ public class PlayerStartingActivity extends ActionBarActivity {
     castManager.destroyNotificationService(this);
     castManager.unregisterLockScreenControls();
     castManager.disconnectOoyalaPlayer();
-//    castManager.clearCastView();
     super.onDestroy();
   }
 

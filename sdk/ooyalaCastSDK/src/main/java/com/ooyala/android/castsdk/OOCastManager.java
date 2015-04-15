@@ -75,6 +75,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
     DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
     if (null == castManager) {
+        DebugMode.logD(TAG, "Create a new OOCastManager");
         if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
             String msg = "Couldn't find the appropriate version of Google Play Services";
             LOGE(TAG, msg);
@@ -99,13 +100,13 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   
   public void setCastView(View view) {
+    DebugMode.assertCondition(view != null, TAG, "cannot set castView to null");
     DebugMode.logD(TAG, "Set cast view to " + view);
     castView = view;
   }
   
   public void clearCastView() {
     DebugMode.logD(TAG, "Clear cast view");
-    castView = null;
     if (castPlayer != null) {
       castPlayer.clearCastView();
     }
@@ -127,6 +128,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.logD(TAG, "destroy OOCastManager");
     ooyalaPlayer = null;
     clearCastView();
+    castView = null;
     destroyCurrentCastPlayer();
     destroyNotificationService(context);
     unregisterLockScreenControls();
@@ -139,7 +141,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (isCastingFromCurrentCastPlayer()) {
       if (isCastingTheSameContent(embedCode)) {
         DebugMode.logD(TAG, "Return existing castPlayer in castManager as the current player");
+        castPlayer.setCastView(castView);
         castPlayer.addObserver(ooyalaPlayer);
+        castPlayer.setOoyalaPlayer(ooyalaPlayer);
         return castPlayer;
       }
       castPlayer.suspend();
@@ -263,11 +267,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public void exitCastMode() {
     DebugMode.logD(TAG, "Exit Cast Mode");
     clearCastView();
-
-    DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be null");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
-
-    ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
+    if (ooyalaPlayer != null) {
+      ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
+    }
     destroyCurrentCastPlayer();
     updateMiniControllersVisibility();
     removeAllMiniControllers();

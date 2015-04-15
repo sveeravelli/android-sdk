@@ -48,6 +48,10 @@ public class OOCastPlayer extends Observable implements CastPlayer {
     this.ooyalaPlayer = ooyalaPlayer;
     OOCastPlayer.castManager = castManager;
   }
+
+  public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+    this.ooyalaPlayer = ooyalaPlayer;
+  }
   
   /*============================================================================================*/
   /*========== CastPlayer Controls =======================================================*/
@@ -153,6 +157,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   }
   
   public void setCastView(View view) {
+    DebugMode.assertCondition(view != null, TAG, "cannot set castView to null");
     clearCastView();
     castView = view;
   }
@@ -160,17 +165,15 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   public void clearCastView() {
     if (ooyalaPlayer != null && ooyalaPlayer.getLayout().getChildCount() != 0) {
       ooyalaPlayer.getLayout().removeView(castView);
-      ooyalaPlayer.getLayout().removeAllViews();
     }
     castView = null;
   }
   
   public void displayCastView() {
-    DebugMode.logD(TAG, "Display castView if avaiable");
+    DebugMode.logD(TAG, "CastView = " + castView);
     if (ooyalaPlayer != null && castView != null) {
       if (ooyalaPlayer.getLayout().getChildCount() != 0) {
         ooyalaPlayer.getLayout().removeView(castView);
-        ooyalaPlayer.getLayout().removeAllViews();
       }
       if (castView.getParent() == null) {
         ooyalaPlayer.getLayout().addView(castView);

@@ -11,8 +11,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ooyala.android.castsdk.OOCastManager;
@@ -32,9 +34,9 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   private OOCastManager castManager;
   private OOMiniController defualtMiniController;
   private OOMiniController customizedMiniController;
-  private View castView;
   private List<Integer> castViewImages;
   ListView _listView;
+  private View castView;
 
   /** Called when the activity is first created. */
   @Override
@@ -67,10 +69,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     
     _listView = (ListView) findViewById(R.id.listView);
     _listView.setAdapter(adapter);
-    
 
-    LayoutInflater inflater = getLayoutInflater();
-    castView = inflater.inflate(R.layout.cast_video_view, null);
+
 
     final Intent intent = new Intent(this, PlayerStartingActivity.class);
     _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -90,8 +90,15 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
         } else {
           intent.putExtra("embedcode", "o0OWg3bzrLBNfadaXSaCA7HbknPLFRPP");
         }
+
+        // Setup castView
+        LayoutInflater inflater = getLayoutInflater();
+        castView = inflater.inflate(R.layout.cast_video_view, null);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
+        castView.setLayoutParams(layoutParams);
         updateCastUI(position);
         castManager.setCastView(castView);
+
         startActivity(intent);
       }
     });
@@ -107,10 +114,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     
     customizedMiniController = (OOMiniController) findViewById(R.id.miniController2);
     castManager.addMiniController(customizedMiniController);
-    
   }
-  
-  
+
   private void updateCastUI(int position) {
     Log.d(TAG, "update cast mode UI infos");
     final ImageView castBackgroundImage = (ImageView) castView.findViewById(R.id.castBackgroundImage);
@@ -121,22 +126,11 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     videoDescription.setText("VIDEO DESCRIPTION");
   }
 
-
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
     castManager.addCastButton(this, menu);
     return true;
-  }
-
-  @Override
-  protected void onResume() {
-    Log.d(TAG, "onResume()");
-    ChromecastSampleAppActivity.activatedActivity++;
-    castManager.addMiniController(defualtMiniController);
-    castManager.addMiniController(customizedMiniController);
-    this.castManager.onResume();
-    super.onResume();
   }
 
   @Override
@@ -177,8 +171,6 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     super.onPause();
     ChromecastSampleAppActivity.activatedActivity--;
     Log.d(TAG, "onPause()");
-    castManager.removeMiniController(defualtMiniController);
-    castManager.removeMiniController(customizedMiniController);
   }
   
 
