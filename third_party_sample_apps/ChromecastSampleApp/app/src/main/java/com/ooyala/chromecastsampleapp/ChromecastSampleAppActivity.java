@@ -137,6 +137,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   public void onResume() {
     super.onResume();
     ChromecastSampleAppActivity.activatedActivity++;
+    castManager.onResume();
     Log.d(TAG, "onResume()");
   }
   
