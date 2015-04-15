@@ -71,6 +71,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public boolean isShowingPlayButton;
   private boolean isConnectedToReceiverApp;
   private int notificationMiniControllerResourceId = -1;
+  private boolean notificationServiceIsActivated;
   
   public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
     DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
@@ -352,6 +353,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public  void createNotificationService(Context context, Class<?> targetActivity) {
     DebugMode.logD(TAG, "Create notification service");
+    notificationServiceIsActivated = true;
     if (castPlayer != null) {
       OOCastManager.targetActivity = targetActivity;
       if (castPlayer.getState() == State.PLAYING) {
@@ -365,6 +367,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void destroyNotificationService(Context context) {
     DebugMode.logD(TAG, "Destroy notification service");
+    notificationServiceIsActivated = false;
     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     mNotifyMgr.cancel(notificationReceiverID);
     unregisterBroadcastReceiver(context);
@@ -477,7 +480,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void registerLockScreenControls(Context context) {
     if (castPlayer != null) {
-    DebugMode.logD(TAG, "Register Lock Screen Mini controller");
+      DebugMode.logD(TAG, "Register Lock Screen Mini controller");
       audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
       audioManager.requestAudioFocus(
           new OnAudioFocusChangeListener() {
@@ -521,7 +524,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void updateNotificationAndLockScreenPlayPauseButton() {
     DebugMode.logD(TAG, "Update Lock Screen mini controller play/pause button status");
-    if (castPlayer != null) {
+    if (castPlayer != null && notificationServiceIsActivated) {
       if (castPlayer.getState() == State.PLAYING) {
         if (remoteControlClient != null) {
           remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);

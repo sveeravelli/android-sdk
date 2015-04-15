@@ -113,7 +113,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
   protected void onStop() {
     Log.d(TAG, "onStop()");
     super.onStop();
-    if (ChromecastSampleAppActivity.activatedActivity == 0 && castManager != null) {
+    if (ChromecastSampleAppActivity.activatedActivity == 0 && castManager != null && castManager.isInCastMode()) {
       castManager.createNotificationService(this, PlayerStartingActivity.class);
       castManager.registerLockScreenControls(this);
     }
