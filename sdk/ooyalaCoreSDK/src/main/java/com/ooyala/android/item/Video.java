@@ -235,6 +235,6 @@ public class Video extends ContentItem implements PlayableItem {
   }
 
   public Stream getStream() {
-    return Stream.bestStream(_streams);
+    return Stream.bestStream(_streams, false);
   }
 }

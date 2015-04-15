@@ -1,7 +1,5 @@
 package com.ooyala.android.player;
 
-import java.util.Set;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -14,16 +12,19 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.view.SurfaceHolder;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.Set;
 
 /**
  * A wrapper around android.media.MediaPlayer
@@ -52,7 +53,9 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
-    stream =  Stream.bestStream(streams);
+    WifiManager wifiManager = (WifiManager)parent.getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
+    boolean isWifiEnabled = wifiManager.isWifiEnabled();
+    stream =  Stream.bestStream(streams, isWifiEnabled);
     if (stream == null) {
       DebugMode.logE(TAG, "ERROR: Invalid Stream (no valid stream available)");
       this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Invalid Stream");
