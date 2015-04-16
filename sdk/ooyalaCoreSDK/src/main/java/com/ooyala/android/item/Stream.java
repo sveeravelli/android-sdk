@@ -104,16 +104,11 @@ public class Stream implements JSONUpdatableItem {
   }
 
   boolean betterThan(Stream other, boolean isWifiEnabled) {
-    boolean isLower = false;
-    if (this.getCombinedBitrate() < other.getCombinedBitrate() ||
-        (this.getCombinedBitrate() == other.getCombinedBitrate() && this.getHeight() < other.getHeight())) {
-      isLower = true;
-    }
-
     if (isWifiEnabled) {
-      return !isLower;
+      return this.getCombinedBitrate() > other.getCombinedBitrate();
     } else {
-      return isLower;
+      // if wifi is off, choose the one closest to 400.
+      return Math.abs(400 - this.getCombinedBitrate()) < Math.abs(400 - other.getCombinedBitrate());
     }
   }
 
