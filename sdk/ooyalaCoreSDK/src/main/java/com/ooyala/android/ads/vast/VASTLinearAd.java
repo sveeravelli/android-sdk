@@ -1,14 +1,14 @@
 package com.ooyala.android.ads.vast;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import com.ooyala.android.item.PlayableItem;
+import com.ooyala.android.item.Stream;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ooyala.android.item.PlayableItem;
-import com.ooyala.android.item.Stream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 class VASTLinearAd implements PlayableItem {
   /** The duration of the ad in seconds */
@@ -157,7 +157,7 @@ class VASTLinearAd implements PlayableItem {
    * @return a Set of Stream objects
    */
   public Stream getStream() {
-    return Stream.bestStream(_streams);
+    return Stream.bestStream(_streams, false);
   }
 
   /**

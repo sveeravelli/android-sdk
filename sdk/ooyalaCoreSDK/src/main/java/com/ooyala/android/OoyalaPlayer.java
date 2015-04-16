@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -1515,8 +1516,10 @@ public class OoyalaPlayer extends Observable implements Observer,
   @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
   public double getBitrate() {
     Stream currentStream = null;
+    WifiManager wifiManager = (WifiManager)getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
+    boolean isWifiEnabled = wifiManager.isWifiEnabled();
     if (getCurrentItem() == null
-        || (currentStream = Stream.bestStream(getCurrentItem().getStreams())) == null) {
+        || (currentStream = Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled)) == null) {
       return -1;
     }
     String deliveryType = currentStream.getDeliveryType();
@@ -1528,12 +1531,12 @@ public class OoyalaPlayer extends Observable implements Observer,
       // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
       metadataRetreiver.setDataSource(
-          Stream.bestStream(getCurrentItem().getStreams()).getUrl(),
+          Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled).getUrl(),
           new HashMap<String, String>());
       return Double.parseDouble(metadataRetreiver
           .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
-      return Stream.bestStream(getCurrentItem().getStreams()).getVideoBitrate() * 1000;
+      return Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled).getVideoBitrate() * 1000;
     }
   }
 
