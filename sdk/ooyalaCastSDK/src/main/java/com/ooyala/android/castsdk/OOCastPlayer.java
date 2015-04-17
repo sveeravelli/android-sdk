@@ -300,6 +300,8 @@ public class OOCastPlayer extends Observable implements CastPlayer {
           setState(State.PAUSED);
         } else if (state.equals("loading")) {
           setState(State.LOADING);
+        } else if (state.equals("buffering")) {
+//          setState(State.LOADING);
         } else if (state.equals("ready")) {
           setState(State.READY);
         } else if (state.equals("error")) {
@@ -323,9 +325,12 @@ public class OOCastPlayer extends Observable implements CastPlayer {
           setDuration((int) Double.parseDouble(duration) * 1000);
         } 
         else if (eventType.equalsIgnoreCase("downloading")) {
+//         setState(State.LOADING);
+        }
+        else if (eventType.equalsIgnoreCase("buffering")) {
           String duration = msg.getString("2");
           setDuration((int) Double.parseDouble(duration) * 1000);
-        } 
+        }
         else if (eventType.equalsIgnoreCase("playing") || eventType.equalsIgnoreCase("streamPlaying")) {
           setState(State.PLAYING);
         } 

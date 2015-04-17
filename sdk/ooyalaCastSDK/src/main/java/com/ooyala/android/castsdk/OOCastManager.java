@@ -265,7 +265,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     return (getCurrentCastPlayer() != null);
   }
   
-  public void exitCastMode() {
+  private void exitCastMode() {
     DebugMode.logD(TAG, "Exit Cast Mode");
     clearCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");

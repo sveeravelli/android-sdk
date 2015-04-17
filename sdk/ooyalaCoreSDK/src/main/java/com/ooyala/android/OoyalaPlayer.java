@@ -2135,7 +2135,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   public void exitCastMode(int exitPlayheadTime, State exitState, String ec) {
-    DebugMode.logD(TAG, "Exit Cast Mode");
+    DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", state = " + exitState);
     _castPlayer = null;
     switchToContent(true, exitPlayheadTime, exitState);
   }
