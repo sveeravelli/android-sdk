@@ -166,17 +166,18 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
 
   private void stateUpdate( OoyalaPlayer.State state ) {
     switch( state ) {
-    case PLAYING:
-      sendPlay();
-      break;
-    case PAUSED:
-    case SUSPENDED:
-    case COMPLETED:
-    case ERROR:
-      sendStop();
-      break;
-    default:
-      break;
+      case PLAYING:
+        sendPlay();
+        break;
+      case PAUSED:
+      case SUSPENDED:
+      case COMPLETED:
+      case ERROR:
+      case LOADING:
+        sendStop();
+        break;
+      default:
+        break;
     }
   }
 
