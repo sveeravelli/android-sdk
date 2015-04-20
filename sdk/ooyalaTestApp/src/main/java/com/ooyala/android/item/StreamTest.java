@@ -72,23 +72,23 @@ public class StreamTest extends AndroidTestCase {
     }
 
     assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
-        Stream.bestStream(mp4s).decodedURL().toString());
-    mp4s.remove(Stream.bestStream(mp4s));
+        Stream.bestStream(mp4s, false).decodedURL().toString());
+    mp4s.remove(Stream.bestStream(mp4s, false));
     assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
-        Stream.bestStream(mp4s).decodedURL().toString());
+        Stream.bestStream(mp4s, false).decodedURL().toString());
 
     Stream hlsStream = new Stream(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_STREAM_HLS));
     Set<Stream> hls = new HashSet<Stream>();
     hls.add(hlsStream);
-    assertEquals(Stream.bestStream(hls), hlsStream);
+    assertEquals(Stream.bestStream(hls, false), hlsStream);
 
     Stream.setStreamSelector(new StreamSelector() {
       @Override
-      public Stream bestStream(Set<Stream> streams) {
+      public Stream bestStream(Set<Stream> streams, boolean isWifiEnabled) {
         return null;
       }
     });
-    assertNull(Stream.bestStream(mp4s));
+    assertNull(Stream.bestStream(mp4s, false));
     Stream.resetStreamSelector();
   }
 }
