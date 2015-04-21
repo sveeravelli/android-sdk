@@ -173,15 +173,16 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
       ;
     }  
   }
-  
-  public void updateVisibility() {
-    if (castManager != null && castManager.getCurrentCastPlayer() != null) {
-      super.setVisibility(VISIBLE);
-      hideControls(false);
-      updateUIInfo();
-    } else {
-      super.setVisibility(GONE);
-    }
+
+  public void show() {
+    super.setVisibility(VISIBLE);
+    hideControls(false);
+    updateUIInfo();
+  }
+
+
+  public void dismiss() {
+    super.setVisibility(GONE);
   }
   
   private void hideControls(boolean hide) {

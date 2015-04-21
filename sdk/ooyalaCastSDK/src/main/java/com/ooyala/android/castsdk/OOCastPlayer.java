@@ -353,6 +353,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
         else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);
+          castManager.dismissMiniControllers();
         } 
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;

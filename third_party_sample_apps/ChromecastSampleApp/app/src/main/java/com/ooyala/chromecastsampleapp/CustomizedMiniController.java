@@ -18,7 +18,6 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.castsdk.OOMiniController;
 import com.ooyala.android.util.DebugMode;
-import com.ooyala.chromecastsampleapp.R;
 
 public class CustomizedMiniController extends RelativeLayout implements OOMiniController {
 
@@ -111,17 +110,15 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
       playPause.setImageDrawable(playDrawable);
     }  
   }
-  
-  public void updateVisibility() {
-    if (castManager != null && castManager.getCurrentCastPlayer() != null) {
-      DebugMode.logD(TAG, "Show customizedMiniController");
-      super.setVisibility(VISIBLE);
-      hideControls(false);
-      updateUIInfo();
-    } else {
-      DebugMode.logD(TAG, "Hide customizedMiniController");
-      super.setVisibility(GONE);
-    }
+
+  public void show() {
+    super.setVisibility(VISIBLE);
+    hideControls(false);
+    updateUIInfo();
+  }
+
+  public void dismiss() {
+    super.setVisibility(GONE);
   }
   
   private void hideControls(boolean hide) {

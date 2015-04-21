@@ -56,9 +56,9 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
         state = castManager.getCurrentCastPlayer().getState();
         castManager.addMiniController(this);
       }
-      updateMetadata();
       updatePlayPauseState(state);
       setupCallbacks();
+      updateMetadata();
       return mainContainer;
   }
   
@@ -222,7 +222,8 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   }
   
   private void updateMetadata() {
-    if (castManager.getCurrentCastPlayer() == null) {
+    // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
+    if (castManager.getCurrentCastPlayer() == null || castManager.getCurrentCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
         return;
     }
@@ -263,11 +264,6 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     }
   }
 
-  @Override
-  public void updateVisibility() {
-    DebugMode.logD(TAG, "Update miniController visibility");
-  }
-  
   @Override
   public void setCastManager(OOCastManager castManager) {
     DebugMode.logD(TAG, "set CastManager to " + castManager);

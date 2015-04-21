@@ -137,6 +137,10 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   public void onResume() {
     super.onResume();
     ChromecastSampleAppActivity.activatedActivity++;
+    if (castManager != null && castManager.isInCastMode()){
+      this.defualtMiniController.show();
+      this.customizedMiniController.show();
+    }
     castManager.onResume();
     Log.d(TAG, "onResume()");
   }

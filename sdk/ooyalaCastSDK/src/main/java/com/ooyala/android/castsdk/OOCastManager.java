@@ -228,7 +228,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void onResume() {
     DebugMode.logD(TAG, "onResume()");
-    updateMiniControllersVisibility();
     updateMiniControllersState();
   }
   
@@ -272,8 +271,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (ooyalaPlayer != null) {
       ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
     }
+    dismissMiniControllers();
     destroyCurrentCastPlayer();
-    updateMiniControllersVisibility();
     removeAllMiniControllers();
   }
   
@@ -325,11 +324,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
     }
   }
   
-  public void updateMiniControllersVisibility() {
-    DebugMode.logD(TAG, "Update mini controllers visibility");
+  public void dismissMiniControllers() {
+    DebugMode.logD(TAG, "dismiss mini controllers");
     if (miniControllers != null) {
       for (OOMiniController miniController : miniControllers) {
-        miniController.updateVisibility();
+        miniController.dismiss();
       }
     }
   }
