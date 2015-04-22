@@ -71,10 +71,10 @@ public class StreamTest extends AndroidTestCase {
       }
     }
 
-    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
         Stream.bestStream(mp4s, false).decodedURL().toString());
     mp4s.remove(Stream.bestStream(mp4s, false));
-    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
         Stream.bestStream(mp4s, false).decodedURL().toString());
 
     Stream hlsStream = new Stream(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_STREAM_HLS));
@@ -89,6 +89,47 @@ public class StreamTest extends AndroidTestCase {
       }
     });
     assertNull(Stream.bestStream(mp4s, false));
+    Stream.resetStreamSelector();
+  }
+
+
+  /**
+   * Tests bestStream with wifi enabled, which should provide higher resolution streams
+   */
+  public void testBestStreamFromArrayWifiEnabled() {
+    JSONArray streamsData = TestConstants.getTestJSONArray(getContext(), TestConstants.TEST_DICTIONARY_STREAMS_MP4);
+    Set<Stream> mp4s = new HashSet<Stream>();
+    if (streamsData.length() > 0) {
+      for (int i = 0; i < streamsData.length(); i++) {
+        try {
+          Stream stream = new Stream(streamsData.getJSONObject(i));
+          if (stream != null) {
+            mp4s.add(stream);
+          }
+        } catch (JSONException e) {
+          fail("JSONException: " + e);
+        }
+      }
+    }
+
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjFyazowODE7_c",
+            Stream.bestStream(mp4s, true).decodedURL().toString());
+    mp4s.remove(Stream.bestStream(mp4s, true));
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjFyazowazsvY7",
+            Stream.bestStream(mp4s, true).decodedURL().toString());
+
+    Stream hlsStream = new Stream(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_STREAM_HLS));
+    Set<Stream> hls = new HashSet<Stream>();
+    hls.add(hlsStream);
+    assertEquals(Stream.bestStream(hls, true), hlsStream);
+
+    Stream.setStreamSelector(new StreamSelector() {
+      @Override
+      public Stream bestStream(Set<Stream> streams, boolean isWifiEnabled) {
+        return null;
+      }
+    });
+    assertNull(Stream.bestStream(mp4s, true));
     Stream.resetStreamSelector();
   }
 }

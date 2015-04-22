@@ -78,7 +78,7 @@ public class VideoTest extends AndroidTestCase {
     assertFalse(video.hasAds());
     video.update(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_VIDEO_AUTH_MP4));
     assertNotNull(video);
-    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
         video.getStream().decodedURL().toString());
 
     video = new Video(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_VIDEO),
@@ -98,7 +98,7 @@ public class VideoTest extends AndroidTestCase {
 
     video.update(TestConstants.getTestJSON(getContext(), TestConstants.TEST_DICTIONARY_VIDEO_AUTH_MP4));
     assertNotNull(video);
-    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjBrO5dC5F",
+    assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOmk2OjA4MTvK-J",
         video.getStream().decodedURL().toString());
   }
 
