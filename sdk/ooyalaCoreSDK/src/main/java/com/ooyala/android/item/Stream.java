@@ -106,7 +106,7 @@ public class Stream implements JSONUpdatableItem {
   boolean betterThan(Stream other, boolean isWifiEnabled) {
 
     // if the bitrates are the same, always choose the bitrate with higher resolution
-    if (this.getCombinedBitrate() == other.getCombinedBitrate() && this.getHeight() < other.getHeight()) {
+    if (this.getCombinedBitrate() == other.getCombinedBitrate() && this.getHeight() > other.getHeight()) {
       return true;
     } else if (isWifiEnabled) {
       return this.getCombinedBitrate() > other.getCombinedBitrate();
