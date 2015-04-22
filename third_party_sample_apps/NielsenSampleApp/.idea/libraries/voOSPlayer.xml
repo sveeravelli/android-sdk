@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="voOSPlayer">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/voOSPlayer.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
