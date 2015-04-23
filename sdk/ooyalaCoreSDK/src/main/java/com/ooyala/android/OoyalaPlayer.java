@@ -72,7 +72,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v4.0.1_RC2";
+  static final String SDK_VERSION = "v4.1.0_RC1";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
