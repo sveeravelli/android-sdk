@@ -754,6 +754,10 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     p.setLive(item.isLive());
 
+    if( getShouldShowLiveClosedCaptions() ) {
+      p.setLiveClosedCaptionsEnabled( true );
+    }
+
     addClosedCaptionsView();
 
     // Player must have been initialized, as well as player's basePlayer, in
@@ -765,6 +769,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     p.setSeekable(_seekable);
     return p;
+  }
+
+  private boolean getShouldShowLiveClosedCaptions() {
+    return _language == LIVE_CLOSED_CAPIONS_LANGUAGE;
   }
 
   private void cleanupPlayers() {
@@ -1454,7 +1462,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     MoviePlayer mp = _player;
     // If we're given the "cc" language, we know it's live closed captions
-    if (_language == LIVE_CLOSED_CAPIONS_LANGUAGE) {
+    if ( getShouldShowLiveClosedCaptions() ) {
       mp.setLiveClosedCaptionsEnabled(true);
       return;
     }
