@@ -754,9 +754,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     p.setLive(item.isLive());
 
-    if( getShouldShowLiveClosedCaptions() ) {
-      p.setLiveClosedCaptionsEnabled( true );
-    }
+    p.setLiveClosedCaptionsEnabled( getShouldShowLiveClosedCaptions() );
 
     addClosedCaptionsView();
 
@@ -1461,7 +1459,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     MoviePlayer mp = _player;
-    // If we're given the "cc" language, we know it's live closed captions
     if ( getShouldShowLiveClosedCaptions() ) {
       mp.setLiveClosedCaptionsEnabled(true);
       return;
