@@ -121,7 +121,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String BUFFERING_COMPLETED_NOTIFICATION = "bufferingCompleted";
   public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
   public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
-
+  public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION = "liveCCAvailabilityChanged";
 
   public enum ContentOrAdType {
     MainContent,
@@ -1387,6 +1387,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     else if (notification.equals(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION)) {
       sendNotification(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
+    }
+    else if( notification.equals( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION ) ) {
+      sendNotification( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
     }
   }
 
