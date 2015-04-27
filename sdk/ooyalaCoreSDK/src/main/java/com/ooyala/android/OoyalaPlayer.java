@@ -2121,7 +2121,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void postContentChanged() {
     DebugMode.logD(TAG, "post content changed");
-    cleanupPlayers();
+    // cleanupPlayers(); disabling this call to cleanupPlayers(), see PBA-1750.
     if (_options.getPreloadContent()) {
       prepareContent(false);
     }
