@@ -484,6 +484,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     // If we're given the "cc" language, we know it's live closed captions
     if (_player != null) {
       if (_closedCaptionLanguage.equals(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+        removeClosedCaptionsView();
         _player.setLiveClosedCaptionsEnabled(true);
         return;
       } else if (_player.isLiveClosedCaptionsAvailable()) {
@@ -491,11 +492,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       }
     };
 
-
-    if (_closedCaptionsView != null) {
-      _closedCaptionsView.setCaption(null);
-    }
-    displayCurrentClosedCaption();
+    refreshClosedCaptionsView();
   }
 
   public void setClosedCaptionsPresentationStyle() {
@@ -504,27 +501,38 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if( _closedCaptionsStyle != null ) {
       _closedCaptionsView.setStyle(_closedCaptionsStyle);
     }
-    _layout.addView(_closedCaptionsView);
-    _closedCaptionsView.setCaption(null);
-    displayCurrentClosedCaption();
+    refreshClosedCaptionsView();
   }
 
   private void removeClosedCaptionsView() {
     if (_closedCaptionsView != null) {
-      _layout.removeView(_closedCaptionsView);
+      ViewGroup parent = (ViewGroup)_closedCaptionsView.getParent();
+      parent.removeView(_closedCaptionsView);
       _closedCaptionsView = null;
     }
   }
 
-  private void addClosedCaptionsView() {
+  private boolean shouldShowClosedCaptions() {
+    return _player != null && !_player.isShowingAd() &&
+        _player.getCurrentItem() != null && _player.getCurrentItem().hasClosedCaptions() &&
+        _closedCaptionLanguage != null &&
+        !_closedCaptionLanguage.equals(LocalizationSupport.localizedStringFor("None"));
+  }
+
+  private void refreshClosedCaptionsView() {
     removeClosedCaptionsView();
-    if (_player != null && _player.getCurrentItem() != null &&
-        _player.getCurrentItem().hasClosedCaptions()) {
-      _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
-      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      _layout.addView(_closedCaptionsView);
+    if (shouldShowClosedCaptions()) {
+      addClosedCaptionsView();
+      displayCurrentClosedCaption();
     }
+  }
+
+  private void addClosedCaptionsView() {
+    _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
+    _closedCaptionsStyle.bottomMargin = getControls().bottomBarOffset();
+    _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+    _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    getLayout().addView(_closedCaptionsView);
   }
 
   /**
@@ -557,7 +565,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         _closedCaptionsView.setStyle(_closedCaptionsStyle);
       }
     }
-    displayCurrentClosedCaption();
+    refreshClosedCaptionsView();
   }
 
   /**
@@ -675,11 +683,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      if (_player.isShowingAd()) {
-        removeClosedCaptionsView();
-      } else {
-        addClosedCaptionsView();
-      }
+      refreshClosedCaptionsView();
     }
 
     if (arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
