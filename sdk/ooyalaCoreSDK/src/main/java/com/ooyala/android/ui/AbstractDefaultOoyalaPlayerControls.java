@@ -226,7 +226,7 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
 
   @Override
   public boolean isShowing() {
-    return _baseLayout.getVisibility() == FrameLayout.VISIBLE;
+    return _baseLayout != null && _baseLayout.getVisibility() == FrameLayout.VISIBLE;
   }
 
   @Override
