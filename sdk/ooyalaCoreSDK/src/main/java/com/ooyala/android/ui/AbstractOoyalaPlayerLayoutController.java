@@ -31,7 +31,6 @@ import com.ooyala.android.util.DebugMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -676,7 +675,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   @Override
   public void update(Observable arg0, Object arg1) {
     if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      if (_player.isPlaying() && !_player.isShowingAd()) {
+      if (_player.isShowingAd()) {
+        removeClosedCaptionsView();
+      } else {
         addClosedCaptionsView();
       }
     }
