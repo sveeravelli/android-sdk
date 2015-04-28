@@ -34,8 +34,6 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
   protected boolean _isPlayerReady = false;
   protected boolean _isVisible = true;
 
-
-
   protected class HideTimerTask extends TimerTask {
     @Override
     public void run() {

@@ -25,7 +25,6 @@ import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
-import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
@@ -189,7 +188,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private Options _options;
   private State _state = State.INIT;
   private LayoutController _layoutController = null;
-  private ClosedCaptionsView _closedCaptionsView = null;
   private Analytics _analytics = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
@@ -759,11 +757,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     p.setSeekable(_seekable);
     return p;
   }
-
-  private boolean getShouldShowLiveClosedCaptions() {
-    return _language == LIVE_CLOSED_CAPIONS_LANGUAGE;
-  }
-
+  
   private void cleanupPlayers() {
     if (_authHeartbeat != null) {
       _authHeartbeat.stop();
@@ -1409,28 +1403,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     notifyObservers(obj);
   }
 
-  /**
-   * @return true if the player has available closed caption, false otherwise.
-   */
-  public void setClosedCaptionsLanguage(String language) {
-    _language = language;
-
-    if (_player == null || !(_player instanceof MoviePlayer)) {
-      return;
-    }
-
-    MoviePlayer mp = _player;
-    if ( getShouldShowLiveClosedCaptions() ) {
-      mp.setLiveClosedCaptionsEnabled(true);
-      return;
-    }
-
-    mp.setLiveClosedCaptionsEnabled(false);
-    if (_closedCaptionsView != null) {
-      _closedCaptionsView.setCaption(null);
-    }
-  }
-
   public boolean isLiveClosedCaptionsAvailable() {
     if (_player != null) {
       return _player.isLiveClosedCaptionsAvailable();
@@ -1453,21 +1425,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
     }
 
-    return languages;
-  }
-  /**
-   * turn on or turn off live closed captions, it available
-   * @param enabled true to enable live closed caption, false to disable.
-   */
-  public Set<String> getAvailableClosedCaptionsLanguages() {
-    Set<String> languages = new HashSet<String>();
-    if (_currentItem != null && _currentItem.getClosedCaptions() != null) {
-      languages.addAll(_currentItem.getClosedCaptions().getLanguages());
-    }
-
-    if (languages.size() <= 0) {
-      this.getLiveClosedCaptionsLanguages(languages);
-    }
     return languages;
   }
 
