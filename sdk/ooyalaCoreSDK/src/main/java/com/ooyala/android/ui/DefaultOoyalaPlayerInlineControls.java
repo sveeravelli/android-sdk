@@ -365,7 +365,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public int bottomBarOffset() {
-    return (PREFERRED_BUTTON_HEIGHT_DP * 2 + MARGIN_SIZE_DP * 4);
+    return isShowing() ? (PREFERRED_BUTTON_HEIGHT_DP * 2 + MARGIN_SIZE_DP * 4) : MARGIN_SIZE_DP * 4;
   }
 
   @Override
