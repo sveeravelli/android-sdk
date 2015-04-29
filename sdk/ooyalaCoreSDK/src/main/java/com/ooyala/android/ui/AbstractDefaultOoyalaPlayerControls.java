@@ -11,7 +11,6 @@ import android.widget.ImageButton;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
-import com.ooyala.android.captions.ClosedCaptionsStyle;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -199,29 +198,17 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     updateButtonStates();
     _hideTimer = new Timer();
     _hideTimer.schedule(new HideTimerTask(), HIDE_AFTER_MILLIS);
-    if (_playerLayoutController != null && _isPlayerReady) {
-      ClosedCaptionsStyle ccStyle = _playerLayoutController.getClosedCaptionsStyle();
-      if (ccStyle != null) {
-        ccStyle.bottomMargin = this.bottomBarOffset();
-        _playerLayoutController.setClosedCaptionsBottomMargin(this.bottomBarOffset());
-      }
-    }
+    updateClosedCaptionsBottomMargin();
   }
 
   @Override
   public void hide() {
-    if (_playerLayoutController != null && _isPlayerReady) {
-      ClosedCaptionsStyle ccStyle = _playerLayoutController.getClosedCaptionsStyle();
-      if (ccStyle != null) {
-        _playerLayoutController.setClosedCaptionsBottomMargin(MARGIN_SIZE_DP * 4);
-      }
-    }
     if (_hideTimer != null) {
       _hideTimer.cancel();
       _hideTimer = null;
     }
     _baseLayout.setVisibility(FrameLayout.GONE);
-
+    updateClosedCaptionsBottomMargin();
   }
 
   @Override
@@ -244,6 +231,12 @@ public abstract class AbstractDefaultOoyalaPlayerControls implements OoyalaPlaye
     _isVisible = visible;
     if (!visible) {
       hide();
+    }
+  }
+
+  private void updateClosedCaptionsBottomMargin() {
+    if (_playerLayoutController != null && _isPlayerReady) {
+      _playerLayoutController.setClosedCaptionsBottomMargin(bottomBarOffset());
     }
   }
 

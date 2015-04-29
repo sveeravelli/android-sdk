@@ -410,8 +410,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public int bottomBarOffset() {
-    return isShowing() ? OVERLAY_PREFERRED_BUTTON_HEIGHT_DP * 2 + OVERLAY_MARGIN_SIZE_DP * 4 :
-        OVERLAY_MARGIN_SIZE_DP * 4;
+    int margin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP * 2);
+
+    if (isShowing() && _bottomOverlay != null) {
+      margin += _bottomOverlay.getHeight();
+    }
+    return margin;
   }
 
   @Override
