@@ -1421,7 +1421,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       languages.addAll(_currentItem.getClosedCaptions().getLanguages());
     }
 
-    if (languages.size() <= 0 && _player.isLiveClosedCaptionsAvailable()) {
+    if (languages.size() <= 0 && _player != null && _player.isLiveClosedCaptionsAvailable()) {
       languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
     }
 
