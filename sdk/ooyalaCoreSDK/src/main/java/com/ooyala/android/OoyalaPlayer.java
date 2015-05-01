@@ -581,7 +581,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (_currentItem.isHeartbeatRequired()) {
       if (_authHeartbeat == null) {
-        _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+        _authHeartbeat = new AuthHeartbeat(_playerAPIClient, _currentItem.getEmbedCode());
         _authHeartbeat.setAuthHeartbeatErrorListener(this);
       }
       _authHeartbeat.start();
@@ -999,7 +999,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         return;
       } else {
         if (_authHeartbeat == null) {
-          _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+          _authHeartbeat = new AuthHeartbeat(_playerAPIClient, _currentItem.getEmbedCode());
         }
         _authHeartbeat.start();
       }
@@ -1971,7 +1971,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void postContentChanged() {
     DebugMode.logD(TAG, "post content changed");
-    cleanupPlayers();
+    // cleanupPlayers(); disabling this call to cleanupPlayers(), see PBA-1750.
     if (_options.getPreloadContent()) {
       prepareContent(false);
     }
