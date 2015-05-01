@@ -25,7 +25,18 @@ SecurePlayerSampleApp is an example of this integration for Android Studio.
     OoyalaPlayer.enableCustomPlayreadyPlayer = true;
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has smooth or hls playback capablities (or a remote asset pointing at a manifest)
+7. Add a "compile files()" line for each of the jars in your project/app/libs/ folder.  for example:
+  compile files('libs/DxDrmDlc.jar')
+  compile files('libs/assets.jar')
+  compile files('libs/voOSBasePlayer.jar')
+  compile files('libs/voOSDataSource.jar')
+  compile files('libs/voOSEngine.jar')
+  compile files('libs/voOSHDMICheck.jar')
+  compile files('libs/voOSPlayer.jar')
+  compile files('libs/voOSStreamingDownloader.jar')
+  compile files('libs/voOSUtils.jar')
+
+8. play an embed code that has smooth or hls playback capablities (or a remote asset pointing at a manifest)
 
   -- Eclipse --
 

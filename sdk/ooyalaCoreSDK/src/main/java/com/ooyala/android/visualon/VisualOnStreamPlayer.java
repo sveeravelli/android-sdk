@@ -794,6 +794,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   private void handleSubtitles() {
+    final boolean pre_isLiveClosedCaptionsAvailable = _isLiveClosedCaptionsAvailable;
+    _handleSubtitles();
+    if( pre_isLiveClosedCaptionsAvailable != _isLiveClosedCaptionsAvailable ) {
+      setChanged();
+      notifyObservers( OoyalaPlayer.LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
+    }
+  }
+
+  private void _handleSubtitles() {
     VO_OSMP_RETURN_CODE returnValue;
     if (_player == null) {
       DebugMode.logE(TAG, "handleSubtitles: player is null");
