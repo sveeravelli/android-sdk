@@ -1677,49 +1677,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * Check to ensure the BasePlayer is authorized to play streams. If it is, set
-   * this base player onto our players and remember it
-   *
-   * @param basePlayer
-   */
-  public void setBasePlayer(StreamPlayer basePlayer) {
-    _basePlayer = basePlayer;
-
-    if (_analytics != null) {
-      _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo()
-          .getUserAgent() : null);
-    }
-
-    if (getCurrentItem() == null) {
-      return;
-    }
-
-    this.cancelOpenTasks();
-
-    final String taskKey = "setBasePlayer" + System.currentTimeMillis();
-    PlayerInfo playerInfo = basePlayer == null ? StreamPlayer.defaultPlayerInfo
-        : basePlayer.getPlayerInfo();
-    taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo,
-        new AuthorizeCallback() {
-          @Override
-          public void callback(boolean result, OoyalaException error) {
-            taskCompleted(taskKey);
-            if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Movie is not authorized for this device!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
-              return;
-            }
-
-            if (_player != null && (_player instanceof MoviePlayer)) {
-              _player.setBasePlayer(_basePlayer);
-            }
-          }
-        }));
-  }
-
-  /**
    * set the analytics tags
    *
    * @param tags
