@@ -101,24 +101,6 @@ public class MoviePlayer extends Player implements Observer {
     return _basePlayer;
   }
 
-  public void setBasePlayer(StreamPlayer basePlayer, Set<Stream> streams) {
-    setStreams( streams );
-    setBasePlayer(basePlayer);
-  }
-
-  public void setBasePlayer(StreamPlayer basePlayer) {
-    boolean shouldResume = !_suspended;
-    if (shouldResume) {
-      suspend();
-    }
-
-    _basePlayer = basePlayer != null ? basePlayer : getPlayerForStreams(_streams);
-
-    if (shouldResume) {
-      resume();
-    }
-  }
-
   @Override
   public void reset() {
     _suspended = false;
