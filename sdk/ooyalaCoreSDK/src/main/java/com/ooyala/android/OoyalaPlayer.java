@@ -196,7 +196,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
-  private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
   private String _tvRatingAdNotification;
@@ -530,8 +529,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         } ));
 
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
-      PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-          : _basePlayer.getPlayerInfo();
+      PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
       // Async authorize;
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
@@ -664,8 +662,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _currentItemInitPlayState = InitPlayState.NONE;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
-    PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-        : _basePlayer.getPlayerInfo();
+    PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
     // Async Authorize
     cancelOpenTasks();
@@ -740,9 +737,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // Initialize this player
     p.addObserver(this);
-    if (_basePlayer != null) {
-      p.setBasePlayer(_basePlayer);
-    }
     p.init(this, streams);
 
     p.setLive(item.isLive());
@@ -970,8 +964,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
-        PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-            : _basePlayer.getPlayerInfo();
+        PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
         cancelOpenTasks();
         final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
         taskStarted(taskKey, _playerAPIClient.authorize(_currentItem,
@@ -1672,53 +1665,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     return this._playerAPIClient;
   }
 
-  public StreamPlayer getBasePlayer() {
-    return _basePlayer;
-  }
-
-  /**
-   * Check to ensure the BasePlayer is authorized to play streams. If it is, set
-   * this base player onto our players and remember it
-   *
-   * @param basePlayer
-   */
-  public void setBasePlayer(StreamPlayer basePlayer) {
-    _basePlayer = basePlayer;
-
-    if (_analytics != null) {
-      _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo()
-          .getUserAgent() : null);
-    }
-
-    if (getCurrentItem() == null) {
-      return;
-    }
-
-    this.cancelOpenTasks();
-
-    final String taskKey = "setBasePlayer" + System.currentTimeMillis();
-    PlayerInfo playerInfo = basePlayer == null ? StreamPlayer.defaultPlayerInfo
-        : basePlayer.getPlayerInfo();
-    taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo,
-        new AuthorizeCallback() {
-          @Override
-          public void callback(boolean result, OoyalaException error) {
-            taskCompleted(taskKey);
-            if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Movie is not authorized for this device!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
-              return;
-            }
-
-            if (_player != null && (_player instanceof MoviePlayer)) {
-              _player.setBasePlayer(_basePlayer);
-            }
-          }
-        }));
-  }
-
   /**
    * set the analytics tags
    *
@@ -1761,9 +1707,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the seek style of current player
    */
   public SeekStyle getSeekStyle() {
-    if (getBasePlayer() != null) {
-      return getBasePlayer().getSeekStyle();
-    } else if (currentPlayer() != null && currentPlayer() instanceof MoviePlayer) {
+    if (currentPlayer() != null && currentPlayer() instanceof MoviePlayer) {
       return ((MoviePlayer)currentPlayer()).getSeekStyle();
     } else if (currentPlayer() != null) {
       //TODO: the PlayerInterface may need getSeekStyle();
