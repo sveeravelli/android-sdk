@@ -8,7 +8,4 @@ import com.ooyala.android.plugin.LifeCycleInterface;
  */
 public interface CastPlayer extends PlayerInterface, LifeCycleInterface {
 
-  public void setSeekable(boolean seekable);
-
-  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying);
 }

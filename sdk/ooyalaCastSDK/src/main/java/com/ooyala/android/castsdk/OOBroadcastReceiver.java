@@ -18,7 +18,7 @@ public class OOBroadcastReceiver extends BroadcastReceiver {
     if (action != null && action.equals(Intent.ACTION_MEDIA_BUTTON)) {
       if (firstIntent == true) {
         OOCastManager castManager = OOCastManager.getCastManager();
-        OOCastPlayer castPlayer = castManager.getCurrentCastPlayer();
+        OOCastPlayer castPlayer = castManager.getCastPlayer();
         if (castPlayer != null) {
           if (castPlayer.getState() == State.PLAYING) {
             castPlayer.pause();

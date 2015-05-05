@@ -45,12 +45,19 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   
   
   public OOCastPlayer(OOCastManager castManager, OoyalaPlayer ooyalaPlayer) {
-    this.ooyalaPlayer = ooyalaPlayer;
+    setOoyalaPlayer(ooyalaPlayer);
     OOCastPlayer.castManager = castManager;
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+    this.addObserver(ooyalaPlayer);
     this.ooyalaPlayer = ooyalaPlayer;
+  }
+
+  public void disconnectFromCurrentOoyalaPlayer() {
+    clearCastView();
+    this.deleteObserver(ooyalaPlayer);
+    this.ooyalaPlayer = null;
   }
   
   /*============================================================================================*/
@@ -169,15 +176,10 @@ public class OOCastPlayer extends Observable implements CastPlayer {
     castView = null;
   }
   
-  public void displayCastView() {
+  private void displayCastView() {
     DebugMode.logD(TAG, "CastView = " + castView);
     if (ooyalaPlayer != null && castView != null) {
-      if (ooyalaPlayer.getLayout().getChildCount() != 0) {
-        ooyalaPlayer.getLayout().removeView(castView);
-      }
-      if (castView.getParent() == null) {
-        ooyalaPlayer.getLayout().addView(castView);
-      }
+      ooyalaPlayer.getLayout().addView(castView);
     }
   }
 
@@ -185,7 +187,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void initReceiverPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
     DebugMode.logD(TAG, "On Cast Mode Entered with playhead time: " + playheadTimeInMillis + ", isPlaying: "
         + isPlaying);
     if (initWithTheCastingContent(embedCode)) {
@@ -289,9 +291,9 @@ public class OOCastPlayer extends Observable implements CastPlayer {
       
       // The key for "State Message" is different from other messages
       // So we should check it separately
-      DebugMode.logD(TAG, "Received Message: " + message);
       if (msg.has("state")) {
         String state = msg.getString("state");
+        DebugMode.logD(TAG, "Received State: " + state);
         if (state.equals("playing")) {
           play();
           setState(State.PLAYING);
@@ -301,7 +303,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
         } else if (state.equals("loading")) {
           setState(State.LOADING);
         } else if (state.equals("buffering")) {
-//          setState(State.LOADING);
+          //setState(State.LOADING);
         } else if (state.equals("ready")) {
           setState(State.READY);
         } else if (state.equals("error")) {
@@ -317,13 +319,16 @@ public class OOCastPlayer extends Observable implements CastPlayer {
       }
       if (msg.has("0")) {
         String eventType = msg.getString("0");
+        if (!eventType.equals("downloading") && !eventType.equals("playheadTimeChanged")) {
+          DebugMode.logD(TAG, "Received event: " + msg);
+        }
         if (eventType.equalsIgnoreCase("playheadTimeChanged")) {
           String currentTime = msg.getString("1");
           setCurrentTime((int) (Double.parseDouble(currentTime) * 1000));
           onPlayHeadChanged();
           String duration = msg.getString("2");
           setDuration((int) Double.parseDouble(duration) * 1000);
-        } 
+        }
         else if (eventType.equalsIgnoreCase("downloading")) {
 //         setState(State.LOADING);
         }
@@ -372,10 +377,10 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   @Override
   public void resume() {
     if (!shouldResumeToCastMode()) {
-      ooyalaPlayer.exitCastMode(currentTime, state, embedCode);
+      ooyalaPlayer.exitCastMode(currentTime, state == State.PLAYING, embedCode);
     } else if (suspended) {
       suspended = false;
-      initReceiverPlayer(embedCode, playheadToResume, autoPlayerWhenResume);
+      enterCastMode(embedCode, playheadToResume, autoPlayerWhenResume);
     }
   }
 

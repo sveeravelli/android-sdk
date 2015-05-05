@@ -10,14 +10,11 @@ public interface CastManager {
    */
   public boolean isConnectedToReceiverApp();
 
-  /**
-   * Create CastPlayer with given embedcode
-   * @param embedCode the embedcode of the content to be cast
-   * @return new created CastPlayer
-   */
-  public CastPlayer createNewCastPlayer(String embedCode);
-
-  public void setCastPlayer(CastPlayer castPlayer);
+  public CastPlayer getCastPlayer();
 
   public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer);
+
+  public boolean isInCastMode();
+
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying);
 }

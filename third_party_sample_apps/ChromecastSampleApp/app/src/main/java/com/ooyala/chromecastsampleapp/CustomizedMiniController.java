@@ -61,14 +61,14 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
 
         @Override
         public void onClick(View v) {
-          if (castManager.getCurrentCastPlayer()  == null) {
+          if (castManager.getCastPlayer()  == null) {
             return;
-          } else if (castManager.getCurrentCastPlayer().getState() == State.PAUSED || 
-                    castManager.getCurrentCastPlayer().getState() == State.READY || 
-                    castManager.getCurrentCastPlayer().getState() == State.COMPLETED){
-            castManager.getCurrentCastPlayer().play();
-          } else if (castManager.getCurrentCastPlayer() .getState() == State.PLAYING){
-            castManager.getCurrentCastPlayer().pause();
+          } else if (castManager.getCastPlayer().getState() == State.PAUSED ||
+                    castManager.getCastPlayer().getState() == State.READY ||
+                    castManager.getCastPlayer().getState() == State.COMPLETED){
+            castManager.getCastPlayer().play();
+          } else if (castManager.getCastPlayer() .getState() == State.PLAYING){
+            castManager.getCastPlayer().pause();
           }
         }
       });
@@ -92,7 +92,7 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
       NoConnectionException {
     Intent intent = new Intent(context, castManager.getTargetActivity());
-    intent.putExtra("embedcode", castManager.getCurrentCastPlayer().getEmbedCode());
+    intent.putExtra("embedcode", castManager.getCastPlayer().getEmbedCode());
     context.startActivity(intent);
   }
   
@@ -131,9 +131,9 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   
   private void updateUIInfo() {
     DebugMode.logD(TAG, "Update MiniController UI Info");
-    title.setText(castManager.getCurrentCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.getCurrentCastPlayer().getCastItemDescription());
-    setIcon(castManager.getCurrentCastPlayer().getCastImageBitmap());
+    title.setText(castManager.getCastPlayer().getCastItemTitle());
+    subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
+    setIcon(castManager.getCastPlayer().getCastImageBitmap());
   }
 
   @Override

@@ -52,8 +52,8 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   public View onCreateMediaControlView(Bundle savedInstanceState) {
       DebugMode.logE(TAG, "onCreateMediaControlView");
       constructMainContainer();
-      if (castManager.getCurrentCastPlayer() != null) {
-        state = castManager.getCurrentCastPlayer().getState();
+      if (castManager.getCastPlayer() != null) {
+        state = castManager.getCastPlayer().getState();
         castManager.addMiniController(this);
       }
       updatePlayPauseState(state);
@@ -181,14 +181,14 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
 
         @Override
         public void onClick(View v) {
-            if (castManager.getCurrentCastPlayer()  == null) {
+            if (castManager.getCastPlayer()  == null) {
                 return;
-            } else if (castManager.getCurrentCastPlayer().getState() == State.PAUSED || 
-                       castManager.getCurrentCastPlayer().getState() == State.READY || 
-                       castManager.getCurrentCastPlayer().getState() == State.COMPLETED){
-              castManager.getCurrentCastPlayer().play();
-            } else if (castManager.getCurrentCastPlayer() .getState() == State.PLAYING){
-              castManager.getCurrentCastPlayer().pause();
+            } else if (castManager.getCastPlayer().getState() == State.PAUSED ||
+                       castManager.getCastPlayer().getState() == State.READY ||
+                       castManager.getCastPlayer().getState() == State.COMPLETED){
+              castManager.getCastPlayer().play();
+            } else if (castManager.getCastPlayer() .getState() == State.PLAYING){
+              castManager.getCastPlayer().pause();
             }
         }
     });
@@ -216,21 +216,21 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
       dismiss();
      } else {
       Intent intent = new Intent(context, castManager.getTargetActivity());
-      intent.putExtra("embedcode", castManager.getCurrentCastPlayer().getEmbedCode());
+      intent.putExtra("embedcode", castManager.getCastPlayer().getEmbedCode());
       context.startActivity(intent);
      }
   }
   
   private void updateMetadata() {
     // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
-    if (castManager.getCurrentCastPlayer() == null || castManager.getCurrentCastPlayer().getState() == State.COMPLETED) {
+    if (castManager.getCastPlayer() == null || castManager.getCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
         return;
     }
     hideControls(false);
-    title.setText(castManager.getCurrentCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.getCurrentCastPlayer().getCastItemDescription());
-    setIcon(castManager.getCurrentCastPlayer().getCastImageBitmap());
+    title.setText(castManager.getCastPlayer().getCastItemTitle());
+    subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
+    setIcon(castManager.getCastPlayer().getCastImageBitmap());
 }
   
   private void setIcon(Bitmap bitmap) {
@@ -251,7 +251,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   }
 
   public void updatePlayPauseState(State state) {
-    if (castManager.getCurrentCastPlayer() != null) {
+    if (castManager.getCastPlayer() != null) {
       if (state == State.PLAYING) {
         pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
         pausePlay.setVisibility(View.VISIBLE);

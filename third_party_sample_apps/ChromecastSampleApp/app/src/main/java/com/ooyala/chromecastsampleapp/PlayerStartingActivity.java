@@ -48,7 +48,6 @@ public class PlayerStartingActivity extends ActionBarActivity {
     player = new OoyalaPlayer(PCODE, domain);
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
 
-
     // Initialize CastManager
     String[] namespaces = {"urn:x-cast:ooyala"};
     castManager = OOCastManager.initialize(this, "F3A32677", namespaces);
@@ -70,7 +69,9 @@ public class PlayerStartingActivity extends ActionBarActivity {
     setupCastView();
 
     player.setEmbedCode(embedCode);
-    player.play();
+    if (!castManager.isInCastMode()) {
+      player.play();
+    }
   }
 
   private void buildThumbnailMap() {
@@ -130,7 +131,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     Log.d(TAG, "onDestroy()");
     castManager.destroyNotificationService(this);
     castManager.unregisterLockScreenControls();
-    castManager.disconnectOoyalaPlayer();
+    castManager.deregisterOoyalaPlayer();
     super.onDestroy();
   }
 
@@ -139,7 +140,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     Log.d(TAG, "onResume()");
     ChromecastSampleAppActivity.activatedActivity++;
 
-    if (castManager != null && castManager.getCurrentCastPlayer() != null) {
+    if (castManager != null && castManager.getCastPlayer() != null) {
       castManager.destroyNotificationService(this);
       castManager.unregisterLockScreenControls();
     } else if (player != null) {
@@ -159,7 +160,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
  
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (castManager != null && castManager.getCurrentCastPlayer() != null) {
+    if (castManager != null && castManager.getCastPlayer() != null) {
       if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
         Log.w(TAG, "KeyEvent.KEYCODE_VOLUME_UP");
         onVolumeChange(DEFAULT_VOLUME_INCREMENT);

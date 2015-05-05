@@ -33,7 +33,6 @@ import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastManager;
-import com.ooyala.android.CastPlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -68,10 +67,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private OoyalaPlayer ooyalaPlayer;
   private OOCastPlayer castPlayer;
   private Set<OOMiniController> miniControllers;
-  public boolean isShowingPlayButton;
-  private boolean isConnectedToReceiverApp;
   private int notificationMiniControllerResourceId = -1;
   private boolean notificationServiceIsActivated;
+  private boolean isConnectedToReceiverApp;
+  private boolean isPlayerSeekable = true;
   
   public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
     DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
@@ -98,96 +97,22 @@ public class OOCastManager extends DataCastManager implements CastManager {
     super(context, applicationId, namespaces);
     namespace = namespaces[0];
   }
-  
-  
-  public void setCastView(View view) {
-    DebugMode.assertCondition(view != null, TAG, "cannot set castView to null");
-    DebugMode.logD(TAG, "Set cast view to " + view);
-    castView = view;
-  }
-  
-  private void clearCastView() {
-    DebugMode.logD(TAG, "Clear cast view");
-    if (castPlayer != null) {
-      castPlayer.clearCastView();
-    }
-  }
-  
-  public void setNotificationImageResourceId(int resourceId) {
-    this.notificationImageResourceId = resourceId;
-  }
-  
-  public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
-    miniControllerImageBitmap = imageBitmap;
-  }
-  
-  public Bitmap getDefaultMiniControllerImageBitmap() {
-    return miniControllerImageBitmap;
-  }
-  
+
   public void destroy(Context context) {
     DebugMode.logD(TAG, "destroy OOCastManager");
     ooyalaPlayer = null;
     clearCastView();
     castView = null;
-    destroyCurrentCastPlayer();
+    destroyCastPlayer();
     destroyNotificationService(context);
     unregisterLockScreenControls();
     unregisterBroadcastReceiver(context);
   }
-  
-  public OOCastPlayer createNewCastPlayer(String embedCode) {
-    DebugMode.logD(TAG, "Create new CastPlayer");
-    DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer cannot be nil");
-    if (isCastingFromCurrentCastPlayer()) {
-      if (isCastingTheSameContent(embedCode)) {
-        DebugMode.logD(TAG, "Return existing castPlayer in castManager as the current player");
-        castPlayer.setCastView(castView);
-        castPlayer.addObserver(ooyalaPlayer);
-        castPlayer.setOoyalaPlayer(ooyalaPlayer);
-        return castPlayer;
-      }
-      castPlayer.suspend();
-    }
 
-    castPlayer = new OOCastPlayer(this, ooyalaPlayer);
-    castPlayer.addObserver(ooyalaPlayer);
-    castPlayer.setCastView(castView);
-    return castPlayer;
-  }
+  /*============================================================================================*/
+  /*========== CastManager App Setting API   ===================================================*/
+  /*============================================================================================*/
 
-  public boolean isConnectedToReceiverApp() {
-    return isConnectedToReceiverApp;
-  }
-
-  private boolean isCastingTheSameContent(String embedCode) {
-    return castPlayer.getEmbedCode().equals(embedCode);
-  }
-
-  private boolean isCastingFromCurrentCastPlayer() {
-    return castPlayer != null;
-  }
-
-  /**
-   * Called from OoyalaPlayer to set the related CastPlayer
-   * @param castPlayerFromOoyalaPlayer
-   */
-  public void setCastPlayer(CastPlayer castPlayerFromOoyalaPlayer) {
-    this.castPlayer = (OOCastPlayer)castPlayerFromOoyalaPlayer;
-  }
-
-  public OOCastPlayer getCurrentCastPlayer() {
-    return castPlayer;
-  }
-  
-  public void destroyCurrentCastPlayer() {
-    DebugMode.logD(TAG, "Destroy current CastPlayer");
-    if (castPlayer != null && this.ooyalaPlayer != null) {
-      castPlayer.deleteObserver(this.ooyalaPlayer);
-    }
-    castPlayer = null;
-  }
-  
   /**
    * Create options menu for cast button
    * @param activity: activity of third party application that implements cast button
@@ -201,6 +126,24 @@ public class OOCastManager extends DataCastManager implements CastManager {
             MenuItemCompat.getActionProvider(mediaRouteMenuItem);
     mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
     mediaRouteActionProvider.setDialogFactory(new OOMediaRouteDialogFactory(this));
+  }
+
+  public void setCastView(View view) {
+    DebugMode.assertCondition(view != null, TAG, "cannot set castView to null");
+    DebugMode.logD(TAG, "Set cast view to " + view);
+    castView = view;
+  }
+
+  public void setNotificationImageResourceId(int resourceId) {
+    this.notificationImageResourceId = resourceId;
+  }
+  
+  public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
+    miniControllerImageBitmap = imageBitmap;
+  }
+
+  public void setCastPlayerSeekable(boolean isSeekable) {
+    isPlayerSeekable = isSeekable;
   }
 
   /**
@@ -218,9 +161,26 @@ public class OOCastManager extends DataCastManager implements CastManager {
    * Disconnect the current OoyalaPlayer from the OOCastManager
    * Called from App level when right before the connected OoyalaPlayer is destroyed
    */
-  public void disconnectOoyalaPlayer() {
+  public void deregisterOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer);
+    castPlayer.disconnectFromCurrentOoyalaPlayer();
     ooyalaPlayer = null;
+  }
+
+  /*============================================================================================*/
+  /*========== Access CastManager Status Or Fields =============================================*/
+  /*============================================================================================*/
+
+  public Bitmap getDefaultMiniControllerImageBitmap() {
+    return miniControllerImageBitmap;
+  }
+
+  public OOCastPlayer getCastPlayer() {
+    return this.castPlayer;
+  }
+
+  public boolean isConnectedToReceiverApp() {
+    return this.isConnectedToReceiverApp;
   }
 
   /**
@@ -230,7 +190,27 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.logD(TAG, "onResume()");
     updateMiniControllersState();
   }
-  
+
+  private void clearCastView() {
+    DebugMode.logD(TAG, "Clear cast view");
+    if (castPlayer != null) {
+      castPlayer.clearCastView();
+    }
+  }
+
+  private void destroyCastPlayer() {
+    DebugMode.logD(TAG, "Destroy current CastPlayer");
+    if (castPlayer != null && this.ooyalaPlayer != null) {
+      castPlayer.deleteObserver(this.ooyalaPlayer);
+    }
+    castPlayer = null;
+  }
+
+  /*============================================================================================*/
+  /*========== BaseCastManager =================================================================*/
+  /*============================================================================================*/
+
+
   @Override
   public void onApplicationConnected(ApplicationMetadata appMetadata, String applicationStatus,
           String sessionId, boolean wasLaunched) {
@@ -241,12 +221,18 @@ public class OOCastManager extends DataCastManager implements CastManager {
       ooyalaPlayer.switchToCastMode(ooyalaPlayer.getEmbedCode());
     }
   }
+
+  private OOCastPlayer createNewCastPlayer() {
+    DebugMode.logD(TAG, "Create new CastPlayer");
+    DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
+    return new OOCastPlayer(this, ooyalaPlayer);
+  }
   
   @Override
   public void onApplicationDisconnected(int errorCode) {
     DebugMode.logD(TAG, "onApplicationDisconnected called");
+    this.isConnectedToReceiverApp = true;
     super.onApplicationDisconnected(errorCode);
-    this.isConnectedToReceiverApp = false;
     exitCastMode();
   }
   
@@ -259,9 +245,21 @@ public class OOCastManager extends DataCastManager implements CastManager {
       exitCastMode();
     }
   }
-  
+
   public boolean isInCastMode() {
-    return (getCurrentCastPlayer() != null);
+    return (castPlayer != null);
+  }
+
+
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    if (this.castPlayer == null) {
+      this.castPlayer = createNewCastPlayer();
+    } else {
+      this.castPlayer.setOoyalaPlayer(this.ooyalaPlayer);
+    }
+    castPlayer.setCastView(castView);
+    castPlayer.setSeekable(isPlayerSeekable);
+    castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying);
   }
   
   private void exitCastMode() {
@@ -269,10 +267,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
     clearCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
     if (ooyalaPlayer != null) {
-      ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState(), castPlayer.getEmbedCode());
+      ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
     }
     dismissMiniControllers();
-    destroyCurrentCastPlayer();
+    destroyCastPlayer();
     removeAllMiniControllers();
   }
   
@@ -421,11 +419,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
     // Create notification View
     RemoteViews notificationView = new RemoteViews(context.getPackageName(), this.notificationMiniControllerResourceId);
-    notificationView.setTextViewText(R.id.titleView, getCurrentCastPlayer().getCastItemTitle());
+    notificationView.setTextViewText(R.id.titleView, getCastPlayer().getCastItemTitle());
     notificationView.setTextViewText(R.id.subTitleView, getDeviceName());
     notificationView.setTextColor(R.id.titleView, Color.WHITE);
     notificationView.setTextColor(R.id.subTitleView, Color.WHITE);
-    notificationView.setImageViewBitmap(R.id.iconView, getCurrentCastPlayer().getCastImageBitmap());
+    notificationView.setImageViewBitmap(R.id.iconView, getCastPlayer().getCastImageBitmap());
     notificationView.setImageViewBitmap(R.id.removeView, OOCastUtils.getChromecastNotificationCloseButton());
 
     if (shouldDisplayPlayButton) {
