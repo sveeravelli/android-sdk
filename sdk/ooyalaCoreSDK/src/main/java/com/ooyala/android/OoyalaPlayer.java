@@ -2101,8 +2101,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "Switch to Cast Mode");
     DebugMode.assertCondition(_currentItem != null, TAG, "castManager should be not null");
     DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
+    boolean isPlaying = isPlaying();
+    int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(embedCode, getCurrentPlayheadForCastMode(), isPlaying());
+    _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
 
