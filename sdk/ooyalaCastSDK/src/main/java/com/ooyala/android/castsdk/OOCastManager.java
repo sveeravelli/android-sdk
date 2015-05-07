@@ -254,11 +254,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
 
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
-    if (this.castPlayer == null) {
-      this.castPlayer = createNewCastPlayer();
-    } else {
-      this.castPlayer.setOoyalaPlayer(this.ooyalaPlayer);
-    }
+    this.castPlayer = createNewCastPlayer();
     castPlayer.setCastView(castView);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying);
