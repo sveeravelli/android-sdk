@@ -202,9 +202,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   private void destroyCastPlayer() {
     DebugMode.logD(TAG, "Destroy current CastPlayer");
-    if (castPlayer != null && this.ooyalaPlayer != null) {
-      castPlayer.deleteObserver(this.ooyalaPlayer);
-    }
+    castPlayer.destroy();
     castPlayer = null;
   }
 

@@ -396,6 +396,9 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   
   @Override
   public void destroy() {
+    if (this.ooyalaPlayer != null) {
+      deleteObservers();
+    }
   }
 
   public int livePlayheadPercentage() {
