@@ -50,15 +50,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private static Class<?> targetActivity;
   private static Class<?> currentActivity;
   private static Context currentContext;
-  
-  private static NotificationCompat.Builder notificationBuilder;
-  private BroadcastReceiver receiver;
-  private AudioManager audioManager;
-  private RemoteControlClient remoteControlClient;
-  private final int notificationReceiverID = 001;
-  
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
+  private static NotificationCompat.Builder notificationBuilder;
+
+  private static BroadcastReceiver receiver;
+  private static AudioManager audioManager;
+  private static RemoteControlClient remoteControlClient;
+  private final int notificationReceiverID = 001;
+
   
   private String namespace;
   private View castView;
@@ -100,13 +100,19 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   public void destroy(Context context) {
     DebugMode.logD(TAG, "destroy OOCastManager");
-    ooyalaPlayer = null;
     clearCastView();
-    castView = null;
     destroyCastPlayer();
     destroyNotificationService(context);
     unregisterLockScreenControls();
     unregisterBroadcastReceiver(context);
+    destroyAllFeilds();
+  }
+
+  private void destroyAllFeilds() {
+    castView = null;
+    ooyalaPlayer = null;
+    miniControllerImageBitmap = null;
+    miniControllers = null;
   }
 
   /*============================================================================================*/
@@ -363,10 +369,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void destroyNotificationService(Context context) {
     DebugMode.logD(TAG, "Destroy notification service");
-    notificationServiceIsActivated = false;
     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     mNotifyMgr.cancel(notificationReceiverID);
     unregisterBroadcastReceiver(context);
+    notificationServiceIsActivated = false;
+    notificationBuilder = null;
   }
   
   private void registerBroadcastReceiver(Context context) {
@@ -408,6 +415,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
       } catch (IllegalArgumentException e) {
         DebugMode.logD(TAG,"epicReciver is already unregistered");
       }
+      receiver = null;
     }
   }
   
@@ -515,7 +523,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.logD(TAG, "Unregister lock screen controls");
     if (audioManager != null) {
       audioManager.unregisterRemoteControlClient(remoteControlClient);
+      audioManager = null;
     }
+    remoteControlClient = null;
   }
   
   public void updateNotificationAndLockScreenPlayPauseButton() {
