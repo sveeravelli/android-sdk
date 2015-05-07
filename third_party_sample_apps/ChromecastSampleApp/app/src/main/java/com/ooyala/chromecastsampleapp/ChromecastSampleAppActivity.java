@@ -24,7 +24,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   private RemoteControlClient remoteControlClient;
   private static final String TAG = "ChromscastSampleAppActivty";
   private final String NAMESPACE = "urn:x-cast:ooyala";
-  private final String APP_ID = "F3A32677";
+  private final String APP_ID = "46147917";
   private OOCastManager castManager;
   private OOMiniController defualtMiniController;
   private OOMiniController customizedMiniController;
@@ -128,8 +128,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   @Override
   protected void onDestroy() {
     Log.d(TAG, "onDestroy()");
-    castManager.destroy(this);
-    castManager = null;
+//    castManager.destroy(this);
+//    castManager = null;
     super.onDestroy();
   }
 
@@ -140,8 +140,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     if (castManager != null && castManager.isInCastMode()){
       this.defualtMiniController.show();
       this.customizedMiniController.show();
+      castManager.onResume();
     }
-    castManager.onResume();
     Log.d(TAG, "onResume()");
   }
   

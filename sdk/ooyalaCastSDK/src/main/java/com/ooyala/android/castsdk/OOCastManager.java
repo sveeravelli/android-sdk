@@ -163,7 +163,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void deregisterOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer);
-    castPlayer.disconnectFromCurrentOoyalaPlayer();
+    if (castPlayer != null) {
+      castPlayer.disconnectFromCurrentOoyalaPlayer();
+    }
     ooyalaPlayer = null;
   }
 
@@ -231,9 +233,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
   @Override
   public void onApplicationDisconnected(int errorCode) {
     DebugMode.logD(TAG, "onApplicationDisconnected called");
-    this.isConnectedToReceiverApp = true;
     super.onApplicationDisconnected(errorCode);
-    exitCastMode();
+    this.isConnectedToReceiverApp = false;
+    if (castPlayer != null) {
+      exitCastMode();
+    }
   }
   
   @Override
@@ -281,6 +285,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   @Override
   public void onMessageReceived(CastDevice castDevice, String namespace, String message) {
+    DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
     if (castPlayer != null) {
       castPlayer.receivedMessage(message);
     }

@@ -50,7 +50,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
 
     // Initialize CastManager
     String[] namespaces = {"urn:x-cast:ooyala"};
-    castManager = OOCastManager.initialize(this, "F3A32677", namespaces);
+    castManager = OOCastManager.initialize(this, "46147917", namespaces);
     castManager.destroyNotificationService(this);
     castManager.registerWithOoyalaPlayer(player);
     castManager.setTargetActivity(PlayerStartingActivity.class);

@@ -892,8 +892,13 @@ public class OoyalaPlayer extends Observable implements Observer,
    * Play the current video
    */
   public void play() {
-    if (isInCastMode() && currentPlayer() != null) {
-      currentPlayer().play();
+    if (isInCastMode()) {
+      PlayerInterface castPlayer = currentPlayer();
+      if (castPlayer != null) {
+        castPlayer.play();
+      } else {
+        queuePlay();
+      }
     } else {
       playLocally();
     }
@@ -1171,8 +1176,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     if (isInCastMode()) {
       curPlayer = this._castManager.getCastPlayer();
-    }
-    else if  (_adManager.inAdMode()) {
+    } else if (_adManager.inAdMode()) {
       curPlayer = _adManager.getPlayerInterface();
     } else {
       curPlayer = _player;
@@ -2099,9 +2103,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void switchToCastMode(String embedCode) {
     DebugMode.logD(TAG, "Switch to Cast Mode");
-    DebugMode.assertCondition(_currentItem != null, TAG, "castManager should be not null");
+    DebugMode.assertCondition(_currentItem != null, TAG, "currentItem should be not null");
     DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
-    boolean isPlaying = isPlaying();
+    boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
     _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
@@ -2117,9 +2121,10 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void exitCastMode(int exitPlayheadTime, boolean isPlaying, String ec) {
     DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", isPlayer = " + isPlaying);
-    DebugMode.assertCondition(ec.equals(this.getEmbedCode()), TAG, "castManager should be not null");
+    DebugMode.assertCondition(ec.equals(this.getEmbedCode()), TAG, "embedCode should be the same as the one in TV playback");
     if (_player == null) {
       prepareContent(isPlaying);
+      _player.seekToTime(exitPlayheadTime);
     } else {
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);

@@ -188,7 +188,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   /*============================================================================================*/
 
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
-    DebugMode.logD(TAG, "On Cast Mode Entered with playhead time: " + playheadTimeInMillis + ", isPlaying: "
+    DebugMode.logD(TAG, "On Cast Mode Entered with embedCode: " + embedCode + " playhead time: " + playheadTimeInMillis + ", isPlaying: "
         + isPlaying);
     if (initWithTheCastingContent(embedCode)) {
       getReceiverPlayerState(); // for updating UI controls
@@ -376,16 +376,6 @@ public class OOCastPlayer extends Observable implements CastPlayer {
 
   @Override
   public void resume() {
-    if (!shouldResumeToCastMode()) {
-      ooyalaPlayer.exitCastMode(currentTime, state == State.PLAYING, embedCode);
-    } else if (suspended) {
-      suspended = false;
-      enterCastMode(embedCode, playheadToResume, autoPlayerWhenResume);
-    }
-  }
-
-  private boolean shouldResumeToCastMode() {
-    return castManager != null && castManager.isConnected();
   }
 
   @Override
@@ -396,14 +386,8 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   public void reset() {
   }
 
-  /**
-   * Only called from OOCastManager.createNewCastPlayer
-   */
   @Override
   public void suspend() {
-    autoPlayerWhenResume = (getState() == State.PLAYING);
-    playheadToResume = currentTime;
-    suspended = true;
   }
 
   @Override
