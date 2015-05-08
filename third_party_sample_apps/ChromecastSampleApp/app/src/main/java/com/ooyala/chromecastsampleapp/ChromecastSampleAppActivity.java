@@ -37,8 +37,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     Log.d(TAG, "onCreate()");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.start_view);
-    String[] namespaces = {NAMESPACE};
-    castManager = OOCastManager.initialize(this, APP_ID, namespaces);
+    castManager = OOCastManager.initialize(this, APP_ID, NAMESPACE);
     castManager.setStopOnDisconnect(false);
     castManager.setNotificationMiniControllerLayout(R.layout.custom_notification);
     castManager.setNotificationImageResourceId(R.drawable.ic_ooyala);

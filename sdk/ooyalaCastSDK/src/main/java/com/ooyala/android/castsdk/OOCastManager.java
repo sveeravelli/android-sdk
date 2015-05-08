@@ -71,6 +71,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
   private boolean isPlayerSeekable = true;
+
+  public static OOCastManager initialize(Context context, String applicationId, String namespace) {
+    String[] namespaces = {namespace};
+    return OOCastManager.initialize(context, applicationId, namespaces);
+  }
   
   public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
     DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
