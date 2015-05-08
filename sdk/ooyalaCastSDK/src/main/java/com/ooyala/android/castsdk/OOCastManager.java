@@ -44,22 +44,22 @@ import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
 public class OOCastManager extends DataCastManager implements CastManager {
   private static final String TAG = "CastManager";
-  
+
+  public static final String ACTION_PLAY = "OOCastPlay";
+  public static final String ACTION_STOP = "OOCastStop";
   private static OOCastManager castManager;
   private static Class<?> targetActivity;
   private static Class<?> currentActivity;
   private static Context currentContext;
-  public static final String ACTION_PLAY = "OOCastPlay";
-  public static final String ACTION_STOP = "OOCastStop";
   private static NotificationCompat.Builder notificationBuilder;
   private static String namespace;
   private static BroadcastReceiver receiver;
   private static AudioManager audioManager;
   private static RemoteControlClient remoteControlClient;
   private static int notificationReceiverID = 001;
-  private static int notificationMiniControllerResourceId = R.layout.oo_default_notification;
-  private static int notificationImageResourceId = -1;
-  private static Bitmap miniControllerImageBitmap;
+  private static int notificationMiniControllerResourceId;
+  private static int notificationImageResourceId;
+  private static Bitmap miniControllerDefaultImageBitmap;
 
   private View castView;
   private OoyalaPlayer ooyalaPlayer;
@@ -72,6 +72,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public static OOCastManager initialize(Context context, String applicationId, String namespace) {
     String[] namespaces = {namespace};
     notificationMiniControllerResourceId = R.layout.oo_default_notification;
+    notificationImageResourceId = R.drawable.ic_ooyala;
     return OOCastManager.initialize(context, applicationId, namespaces);
   }
   
@@ -114,7 +115,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private void destroyAllFeilds() {
     castView = null;
     ooyalaPlayer = null;
-    miniControllerImageBitmap = null;
+    miniControllerDefaultImageBitmap = null;
     miniControllers = null;
   }
 
@@ -144,11 +145,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void setNotificationImageResourceId(int resourceId) {
-    this.notificationImageResourceId = resourceId;
+    notificationImageResourceId = resourceId;
   }
   
   public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
-    miniControllerImageBitmap = imageBitmap;
+    miniControllerDefaultImageBitmap = imageBitmap;
+  }
+
+  public void setNotificationMiniControllerLayout(int recourceId) {
+    notificationMiniControllerResourceId = recourceId;
   }
 
   public void setCastPlayerSeekable(boolean isSeekable) {
@@ -183,7 +188,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   /*============================================================================================*/
 
   public Bitmap getDefaultMiniControllerImageBitmap() {
-    return miniControllerImageBitmap;
+    return miniControllerDefaultImageBitmap;
   }
 
   public OOCastPlayer getCastPlayer() {
@@ -297,11 +302,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   /*============================================================================================*/
   /*========== MiniController ==================================================================*/
   /*============================================================================================*/
-  
-  public void setNotificationMiniControllerLayout(int recourceId) {
-//    notificationMiniControllerResourceId = recourceId;
-  }
-  
+
   public void addMiniController(OOMiniController miniController) {
     DebugMode.logD(TAG, "Add mini controller " + miniController);
     if (miniControllers == null) {
