@@ -53,14 +53,13 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
   private static NotificationCompat.Builder notificationBuilder;
-
+  private static String namespace;
   private static BroadcastReceiver receiver;
   private static AudioManager audioManager;
   private static RemoteControlClient remoteControlClient;
   private final int notificationReceiverID = 001;
 
-  
-  private String namespace;
+
   private View castView;
   private int notificationImageResourceId = -1;
   private Bitmap miniControllerImageBitmap;
@@ -100,7 +99,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   protected OOCastManager(Context context, String applicationId, String[] namespaces) {
     super(context, applicationId, namespaces);
-    namespace = namespaces[0];
+    OOCastManager.namespace = namespaces[0];
   }
 
   public void destroy(Context context) {
@@ -285,7 +284,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {
-   super.sendDataMessage(message, namespace);
+   super.sendDataMessage(message, OOCastManager.namespace);
   }
 
   @Override
