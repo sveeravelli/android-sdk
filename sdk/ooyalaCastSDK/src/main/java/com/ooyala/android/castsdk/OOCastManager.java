@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -57,22 +56,22 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private static BroadcastReceiver receiver;
   private static AudioManager audioManager;
   private static RemoteControlClient remoteControlClient;
-  private final int notificationReceiverID = 001;
-
+  private static int notificationReceiverID = 001;
+  private static int notificationMiniControllerResourceId = R.layout.oo_default_notification;
+  private static int notificationImageResourceId = -1;
+  private static Bitmap miniControllerImageBitmap;
 
   private View castView;
-  private int notificationImageResourceId = -1;
-  private Bitmap miniControllerImageBitmap;
   private OoyalaPlayer ooyalaPlayer;
   private OOCastPlayer castPlayer;
   private Set<OOMiniController> miniControllers;
-  private int notificationMiniControllerResourceId = -1;
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
   private boolean isPlayerSeekable = true;
 
   public static OOCastManager initialize(Context context, String applicationId, String namespace) {
     String[] namespaces = {namespace};
+    notificationMiniControllerResourceId = R.layout.oo_default_notification;
     return OOCastManager.initialize(context, applicationId, namespaces);
   }
   
@@ -104,7 +103,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   public void destroy(Context context) {
     DebugMode.logD(TAG, "destroy OOCastManager");
-    clearCastView();
+    hideCastView();
     destroyCastPlayer();
     destroyNotificationService(context);
     unregisterLockScreenControls();
@@ -192,7 +191,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public boolean isConnectedToReceiverApp() {
-    return this.isConnectedToReceiverApp;
+    return this.isConnected() && this.isConnectedToReceiverApp;
   }
 
   /**
@@ -203,7 +202,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     updateMiniControllersState();
   }
 
-  private void clearCastView() {
+  private void hideCastView() {
     DebugMode.logD(TAG, "Clear cast view");
     if (castPlayer != null) {
       castPlayer.clearCastView();
@@ -272,7 +271,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   private void exitCastMode() {
     DebugMode.logD(TAG, "Exit Cast Mode");
-    clearCastView();
+    hideCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null");
     if (ooyalaPlayer != null) {
       ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
@@ -300,7 +299,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   /*============================================================================================*/
   
   public void setNotificationMiniControllerLayout(int recourceId) {
-    notificationMiniControllerResourceId = recourceId;
+//    notificationMiniControllerResourceId = recourceId;
   }
   
   public void addMiniController(OOMiniController miniController) {
@@ -396,6 +395,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
             String action = intent.getAction();
             if (action.equals(ACTION_STOP)) {
               disconnect();
+              if (castPlayer != null) {
+                exitCastMode();
+              }
               destroyNotificationService(context);
             } else if (action.equals(ACTION_PLAY)) {
               if (castPlayer.getState() == State.PLAYING) {
@@ -429,18 +431,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
     }
 
     // Create notification View
-    RemoteViews notificationView = new RemoteViews(context.getPackageName(), this.notificationMiniControllerResourceId);
-    notificationView.setTextViewText(R.id.titleView, getCastPlayer().getCastItemTitle());
-    notificationView.setTextViewText(R.id.subTitleView, getDeviceName());
-    notificationView.setTextColor(R.id.titleView, Color.WHITE);
-    notificationView.setTextColor(R.id.subTitleView, Color.WHITE);
-    notificationView.setImageViewBitmap(R.id.iconView, getCastPlayer().getCastImageBitmap());
-    notificationView.setImageViewBitmap(R.id.removeView, OOCastUtils.getChromecastNotificationCloseButton());
+    RemoteViews notificationView = new RemoteViews(context.getPackageName(), OOCastManager.notificationMiniControllerResourceId);
+    notificationView.setTextViewText(R.id.OOTitleView, getCastPlayer().getCastItemTitle());
+    notificationView.setTextViewText(R.id.OOSubtitleView, getDeviceName());
+    notificationView.setImageViewBitmap(R.id.OOIconView, getCastPlayer().getCastImageBitmap());
 
     if (shouldDisplayPlayButton) {
-      notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPlayButton());
+      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, OOCastUtils.getLightChromecastPlayButton());
     } else {
-      notificationView.setImageViewBitmap(R.id.playPauseView, OOCastUtils.getDarkChromecastPauseButton());
+      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, OOCastUtils.getLightChromecastPauseButton());
     }
 
     // Set the result intent so the user can navigate to the target activity by clicking the notification view
@@ -470,11 +469,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
     
     Intent switchIntent = new Intent(ACTION_PLAY);
     PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(context, 100, switchIntent, 0);
-    notificationView.setOnClickPendingIntent(R.id.playPauseView, pendingSwitchIntent);
+    notificationView.setOnClickPendingIntent(R.id.OOPlayPauseView, pendingSwitchIntent);
 
     Intent stopIntent = new Intent(ACTION_STOP);
     PendingIntent stopPendingIntent = PendingIntent.getBroadcast(context, 100, stopIntent, 0);
-    notificationView.setOnClickPendingIntent(R.id.removeView, stopPendingIntent);
+    notificationView.setOnClickPendingIntent(R.id.OORemoveView, stopPendingIntent);
     
     
     NotificationManager notifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

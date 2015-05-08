@@ -39,7 +39,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     setContentView(R.layout.start_view);
     castManager = OOCastManager.initialize(this, APP_ID, NAMESPACE);
     castManager.setStopOnDisconnect(false);
-    castManager.setNotificationMiniControllerLayout(R.layout.custom_notification);
+    castManager.setNotificationMiniControllerLayout(R.layout.oo_default_notification);
     castManager.setNotificationImageResourceId(R.drawable.ic_ooyala);
     
     Video videoList[] = new Video[] {
