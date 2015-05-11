@@ -4,9 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
 
-import com.ooyala.android.CastPlayer;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
 
 import org.json.JSONException;
@@ -17,21 +18,16 @@ import java.util.Observable;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class OOCastPlayer extends Observable implements CastPlayer {
+public class OOCastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
  
-  private static OOCastManager castManager;
+  private OOCastManager castManager;
   private OoyalaPlayer ooyalaPlayer;
   
   private String embedCode;
-  private JSONObject contentTreeMsg;
   private int duration;
   private int currentTime;
   private State state = State.INIT;
-
-  private int playheadToResume;
-  private boolean autoPlayerWhenResume;
-  private  boolean suspended;
 
   private boolean isSeeking;
   private boolean seekable;
@@ -40,13 +36,14 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   private String castItemTitle;
   private String castItemDescription;
   private String castItemPromoImg;
+
   private Bitmap castImageBitmap;
   private View castView;
   
   
   public OOCastPlayer(OOCastManager castManager, OoyalaPlayer ooyalaPlayer) {
     setOoyalaPlayer(ooyalaPlayer);
-    OOCastPlayer.castManager = castManager;
+    this.castManager = castManager;
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
@@ -93,8 +90,8 @@ public class OOCastPlayer extends Observable implements CastPlayer {
     return duration;
   }
 
-  public void setDuration(int duration) {
-    this.duration = duration;
+  private void setDuration(int d) {
+    this.duration = d;
   }
   
   public void setSeekable(boolean seekable) {
@@ -127,9 +124,9 @@ public class OOCastPlayer extends Observable implements CastPlayer {
   
   protected void setState(State state) {
     this.state = state;
-    setChanged();
     castManager.updateMiniControllersState();
     castManager.updateNotificationAndLockScreenPlayPauseButton();
+    setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
@@ -303,7 +300,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
         } else if (state.equals("loading")) {
           setState(State.LOADING);
         } else if (state.equals("buffering")) {
-          //setState(State.LOADING);
+          setState(State.LOADING);
         } else if (state.equals("ready")) {
           setState(State.READY);
         } else if (state.equals("error")) {
@@ -329,9 +326,9 @@ public class OOCastPlayer extends Observable implements CastPlayer {
           String duration = msg.getString("2");
           setDuration((int) Double.parseDouble(duration) * 1000);
         }
-        else if (eventType.equalsIgnoreCase("downloading")) {
+//        else if (eventType.equalsIgnoreCase("downloading")) {
 //         setState(State.LOADING);
-        }
+//        }
         else if (eventType.equalsIgnoreCase("buffering")) {
           String duration = msg.getString("2");
           setDuration((int) Double.parseDouble(duration) * 1000);
@@ -343,8 +340,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
           setState(State.PAUSED);
         }
         else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
-          contentTreeMsg = msg.getJSONObject("1");
-          String embedCode = contentTreeMsg.getString("embed_code");
+          String embedCode =  msg.getJSONObject("1").getString("embed_code");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             // current content has been override on receiver side. keep play current content on content mode
             castManager.disconnectDevice(false, true, true);
@@ -358,7 +354,7 @@ public class OOCastPlayer extends Observable implements CastPlayer {
         else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);
-          castManager.dismissMiniControllers();
+            castManager.dismissMiniControllers();
         } 
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;
