@@ -250,9 +250,9 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
       if (hide) pausePlay.setVisibility(visibility);
   }
 
-  public void updatePlayPauseState(State state) {
+  public void updatePlayPauseButtonImage(boolean isPlaying) {
     if (castManager.getCastPlayer() != null) {
-      if (state == State.PLAYING) {
+      if (isPlaying) {
         pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
         pausePlay.setVisibility(View.VISIBLE);
       } else {

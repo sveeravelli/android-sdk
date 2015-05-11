@@ -292,10 +292,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         String state = msg.getString("state");
         DebugMode.logD(TAG, "Received State: " + state);
         if (state.equals("playing")) {
-          play();
           setState(State.PLAYING);
         } else if (state.equals("paused")) {
-          pause();
           setState(State.PAUSED);
         } else if (state.equals("loading")) {
           setState(State.LOADING);
@@ -305,13 +303,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
           setState(State.READY);
         } else if (state.equals("error")) {
           setState(State.ERROR);
-        } 
-        if (msg.has("playhead")) {
-          JSONObject playheadInfo = new JSONObject( msg.getString("playhead"));
-          if (playheadInfo.has("1")) {
-            String currentTime = playheadInfo.getString("1");
-            setCurrentTime((int) (Double.parseDouble(currentTime) * 1000));
-          }
         }
       }
       if (msg.has("0")) {
@@ -326,12 +317,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
           String duration = msg.getString("2");
           setDuration((int) Double.parseDouble(duration) * 1000);
         }
-//        else if (eventType.equalsIgnoreCase("downloading")) {
-//         setState(State.LOADING);
-//        }
         else if (eventType.equalsIgnoreCase("buffering")) {
-//          String duration = msg.getString("1");
-//          setDuration((int) Double.parseDouble(duration) * 1000);
+          setState(State.LOADING);
         }
         else if (eventType.equalsIgnoreCase("playing") || eventType.equalsIgnoreCase("streamPlaying")) {
           setState(State.PLAYING);
@@ -341,6 +328,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         }
         else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
+          DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             // current content has been override on receiver side. keep play current content on content mode
             castManager.disconnectDevice(false, true, true);
