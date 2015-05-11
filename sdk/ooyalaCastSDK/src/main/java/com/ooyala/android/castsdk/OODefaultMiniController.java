@@ -139,7 +139,6 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
       @Override
       public void onClick(View v) {
-
         if (castManager.getTargetActivity() != null) {
           try {
             onTargetActivityInvoked(getContext());

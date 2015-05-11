@@ -434,10 +434,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
   
   private void buildNotificationService(Context context, boolean shouldDisplayPlayButton) {
-    if (this.notificationMiniControllerResourceId == -1) {
-      return;
-    }
-
     // Create notification View
     RemoteViews notificationView = new RemoteViews(context.getPackageName(), OOCastManager.notificationMiniControllerResourceId);
     notificationView.setTextViewText(R.id.OOTitleView, getCastPlayer().getCastItemTitle());
@@ -452,7 +448,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
     // Set the result intent so the user can navigate to the target activity by clicking the notification view
     Intent resultIntent = new Intent(context, targetActivity);
-//    resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
     resultIntent.putExtra("embedcode", castPlayer.getEmbedCode());
     resultIntent.putExtra("castState", "casting");
 
@@ -502,7 +497,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
               public void onAudioFocusChange(int focusChange) {}
           },
           // Use the music stream.
-          AudioManager.STREAM_MUSIC,    
+          AudioManager.STREAM_MUSIC,
           // Request permanent focus.
           AudioManager.AUDIOFOCUS_GAIN);
 

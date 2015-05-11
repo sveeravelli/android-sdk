@@ -267,6 +267,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   @Override
   public void setCastManager(OOCastManager castManager) {
     DebugMode.logD(TAG, "set CastManager to " + castManager);
+    this.castManager = castManager;
   }
 
   @Override
