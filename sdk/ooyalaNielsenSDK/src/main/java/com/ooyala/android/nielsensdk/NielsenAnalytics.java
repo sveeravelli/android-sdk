@@ -127,7 +127,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
    * @param tag
    */
   public void onTag( byte[] tag ) {
-    if( isValid() && isContent() ) {
+    if( onTag_shouldReportTag() ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
       if( tagStr.contains("www.nielsen.com") ) {
@@ -136,6 +136,13 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
         nielsenApp.sendID3( nielsenStr );
       }
     }
+  }
+
+  private boolean onTag_shouldReportTag() {
+    return
+      isValid() &&
+      isContent() &&
+      ! isCMS( metadataJson );
   }
 
   /**
