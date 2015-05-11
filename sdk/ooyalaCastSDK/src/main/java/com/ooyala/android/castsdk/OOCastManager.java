@@ -317,7 +317,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     miniControllers.remove(miniController);
   }
   
-  public void removeAllMiniControllers() {
+  private void removeAllMiniControllers() {
     DebugMode.logD(TAG, "Remove all mini controllers");
     miniControllers.clear();
   }
@@ -325,13 +325,17 @@ public class OOCastManager extends DataCastManager implements CastManager {
   public void updateMiniControllersState() {
     DebugMode.logD(TAG, "Update mini controllers state");
     if (miniControllers != null &&  castPlayer != null) {
-      for (OOMiniController miniController : miniControllers) {
-        miniController.updatePlayPauseState(castPlayer.getState());
+      if (castPlayer.getState() == State.COMPLETED) {
+        dismissMiniControllers();
+      } else {
+        for (OOMiniController miniController : miniControllers) {
+          miniController.updatePlayPauseButtonImage(castPlayer.getState() == State.PLAYING);
+        }
       }
     }
   }
   
-  public void dismissMiniControllers() {
+  private void dismissMiniControllers() {
     DebugMode.logD(TAG, "dismiss mini controllers");
     if (miniControllers != null) {
       for (OOMiniController miniController : miniControllers) {

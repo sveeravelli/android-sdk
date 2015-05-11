@@ -330,8 +330,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
 //         setState(State.LOADING);
 //        }
         else if (eventType.equalsIgnoreCase("buffering")) {
-          String duration = msg.getString("2");
-          setDuration((int) Double.parseDouble(duration) * 1000);
+//          String duration = msg.getString("1");
+//          setDuration((int) Double.parseDouble(duration) * 1000);
         }
         else if (eventType.equalsIgnoreCase("playing") || eventType.equalsIgnoreCase("streamPlaying")) {
           setState(State.PLAYING);
@@ -354,7 +354,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);
-            castManager.dismissMiniControllers();
         } 
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;

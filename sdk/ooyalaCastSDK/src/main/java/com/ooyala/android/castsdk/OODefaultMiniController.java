@@ -163,8 +163,8 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   }
   
   @Override
-  public void updatePlayPauseState(State state) {
-    if (state == OoyalaPlayer.State.PLAYING) {
+  public void updatePlayPauseButtonImage(boolean isPlaying) {
+    if (isPlaying) {
       playPause.setVisibility(View.VISIBLE);
       playPause.setImageBitmap(pauseImageBitmap);
     } else {
