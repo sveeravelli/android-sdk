@@ -269,16 +269,4 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     DebugMode.logD(TAG, "set CastManager to " + castManager);
     this.castManager = castManager;
   }
-
-  @Override
-  public void play() {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void pause() {
-    // TODO Auto-generated method stub
-    
-  }
 }

@@ -134,18 +134,6 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
     subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
     setIcon(castManager.getCastPlayer().getCastImageBitmap());
   }
-
-  @Override
-  public void play() {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void pause() {
-    // TODO Auto-generated method stub
-    
-  }
 }
 
 

@@ -19,20 +19,6 @@ public interface OOMiniController {
    * @param isPlaying true if the content is playing right now
    */
   public void updatePlayPauseButtonImage(boolean isPlaying);
-  
-  /**
-   * Play the content when the play button in the mini controller is clicked by calling castManager.getCurrentCastPlayer().play() and
-   * this call can be the only thing you need to do in this method;
-   * This method should be called when the play button in your mini controller is clicked 
-   */
-  public void play();
-  
-  /**
-   * Pause the content when the pause button in the mini controller is clicked by calling castManager.getCurrentCastPlayer().pause() and
-   * this call can be the only thing you need to do in this method
-   * This method should be called when the pause button in your mini controller is clicked 
-   */
-  public void pause();
 
   public void show();
 
