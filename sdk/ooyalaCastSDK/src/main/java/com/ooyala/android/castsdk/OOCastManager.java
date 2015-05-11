@@ -144,6 +144,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
     castView = view;
   }
 
+  public View getCastView() {
+    return castView;
+  }
+
   public void setNotificationImageResourceId(int resourceId) {
     notificationImageResourceId = resourceId;
   }
@@ -269,7 +273,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
     this.castPlayer = createNewCastPlayer();
-    castPlayer.setCastView(castView);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying);
   }

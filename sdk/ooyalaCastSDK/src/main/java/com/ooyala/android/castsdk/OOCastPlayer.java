@@ -38,7 +38,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private String castItemPromoImg;
 
   private Bitmap castImageBitmap;
-  private View castView;
   
   
   public OOCastPlayer(OOCastManager castManager, OoyalaPlayer ooyalaPlayer) {
@@ -160,20 +159,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     return castImageBitmap;
   }
   
-  public void setCastView(View view) {
-    DebugMode.assertCondition(view != null, TAG, "cannot set castView to null");
-    clearCastView();
-    castView = view;
-  }
-  
   public void clearCastView() {
     if (ooyalaPlayer != null && ooyalaPlayer.getLayout().getChildCount() != 0) {
-      ooyalaPlayer.getLayout().removeView(castView);
+      ooyalaPlayer.getLayout().removeView(castManager.getCastView());
     }
-    castView = null;
   }
   
   private void displayCastView() {
+    View castView = castManager.getCastView();
     DebugMode.logD(TAG, "CastView = " + castView);
     if (ooyalaPlayer != null && castView != null) {
       ooyalaPlayer.getLayout().addView(castView);
