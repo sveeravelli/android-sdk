@@ -112,7 +112,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   private void constructTitleTextView() {
     title = new TextView(context);
     title.setId(3);
-    LayoutParams layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.ALIGN_TOP, icon.getId());
     layoutParams.addRule(RelativeLayout.LEFT_OF, pausePlay.getId());
     layoutParams.addRule(RelativeLayout.RIGHT_OF, icon.getId());
@@ -126,7 +126,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   private void constructSubtitleTextView() {
     subTitle = new TextView(context);
     subTitle.setId(4);
-    LayoutParams layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, icon.getId());
     layoutParams.addRule(RelativeLayout.LEFT_OF, pausePlay.getId());
     layoutParams.addRule(RelativeLayout.RIGHT_OF, icon.getId());
@@ -154,7 +154,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   private void constructEmptyTextView() {
     emptyText = new TextView(context);
     emptyText.setId(4);
-    LayoutParams layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(Gravity.CENTER);
     layoutParams.setMargins(0, 10 * DP, 0, 10 *DP);
     emptyText.setTextColor(Color.WHITE);
@@ -225,12 +225,12 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
     if (castManager.getCastPlayer() == null || castManager.getCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
-        return;
+    } else {
+      hideControls(false);
+      title.setText(castManager.getCastPlayer().getCastItemTitle());
+      subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
+      setIcon(castManager.getCastPlayer().getCastImageBitmap());
     }
-    hideControls(false);
-    title.setText(castManager.getCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
-    setIcon(castManager.getCastPlayer().getCastImageBitmap());
 }
   
   private void setIcon(Bitmap bitmap) {

@@ -366,8 +366,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public  void createNotificationService(Context context, Class<?> targetActivity) {
     DebugMode.logD(TAG, "Create notification service");
-    notificationServiceIsActivated = true;
     if (castPlayer != null) {
+      notificationServiceIsActivated = true;
       OOCastManager.targetActivity = targetActivity;
       if (castPlayer.getState() == State.PLAYING) {
         buildNotificationService(context, false);
@@ -380,6 +380,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void destroyNotificationService(Context context) {
     DebugMode.logD(TAG, "Destroy notification service");
+
     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     mNotifyMgr.cancel(notificationReceiverID);
     unregisterBroadcastReceiver(context);

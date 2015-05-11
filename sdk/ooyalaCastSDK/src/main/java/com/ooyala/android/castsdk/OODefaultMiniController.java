@@ -22,7 +22,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
   private static final String TAG = "OODefaultMiniController";
 
-  private static OOCastManager castManager;
+  private OOCastManager castManager;
 
   private final int DP;
   
@@ -48,12 +48,12 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   }
   
   public void setCastManager(OOCastManager castManager) {
-    OODefaultMiniController.castManager = castManager;
+    this.castManager = castManager;
   }
   
   private void constructContainer(Context context) {
     container = new RelativeLayout(context);
-    LayoutParams layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     container.setLayoutParams(layoutParams);
     constructIconImageView(context);
     constructPlayPauseImageView(context);
@@ -88,7 +88,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   private void constructTitleTextView(Context context) {
     title = new TextView(context);
     title.setId(3);
-    LayoutParams layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.ALIGN_TOP, icon.getId());
     layoutParams.addRule(RelativeLayout.RIGHT_OF, icon.getId());
     layoutParams.addRule(RelativeLayout.LEFT_OF, playPause.getId());
@@ -129,7 +129,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
                    castManager.getCastPlayer().getState() == State.READY ||
                    castManager.getCastPlayer().getState() == State.COMPLETED){
           castManager.getCastPlayer().play();
-        } else if (castManager.getCastPlayer() .getState() == State.PLAYING){
+        } else if (castManager.getCastPlayer().getState() == State.PLAYING){
           castManager.getCastPlayer().pause();
         }
       }
@@ -204,7 +204,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   @Override
   public void play() {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
