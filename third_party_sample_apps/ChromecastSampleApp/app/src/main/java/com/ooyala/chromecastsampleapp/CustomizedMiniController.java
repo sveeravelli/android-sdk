@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
-import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.castsdk.OOMiniController;
@@ -101,8 +100,8 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   }
   
   @Override
-  public void updatePlayPauseState(State state) {
-    if (state == OoyalaPlayer.State.PLAYING) {
+  public void updatePlayPauseButtonImage(boolean isPlaying) {
+    if (isPlaying) {
       playPause.setVisibility(View.VISIBLE);
       playPause.setImageDrawable(pauseDrawable);
     } else {

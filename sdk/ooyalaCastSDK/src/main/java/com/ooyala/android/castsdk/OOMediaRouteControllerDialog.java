@@ -56,7 +56,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
         state = castManager.getCastPlayer().getState();
         castManager.addMiniController(this);
       }
-      updatePlayPauseState(state);
+      updatePlayPauseButtonImage(state == State.PLAYING);
       setupCallbacks();
       updateMetadata();
       return mainContainer;
