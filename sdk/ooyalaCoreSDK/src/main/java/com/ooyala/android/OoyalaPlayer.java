@@ -1321,11 +1321,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void update(Observable arg0, Object arg1) {
     String notification = arg1.toString();
-
     if (arg0 instanceof Player) {
       processContentNotifications((Player) arg0, notification);
-    } else if (arg0 instanceof CastPlayer) {
-      processCastNotifications((CastPlayer) arg0, notification);
+    } else if (arg0.getClass() == this._castManager.getCastPlayer().getClass() ) {
+      processCastNotifications(notification);
     }
   }
 
@@ -1427,10 +1426,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     sendNotification(notification);
   }
 
-  private void processCastNotifications(CastPlayer castPlayer, String notification) {
+  private void processCastNotifications(String notification) {
 
     if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      setState(castPlayer.getState());
+      setState(this._castManager.getCastPlayer().getState());
     } else if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
       sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {

@@ -1,5 +1,7 @@
 package com.ooyala.android;
 
+import com.ooyala.android.player.PlayerInterface;
+
 /**
  * Created by liusha.huang on 3/26/15.
  */
@@ -10,7 +12,7 @@ public interface CastManager {
    */
   public boolean isConnectedToReceiverApp();
 
-  public CastPlayer getCastPlayer();
+  public PlayerInterface getCastPlayer();
 
   public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer);
 
