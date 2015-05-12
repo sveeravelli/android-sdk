@@ -45,7 +45,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   private TextView _liveIndicator = null;
   private TextView _liveDVRIndicator = null;
   private ProgressBar _spinner = null;
-  private boolean _wasPlaying;
   private boolean _seeking;
   private boolean _fullscreenButtonShowing = true;
 
@@ -302,8 +301,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   @Override
   public void onStartTrackingTouch(SeekBar seekBar) {
     _seeking = true;
-    _wasPlaying = _player.isPlaying();
-    _player.pause();
   }
 
   @Override
@@ -311,9 +308,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     _player.seekToPercent(seekBar.getProgress());
     update(null, null);
     _seeking = false;
-    if (_wasPlaying) {
-      _player.play();
-    }
   }
 
   @Override

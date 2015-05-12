@@ -1,0 +1,15 @@
+include ':app'
+//
+//include ':ooyalaCoreSDK'
+//project(':ooyalaCoreSDK').projectDir = new File(settingsDir, '../sdk/ooyalaCoreSDK')
+//
+//
+include ':ooyalaCoreSDK'
+project(':ooyalaCoreSDK').projectDir = new File(settingsDir, '../../sdk/ooyalaCoreSDK')
+
+
+include ':ooyalaCastSDK'
+project(':ooyalaCastSDK').projectDir=new File(settingsDir, '../../sdk/ooyalaCastSDK')
+
+include ':CastCompanionLibrary'
+project(':CastCompanionLibrary').projectDir=new File(settingsDir, '../../vendor/CastCompanionLibrary')

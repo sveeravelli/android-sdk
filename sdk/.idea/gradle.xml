@@ -9,11 +9,13 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/internalTestApp" />
+            <option value="$PROJECT_DIR$/ooyalaCastSDK" />
             <option value="$PROJECT_DIR$/ooyalaCoreSDK" />
             <option value="$PROJECT_DIR$/ooyalaFreewheelSDK" />
             <option value="$PROJECT_DIR$/ooyalaIMASDK" />
             <option value="$PROJECT_DIR$/ooyalaNielsenSDK" />
             <option value="$PROJECT_DIR$/ooyalaTestApp" />
+            <option value="$PROJECT_DIR$/../vendor/CastCompanionLibrary" />
           </set>
         </option>
       </GradleProjectSettings>
