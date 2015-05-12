@@ -51,15 +51,16 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private static Class<?> targetActivity;
   private static Class<?> currentActivity;
   private static Context currentContext;
-  private static NotificationCompat.Builder notificationBuilder;
   private static String namespace;
-  private static BroadcastReceiver receiver;
-  private static AudioManager audioManager;
-  private static RemoteControlClient remoteControlClient;
-  private static int notificationReceiverID = 001;
   private static int notificationMiniControllerResourceId;
   private static int notificationImageResourceId;
-  private static Bitmap miniControllerDefaultImageBitmap;
+
+  private NotificationCompat.Builder notificationBuilder;
+  private BroadcastReceiver receiver;
+  private AudioManager audioManager;
+  private RemoteControlClient remoteControlClient;
+  private int notificationID = 001;
+  private Bitmap miniControllerDefaultImageBitmap;
 
   private View castView;
   private OoyalaPlayer ooyalaPlayer;
@@ -88,7 +89,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
         castManager = new OOCastManager(context, applicationId, namespaces);
         mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
     }
-    OOCastManager.currentActivity = context.getClass();
+    currentActivity = context.getClass();
     currentContext = context;
     return castManager;
   }
@@ -348,15 +349,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
   
   public void setTargetActivity(Class<?> targetActivity) {
-    OOCastManager.targetActivity = targetActivity;
+    this.targetActivity = targetActivity;
   }
   
   public Class<?> getTargetActivity() {
-    return OOCastManager.targetActivity;
+    return targetActivity;
   }
   
   public Class<?> getCurrentActivity() {
-    return OOCastManager.currentActivity;
+    return currentActivity;
   }
   
   
@@ -364,11 +365,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
   /*==========  Notification Service ============================================================*/
   /*============================================================================================*/
   
-  public  void createNotificationService(Context context, Class<?> targetActivity) {
+  public  void createNotificationService(Context context) {
     DebugMode.logD(TAG, "Create notification service");
     if (castPlayer != null) {
       notificationServiceIsActivated = true;
-      OOCastManager.targetActivity = targetActivity;
       if (castPlayer.getState() == State.PLAYING) {
         buildNotificationService(context, false);
       } else {
@@ -380,12 +380,13 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void destroyNotificationService(Context context) {
     DebugMode.logD(TAG, "Destroy notification service");
-
-    NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    mNotifyMgr.cancel(notificationReceiverID);
-    unregisterBroadcastReceiver(context);
-    notificationServiceIsActivated = false;
-    notificationBuilder = null;
+    if (notificationServiceIsActivated) {
+      NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+      mNotifyMgr.cancel(notificationID);
+      unregisterBroadcastReceiver(context);
+      notificationServiceIsActivated = false;
+      notificationBuilder = null;
+    }
   }
   
   private void registerBroadcastReceiver(Context context) {
@@ -450,7 +451,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
     // Set the result intent so the user can navigate to the target activity by clicking the notification view
     Intent resultIntent = new Intent(context, targetActivity);
     resultIntent.putExtra("embedcode", castPlayer.getEmbedCode());
-    resultIntent.putExtra("castState", "casting");
 
     // Build the stack for PendingIntent to make sure the user can navigate back to the parent acitvity
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -458,8 +458,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
     stackBuilder.addNextIntent(resultIntent);
 
     PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-    if (castManager.notificationBuilder == null) {
-      castManager.notificationBuilder = new NotificationCompat.Builder(context).
+    if (notificationBuilder == null) {
+      notificationBuilder = new NotificationCompat.Builder(context).
           setSmallIcon(notificationImageResourceId).
           setOnlyAlertOnce(true).
           setAutoCancel(false).
@@ -481,7 +481,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     
     
     NotificationManager notifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notifyMgr.notify(notificationReceiverID, notification);
+    notifyMgr.notify(notificationID, notification);
   }
   
   

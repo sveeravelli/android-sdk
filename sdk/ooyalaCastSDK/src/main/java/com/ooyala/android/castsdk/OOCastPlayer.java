@@ -3,6 +3,7 @@ package com.ooyala.android.castsdk;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -13,6 +14,7 @@ import com.ooyala.android.util.DebugMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Observable;
 
@@ -21,7 +23,7 @@ import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 public class OOCastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
  
-  private OOCastManager castManager;
+  private WeakReference<OOCastManager> castManager;
   private OoyalaPlayer ooyalaPlayer;
   
   private String embedCode;
@@ -42,7 +44,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   public OOCastPlayer(OOCastManager castManager, OoyalaPlayer ooyalaPlayer) {
     setOoyalaPlayer(ooyalaPlayer);
-    this.castManager = castManager;
+    this.castManager = new WeakReference<OOCastManager>(castManager);
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
@@ -123,8 +125,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   protected void setState(State state) {
     this.state = state;
-    castManager.updateMiniControllersState();
-    castManager.updateNotificationAndLockScreenPlayPauseButton();
+    castManager.get().updateMiniControllersState();
+    castManager.get().updateNotificationAndLockScreenPlayPauseButton();
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
@@ -161,14 +163,17 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   public void clearCastView() {
     if (ooyalaPlayer != null && ooyalaPlayer.getLayout().getChildCount() != 0) {
-      ooyalaPlayer.getLayout().removeView(castManager.getCastView());
+      ooyalaPlayer.getLayout().removeView(castManager.get().getCastView());
     }
   }
   
   private void displayCastView() {
-    View castView = castManager.getCastView();
+    View castView = castManager.get().getCastView();
     DebugMode.logD(TAG, "CastView = " + castView);
     if (ooyalaPlayer != null && castView != null) {
+      if (castView.getParent() != null) {
+        ((ViewGroup) castView.getParent()).removeView(castView);
+      }
       ooyalaPlayer.getLayout().addView(castView);
     }
   }
@@ -250,7 +255,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         } catch (Exception e) {
           LOGE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", using the default one",
               e);
-          castImageBitmap = castManager.getDefaultMiniControllerImageBitmap();
+          castImageBitmap = castManager.get().getDefaultMiniControllerImageBitmap();
         }
       }
     }).start();
@@ -264,7 +269,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private void sendMessage(final String message) {
     try {
       DebugMode.logD(TAG, "Sending Message: " + message);
-      castManager.sendDataMessage(message);
+      castManager.get().sendDataMessage(message);
     }  catch (Exception e) {
       e.printStackTrace();
     }
@@ -324,7 +329,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
           DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             // current content has been override on receiver side. keep play current content on content mode
-            castManager.disconnectDevice(false, true, true);
+            castManager.get().disconnectDevice(false, true, true);
           }
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {

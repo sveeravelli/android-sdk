@@ -18,11 +18,13 @@ import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
+import java.lang.ref.WeakReference;
+
 public class OODefaultMiniController extends RelativeLayout implements com.ooyala.android.castsdk.OOMiniController {
 
   private static final String TAG = "OODefaultMiniController";
 
-  private OOCastManager castManager;
+  private WeakReference<OOCastManager> castManager;
 
   private final int DP;
   
@@ -48,7 +50,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   }
   
   public void setCastManager(OOCastManager castManager) {
-    this.castManager = castManager;
+    this.castManager = new WeakReference<OOCastManager>(castManager);
   }
   
   private void constructContainer(Context context) {
@@ -123,23 +125,22 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
         @Override
         public void onClick(View v) {
-          if (castManager.getCastPlayer()  == null) {
-            return;
-        } else if (castManager.getCastPlayer().getState() == State.PAUSED ||
-                   castManager.getCastPlayer().getState() == State.READY ||
-                   castManager.getCastPlayer().getState() == State.COMPLETED){
-          castManager.getCastPlayer().play();
-        } else if (castManager.getCastPlayer().getState() == State.PLAYING){
-          castManager.getCastPlayer().pause();
+          DebugMode.assertCondition((castManager.get().getCastPlayer()  == null), TAG, "castPlayer should never be null when we have a mini controller");
+          if (castManager.get().getCastPlayer().getState() == State.PAUSED ||
+                     castManager.get().getCastPlayer().getState() == State.READY ||
+                     castManager.get().getCastPlayer().getState() == State.COMPLETED){
+            castManager.get().getCastPlayer().play();
+          } else if (castManager.get().getCastPlayer().getState() == State.PLAYING){
+            castManager.get().getCastPlayer().pause();
+          }
         }
-      }
     });
 
     container.setOnClickListener(new OnClickListener() {
 
       @Override
       public void onClick(View v) {
-        if (castManager.getTargetActivity() != null) {
+        if (castManager.get().getTargetActivity() != null) {
           try {
             onTargetActivityInvoked(getContext());
           } catch (Exception e) {
@@ -152,8 +153,8 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
       NoConnectionException {
-    Intent intent = new Intent(context, castManager.getTargetActivity());
-    intent.putExtra("embedcode", castManager.getCastPlayer().getEmbedCode());
+    Intent intent = new Intent(context, castManager.get().getTargetActivity());
+    intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
     context.startActivity(intent);
   }
   
@@ -175,30 +176,18 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
   public void show() {
     super.setVisibility(VISIBLE);
-    hideControls(false);
     updateUIInfo();
   }
-
 
   public void dismiss() {
     super.setVisibility(GONE);
   }
-  
-  private void hideControls(boolean hide) {
-    int visibility = hide ? View.GONE : View.VISIBLE;
-    icon.setVisibility(visibility);
-    title.setVisibility(visibility);
-    subTitle.setVisibility(visibility);
-    if (hide) {
-      playPause.setVisibility(visibility);
-    }
-  }
-  
+
   private void updateUIInfo() {
     DebugMode.logD(TAG, "Update MiniController UI Info");
-    title.setText(castManager.getCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
-    setIcon(castManager.getCastPlayer().getCastImageBitmap());
+    title.setText(castManager.get().getCastPlayer().getCastItemTitle());
+    subTitle.setText(castManager.get().getCastPlayer().getCastItemDescription());
+    setIcon(castManager.get().getCastPlayer().getCastImageBitmap());
   }
 }
 

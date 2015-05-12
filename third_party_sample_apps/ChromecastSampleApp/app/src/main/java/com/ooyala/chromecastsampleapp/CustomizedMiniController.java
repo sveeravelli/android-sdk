@@ -18,11 +18,13 @@ import com.ooyala.android.castsdk.OOCastManager;
 import com.ooyala.android.castsdk.OOMiniController;
 import com.ooyala.android.util.DebugMode;
 
+import java.lang.ref.WeakReference;
+
 public class CustomizedMiniController extends RelativeLayout implements OOMiniController {
 
   private static final String TAG = "CustomizedMiniController";
 
-  private static OOCastManager castManager;
+  private WeakReference<OOCastManager> castManager;
   
   protected ImageView icon;
   protected TextView title;
@@ -43,7 +45,7 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   }
   
   public void setCastManager(OOCastManager castManager) {
-    CustomizedMiniController.castManager = castManager;
+    this.castManager = new WeakReference<OOCastManager>(castManager);
   }
   
   private void loadViews(View miniControllerView) {
@@ -60,14 +62,14 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
 
         @Override
         public void onClick(View v) {
-          if (castManager.getCastPlayer()  == null) {
+          if (castManager.get().getCastPlayer()  == null) {
             return;
-          } else if (castManager.getCastPlayer().getState() == State.PAUSED ||
-                    castManager.getCastPlayer().getState() == State.READY ||
-                    castManager.getCastPlayer().getState() == State.COMPLETED){
-            castManager.getCastPlayer().play();
-          } else if (castManager.getCastPlayer() .getState() == State.PLAYING){
-            castManager.getCastPlayer().pause();
+          } else if (castManager.get().getCastPlayer().getState() == State.PAUSED ||
+                    castManager.get().getCastPlayer().getState() == State.READY ||
+                    castManager.get().getCastPlayer().getState() == State.COMPLETED){
+            castManager.get().getCastPlayer().play();
+          } else if (castManager.get().getCastPlayer() .getState() == State.PLAYING){
+            castManager.get().getCastPlayer().pause();
           }
         }
       });
@@ -77,7 +79,7 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
       @Override
       public void onClick(View v) {
 
-        if (castManager.getTargetActivity() != null) {
+        if (castManager.get().getTargetActivity() != null) {
           try {
             onTargetActivityInvoked(getContext());
           } catch (Exception e) {
@@ -90,8 +92,8 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
 
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
       NoConnectionException {
-    Intent intent = new Intent(context, castManager.getTargetActivity());
-    intent.putExtra("embedcode", castManager.getCastPlayer().getEmbedCode());
+    Intent intent = new Intent(context, castManager.get().getTargetActivity());
+    intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
     context.startActivity(intent);
   }
   
@@ -130,9 +132,9 @@ public class CustomizedMiniController extends RelativeLayout implements OOMiniCo
   
   private void updateUIInfo() {
     DebugMode.logD(TAG, "Update MiniController UI Info");
-    title.setText(castManager.getCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.getCastPlayer().getCastItemDescription());
-    setIcon(castManager.getCastPlayer().getCastImageBitmap());
+    title.setText(castManager.get().getCastPlayer().getCastItemTitle());
+    subTitle.setText(castManager.get().getCastPlayer().getCastItemDescription());
+    setIcon(castManager.get().getCastPlayer().getCastImageBitmap());
   }
 }
 
