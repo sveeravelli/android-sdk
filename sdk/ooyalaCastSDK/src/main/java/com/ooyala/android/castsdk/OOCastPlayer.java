@@ -24,7 +24,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private static final String TAG = "OOCastPlayer";
  
   private WeakReference<OOCastManager> castManager;
-  private OoyalaPlayer ooyalaPlayer;
+  private WeakReference<OoyalaPlayer> ooyalaPlayer;
   
   private String embedCode;
   private int duration;
@@ -49,12 +49,12 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     this.addObserver(ooyalaPlayer);
-    this.ooyalaPlayer = ooyalaPlayer;
+    this.ooyalaPlayer = new WeakReference<OoyalaPlayer>(ooyalaPlayer);
   }
 
   public void disconnectFromCurrentOoyalaPlayer() {
     clearCastView();
-    this.deleteObserver(ooyalaPlayer);
+    this.deleteObserver(ooyalaPlayer.get());
     this.ooyalaPlayer = null;
   }
   
@@ -91,10 +91,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     return duration;
   }
 
-  private void setDuration(int d) {
-    this.duration = d;
-  }
-  
   public void setSeekable(boolean seekable) {
     this.seekable = seekable;
   }
@@ -162,8 +158,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   }
   
   public void clearCastView() {
-    if (ooyalaPlayer != null && ooyalaPlayer.getLayout().getChildCount() != 0) {
-      ooyalaPlayer.getLayout().removeView(castManager.get().getCastView());
+    if (ooyalaPlayer != null && ooyalaPlayer.get().getLayout().getChildCount() != 0) {
+      ooyalaPlayer.get().getLayout().removeView(castManager.get().getCastView());
     }
   }
   
@@ -174,7 +170,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       if (castView.getParent() != null) {
         ((ViewGroup) castView.getParent()).removeView(castView);
       }
-      ooyalaPlayer.getLayout().addView(castView);
+      ooyalaPlayer.get().getLayout().addView(castView);
     }
   }
 
@@ -191,7 +187,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       return;
     }
     this.embedCode = embedCode;
-    updateMetadataFromOoyalaPlayer(ooyalaPlayer);
+    updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
     displayCastView();
     String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
     sendMessage(initialPlayMessage);
@@ -238,7 +234,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
       castItemDescription = player.getCurrentItem().getDescription();
-      seekable = ooyalaPlayer.seekable();
+      seekable = ooyalaPlayer.get().seekable();
       loadIcon();
     } else {
       DebugMode.logD(TAG, "OoyalaPlayer returns null when updateMetadata()");
@@ -313,7 +309,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
           setCurrentTime((int) (Double.parseDouble(currentTime) * 1000));
           onPlayHeadChanged();
           String duration = msg.getString("2");
-          setDuration((int) Double.parseDouble(duration) * 1000);
+          this.duration = ((int) Double.parseDouble(duration) * 1000);
         }
         else if (eventType.equalsIgnoreCase("buffering")) {
           setState(State.LOADING);

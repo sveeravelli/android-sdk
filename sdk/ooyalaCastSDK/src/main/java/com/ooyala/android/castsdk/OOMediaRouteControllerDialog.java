@@ -221,12 +221,12 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   NoConnectionException {
     if (castManager.get().getCurrentActivity() == castManager.get().getTargetActivity()) {
       DebugMode.logD(TAG, "Already in the target activity");
-      dismiss();
      } else {
       Intent intent = new Intent(context, castManager.get().getTargetActivity());
       intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
       context.startActivity(intent);
      }
+    dismiss();
   }
   
   private void updateMetadata() {

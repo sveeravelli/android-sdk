@@ -37,6 +37,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,7 +64,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private Bitmap miniControllerDefaultImageBitmap;
 
   private View castView;
-  private OoyalaPlayer ooyalaPlayer;
+  private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private OOCastPlayer castPlayer;
   private Set<OOMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
@@ -170,7 +171,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     DebugMode.logD(TAG, "Connect to OoyalaPlayer " + ooyalaPlayer);
-    this.ooyalaPlayer = ooyalaPlayer;
+    this.ooyalaPlayer = new WeakReference<OoyalaPlayer>(ooyalaPlayer);
     ooyalaPlayer.registerCastManager(this);
   }
 
@@ -234,15 +235,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
     DebugMode.logD(TAG, "onApplicationConnected called");
     super.onApplicationConnected(appMetadata, applicationStatus, sessionId, wasLaunched);
     this.isConnectedToReceiverApp = true;
-    if (ooyalaPlayer != null && ooyalaPlayer.getCurrentItem() != null) {
-      ooyalaPlayer.switchToCastMode(ooyalaPlayer.getEmbedCode());
+    if (ooyalaPlayer != null && ooyalaPlayer.get().getCurrentItem() != null) {
+      ooyalaPlayer.get().switchToCastMode(ooyalaPlayer.get().getEmbedCode());
     }
   }
 
   private OOCastPlayer createNewCastPlayer() {
     DebugMode.logD(TAG, "Create new CastPlayer");
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
-    return new OOCastPlayer(this, ooyalaPlayer);
+    return new OOCastPlayer(this, ooyalaPlayer.get());
   }
   
   @Override
@@ -269,7 +270,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
     return (castPlayer != null);
   }
 
-
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
     this.castPlayer = createNewCastPlayer();
     castPlayer.setSeekable(isPlayerSeekable);
@@ -281,7 +281,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     hideCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null when exit cast mode");
     if (ooyalaPlayer != null) {
-      ooyalaPlayer.exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
+      ooyalaPlayer.get().exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
     }
     dismissMiniControllers();
     destroyCastPlayer();
@@ -313,17 +313,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     miniControllers.add(miniController);
     miniController.setCastManager(castManager);
   }
-  
-  public void removeMiniController(OOMiniController miniController) {
-    DebugMode.logD(TAG, "Remove mini controller " + miniController);
-    miniControllers.remove(miniController);
-  }
-  
-  private void removeAllMiniControllers() {
-    DebugMode.logD(TAG, "Remove all mini controllers");
-    miniControllers.clear();
-  }
-  
+
   public void updateMiniControllersState() {
     DebugMode.logD(TAG, "Update mini controllers state");
     if (miniControllers != null &&  castPlayer != null) {
@@ -335,6 +325,16 @@ public class OOCastManager extends DataCastManager implements CastManager {
         }
       }
     }
+  }
+  
+  public void removeMiniController(OOMiniController miniController) {
+    DebugMode.logD(TAG, "Remove mini controller " + miniController);
+    miniControllers.remove(miniController);
+  }
+  
+  private void removeAllMiniControllers() {
+    DebugMode.logD(TAG, "Remove all mini controllers");
+    miniControllers.clear();
   }
   
   private void dismissMiniControllers() {

@@ -32,7 +32,6 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   protected TextView title;
   protected TextView subTitle;
   protected ImageView playPause;
-  protected ProgressBar loadingBar;
   private RelativeLayout container;
   private Bitmap pauseImageBitmap;
   private Bitmap playImageBitmap;
