@@ -107,6 +107,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
   protected void onStart() {
     Log.d(TAG, "onStart()");
     super.onStart();
+    castManager.setCurrentContext(this);
   }
 
   @Override

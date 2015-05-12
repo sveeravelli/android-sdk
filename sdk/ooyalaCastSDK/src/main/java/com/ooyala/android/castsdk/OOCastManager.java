@@ -89,8 +89,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
         castManager = new OOCastManager(context, applicationId, namespaces);
         mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
     }
-    currentActivity = context.getClass();
-    currentContext = context;
     return castManager;
   }
   
@@ -354,6 +352,11 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public Class<?> getTargetActivity() {
     return targetActivity;
+  }
+
+  public void setCurrentContext(Context context) {
+    currentActivity = context.getClass();
+    currentContext = context;
   }
   
   public Class<?> getCurrentActivity() {
