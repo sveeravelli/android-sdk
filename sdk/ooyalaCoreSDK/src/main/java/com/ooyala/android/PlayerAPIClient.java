@@ -44,6 +44,7 @@ class PlayerAPIClient {
   protected static final String KEY_METADATA = "metadata";
   protected static final String KEY_DEVICE = "device";
   protected static final String KEY_ERRORS = "errors";
+  protected static final String KEY_EMBED_CODE = "embed_code";
 
   protected static final String AUTHORIZE_CONTENT_ID_URI = "/sas/player_api/v%s/authorization/content_id/%s/%s";
   protected static final String AUTHORIZE_EMBED_CODE_URI = "/sas/player_api/v%s/authorization/embed_code/%s/%s";
@@ -381,44 +382,11 @@ class PlayerAPIClient {
     return task;
   }
 
-  private class AuthorizeHeartbeatTask extends AsyncTask<Void, Void, Boolean> {
-    protected OoyalaException _error = null;
-    protected AuthorizeHeartbeatCallback _callback = null;
-
-    public AuthorizeHeartbeatTask(AuthorizeHeartbeatCallback callback) {
-      super();
-      _callback = callback;
-    }
-
-    @Override
-    protected Boolean doInBackground(Void... params) { //params should be null here
-      try {
-        return authorizeHeartbeat();
-      } catch (OoyalaException e) {
-        _error = e;
-        return Boolean.FALSE;
-      }
-    }
-
-    @Override
-    protected void onPostExecute(Boolean result) {
-      _callback.callback(result.booleanValue(), _error);
-    }
-  }
-
-  public interface AuthorizeHeartbeatCallback {
-    /**
-     * This callback is used for asynchronous authorize heartbeat calls
-     * @param result true if the authorize call succeeded, false otherwise
-     * @param error the OoyalaException if there was one
-     */
-    public void callback(boolean result, OoyalaException error);
-  }
-
-  // boolean here refers to the response.
-  public boolean authorizeHeartbeat() throws OoyalaException {
+  public boolean authorizeHeartbeat(String embedCode) throws OoyalaException {
     String uri = String.format(AUTHORIZE_HEARTBEAT_URI, OoyalaPlayer.API_VERSION, _pcode, getAuthToken());
-    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, null,
+    Map<String, String> params = new HashMap<String, String>();
+    params.put( KEY_EMBED_CODE, embedCode );
+    JSONObject json = OoyalaAPIHelper.objectForAPI(Environment.AUTHORIZE_HOST, uri, params,
             _connectionTimeoutInMillisecond, _readTimeoutInMillisecond);
     try {
       return verifyAuthorizeHeartbeatJSON(json) != null;  // any returned result is valid
@@ -428,11 +396,6 @@ class PlayerAPIClient {
     }
   }
 
-  public Object authorizeHeartbeat(AuthorizeHeartbeatCallback callback) {
-    AuthorizeHeartbeatTask task = new AuthorizeHeartbeatTask(callback);
-    task.execute();
-    return task;
-  }
   private Map<String, String> contentTreeParams(Map<String, String> additionalParams) {
     Map<String, String> params = new HashMap<String, String>();
     if (additionalParams != null) {

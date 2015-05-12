@@ -17,7 +17,14 @@ VisualOnSampleApp is an example of this integration using Android Studio.
 
     OoyalaPlayer.enableCustomHLSPlayer = true;
 
-7. play an embed code that has HLS playback capabilities (or a remote asset pointing at an .m3u8 file)
+7. Add a "compile files()" line for each of the jars in your project/app/libs/ folder.  for example:
+  compile files('libs/voOSBasePlayer.jar')
+  compile files('libs/voOSDataSource.jar')
+  compile files('libs/voOSEngine.jar')
+  compile files('libs/voOSPlayer.jar')
+  compile files('libs/voOSUtils.jar')
+
+8. play an embed code that has HLS playback capabilities (or a remote asset pointing at an .m3u8 file)
 
 
 

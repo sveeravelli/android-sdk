@@ -26,14 +26,19 @@
     <string name="menu_summery_content">Acquire rights for a protected content located on the file-system</string>
     <string name="menu_summery_download">Download file from URL to local path</string>
     <string name="menu_summery_Harmonic_Ts">Download TS fragment for Harmonic HLS stream</string>
-    <string name="menu_summery_perform_playback">Playback of of content that have valid rights</string>
+    <string name="menu_summery_perform_playback">Playback of content that have valid rights</string>
     <string name="menu_summery_localize">Display the rights information of a protected content as a human readable string</string>
     <string name="menu_summery_About">N/A</string>
     <string name="Local_playback_summary">Play only after the content has been downloaded to the device</string>
     
     <string name="acquire_Rights_before_download">You need to download the file before you acquire Rights.</string>
 	<string name="BpsQuality_Auto">Auto</string>
-    
+	<string name="playback_information_BPS_default_value">N/A</string>
+	<string name="playback_information_BPS_tView_header">BPS: </string>
+	<string name="playback_information_BPS_tView_units">bps</string>
+	<string name="playback_information_Resolution_default_value">N/A</string>
+	<string name="playback_information_Resolution_tView_header">Resolution: </string>
+	
 <!-- keys values -->
 	<string name="key_active_content_pref">active content</string>
 	<string name="key_use_custom_content_checkBox">use custom content</string>
@@ -47,6 +52,7 @@
 	<string name="key_active_content_display">active content display</string>
 	<string name="key_about">Version display</string>
 	<string name="key_hardware_accelerator">Hardware Accelerator</string>
+	<string name="key_display_playback_information">Display Playback Information</string>
 
 
 	<string name="str_OK">OK</string>
@@ -72,4 +78,7 @@
 	<string name="streaming_downloader_download">Download</string>
 	<string name="streaming_downloader_URL">URL</string>
 	<string name="streaming_downloader_pause">Pause</string>
+	
+	<string name="category_title_playback_information">Playback Informarion</string>
+	<string name="title_checkbox_playback_information">Display Playback Informarion</string>	
 </resources>

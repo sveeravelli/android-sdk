@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -24,12 +25,9 @@ import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.apis.MetadataFetchedCallback;
-import com.ooyala.android.captions.ClosedCaptionsStyle;
-import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.configuration.ReadonlyOptionsInterface;
 import com.ooyala.android.item.AuthorizableItem.AuthCode;
-import com.ooyala.android.item.Caption;
 import com.ooyala.android.item.Channel;
 import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
@@ -46,6 +44,7 @@ import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.visualon.VisualOnStreamPlayer;
 
 import org.json.JSONObject;
 
@@ -70,7 +69,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v4.0.0_RC1";
+  static final String SDK_VERSION = "v4.1.0_RC5";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -119,7 +118,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String BUFFERING_COMPLETED_NOTIFICATION = "bufferingCompleted";
   public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
   public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
-
+  public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION = "liveCCAvailabilityChanged";
 
   public enum ContentOrAdType {
     MainContent,
@@ -129,8 +128,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
-
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
+
   /**
    * If set to true, this will allow HLS streams regardless of the Android
    * version. WARNING: Ooyala's internal testing has shown that Android 3.x HLS
@@ -189,19 +188,14 @@ public class OoyalaPlayer extends Observable implements Observer,
   private Options _options;
   private State _state = State.INIT;
   private LayoutController _layoutController = null;
-  private ClosedCaptionsView _closedCaptionsView = null;
-  private boolean _streamBasedCC = false;
   private Analytics _analytics = null;
-  private String _language = null;
   private boolean _seekable = true;
   private boolean _playQueued = false;
   private int _queuedSeekTime;
   private String _lastAccountId = null;
-  private ClosedCaptionsStyle _closedCaptionsStyle;
   private final Map<String, Object> _openTasks = new HashMap<String, Object>();
   private AuthHeartbeat _authHeartbeat;
   private long _suspendTime = System.currentTimeMillis();
-  private StreamPlayer _basePlayer = null;
   private final Map<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
   private String _tvRatingAdNotification;
@@ -536,8 +530,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         } ));
 
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
-      PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-          : _basePlayer.getPlayerInfo();
+      PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
       // Async authorize;
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
@@ -587,7 +580,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (_currentItem.isHeartbeatRequired()) {
       if (_authHeartbeat == null) {
-        _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+        _authHeartbeat = new AuthHeartbeat(_playerAPIClient, _currentItem.getEmbedCode());
         _authHeartbeat.setAuthHeartbeatErrorListener(this);
       }
       _authHeartbeat.start();
@@ -625,6 +618,12 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   private boolean changeCurrentItemAfterFetch() {
     String accountId = _playerAPIClient.getUserInfo().getAccountId();
+
+    //SecurePlayer GENERAL_ANDR_VOP_PROB_RC_03_01_03_0631 on Android 5.0 requires DxDrmDlc to be
+    // "warmed" or initialized before any webview is initialized.  This has to be done before analytics
+    if(OoyalaPlayer.enableCustomPlayreadyPlayer) {
+      VisualOnStreamPlayer.warmDxDrmDlc(getLayout().getContext());
+    }
 
     // If analytics is uninitialized, OR
     // If has account ID that was different than before, OR
@@ -670,8 +669,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _currentItemInitPlayState = InitPlayState.NONE;
     sendNotification(CONTENT_TREE_READY_NOTIFICATION);
 
-    PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-        : _basePlayer.getPlayerInfo();
+    PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
     // Async Authorize
     cancelOpenTasks();
@@ -746,14 +744,9 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     // Initialize this player
     p.addObserver(this);
-    if (_basePlayer != null) {
-      p.setBasePlayer(_basePlayer);
-    }
     p.init(this, streams);
 
     p.setLive(item.isLive());
-
-    addClosedCaptionsView();
 
     // Player must have been initialized, as well as player's basePlayer, in
     // order to continue
@@ -765,7 +758,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     p.setSeekable(_seekable);
     return p;
   }
-
+  
   private void cleanupPlayers() {
     if (_authHeartbeat != null) {
       _authHeartbeat.stop();
@@ -774,7 +767,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayer(_player);
     _player = null;
 
-    removeClosedCaptionsView();
     hidePromoImage();
   }
 
@@ -992,8 +984,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
-        PlayerInfo playerInfo = _basePlayer == null ? StreamPlayer.defaultPlayerInfo
-            : _basePlayer.getPlayerInfo();
+        PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
         cancelOpenTasks();
         final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
         taskStarted(taskKey, _playerAPIClient.authorize(_currentItem,
@@ -1021,7 +1012,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         return;
       } else {
         if (_authHeartbeat == null) {
-          _authHeartbeat = new AuthHeartbeat(_playerAPIClient);
+          _authHeartbeat = new AuthHeartbeat(_playerAPIClient, _currentItem.getEmbedCode());
         }
         _authHeartbeat.start();
       }
@@ -1072,9 +1063,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (isFullscreen() == !fullscreen) { // this is so we don't add/remove cc
                                          // view if we are not actually
       // changing state.
-      removeClosedCaptionsView();
       _layoutController.setFullscreen(fullscreen);
-      addClosedCaptionsView();
 
       // Create Learn More button when going in and out of fullscreen
       if (isShowingAd() && currentPlayer() != null) {
@@ -1142,24 +1131,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       _queuedSeekTime = timeInMillis;
     }
     DebugMode.logV(TAG, "...seek(): _queuedSeekTime=" + _queuedSeekTime);
-  }
-
-  private void addClosedCaptionsView() {
-    removeClosedCaptionsView();
-    if (_currentItem != null && _currentItem.hasClosedCaptions()
-        || _streamBasedCC) {
-      _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
-      _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      getLayout().addView(_closedCaptionsView);
-    }
-  }
-
-  private void removeClosedCaptionsView() {
-    if (_closedCaptionsView != null) {
-      getLayout().removeView(_closedCaptionsView);
-      _closedCaptionsView = null;
-    }
   }
 
   /**
@@ -1281,10 +1252,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * reset the content player, only called by onComplete.
    */
   private void reset() {
-    removeClosedCaptionsView();
     _playQueued = false;
     _player.reset();
-    addClosedCaptionsView();
   }
 
   private void onComplete() {
@@ -1350,9 +1319,6 @@ public class OoyalaPlayer extends Observable implements Observer,
         _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
       }
       processAdModes(AdMode.Playhead, _player.currentTime());
-      // closed captions
-      displayCurrentClosedCaption();
-
       sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
@@ -1407,6 +1373,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     else if (notification.equals(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION)) {
       sendNotification(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
+    }
+    else if( notification.equals( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION ) ) {
+      sendNotification( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
     }
   }
 
@@ -1477,52 +1446,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     notifyObservers(obj);
   }
 
-  /**
-   * Set the displayed closed captions language
-   *
-   * @param language
-   *          2 letter country code of the language to display or nil to hide
-   *          closed captions
-   */
-  public void setClosedCaptionsLanguage(String language) {
-    _language = language;
-
-    if (_player == null || !(_player instanceof MoviePlayer)) {
-      return;
+  public boolean isLiveClosedCaptionsAvailable() {
+    if (_player != null) {
+      return _player.isLiveClosedCaptionsAvailable();
     }
-
-    MoviePlayer mp = _player;
-    // If we're given the "cc" language, we know it's live closed captions
-    if (_language == LIVE_CLOSED_CAPIONS_LANGUAGE) {
-      mp.setLiveClosedCaptionsEnabled(true);
-      return;
-    }
-
-    mp.setLiveClosedCaptionsEnabled(false);
-    if (_closedCaptionsView != null) {
-      _closedCaptionsView.setCaption(null);
-    }
-    displayCurrentClosedCaption();
-  }
-
-  public void setClosedCaptionsPresentationStyle() {
-    removeClosedCaptionsView();
-    _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
-    if( _closedCaptionsStyle != null ) {
-      _closedCaptionsView.setStyle(_closedCaptionsStyle);
-    }
-    getLayout().addView(_closedCaptionsView);
-    _closedCaptionsView.setCaption(null);
-    displayCurrentClosedCaption();
-  }
-
-  /**
-   * Get the current closed caption language
-   *
-   * @return the current closed caption language
-   */
-  public String getClosedCaptionsLanguage() {
-    return _language;
+    return false;
   }
 
   /**
@@ -1536,8 +1464,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       languages.addAll(_currentItem.getClosedCaptions().getLanguages());
     }
 
-    if (languages.size() <= 0) {
-      this.getLiveClosedCaptionsLanguages(languages);
+    if (languages.size() <= 0 && _player != null && _player.isLiveClosedCaptionsAvailable()) {
+      languages.add(LIVE_CLOSED_CAPIONS_LANGUAGE);
     }
 
     return languages;
@@ -1550,14 +1478,23 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  public void setLiveClosedCaptionsEnabled(boolean enabled) {
+    if (_player != null && _player.isLiveClosedCaptionsAvailable()) {
+      _player.setLiveClosedCaptionsEnabled(enabled);
+    } else {
+      DebugMode.logE(TAG, "set live closed captions failed, no live CC available");
+    }
+  }
   /**
    * @return get the bitrate of the current item
    */
   @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
   public double getBitrate() {
     Stream currentStream = null;
+    WifiManager wifiManager = (WifiManager)getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
+    boolean isWifiEnabled = wifiManager.isWifiEnabled();
     if (getCurrentItem() == null
-        || (currentStream = Stream.bestStream(getCurrentItem().getStreams())) == null) {
+        || (currentStream = Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled)) == null) {
       return -1;
     }
     String deliveryType = currentStream.getDeliveryType();
@@ -1569,12 +1506,12 @@ public class OoyalaPlayer extends Observable implements Observer,
       // Query for bitrate
       MediaMetadataRetriever metadataRetreiver = new MediaMetadataRetriever();
       metadataRetreiver.setDataSource(
-          Stream.bestStream(getCurrentItem().getStreams()).getUrl(),
+          Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled).getUrl(),
           new HashMap<String, String>());
       return Double.parseDouble(metadataRetreiver
           .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
     } else {
-      return Stream.bestStream(getCurrentItem().getStreams()).getVideoBitrate() * 1000;
+      return Stream.bestStream(getCurrentItem().getStreams(), isWifiEnabled).getVideoBitrate() * 1000;
     }
   }
 
@@ -1771,129 +1708,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     _openTasks.clear();
   }
 
-  /**
-   * @return the current ClosedCaptionsStyle
-   */
-  public ClosedCaptionsStyle getClosedCaptionsStyle() {
-    return _closedCaptionsStyle;
-  }
-
-  /**
-   * Set the ClosedCaptionsStyle
-   *
-   * @param closedCaptionsStyle
-   *          the ClosedCaptionsStyle to use
-   */
-  public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
-    _closedCaptionsStyle = closedCaptionsStyle;
-    if (_closedCaptionsStyle != null) {
-      if( _closedCaptionsView != null ) {
-        _closedCaptionsView.setStyle(_closedCaptionsStyle);
-        _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      }
-    }
-    displayCurrentClosedCaption();
-  }
-
-  /**
-   * Set the bottomMargin of closedCaptions view
-   *
-   * @param bottomMargin
-   *          the bottom margin to use
-   */
-  public void setClosedCaptionsBottomMargin(int bottomMargin) {
-    if( _closedCaptionsStyle != null ) {
-      _closedCaptionsStyle.bottomMargin = bottomMargin;
-      if( _closedCaptionsView != null ) {
-        _closedCaptionsView.setStyle(_closedCaptionsStyle);
-      }
-    }
-  }
-
-  private void displayCurrentClosedCaption() {
-    if (_closedCaptionsView == null || _currentItem == null)
-      return;
-    if (_streamBasedCC)
-      return;
-
-    // PB-3090: we currently only support captions for the main content, not
-    // also the advertisements.
-    if (_language != null && _currentItem.hasClosedCaptions() && !isShowingAd() && currentPlayer() != null) {
-      double currT = (currentPlayer().currentTime()) / 1000d;
-      if (_closedCaptionsView.getCaption() == null
-          || currT > _closedCaptionsView.getCaption().getEnd()
-          || currT < _closedCaptionsView.getCaption().getBegin()) {
-        Caption caption = _currentItem.getClosedCaptions().getCaption(
-            _language, currT);
-        if (caption != null && caption.getBegin() <= currT
-            && caption.getEnd() >= currT) {
-          _closedCaptionsView.setCaption(caption);
-        } else {
-          _closedCaptionsView.setCaption(null);
-        }
-      }
-    } else {
-      _closedCaptionsView.setCaption(null);
-    }
-  }
-
-  public void displayClosedCaptionText(String text) {
-    _streamBasedCC = true;
-    if (_closedCaptionsView == null) {
-      addClosedCaptionsView();
-    }
-    _closedCaptionsView.setCaptionText(text);
-  }
-
   PlayerAPIClient getPlayerAPIClient() {
     return this._playerAPIClient;
-  }
-
-  public StreamPlayer getBasePlayer() {
-    return _basePlayer;
-  }
-
-  /**
-   * Check to ensure the BasePlayer is authorized to play streams. If it is, set
-   * this base player onto our players and remember it
-   *
-   * @param basePlayer
-   */
-  public void setBasePlayer(StreamPlayer basePlayer) {
-    _basePlayer = basePlayer;
-
-    if (_analytics != null) {
-      _analytics.setUserAgent(_basePlayer != null ? _basePlayer.getPlayerInfo()
-          .getUserAgent() : null);
-    }
-
-    if (getCurrentItem() == null) {
-      return;
-    }
-
-    this.cancelOpenTasks();
-
-    final String taskKey = "setBasePlayer" + System.currentTimeMillis();
-    PlayerInfo playerInfo = basePlayer == null ? StreamPlayer.defaultPlayerInfo
-        : basePlayer.getPlayerInfo();
-    taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo,
-        new AuthorizeCallback() {
-          @Override
-          public void callback(boolean result, OoyalaException error) {
-            taskCompleted(taskKey);
-            if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Movie is not authorized for this device!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
-              return;
-            }
-
-            if (_player != null && (_player instanceof MoviePlayer)) {
-              _player.setBasePlayer(_basePlayer);
-            }
-          }
-        }));
   }
 
   /**
@@ -1938,9 +1754,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the seek style of current player
    */
   public SeekStyle getSeekStyle() {
-    if (getBasePlayer() != null) {
-      return getBasePlayer().getSeekStyle();
-    } else if (currentPlayer() != null && currentPlayer() instanceof MoviePlayer) {
+    if (currentPlayer() != null && currentPlayer() instanceof MoviePlayer) {
       return ((MoviePlayer)currentPlayer()).getSeekStyle();
     } else if (currentPlayer() != null) {
       //TODO: the PlayerInterface may need getSeekStyle();
@@ -2039,7 +1853,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (_player != null) {
         _player.suspend();
     }
-    removeClosedCaptionsView();
     hidePromoImage();
     _adManager.onAdModeEntered();
   }
@@ -2053,9 +1866,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       } else {
         _player.resume();
       }
-      addClosedCaptionsView();
     }
-
     maybeReshowTVRating();
   }
 
@@ -2127,7 +1938,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else {
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
-      addClosedCaptionsView();
     }
   }
 
@@ -2194,7 +2004,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   private void postContentChanged() {
     DebugMode.logD(TAG, "post content changed");
-    cleanupPlayers();
+    // cleanupPlayers(); disabling this call to cleanupPlayers(), see PBA-1750.
     if (_options.getPreloadContent()) {
       prepareContent(false);
     }
@@ -2236,7 +2046,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       _adManager.suspend();
     } else if (_player != null && !isInCastMode()) {
       _player.suspend();
-      removeClosedCaptionsView();
     }
   }
 
@@ -2251,7 +2060,6 @@ public class OoyalaPlayer extends Observable implements Observer,
       } else {
         _player.resume();
         dequeuePlay();
-        this.addClosedCaptionsView();
       }
     }
   }

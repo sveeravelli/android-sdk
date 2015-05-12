@@ -119,36 +119,6 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     return _ad;
   }
 
-  @Override
-  public void setBasePlayer(StreamPlayer basePlayer) {
-    if (_ad == null) {
-      setBasePlayer2(basePlayer);
-      return;
-    }
-
-    PlayerInfo info = basePlayer != null ? basePlayer.getPlayerInfo() : StreamPlayer.defaultPlayerInfo;
-    final StreamPlayer player = basePlayer;
-
-    _fetchTask = _ad.fetchPlaybackInfo(info, new FetchPlaybackInfoCallback() {
-
-      @Override
-      public void callback(boolean result) {
-        if (!_ad.isAuthorized()) {
-          _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Error fetching playback info on setBasePlayer");
-          setState(State.ERROR);
-          return;
-        } else {
-          setBasePlayer2(player);
-        }
-      }
-    });
-  }
-
-  // we can't access super in an anonymous class
-  private void setBasePlayer2(StreamPlayer basePlayer) {
-    super.setBasePlayer(basePlayer);
-  }
-
   /**
    * Called by OoyalaPlayer when going in and out of fullscreen using OoyalaPlayerLayoutController
    * @param layout the new layout to add the Learn More button

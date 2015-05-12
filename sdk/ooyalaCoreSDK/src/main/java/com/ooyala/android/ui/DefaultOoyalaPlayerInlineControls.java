@@ -359,7 +359,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public int bottomBarOffset() {
-    return (PREFERRED_BUTTON_HEIGHT_DP * 2 + MARGIN_SIZE_DP * 4);
+    int margin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP * 2);
+
+    if (isShowing() && _bottomBar != null) {
+      margin += _bottomBar.getHeight();
+    }
+    return margin;
   }
 
   @Override

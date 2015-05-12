@@ -1,15 +1,5 @@
 package com.ooyala.android;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.os.AsyncTask;
 
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
@@ -19,6 +9,16 @@ import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Stores the info and metadata for an Ooyala Managed Adspot.
@@ -165,7 +165,7 @@ public class OoyalaAdSpot extends OoyalaManagedAdSpot implements AuthorizableIte
   }
 
   public Stream getStream() {
-    return Stream.bestStream(_streams);
+    return Stream.bestStream(_streams, false);
   }
 
   /**

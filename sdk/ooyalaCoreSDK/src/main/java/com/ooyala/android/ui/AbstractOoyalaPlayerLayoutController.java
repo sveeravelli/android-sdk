@@ -1,10 +1,5 @@
 package com.ooyala.android.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,16 +16,27 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
+import com.ooyala.android.captions.ClosedCaptionsStyle;
+import com.ooyala.android.captions.ClosedCaptionsView;
 import com.ooyala.android.configuration.Options;
+import com.ooyala.android.item.Caption;
+import com.ooyala.android.item.Video;
 import com.ooyala.android.player.FCCTVRatingUI;
+import com.ooyala.android.util.DebugMode;
 
-public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+
+public abstract class AbstractOoyalaPlayerLayoutController implements LayoutController, Observer {
   private static final String TAG = AbstractOoyalaPlayerLayoutController.class.getName();
   public static enum DefaultControlStyle {
     NONE, AUTO
@@ -49,6 +55,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected ListView listView;
   protected AlertDialog dialog;
   private FCCTVRatingUI _tvRatingUI;
+  private ClosedCaptionsView _closedCaptionsView;
+  private String _closedCaptionLanguage = null;
+  private ClosedCaptionsStyle _closedCaptionsStyle = null;
 
   private int selectedLanguageIndex;
   private int selectedPresentationIndex;
@@ -56,7 +65,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   public int getSelectedLanguageIndex() {
     return this.selectedLanguageIndex;
   }
-
   public int getSelectedPresentationIndex() {
     return this.selectedPresentationIndex;
   }
@@ -152,6 +160,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _inlineControls.hide();
       _player.addObserver(_inlineControls);
     }
+    _player.addObserver(this);
+
   }
 
   @Override
@@ -421,7 +431,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
       this.selectedLanguageIndex = position;
-      _player.setClosedCaptionsLanguage(this.optionList.get(position));
+      this.setClosedCaptionsLanguage(this.optionList.get(position));
     }
 
     /*else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
@@ -459,6 +469,145 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
     }*/
+  }
+
+  /**
+   * Set the displayed closed captions language
+   *
+   * @param language
+   *          2 letter country code of the language to display or nil to hide
+   *          closed captions
+   */
+  public void setClosedCaptionsLanguage(String language) {
+    _closedCaptionLanguage = language;
+
+    // If we're given the "cc" language, we know it's live closed captions
+    if (_player != null) {
+      if (_closedCaptionLanguage.equals(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+        removeClosedCaptionsView();
+        _player.setLiveClosedCaptionsEnabled(true);
+        return;
+      } else if (_player.isLiveClosedCaptionsAvailable()) {
+        _player.setLiveClosedCaptionsEnabled(false);
+      }
+    };
+
+    refreshClosedCaptionsView();
+  }
+
+  public void setClosedCaptionsPresentationStyle() {
+    removeClosedCaptionsView();
+    _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    }
+    refreshClosedCaptionsView();
+  }
+
+  private void removeClosedCaptionsView() {
+    if (_closedCaptionsView != null) {
+      ViewGroup parent = (ViewGroup)_closedCaptionsView.getParent();
+      parent.removeView(_closedCaptionsView);
+      _closedCaptionsView = null;
+    }
+  }
+
+  private boolean shouldShowClosedCaptions() {
+    return _player != null && !_player.isShowingAd() &&
+        _player.getCurrentItem() != null && _player.getCurrentItem().hasClosedCaptions() &&
+        _closedCaptionLanguage != null &&
+        !_closedCaptionLanguage.equals(LocalizationSupport.localizedStringFor("None"));
+  }
+
+  private void refreshClosedCaptionsView() {
+    removeClosedCaptionsView();
+    if (shouldShowClosedCaptions()) {
+      addClosedCaptionsView();
+      displayCurrentClosedCaption();
+    }
+  }
+
+  private void addClosedCaptionsView() {
+    _closedCaptionsStyle = new ClosedCaptionsStyle(getLayout().getContext());
+    _closedCaptionsStyle.bottomMargin = getControls().bottomBarOffset();
+    _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
+    _closedCaptionsView.setStyle(_closedCaptionsStyle);
+    getLayout().addView(_closedCaptionsView);
+  }
+
+  /**
+   * Get the current closed caption language
+   *
+   * @return the current closed caption language
+   */
+  public String getClosedCaptionsLanguage() {
+    return _closedCaptionLanguage;
+  }
+
+  /**
+   * @return the current ClosedCaptionsStyle
+   */
+  public ClosedCaptionsStyle getClosedCaptionsStyle() {
+    return _closedCaptionsStyle;
+  }
+
+  /**
+   * Set the ClosedCaptionsStyle
+   *
+   * @param closedCaptionsStyle
+   *          the ClosedCaptionsStyle to use
+   */
+  public void setClosedCaptionsStyle(ClosedCaptionsStyle closedCaptionsStyle) {
+    _closedCaptionsStyle = closedCaptionsStyle;
+    if (_closedCaptionsStyle != null) {
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
+    }
+    refreshClosedCaptionsView();
+  }
+
+  /**
+   * Set the bottomMargin of closedCaptions view
+   *
+   * @param bottomMargin
+   *          the bottom margin to use
+   */
+  public void setClosedCaptionsBottomMargin(int bottomMargin) {
+    if( _closedCaptionsStyle != null ) {
+      _closedCaptionsStyle.bottomMargin = bottomMargin;
+      if( _closedCaptionsView != null ) {
+        _closedCaptionsView.setStyle(_closedCaptionsStyle);
+      }
+    }
+  }
+
+  void displayCurrentClosedCaption() {
+    if (_closedCaptionsView == null || _player == null || _player.getCurrentItem() == null)
+      return;
+
+    Video currentItem = _player.getCurrentItem();
+
+    // PB-3090: we currently only support captions for the main content, not
+    // also the advertisements.
+    if (_closedCaptionLanguage != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
+      double currT = _player.getPlayheadTime() / 1000d;
+      if (_closedCaptionsView.getCaption() == null
+          || currT > _closedCaptionsView.getCaption().getEnd()
+          || currT < _closedCaptionsView.getCaption().getBegin()) {
+        Caption caption = currentItem.getClosedCaptions().getCaption(
+            _closedCaptionLanguage, currT);
+        if (caption != null && caption.getBegin() <= currT
+            && caption.getEnd() >= currT) {
+          _closedCaptionsView.setCaption(caption);
+        } else {
+          _closedCaptionsView.setCaption(null);
+        }
+      }
+    } else {
+      _closedCaptionsView.setCaption(null);
+    }
   }
 
   class ClosedCaptionArrayAdapter extends ArrayAdapter<String> {
@@ -528,6 +677,21 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       });
       return radioButton;
+    }
+  }
+
+  @Override
+  public void update(Observable arg0, Object arg1) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      refreshClosedCaptionsView();
+    }
+
+    if (arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+      removeClosedCaptionsView();
+    }
+    
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      displayCurrentClosedCaption();
     }
   }
 }

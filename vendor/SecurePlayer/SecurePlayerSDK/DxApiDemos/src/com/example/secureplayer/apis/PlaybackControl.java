@@ -379,7 +379,7 @@ public class PlaybackControl extends LinearLayout implements SeekBar.OnSeekBarCh
 		} 
 		catch (InterruptedException e) 
 		{
-			DebugMode.logE(TAG, "Caught!", e);
+			e.printStackTrace();
 		}
 
 		showMediaController();
@@ -517,6 +517,16 @@ public class PlaybackControl extends LinearLayout implements SeekBar.OnSeekBarCh
 		}	
 		case VO_OSMP_CB_SEEK_COMPLETE:		// Seek (SetPos) complete
 		{
+			break;
+		}
+		case VO_OSMP_CB_AUDIO_RENDER_START:		// Audio render start
+		{
+			mWaitIcon.setVisibility(View.GONE);					// Hide wait icon
+			break;
+		}
+		case VO_OSMP_CB_VIDEO_RENDER_START:		// Video render start
+		{
+			mWaitIcon.setVisibility(View.GONE);					// Hide wait icon
 			break;
 		}
 		case VO_OSMP_CB_VIDEO_STOP_BUFFER:		// Video buffering stopped

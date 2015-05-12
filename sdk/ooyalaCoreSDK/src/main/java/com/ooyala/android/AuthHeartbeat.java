@@ -11,18 +11,19 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
  */
 class AuthHeartbeat {
   private Timer _timer = new Timer("AuthHeartbeat");
-  private PlayerAPIClient _apiClient;
+  private final PlayerAPIClient _apiClient;
+  private final String _embedCode;
   private Handler _handler = new Handler();
   private OnAuthHeartbeatErrorListener _authHeartbeatErrorListener;
 
-  public AuthHeartbeat(PlayerAPIClient client) {
+  public AuthHeartbeat(PlayerAPIClient client, String embedCode) {
     _apiClient = client;
+    _embedCode = embedCode;
   }
 
   public void start() {
     stop();
     _timer = new Timer("AuthHeartbeat");
-    _timer.schedule(new AuthHeartbeatTimerTask(), 0); //send initial ping right now.
     _timer.scheduleAtFixedRate(new AuthHeartbeatTimerTask(), 0, _apiClient.getHeartbeatInterval() * 1000);
   }
 
@@ -43,7 +44,7 @@ class AuthHeartbeat {
     private void tryHeartbeat(int attempt) {
       OoyalaException exception = null;
       try {
-        if (!_apiClient.authorizeHeartbeat()) {
+        if (!_apiClient.authorizeHeartbeat(_embedCode)) {
           exception = new OoyalaException(OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED, "Unauthorized");
         }
       } catch (OoyalaException e) {

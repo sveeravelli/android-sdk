@@ -358,8 +358,6 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       _currTimeLive.setText(currentTime);
     }
 
-    
-    
     // update UI on adStarted/adCompleted
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
       _isPlayerReady = true;
@@ -406,9 +404,12 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
 
   @Override
   public int bottomBarOffset() {
-    if (_baseLayout == null) return 0;
-    int pixelValue = OVERLAY_PREFERRED_BUTTON_HEIGHT_DP * 2 + OVERLAY_MARGIN_SIZE_DP * 4;
-    return Images.dpToPixels(_baseLayout.getContext(), pixelValue);
+    int margin = Images.dpToPixels(_baseLayout.getContext(), MARGIN_SIZE_DP * 2);
+
+    if (isShowing() && _bottomOverlay != null) {
+      margin += _bottomOverlay.getHeight();
+    }
+    return margin;
   }
 
   @Override

@@ -238,4 +238,35 @@ public class DxConstants {
 	public static void setHardwareAccelerated(boolean val) {
 		HardwareAccelerated = val;
 	}
+	
+    private static boolean DisplayPlaybackInformation = false;
+	
+	public static boolean getDisplayPlaybackInformation() {
+		return DisplayPlaybackInformation;
+	}
+	
+	public static void setDisplayPlaybackInformation(boolean val) {
+		DisplayPlaybackInformation = val;
+	}
+    
+	private static String PlaybackInformationBPS =null;
+	
+	public static String getPlaybackInformationBPS() {
+		return PlaybackInformationBPS;
+	}
+	
+	public static void setPlaybackInformationBPS(String val) {
+		PlaybackInformationBPS = val;
+	}
+	
+	private static String PlaybackInformationResolution =null;
+	
+	public static String getPlaybackInformationResolution() {
+		return PlaybackInformationResolution;
+	}
+	
+	public static void setPlaybackInformationResolution(String val) {
+		PlaybackInformationResolution = val;
+	}
+	
 }

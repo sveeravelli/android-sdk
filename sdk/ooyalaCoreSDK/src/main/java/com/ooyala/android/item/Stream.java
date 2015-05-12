@@ -1,16 +1,16 @@
 package com.ooyala.android.item;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Set;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.os.Build;
 import android.util.Base64;
 
 import com.ooyala.android.StreamSelector;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Set;
 
 public class Stream implements JSONUpdatableItem {
   static final String KEY_VIDEO_BITRATE = "video_bitrate";
@@ -60,25 +60,23 @@ public class Stream implements JSONUpdatableItem {
     public DefaultStreamSelector() {}
 
     @Override
-    public Stream bestStream(Set<Stream> streams) {
+    public Stream bestStream(Set<Stream> streams, boolean isWifiEnabled) {
       if (streams == null || streams.size() == 0) { return null; }
 
-      Stream lowestBitrateStream = null;
+      Stream bestBitrateStream = null;
       for (Stream stream : streams) {
         // for remote assets, just pick the first stream
         if (stream.getDeliveryType().equals(DELIVERY_TYPE_REMOTE_ASSET)
             || stream.getDeliveryType().equals(DELIVERY_TYPE_HLS)) { return stream; }
         if (Stream.isDeliveryTypePlayable(stream)
             && Stream.isProfilePlayable(stream)
-            && (lowestBitrateStream == null
-                || stream.getCombinedBitrate() < lowestBitrateStream.getCombinedBitrate() || (stream
-                .getCombinedBitrate() == lowestBitrateStream.getCombinedBitrate() && stream.getHeight() < lowestBitrateStream
-                .getHeight()))) {
-          lowestBitrateStream = stream;
+            && (bestBitrateStream == null
+                || stream.betterThan(bestBitrateStream, isWifiEnabled))) {
+          bestBitrateStream = stream;
         }
       }
 
-      return lowestBitrateStream;
+      return bestBitrateStream;
     }
   }
 
@@ -103,6 +101,19 @@ public class Stream implements JSONUpdatableItem {
 
   public Stream(JSONObject data) {
     update(data);
+  }
+
+  boolean betterThan(Stream other, boolean isWifiEnabled) {
+
+    // if the bitrates are the same, always choose the bitrate with higher resolution
+    if (this.getCombinedBitrate() == other.getCombinedBitrate() && this.getHeight() > other.getHeight()) {
+      return true;
+    } else if (isWifiEnabled) {
+      return this.getCombinedBitrate() > other.getCombinedBitrate();
+    } else {
+      // if wifi is off, choose the one closest to 400.
+      return Math.abs(400 - this.getCombinedBitrate()) < Math.abs(400 - other.getCombinedBitrate());
+    }
   }
 
   ReturnState update(JSONObject data) {
@@ -300,8 +311,8 @@ public class Stream implements JSONUpdatableItem {
     return stream.getProfile() == null || PROFILE_BASELINE.equals(stream.getProfile());
   }
 
-  public static Stream bestStream(Set<Stream> streams) {
-    return _selector.bestStream(streams);
+  public static Stream bestStream(Set<Stream> streams, boolean isWifiEnabled) {
+    return _selector.bestStream(streams, isWifiEnabled);
   }
 
   public static boolean streamSetContainsDeliveryType(Set<Stream> streams, String deliveryType) {

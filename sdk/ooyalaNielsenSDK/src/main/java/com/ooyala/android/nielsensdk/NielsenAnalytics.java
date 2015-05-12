@@ -57,11 +57,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
    * see AppSdk
    * @see #destroy()
    */
-  public NielsenAnalytics( Context context, OoyalaPlayer player, IAppNotifier iappNotifier, String appID, String appVersion, String appName, String sfCode, ID3TagNotifier id3TagNotifier, JSONObject customConfig, JSONObject customMetadata ) {
+  public NielsenAnalytics( Context context, OoyalaPlayer player, IAppNotifier iappNotifier, String appID, String appVersion, String appName, String sfCode, JSONObject customConfig, JSONObject customMetadata ) {
     this.metadataJson = new JSONObject();
     this.customMetadata = customMetadata;
     this.player = player;
-    this.id3TagNotifier = id3TagNotifier;
+    this.id3TagNotifier = player.getID3TagNotifier();
     this.lastReportedMsec = Long.MIN_VALUE;
     JSONObject configJson = new JSONObject();
     try {
@@ -159,23 +159,25 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
   }
 
   private void itemChanged( Video item ) {
+    sendStop();
     metadataJson = null;
     channelJson = null;
   }
 
   private void stateUpdate( OoyalaPlayer.State state ) {
     switch( state ) {
-    case PLAYING:
-      sendPlay();
-      break;
-    case PAUSED:
-    case SUSPENDED:
-    case COMPLETED:
-    case ERROR:
-      sendStop();
-      break;
-    default:
-      break;
+      case PLAYING:
+        sendPlay();
+        break;
+      case PAUSED:
+      case SUSPENDED:
+      case COMPLETED:
+      case ERROR:
+      case LOADING:
+        sendStop();
+        break;
+      default:
+        break;
     }
   }
 

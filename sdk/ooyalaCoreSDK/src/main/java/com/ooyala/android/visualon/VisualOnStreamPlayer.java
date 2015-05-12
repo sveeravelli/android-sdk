@@ -1,16 +1,9 @@
 package com.ooyala.android.visualon;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -20,7 +13,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -30,6 +22,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
+import com.ooyala.android.util.DebugMode;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
 import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection;
 import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection.VOOSMPAssetProperty;
@@ -49,6 +42,14 @@ import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleInfoEntry;
 import com.visualon.OSMPSubTitle.voSubTitleManager.voSubtitleTextRowInfo;
 import com.visualon.OSMPUtils.voOSType;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * A StreamPlayer which wraps around VisualOn's OSMP Player
  * Provides consistent HLS and Smooth/Playready playback
@@ -59,7 +60,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static boolean didCleanupLocalFiles = false;
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
-  private static final String EXPECTED_VISUALON_VERSION = "3.14.12-B76704";
+  private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
   private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.14.12-B76704";
   private VisualOnConfiguration _visualOnConfiguration = null;
   private static final boolean ENABLE_DEBUGGING = false;
@@ -90,6 +91,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   protected boolean _isDiscredixLoaded = false;
 
+  public static void warmDxDrmDlc(Context context) {
+    DiscredixDrmUtils.warmDxDrmDlc(context);
+  }
+
   private boolean checkForDiscredixLibrary(Context context) {
     boolean hasDiscredix;
     try {
@@ -109,7 +114,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     DebugMode.logD(TAG, "Using VOPlayer");
-    _stream = Stream.bestStream(streams);
+    WifiManager wifiManager = (WifiManager)parent.getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
+    boolean isWifiEnabled = wifiManager.isWifiEnabled();
+    _stream = Stream.bestStream(streams, isWifiEnabled);
 
     if (_stream == null) {
       DebugMode.logE(TAG, "ERROR: Invalid Stream (no valid stream available)");
@@ -787,6 +794,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   private void handleSubtitles() {
+    final boolean pre_isLiveClosedCaptionsAvailable = _isLiveClosedCaptionsAvailable;
+    _handleSubtitles();
+    if( pre_isLiveClosedCaptionsAvailable != _isLiveClosedCaptionsAvailable ) {
+      setChanged();
+      notifyObservers( OoyalaPlayer.LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
+    }
+  }
+
+  private void _handleSubtitles() {
     VO_OSMP_RETURN_CODE returnValue;
     if (_player == null) {
       DebugMode.logE(TAG, "handleSubtitles: player is null");

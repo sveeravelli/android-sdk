@@ -23,10 +23,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.discretix.vodx.VODXPlayer;
@@ -34,6 +36,7 @@ import com.discretix.vodx.VODXPlayerImpl;
 import com.example.secureplayer.DxConstants;
 import com.example.secureplayer.R;
 import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection.VOOSMPAssetProperty;
+import com.visualon.OSMPPlayer.VOCommonPlayerListener.VO_OSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT;
 import com.visualon.OSMPPlayer.VOCommonPlayerListener;
 import com.visualon.OSMPPlayer.VOOSMPInitParam;
 import com.visualon.OSMPPlayer.VOOSMPOpenParam;
@@ -161,18 +164,66 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			//mPlayer.start();		
 		}
 	}
+    private void updatePlaybackInfoBPS(){
+    	TextView tView = (TextView) findViewById(R.id.playback_info_bps);
+    	String value=DxConstants.getPlaybackInformationBPS();
+    	if (value == null){
+    		// if Value hasn't been set;null; then use default value
+    		value = getString(R.string.playback_information_BPS_default_value);
+    	}
+    	else{
+    		// Set units
+    		value = value +getString(R.string.playback_information_BPS_tView_units);
+    	}
+    	value = getString(R.string.playback_information_BPS_tView_header) + value;
+    	tView.setText(value);
+    	tView.invalidate();
+    }
+    
+    private void updatePlaybackInfoResolution(){
+    	TextView tView = (TextView) findViewById(R.id.playback_info_res);
+    	String value = DxConstants.getPlaybackInformationResolution();
+    	if (value == null){
+    		// if Value hasn't been set;null; then use default value
+    		value = getString(R.string.playback_information_Resolution_default_value);
+    	}
+    	value = getString(R.string.playback_information_Resolution_tView_header) + value;
+    	tView.setText(value);
+    	tView.invalidate();
+    }
+    
 
+	private void updatePlaybackInfoLayout(){
+		updatePlaybackInfoBPS();
+		updatePlaybackInfoResolution();
+		View playbackInfoLayout = (View) findViewById(R.id.playbackInfoLayout);
+		
+		if (DxConstants.getDisplayPlaybackInformation() == true){
+			playbackInfoLayout.setVisibility(android.view.View.VISIBLE);
+		}
+		else{
+			playbackInfoLayout.setVisibility(android.view.View.INVISIBLE);	
+		}	
+	}
+	private void resetPlayBackInformation(){
+		DxConstants.setPlaybackInformationBPS(getString(R.string.playback_information_BPS_default_value));
+		DxConstants.setPlaybackInformationResolution(getString(R.string.playback_information_Resolution_default_value));
+	}
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.destroy();
 		}
+		//we should reset global vars playback information BPS/Resolution to NA
+		resetPlayBackInformation();
+		
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		updatePlaybackInfoLayout();
 	}
 
 	@Override
@@ -246,8 +297,22 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 	@Override
 	public VO_OSMP_RETURN_CODE onVOEvent(VO_OSMP_CB_EVENT_ID nID, int nParam1, int nParam2, Object obj)
 	{
-		if (nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING) 
-		{
+		switch (nID) {
+		case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_INFO: {
+			VO_OSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT event = VO_OSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT.valueOf(nParam1);
+			switch (event) {
+			case VO_OSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE:
+				Log.v(TAG,"OnEvent VOOSMP_SRC_ADAPTIVE_STREAMING_INFO_EVENT_BITRATE_CHANGE, param2 is " + nParam2);
+				DxConstants.setPlaybackInformationBPS(Integer.toString(nParam2)+" ");
+				updatePlaybackInfoBPS();
+				break;
+
+			default:
+				break;
+			}
+			break;
+		}
+		case VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING:
 			if ( nParam1 == VO_OSMP_SRC_ADAPTIVE_STREAMING_WARNING_EVENT.VO_OSMP_SRC_ADAPTIVE_STREAMING_WARNING_EVENT_CHUNK_DRMERROR.getValue()) 
 			{
 				Log.v(TAG, "VO_OSMP_SRC_CB_ADAPTIVE_STREAM_WARNING, nParam1 is VOOSMP_SRC_ADAPTIVE_STREAMING_WARNING_EVENT_CHUNK_DRMERROR");
@@ -259,9 +324,12 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			{
 				Log.v(TAG, "VOOSMP_SRC_CB_Adaptive_Stream_Warning, nParam1 is "+nParam1);
 			}
+			break;
+		
+		case VO_OSMP_SRC_CB_BA_HAPPENED :{
+			break;
 		}
-		else if (nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_VIDEO_SIZE_CHANGED)	// Video size changed
-		{
+		case VO_OSMP_CB_VIDEO_SIZE_CHANGED:{
 			int videoWidth = nParam1;
 			int videoHeight = nParam2;
 
@@ -269,7 +337,6 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			DisplayMetrics dm  = new DisplayMetrics();
 			WindowManager windowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
 			windowManager.getDefaultDisplay().getMetrics(dm);
-
 			if (getResources().getConfiguration().orientation
 					== Configuration.ORIENTATION_PORTRAIT) {
 
@@ -279,28 +346,39 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 				lp.height = dm.widthPixels * videoHeight / videoWidth;
 				mPlayerSurfaceView.setLayoutParams(lp);
 			}
-		}	
-		else if (nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_PLAY_COMPLETE)
-		{
+			// now update playback info
+			DxConstants.setPlaybackInformationResolution(videoWidth + "x" + videoHeight);
+			updatePlaybackInfoResolution();
+			break;
+		}
+		case VO_OSMP_CB_PLAY_COMPLETE:{
 			StopPlayback();
 			Toast.makeText(this, "Playback has finished", Toast.LENGTH_LONG).show();
 			// Finish should be called in order to exit the activity after playback
 			// completes.
-			finish();		
-		}else if (nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_ERROR
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_FAIL
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DOWNLOAD_FAIL
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_FAIL
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_CONNECTION_REJECTED
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_NOT_SECURE
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_CB_CODEC_NOT_SUPPORT
-				|| nID == VO_OSMP_CB_EVENT_ID.VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR)	// Errors
-		{			
+			finish();
+			break;
+		}
+		case VO_OSMP_CB_ERROR:
+		case VO_OSMP_SRC_CB_CONNECTION_FAIL:
+		case VO_OSMP_SRC_CB_DOWNLOAD_FAIL:
+		case VO_OSMP_SRC_CB_DRM_FAIL:
+		case VO_OSMP_SRC_CB_PLAYLIST_PARSE_ERR:
+		case VO_OSMP_SRC_CB_CONNECTION_REJECTED:
+		case VO_OSMP_SRC_CB_DRM_NOT_SECURE:
+		case VO_OSMP_SRC_CB_DRM_AV_OUT_FAIL:
+		case VO_OSMP_CB_CODEC_NOT_SUPPORT:
+		case VO_OSMP_SRC_CB_ADAPTIVE_STREAMING_ERROR:{			
 			// Display error dialog and stop player
 			onError(mPlayer, nID.getValue(), nParam1);
+			break;
 		}
+		
+		default:
+			Log.w(TAG,"Unhandled VO_OSMP_CB_EVENT_ID:"+nID);
+			break;
+		}
+		 
 
 		return VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE;		
 	}
@@ -504,7 +582,7 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			}
 			
 		} catch (IOException e) {
-			DebugMode.logE(TAG, "Caught!", e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -527,7 +605,7 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			if(mPlayer != null)
 				mPlayer.setDeviceCapabilityByFile(filePath);
 		} catch (IOException e) {
-			DebugMode.logE(TAG, "Caught!", e);
+			e.printStackTrace();
 		}
 	}
 

@@ -19,13 +19,13 @@
                 android:id="@+id/embedSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@android:style/Widget.Holo.Light.Spinner"/>
+                style="@android:style/Widget.Holo.Spinner"/>
 
             <Spinner
                 android:id="@+id/playerSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Widget.Holo.Light.Spinner"/>
+                style="@android:style/Widget.Holo.Spinner"/>
         </LinearLayout>
 
         <Button
