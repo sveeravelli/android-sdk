@@ -88,8 +88,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     defualtMiniController = (OOMiniController) findViewById(R.id.miniController1);
     castManager.addMiniController(defualtMiniController);
     
-    customizedMiniController = (OOMiniController) findViewById(R.id.miniController2);
-    castManager.addMiniController(customizedMiniController);
+//    customizedMiniController = (OOMiniController) findViewById(R.id.miniController2);
+//    castManager.addMiniController(customizedMiniController);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     ChromecastSampleAppActivity.activatedActivity++;
     if (castManager != null && castManager.isInCastMode()){
       this.defualtMiniController.show();
-      this.customizedMiniController.show();
+//      this.customizedMiniController.show();
       castManager.onResume();
     }
     Log.d(TAG, "onResume()");
