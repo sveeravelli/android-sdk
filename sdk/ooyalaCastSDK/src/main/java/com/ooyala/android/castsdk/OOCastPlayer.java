@@ -2,8 +2,6 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -24,7 +22,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private static final String TAG = "OOCastPlayer";
  
   private WeakReference<OOCastManager> castManager;
-  private WeakReference<OoyalaPlayer> ooyalaPlayer;
   
   private String embedCode;
   private int duration;
@@ -42,21 +39,17 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private Bitmap castImageBitmap;
   
   
-  public OOCastPlayer(OOCastManager castManager, OoyalaPlayer ooyalaPlayer) {
-    setOoyalaPlayer(ooyalaPlayer);
+  public OOCastPlayer(OOCastManager castManager) {
     this.castManager = new WeakReference<OOCastManager>(castManager);
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     this.addObserver(ooyalaPlayer);
-    this.ooyalaPlayer = new WeakReference<OoyalaPlayer>(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
   }
 
   public void disconnectFromCurrentOoyalaPlayer() {
-    clearCastView();
-    this.deleteObserver(ooyalaPlayer.get());
-    this.ooyalaPlayer = null;
+    this.deleteObservers();
   }
   
   /*============================================================================================*/
@@ -157,23 +150,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   public Bitmap getCastImageBitmap() {
     return castImageBitmap;
   }
-  
-  public void clearCastView() {
-    if (ooyalaPlayer != null && ooyalaPlayer.get().getLayout().getChildCount() != 0) {
-      ooyalaPlayer.get().getLayout().removeView(castManager.get().getCastView());
-    }
-  }
-  
-  private void displayCastView() {
-    View castView = castManager.get().getCastView();
-    DebugMode.logD(TAG, "CastView = " + castView);
-    if (ooyalaPlayer != null && castView != null) {
-      if (castView.getParent() != null) {
-        ((ViewGroup) castView.getParent()).removeView(castView);
-      }
-      ooyalaPlayer.get().getLayout().addView(castView);
-    }
-  }
 
   /*============================================================================================*/
   /*========== CastPlayer Receiver related =====================================================*/
@@ -190,7 +166,6 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       sendMessage(initialPlayMessage);
       setCurrentTime(playheadTimeInMillis);
     }
-    displayCastView();
   }
 
   private boolean initWithTheCastingContent(String embedCode) {
@@ -228,13 +203,12 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     return wrap.toString();
   }
   
-  private void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
+  public void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
     if (player != null) {
-      embedCode = player.getCurrentItem().getEmbedCode();
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
       castItemDescription = player.getCurrentItem().getDescription();
-      seekable = ooyalaPlayer.get().seekable();
+      seekable = player.seekable();
       loadIcon();
     } else {
       DebugMode.logD(TAG, "OoyalaPlayer returns null when updateMetadata()");
@@ -373,9 +347,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   @Override
   public void destroy() {
-    if (this.ooyalaPlayer != null) {
-      deleteObservers();
-    }
+    deleteObservers();
   }
 
   public int livePlayheadPercentage() {
