@@ -50,6 +50,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     this.addObserver(ooyalaPlayer);
     this.ooyalaPlayer = new WeakReference<OoyalaPlayer>(ooyalaPlayer);
+    updateMetadataFromOoyalaPlayer(ooyalaPlayer);
   }
 
   public void disconnectFromCurrentOoyalaPlayer() {
@@ -183,15 +184,13 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         + isPlaying);
     if (initWithTheCastingContent(embedCode)) {
       getReceiverPlayerState(); // for updating UI controls
-      displayCastView();
-      return;
+    } else {
+      this.embedCode = embedCode;
+      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
+      sendMessage(initialPlayMessage);
+      setCurrentTime(playheadTimeInMillis);
     }
-    this.embedCode = embedCode;
-    updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
     displayCastView();
-    String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
-    sendMessage(initialPlayMessage);
-    setCurrentTime(playheadTimeInMillis);
   }
 
   private boolean initWithTheCastingContent(String embedCode) {
@@ -231,6 +230,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   private void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
     if (player != null) {
+      embedCode = player.getCurrentItem().getEmbedCode();
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
       castItemDescription = player.getCurrentItem().getDescription();
