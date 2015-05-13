@@ -2058,6 +2058,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
       // In this case we need to check should we switch to cast mode
       if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
+        DebugMode.logD(TAG, "Switch to cast mode when resume current player");
         switchToCastMode(_currentItem.getEmbedCode());
       } else {
         _player.resume();

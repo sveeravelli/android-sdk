@@ -124,7 +124,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
         @Override
         public void onClick(View v) {
-          DebugMode.assertCondition((castManager.get().getCastPlayer()  == null), TAG, "castPlayer should never be null when we have a mini controller");
+          DebugMode.assertCondition((castManager.get().getCastPlayer()  != null), TAG, "castPlayer should never be null when we have a mini controller");
           if (castManager.get().getCastPlayer().getState() == State.PAUSED ||
                      castManager.get().getCastPlayer().getState() == State.READY ||
                      castManager.get().getCastPlayer().getState() == State.COMPLETED){
