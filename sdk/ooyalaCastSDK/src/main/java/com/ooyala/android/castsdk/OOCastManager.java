@@ -186,7 +186,6 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (isInCastMode()) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
-    ooyalaPlayer = null;
   }
 
   /*============================================================================================*/
