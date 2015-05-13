@@ -231,7 +231,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   
   private void updateMetadata() {
     // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
-    if (castManager.get().getCastPlayer() == null || castManager.get().getCastPlayer().getState() == State.COMPLETED) {
+    if (!castManager.get().isInCastMode() || castManager.get().getCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
     } else {
       hideControls(false);
