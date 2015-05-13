@@ -1919,6 +1919,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
     _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
+    _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
 
@@ -1939,6 +1940,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
     }
+    _layoutController.setFullscreenButtonShowing(false);
   }
 
   private boolean prepareContent(boolean forcePlay) {
