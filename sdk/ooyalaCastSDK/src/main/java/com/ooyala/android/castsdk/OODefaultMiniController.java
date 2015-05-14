@@ -128,12 +128,10 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
           OOCastPlayer castPlayer = castManager.get().getCastPlayer();
           State state = castPlayer.getState();
           DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
-          if (state == State.PAUSED ||
-                  state == State.READY ||
-                  state == State.COMPLETED) {
-            castPlayer.play();
-          } else if (state == State.PLAYING){
+          if (state == State.PLAYING){
             castPlayer.pause();
+          } else {
+            castPlayer.play();
           }
         }
     });
