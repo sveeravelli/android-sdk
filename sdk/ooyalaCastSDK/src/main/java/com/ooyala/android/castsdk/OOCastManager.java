@@ -428,8 +428,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
           if (isInCastMode()) {
             String action = intent.getAction();
             if (action.equals(ACTION_STOP)) {
-              disconnect();
               exitCastMode();
+              disconnect();
               destroyNotificationService(context);
             } else if (action.equals(ACTION_PLAY)) {
               if (castPlayer.getState() == State.PLAYING) {
