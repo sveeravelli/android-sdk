@@ -336,7 +336,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (miniControllers == null) {
       miniControllers = new HashSet<OOMiniController>();
     }
-    miniControllers.add(miniController);
+    if (!miniControllers.contains(miniController)) {
+      miniControllers.add(miniController);
+    }
     miniController.setCastManager(castManager);
   }
 
