@@ -483,7 +483,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     // If we're given the "cc" language, we know it's live closed captions
     if (_player != null) {
-      if (_closedCaptionLanguage.equals(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+      if (isLiveClosedCaptionsLanguage(_closedCaptionLanguage)) {
         removeClosedCaptionsView();
         _player.setLiveClosedCaptionsEnabled(true);
         return;
@@ -493,6 +493,14 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     };
 
     refreshClosedCaptionsView();
+  }
+
+  public boolean getShouldShowLiveClosedCaptions() {
+    return isLiveClosedCaptionsLanguage( getClosedCaptionsLanguage() );
+  }
+
+  private boolean isLiveClosedCaptionsLanguage( String cc ) {
+    return OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals( cc );
   }
 
   public void setClosedCaptionsPresentationStyle() {
