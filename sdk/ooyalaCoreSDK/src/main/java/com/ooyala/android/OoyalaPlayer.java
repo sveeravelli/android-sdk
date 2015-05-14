@@ -630,6 +630,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
     if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
+      DebugMode.logD(TAG, "switchToCastMode onChangeCurrentItemAfterFetch");
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
       boolean needToLoadAnalytics = _analytics == null;

@@ -285,6 +285,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
     initCastPlayer(embedCode, playheadTimeInMillis, isPlaying);
@@ -293,6 +294,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
     castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
