@@ -189,15 +189,17 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
 
         @Override
         public void onClick(View v) {
-            if (castManager.get().getCastPlayer()  == null) {
-                return;
-            } else if (castManager.get().getCastPlayer().getState() == State.PAUSED ||
-                       castManager.get().getCastPlayer().getState() == State.READY ||
-                       castManager.get().getCastPlayer().getState() == State.COMPLETED){
-              castManager.get().getCastPlayer().play();
-            } else if (castManager.get().getCastPlayer() .getState() == State.PLAYING){
-              castManager.get().getCastPlayer().pause();
-            }
+          DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
+          OOCastPlayer castPlayer = castManager.get().getCastPlayer();
+          State state = castPlayer.getState();
+          DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
+          if (state == State.PAUSED ||
+                  state == State.READY ||
+                  state == State.COMPLETED) {
+            castPlayer.play();
+          } else if (state == State.PLAYING){
+            castPlayer.pause();
+          }
         }
     });
 

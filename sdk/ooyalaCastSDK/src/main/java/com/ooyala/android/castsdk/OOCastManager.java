@@ -105,7 +105,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void destroy(Context context) {
-    DebugMode.logD(TAG, "destroy OOCastManager");
+    DebugMode.logD(TAG, "Destroy OOCastManager");
     hideCastView();
     destroyCastPlayer();
     destroyNotificationService(context);
@@ -151,15 +151,18 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void setNotificationImageResourceId(int resourceId) {
+    DebugMode.logD(TAG, "Set notification image recourse id = " + resourceId);
     notificationImageResourceId = resourceId;
   }
   
   public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
+    DebugMode.logD(TAG, "Set mini controller image bitmap = " + imageBitmap);
     miniControllerDefaultImageBitmap = imageBitmap;
   }
 
-  public void setNotificationMiniControllerLayout(int recourceId) {
-    notificationMiniControllerResourceId = recourceId;
+  public void setNotificationMiniControllerLayout(int resourceId) {
+    DebugMode.logD(TAG, "Set notification mini controller layout = " + resourceId);
+    notificationMiniControllerResourceId = resourceId;
   }
 
   public void setCastPlayerSeekable(boolean isSeekable) {
