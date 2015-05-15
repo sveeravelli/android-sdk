@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="voOSHDMICheck">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/voOSHDMICheck.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="voOSUtils">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/voOSUtils.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
