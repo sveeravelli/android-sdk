@@ -205,6 +205,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
 
         @Override
         public void onClick(View v) {
+          DebugMode.logD(TAG, "Cast menu mini controller is clicked");
           if (castManager.get().getTargetActivity() != null) {
             try {
               onTargetActivityInvoked(getContext());
