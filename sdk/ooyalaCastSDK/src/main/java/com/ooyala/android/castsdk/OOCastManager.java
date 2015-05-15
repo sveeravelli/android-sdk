@@ -269,12 +269,14 @@ public class OOCastManager extends DataCastManager implements CastManager {
       exitCastMode();
     }
   }
-  
+
+  // if the device is disconnected this method will be called from Google lib HOWEVER, "onApplicationDisconnected" will not be called
   @Override
   public void disconnectDevice(boolean stopAppOnExit, boolean clearPersistedConnectionData,
       boolean setDefaultRoute) {
     DebugMode.logD(TAG, "disconnectDevice called");
     super.disconnectDevice(stopAppOnExit, clearPersistedConnectionData, setDefaultRoute);
+    this.isConnectedToReceiverApp = false;
     if (isInCastMode()) {
       exitCastMode();
     }
