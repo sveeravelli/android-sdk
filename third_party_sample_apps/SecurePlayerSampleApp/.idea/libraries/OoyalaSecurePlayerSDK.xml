@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="OoyalaSecurePlayerSDK">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/OoyalaSecurePlayerSDK.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
