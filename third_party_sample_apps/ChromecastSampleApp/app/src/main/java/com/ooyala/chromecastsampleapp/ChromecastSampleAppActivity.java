@@ -24,7 +24,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   private RemoteControlClient remoteControlClient;
   private static final String TAG = "ChromscastSampleAppActivty";
   private final String NAMESPACE = "urn:x-cast:ooyala";
-  private final String APP_ID = "46147917";
+  private final String APP_ID = "4172C76F";
   private OOCastManager castManager;
   private OOMiniController defualtMiniController;
   private OOMiniController customizedMiniController;
