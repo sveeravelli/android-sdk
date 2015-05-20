@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbLocalPerso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:textSize="22sp" 
+                android:text="@string/personalization_local" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvURL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/personalization_remote_URL"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/etRemoteURL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri" />
+
+        <TextView
+            android:id="@+id/tvSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/personalization_session_ID"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/etSessionID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri" />
+        
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/personalization_app_version"
+            android:textSize="22sp" />
+
+        <EditText
+            android:id="@+id/etAppVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri" />        
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" 
+            android:layout_marginTop="15sp">
+            
+            <Button
+                android:id="@+id/btnPersonalize"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:text="@string/personalization_personalize" 
+                android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+
+</LinearLayout>

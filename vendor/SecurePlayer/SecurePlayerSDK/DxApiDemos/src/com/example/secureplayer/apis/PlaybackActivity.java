@@ -215,7 +215,6 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 		if (mPlayer != null) {
 			mPlayer.destroy();
 		}
-		//we should reset global vars playback information BPS/Resolution to NA
 		resetPlayBackInformation();
 		
 	}

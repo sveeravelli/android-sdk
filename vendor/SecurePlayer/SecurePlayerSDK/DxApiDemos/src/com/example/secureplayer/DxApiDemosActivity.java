@@ -19,8 +19,12 @@ import com.discretix.drmdlc.api.DxLogConfig.LogLevel;
 import com.discretix.drmdlc.api.IDxDrmDlc;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
+import com.discretix.vodx.VODXPlayerImpl;
 import com.example.secureplayer.DxContentItem.ECustomDataType;
+import com.visualon.OSMPPlayer.VOOSMPInitParam;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_MODULE_TYPE;
 import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_PLAYER_ENGINE;
+import com.visualon.OSMPPlayer.VOOSMPType.VO_OSMP_RETURN_CODE;
 
 public class DxApiDemosActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener, OnPreferenceClickListener{
@@ -65,12 +69,26 @@ public class DxApiDemosActivity extends PreferenceActivity implements
 		// activate the DRM native logging and to display the version.
 		// It is possible to call getDxDrmDlc() only when required.
 		try {
-			IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(this, new DxLogConfig(LogLevel.Info, 10));
 			//fill About Version
+			//DRM Version
+			IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(this, new DxLogConfig(LogLevel.Info, 10));
 			String ver = dlc.getDrmVersion();
 			ver = ver.replace(';', '\n');
 			findPreference(getString(R.string.key_about)).setSummary(ver);
-			
+
+			//Player Version
+			VODXPlayerImpl player = new VODXPlayerImpl();
+			VOOSMPInitParam initParam = new VOOSMPInitParam();
+			String apkPath = getFilesDir().getParent() + "/lib/";
+			initParam.setLibraryPath(apkPath);
+			initParam.setContext(this);
+			VO_OSMP_RETURN_CODE nRet = player.init(VO_OSMP_PLAYER_ENGINE.VO_OSMP_VOME2_PLAYER, initParam);
+			if (nRet != VO_OSMP_RETURN_CODE.VO_OSMP_ERR_NONE) {
+				//TODO handle error
+			}
+			String VoVer = player.getVersion(VO_OSMP_MODULE_TYPE.VO_OSMP_MODULE_TYPE_SDK); 
+			findPreference(getString(R.string.key_about_player)).setSummary(VoVer);
+								
 		} catch (DrmClientInitFailureException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

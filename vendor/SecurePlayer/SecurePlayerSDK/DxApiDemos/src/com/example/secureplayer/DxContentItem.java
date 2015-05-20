@@ -151,17 +151,15 @@ public class DxContentItem {
 	
 	public static String generateFileName(String url){
 		String lastComponent = url.substring(url.lastIndexOf('/') + 1);
-
-		if (lastComponent.lastIndexOf('?') > 0) { //check if there is a query string
-			lastComponent = lastComponent.substring(0, lastComponent.lastIndexOf('?')); //skip query string
+		
+		if (lastComponent.lastIndexOf('?')>0){//check if there is a query string
+			lastComponent = lastComponent.substring(0, lastComponent.lastIndexOf('?'));//skip query string
 		}
-
-		if (lastComponent.lastIndexOf('.') > 0 ) {
+		if (lastComponent.lastIndexOf('.')>0){
 			return String.format("%s/%08X%s", DxConstants.CONTENT_DIR,
 					                          url.hashCode(),
 					                          lastComponent.substring(lastComponent.lastIndexOf('.')));
 		}
-
 		return String.format("%s/%08X_%s", DxConstants.CONTENT_DIR,
 				                           url.hashCode(),
 				                           lastComponent);

@@ -61,7 +61,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
   private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
-  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.14.12-B76704";
+  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.14.15-B77005";
   private VisualOnConfiguration _visualOnConfiguration = null;
   private static final boolean ENABLE_DEBUGGING = false;
   private static final boolean EXTREME_DEBUGGING = false;
@@ -156,7 +156,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     if(_isDiscredixLoaded && _localFilePath == null) {
       // Check if the Discredix version string matches what we expect
       if (!DiscredixDrmUtils.isDiscredixVersionCorrect(context)) {
-        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+        if (!_visualOnConfiguration.getDisableLibraryVersionChecks()) {
           this._error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "SecurePlayer Initialization error: Unexpected Discredix Version");
           setState(State.ERROR);
           return;
@@ -411,7 +411,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         DebugMode.logE(TAG, libraryUsed + " Version was not expected! Expected: " + expectedVersion + ", Actual: " + visualOnVersion);
         DebugMode.logE(TAG, "Please ask your CSM for updated versions of the " + libraryUsed + " libraries");
 
-        if (!_visualOnConfiguration.disableLibraryVersionChecks) {
+        if (!_visualOnConfiguration.getDisableLibraryVersionChecks()) {
           // Errors here cannot be run on async thread - This is run in SurfaceCreated, and erroring will nullpointer exception SurfaceChanged
           Handler mainHandler = new Handler(Looper.getMainLooper());
           Runnable runner =  new Runnable() {
@@ -1035,7 +1035,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_isDiscredixLoaded &&
           DiscredixDrmUtils.isStreamProtected(_parent.getLayout().getContext(), _localFilePath)) {
         DebugMode.logD(TAG, "File Download Succeeded: Need to acquire rights");
-        PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode());
+        PersonalizationAsyncTask personalizationTask = new PersonalizationAsyncTask(this, _parent.getLayout().getContext(), _parent.getOoyalaAPIClient().getPcode(), _visualOnConfiguration.getPersonalizationServerUrl());
         personalizationTask.execute();
       }
       else {
