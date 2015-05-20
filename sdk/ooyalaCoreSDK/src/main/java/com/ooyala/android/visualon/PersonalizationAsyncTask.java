@@ -23,17 +23,20 @@ class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   protected Context _context;
   protected boolean _enableDebugDRMPlayback;
   protected String _pcode;
+  protected String _personalizationServerUrl;
 
   /**
    * An executable task which will perform Discredix Personalization for this device
    * @param callback the object which should be used as a callback
    * @param context the context in which this should run
    */
-  public PersonalizationAsyncTask(PersonalizationCallback callback, Context context, String pcode) {
+  public PersonalizationAsyncTask(PersonalizationCallback callback, Context context, String pcode, String personalizationServerUrl) {
     super();
     _context = context;
     _callback = callback;
     _pcode = pcode;
+    _personalizationServerUrl = personalizationServerUrl;
+
     _enableDebugDRMPlayback = OoyalaPlayer.enableDebugDRMPlayback;
   }
 
@@ -43,7 +46,7 @@ class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
     DxLogConfig config = null;
     IDxDrmDlc dlc;
 
-    String personalizationUrl = Environment.AUTHORIZE_HOST + String.format(PERSONALIZATION_URI, _pcode);
+    String personalizationUrl = _personalizationServerUrl;
     try {
       dlc = DxDrmDlc.getDxDrmDlc(_context, config);
 
