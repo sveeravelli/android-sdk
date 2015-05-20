@@ -79,33 +79,33 @@ public class VisualOnConfiguration {
     }
     
     /**
-     * Set initial buffering time
-     * @param initialBufferingTime
+     * Set the amount of video that is buffered when video is loaded or seeked.
+     * @param initialBufferingTimeInMs the number of milliseconds to buffer before video starts to play
      * @return the Builder object to continue building
      */
-    public Builder setInitialBufferingTime(int initialBufferingTime) {
-      this.initialBufferingTime = initialBufferingTime;
+    public Builder setInitialBufferingTime(int initialBufferingTimeInMs) {
+      this.initialBufferingTime = initialBufferingTimeInMs;
       return this;
     }
     
     /**
-     * Set max buffering time
-     * @param maxBufferingTime
+     * Set the maximum amount of video that can be buffered during video playback
+     * @param maxBufferingTimeInMs the maximum number of milliseconds the video can buffer
      * @return the Builder object to continue building
      * 
      */
-    public Builder setMaxBufferingTime(int maxBufferingTime) {
-      this.maxBufferingTime = maxBufferingTime;
+    public Builder setMaxBufferingTime(int maxBufferingTimeInMs) {
+      this.maxBufferingTime = maxBufferingTimeInMs;
       return this;
     }
     
     /**
-     * Set the buffering time when re-buffering is needed during playback
-     * @param playbackBufferingTime
+     * Set the amount of video that is buffered when re-buffering is needed during playback
+     * @param playbackBufferingTimeInMs the number of milliseconds to buffer before video starts to play
      * @return the Builder object to continue building
      */
-    public Builder setPlaybackBufferingTime(int playbackBufferingTime) {
-      this.playbackBufferingTime = playbackBufferingTime;
+    public Builder setPlaybackBufferingTime(int playbackBufferingTimeInMs) {
+      this.playbackBufferingTime = playbackBufferingTimeInMs;
       return this;
     }
 

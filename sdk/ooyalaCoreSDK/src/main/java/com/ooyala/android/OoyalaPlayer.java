@@ -748,6 +748,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     p.init(this, streams);
 
     p.setLive(item.isLive());
+    p.setLiveClosedCaptionsEnabled( getShouldShowLiveClosedCaptions() );
 
     // Player must have been initialized, as well as player's basePlayer, in
     // order to continue
@@ -758,6 +759,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
     p.setSeekable(_seekable);
     return p;
+  }
+
+  private boolean getShouldShowLiveClosedCaptions() {
+    boolean should = false;
+    if( _layoutController instanceof AbstractOoyalaPlayerLayoutController ) {
+      final AbstractOoyalaPlayerLayoutController aoplc = (AbstractOoyalaPlayerLayoutController)_layoutController;
+      should = aoplc.getShouldShowLiveClosedCaptions();
+    }
+    return should;
   }
   
   private void cleanupPlayers() {
