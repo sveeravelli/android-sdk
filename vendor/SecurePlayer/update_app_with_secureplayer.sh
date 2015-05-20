@@ -70,3 +70,7 @@ cp -r ${libs_dir}/armeabi-v7a ${app_jni_dir}
 echo "copying assets from ${assets_dir} to ${app_assets_dir}"
 cp ${assets_dir}/* ${app_assets_dir}
 
+if [ $? -eq 0 ]; then
+  echo "Success!"
+fi
+
