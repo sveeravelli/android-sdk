@@ -359,12 +359,16 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void removeMiniController(OOMiniController miniController) {
     DebugMode.logD(TAG, "Remove mini controller " + miniController);
-    miniControllers.remove(miniController);
+    if (miniControllers != null) {
+      miniControllers.remove(miniController);
+    }
   }
   
   private void removeAllMiniControllers() {
     DebugMode.logD(TAG, "Remove all mini controllers");
-    miniControllers.clear();
+    if (miniControllers != null) {
+      miniControllers.clear();
+    }
   }
   
   private void dismissMiniControllers() {
