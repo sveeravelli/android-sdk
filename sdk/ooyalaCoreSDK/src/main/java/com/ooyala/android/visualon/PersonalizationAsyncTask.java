@@ -11,12 +11,12 @@ import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmNotSupportedException;
 import com.discretix.drmdlc.api.exceptions.DrmUpdateRequiredException;
 import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaPlayer;
 
 class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
   private static final String TAG = PersonalizationAsyncTask.class.getClass().toString();
-  protected static final String PERSONALIZATION_URI = "/discretix/personalization.svc/personalize/%s";
+//  No longer used. used to be AUTHORIZE_HOST + PERSONALIZATION_URI + PCODE
+//  protected static final String PERSONALIZATION_URI = "/discretix/personalization.svc/personalize/%s";
   protected static final String SESSION_ID = "session";
 
   protected PersonalizationCallback _callback = null;
@@ -55,6 +55,7 @@ class PersonalizationAsyncTask extends AsyncTask<Void, Void, Exception> {
       }
       //Check for verification.
       if (!dlc.personalizationVerify()) {
+        DebugMode.logV(TAG, "Personalizing with Server URL: " + personalizationUrl);
         dlc.performPersonalization(OoyalaPlayer.getVersion(), personalizationUrl, SESSION_ID);
       } else {
         DebugMode.logD(TAG, "Device is already personalized");
