@@ -15,10 +15,10 @@ import com.example.secureplayer.R;
 public class PlaybackOptionsActivity extends PreferenceActivity implements
 OnSharedPreferenceChangeListener{
 	
-	ListPreference     subtitlesList        = null;
-	EditTextPreference subtitlesCustom      = null;
-	CheckBoxPreference checkBoxSubtitles    = null;
-	ListPreference     audioLanguageList    = null;
+	ListPreference     subtitlesList = null;
+	EditTextPreference subtitlesCustom = null;
+	CheckBoxPreference checkBoxSubtitles = null;
+	ListPreference     audioLanguageList = null;
 	CheckBoxPreference checkBoxPlaybackInfo = null;
 	
 	

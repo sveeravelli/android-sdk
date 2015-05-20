@@ -48,6 +48,10 @@ public class RightsInfoLocalizer {
 		case FUTURE:
 			retStr = c.getString(R.string.RIGHTS_FUTURE);
 			break;
+		case INVALID:
+		case SECURE_CLOCK_NOT_SET:
+			retStr = c.getString(R.string.RIGHTS_NOT_VALID);
+			break;
 		}
 		return retStr;
 	}

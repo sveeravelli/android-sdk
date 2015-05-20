@@ -4,11 +4,11 @@
     <PreferenceCategory android:title="@string/settings_category_personalization" >
         <Preference
             android:key="select_pic_pref"
-            android:title="Perform Personalization" >
+            android:title="@string/menu_perform_personalization" >
             <intent android:action="com.discretix.PERSONALIZATION" >
             </intent>
         </Preference>
-        <Preference android:title="Delete Personalization" >
+        <Preference android:title="@string/menu_delete_personalization" >
             <intent android:action="com.discretix.DELETE_PERSONALIZATION" >
             </intent>
         </Preference>
@@ -27,7 +27,7 @@
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_Player_Type" >
-        <CheckBoxPreference
+    	<CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/key_hardware_accelerator"
             android:summary="@string/Select_Hardware_Acceleration_Summary"
@@ -109,6 +109,12 @@
             </intent>
         </Preference>
         <Preference
+            android:summary="@string/menu_summery_delete"
+            android:title="@string/menu_delete_rights" >
+            <intent android:action="com.discretix.DELETE_RIGHTS" >
+            </intent>
+        </Preference>
+        <Preference
             android:summary="@string/menu_summery_perform_playback"
             android:title="@string/menu_play" >
             <intent android:action="com.discretix.PLAY_STREAMING" >
@@ -122,10 +128,15 @@
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="About" >
-        <Preference
+         <Preference
             android:key="@string/key_about"
             android:summary="@string/menu_summery_About"
             android:title="@string/menu_Version" >
+        </Preference>
+        <Preference
+            android:key="@string/key_about_player"
+            android:summary="@string/menu_summery_About_player"
+            android:title="@string/menu_player_version" >
         </Preference>
     </PreferenceCategory>
 
