@@ -7,11 +7,11 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/../../sdk/CastCompanionLibrary" />
             <option value="$PROJECT_DIR$/../../sdk/ooyalaCastSDK" />
             <option value="$PROJECT_DIR$/../../sdk/ooyalaCoreSDK" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/../../vendor/CastCompanionLibrary" />
           </set>
         </option>
       </GradleProjectSettings>

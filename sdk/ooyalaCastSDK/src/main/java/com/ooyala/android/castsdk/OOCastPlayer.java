@@ -184,7 +184,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       if (isPlaying) {
         playerParams.put("autoplay", true);
       } else {
-        playerParams.put("autoplay", false);
+        playerParams.put("autoplay", true);
       }
       dataParams.put("ec", ec);
       dataParams.put("version", version);
