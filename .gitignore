@@ -1,12 +1,5 @@
 .DS_Store
-OoyalaSDK-Android.zip
-OoyalaIMASDK-Android.zip
-OoyalaFreewheelSDK-Android.zip
-OoyalaSecurePlayerIntegration-Android.zip
-OoyalaVisualOnIntegration-Android.zip
-OoyalaSDKArchive-Android.zip
-OoyalaNielsenSDK-Android.zip
-OoyalaNPAWSDK-Android.zip
+Ooyala*-Android.zip
 test_results.txt
 *.class
 */javadoc
@@ -58,6 +51,7 @@ vendor/google_play_services/libproject/google-play-services_lib/local.properties
 **/OoyalaIMASDK.jar
 **/OoyalaNielsenSDK.jar
 **/OoyalaNPAWSDK.jar
+**/OoyalaCastSDK.aar
 script/android_*
 deploy/android_deploy
 
