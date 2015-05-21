@@ -120,7 +120,6 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     if (_playerPrepared) {
       _player.stop();
     }
-    _player.reset();
     _player.release();
     _player = null;
     _playerPrepared = false;
