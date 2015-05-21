@@ -186,6 +186,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void deregisterOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer);
+    this.ooyalaPlayer = null;
     if (isInCastMode()) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
