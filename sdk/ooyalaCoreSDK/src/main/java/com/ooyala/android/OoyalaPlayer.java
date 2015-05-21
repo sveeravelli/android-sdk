@@ -1951,7 +1951,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
     }
-    _layoutController.setFullscreenButtonShowing(false);
+    _layoutController.setFullscreenButtonShowing(true);
   }
 
   private boolean prepareContent(boolean forcePlay) {
