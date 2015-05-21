@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.secureplayer.DxConstants;
 import com.example.secureplayer.R;
 import com.example.secureplayer.Utils;
 import com.visualon.OSMPPlayer.VOCommonPlayerAssetSelection;
@@ -74,6 +75,16 @@ public class StreamingDownloaderActivity extends Activity implements VOOSMPStrea
 
 		setContentView(R.layout.streaming_downloader);
 		m_edURL = (EditText)findViewById(R.id.etDownloadUrl);
+		
+		if (DxConstants.getActiveContent() != null && DxConstants.getActiveContent().IsStreaming() == false) {
+			
+			s_downloadUrl = DxConstants.getActiveContent().getContentUrl();
+		}
+		else {
+			
+			s_downloadUrl = "";			
+		}
+				
 		m_tvDownloadCurrent = (TextView)findViewById(R.id.tvDownloadCurrent);
 		m_tvDownloadTotal = (TextView)findViewById(R.id.tvDownloadTotal);
 		m_pbDownloaded = (ProgressBar)findViewById(R.id.progressBar1);

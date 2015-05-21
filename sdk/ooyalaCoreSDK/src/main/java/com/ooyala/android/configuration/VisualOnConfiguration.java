@@ -1,13 +1,16 @@
 package com.ooyala.android.configuration;
 
-
 /**
  * VisualOnConfiguration is a bundle that holds application-defined properties that configure
  * Ooyala Player's use of VisualOn and SecurePlayer
  *
  */
 public class VisualOnConfiguration {
-  public boolean disableLibraryVersionChecks;
+
+  public static String PRODUCTION_PERSONALIZATION_SERVER_URL = "http://perso.purpledrm.com/PersoServer/Personalization";
+
+  private boolean disableLibraryVersionChecks;
+  private String personalizationServerUrl;
   private int upperBitrateThreshold;
   private int lowerBitrateThreshold;
   private int initialBitrate;
@@ -21,6 +24,7 @@ public class VisualOnConfiguration {
    */
   public static class Builder {
     private boolean disableLibraryVersionChecks;
+    private String personalizationServerUrl;
     private int upperBitrateThreshold;
     private int lowerBitrateThreshold;
     private int initialBitrate;
@@ -30,6 +34,7 @@ public class VisualOnConfiguration {
 
     public Builder() {
       this.disableLibraryVersionChecks = false;
+      this.personalizationServerUrl = "http://persopp.purpledrm.com/PersoServer/Personalization";
       this.upperBitrateThreshold = -1;
       this.lowerBitrateThreshold = -1;
       this.initialBitrate = -1;
@@ -47,7 +52,21 @@ public class VisualOnConfiguration {
       this.disableLibraryVersionChecks = disableLibraryVersionChecks;
       return this;
     }
-    
+
+    /**
+     * Sets the personalization server URL used for personalization.
+     *
+     * This targets Viaccess-Orca's Pre-Production Personalization server, and must be modified
+     * to target the production server when the application is intended to be deployed.  You can use
+     * PRODUCTION_PERSONALIZATION_SERVER_URL when you are certified to use production personalization
+     * @param personalizationServerUrl the url to be used for personalization
+     * @return the Builder object to continue building
+     */
+    public Builder setPersonalizationServerUrl( String personalizationServerUrl ) {
+      this.personalizationServerUrl = personalizationServerUrl;
+      return this;
+    }
+
     /**
      * Set the upper bit rate threshold
      * @param upperBitrateThreshold 
@@ -114,7 +133,7 @@ public class VisualOnConfiguration {
      * @return a VisualOnConfiguration for providing in the Options
      */
     public VisualOnConfiguration build() {
-      return new VisualOnConfiguration(this.disableLibraryVersionChecks, this.upperBitrateThreshold, this.lowerBitrateThreshold, this.initialBitrate,  this.maxBufferingTime, this.initialBufferingTime, this.playbackBufferingTime);
+      return new VisualOnConfiguration(this.disableLibraryVersionChecks, this.personalizationServerUrl, this.upperBitrateThreshold, this.lowerBitrateThreshold, this.initialBitrate,  this.maxBufferingTime, this.initialBufferingTime, this.playbackBufferingTime);
     }
   }
 
@@ -131,8 +150,9 @@ public class VisualOnConfiguration {
    * Initialize a VisualOnConfiguration. Private in favor of the Builder class
    * @param disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
    */
-  private VisualOnConfiguration(boolean disableLibraryVersionChecks, int upperBitrateThreshold, int lowerBitrateThreshold, int initialBitrate, int maxBufferingTime, int initialBufferingTime, int playbackBufferingTime) {
+  private VisualOnConfiguration(boolean disableLibraryVersionChecks, String personalizationServerUrl, int upperBitrateThreshold, int lowerBitrateThreshold, int initialBitrate, int maxBufferingTime, int initialBufferingTime, int playbackBufferingTime) {
     this.disableLibraryVersionChecks = disableLibraryVersionChecks;
+    this.personalizationServerUrl = personalizationServerUrl;
     this.upperBitrateThreshold = upperBitrateThreshold;
     this.lowerBitrateThreshold = lowerBitrateThreshold;
     this.initialBitrate = initialBitrate;
@@ -140,7 +160,22 @@ public class VisualOnConfiguration {
     this.initialBufferingTime = initialBufferingTime;
     this.playbackBufferingTime = playbackBufferingTime;
   }
-  
+  /**
+   *
+   * @return disableLibraryVersionChecks true if you want to allow playback with unexpected VisualOn versions (default false)
+   */
+  public boolean getDisableLibraryVersionChecks() {
+    return this.disableLibraryVersionChecks;
+  }
+
+  /**
+   *
+   * @return personalizationServerUrl the url to be used for personalization
+   */
+  public String getPersonalizationServerUrl() {
+    return this.personalizationServerUrl;
+  }
+
   /**
    * 
    * @return upper bit rate threshold

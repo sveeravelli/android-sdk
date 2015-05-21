@@ -35,5 +35,4 @@
             android:key="@string/key_display_playback_information" />
         </PreferenceCategory>
     
-    
 </PreferenceScreen>

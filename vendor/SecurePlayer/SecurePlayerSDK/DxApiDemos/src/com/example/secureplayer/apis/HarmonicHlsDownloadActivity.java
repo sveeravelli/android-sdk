@@ -74,13 +74,13 @@ public class HarmonicHlsDownloadActivity extends Activity {
 		        bufferedReader = new BufferedReader(new InputStreamReader(playlistUrl.openConnection().getInputStream()));
 		        String inputLine;
 
-		        while ((inputLine = bufferedReader.readLine()) != null) { 
+		        while ((inputLine = bufferedReader.readLine()) != null){ 
 		            String trimmedLine = inputLine.trim();
 		            String trimmedLineWithoutQuery = trimmedLine;
-		            if (trimmedLine.lastIndexOf('?') > 0) { //check if there is a query string
+		            if (trimmedLine.lastIndexOf('?')>0){//check if there is a query string
 		            	trimmedLineWithoutQuery = trimmedLine.substring(0, trimmedLine.lastIndexOf('?'));//skip query string
 		    		}
-		            if (trimmedLine.equals("") || trimmedLine.startsWith("#")) {
+		            if (trimmedLine.equals("") || trimmedLine.startsWith("#")){
 		            	continue;
 		            } else if (trimmedLineWithoutQuery.toLowerCase(Locale.getDefault()).endsWith(".m3u8")){
 		            	return getTsUrl(baseUrl + trimmedLine);
@@ -89,7 +89,7 @@ public class HarmonicHlsDownloadActivity extends Activity {
 		            }
 		        }
 			} finally {
-				if (null != bufferedReader) {
+				if (null != bufferedReader){
 					bufferedReader.close();
 				}
 			}

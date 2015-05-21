@@ -13,13 +13,14 @@ public class DxConstants {
 	public static String TAG = "DxApiDemos";
 	public static String CONTENT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DxApiDemos_Contents";
 	
-	
+	// ! Personalization Local/Remote
+	public static final Boolean PERSONALIZATION_LOCAL = true;	
 	// ! Personalization Url
-	public static final String PERSONALIZATION_URL = "localhost:8000/Personalization";
+	public static final String PERSONALIZATION_URL = "http://persotest.purpledrm.com/PersoServerNoCheck/Personalization";
 	// ! App Version name to be transmitted via performPersonalization API.
-	public static final String APPLICATION_VERSION = "DxApiDemos";
+	public static final String PERSONALIZATION_APPLICATION_VERSION = "DxApiDemos";
 	// ! SessionID string to be transmitted via performPersonalization API.
-	public static final String SESSION_ID = "session";
+	public static final String PERSONALIZATION_SESSION_ID = "Android";
 	
 	private static SharedPreferences mSharedPref = null;
 	
@@ -36,59 +37,59 @@ public class DxConstants {
 	private static  DxContentItem[] mContentArry = new DxContentItem[]{
 	
 		new DxContentItem.Builder("PR Dx3.0 HLS - Avatar")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Avatar_HLS_25FPS_Enc/Avatar.m3u8")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Avatar_HLS_25FPS_Enc/Avatar.m3u8")
 			.setIsStreaming(true)
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Avatar_HLS_25FPS_Enc/LicenseAcquisition_HLS_Avatar.cms")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Avatar_HLS_25FPS_Enc/LicenseAcquisition_HLS_Avatar.cms")
 			.setCustomData("Unlimited",	ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 
         new DxContentItem.Builder("PR Harmonic HLS - Salt")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Salt_HLS_25FPS_Enc/Salt.m3u8")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Salt_HLS_25FPS_Enc/Salt.m3u8")
 			.setIsStreaming(true)
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Salt_HLS_25FPS_Enc/LicenseAcquisition_HLS_Salt.cms")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Salt_HLS_25FPS_Enc/LicenseAcquisition_HLS_Salt.cms")
 			.build(),
 	    
 		new DxContentItem.Builder("PR Dx2.1 HLS - Zombie Land")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Zombieland_HLS_25FPS_Enc/Zombieland.m3u8")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Zombieland_HLS_25FPS_Enc/Zombieland.m3u8")
 	        .setIsStreaming(true)
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/high/Zombieland_HLS_25FPS_Enc/LicenseAcquisition_HLS_Zombieland.cms")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/high/Zombieland_HLS_25FPS_Enc/LicenseAcquisition_HLS_Zombieland.cms")
 			.setCustomData("ExpireIn2Days", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		
 		new DxContentItem.Builder("PR Cisco format HLS - Cars 2")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/High/Cars2_HLS_25FPS_Enc/Cars2.m3u8")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/High/Cars2_HLS_25FPS_Enc/Cars2.m3u8")
 			.setIsStreaming(true)
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/HLS/High/Cars2_HLS_25FPS_Enc/LicenseAcquisition_HLS_Cars2.cms")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/HLS/High/Cars2_HLS_25FPS_Enc/LicenseAcquisition_HLS_Cars2.cms")
 			.setCustomData("Unlimited", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		
 		new DxContentItem.Builder("PR SMST - Valhalla Rising")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/ValhallaRising.ism/Manifest")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/LicenseAcquisition_SmStr_ValhallaRising.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/ValhallaRising.ism/Manifest")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/LicenseAcquisition_SmStr_ValhallaRising.cms")
 			.setIsStreaming(true)
 			.setCustomData("ExpireIn10Days", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		new DxContentItem.Builder("PR SMST - Toy Story 3")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ToyStory3_SmStr_25FPS_Enc/ToyStory3.ism/Manifest")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ToyStory3_SmStr_25FPS_Enc//LicenseAcquisition_SmStr_ToyStory3.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ToyStory3_SmStr_25FPS_Enc/ToyStory3.ism/Manifest")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ToyStory3_SmStr_25FPS_Enc//LicenseAcquisition_SmStr_ToyStory3.cms")
 			.setIsStreaming(true)
 			.setCustomData("ExpireIn10Days", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		//---------------------------------------------------------				          
 		new DxContentItem.Builder("Local PR Env - Airbender")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/Airbender_ENV_Enc/Airbender_320x136_350KbpsBP25Fps.eny")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/Airbender_ENV_Enc/LicenseAcquisition_ENV_Airbender_320x136_350KbpsBP25Fps.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/Airbender_ENV_Enc/Airbender_320x136_350KbpsBP25Fps.eny")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/Airbender_ENV_Enc/LicenseAcquisition_ENV_Airbender_320x136_350KbpsBP25Fps.cms")
 			.setIsStreaming(false)
 			.build(),
 		new DxContentItem.Builder("Local PR Env - District 9")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/District9_ENV_Enc/District9_584x312_1000KbpsBP25Fps.eny")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/District9_ENV_Enc/LicenseAcquisition_ENV_District9_584x312_1000KbpsBP25Fps.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/District9_ENV_Enc/District9_584x312_1000KbpsBP25Fps.eny")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/District9_ENV_Enc/LicenseAcquisition_ENV_District9_584x312_1000KbpsBP25Fps.cms")
 			.setIsStreaming(false)
 			.setCustomData("ExpireIn2Days", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		new DxContentItem.Builder("Local PR Env - Ice Age")
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/IceAge_ENV_Enc/IceAge_568x304_800KbpsBP25Fps.eny")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/Envelope/IceAge_ENV_Enc/LicenseAcquisition_ENV_IceAge_568x304_800KbpsBP25Fps.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/IceAge_ENV_Enc/IceAge_568x304_800KbpsBP25Fps.eny")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/Envelope/IceAge_ENV_Enc/LicenseAcquisition_ENV_IceAge_568x304_800KbpsBP25Fps.cms")
 			.setIsStreaming(false)
 			.setCustomData("Unlimited", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
@@ -99,8 +100,8 @@ public class DxConstants {
 			.setCustomData("Unlimited", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build(),
 		new DxContentItem.Builder("Local PR ISMV - Valhalla Rising") 
-			.setContentUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/ValhallaRising_768x324_1000KbpsBP25Fps.ismv")
-			.setInitiatorUrl("http://64.57.247.9/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/LicenseAcquisition_SmStr_ValhallaRising.cms")
+			.setContentUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/ValhallaRising_768x324_1000KbpsBP25Fps.ismv")
+			.setInitiatorUrl("http://192.116.217.179/PlayReadyDemo/SPDemo/SmStreaming/ValhallaRising_SmStr_25FPS_Enc/LicenseAcquisition_SmStr_ValhallaRising.cms")
 			.setIsStreaming(false)
 			.setCustomData("ExpireIn10Days", ECustomDataType.CUSTOM_DATA_IS_TEXT)
 			.build()
@@ -238,7 +239,6 @@ public class DxConstants {
 	public static void setHardwareAccelerated(boolean val) {
 		HardwareAccelerated = val;
 	}
-	
     private static boolean DisplayPlaybackInformation = false;
 	
 	public static boolean getDisplayPlaybackInformation() {
