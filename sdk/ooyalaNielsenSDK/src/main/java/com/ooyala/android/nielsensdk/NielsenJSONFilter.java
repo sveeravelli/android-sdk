@@ -34,12 +34,12 @@ public class NielsenJSONFilter {
    */
   public String filter( String json ) {
     String r = json;
-
-    for( Pair<Pattern,String> ps : psz ) {
-      final Matcher backspaceMatcher = ps.first.matcher( r );
-      r = backspaceMatcher.replaceAll( ps.second );
+    if( r != null ) {
+      for( Pair<Pattern, String> ps : psz ) {
+        final Matcher backspaceMatcher = ps.first.matcher( r );
+        r = backspaceMatcher.replaceAll( ps.second );
+      }
     }
-
     return r;
   }
 }

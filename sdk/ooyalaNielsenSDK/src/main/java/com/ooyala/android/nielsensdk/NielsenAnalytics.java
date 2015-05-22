@@ -250,8 +250,9 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
     while ( keys.hasNext() ) {
       final String k = keys.next();
       final String v = (String)Utils.getJSONValueOrElse( metadataJson, k, null );
-      if( v != null && NielsenJSONFilter.s_instance.filter( v ) != v ) {
-        DebugMode.logE( TAG, "logMetadataWarnings(): perhaps invalid format, was '" + v + "'" );
+      final String fv = NielsenJSONFilter.s_instance.filter( v );
+      if( v != null && ! fv.equals( v ) ) {
+        DebugMode.logE( TAG, "logMetadataWarnings(): perhaps invalid format, was '" + v + "', filtered version was '" + fv + "'" );
       }
     }
   }
