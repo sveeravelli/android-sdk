@@ -45,7 +45,7 @@ import java.util.Set;
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
 public class OOCastManager extends DataCastManager implements CastManager {
-  private static final String TAG = "CastManager 5/22";
+  private static final String TAG = "CastManager";
 
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
