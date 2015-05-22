@@ -316,7 +316,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     removeAllMiniControllers();
     isInCastMode = false;
   }
-  
+
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {
    super.sendDataMessage(message, OOCastManager.namespace);
@@ -393,7 +393,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     currentActivity = context.getClass();
     currentContext = context;
   }
-  
+
   public Class<?> getCurrentActivity() {
     return currentActivity;
   }
