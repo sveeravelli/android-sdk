@@ -45,7 +45,7 @@ import java.util.Set;
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
 public class OOCastManager extends DataCastManager implements CastManager {
-  private static final String TAG = "CastManager";
+  private static final String TAG = "CastManager 5/22";
 
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
@@ -316,7 +316,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     removeAllMiniControllers();
     isInCastMode = false;
   }
-  
+
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {
    super.sendDataMessage(message, OOCastManager.namespace);
@@ -393,7 +393,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     currentActivity = context.getClass();
     currentContext = context;
   }
-  
+
   public Class<?> getCurrentActivity() {
     return currentActivity;
   }

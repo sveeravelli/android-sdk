@@ -114,6 +114,18 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     setCurrentTime(timeInMillis);
     onPlayHeadChanged();
   }
+
+  public void syncDeviceVolumeToTV() {
+    DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
+    JSONObject actionSetVolume = new JSONObject();
+    try {
+      actionSetVolume.put("action", "volume");
+      actionSetVolume.put("data", castManager.get().getDeviceVolume());
+      sendMessage(actionSetVolume.toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
   
   protected void setState(State state) {
     this.state = state;
@@ -306,6 +318,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {
           onPlayHeadChanged();
+          syncDeviceVolumeToTV();
           setState(State.READY);
           getReceiverPlayerState();
         } 
