@@ -24,7 +24,7 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
   private RemoteControlClient remoteControlClient;
   private static final String TAG = "ChromscastSampleAppActivty";
   private final String NAMESPACE = "urn:x-cast:ooyala";
-  private final String APP_ID = "46147917";
+  private final String APP_ID = "4172C76F";
   private OOCastManager castManager;
   private OOMiniController defualtMiniController;
   private OOMiniController customizedMiniController;
@@ -84,9 +84,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     
-    
+
     defualtMiniController = (OOMiniController) findViewById(R.id.miniController1);
-    castManager.addMiniController(defualtMiniController);
     
 //    customizedMiniController = (OOMiniController) findViewById(R.id.miniController2);
 //    castManager.addMiniController(customizedMiniController);
@@ -138,7 +137,8 @@ public class ChromecastSampleAppActivity extends ActionBarActivity {
     super.onResume();
     ChromecastSampleAppActivity.activatedActivity++;
     if (castManager != null && castManager.isInCastMode()){
-      this.defualtMiniController.show();
+      castManager.addMiniController(defualtMiniController);
+      defualtMiniController.show();
 //      this.customizedMiniController.show();
       castManager.onResume();
     }

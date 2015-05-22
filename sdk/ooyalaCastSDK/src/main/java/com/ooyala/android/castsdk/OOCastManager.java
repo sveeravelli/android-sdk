@@ -105,7 +105,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void destroy(Context context) {
-    DebugMode.logD(TAG, "destroy OOCastManager");
+    DebugMode.logD(TAG, "Destroy OOCastManager");
     hideCastView();
     destroyCastPlayer();
     destroyNotificationService(context);
@@ -151,15 +151,18 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void setNotificationImageResourceId(int resourceId) {
+    DebugMode.logD(TAG, "Set notification image recourse id = " + resourceId);
     notificationImageResourceId = resourceId;
   }
   
   public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
+    DebugMode.logD(TAG, "Set mini controller image bitmap = " + imageBitmap);
     miniControllerDefaultImageBitmap = imageBitmap;
   }
 
-  public void setNotificationMiniControllerLayout(int recourceId) {
-    notificationMiniControllerResourceId = recourceId;
+  public void setNotificationMiniControllerLayout(int resourceId) {
+    DebugMode.logD(TAG, "Set notification mini controller layout = " + resourceId);
+    notificationMiniControllerResourceId = resourceId;
   }
 
   public void setCastPlayerSeekable(boolean isSeekable) {
@@ -183,10 +186,10 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void deregisterOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer);
+    this.ooyalaPlayer = null;
     if (isInCastMode()) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
-    ooyalaPlayer = null;
   }
 
   /*============================================================================================*/
@@ -267,12 +270,14 @@ public class OOCastManager extends DataCastManager implements CastManager {
       exitCastMode();
     }
   }
-  
+
+  // if the device is disconnected this method will be called from Google lib HOWEVER, "onApplicationDisconnected" will not be called
   @Override
   public void disconnectDevice(boolean stopAppOnExit, boolean clearPersistedConnectionData,
       boolean setDefaultRoute) {
     DebugMode.logD(TAG, "disconnectDevice called");
     super.disconnectDevice(stopAppOnExit, clearPersistedConnectionData, setDefaultRoute);
+    this.isConnectedToReceiverApp = false;
     if (isInCastMode()) {
       exitCastMode();
     }
@@ -283,6 +288,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
     initCastPlayer(embedCode, playheadTimeInMillis, isPlaying);
@@ -291,6 +297,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   }
 
   private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+    DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
     castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
@@ -332,7 +339,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
     if (miniControllers == null) {
       miniControllers = new HashSet<OOMiniController>();
     }
-    miniControllers.add(miniController);
+    if (!miniControllers.contains(miniController)) {
+      miniControllers.add(miniController);
+    }
     miniController.setCastManager(castManager);
   }
 
@@ -351,12 +360,16 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   public void removeMiniController(OOMiniController miniController) {
     DebugMode.logD(TAG, "Remove mini controller " + miniController);
-    miniControllers.remove(miniController);
+    if (miniControllers != null) {
+      miniControllers.remove(miniController);
+    }
   }
   
   private void removeAllMiniControllers() {
     DebugMode.logD(TAG, "Remove all mini controllers");
-    miniControllers.clear();
+    if (miniControllers != null) {
+      miniControllers.clear();
+    }
   }
   
   private void dismissMiniControllers() {
@@ -429,8 +442,8 @@ public class OOCastManager extends DataCastManager implements CastManager {
           if (isInCastMode()) {
             String action = intent.getAction();
             if (action.equals(ACTION_STOP)) {
-              disconnect();
               exitCastMode();
+              disconnect();
               destroyNotificationService(context);
             } else if (action.equals(ACTION_PLAY)) {
               if (castPlayer.getState() == State.PLAYING) {

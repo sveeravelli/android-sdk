@@ -44,11 +44,13 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+    DebugMode.logD(TAG, "Set OoyalaPlayer = " + ooyalaPlayer);
     this.addObserver(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
   }
 
   public void disconnectFromCurrentOoyalaPlayer() {
+    DebugMode.logD(TAG, "Disconnect from current OoyalaPlayer by removing observers");
     this.deleteObservers();
   }
   

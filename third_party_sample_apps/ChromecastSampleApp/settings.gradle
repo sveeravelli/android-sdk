@@ -1,9 +1,8 @@
 include ':app'
-//
-//include ':ooyalaCoreSDK'
-//project(':ooyalaCoreSDK').projectDir = new File(settingsDir, '../sdk/ooyalaCoreSDK')
-//
-//
+
+include ':CastCompanionLibrary'
+project(':CastCompanionLibrary').projectDir = new File(settingsDir, '../../vendor/CastCompanionLibrary')
+
 include ':ooyalaCoreSDK'
 project(':ooyalaCoreSDK').projectDir = new File(settingsDir, '../../sdk/ooyalaCoreSDK')
 
@@ -11,5 +10,3 @@ project(':ooyalaCoreSDK').projectDir = new File(settingsDir, '../../sdk/ooyalaCo
 include ':ooyalaCastSDK'
 project(':ooyalaCastSDK').projectDir=new File(settingsDir, '../../sdk/ooyalaCastSDK')
 
-include ':CastCompanionLibrary'
-project(':CastCompanionLibrary').projectDir=new File(settingsDir, '../../vendor/CastCompanionLibrary')
