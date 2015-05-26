@@ -192,9 +192,13 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       if (_player != null) {
         DebugMode
             .logD(TAG, "createMediaPlayer: reset the existing mediaplayer");
-        stop();
+        _playerPrepared = false;
+        _player.reset();
+      } else {
+        DebugMode
+                .logD(TAG, "createMediaPlayer: creating a new mediaplayer");
+        _player = new MediaPlayer();
       }
-      _player = new MediaPlayer();
       // Set cookies if they exist for 4.0+ Secure HLS Support
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
         _player.setDataSource(_parent.getLayout().getContext(), Uri.parse(_streamUrl));
