@@ -1,6 +1,6 @@
 [submodule "submodules/mobile_sdk_build_packaging_scripts"]
 	path = submodules/mobile_sdk_build_packaging_scripts
-	url = git@github.services.ooyala.net:playback-app/mobile_sdk_build_packaging_scripts
+	url = http://github.services.ooyala.net/playback-app/mobile_sdk_build_packaging_scripts
 [submodule "submodules/android_sample_apps"]
 	path = submodules/android_sample_apps
-	url = git@github.com:ooyala/android-sample-apps.git
+	url = https://github.com/ooyala/android-sample-apps.git
