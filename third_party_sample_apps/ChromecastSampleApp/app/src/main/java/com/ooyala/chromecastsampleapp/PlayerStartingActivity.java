@@ -49,7 +49,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(playerLayout, player);
 
     // Initialize CastManager
-    castManager = OOCastManager.initialize(this, "46147917", "urn:x-cast:ooyala");
+    castManager = OOCastManager.initialize(this, "4172C76F", "urn:x-cast:ooyala");
     castManager.destroyNotificationService(this);
     castManager.registerWithOoyalaPlayer(player);
     castManager.setTargetActivity(PlayerStartingActivity.class);
@@ -132,6 +132,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
     castManager.destroyNotificationService(this);
     castManager.unregisterLockScreenControls();
     castManager.deregisterOoyalaPlayer();
+    player = null;
     super.onDestroy();
   }
 
@@ -145,7 +146,7 @@ public class PlayerStartingActivity extends ActionBarActivity {
       castManager.unregisterLockScreenControls();
     } else if (player != null) {
       player.resume();
-    }  
+    }
   super.onResume();
   }
 
@@ -164,9 +165,11 @@ public class PlayerStartingActivity extends ActionBarActivity {
       if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
         Log.w(TAG, "KeyEvent.KEYCODE_VOLUME_UP");
         onVolumeChange(DEFAULT_VOLUME_INCREMENT);
+        return  true;
       } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
         Log.w(TAG, "KeyEvent.KEYCODE_VOLUME_DOWN");
         onVolumeChange(-DEFAULT_VOLUME_INCREMENT);
+        return  true;
       } else {
         // we don't want to consume non-volume key events
         return super.onKeyDown(keyCode, event);

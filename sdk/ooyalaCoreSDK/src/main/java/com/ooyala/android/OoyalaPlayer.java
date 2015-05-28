@@ -69,7 +69,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v4.1.0_RC5";
+  static final String SDK_VERSION = "v4.2.0_RC4";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -629,7 +629,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
-    if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
+    if (_castManager != null && _castManager.isConnectedToReceiverApp() && _castManager.getCastPlayer() != null) {
+      DebugMode.logD(TAG, "switchToCastMode onChangeCurrentItemAfterFetch");
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
       boolean needToLoadAnalytics = _analytics == null;
@@ -1929,6 +1930,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
     _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
+    _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
 
@@ -1949,6 +1951,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
     }
+    _layoutController.setFullscreenButtonShowing(true);
   }
 
   private boolean prepareContent(boolean forcePlay) {
@@ -2065,7 +2068,8 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (_player != null) {
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
       // In this case we need to check should we switch to cast mode
-      if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
+      if (_castManager != null && _castManager.isConnectedToReceiverApp() && _castManager.getCastPlayer() != null) {
+        DebugMode.logD(TAG, "Switch to cast mode when resume current player");
         switchToCastMode(_currentItem.getEmbedCode());
       } else {
         _player.resume();

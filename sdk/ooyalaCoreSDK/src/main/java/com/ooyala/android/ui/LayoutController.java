@@ -65,4 +65,9 @@ public interface LayoutController {
    * Reshow TV rating (if the current FCCTVRatingConfiguration allows it).
    */
   public void reshowTVRating();
+
+  /**
+   * setFullscreenButtonShowing will enable and disable visibility of the fullscreen button
+   */
+  public void setFullscreenButtonShowing(boolean showing);
 }

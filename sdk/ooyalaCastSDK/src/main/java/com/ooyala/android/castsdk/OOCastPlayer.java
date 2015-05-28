@@ -44,11 +44,13 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+    DebugMode.logD(TAG, "Set OoyalaPlayer = " + ooyalaPlayer);
     this.addObserver(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
   }
 
   public void disconnectFromCurrentOoyalaPlayer() {
+    DebugMode.logD(TAG, "Disconnect from current OoyalaPlayer by removing observers");
     this.deleteObservers();
   }
   
@@ -111,6 +113,18 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     sendMessage(actionSeek.toString());
     setCurrentTime(timeInMillis);
     onPlayHeadChanged();
+  }
+
+  public void syncDeviceVolumeToTV() {
+    DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
+    JSONObject actionSetVolume = new JSONObject();
+    try {
+      actionSetVolume.put("action", "volume");
+      actionSetVolume.put("data", castManager.get().getDeviceVolume());
+      sendMessage(actionSetVolume.toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
   
   protected void setState(State state) {
@@ -304,6 +318,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {
           onPlayHeadChanged();
+          syncDeviceVolumeToTV();
           setState(State.READY);
           getReceiverPlayerState();
         } 

@@ -124,13 +124,14 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
         @Override
         public void onClick(View v) {
-          DebugMode.assertCondition((castManager.get().getCastPlayer()  == null), TAG, "castPlayer should never be null when we have a mini controller");
-          if (castManager.get().getCastPlayer().getState() == State.PAUSED ||
-                     castManager.get().getCastPlayer().getState() == State.READY ||
-                     castManager.get().getCastPlayer().getState() == State.COMPLETED){
-            castManager.get().getCastPlayer().play();
-          } else if (castManager.get().getCastPlayer().getState() == State.PLAYING){
-            castManager.get().getCastPlayer().pause();
+          DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
+          OOCastPlayer castPlayer = castManager.get().getCastPlayer();
+          State state = castPlayer.getState();
+          DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
+          if (state == State.PLAYING){
+            castPlayer.pause();
+          } else {
+            castPlayer.play();
           }
         }
     });
@@ -139,6 +140,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
 
       @Override
       public void onClick(View v) {
+        DebugMode.logD(TAG, "Mini Controller is clicked.");
         if (castManager.get().getTargetActivity() != null) {
           try {
             onTargetActivityInvoked(getContext());
@@ -163,6 +165,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   
   @Override
   public void updatePlayPauseButtonImage(boolean isPlaying) {
+    DebugMode.logD(TAG, "Update play/pause button in default mini controller for isPlaying = " + isPlaying);
     if (isPlaying) {
       playPause.setVisibility(View.VISIBLE);
       playPause.setImageBitmap(pauseImageBitmap);
