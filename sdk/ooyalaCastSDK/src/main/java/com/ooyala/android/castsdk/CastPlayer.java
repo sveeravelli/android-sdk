@@ -18,10 +18,10 @@ import java.util.Observable;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class OOCastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
+public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
  
-  private WeakReference<OOCastManager> castManager;
+  private WeakReference<CastManager> castManager;
   
   private String embedCode;
   private int duration;
@@ -39,8 +39,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private Bitmap castImageBitmap;
   
   
-  public OOCastPlayer(OOCastManager castManager) {
-    this.castManager = new WeakReference<OOCastManager>(castManager);
+  public CastPlayer(CastManager castManager) {
+    this.castManager = new WeakReference<CastManager>(castManager);
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
@@ -62,14 +62,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   public void pause() {
     DebugMode.logD(TAG, "pause()");
     setState(State.PAUSED);
-    sendMessage(OOCastUtils.makeActionJSON("pause"));
+    sendMessage(CastUtils.makeActionJSON("pause"));
   }
 
   @Override
   public void play() {
     DebugMode.logD(TAG, "play()");
     setState(State.PLAYING);
-    sendMessage(OOCastUtils.makeActionJSON("play"));
+    sendMessage(CastUtils.makeActionJSON("play"));
   }
 
   @Override
@@ -261,7 +261,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   private void getReceiverPlayerState() {
     DebugMode.logD(TAG, "getReceiverPlayerState");
-    sendMessage(OOCastUtils.makeActionJSON("getstatus"));
+    sendMessage(CastUtils.makeActionJSON("getstatus"));
   }
   
   public void receivedMessage(String message) {

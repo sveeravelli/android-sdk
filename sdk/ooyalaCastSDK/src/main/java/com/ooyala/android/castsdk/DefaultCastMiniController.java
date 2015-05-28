@@ -8,23 +8,21 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 
 import java.lang.ref.WeakReference;
 
-public class OODefaultMiniController extends RelativeLayout implements com.ooyala.android.castsdk.OOMiniController {
+public class DefaultCastMiniController extends RelativeLayout implements CastMiniController {
 
   private static final String TAG = "OODefaultMiniController";
 
-  private WeakReference<OOCastManager> castManager;
+  private WeakReference<CastManager> castManager;
 
   private final int DP;
   
@@ -36,20 +34,20 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
   private Bitmap pauseImageBitmap;
   private Bitmap playImageBitmap;
   
-  public OODefaultMiniController(Context context, AttributeSet attrs) {
+  public DefaultCastMiniController(Context context, AttributeSet attrs) {
     super(context, attrs);
     
     this.DP = (int)context.getResources().getDisplayMetrics().density;
     
-    pauseImageBitmap = OOCastUtils.getDarkChromecastPauseButton();
-    playImageBitmap = OOCastUtils.getDarkChromecastPlayButton();
+    pauseImageBitmap = CastUtils.getDarkChromecastPauseButton();
+    playImageBitmap = CastUtils.getDarkChromecastPlayButton();
 
     constructContainer(context);
     setupCallbacks();
   }
   
-  public void setCastManager(OOCastManager castManager) {
-    this.castManager = new WeakReference<OOCastManager>(castManager);
+  public void setCastManager(CastManager castManager) {
+    this.castManager = new WeakReference<CastManager>(castManager);
   }
   
   private void constructContainer(Context context) {
@@ -125,7 +123,7 @@ public class OODefaultMiniController extends RelativeLayout implements com.ooyal
         @Override
         public void onClick(View v) {
           DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
-          OOCastPlayer castPlayer = castManager.get().getCastPlayer();
+          CastPlayer castPlayer = castManager.get().getCastPlayer();
           State state = castPlayer.getState();
           DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
           if (state == State.PLAYING){
