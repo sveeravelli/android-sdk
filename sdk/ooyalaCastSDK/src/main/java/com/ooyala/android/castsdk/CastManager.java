@@ -341,7 +341,6 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
     if (!miniControllers.contains(miniController)) {
       miniControllers.add(miniController);
     }
-    miniController.setCastManager(castManager);
   }
 
   public void updateMiniControllersState() {

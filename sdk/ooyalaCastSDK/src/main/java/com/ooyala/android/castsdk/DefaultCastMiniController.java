@@ -22,7 +22,6 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
 
   private static final String TAG = "OODefaultMiniController";
 
-  private WeakReference<CastManager> castManager;
 
   private final int DP;
   
@@ -44,10 +43,6 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
 
     constructContainer(context);
     setupCallbacks();
-  }
-  
-  public void setCastManager(CastManager castManager) {
-    this.castManager = new WeakReference<CastManager>(castManager);
   }
   
   private void constructContainer(Context context) {
@@ -122,8 +117,8 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
 
         @Override
         public void onClick(View v) {
-          DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
-          CastPlayer castPlayer = castManager.get().getCastPlayer();
+          DebugMode.assertCondition((CastManager.getCastManager().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
+          CastPlayer castPlayer = CastManager.getCastManager().getCastPlayer();
           State state = castPlayer.getState();
           DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
           if (state == State.PLAYING){
@@ -139,7 +134,7 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
       @Override
       public void onClick(View v) {
         DebugMode.logD(TAG, "Mini Controller is clicked.");
-        if (castManager.get().getTargetActivity() != null) {
+        if (CastManager.getCastManager().getTargetActivity() != null) {
           try {
             onTargetActivityInvoked(getContext());
           } catch (Exception e) {
@@ -152,8 +147,8 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
 
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
       NoConnectionException {
-    Intent intent = new Intent(context, castManager.get().getTargetActivity());
-    intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
+    Intent intent = new Intent(context, CastManager.getCastManager().getTargetActivity());
+    intent.putExtra("embedcode", CastManager.getCastManager().getCastPlayer().getEmbedCode());
     context.startActivity(intent);
   }
   
@@ -185,9 +180,9 @@ public class DefaultCastMiniController extends RelativeLayout implements CastMin
 
   private void updateUIInfo() {
     DebugMode.logD(TAG, "Update MiniController UI Info");
-    title.setText(castManager.get().getCastPlayer().getCastItemTitle());
-    subTitle.setText(castManager.get().getCastPlayer().getCastItemDescription());
-    setIcon(castManager.get().getCastPlayer().getCastImageBitmap());
+    title.setText(CastManager.getCastManager().getCastPlayer().getCastItemTitle());
+    subTitle.setText(CastManager.getCastManager().getCastPlayer().getCastItemDescription());
+    setIcon(CastManager.getCastManager().getCastPlayer().getCastImageBitmap());
   }
 }
 
