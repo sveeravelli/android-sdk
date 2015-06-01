@@ -130,12 +130,13 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
    */
   public void addCastButton(Activity activity, Menu menu) {
     DebugMode.logD(TAG, "Add Cast Button");
+    this.setCurrentContext(activity);
     activity.getMenuInflater().inflate(R.menu.main, menu);
     MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
     MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider)
             MenuItemCompat.getActionProvider(mediaRouteMenuItem);
     mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
-    mediaRouteActionProvider.setDialogFactory(new CastMediaRouteDialogFactory(this));
+    mediaRouteActionProvider.setDialogFactory(new CastMediaRouteDialogFactory());
   }
 
   public void setCastView(View view) {

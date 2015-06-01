@@ -1,20 +1,19 @@
 package com.ooyala.android.castsdk;
 
-import java.lang.ref.WeakReference;
+import com.ooyala.android.util.DebugMode;
 
 public class CastMediaRouteDialogFactory extends android.support.v7.app.MediaRouteDialogFactory {
-
-  private WeakReference<CastManager> castManager;
+  private static final String TAG = "CastMediaRouteDialogFactory";
+  private CastManager castManager;
   
-  public CastMediaRouteDialogFactory(CastManager castManager) {
+  public CastMediaRouteDialogFactory() {
     super();
-    this.castManager = new WeakReference<CastManager>(castManager);
   }
   
   @Override
   public CastMediaRouteControllerDialogFragment onCreateControllerDialogFragment() {
+    DebugMode.logD(TAG, "onCreateControllerDialogFragment");
     CastMediaRouteControllerDialogFragment mediarouteControllerDialogFragment =  new CastMediaRouteControllerDialogFragment();
-    mediarouteControllerDialogFragment.setCastManager(this.castManager.get());
     return mediarouteControllerDialogFragment;
   }
 

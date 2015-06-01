@@ -16,17 +16,13 @@ import android.widget.TextView;
 
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
-import com.google.sample.castcompanionlibrary.utils.LogUtils;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer.State;
-
-import java.lang.ref.WeakReference;
+import com.ooyala.android.util.DebugMode;
 
 public class CastMediaRouteControllerDialog extends android.support.v7.app.MediaRouteControllerDialog implements CastMiniController {
   
-  private static final String TAG = LogUtils.makeLogTag(android.support.v7.app.MediaRouteControllerDialog.class);
-  
-  private WeakReference<CastManager> castManager;
+  private static final String TAG = "CastMediaRouteControllerDialog";
+
   private State state;
 
   private final int DP;
@@ -41,32 +37,24 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
   private RelativeLayout iconContainer;
   private LinearLayout textContainer;
   
-  public CastMediaRouteControllerDialog(Context context, CastManager castManager) {
+  public CastMediaRouteControllerDialog(Context context) {
     super(context);
-    this.castManager = new WeakReference<CastManager>(castManager);
-
     this.DP = (int)context.getResources().getDisplayMetrics().density;
     this.context = context;
   }
 
   @Override
   public View onCreateMediaControlView(Bundle savedInstanceState) {
-      DebugMode.logE(TAG, "onCreateMediaControlView");
+      DebugMode.logE(TAG, "onCreateMediaControlView for dialog = " + this);
       constructMainContainer();
-      if (castManager.get().getCastPlayer() != null) {
-        state = castManager.get().getCastPlayer().getState();
-        castManager.get().addMiniController(this);
+      if (CastManager.getCastManager() != null && CastManager.getCastManager().getCastPlayer() != null) {
+        state = CastManager.getCastManager().getCastPlayer().getState();
+        CastManager.getCastManager().addMiniController(this);
       }
       updatePlayPauseButtonImage(state == State.PLAYING);
       setupCallbacks();
       updateMetadata();
       return mainContainer;
-  }
-
-  @Override
-  public void setCastManager(CastManager castManager) {
-    DebugMode.logD(TAG, "set CastManager to " + castManager);
-    this.castManager = new WeakReference<CastManager>(castManager);
   }
   
   private void constructMainContainer() {
@@ -176,9 +164,9 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
   @Override
   public void dismiss() {
     super.dismiss();
-    DebugMode.logE(TAG, "Dismiss Dialog");
-    if (castManager != null) {
-      castManager.get().removeMiniController(this);
+    DebugMode.logD(TAG, "Dismiss Dialog");
+    if (CastManager.getCastManager() != null) {
+      CastManager.getCastManager().removeMiniController(this);
     }
   }
   
@@ -188,8 +176,8 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
 
         @Override
         public void onClick(View v) {
-          DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
-          CastPlayer castPlayer = castManager.get().getCastPlayer();
+          DebugMode.assertCondition((CastManager.getCastManager().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
+          CastPlayer castPlayer = CastManager.getCastManager().getCastPlayer();
           State state = castPlayer.getState();
           DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
           if (state == State.PLAYING){
@@ -205,7 +193,7 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
         @Override
         public void onClick(View v) {
           DebugMode.logD(TAG, "Cast menu mini controller is clicked");
-          if (castManager.get().getTargetActivity() != null) {
+          if (CastManager.getCastManager().getTargetActivity() != null) {
             try {
               onTargetActivityInvoked(getContext());
             } catch (Exception e) {
@@ -219,11 +207,11 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
   
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
   NoConnectionException {
-    if (castManager.get().getCurrentActivity() == castManager.get().getTargetActivity()) {
+    if (CastManager.getCastManager().getCurrentActivity() == CastManager.getCastManager().getTargetActivity()) {
       DebugMode.logD(TAG, "Already in the target activity");
      } else {
-      Intent intent = new Intent(context, castManager.get().getTargetActivity());
-      intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
+      Intent intent = new Intent(context, CastManager.getCastManager().getTargetActivity());
+      intent.putExtra("embedcode", CastManager.getCastManager().getCastPlayer().getEmbedCode());
       context.startActivity(intent);
      }
     dismiss();
@@ -231,13 +219,13 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
   
   private void updateMetadata() {
     // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
-    if (!castManager.get().isInCastMode() || castManager.get().getCastPlayer().getState() == State.COMPLETED) {
+    if (!CastManager.getCastManager().isInCastMode() || CastManager.getCastManager().getCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
     } else {
       hideControls(false);
-      title.setText(castManager.get().getCastPlayer().getCastItemTitle());
-      subTitle.setText(castManager.get().getCastPlayer().getCastItemDescription());
-      setIcon(castManager.get().getCastPlayer().getCastImageBitmap());
+      title.setText(CastManager.getCastManager().getCastPlayer().getCastItemTitle());
+      subTitle.setText(CastManager.getCastManager().getCastPlayer().getCastItemDescription());
+      setIcon(CastManager.getCastManager().getCastPlayer().getCastImageBitmap());
     }
 }
   
@@ -259,7 +247,7 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
   }
 
   public void updatePlayPauseButtonImage(boolean isPlaying) {
-    if (castManager.get().getCastPlayer() != null) {
+    if (CastManager.getCastManager().getCastPlayer() != null) {
       if (isPlaying) {
         pausePlay.setImageBitmap(CastUtils.getDarkChromecastPauseButton());
         pausePlay.setVisibility(View.VISIBLE);
