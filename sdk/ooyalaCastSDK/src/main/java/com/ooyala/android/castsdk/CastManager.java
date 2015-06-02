@@ -31,6 +31,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
+import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -286,21 +287,21 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
     return isInCastMode;
   }
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator) {
     DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
-    initCastPlayer(embedCode, playheadTimeInMillis, isPlaying);
+    initCastPlayer(embedCode, playheadTimeInMillis, isPlaying, CastUtils.blockingGetEmbedTokenForEmbedCode(generator, embedCode));
     displayCastView();
     isInCastMode = true;
   }
 
-  private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
     castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-    castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying);
+    castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying, embedToken);
   }
 
   private void exitCastMode() {

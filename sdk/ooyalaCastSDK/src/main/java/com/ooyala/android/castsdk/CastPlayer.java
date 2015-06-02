@@ -169,14 +169,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode: " + embedCode + " playhead time: " + playheadTimeInMillis + ", isPlaying: "
         + isPlaying);
     if (initWithTheCastingContent(embedCode)) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
       this.embedCode = embedCode;
-      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
+      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying, embedToken);
       sendMessage(initialPlayMessage);
       setCurrentTime(playheadTimeInMillis);
     }
@@ -186,7 +186,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying) {
+  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     float playheadTime = playheadTimeInMillis / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
@@ -198,6 +198,11 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       } else {
         playerParams.put("autoplay", false);
       }
+
+      if (embedToken != null) {
+        playerParams.put("embedToken", embedToken);
+      }
+
       dataParams.put("ec", ec);
       dataParams.put("version", version);
       dataParams.put("params", playerParams.toString());

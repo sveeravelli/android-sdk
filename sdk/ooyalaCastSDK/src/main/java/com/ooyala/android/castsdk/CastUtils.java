@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,11 +14,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class CastUtils {
 
   /**
    * make JSON String to pass in information
+   *
    * @param action: Play/Pause/Seek
    * @return
    */
@@ -32,6 +41,7 @@ public class CastUtils {
 
   /**
    * Takes in a URL and decode the URL into a Bitmap
+   *
    * @param url
    * @return
    */
@@ -87,5 +97,31 @@ public class CastUtils {
     byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     return decodedByte;
+  }
+
+  public static String blockingGetEmbedTokenForEmbedCode(EmbedTokenGenerator generator, String embedCode) {
+    if (generator != null) {
+      final Semaphore sem = new Semaphore(0);
+      final Map<String, String> params = new HashMap<String, String>();
+      List<String> embedCodes = new ArrayList<String>();
+      embedCodes.add(embedCode);
+      generator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
+
+        @Override
+        public void setEmbedToken(String token) {
+          sem.release();
+          params.put("embedToken", token);
+        }
+      });
+      try {
+        sem.acquire();
+      } catch (InterruptedException e) {
+        return null;
+      }
+      return params.get("embedToken");
+    }
+    else {
+      return null;
+    }
   }
 }

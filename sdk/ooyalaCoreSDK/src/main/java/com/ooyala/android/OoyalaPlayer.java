@@ -204,6 +204,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
+  private EmbedTokenGenerator _embedTokenGenerator = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -247,6 +248,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator, options);
     _actionAtEnd = ActionAtEnd.CONTINUE;
     _options = options == null ? new Options.Builder().build() : options;
+    _embedTokenGenerator = generator;
 
     // Initialize Ad Players
     _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
@@ -1929,7 +1931,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
+    _castManager.enterCastMode(embedCode, playheadTime, isPlaying, _embedTokenGenerator);
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
