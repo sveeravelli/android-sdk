@@ -21,7 +21,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class CastUtils {
-  private static String TAG = "CastUtils";
+  private static String TAG = CastUtils.class.getSimpleName();
   /**
    * make JSON String to pass in information
    *
@@ -116,8 +116,8 @@ public class CastUtils {
 
         @Override
         public void setEmbedToken(String token) {
-          sem.release();
           tokenReference.set(token);
+          sem.release();
         }
       });
       try {
