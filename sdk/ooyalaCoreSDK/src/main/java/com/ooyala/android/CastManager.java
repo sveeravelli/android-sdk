@@ -18,5 +18,5 @@ public interface CastManager {
 
   public boolean isInCastMode();
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying);
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator);
 }
