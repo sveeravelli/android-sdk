@@ -291,12 +291,12 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
     DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
-    initCastPlayer(embedCode, playheadTimeInMillis, isPlaying, CastUtils.blockingGetEmbedTokenForEmbedCode(generator, embedCode));
+    new CastManagerInitCastPlayerAsyncTask(this, embedCode, playheadTimeInMillis, isPlaying, generator).execute();
     displayCastView();
     isInCastMode = true;
   }
 
-  private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
+  void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     castPlayer.setSeekable(isPlayerSeekable);
     castPlayer.setOoyalaPlayer(ooyalaPlayer.get());

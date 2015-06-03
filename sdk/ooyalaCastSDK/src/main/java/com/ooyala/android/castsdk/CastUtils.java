@@ -99,38 +99,5 @@ public class CastUtils {
     return decodedByte;
   }
 
-  /**
-   * Block the current thread while getting the Ooyala Player Token
-   * @param generator an implemented EmbedTokenGenerator to generate an embed code, can be null
-   * @param embedCode the embed code which needs a generated embed token
-   * @return a string of the Ooyala Player Token, or null if there is no generator or an error
-   */
-  public static String blockingGetEmbedTokenForEmbedCode(EmbedTokenGenerator generator, String embedCode) {
-    if (generator != null) {
-      DebugMode.logD(TAG, "Requesting an OPT for Chromecast");
-      final Semaphore sem = new Semaphore(0);
-      final AtomicReference<String> tokenReference = new AtomicReference<>();
-      List<String> embedCodes = new ArrayList<>();
-      embedCodes.add(embedCode);
-      generator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
 
-        @Override
-        public void setEmbedToken(String token) {
-          tokenReference.set(token);
-          sem.release();
-        }
-      });
-      try {
-        sem.acquire();
-      } catch (InterruptedException e) {
-        DebugMode.logE(TAG, "Embed Token request was interrupted");
-        return null;
-      }
-      return tokenReference.get();
-    }
-    else {
-      DebugMode.logD(TAG, "No embed token generator to get an OPT");
-      return null;
-    }
-  }
 }

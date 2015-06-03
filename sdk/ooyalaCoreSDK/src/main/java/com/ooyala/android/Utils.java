@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +34,7 @@ public class Utils {
   static final String SEPARATOR_AMPERSAND = "&";
   static final String SEPARATOR_TIME = ":";
 
-  private static final String TAG = Utils.class.getName();
+  private static final String TAG = Utils.class.getSimpleName();
 
   public static String device() {
     // temporarily disable HLS
@@ -173,5 +175,38 @@ public class Utils {
     String encrypted = Base64.encodeToString(digest.digest(bytes),
         Base64.DEFAULT);
     return encrypted;
+  }
+
+  /**
+   * Block the current thread while getting the Ooyala Player Token
+   * @param generator an implemented EmbedTokenGenerator to generate an embed code, can be null
+   * @param embedCodes the List of embed codes which need a generated embed token
+   * @return a string of the Ooyala Player Token, or null if there is no generator or an error
+   */
+  public static String blockingGetEmbedTokenForEmbedCodes(EmbedTokenGenerator generator, List<String> embedCodes) {
+    if (generator != null) {
+      DebugMode.logD(TAG, "Requesting an OPT for Chromecast");
+      final Semaphore sem = new Semaphore(0);
+      final AtomicReference<String> tokenReference = new AtomicReference<String>();
+      generator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
+
+        @Override
+        public void setEmbedToken(String token) {
+          tokenReference.set(token);
+          sem.release();
+        }
+      });
+      try {
+        sem.acquire();
+      } catch (InterruptedException e) {
+        DebugMode.logE(TAG, "Embed Token request was interrupted");
+        return null;
+      }
+      return tokenReference.get();
+    }
+    else {
+      DebugMode.logD(TAG, "No embed token generator to get an OPT");
+      return null;
+    }
   }
 }
