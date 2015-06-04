@@ -13,14 +13,16 @@ public class EmbeddedSignatureGenerator implements SignatureGenerator {
 
   /**
    * Generate the APIv2/SAS style signature
-   * @par This method should do the following:
-   * @li Prepend the secret key to data
-   * @li Hash the resulting string using the SHA256 algorithm
-   * @li Base64 encode the resulting hash
-   * @li Convert the Base64 encoded hash to a String
-   * @li Truncate the String to 43 characters
-   * @li Strip any '=' characters from the end of the truncated String
-   * @li Return the resulting String
+   * This method should do the following:
+   * <ul>
+   * <li> Prepend the secret key to data
+   * <li> Hash the resulting string using the SHA256 algorithm
+   * <li> Base64 encode the resulting hash
+   * <li> Convert the Base64 encoded hash to a String
+   * <li> Truncate the String to 43 characters
+   * <li> Strip any '=' characters from the end of the truncated String
+   * <li> Return the resulting String
+   * </ul>
    * @param data the String to create the signature from (not prepended with the secret key)
    * @return String containing the signature
    */
