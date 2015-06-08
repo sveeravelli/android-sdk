@@ -150,7 +150,7 @@ public class CastMediaRouteControllerDialog extends android.support.v7.app.Media
     emptyText = new TextView(context);
     emptyText.setId(4);
     LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(Gravity.CENTER);
+//    layoutParams.addRule(Gravity.CENTER);  Removed because it crashes 4.1.x devices
     layoutParams.setMargins(0, 10 * DP, 0, 10 *DP);
     emptyText.setTextColor(Color.WHITE);
     emptyText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
