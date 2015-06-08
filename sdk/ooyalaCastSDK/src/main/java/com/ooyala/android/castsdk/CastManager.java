@@ -298,10 +298,14 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
 
   void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
-    castPlayer.setSeekable(isPlayerSeekable);
-    castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
-    castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-    castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying, embedToken);
+    if (ooyalaPlayer != null) {
+      castPlayer.setSeekable(isPlayerSeekable);
+      castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
+      castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
+      castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying, embedToken);
+    } else {
+      DebugMode.logE(TAG, "Attempted to initCastPlayer while ooyalaPlayer is null");
+    }
   }
 
   private void exitCastMode() {
@@ -587,37 +591,5 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

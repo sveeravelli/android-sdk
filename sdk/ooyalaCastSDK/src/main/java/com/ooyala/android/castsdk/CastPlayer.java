@@ -223,14 +223,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
   
   public void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
-    if (player != null) {
+    if (player != null && player.getCurrentItem() != null) {
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
       castItemDescription = player.getCurrentItem().getDescription();
       seekable = player.seekable();
       loadIcon();
     } else {
-      DebugMode.logD(TAG, "OoyalaPlayer returns null when updateMetadata()");
+      DebugMode.logD(TAG, "OoyalaPlayer or currentItem returns null when updateMetadata()");
     }
   }
   

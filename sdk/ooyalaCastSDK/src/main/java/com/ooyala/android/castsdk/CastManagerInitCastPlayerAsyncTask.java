@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * An async task that can handle the blocking embed token generation needed to init the player
  */
-public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer, Void> {
+public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer, String> {
   CastManager manager;
   String embedCode;
   int playheadTime;
@@ -28,17 +28,18 @@ public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer,
   }
 
   @Override
-  protected Void doInBackground(Void...params) {
+  protected String doInBackground(Void...params) {
     List<String> embedCodes = new ArrayList<>();
     embedCodes.add(embedCode);
-
-    manager.initCastPlayer(embedCode, playheadTime, isPlaying, Utils.blockingGetEmbedTokenForEmbedCodes(embedTokenGenerator, embedCodes));
-    return null;
+    return Utils.blockingGetEmbedTokenForEmbedCodes(embedTokenGenerator, embedCodes);
   }
 
   @Override
-  protected void onPostExecute(Void aVoid) {
-    super.onPostExecute(aVoid);
+  protected void onPostExecute(String token) {
+    super.onPostExecute(token);
+    if (!isCancelled()) {
+      manager.initCastPlayer(embedCode, playheadTime, isPlaying, token);
+    }
   }
 
 }
