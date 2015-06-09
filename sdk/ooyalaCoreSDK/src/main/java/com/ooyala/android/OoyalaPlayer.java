@@ -1947,8 +1947,13 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", isPlayer = " + isPlaying);
     DebugMode.assertCondition(ec.equals(this.getEmbedCode()), TAG, "embedCode should be the same as the one in TV playback");
     if (_player == null) {
-      prepareContent(isPlaying);
-      _player.seekToTime(exitPlayheadTime);
+     if (prepareContent(isPlaying)) {
+       _player.seekToTime(exitPlayheadTime);
+     } else {
+       DebugMode.logE(TAG, "Player initialization failed");
+       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Player initialization failed");
+       onContentError();
+     }
     } else {
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
