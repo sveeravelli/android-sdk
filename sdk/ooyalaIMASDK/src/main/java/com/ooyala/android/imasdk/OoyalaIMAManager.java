@@ -105,7 +105,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
       @Override
       public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
         DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
-        if(timeoutThread.isAlive()) {
+        if(timeoutThread != null && timeoutThread.isAlive()) {
           timeoutThread.interrupt();
         }
         _adsManager = event.getAdsManager();
