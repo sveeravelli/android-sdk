@@ -1,16 +1,8 @@
 package com.ooyala.android.castsdk;
 
-public interface OOMiniController {
+public interface CastMiniController {
   
-  /**
-   * Set the current castManager to the current mini controller.
-   * This method should be called once you create a mini controller so that your mini controller
-   * can control the cast playback through castManager.
-   * This castManager is the interface between App and Chromecast SDK.
-   * @param castManager
-   */
-  public void setCastManager(OOCastManager castManager);
-  
+
   /**
    * Update the play/pause button image based on the given state.
    * For example if the given state is State.PLAYING the mini controller should display pauese button image otherwise the image should be play image

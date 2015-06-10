@@ -1,12 +1,11 @@
 package com.ooyala.android.castsdk;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import com.ooyala.android.OoyalaPlayer.State;
 
-public class OOBroadcastReceiver extends BroadcastReceiver {
+public class CastBroadcastReceiver extends android.content.BroadcastReceiver {
   
   // Same intent can be fired more than once and this is a device specific problem. 
   // So add the boolean variable to check if the current intent is the first intent
@@ -17,8 +16,8 @@ public class OOBroadcastReceiver extends BroadcastReceiver {
     final String action = intent.getAction();
     if (action != null && action.equals(Intent.ACTION_MEDIA_BUTTON)) {
       if (firstIntent == true) {
-        OOCastManager castManager = OOCastManager.getCastManager();
-        OOCastPlayer castPlayer = castManager.getCastPlayer();
+        CastManager castManager = CastManager.getCastManager();
+        CastPlayer castPlayer = castManager.getCastPlayer();
         if (castPlayer != null) {
           if (castPlayer.getState() == State.PLAYING) {
             castPlayer.pause();

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.MediaRouteControllerDialog;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -17,17 +16,13 @@ import android.widget.TextView;
 
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
-import com.google.sample.castcompanionlibrary.utils.LogUtils;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.util.DebugMode;
 
-import java.lang.ref.WeakReference;
+public class CastMediaRouteControllerDialog extends android.support.v7.app.MediaRouteControllerDialog implements CastMiniController {
+  
+  private static final String TAG = "CastMediaRouteControllerDialog";
 
-public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog implements OOMiniController {
-  
-  private static final String TAG = LogUtils.makeLogTag(MediaRouteControllerDialog.class);
-  
-  private WeakReference<OOCastManager> castManager;
   private State state;
 
   private final int DP;
@@ -42,32 +37,24 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   private RelativeLayout iconContainer;
   private LinearLayout textContainer;
   
-  public OOMediaRouteControllerDialog(Context context, OOCastManager castManager) {
+  public CastMediaRouteControllerDialog(Context context) {
     super(context);
-    this.castManager = new WeakReference<OOCastManager>(castManager);
-
     this.DP = (int)context.getResources().getDisplayMetrics().density;
     this.context = context;
   }
 
   @Override
   public View onCreateMediaControlView(Bundle savedInstanceState) {
-      DebugMode.logE(TAG, "onCreateMediaControlView");
+      DebugMode.logE(TAG, "onCreateMediaControlView for dialog = " + this);
       constructMainContainer();
-      if (castManager.get().getCastPlayer() != null) {
-        state = castManager.get().getCastPlayer().getState();
-        castManager.get().addMiniController(this);
+      if (CastManager.getCastManager() != null && CastManager.getCastManager().getCastPlayer() != null) {
+        state = CastManager.getCastManager().getCastPlayer().getState();
+        CastManager.getCastManager().addMiniController(this);
       }
       updatePlayPauseButtonImage(state == State.PLAYING);
       setupCallbacks();
       updateMetadata();
       return mainContainer;
-  }
-
-  @Override
-  public void setCastManager(OOCastManager castManager) {
-    DebugMode.logD(TAG, "set CastManager to " + castManager);
-    this.castManager = new WeakReference<OOCastManager>(castManager);
   }
   
   private void constructMainContainer() {
@@ -154,7 +141,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     layoutParams.setMargins(0, 0, 9 * DP, 0);
-    pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
+    pausePlay.setImageBitmap(CastUtils.getDarkChromecastPauseButton());
     pausePlay.setLayoutParams(layoutParams);
     mainContainer.addView(pausePlay);
   }
@@ -163,7 +150,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
     emptyText = new TextView(context);
     emptyText.setId(4);
     LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(Gravity.CENTER);
+//    layoutParams.addRule(Gravity.CENTER);  Removed because it crashes 4.1.x devices
     layoutParams.setMargins(0, 10 * DP, 0, 10 *DP);
     emptyText.setTextColor(Color.WHITE);
     emptyText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
@@ -177,9 +164,9 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   @Override
   public void dismiss() {
     super.dismiss();
-    DebugMode.logE(TAG, "Dismiss Dialog");
-    if (castManager != null) {
-      castManager.get().removeMiniController(this);
+    DebugMode.logD(TAG, "Dismiss Dialog");
+    if (CastManager.getCastManager() != null) {
+      CastManager.getCastManager().removeMiniController(this);
     }
   }
   
@@ -189,8 +176,8 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
 
         @Override
         public void onClick(View v) {
-          DebugMode.assertCondition((castManager.get().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
-          OOCastPlayer castPlayer = castManager.get().getCastPlayer();
+          DebugMode.assertCondition((CastManager.getCastManager().getCastPlayer() != null), TAG, "castPlayer should never be null when we have a mini controller");
+          CastPlayer castPlayer = CastManager.getCastManager().getCastPlayer();
           State state = castPlayer.getState();
           DebugMode.logD(TAG, "Play/Pause button is clicked in default mini controller with state = " + state);
           if (state == State.PLAYING){
@@ -206,7 +193,7 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
         @Override
         public void onClick(View v) {
           DebugMode.logD(TAG, "Cast menu mini controller is clicked");
-          if (castManager.get().getTargetActivity() != null) {
+          if (CastManager.getCastManager().getTargetActivity() != null) {
             try {
               onTargetActivityInvoked(getContext());
             } catch (Exception e) {
@@ -220,11 +207,11 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   
   private void onTargetActivityInvoked(Context context) throws TransientNetworkDisconnectionException,
   NoConnectionException {
-    if (castManager.get().getCurrentActivity() == castManager.get().getTargetActivity()) {
+    if (CastManager.getCastManager().getCurrentActivity() == CastManager.getCastManager().getTargetActivity()) {
       DebugMode.logD(TAG, "Already in the target activity");
      } else {
-      Intent intent = new Intent(context, castManager.get().getTargetActivity());
-      intent.putExtra("embedcode", castManager.get().getCastPlayer().getEmbedCode());
+      Intent intent = new Intent(context, CastManager.getCastManager().getTargetActivity());
+      intent.putExtra("embedcode", CastManager.getCastManager().getCastPlayer().getEmbedCode());
       context.startActivity(intent);
      }
     dismiss();
@@ -232,13 +219,13 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   
   private void updateMetadata() {
     // Currently we do not want to show a mini controller when the related playback is in "COMPLETED" state
-    if (!castManager.get().isInCastMode() || castManager.get().getCastPlayer().getState() == State.COMPLETED) {
+    if (!CastManager.getCastManager().isInCastMode() || CastManager.getCastManager().getCastPlayer().getState() == State.COMPLETED) {
         hideControls(true);
     } else {
       hideControls(false);
-      title.setText(castManager.get().getCastPlayer().getCastItemTitle());
-      subTitle.setText(castManager.get().getCastPlayer().getCastItemDescription());
-      setIcon(castManager.get().getCastPlayer().getCastImageBitmap());
+      title.setText(CastManager.getCastManager().getCastPlayer().getCastItemTitle());
+      subTitle.setText(CastManager.getCastManager().getCastPlayer().getCastItemDescription());
+      setIcon(CastManager.getCastManager().getCastPlayer().getCastImageBitmap());
     }
 }
   
@@ -260,12 +247,12 @@ public class OOMediaRouteControllerDialog extends MediaRouteControllerDialog imp
   }
 
   public void updatePlayPauseButtonImage(boolean isPlaying) {
-    if (castManager.get().getCastPlayer() != null) {
+    if (CastManager.getCastManager().getCastPlayer() != null) {
       if (isPlaying) {
-        pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPauseButton());
+        pausePlay.setImageBitmap(CastUtils.getDarkChromecastPauseButton());
         pausePlay.setVisibility(View.VISIBLE);
       } else {
-        pausePlay.setImageBitmap(OOCastUtils.getDarkChromecastPlayButton());
+        pausePlay.setImageBitmap(CastUtils.getDarkChromecastPlayButton());
         pausePlay.setVisibility(View.VISIBLE);
       }
     } else {

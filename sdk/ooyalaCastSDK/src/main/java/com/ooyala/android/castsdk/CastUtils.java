@@ -4,6 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
+import com.ooyala.android.EmbedTokenGenerator;
+import com.ooyala.android.EmbedTokenGeneratorCallback;
+import com.ooyala.android.util.DebugMode;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,11 +15,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class OOCastUtils {
-
+public class CastUtils {
+  private static String TAG = CastUtils.class.getSimpleName();
   /**
    * make JSON String to pass in information
+   *
    * @param action: Play/Pause/Seek
    * @return
    */
@@ -32,6 +41,7 @@ public class OOCastUtils {
 
   /**
    * Takes in a URL and decode the URL into a Bitmap
+   *
    * @param url
    * @return
    */
@@ -88,4 +98,6 @@ public class OOCastUtils {
     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     return decodedByte;
   }
+
+
 }

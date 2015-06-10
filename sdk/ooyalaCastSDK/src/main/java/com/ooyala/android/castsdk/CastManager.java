@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +31,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
-import com.ooyala.android.CastManager;
+import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -44,12 +43,12 @@ import java.util.Set;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class OOCastManager extends DataCastManager implements CastManager {
+public class CastManager extends DataCastManager implements com.ooyala.android.CastManager {
   private static final String TAG = "CastManager";
 
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
-  private static OOCastManager castManager;
+  private static CastManager castManager;
   private static Class<?> targetActivity;
   private static Class<?> currentActivity;
   private static Context currentContext;
@@ -58,7 +57,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private static int notificationImageResourceId;
 
   private NotificationCompat.Builder notificationBuilder;
-  private BroadcastReceiver receiver;
+  private android.content.BroadcastReceiver receiver;
   private AudioManager audioManager;
   private RemoteControlClient remoteControlClient;
   private int notificationID = 001;
@@ -66,21 +65,21 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   private View castView;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
-  private OOCastPlayer castPlayer;
-  private Set<OOMiniController> miniControllers;
+  private CastPlayer castPlayer;
+  private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
   private boolean isPlayerSeekable = true;
   private boolean isInCastMode;
 
-  public static OOCastManager initialize(Context context, String applicationId, String namespace) {
+  public static CastManager initialize(Context context, String applicationId, String namespace) {
     String[] namespaces = {namespace};
     notificationMiniControllerResourceId = R.layout.oo_default_notification;
     notificationImageResourceId = R.drawable.ic_ooyala;
-    return OOCastManager.initialize(context, applicationId, namespaces);
+    return CastManager.initialize(context, applicationId, namespaces);
   }
   
-  public static OOCastManager initialize(Context context, String applicationId, String... namespaces) {
+  public static CastManager initialize(Context context, String applicationId, String... namespaces) {
     DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
     if (null == castManager) {
         DebugMode.logD(TAG, "Create a new OOCastManager");
@@ -89,19 +88,19 @@ public class OOCastManager extends DataCastManager implements CastManager {
             LOGE(TAG, msg);
             throw new RuntimeException(msg);
         }
-        castManager = new OOCastManager(context, applicationId, namespaces);
+        castManager = new CastManager(context, applicationId, namespaces);
         mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
     }
     return castManager;
   }
   
-  public static OOCastManager getCastManager() {
+  public static CastManager getCastManager() {
     return castManager;
   }
   
-  protected OOCastManager(Context context, String applicationId, String[] namespaces) {
+  protected CastManager(Context context, String applicationId, String[] namespaces) {
     super(context, applicationId, namespaces);
-    OOCastManager.namespace = namespaces[0];
+    CastManager.namespace = namespaces[0];
   }
 
   public void destroy(Context context) {
@@ -132,12 +131,13 @@ public class OOCastManager extends DataCastManager implements CastManager {
    */
   public void addCastButton(Activity activity, Menu menu) {
     DebugMode.logD(TAG, "Add Cast Button");
+    this.setCurrentContext(activity);
     activity.getMenuInflater().inflate(R.menu.main, menu);
     MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
     MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider)
             MenuItemCompat.getActionProvider(mediaRouteMenuItem);
     mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
-    mediaRouteActionProvider.setDialogFactory(new OOMediaRouteDialogFactory(this));
+    mediaRouteActionProvider.setDialogFactory(new CastMediaRouteDialogFactory());
   }
 
   public void setCastView(View view) {
@@ -200,7 +200,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     return miniControllerDefaultImageBitmap;
   }
 
-  public OOCastPlayer getCastPlayer() {
+  public CastPlayer getCastPlayer() {
     return this.castPlayer;
   }
 
@@ -256,9 +256,9 @@ public class OOCastManager extends DataCastManager implements CastManager {
     }
   }
 
-  private OOCastPlayer createNewCastPlayer() {
+  private CastPlayer createNewCastPlayer() {
     DebugMode.logD(TAG, "Create new CastPlayer");
-    return new OOCastPlayer(this);
+    return new CastPlayer(this);
   }
   
   @Override
@@ -287,21 +287,25 @@ public class OOCastManager extends DataCastManager implements CastManager {
     return isInCastMode;
   }
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator) {
     DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
-    initCastPlayer(embedCode, playheadTimeInMillis, isPlaying);
+    new CastManagerInitCastPlayerAsyncTask(this, embedCode, playheadTimeInMillis, isPlaying, generator).execute();
     displayCastView();
     isInCastMode = true;
   }
 
-  private void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
-    castPlayer.setSeekable(isPlayerSeekable);
-    castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
-    castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-    castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying);
+    if (ooyalaPlayer != null) {
+      castPlayer.setSeekable(isPlayerSeekable);
+      castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
+      castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
+      castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying, embedToken);
+    } else {
+      DebugMode.logE(TAG, "Attempted to initCastPlayer while ooyalaPlayer is null");
+    }
   }
 
   private void exitCastMode() {
@@ -319,7 +323,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
 
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {
-   super.sendDataMessage(message, OOCastManager.namespace);
+   super.sendDataMessage(message, CastManager.namespace);
   }
 
   @Override
@@ -334,15 +338,14 @@ public class OOCastManager extends DataCastManager implements CastManager {
   /*========== MiniController ==================================================================*/
   /*============================================================================================*/
 
-  public void addMiniController(OOMiniController miniController) {
+  public void addMiniController(CastMiniController miniController) {
     DebugMode.logD(TAG, "Add mini controller " + miniController);
     if (miniControllers == null) {
-      miniControllers = new HashSet<OOMiniController>();
+      miniControllers = new HashSet<CastMiniController>();
     }
     if (!miniControllers.contains(miniController)) {
       miniControllers.add(miniController);
     }
-    miniController.setCastManager(castManager);
   }
 
   public void updateMiniControllersState() {
@@ -351,14 +354,14 @@ public class OOCastManager extends DataCastManager implements CastManager {
       if (castPlayer.getState() == State.COMPLETED) {
         dismissMiniControllers();
       } else {
-        for (OOMiniController miniController : miniControllers) {
+        for (CastMiniController miniController : miniControllers) {
           miniController.updatePlayPauseButtonImage(castPlayer.getState() == State.PLAYING);
         }
       }
     }
   }
   
-  public void removeMiniController(OOMiniController miniController) {
+  public void removeMiniController(CastMiniController miniController) {
     DebugMode.logD(TAG, "Remove mini controller " + miniController);
     if (miniControllers != null) {
       miniControllers.remove(miniController);
@@ -375,7 +378,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
   private void dismissMiniControllers() {
     DebugMode.logD(TAG, "dismiss mini controllers");
     if (miniControllers != null) {
-      for (OOMiniController miniController : miniControllers) {
+      for (CastMiniController miniController : miniControllers) {
         miniController.dismiss();
       }
     }
@@ -434,7 +437,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
     filter.addAction(ACTION_STOP);
     
     if (receiver == null) {
-      receiver = new BroadcastReceiver() {
+      receiver = new android.content.BroadcastReceiver() {
         
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -473,15 +476,15 @@ public class OOCastManager extends DataCastManager implements CastManager {
   
   private void buildNotificationService(Context context, boolean shouldDisplayPlayButton) {
     // Create notification View
-    RemoteViews notificationView = new RemoteViews(context.getPackageName(), OOCastManager.notificationMiniControllerResourceId);
+    RemoteViews notificationView = new RemoteViews(context.getPackageName(), CastManager.notificationMiniControllerResourceId);
     notificationView.setTextViewText(R.id.OOTitleView, getCastPlayer().getCastItemTitle());
     notificationView.setTextViewText(R.id.OOSubtitleView, getDeviceName());
     notificationView.setImageViewBitmap(R.id.OOIconView, getCastPlayer().getCastImageBitmap());
 
     if (shouldDisplayPlayButton) {
-      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, OOCastUtils.getLightChromecastPlayButton());
+      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, CastUtils.getLightChromecastPlayButton());
     } else {
-      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, OOCastUtils.getLightChromecastPauseButton());
+      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, CastUtils.getLightChromecastPauseButton());
     }
 
     // Set the result intent so the user can navigate to the target activity by clicking the notification view
@@ -538,7 +541,7 @@ public class OOCastManager extends DataCastManager implements CastManager {
           // Request permanent focus.
           AudioManager.AUDIOFOCUS_GAIN);
 
-      ComponentName myEventReceiver = new ComponentName(context, OOBroadcastReceiver.class);
+      ComponentName myEventReceiver = new ComponentName(context, CastBroadcastReceiver.class);
       audioManager.registerMediaButtonEventReceiver(myEventReceiver);
       if (remoteControlClient == null) {
           Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
@@ -588,37 +591,5 @@ public class OOCastManager extends DataCastManager implements CastManager {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

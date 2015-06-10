@@ -216,19 +216,7 @@ class PlayerAPIClient {
     }
 
     if (_embedTokenGenerator != null) {
-      final Semaphore sem = new Semaphore(0);
-      _embedTokenGenerator.getTokenForEmbedCodes(embedCodes, new EmbedTokenGeneratorCallback() {
-        @Override
-        public void setEmbedToken(String token) {
-          params.put("embedToken", token);
-          sem.release();
-        }
-      });
-      try {
-        sem.acquire();
-      } catch (InterruptedException e) {
-        return params;
-      }
+      params.put("embedToken", Utils.blockingGetEmbedTokenForEmbedCodes(_embedTokenGenerator, embedCodes));
     }
     return params;
   }

@@ -204,6 +204,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
+  private EmbedTokenGenerator _embedTokenGenerator = null;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -247,6 +248,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playerAPIClient = new PlayerAPIClient(pcode, domain, generator, options);
     _actionAtEnd = ActionAtEnd.CONTINUE;
     _options = options == null ? new Options.Builder().build() : options;
+    _embedTokenGenerator = generator;
 
     // Initialize Ad Players
     _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
@@ -1929,7 +1931,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(embedCode, playheadTime, isPlaying);
+    _castManager.enterCastMode(embedCode, playheadTime, isPlaying, _embedTokenGenerator);
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
@@ -1945,8 +1947,13 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", isPlayer = " + isPlaying);
     DebugMode.assertCondition(ec.equals(this.getEmbedCode()), TAG, "embedCode should be the same as the one in TV playback");
     if (_player == null) {
-      prepareContent(isPlaying);
-      _player.seekToTime(exitPlayheadTime);
+     if (prepareContent(isPlaying)) {
+       _player.seekToTime(exitPlayheadTime);
+     } else {
+       DebugMode.logE(TAG, "Player initialization failed");
+       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Player initialization failed");
+       onContentError();
+     }
     } else {
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);

@@ -7,4 +7,5 @@
 -link http://docs.oracle.com/javase/6/docs/api/
 -public
 -sourcepath src/main/java
-src/main/java/com/ooyala/android/castsdk/OOCastManager.java
+src/main/java/com/ooyala/android/castsdk/CastManager.java
+src/main/java/com/ooyala/android/castsdk/CastPlayer.java

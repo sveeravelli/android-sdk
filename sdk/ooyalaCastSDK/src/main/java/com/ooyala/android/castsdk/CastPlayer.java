@@ -18,10 +18,10 @@ import java.util.Observable;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class OOCastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
+public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
  
-  private WeakReference<OOCastManager> castManager;
+  private WeakReference<CastManager> castManager;
   
   private String embedCode;
   private int duration;
@@ -39,8 +39,8 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   private Bitmap castImageBitmap;
   
   
-  public OOCastPlayer(OOCastManager castManager) {
-    this.castManager = new WeakReference<OOCastManager>(castManager);
+  public CastPlayer(CastManager castManager) {
+    this.castManager = new WeakReference<CastManager>(castManager);
   }
 
   public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
@@ -62,14 +62,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   public void pause() {
     DebugMode.logD(TAG, "pause()");
     setState(State.PAUSED);
-    sendMessage(OOCastUtils.makeActionJSON("pause"));
+    sendMessage(CastUtils.makeActionJSON("pause"));
   }
 
   @Override
   public void play() {
     DebugMode.logD(TAG, "play()");
     setState(State.PLAYING);
-    sendMessage(OOCastUtils.makeActionJSON("play"));
+    sendMessage(CastUtils.makeActionJSON("play"));
   }
 
   @Override
@@ -169,14 +169,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying) {
+  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode: " + embedCode + " playhead time: " + playheadTimeInMillis + ", isPlaying: "
         + isPlaying);
     if (initWithTheCastingContent(embedCode)) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
       this.embedCode = embedCode;
-      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying);
+      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying, embedToken);
       sendMessage(initialPlayMessage);
       setCurrentTime(playheadTimeInMillis);
     }
@@ -186,7 +186,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying) {
+  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
     float playheadTime = playheadTimeInMillis / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
@@ -198,6 +198,11 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
       } else {
         playerParams.put("autoplay", false);
       }
+
+      if (embedToken != null) {
+        playerParams.put("embedToken", embedToken);
+      }
+
       dataParams.put("ec", ec);
       dataParams.put("version", version);
       dataParams.put("params", playerParams.toString());
@@ -218,14 +223,14 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   }
   
   public void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
-    if (player != null) {
+    if (player != null && player.getCurrentItem() != null) {
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
       castItemDescription = player.getCurrentItem().getDescription();
       seekable = player.seekable();
       loadIcon();
     } else {
-      DebugMode.logD(TAG, "OoyalaPlayer returns null when updateMetadata()");
+      DebugMode.logD(TAG, "OoyalaPlayer or currentItem returns null when updateMetadata()");
     }
   }
   
@@ -261,7 +266,7 @@ public class OOCastPlayer extends Observable implements PlayerInterface, LifeCyc
   
   private void getReceiverPlayerState() {
     DebugMode.logD(TAG, "getReceiverPlayerState");
-    sendMessage(OOCastUtils.makeActionJSON("getstatus"));
+    sendMessage(CastUtils.makeActionJSON("getstatus"));
   }
   
   public void receivedMessage(String message) {
