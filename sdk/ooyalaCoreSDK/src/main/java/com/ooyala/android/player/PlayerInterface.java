@@ -70,4 +70,13 @@ public interface PlayerInterface {
    * @param percent The percent of scrubber the cursor ends after seek 
    */
   public void seekToPercentLive(int percent);
+
+  /**
+   * Set the displayed closed captions language.
+   *
+   * @param language
+   *          2 letter country code of the language to display or nil to hide
+   *          closed captions
+   */
+  public void setClosedCaptionsLanguage(String language);
 }

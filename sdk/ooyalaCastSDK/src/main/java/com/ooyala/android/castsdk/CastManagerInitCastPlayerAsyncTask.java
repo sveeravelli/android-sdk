@@ -17,14 +17,16 @@ public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer,
   int playheadTime;
   boolean isPlaying;
   EmbedTokenGenerator embedTokenGenerator;
+  String ccLanguage;
 
-  public CastManagerInitCastPlayerAsyncTask(CastManager manager, String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator) {
+  public CastManagerInitCastPlayerAsyncTask(CastManager manager, String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator, String ccLanguage) {
     super();
     this.manager = manager;
     this.embedCode = embedCode;
     this.playheadTime = playheadTimeInMillis;
     this.isPlaying = isPlaying;
     this.embedTokenGenerator = generator;
+    this.ccLanguage = ccLanguage;
   }
 
   @Override
@@ -38,7 +40,7 @@ public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer,
   protected void onPostExecute(String token) {
     super.onPostExecute(token);
     if (!isCancelled()) {
-      manager.initCastPlayer(embedCode, playheadTime, isPlaying, token);
+      manager.initCastPlayer(embedCode, playheadTime, isPlaying, token, ccLanguage);
     }
   }
 

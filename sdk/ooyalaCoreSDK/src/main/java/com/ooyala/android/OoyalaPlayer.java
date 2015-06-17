@@ -103,6 +103,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
   public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
   public static final String CONTENT_TREE_READY_NOTIFICATION = "contentTreeReady";
+  public static final String CLOSED_CAPTIONS_LANGUAGE_CHANGED = "closedCaptionsLanguageChanged";
   public static final String AUTHORIZATION_READY_NOTIFICATION = "authorizationReady";
   public static final String ERROR_NOTIFICATION = "error";
   public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
@@ -175,6 +176,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     Environment.setEnvironment(e);
   }
 
+  static public boolean isLiveClosedCaptionsLanguage( String cc ) {
+    return OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals( cc );
+  }
+
   private static final String TAG = OoyalaPlayer.class.getName();
 
   private final Handler _handler = new Handler();
@@ -199,8 +204,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   private final Map<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>> _adPlayers;
   private String _customDRMData = null;
   private String _tvRatingAdNotification;
+  private String _closedCaptionLanguage;
   private AdPluginManager _adManager = null;
-  private CastManager _castManager;
+  private CastManagerInterface _castManager;
   private MoviePlayer _player = null;
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
@@ -750,28 +756,19 @@ public class OoyalaPlayer extends Observable implements Observer,
     p.init(this, streams);
 
     p.setLive(item.isLive());
-    p.setLiveClosedCaptionsEnabled( getShouldShowLiveClosedCaptions() );
+    p.setClosedCaptionsLanguage(_closedCaptionLanguage);
 
     // Player must have been initialized, as well as player's basePlayer, in
     // order to continue
     if (p == null || p.getError() != null) {
       DebugMode.assertFail(TAG,
-          "movie player has an error when initialze player");
+          "movie player has an error when initialize player");
       return null;
     }
     p.setSeekable(_seekable);
     return p;
   }
 
-  private boolean getShouldShowLiveClosedCaptions() {
-    boolean should = false;
-    if( _layoutController instanceof AbstractOoyalaPlayerLayoutController ) {
-      final AbstractOoyalaPlayerLayoutController aoplc = (AbstractOoyalaPlayerLayoutController)_layoutController;
-      should = aoplc.getShouldShowLiveClosedCaptions();
-    }
-    return should;
-  }
-  
   private void cleanupPlayers() {
     if (_authHeartbeat != null) {
       _authHeartbeat.stop();
@@ -1491,13 +1488,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  public void setLiveClosedCaptionsEnabled(boolean enabled) {
-    if (_player != null && _player.isLiveClosedCaptionsAvailable()) {
-      _player.setLiveClosedCaptionsEnabled(enabled);
-    } else {
-      DebugMode.logE(TAG, "set live closed captions failed, no live CC available");
-    }
-  }
   /**
    * @return get the bitrate of the current item
    */
@@ -1840,10 +1830,10 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   /**
    * Resgister a castManager
-   * @param castManager
+   * @param castManagerInterface
    */
-  public void registerCastManager(CastManager castManager) {
-    _castManager = castManager;
+  public void registerCastManager(CastManagerInterface castManagerInterface) {
+    _castManager = castManagerInterface;
   }
 
   /**
@@ -1931,7 +1921,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(embedCode, playheadTime, isPlaying, _embedTokenGenerator);
+    _castManager.enterCastMode(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage());
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
@@ -2215,5 +2205,33 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public ID3TagNotifier getID3TagNotifier() {
     return ID3TagNotifier.s_getInstance();
+  }
+  
+  /**
+   * Set the displayed closed captions language
+   *
+   * @param language
+   *          2 letter country code of the language to display or nil to hide
+   *          closed captions
+   */
+  public void setClosedCaptionsLanguage(String language) {
+    _closedCaptionLanguage = language;
+
+    // If we're given the "cc" language, we know it's live closed captions
+    if (currentPlayer() != null) {
+      currentPlayer().setClosedCaptionsLanguage(_closedCaptionLanguage);
+    }
+
+    sendNotification(CLOSED_CAPTIONS_LANGUAGE_CHANGED);
+  }
+
+  /**
+   * Get the currently enabled closed captions language
+   *
+   * @returns 2 letter country code of the language to display or nil to hide
+   *          closed captions
+   */
+  public String getClosedCaptionsLanguage() {
+    return _closedCaptionLanguage;
   }
 }

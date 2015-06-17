@@ -277,12 +277,14 @@ public class MoviePlayer extends Player implements Observer {
   public boolean isPlaying() { return _basePlayer != null ? _basePlayer.isPlaying() : false; }
   @Override
   public boolean isLiveClosedCaptionsAvailable() { return _basePlayer != null ? _basePlayer.isLiveClosedCaptionsAvailable() : false; }
+
   @Override
-  public void setLiveClosedCaptionsEnabled(boolean enabled) {
+  public void setClosedCaptionsLanguage(String language) {
     if (_basePlayer != null) {
-      _basePlayer.setLiveClosedCaptionsEnabled(enabled);
+      _basePlayer.setClosedCaptionsLanguage(language);
     } else {
-      DebugMode.logE(TAG, "Trying to setLiveClosedCaptionsEnabled MoviePlayer without a Base Player");
+      DebugMode.logE(TAG, "Trying to setClosedCaptionsLanguage MoviePlayer without a Base Player");
     }
   }
+
 }

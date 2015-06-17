@@ -16,8 +16,6 @@ import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDi
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer.State;
 
-import java.lang.ref.WeakReference;
-
 public class DefaultCastMiniController extends RelativeLayout implements CastMiniController {
 
   private static final String TAG = "OODefaultMiniController";
