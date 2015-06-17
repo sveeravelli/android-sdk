@@ -3,6 +3,7 @@ package com.ooyala.android.castsdk;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
@@ -144,7 +145,21 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   public int buffer() {
     return 0;
   }
-  
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+    DebugMode.logD(TAG, "Sending Closed Captions information to Cast: " + language);
+
+    JSONObject actionSetVolume = new JSONObject();
+    try {
+      actionSetVolume.put("action", "setCCLanguage");
+      actionSetVolume.put("data", language);
+      sendMessage(actionSetVolume.toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public String getEmbedCode() {
     return embedCode;
   }
@@ -169,16 +184,15 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
-    DebugMode.logD(TAG, "On Cast Mode Entered with embedCode: " + embedCode + " playhead time: " + playheadTimeInMillis + ", isPlaying: "
-        + isPlaying);
-    if (initWithTheCastingContent(embedCode)) {
+  public void enterCastMode(CastModeOptions options, String embedToken) {
+    DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
+    if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
-      this.embedCode = embedCode;
-      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying, embedToken);
+      this.embedCode = options.getEmbedCode();
+      String initialPlayMessage = initializePlayerParams(options.getEmbedCode(), null, options.getPlayheadTimeInMillis(), options.isPlaying(), embedToken, options.getCCLanguage());
       sendMessage(initialPlayMessage);
-      setCurrentTime(playheadTimeInMillis);
+      setCurrentTime(options.getPlayheadTimeInMillis());
     }
   }
 
@@ -186,7 +200,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
+  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying, String embedToken, String ccLanguage) {
     float playheadTime = playheadTimeInMillis / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
@@ -201,6 +215,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
       if (embedToken != null) {
         playerParams.put("embedToken", embedToken);
+      }
+
+      if (ccLanguage != null) {
+        playerParams.put("ccLanguage", ccLanguage );
       }
 
       dataParams.put("ec", ec);

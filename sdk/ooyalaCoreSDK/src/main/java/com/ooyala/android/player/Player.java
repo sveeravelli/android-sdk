@@ -75,12 +75,6 @@ public class Player extends Observable implements PlayerInterface,
     return false;
   }
 
-  /**
-   * Enables and disables live closed captions on the player
-   * @param enabled weather to disable or enable live closed captions
-   */
-  public void setLiveClosedCaptionsEnabled(boolean enabled){}
-
   public SeekStyle getSeekStyle() {
     return SeekStyle.BASIC;
   }
@@ -173,5 +167,10 @@ public class Player extends Observable implements PlayerInterface,
   public void seekToPercentLive(int percent) {
     // TODO Auto-generated method stub
     
+  }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+    // TODO Auto-generated method stub
   }
 }

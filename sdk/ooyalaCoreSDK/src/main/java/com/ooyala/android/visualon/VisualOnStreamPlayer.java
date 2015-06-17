@@ -293,7 +293,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   }
 
   //Sets enablement of live CC, which is checked every time VisualOn receives CC data on stream
-  @Override
   public void setLiveClosedCaptionsEnabled(boolean enabled) {
     _isLiveClosedCaptionsEnabled = enabled;
     applySubtitleSettings();
@@ -346,7 +345,6 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       long cur = _player.getPosition();
 
       float fPercent = ((cur - min) / ((float) max - min)) * (100f);
-      DebugMode.logD(TAG, "Inside LivePlayheadPercentage = " + fPercent);
       return (int)fPercent;
     }
     return 100;
@@ -748,6 +746,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       _playheadUpdateTimer.cancel();
       _playheadUpdateTimer = null;
     }
+  }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+    DebugMode.logD(TAG, "Checking if closed captions is in-stream: " + language);
+    setLiveClosedCaptionsEnabled(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals(language));
   }
 
   /** Extract text string from CC data. Does not handle position, color, font type, etc. */

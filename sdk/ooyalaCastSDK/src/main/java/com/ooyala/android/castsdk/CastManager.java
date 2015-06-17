@@ -31,6 +31,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.sample.castcompanionlibrary.cast.DataCastManager;
 import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
+import com.ooyala.android.CastManagerInterface;
+import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -43,7 +45,7 @@ import java.util.Set;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
-public class CastManager extends DataCastManager implements com.ooyala.android.CastManager {
+public class CastManager extends DataCastManager implements CastManagerInterface {
   private static final String TAG = "CastManager";
 
   public static final String ACTION_PLAY = "OOCastPlay";
@@ -287,22 +289,22 @@ public class CastManager extends DataCastManager implements com.ooyala.android.C
     return isInCastMode;
   }
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator) {
-    DebugMode.logD(TAG, "enterCastMode with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
+  public void enterCastMode(CastModeOptions options) {
+    DebugMode.logD(TAG, "enterCastMode with embedCode = " + options.getEmbedCode() + ", playhead = " + options.getPlayheadTimeInMillis() + " isPlaying = " + options.isPlaying());
     DebugMode.assertCondition(ooyalaPlayer != null, TAG, "ooyalaPlayer should be not null while entering cast mode");
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer should be not null while entering cast mode");
-    new CastManagerInitCastPlayerAsyncTask(this, embedCode, playheadTimeInMillis, isPlaying, generator).execute();
+    new CastManagerInitCastPlayerAsyncTask(this, options).execute();
     displayCastView();
     isInCastMode = true;
   }
 
-  void initCastPlayer(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken) {
-    DebugMode.logD(TAG, "initCastPlayer with embedCode = " + embedCode + ", playhead = " + playheadTimeInMillis + " isPlaying = " + isPlaying);
+  void initCastPlayer(CastModeOptions options, String embedToken) {
+    DebugMode.logD(TAG, "initCastPlayer with embedCode = " + options.getEmbedCode() + ", playhead = " + options.getPlayheadTimeInMillis() + " isPlaying = " + options.isPlaying());
     if (ooyalaPlayer != null) {
       castPlayer.setSeekable(isPlayerSeekable);
       castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
       castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-      castPlayer.enterCastMode(embedCode, playheadTimeInMillis, isPlaying, embedToken);
+      castPlayer.enterCastMode(options, embedToken);
     } else {
       DebugMode.logE(TAG, "Attempted to initCastPlayer while ooyalaPlayer is null");
     }

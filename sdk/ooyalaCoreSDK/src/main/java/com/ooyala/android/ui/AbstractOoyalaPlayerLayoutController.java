@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Debug;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -56,7 +57,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   protected AlertDialog dialog;
   private FCCTVRatingUI _tvRatingUI;
   private ClosedCaptionsView _closedCaptionsView;
-  private String _closedCaptionLanguage = null;
   private ClosedCaptionsStyle _closedCaptionsStyle = null;
 
   private int selectedLanguageIndex;
@@ -431,7 +431,17 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
       this.selectedLanguageIndex = position;
-      this.setClosedCaptionsLanguage(this.optionList.get(position));
+      if (_player == null) {
+        DebugMode.logE(TAG, "Trying to set Closed Captions while player is null");
+      }
+      else {
+        String languageInTable = this.optionList.get(position);
+        if (languageInTable.equals(LocalizationSupport.localizedStringFor("None"))) {
+          DebugMode.logD(TAG, "Closed captions set to None");
+          languageInTable = "";
+        }
+        _player.setClosedCaptionsLanguage(languageInTable);
+      }
     }
 
     /*else if (position != this.selectedLanguageIndex && position != this.selectedPresentationIndex) {
@@ -471,38 +481,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     }*/
   }
 
-  /**
-   * Set the displayed closed captions language
-   *
-   * @param language
-   *          2 letter country code of the language to display or nil to hide
-   *          closed captions
-   */
-  public void setClosedCaptionsLanguage(String language) {
-    _closedCaptionLanguage = language;
-
-    // If we're given the "cc" language, we know it's live closed captions
-    if (_player != null) {
-      if (isLiveClosedCaptionsLanguage(_closedCaptionLanguage)) {
-        removeClosedCaptionsView();
-        _player.setLiveClosedCaptionsEnabled(true);
-        return;
-      } else if (_player.isLiveClosedCaptionsAvailable()) {
-        _player.setLiveClosedCaptionsEnabled(false);
-      }
-    };
-
-    refreshClosedCaptionsView();
-  }
-
-  public boolean getShouldShowLiveClosedCaptions() {
-    return isLiveClosedCaptionsLanguage( getClosedCaptionsLanguage() );
-  }
-
-  private boolean isLiveClosedCaptionsLanguage( String cc ) {
-    return OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals( cc );
-  }
-
   public void setClosedCaptionsPresentationStyle() {
     removeClosedCaptionsView();
     _closedCaptionsView = new ClosedCaptionsView(_layout.getContext());
@@ -523,8 +501,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   private boolean shouldShowClosedCaptions() {
     return _player != null && !_player.isShowingAd() &&
         _player.getCurrentItem() != null && _player.getCurrentItem().hasClosedCaptions() &&
-        _closedCaptionLanguage != null &&
-        !_closedCaptionLanguage.equals(LocalizationSupport.localizedStringFor("None"));
+        _player.getClosedCaptionsLanguage() != null &&
+        !_player.getClosedCaptionsLanguage().equals("") &&
+        !_player.isInCastMode() &&
+        !OoyalaPlayer.isLiveClosedCaptionsLanguage(_player.getClosedCaptionsLanguage());
   }
 
   private void refreshClosedCaptionsView() {
@@ -541,15 +521,6 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     _closedCaptionsView = new ClosedCaptionsView(getLayout().getContext());
     _closedCaptionsView.setStyle(_closedCaptionsStyle);
     getLayout().addView(_closedCaptionsView);
-  }
-
-  /**
-   * Get the current closed caption language
-   *
-   * @return the current closed caption language
-   */
-  public String getClosedCaptionsLanguage() {
-    return _closedCaptionLanguage;
   }
 
   /**
@@ -599,13 +570,13 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
     // PB-3090: we currently only support captions for the main content, not
     // also the advertisements.
-    if (_closedCaptionLanguage != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
+    if (_player.getClosedCaptionsLanguage() != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
       double currT = _player.getPlayheadTime() / 1000d;
       if (_closedCaptionsView.getCaption() == null
           || currT > _closedCaptionsView.getCaption().getEnd()
           || currT < _closedCaptionsView.getCaption().getBegin()) {
         Caption caption = currentItem.getClosedCaptions().getCaption(
-            _closedCaptionLanguage, currT);
+                _player.getClosedCaptionsLanguage(), currT);
         if (caption != null && caption.getBegin() <= currT
             && caption.getEnd() >= currT) {
           _closedCaptionsView.setCaption(caption);
@@ -701,5 +672,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       displayCurrentClosedCaption();
     }
+
+    if (arg1 == OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED) {
+      refreshClosedCaptionsView();
+    }
   }
+
 }
