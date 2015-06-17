@@ -3,6 +3,7 @@ package com.ooyala.android.castsdk;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
@@ -183,16 +184,15 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(String embedCode, int playheadTimeInMillis, boolean isPlaying, String embedToken, String ccLanguage) {
-    DebugMode.logD(TAG, "On Cast Mode Entered with embedCode: " + embedCode + " playhead time: " + playheadTimeInMillis + ", isPlaying: "
-        + isPlaying);
-    if (initWithTheCastingContent(embedCode)) {
+  public void enterCastMode(CastModeOptions options, String embedToken) {
+    DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
+    if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
-      this.embedCode = embedCode;
-      String initialPlayMessage = initializePlayerParams(embedCode, null, playheadTimeInMillis, isPlaying, embedToken, ccLanguage);
+      this.embedCode = options.getEmbedCode();
+      String initialPlayMessage = initializePlayerParams(options.getEmbedCode(), null, options.getPlayheadTimeInMillis(), options.isPlaying(), embedToken, options.getCCLanguage());
       sendMessage(initialPlayMessage);
-      setCurrentTime(playheadTimeInMillis);
+      setCurrentTime(options.getPlayheadTimeInMillis());
     }
   }
 

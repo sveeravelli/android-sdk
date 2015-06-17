@@ -2,6 +2,7 @@ package com.ooyala.android.castsdk;
 
 import android.os.AsyncTask;
 
+import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.Utils;
 
@@ -13,34 +14,26 @@ import java.util.List;
  */
 public class CastManagerInitCastPlayerAsyncTask extends AsyncTask<Void, Integer, String> {
   CastManager manager;
-  String embedCode;
-  int playheadTime;
-  boolean isPlaying;
-  EmbedTokenGenerator embedTokenGenerator;
-  String ccLanguage;
+  CastModeOptions options;
 
-  public CastManagerInitCastPlayerAsyncTask(CastManager manager, String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator, String ccLanguage) {
+  public CastManagerInitCastPlayerAsyncTask(CastManager manager, CastModeOptions options) {
     super();
     this.manager = manager;
-    this.embedCode = embedCode;
-    this.playheadTime = playheadTimeInMillis;
-    this.isPlaying = isPlaying;
-    this.embedTokenGenerator = generator;
-    this.ccLanguage = ccLanguage;
+    this.options = options;
   }
 
   @Override
   protected String doInBackground(Void...params) {
     List<String> embedCodes = new ArrayList<>();
-    embedCodes.add(embedCode);
-    return Utils.blockingGetEmbedTokenForEmbedCodes(embedTokenGenerator, embedCodes);
+    embedCodes.add(this.options.getEmbedCode());
+    return Utils.blockingGetEmbedTokenForEmbedCodes(this.options.getGenerator(), embedCodes);
   }
 
   @Override
   protected void onPostExecute(String token) {
     super.onPostExecute(token);
     if (!isCancelled()) {
-      manager.initCastPlayer(embedCode, playheadTime, isPlaying, token, ccLanguage);
+      manager.initCastPlayer(this.options, token);
     }
   }
 

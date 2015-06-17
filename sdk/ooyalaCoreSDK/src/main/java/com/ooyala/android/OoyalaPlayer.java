@@ -1921,7 +1921,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage());
+    _castManager.enterCastMode(new CastModeOptions(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage()));
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
@@ -1934,7 +1934,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   public void exitCastMode(int exitPlayheadTime, boolean isPlaying, String ec) {
-    DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", isPlayer = " + isPlaying);
+    DebugMode.logD(TAG, "Exit Cast Mode with playhead = " + exitPlayheadTime + ", isPlayer = " + isPlaying + ", embedCode = " + ec);
     DebugMode.assertCondition(ec.equals(this.getEmbedCode()), TAG, "embedCode should be the same as the one in TV playback");
     if (_player == null) {
      if (prepareContent(isPlaying)) {
