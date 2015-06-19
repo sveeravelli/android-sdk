@@ -2228,7 +2228,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * Get the currently enabled closed captions language
    *
-   * @returns 2 letter country code of the language to display or nil to hide
+   * @return 2 letter country code of the language to display or nil to hide
    *          closed captions
    */
   public String getClosedCaptionsLanguage() {

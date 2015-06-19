@@ -151,6 +151,11 @@ public void seekToPercentLive(int percent) {
 	// TODO Auto-generated method stub
 	
 }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+
+  }
 }
 
 public class PluginManagerTest extends AndroidTestCase {

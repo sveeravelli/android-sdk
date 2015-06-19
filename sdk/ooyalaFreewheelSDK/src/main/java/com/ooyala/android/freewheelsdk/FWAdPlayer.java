@@ -376,4 +376,9 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
     // TODO Auto-generated method stub
 
   }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+
+  }
 }
