@@ -190,7 +190,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       getReceiverPlayerState(); // for updating UI controls
     } else {
       this.embedCode = options.getEmbedCode();
-      String initialPlayMessage = initializePlayerParams(options.getEmbedCode(), null, options.getPlayheadTimeInMillis(), options.isPlaying(), embedToken, options.getCCLanguage());
+      String initialPlayMessage = initializePlayerParams(options, embedToken);
       sendMessage(initialPlayMessage);
       setCurrentTime(options.getPlayheadTimeInMillis());
     }
@@ -200,14 +200,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(String ec, String version, int playheadTimeInMillis, boolean isPlaying, String embedToken, String ccLanguage) {
-    float playheadTime = playheadTimeInMillis / 1000;
+  private String initializePlayerParams(CastModeOptions options, String embedToken) {
+    float playheadTime = options.getPlayheadTimeInMillis() / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
     JSONObject wrap = new JSONObject();
     try {
       playerParams.put("initialTime", playheadTime);
-      if (isPlaying) {
+      if (options.isPlaying()) {
         playerParams.put("autoplay", true);
       } else {
         playerParams.put("autoplay", false);
@@ -217,12 +217,16 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         playerParams.put("embedToken", embedToken);
       }
 
-      if (ccLanguage != null) {
-        playerParams.put("ccLanguage", ccLanguage );
+      if (options.getCCLanguage() != null) {
+        playerParams.put("ccLanguage", options.getCCLanguage());
       }
 
-      dataParams.put("ec", ec);
-      dataParams.put("version", version);
+      if (options.getAuthToken() != null) {
+        playerParams.put("authToken", options.getAuthToken());
+      }
+
+      dataParams.put("ec", options.getEmbedCode());
+      dataParams.put("version", null);
       dataParams.put("params", playerParams.toString());
       if (castItemTitle != null || castItemDescription != null || castItemPromoImg != null) {
         dataParams.put("title", castItemTitle);

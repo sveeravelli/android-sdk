@@ -6,13 +6,15 @@ public class CastModeOptions {
   private boolean isPlaying;
   private EmbedTokenGenerator generator;
   private String ccLanguage;
+  private String authToken;
 
-  public CastModeOptions(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator, String ccLanguage) {
+  public CastModeOptions(String embedCode, int playheadTimeInMillis, boolean isPlaying, EmbedTokenGenerator generator, String ccLanguage, String authToken) {
     this.embedCode = embedCode;
     this.playheadTimeInMillis = playheadTimeInMillis;
     this.isPlaying = isPlaying;
     this.generator = generator;
     this.ccLanguage = ccLanguage;
+    this.authToken = authToken;
   }
 
   public String getCCLanguage() {
@@ -33,6 +35,10 @@ public class CastModeOptions {
 
   public EmbedTokenGenerator getGenerator() {
     return generator;
+  }
+
+  public String getAuthToken() {
+    return authToken;
   }
 
 }
