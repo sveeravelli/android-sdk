@@ -1921,7 +1921,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     suspendCurrentPlayer();
-    _castManager.enterCastMode(new CastModeOptions(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage()));
+    _castManager.enterCastMode(new CastModeOptions(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage(), _playerAPIClient.getAuthToken()));
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
   }
