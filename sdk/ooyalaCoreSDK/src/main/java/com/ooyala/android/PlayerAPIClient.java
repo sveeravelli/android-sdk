@@ -809,7 +809,7 @@ class PlayerAPIClient {
     return _domain;
   }
 
-  private void setAuthToken(String authToken) {
+  void setAuthToken(String authToken) {
     _authToken = authToken;
     if (_context != null) {
       SharedPreferences preferences = _context.getSharedPreferences(OoyalaPlayer.PREFERENCES_NAME, 4);
