@@ -833,15 +833,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * Get the authToken for the current player.
-   *
-   * @return authToken
-   */
-  public String getAuthToken() {
-    return _playerAPIClient.getAuthToken();
-  }
-
-  /**
    * Get the customDRMData for the current player.
    *
    * @return _customDRMData
@@ -2233,5 +2224,29 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public String getClosedCaptionsLanguage() {
     return _closedCaptionLanguage;
+  }
+
+
+  /**
+   * Get the authToken for the current player.
+   *
+   * @return authToken The authorization token that represents this device's streaming session
+   */
+  public String getAuthToken() {
+    return _playerAPIClient.getAuthToken();
+  }
+
+  /**
+   * Set the AuthToken used to authorize video playback
+   *
+   * Changing this manually without an existing auth token can cause an inflated number of concurrent
+   * streams for a user
+   *
+   * @param authToken The authorization token that represents this device's streaming session
+   */
+  public void setAuthToken(String authToken) {
+    if (_playerAPIClient != null) {
+      _playerAPIClient.setAuthToken(authToken);
+    }
   }
 }
