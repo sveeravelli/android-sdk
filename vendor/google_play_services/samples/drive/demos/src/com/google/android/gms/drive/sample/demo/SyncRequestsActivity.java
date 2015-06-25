@@ -72,7 +72,7 @@ public class SyncRequestsActivity extends BaseDemoActivity {
             try {
                 os.write("Hello world!\n".getBytes());
             } catch (IOException e) {
-                DebugMode.logE(TAG, "Caught!", e);
+                e.printStackTrace();
                 return null;
             }
 
