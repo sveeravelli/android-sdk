@@ -21,7 +21,8 @@ import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
- 
+  private String RECEIVER_LIVE_LANGUAGE = "live";
+
   private WeakReference<CastManager> castManager;
   
   private String embedCode;
@@ -31,7 +32,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   private boolean isSeeking;
   private boolean seekable;
- 
+
+  private boolean isLiveClosedCaptionsAvailable;
+  
   // Related info for current content
   private String castItemTitle;
   private String castItemDescription;
@@ -153,11 +156,20 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     JSONObject actionSetVolume = new JSONObject();
     try {
       actionSetVolume.put("action", "setCCLanguage");
-      actionSetVolume.put("data", language);
+      if (OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equalsIgnoreCase(language)) {
+        actionSetVolume.put("data", RECEIVER_LIVE_LANGUAGE);
+      } else {
+        actionSetVolume.put("data", language);
+      }
       sendMessage(actionSetVolume.toString());
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    return isLiveClosedCaptionsAvailable;
   }
 
   public String getEmbedCode() {
@@ -189,11 +201,16 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
+      resetStateOnVideoChange();
       this.embedCode = options.getEmbedCode();
       String initialPlayMessage = initializePlayerParams(options, embedToken);
       sendMessage(initialPlayMessage);
       setCurrentTime(options.getPlayheadTimeInMillis());
     }
+  }
+
+  private void resetStateOnVideoChange() {
+    isLiveClosedCaptionsAvailable = false;
   }
 
   private boolean initWithTheCastingContent(String embedCode) {
@@ -348,7 +365,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           syncDeviceVolumeToTV();
           setState(State.READY);
           getReceiverPlayerState();
-        } 
+        }
+        else if (eventType.equalsIgnoreCase("closedCaptionsInfoAvailable")) {
+          //TODO: Need to check if the info available is "live"
+          String language = msg.getJSONObject("1").getString("lang");
+          if (RECEIVER_LIVE_LANGUAGE.equals(language)) {
+            isLiveClosedCaptionsAvailable = true;
+          }
+        }
         else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);

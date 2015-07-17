@@ -72,6 +72,11 @@ public interface PlayerInterface {
   public void seekToPercentLive(int percent);
 
   /**
+   * @return true if the player can support live closed captions
+   */
+  public boolean isLiveClosedCaptionsAvailable();
+
+  /**
    * Set the displayed closed captions language.
    *
    * @param language
