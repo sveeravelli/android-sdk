@@ -22,6 +22,7 @@ import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
   private String RECEIVER_LIVE_LANGUAGE = "live";
+  private String RECEIVER_DISABLE_LANGUAGE = "";
 
   private WeakReference<CastManager> castManager;
   
@@ -34,7 +35,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private boolean seekable;
 
   private boolean isLiveClosedCaptionsAvailable;
-  
+
   // Related info for current content
   private String castItemTitle;
   private String castItemDescription;
@@ -158,6 +159,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       actionSetVolume.put("action", "setCCLanguage");
       if (OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equalsIgnoreCase(language)) {
         actionSetVolume.put("data", RECEIVER_LIVE_LANGUAGE);
+      } else if (language == null) {
+        actionSetVolume.put("data", "");
       } else {
         actionSetVolume.put("data", language);
       }
