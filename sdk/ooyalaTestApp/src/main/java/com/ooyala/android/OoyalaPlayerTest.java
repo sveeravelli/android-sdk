@@ -3,6 +3,9 @@ package com.ooyala.android;
 import android.test.AndroidTestCase;
 
 public class OoyalaPlayerTest extends AndroidTestCase {
+  final String PCODE  = "R2d3I6s06RyB712DN0_2GsQS-R-Y";
+  final String DOMAIN = "http://ooyala.com";
+
   public OoyalaPlayerTest() {
     super();
   }
@@ -70,4 +73,15 @@ public class OoyalaPlayerTest extends AndroidTestCase {
     assertEquals("Prod backlot host should be http://cdn.api.ooyala.com", Environment.BACKLOT_HOST,
         "http://cdn.api.ooyala.com");
   }
+
+  public void testChangeCurrentItemNull() {
+    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    assertFalse(player.changeCurrentItem(null));
+  }
+
+  public void testChangeCurrentItemInvalid() {
+    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    assertFalse(player.changeCurrentItem("invalid"));
+  }
+
 }
