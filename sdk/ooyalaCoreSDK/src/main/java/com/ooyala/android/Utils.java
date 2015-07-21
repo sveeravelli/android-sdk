@@ -1,5 +1,14 @@
 package com.ooyala.android;
 
+import android.os.Build;
+import android.util.Base64;
+
+import com.ooyala.android.util.DebugMode;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,15 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import android.os.Build;
-import android.util.Base64;
-
-import com.ooyala.android.util.DebugMode;
 
 public class Utils {
   static final String DEVICE_ANDROID_SDK = "android_sdk";
@@ -70,6 +70,10 @@ public class Utils {
     StringBuffer result = new StringBuffer();
     boolean first = true;
     for (String key : asSortedList(params.keySet())) {
+      if (key == null || params.get(key) == null) {
+        continue;
+      }
+
       if (first) {
         first = false;
       } else {
