@@ -495,6 +495,9 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if the change was successful, false if not
    */
   public boolean changeCurrentItem(String embedCode) {
+    if (_rootItem == null) {
+      return false;
+    }
     return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem), null);
   }
 
