@@ -140,21 +140,25 @@ class TestAdPlayer implements PlayerInterface {
     return null;
   }
 
-@Override
-public int livePlayheadPercentage() {
-	// TODO Auto-generated method stub
-	return 0;
-}
+  @Override
+  public int livePlayheadPercentage() {
+	  // TODO Auto-generated method stub
+	  return 0;
+  }
 
-@Override
-public void seekToPercentLive(int percent) {
-	// TODO Auto-generated method stub
-	
-}
+  @Override
+  public void seekToPercentLive(int percent) {
+	  // TODO Auto-generated method stub
+  }
 
   @Override
   public void setClosedCaptionsLanguage(String language) {
 
+  }
+
+  @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    return false;
   }
 }
 
