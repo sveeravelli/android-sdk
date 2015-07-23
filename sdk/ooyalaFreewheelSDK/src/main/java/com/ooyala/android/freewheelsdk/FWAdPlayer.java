@@ -378,6 +378,11 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   }
 
   @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    return false;
+  }
+
+  @Override
   public void setClosedCaptionsLanguage(String language) {
 
   }
