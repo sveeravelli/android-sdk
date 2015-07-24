@@ -332,6 +332,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     int min = (int)_player.getMinPosition();
     int duration = max - min;
     int newPosition = duration * percent / 100 + min;
+    DebugMode.logD(TAG, "Seeking Live. Min=" + min + "max=" + max + ", newPosition=" + newPosition);
     if (_player.setPosition(newPosition) < 0) {
       DebugMode.logE(TAG, "setPosition failed.");
     }
