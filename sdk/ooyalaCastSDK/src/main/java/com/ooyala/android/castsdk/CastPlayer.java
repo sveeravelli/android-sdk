@@ -157,19 +157,22 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     JSONObject actionSetVolume = new JSONObject();
     try {
       actionSetVolume.put("action", "setCCLanguage");
-      if (OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equalsIgnoreCase(language)) {
-        actionSetVolume.put("data", RECEIVER_LIVE_LANGUAGE);
-      } else if (language == null) {
-        actionSetVolume.put("data", "");
-      } else {
-        actionSetVolume.put("data", language);
-      }
+      actionSetVolume.put("data", convertClosedCaptionsLanguageForReceiver(language));
       sendMessage(actionSetVolume.toString());
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
+  private String convertClosedCaptionsLanguageForReceiver(String language) {
+    if (OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equalsIgnoreCase(language)) {
+      return RECEIVER_LIVE_LANGUAGE;
+    } else if (language == null) {
+      return RECEIVER_DISABLE_LANGUAGE;
+    } else {
+      return language;
+    }
+  }
   @Override
   public boolean isLiveClosedCaptionsAvailable() {
     return isLiveClosedCaptionsAvailable;
@@ -238,7 +241,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       }
 
       if (options.getCCLanguage() != null) {
-        playerParams.put("ccLanguage", options.getCCLanguage());
+        playerParams.put("ccLanguage", convertClosedCaptionsLanguageForReceiver(options.getCCLanguage()));
       }
 
       if (options.getAuthToken() != null) {
