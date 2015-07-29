@@ -4,6 +4,7 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.AdsLearnMoreInterface;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
@@ -385,5 +386,10 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   @Override
   public void setClosedCaptionsLanguage(String language) {
 
+  }
+
+  @Override
+  public OoyalaException getError() {
+    return null;
   }
 }
