@@ -29,8 +29,7 @@ function ensure_folder_exists {
 }
 
 function assert_non_vendor_folder {
-  echo ${cur_dir} | grep -i vendor/VisualOn
-  if [ $? -eq 0 ]; then
+  if [[ $1 =~ .*vendor/VisualOn ]]; then
     echo "ERROR: This script is not for use in the vendor/VisualOn folder."
     echo "It is to be run in the unzipped Ooyala archive."
     exit 1
@@ -49,7 +48,7 @@ echo "Copying VisualOn files from this directory to Application in ${app_root_di
 echo ""
 cur_dir=`pwd`
 
-assert_non_vendor_folder
+assert_non_vendor_folder $cur_dir
 
 libs_dir="${cur_dir}/libs"
 check_if_folder_exists $libs_dir "Are you running this script in the correct folder?"
