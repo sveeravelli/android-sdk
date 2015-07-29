@@ -83,8 +83,8 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   }
   
   public static CastManager initialize(Context context, String applicationId, String... namespaces) {
-    DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
     if (null == castManager) {
+        DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
         DebugMode.logD(TAG, "Create a new OOCastManager");
         if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
             String msg = "Couldn't find the appropriate version of Google Play Services";
@@ -93,6 +93,8 @@ public class CastManager extends DataCastManager implements CastManagerInterface
         }
         castManager = new CastManager(context, applicationId, namespaces);
         mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
+    } else {
+      DebugMode.logI(TAG, "Calling initialize a second time. Not an error, but any newer Application ID will not be respected");
     }
     return castManager;
   }
@@ -113,10 +115,10 @@ public class CastManager extends DataCastManager implements CastManagerInterface
     destroyNotificationService(context);
     unregisterLockScreenControls();
     unregisterBroadcastReceiver(context);
-    destroyAllFeilds();
+    destroyAllFields();
   }
 
-  private void destroyAllFeilds() {
+  private void destroyAllFields() {
     castView = null;
     ooyalaPlayer = null;
     miniControllerDefaultImageBitmap = null;
@@ -154,7 +156,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   }
 
   public void setNotificationImageResourceId(int resourceId) {
-    DebugMode.logD(TAG, "Set notification image recourse id = " + resourceId);
+    DebugMode.logD(TAG, "Set notification image resource id = " + resourceId);
     notificationImageResourceId = resourceId;
   }
   
