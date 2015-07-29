@@ -33,15 +33,14 @@ import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionExcept
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
-import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
@@ -69,7 +68,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   private View castView;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private CastPlayer castPlayer;
-  private HashMap<String, String> additionalInitParams;
+  private Map<String, String> additionalInitParams;
   private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
@@ -200,7 +199,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
    * Provide key-value pairs that will be passed to the Receiver upon Cast Playback. Anything
    * added to this will overwrite anything set by default in the init.
    */
-  public void setAdditionalInitParams(HashMap<String, String> params) {
+  public void setAdditionalInitParams(Map<String, String> params) {
     additionalInitParams = params;
   }
 

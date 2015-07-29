@@ -15,8 +15,8 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Observable;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
@@ -204,7 +204,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(CastModeOptions options, String embedToken, HashMap<String, String> additionalInitParams) {
+  public void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
     if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
@@ -225,7 +225,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(CastModeOptions options, String embedToken, HashMap<String, String> additionalInitParams) {
+  private String initializePlayerParams(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     float playheadTime = options.getPlayheadTimeInMillis() / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
@@ -265,9 +265,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       if (additionalInitParams != null) {
         Iterator paramsIterator = additionalInitParams.entrySet().iterator();
         while (paramsIterator.hasNext()) {
-          HashMap.Entry<String, String> entry = (HashMap.Entry) paramsIterator.next();
+          Map.Entry<String, String> entry = (Map.Entry) paramsIterator.next();
           dataParams.put(entry.getKey(), entry.getValue());
-          paramsIterator.remove();
         }
       }
 
