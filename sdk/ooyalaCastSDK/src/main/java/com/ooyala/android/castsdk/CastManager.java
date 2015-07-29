@@ -40,6 +40,7 @@ import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,6 +69,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   private View castView;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private CastPlayer castPlayer;
+  private HashMap<String, String> additionalInitParams;
   private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
@@ -194,6 +196,14 @@ public class CastManager extends DataCastManager implements CastManagerInterface
     }
   }
 
+  /**
+   * Provide key-value pairs that will be passed to the Receiver upon Cast Playback. Anything
+   * added to this will overwrite anything set by default in the init.
+   */
+  public void setAdditionalInitParams(HashMap<String, String> params) {
+    additionalInitParams = params;
+  }
+
   /*============================================================================================*/
   /*========== Access CastManager Status Or Fields =============================================*/
   /*============================================================================================*/
@@ -304,7 +314,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
       castPlayer.setSeekable(isPlayerSeekable);
       castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
       castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-      castPlayer.enterCastMode(options, embedToken);
+      castPlayer.enterCastMode(options, embedToken, additionalInitParams);
     } else {
       DebugMode.logE(TAG, "Attempted to initCastPlayer while ooyalaPlayer is null");
     }
