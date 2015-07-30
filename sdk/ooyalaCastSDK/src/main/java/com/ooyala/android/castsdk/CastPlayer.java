@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
-import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
-
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
   private static final String TAG = "OOCastPlayer";
   private String RECEIVER_LIVE_LANGUAGE = "live";
@@ -308,7 +306,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           URL imgUrl = new URL(castItemPromoImg.toString());
           castImageBitmap = BitmapFactory.decodeStream(imgUrl.openStream());
         } catch (Exception e) {
-          LOGE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", using the default one",
+          DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", using the default one",
               e);
           castImageBitmap = castManager.get().getDefaultMiniControllerImageBitmap();
         }
