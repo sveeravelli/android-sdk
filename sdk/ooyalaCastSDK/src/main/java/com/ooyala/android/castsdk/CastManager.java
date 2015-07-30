@@ -33,7 +33,6 @@ import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionExcept
 import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
-import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -41,6 +40,7 @@ import com.ooyala.android.util.DebugMode;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
@@ -68,6 +68,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   private View castView;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private CastPlayer castPlayer;
+  private Map<String, String> additionalInitParams;
   private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
   private boolean isConnectedToReceiverApp;
@@ -82,8 +83,8 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   }
   
   public static CastManager initialize(Context context, String applicationId, String... namespaces) {
-    DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
     if (null == castManager) {
+        DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespaces);
         DebugMode.logD(TAG, "Create a new OOCastManager");
         if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
             String msg = "Couldn't find the appropriate version of Google Play Services";
@@ -92,6 +93,8 @@ public class CastManager extends DataCastManager implements CastManagerInterface
         }
         castManager = new CastManager(context, applicationId, namespaces);
         mCastManager = castManager; // mCastManager is used when BaseCastManarger.getCastManager() called
+    } else {
+      DebugMode.logI(TAG, "Calling initialize a second time. Not an error, but any newer Application ID will not be respected");
     }
     return castManager;
   }
@@ -112,10 +115,10 @@ public class CastManager extends DataCastManager implements CastManagerInterface
     destroyNotificationService(context);
     unregisterLockScreenControls();
     unregisterBroadcastReceiver(context);
-    destroyAllFeilds();
+    destroyAllFields();
   }
 
-  private void destroyAllFeilds() {
+  private void destroyAllFields() {
     castView = null;
     ooyalaPlayer = null;
     miniControllerDefaultImageBitmap = null;
@@ -153,7 +156,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
   }
 
   public void setNotificationImageResourceId(int resourceId) {
-    DebugMode.logD(TAG, "Set notification image recourse id = " + resourceId);
+    DebugMode.logD(TAG, "Set notification image resource id = " + resourceId);
     notificationImageResourceId = resourceId;
   }
   
@@ -192,6 +195,14 @@ public class CastManager extends DataCastManager implements CastManagerInterface
     if (isInCastMode()) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
+  }
+
+  /**
+   * Provide key-value pairs that will be passed to the Receiver upon Cast Playback. Anything
+   * added to this will overwrite anything set by default in the init.
+   */
+  public void setAdditionalInitParams(Map<String, String> params) {
+    additionalInitParams = params;
   }
 
   /*============================================================================================*/
@@ -304,7 +315,7 @@ public class CastManager extends DataCastManager implements CastManagerInterface
       castPlayer.setSeekable(isPlayerSeekable);
       castPlayer.setOoyalaPlayer(ooyalaPlayer.get());
       castPlayer.updateMetadataFromOoyalaPlayer(ooyalaPlayer.get());
-      castPlayer.enterCastMode(options, embedToken);
+      castPlayer.enterCastMode(options, embedToken, additionalInitParams);
     } else {
       DebugMode.logE(TAG, "Attempted to initCastPlayer while ooyalaPlayer is null");
     }

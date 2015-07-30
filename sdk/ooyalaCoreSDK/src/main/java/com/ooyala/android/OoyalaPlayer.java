@@ -1914,6 +1914,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
+    _queuedSeekTime = 0;  //Clear queued seek time if we start casting
     suspendCurrentPlayer();
     _castManager.enterCastMode(new CastModeOptions(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage(), _playerAPIClient.getAuthToken()));
     _layoutController.setFullscreenButtonShowing(false);
@@ -1921,6 +1922,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private int getCurrentPlayheadForCastMode() {
+    if (_queuedSeekTime != 0) {
+      return _queuedSeekTime;
+    }
     if (_player != null) {
       return _player.currentTime();
     }

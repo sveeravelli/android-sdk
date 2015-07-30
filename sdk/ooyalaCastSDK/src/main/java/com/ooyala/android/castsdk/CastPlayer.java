@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
@@ -213,14 +214,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(CastModeOptions options, String embedToken) {
+  public void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
     if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
     } else {
       resetStateOnVideoChange();
       this.embedCode = options.getEmbedCode();
-      String initialPlayMessage = initializePlayerParams(options, embedToken);
+      String initialPlayMessage = initializePlayerParams(options, embedToken, additionalInitParams);
       sendMessage(initialPlayMessage);
       setCurrentTime(options.getPlayheadTimeInMillis());
     }
@@ -234,7 +235,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(CastModeOptions options, String embedToken) {
+  private String initializePlayerParams(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     float playheadTime = options.getPlayheadTimeInMillis() / 1000;
     JSONObject playerParams = new JSONObject();
     JSONObject dataParams = new JSONObject();
@@ -268,6 +269,15 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         dataParams.put("promo_url", castItemPromoImg);
       } else {
         DebugMode.logE(TAG, "Title or description or PromoImage is null!!");
+      }
+
+      // Iterate through additionalInitParams (Overrides anything set by default in the init)
+      if (additionalInitParams != null) {
+        Iterator paramsIterator = additionalInitParams.entrySet().iterator();
+        while (paramsIterator.hasNext()) {
+          Map.Entry<String, String> entry = (Map.Entry) paramsIterator.next();
+          dataParams.put(entry.getKey(), entry.getValue());
+        }
       }
 
       wrap.put("action", "init");
