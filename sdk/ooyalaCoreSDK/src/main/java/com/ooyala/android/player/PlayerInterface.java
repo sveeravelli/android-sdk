@@ -1,5 +1,6 @@
 package com.ooyala.android.player;
 
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer.State;
 
 /**
@@ -84,4 +85,6 @@ public interface PlayerInterface {
    *          closed captions
    */
   public void setClosedCaptionsLanguage(String language);
+
+  public OoyalaException getError();
 }

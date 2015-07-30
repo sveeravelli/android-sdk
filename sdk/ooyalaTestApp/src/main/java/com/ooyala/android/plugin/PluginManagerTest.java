@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.PlayerInterface;
@@ -159,6 +160,12 @@ class TestAdPlayer implements PlayerInterface {
   @Override
   public boolean isLiveClosedCaptionsAvailable() {
     return false;
+  }
+  
+  @Override
+  public OoyalaException getError() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
 

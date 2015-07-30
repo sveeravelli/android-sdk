@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.ooyala.android.CastModeOptions;
+import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
@@ -15,6 +17,8 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
@@ -32,6 +36,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private int duration;
   private int currentTime;
   private State state = State.INIT;
+  private OoyalaException error;
 
   private boolean isSeeking;
   private boolean seekable;
@@ -175,6 +180,11 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       return language;
     }
   }
+  @Override
+  public OoyalaException getError() {
+    return error;
+  }
+
   @Override
   public boolean isLiveClosedCaptionsAvailable() {
     return isLiveClosedCaptionsAvailable;
@@ -397,6 +407,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;
           getReceiverPlayerState();
+        } else if (eventType.equalsIgnoreCase("error")) {
+          String receiverCode = msg.getJSONObject("1").getString("code");
+          this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
+          setState(State.ERROR);
         }
       }
     } catch (JSONException e) {
@@ -438,6 +452,48 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
 
   public void seekToPercentLive(int percent) {
+  }
 
+  // The translations between HTML5 Error codes and OoyalaPlayer Error Codes
+  static Map<String, OoyalaErrorCode> errorMap;
+  static {
+    Map<String, OoyalaErrorCode> map = new HashMap<String, OoyalaErrorCode>();
+    map.put("network", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("sas", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("geo", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("domain", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("future", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("past", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("device", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("proxy", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+    map.put("concurrent_streams", OoyalaErrorCode.ERROR_DEVICE_CONCURRENT_STREAMS);
+    map.put("invalid_heartbeat", OoyalaErrorCode.ERROR_AUTHORIZATION_HEARTBEAT_FAILED);
+    map.put("device_invalid_auth_token", OoyalaErrorCode.ERROR_DEVICE_INVALID_AUTH_TOKEN);
+    map.put("device_limit_reached", OoyalaErrorCode.ERROR_DEVICE_LIMIT_REACHED);
+    map.put("device_binding_failed", OoyalaErrorCode.ERROR_DEVICE_BINDING_FAILED);
+    map.put("device_id_too_long", OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
+    map.put("drm_server_error", OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR);
+    map.put("drm_general_failure", OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE);
+    map.put("invalid_entitlements", OoyalaErrorCode.ERROR_UNKNOWN);
+    map.put("playback", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("stream", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("livestream", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("network_error", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("chromecast_manifest", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("chromecast_mediakeys", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("chromecast_network", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("chromecast_playback", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("unplayable_content", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("invalid_external_id", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("empty_channel", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("empty_channel_set", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("channel_content", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+    map.put("content_tree", OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID);
+    map.put("metadata", OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED);
+    errorMap = Collections.unmodifiableMap(map);
+  }
+
+  private OoyalaErrorCode getOoyalaErrorCodeForReceiverCode(String receiverCode) {
+     return errorMap.get(receiverCode) == null ? errorMap.get(receiverCode) : OoyalaErrorCode.ERROR_UNKNOWN;
   }
 }

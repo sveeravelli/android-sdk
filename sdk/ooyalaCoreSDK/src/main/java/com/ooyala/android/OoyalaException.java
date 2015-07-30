@@ -36,6 +36,8 @@ public class OoyalaException extends Exception {
     ERROR_DEVICE_ID_TOO_LONG,
     /** Device limit has been reached */
     ERROR_DEVICE_LIMIT_REACHED,
+    /** Concurrent Streams limit reached */
+    ERROR_DEVICE_CONCURRENT_STREAMS,
     /** DRM Rights Acquisition server error */
     ERROR_DRM_RIGHTS_SERVER_ERROR,
     /** General non-Ooyala related DRM failure. stack trace of resulting failure is attached */
@@ -44,6 +46,7 @@ public class OoyalaException extends Exception {
     /* Advertising Id Errors */
     /** Failed to obtain Advertising Id. */
     ERROR_ADVERTISING_ID_FAILURE,
+    ERROR_UNKNOWN,
   };
 
   private OoyalaErrorCode _code;

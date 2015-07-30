@@ -4,6 +4,7 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.AdsLearnMoreInterface;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
@@ -385,5 +386,11 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
   @Override
   public void setClosedCaptionsLanguage(String language) {
 
+  }
+
+  @Override
+  public OoyalaException getError() {
+    // Ad Players do not use getError to report to OoyalaPlayer yet.  They can, but they don't at the moment
+    return null;
   }
 }
