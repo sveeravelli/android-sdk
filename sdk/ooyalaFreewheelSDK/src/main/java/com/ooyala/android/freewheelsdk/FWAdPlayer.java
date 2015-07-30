@@ -390,6 +390,7 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
 
   @Override
   public OoyalaException getError() {
+    // Ad Players do not use getError to report to OoyalaPlayer yet.  They can, but they don't at the moment
     return null;
   }
 }

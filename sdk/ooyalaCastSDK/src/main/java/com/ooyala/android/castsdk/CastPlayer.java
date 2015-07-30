@@ -17,6 +17,9 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 
 import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
@@ -396,7 +399,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           getReceiverPlayerState();
         } else if (eventType.equalsIgnoreCase("error")) {
           String receiverCode = msg.getJSONObject("1").getString("code");
-          this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode));
+          this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
           setState(State.ERROR);
         }
       }
@@ -441,8 +444,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   public void seekToPercentLive(int percent) {
   }
 
-  private OoyalaErrorCode getOoyalaErrorCodeForReceiverCode(String receiverCode) {
-    HashMap<String, OoyalaErrorCode> map = new HashMap<String, OoyalaErrorCode>();
+  // The translations between HTML5 Error codes and OoyalaPlayer Error Codes
+  static Map<String, OoyalaErrorCode> errorMap;
+  static {
+    Map<String, OoyalaErrorCode> map = new HashMap<String, OoyalaErrorCode>();
     map.put("network", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
     map.put("sas", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
     map.put("geo", OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
@@ -459,7 +464,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     map.put("device_id_too_long", OoyalaErrorCode.ERROR_DEVICE_ID_TOO_LONG);
     map.put("drm_server_error", OoyalaErrorCode.ERROR_DRM_RIGHTS_SERVER_ERROR);
     map.put("drm_general_failure", OoyalaErrorCode.ERROR_DRM_GENERAL_FAILURE);
-//    map.put("invalid_entitlements", OoyalaErrorCode.);
+    map.put("invalid_entitlements", OoyalaErrorCode.ERROR_UNKNOWN);
     map.put("playback", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
     map.put("stream", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
     map.put("livestream", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
@@ -475,9 +480,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     map.put("channel_content", OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
     map.put("content_tree", OoyalaErrorCode.ERROR_CONTENT_TREE_INVALID);
     map.put("metadata", OoyalaErrorCode.ERROR_METADATA_FETCH_FAILED);
-    if (map.get(receiverCode) == null) {
-      return OoyalaErrorCode.ERROR_UNKNOWN;
-    } else
-      return map.get(receiverCode);
+    errorMap = Collections.unmodifiableMap(map);
+  }
+
+  private OoyalaErrorCode getOoyalaErrorCodeForReceiverCode(String receiverCode) {
+     return errorMap.get(receiverCode) == null ? errorMap.get(receiverCode) : OoyalaErrorCode.ERROR_UNKNOWN;
   }
 }
