@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class CastManager implements CastManagerInterface, IDataCastConsumer {
-  private static final String TAG = "CastManager";
+  private static final String TAG = CastManager.class.getSimpleName();
 
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
@@ -80,27 +80,29 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   private final String namespace;
 
   public static CastManager initialize(Context context, String applicationId, String namespace) {
-    if (null == castManager) {
+    DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
+    if( castManager == null ) {
       notificationMiniControllerResourceId = R.layout.oo_default_notification;
       notificationImageResourceId = R.drawable.ic_ooyala;
-      DebugMode.logD(TAG, "Init OOCastManager with appId = " + applicationId + ", namespace = " + namespace);
-      DebugMode.logD(TAG, "Create a new OOCastManager");
-      if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
-        String msg = "Couldn't find the appropriate version of Google Play Services";
-        DebugMode.logE(TAG, msg);
-        throw new RuntimeException(msg);
-      }
+      DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
+      requireGooglePlayServices(context);
+      DataCastManager.initialize( context, applicationId, new String[]{namespace} );
       try {
-        DataCastManager.initialize( context, applicationId, new String[]{namespace} );
         castManager = new CastManager( DataCastManager.getInstance(), namespace );
       }
       catch( CastException ce ) {
         throw new RuntimeException( ce );
       }
-    } else {
-      DebugMode.logI(TAG, "Calling initialize a second time. Not an error, but any newer Application ID will not be respected");
     }
     return castManager;
+  }
+
+  private static void requireGooglePlayServices(Context context) {
+    if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
+      String msg = "Couldn't find the appropriate version of Google Play Services";
+      DebugMode.logE( TAG, msg );
+      throw new RuntimeException( msg );
+    }
   }
   
   public static CastManager getCastManager() {
@@ -276,12 +278,11 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   @Override
   public void onApplicationStopFailed( int errorCode ) {
     DebugMode.logD( TAG, "onApplicationStopFailed: " + errorCode );
-
   }
 
   @Override
   public boolean onApplicationConnectionFailed( int errorCode ) {
-    return false; // TODO: what do we want here?
+    return true; // TODO: what do we want here?
   }
 
   @Override
@@ -318,7 +319,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
 
   @Override
   public boolean onConnectionFailed( ConnectionResult result ) {
-    return false; // TODO: what do we want here?
+    return true; // TODO: what do we want here?
   }
 
   @Override
@@ -354,6 +355,11 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   @Override
   public void onRemoved(CastDevice castDevice, String namespace) {
     DebugMode.logD( TAG, "onRemoved: " + castDevice + ", " + namespace );
+  }
+
+  @Override
+  public void onFailed( int resourceId, int statusCode ) {
+    DebugMode.logD( TAG, "onFailed: " + resourceId + ", " + statusCode );
   }
 
   public boolean isInCastMode() {
@@ -409,7 +415,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
 
   @Override
   public void onMessageSendFailed( Status status ) {
-
+    DebugMode.logD( TAG, "onMessageSendFailed: " + status );
   }
   
   /*============================================================================================*/
@@ -668,11 +674,4 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
       }
     }
   }
-
-  @Override
-  public void onFailed( int resourceId, int statusCode ) {
-
-  }
 }
-
-
