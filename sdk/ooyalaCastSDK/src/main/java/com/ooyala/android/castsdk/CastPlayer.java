@@ -132,7 +132,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     JSONObject actionSetVolume = new JSONObject();
     try {
       actionSetVolume.put("action", "volume");
-      actionSetVolume.put("data", castManager.get().getDeviceVolume());
+      actionSetVolume.put("data", castManager.get().getDataCastManager().getDeviceVolume());
       sendMessage(actionSetVolume.toString());
     } catch (Exception e) {
       e.printStackTrace();
@@ -141,7 +141,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   
   protected void setState(State state) {
     this.state = state;
-    castManager.get().updateMiniControllersState();
+    castManager.get().updateMiniControllers();
     castManager.get().updateNotificationAndLockScreenPlayPauseButton();
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
@@ -384,7 +384,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             // current content has been override on receiver side. keep play current content on content mode
-            castManager.get().disconnectDevice(false, true, true);
+            castManager.get().getDataCastManager().disconnectDevice(false, true, true);
           }
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {
