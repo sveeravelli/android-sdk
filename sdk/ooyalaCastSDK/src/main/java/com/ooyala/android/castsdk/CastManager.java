@@ -79,6 +79,16 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   private final DataCastManager dataCastManager;
   private final String namespace;
 
+  /**
+   * Set up the CastManager singleton.
+   *
+   * @param context       an Android context. Non-null.
+   * @param applicationId the unique ID for your application
+   * @param namespace     is the single namespace to be set up for this class.
+   * @return the CastManager singleton.
+   * @throws java.lang.RuntimeException if Google Play Services are not available or if the underlying
+   * Google DataCastManager couldn't be initialized.
+   */
   public static CastManager initialize(Context context, String applicationId, String namespace) {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
@@ -97,24 +107,33 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     return castManager;
   }
 
-  private static void requireGooglePlayServices(Context context) {
-    if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
-      String msg = "Couldn't find the appropriate version of Google Play Services";
+  private static void requireGooglePlayServices( Context context ) {
+    final int gpsAvailableCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable( context );
+    if( ConnectionResult.SUCCESS != gpsAvailableCode ) {
+      String msg = "Couldn't find the appropriate version of Google Play Services (code " + gpsAvailableCode + ")";
       DebugMode.logE( TAG, msg );
       throw new RuntimeException( msg );
     }
   }
-  
+
+  /**
+   * @return the CastManager singleton. Possibly null.
+   * @see #initialize(android.content.Context, String, String)
+   */
   public static CastManager getCastManager() {
     return castManager;
   }
   
   private CastManager( DataCastManager dataCastManager, String namespace ) {
     this.dataCastManager = dataCastManager;
-    this.namespace = namespace;
+    this.namespace = namespace; // there's no accessor for namespaces on DataCastManager.
     this.dataCastManager.addDataCastConsumer( this );
   }
 
+  /**
+   * Get the DataCastManager, only to be used for calling methods that we have not already wrapped in CastManager.
+   * @return the DataCastManager being wrapped.
+   */
   public DataCastManager getDataCastManager() {
     return this.dataCastManager;
   }
@@ -124,9 +143,11 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /*============================================================================================*/
 
   /**
-   * Create options menu for cast button
-   * @param activity: activity of third party application that implements cast button
-   * @param menu: menu that pops up after clicking on the cast button
+   * Add UI for casting options into a pre-existing menu.
+   *
+   * @param activity third party application's Activity desiring a cast button.
+   * @param menu     into which to add the cast button. A selection of available
+   *                 receivers will pop up after clicking on the cast button.
    */
   public void addCastButton(Activity activity, Menu menu) {
     DebugMode.logD(TAG, "Add Cast Button");
@@ -138,55 +159,87 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     mediaRouteActionProvider.setRouteSelector(dataCastManager.getMediaRouteSelector());
     mediaRouteActionProvider.setDialogFactory(new CastMediaRouteDialogFactory());
   }
-
+  
+  /**
+   * * @param view to display in the video area while casting. Possibly null.
+   *
+   * @see #getCastView()
+   */
   public void setCastView(View view) {
     DebugMode.assertCondition( view != null, TAG, "cannot set castView to null" );
     DebugMode.logD( TAG, "Set cast view to " + view );
     castView = view;
   }
 
+  /**
+   * @return the currently associated View. Possibly null.
+   * @see #setCastView(android.view.View)
+   */
   public View getCastView() {
     return castView;
   }
 
+  /**
+   * Icon to use for Android Notifications.
+   *
+   * @param resourceId for looking up the notification small icon image.
+   */
   public void setNotificationImageResourceId(int resourceId) {
     DebugMode.logD(TAG, "Set notification image resource id = " + resourceId);
     notificationImageResourceId = resourceId;
   }
-  
+
+  /**
+   * What to show in the mini controller when there's no thumbnail for the video asset.
+   *
+   * @param imageBitmap to show in the mini controller. Should not be null.
+   * @see #getDefaultMiniControllerImageBitmap()
+   */
   public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
     DebugMode.logD(TAG, "Set mini controller image bitmap = " + imageBitmap);
     miniControllerDefaultImageBitmap = imageBitmap;
   }
 
+  /**
+   * @param resourceId for looking up the notification mini controller view layout.
+   */
   public void setNotificationMiniControllerLayout(int resourceId) {
     DebugMode.logD(TAG, "Set notification mini controller layout = " + resourceId);
     notificationMiniControllerResourceId = resourceId;
   }
 
+  /**
+   * @param isSeekable true allows seek operations, false denies them.
+   */
   public void setCastPlayerSeekable(boolean isSeekable) {
     isPlayerSeekable = isSeekable;
   }
 
   /**
-   * Init this.ooyalaPlayer with given ooyalaPlayer
-   * Register the OOCastManager of the given ooyalaPlayer with "this"
-   * @param ooyalaPlayer
+   * Connect the CastManager to the OoyalaPlayer instance.
+   * Must be called before setting the embed code of the video asset on the OoyalaPlayer instance.
+   *
+   * @param ooyalaPlayer must not be null.
+   * @see #deregisterFromOoyalaPlayer()
    */
   public void registerWithOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+    DebugMode.assertCondition( ooyalaPlayer != null, TAG, "OoyalaPlayer must be non-null" );
     DebugMode.logD(TAG, "Connect to OoyalaPlayer " + ooyalaPlayer);
     this.ooyalaPlayer = new WeakReference<OoyalaPlayer>(ooyalaPlayer);
     ooyalaPlayer.registerCastManager(this);
   }
 
   /**
-   * Disconnect the current OoyalaPlayer from the OOCastManager
-   * Called from App level when right before the connected OoyalaPlayer is destroyed
+   * Disconnect the currently registered OoyalaPlayer from the OOCastManager.
+   * The Android Activity making use of Ooyala Casting should call this
+   * appropriately e.g. during its own tear-down.
+   *
+   * @see #registerWithOoyalaPlayer(com.ooyala.android.OoyalaPlayer)
    */
-  public void deregisterOoyalaPlayer() {
+  public void deregisterFromOoyalaPlayer() {
     DebugMode.logD( TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer );
     this.ooyalaPlayer = null;
-    if (isInCastMode()) {
+    if( isActivelyCastingContent() ) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
   }
@@ -203,33 +256,61 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /*========== Access CastManager Status Or Fields =============================================*/
   /*============================================================================================*/
 
+  /**
+   * @return any previously registered bitmap, otherwise null.
+   * @see #setDefaultMiniControllerImageBitmap(android.graphics.Bitmap)
+   */
   public Bitmap getDefaultMiniControllerImageBitmap() {
     return miniControllerDefaultImageBitmap;
   }
 
+  /**
+   * For interacting with the cast playback, even when there is no OoyalaPlayer.
+   *
+   * @return the current CastPlayer. Possibly null.
+   */
   public CastPlayer getCastPlayer() {
     return this.castPlayer;
   }
 
+  /**
+   * @return true if the CastManager is connected to a receiver app (e.g. on a networked Chromecast box),
+   * even if casting has not actually begun.
+   */
   public boolean isConnectedToReceiverApp() {
     return dataCastManager.isConnected() && this.isConnectedToReceiverApp;
   }
-
+  
   /**
-   * Update the mini controllers when activity with mini controllers resumes
+   * @return true if the CastManager is casting content to a receiver.
    */
-  public void onResume() {
-    DebugMode.logD(TAG, "onResume()");
-    updateMiniControllersState();
+  public boolean isActivelyCastingContent() {
+    return isInCastMode;
   }
 
+  /**
+   * The Android Activity making use of Ooyala Casting must call this
+   * in its own Application.onResume().
+   */
+  public void onResume( Context context ) {
+    DebugMode.logD(TAG, "onResume()");
+    setCurrentContext( context );
+    updateMiniControllers();
+  }
+
+  /**
+   * Removes castView from the OoyalaPlayer, for use after disconnecting from the receiver.
+   */
   private void hideCastView() {
     DebugMode.logD(TAG, "Hide cast view");
-    if (ooyalaPlayer != null && ooyalaPlayer.get().getLayout().getChildCount() != 0) {
+    if( ooyalaPlayer != null && ooyalaPlayer.get().getLayout().getChildCount() != 0 && castView != null ) {
       ooyalaPlayer.get().getLayout().removeView(castView);
     }
   }
 
+  /**
+   * Called after we establish casting to a receiver.
+   */
   private void displayCastView() {
     DebugMode.logD(TAG, "CastView = " + castView);
     if (ooyalaPlayer != null && castView != null) {
@@ -240,6 +321,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
 
+  /**
+   * Called when exiting cast mode.
+   */
   private void destroyCastPlayer() {
     DebugMode.logD(TAG, "Destroy current CastPlayer");
     castPlayer.destroy();
@@ -270,8 +354,8 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   public void onApplicationDisconnected(int errorCode) {
     DebugMode.logD( TAG, "onApplicationDisconnected called" );
     this.isConnectedToReceiverApp = false;
-    if (isInCastMode()) {
-      exitCastMode();
+    if (isActivelyCastingContent()) {
+      cleanupAfterReceiverDisconnect();
     }
   }
 
@@ -313,7 +397,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   DebugMode.logD(TAG, "onDisconnected called");
     this.isConnectedToReceiverApp = false;
     if (isInCastMode()) {
-      exitCastMode();
+      cleanupAfterReceiverDisconnect();
     }
   }
 
@@ -375,7 +459,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     isInCastMode = true;
   }
 
-  void initCastPlayer(CastModeOptions options, String embedToken) {
+  /*package private on purpose*/ void initCastPlayer(CastModeOptions options, String embedToken) {
     DebugMode.logD(TAG, "initCastPlayer with embedCode = " + options.getEmbedCode() + ", playhead = " + options.getPlayheadTimeInMillis() + " isPlaying = " + options.isPlaying());
     if (ooyalaPlayer != null) {
       castPlayer.setSeekable(isPlayerSeekable);
@@ -387,19 +471,24 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
 
-  private void exitCastMode() {
+  private void cleanupAfterReceiverDisconnect() {
     DebugMode.logD(TAG, "Exit Cast Mode");
     hideCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null when exit cast mode");
     if (ooyalaPlayer != null) {
       ooyalaPlayer.get().exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
     }
-    dismissMiniControllers();
     destroyCastPlayer();
+    dismissMiniControllers();
     removeAllMiniControllers();
     isInCastMode = false;
   }
 
+  /**
+   * Send a data message using the previously configured CastManager namespace.
+   *
+   * @see com.google.sample.castcompanionlibrary.cast.DataCastManager#sendDataMessage(String, String)
+   */
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {
    dataCastManager.sendDataMessage(message, namespace);
@@ -422,6 +511,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /*========== MiniController ==================================================================*/
   /*============================================================================================*/
 
+  /**
+   * @param miniController to associate with this CastManager.
+   */
   public void addMiniController(CastMiniController miniController) {
     DebugMode.logD(TAG, "Add mini controller " + miniController);
     if (miniControllers == null) {
@@ -432,9 +524,12 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
 
-  public void updateMiniControllersState() {
+  /**
+   * Tell all associated CastMiniControllers to update.
+   */
+  public void updateMiniControllers() {
     DebugMode.logD(TAG, "Update mini controllers state");
-    if (miniControllers != null &&  isInCastMode()) {
+    if( miniControllers != null && isActivelyCastingContent() ) {
       if (castPlayer.getState() == State.COMPLETED) {
         dismissMiniControllers();
       } else {
@@ -445,6 +540,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * @param miniController to be disassociated from this CastManager.
+   */
   public void removeMiniController(CastMiniController miniController) {
     DebugMode.logD(TAG, "Remove mini controller " + miniController);
     if (miniControllers != null) {
@@ -452,6 +550,11 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * Disassociate all previously associated CastMiniControllers.
+   *
+   * @see #removeMiniController(CastMiniController)
+   */
   private void removeAllMiniControllers() {
     DebugMode.logD(TAG, "Remove all mini controllers");
     if (miniControllers != null) {
@@ -459,6 +562,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * Tell all associated CastMiniControllers to dismiss.
+   */
   private void dismissMiniControllers() {
     DebugMode.logD(TAG, "dismiss mini controllers");
     if (miniControllers != null) {
@@ -468,20 +574,29 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * Should be called by the Activity in onCreate().
+   *
+   * @param targetActivity to be resumed (probably the Activity calling this method)
+   *                       when the CastMiniController container is clicked. Should not be null.
+   */
   public void setTargetActivity(Class<?> targetActivity) {
     this.targetActivity = targetActivity;
   }
   
+  /**
+   * @return previously registered target activity. Possibly null.
+   */
   public Class<?> getTargetActivity() {
     return targetActivity;
   }
 
-  public void setCurrentContext(Context context) {
+  private void setCurrentContext(Context context) {
     currentActivity = context.getClass();
     currentContext = context;
   }
 
-  public Class<?> getCurrentActivity() {
+  /*package private on purpose*/ Class<?> getCurrentActivity() {
     return currentActivity;
   }
   
@@ -490,9 +605,17 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /*==========  Notification Service ============================================================*/
   /*============================================================================================*/
   
+  /**
+   * Enables reacting to mini controllers in the Notification area of the Android UI.
+   * The app Activity should call this to add the Notification mini controller support e.g. in onSuspend().
+   * Requires setTargetActivity to have previously been called with a valid target.
+   *
+   * @param context an Android context. Non-null.
+   * @see #setTargetActivity(Class)
+   */
   public  void createNotificationService(Context context) {
     DebugMode.logD(TAG, "Create notification service");
-    if (isInCastMode()) {
+    if( isActivelyCastingContent() ) {
       notificationServiceIsActivated = true;
       if (castPlayer.getState() == State.PLAYING) {
         buildNotificationService(context, false);
@@ -503,6 +626,11 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * The app Actvity should call this to remove the Notification mini
+   * controller support e.g. in onResume().
+   * @param context an Android context. Non-null.
+   */
   public void destroyNotificationService(Context context) {
     DebugMode.logD(TAG, "Destroy notification service");
     if (notificationServiceIsActivated) {
@@ -526,10 +654,10 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
         @Override
         public void onReceive(Context context, Intent intent) {
          DebugMode.logD("TAG", "Play/Pause button is clicked in notification service");
-          if (isInCastMode()) {
+          if( isActivelyCastingContent() ) {
             String action = intent.getAction();
             if (action.equals(ACTION_STOP)) {
-              exitCastMode();
+              cleanupAfterReceiverDisconnect();
               dataCastManager.disconnect();
               destroyNotificationService(context);
             } else if (action.equals(ACTION_PLAY)) {
@@ -612,8 +740,15 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /*========== Lock Screen Controller ==========================================================*/
   /*============================================================================================*/
   
+  /**
+   * Set up controls to appear on the lock screen.
+   * The application should call this to add the lock screen mini
+   * controller support e.g. in onResume().
+   *
+   * @param context an Android context. Non-null.
+   */
   public void registerLockScreenControls(Context context) {
-    if (isInCastMode()) {
+    if( isActivelyCastingContent() ) {
       DebugMode.logD(TAG, "Register Lock Screen Mini controller");
       audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
       audioManager.requestAudioFocus(
@@ -649,6 +784,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     }
   }
   
+  /**
+   * Remove any casting controls from the lock screen.
+   */
   public void unregisterLockScreenControls() {
     DebugMode.logD(TAG, "Unregister lock screen controls");
     if (audioManager != null) {
@@ -658,9 +796,9 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
     remoteControlClient = null;
   }
   
-  public void updateNotificationAndLockScreenPlayPauseButton() {
+  /*package private on purpose*/ void updateNotificationAndLockScreenPlayPauseButton() {
     DebugMode.logD( TAG, "Update Lock Screen mini controller play/pause button status" );
-    if (isInCastMode() && notificationServiceIsActivated) {
+    if (isActivelyCastingContent() && notificationServiceIsActivated) {
       if (castPlayer.getState() == State.PLAYING) {
         if (remoteControlClient != null) {
           remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);

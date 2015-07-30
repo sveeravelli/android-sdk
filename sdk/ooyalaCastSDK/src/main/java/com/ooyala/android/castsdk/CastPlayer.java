@@ -136,7 +136,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   
   protected void setState(State state) {
     this.state = state;
-    castManager.get().updateMiniControllersState();
+    castManager.get().updateMiniControllers();
     castManager.get().updateNotificationAndLockScreenPlayPauseButton();
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
