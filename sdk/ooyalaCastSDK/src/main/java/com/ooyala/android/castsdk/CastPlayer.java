@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -532,6 +533,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       final CastManager cm = wcm.get();
       if( cm != null ) {
         run( cm );
+      }
+      else {
+        DebugMode.logE( TAG, "Weak CastManager was null. Stack = " + Arrays.toString(Thread.currentThread().getStackTrace()) );
       }
     }
     protected abstract void run( CastManager cm );
