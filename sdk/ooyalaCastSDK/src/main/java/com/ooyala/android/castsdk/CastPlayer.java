@@ -25,7 +25,7 @@ import java.util.Observable;
 
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
 
-  private static final String TAG = "OOCastPlayer";
+  private static final String TAG = CastPlayer.class.getSimpleName();
   private String RECEIVER_LIVE_LANGUAGE = "live";
   private String RECEIVER_DISABLE_LANGUAGE = "";
 
