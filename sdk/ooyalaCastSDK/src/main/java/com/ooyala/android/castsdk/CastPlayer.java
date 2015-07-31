@@ -17,16 +17,16 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
-import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
-
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
-  private static final String TAG = "OOCastPlayer";
+
+  private static final String TAG = CastPlayer.class.getSimpleName();
   private String RECEIVER_LIVE_LANGUAGE = "live";
   private String RECEIVER_DISABLE_LANGUAGE = "";
 
@@ -129,20 +129,31 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   public void syncDeviceVolumeToTV() {
     DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
-    JSONObject actionSetVolume = new JSONObject();
-    try {
-      actionSetVolume.put("action", "volume");
-      actionSetVolume.put("data", castManager.get().getDataCastManager().getDeviceVolume());
-      sendMessage(actionSetVolume.toString());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    new RunWithWeakCastManager(castManager) {
+      @Override
+      protected void run( CastManager cm ) {
+        JSONObject actionSetVolume = new JSONObject();
+        try {
+          actionSetVolume.put( "action", "volume" );
+          actionSetVolume.put( "data", cm.getDataCastManager().getDeviceVolume() );
+          sendMessage( actionSetVolume.toString() );
+        }
+        catch( Exception e ) {
+          e.printStackTrace();
+        }
+      }
+    }.safeRun();
   }
   
   protected void setState(State state) {
     this.state = state;
-    castManager.get().updateMiniControllers();
-    castManager.get().updateNotificationAndLockScreenPlayPauseButton();
+    new RunWithWeakCastManager( castManager ) {
+      @Override
+      public void run( CastManager cm ) {
+        cm.updateMiniControllers();
+        cm.updateNotificationAndLockScreenPlayPauseButton();
+      }
+    }.safeRun();
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
@@ -308,9 +319,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           URL imgUrl = new URL(castItemPromoImg.toString());
           castImageBitmap = BitmapFactory.decodeStream(imgUrl.openStream());
         } catch (Exception e) {
-          LOGE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", using the default one",
+          DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", trying the default one",
               e);
-          castImageBitmap = castManager.get().getDefaultMiniControllerImageBitmap();
+          new RunWithWeakCastManager( castManager ) {
+            @Override
+            public void run( CastManager cm ) {
+              castImageBitmap = cm.getDefaultMiniControllerImageBitmap();
+            }
+          }.safeRun();
         }
       }
     }).start();
@@ -322,14 +338,20 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
   
   private void sendMessage(final String message) {
-    try {
-      DebugMode.logD(TAG, "Sending Message: " + message);
-      castManager.get().sendDataMessage(message);
-    }  catch (Exception e) {
-      e.printStackTrace();
-    }
+    DebugMode.logD( TAG, "Sending Message: " + message );
+    new RunWithWeakCastManager( castManager ) {
+      @Override
+      public void run( CastManager cm ) {
+        try {
+          cm.sendDataMessage( message );
+        }
+        catch( Exception e ) {
+          e.printStackTrace();
+        }
+      }
+    }.safeRun();
   }
-  
+
   private void getReceiverPlayerState() {
     DebugMode.logD(TAG, "getReceiverPlayerState");
     sendMessage(CastUtils.makeActionJSON("getstatus"));
@@ -383,8 +405,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
           DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
-            // current content has been override on receiver side. keep play current content on content mode
-            castManager.get().getDataCastManager().disconnectDevice(false, true, true);
+            new RunWithWeakCastManager( castManager ) {
+              @Override
+              public void run( CastManager cm ) {
+                // current content has been override on receiver side. keep play current content on content mode
+                cm.getDataCastManager().disconnectDevice( false, true, true );
+              }
+            }.safeRun();
           }
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {
@@ -495,5 +522,22 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   private OoyalaErrorCode getOoyalaErrorCodeForReceiverCode(String receiverCode) {
      return errorMap.get(receiverCode) == null ? errorMap.get(receiverCode) : OoyalaErrorCode.ERROR_UNKNOWN;
+  }
+
+  private abstract static class RunWithWeakCastManager {
+    private final WeakReference<CastManager> wcm;
+    protected RunWithWeakCastManager( WeakReference<CastManager> wcm ) {
+      this.wcm = wcm;
+    }
+    public void safeRun() {
+      final CastManager cm = wcm.get();
+      if( cm != null ) {
+        run( cm );
+      }
+      else {
+        DebugMode.logE( TAG, "Weak CastManager was null. Stack = " + Arrays.toString(Thread.currentThread().getStackTrace()) );
+      }
+    }
+    protected abstract void run( CastManager cm );
   }
 }
