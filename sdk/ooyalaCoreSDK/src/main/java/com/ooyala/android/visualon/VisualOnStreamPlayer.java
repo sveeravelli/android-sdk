@@ -523,8 +523,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _surfaceExists = false;
     new Handler().post(new Runnable() {
       public void run() {
-        _player.stop();
-        _player.setView(null);
+        if (_player != null) {
+          _player.stop();
+          _player.setView(null);
+        }
       }
     });
   }
