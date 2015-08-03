@@ -521,10 +521,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void surfaceDestroyed(SurfaceHolder arg0) {
     DebugMode.logI(TAG, "Surface Destroyed");
     _surfaceExists = false;
-    if (_player != null) {
-      _player.stop();
-      _player.setView(null);
-    }
+    new Handler().post(new Runnable() {
+      public void run() {
+        if (_player != null) {
+          _player.stop();
+          _player.setView(null);
+        }
+      }
+    });
   }
   
   private void setVisualOnConfigurations() {
