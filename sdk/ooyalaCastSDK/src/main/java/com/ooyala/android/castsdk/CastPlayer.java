@@ -2,7 +2,6 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -11,10 +10,8 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Arrays;
@@ -24,6 +21,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
+/**
+ * Control the playback e.g. pausing, seeking.
+ * The lifecycle of the CastPlayer is to be managed by the CastManager, not by the 3rd party Android application.
+ */
 public class CastPlayer extends Observable implements PlayerInterface, LifeCycleInterface {
 
   private static final String TAG = CastPlayer.class.getSimpleName();
@@ -49,19 +50,18 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private String castItemPromoImg;
 
   private Bitmap castImageBitmap;
-  
-  
-  public CastPlayer(CastManager castManager) {
+
+  /*package private on purpose*/ CastPlayer(CastManager castManager) {
     this.castManager = new WeakReference<CastManager>(castManager);
   }
 
-  public void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
+  /*package private on purpose*/ void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     DebugMode.logD(TAG, "Set OoyalaPlayer = " + ooyalaPlayer);
     this.addObserver(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
   }
 
-  public void disconnectFromCurrentOoyalaPlayer() {
+  /*package private on purpose*/ void disconnectFromCurrentOoyalaPlayer() {
     DebugMode.logD(TAG, "Disconnect from current OoyalaPlayer by removing observers");
     this.deleteObservers();
   }
@@ -89,6 +89,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return currentTime;
   }
 
+  /**
+   * Change the playhead to the given time.
+   * @param curTime position to seek to, in milliseconds.
+   */
   private void setCurrentTime(int curTime) {
     currentTime = curTime;
     onPlayHeadChanged();
@@ -99,6 +103,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return duration;
   }
 
+  /**
+   * Tell the UI if the scrubber should allow seeking.
+   * @param seekable true for scrubbing/seeking, false to prevent it.
+   */
   public void setSeekable(boolean seekable) {
     this.seekable = seekable;
   }
@@ -127,7 +135,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     onPlayHeadChanged();
   }
 
-  public void syncDeviceVolumeToTV() {
+  /*package private on purpose*/ void syncDeviceVolumeToTV() {
     DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
     new RunWithWeakCastManager(castManager) {
       @Override
@@ -145,7 +153,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     }.safeRun();
   }
   
-  protected void setState(State state) {
+  private void setState(State state) {
     this.state = state;
     new RunWithWeakCastManager( castManager ) {
       @Override
@@ -191,6 +199,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       return language;
     }
   }
+
   @Override
   public OoyalaException getError() {
     return error;
@@ -201,22 +210,52 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return isLiveClosedCaptionsAvailable;
   }
 
+  /**
+   * For Ooyala internal use only.
+   */
+  // TODO: maybe this should be returning 100%, not 0%?
+  public int livePlayheadPercentage() {
+    return 0;
+  }
+
+  /**
+   * For Ooyala internal use only.
+   * Seeking to live is not currently supported.
+   */
+  public void seekToPercentLive(int percent) {
+  }
+
+  /**
+   * @return the current asset embed code. Possibly null.
+   */
   public String getEmbedCode() {
     return embedCode;
   }
-  
+
+  /**
+   * @return the current asset title. Possibly null.
+   */
   public String getCastItemTitle() {
     return castItemTitle;
   }
 
+  /**
+   * @return the current asset description. Possibly null.
+   */
   public String getCastItemDescription() {
     return castItemDescription;
   }
 
+  /**
+   * @return the current asset promo image url. Possibly null.
+   */
   public String getCastItemPromoImgUrl() {
     return castItemPromoImg;
   }
-  
+
+  /**
+   * @return the current asset casting image. Possibly null.
+   */
   public Bitmap getCastImageBitmap() {
     return castImageBitmap;
   }
@@ -225,7 +264,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  public void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
+  /*package private on purpose*/ void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
     if (initWithTheCastingContent(options.getEmbedCode())) {
       getReceiverPlayerState(); // for updating UI controls
@@ -298,8 +337,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     }
     return wrap.toString();
   }
-  
-  public void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
+
+  /*package private on purpose*/ void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
     if (player != null && player.getCurrentItem() != null) {
       castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
       castItemTitle = player.getCurrentItem().getTitle();
@@ -356,8 +395,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     DebugMode.logD(TAG, "getReceiverPlayerState");
     sendMessage(CastUtils.makeActionJSON("getstatus"));
   }
-  
-  public void receivedMessage(String message) {
+
+  /*package private on purpose*/ void receivedMessage(String message) {
     try {
       JSONObject msg = new JSONObject(message);
       
@@ -472,13 +511,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void destroy() {
     deleteObservers();
-  }
-
-  public int livePlayheadPercentage() {
-    return 0;
-  }
-
-  public void seekToPercentLive(int percent) {
   }
 
   // The translations between HTML5 Error codes and OoyalaPlayer Error Codes
