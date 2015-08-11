@@ -98,8 +98,6 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
       requireGooglePlayServices(context);
       DataCastManager.initialize( context, applicationId, new String[]{namespace} );
       castManager = new CastManager( DataCastManager.getInstance(), namespace );
-      castManager.getDataCastManager().startCastDiscovery();
-
     }
     return castManager;
   }
