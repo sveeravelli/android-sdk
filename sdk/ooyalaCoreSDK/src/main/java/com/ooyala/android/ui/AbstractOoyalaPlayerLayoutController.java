@@ -413,7 +413,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     _fullscreenButtonShowing = showing;
   }
 
-  private void ccLanguageDialogDismissed() {
+  private void changeLanguage() {
     if( ! ccLanguageDialogCanceled ) {
       String language = ccLanguageDialogUncommittedSelection.getText().toString();
       if( _player == null ) {
@@ -442,6 +442,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     DebugMode.logD( TAG, "onCCDialogLanguageClicked: " + ", " + button.getText() + ", " + button.isChecked() );
     ccLanguageDialogUncommittedSelection = button;
     checkOnly( button );
+    changeLanguage();
   }
 
   private void checkOnly( RadioButton button ) {
