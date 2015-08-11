@@ -386,9 +386,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       listView.setAdapter(optionAdapter);
       AlertDialog.Builder builder = new AlertDialog.Builder(context);
       builder.setView( listView );
-      builder.setOnDismissListener( new DialogInterface.OnDismissListener() {
-        @Override public void onDismiss( DialogInterface dialog ) { ccLanguageDialogDismissed(); }
-      } );
+//      builder.setOnDismissListener( new DialogInterface.OnDismissListener() {
+//        @Override public void onDismiss( DialogInterface dialog ) { ccLanguageDialogDismissed(); }
+//      } );
       builder.setOnCancelListener( new DialogInterface.OnCancelListener() {
         @Override public void onCancel( DialogInterface dialog ) { onCCLanguageDialogCanceled(); }
       } );
