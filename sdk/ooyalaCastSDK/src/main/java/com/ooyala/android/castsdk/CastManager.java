@@ -30,11 +30,11 @@ import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.Status;
-import com.google.sample.castcompanionlibrary.cast.DataCastManager;
-import com.google.sample.castcompanionlibrary.cast.callbacks.IDataCastConsumer;
-import com.google.sample.castcompanionlibrary.cast.exceptions.CastException;
-import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
-import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
+import com.google.android.libraries.cast.companionlibrary.cast.DataCastManager;
+import com.google.android.libraries.cast.companionlibrary.cast.callbacks.DataCastConsumer;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.CastException;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaPlayer;
@@ -47,7 +47,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class CastManager implements CastManagerInterface, IDataCastConsumer {
+public class CastManager implements CastManagerInterface, DataCastConsumer {
   private static final String TAG = CastManager.class.getSimpleName();
 
   public static final String ACTION_PLAY = "OOCastPlay";
@@ -97,12 +97,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
       DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
       requireGooglePlayServices(context);
       DataCastManager.initialize( context, applicationId, new String[]{namespace} );
-      try {
-        castManager = new CastManager( DataCastManager.getInstance(), namespace );
-      }
-      catch( CastException ce ) {
-        throw new RuntimeException( ce );
-      }
+      castManager = new CastManager( DataCastManager.getInstance(), namespace );
     }
     return castManager;
   }
@@ -365,8 +360,8 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   }
 
   @Override
-  public boolean onApplicationConnectionFailed( int errorCode ) {
-    return true; // TODO: what do we want here?
+  public void onApplicationConnectionFailed( int errorCode ) {
+    return; // TODO: what do we want here?
   }
 
   @Override
@@ -402,8 +397,8 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   }
 
   @Override
-  public boolean onConnectionFailed( ConnectionResult result ) {
-    return true; // TODO: what do we want here?
+  public void onConnectionFailed( ConnectionResult result ) {
+    return; // TODO: what do we want here?
   }
 
   @Override
@@ -487,7 +482,7 @@ public class CastManager implements CastManagerInterface, IDataCastConsumer {
   /**
    * Send a data message using the previously configured CastManager namespace.
    *
-   * @see com.google.sample.castcompanionlibrary.cast.DataCastManager#sendDataMessage(String, String)
+   * @see com.google.android.libraries.cast.companionlibrary.cast.DataCastManager#sendDataMessage(String, String)
    */
   public void sendDataMessage(String message) throws IllegalArgumentException, IllegalStateException, IOException,
       TransientNetworkDisconnectionException, NoConnectionException {

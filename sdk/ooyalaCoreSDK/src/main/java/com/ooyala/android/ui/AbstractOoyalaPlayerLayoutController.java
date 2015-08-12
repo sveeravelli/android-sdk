@@ -386,9 +386,9 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       listView.setAdapter(optionAdapter);
       AlertDialog.Builder builder = new AlertDialog.Builder(context);
       builder.setView( listView );
-      builder.setOnDismissListener( new DialogInterface.OnDismissListener() {
-        @Override public void onDismiss( DialogInterface dialog ) { ccLanguageDialogDismissed(); }
-      } );
+//      builder.setOnDismissListener( new DialogInterface.OnDismissListener() {
+//        @Override public void onDismiss( DialogInterface dialog ) { ccLanguageDialogDismissed(); }
+//      } );
       builder.setOnCancelListener( new DialogInterface.OnCancelListener() {
         @Override public void onCancel( DialogInterface dialog ) { onCCLanguageDialogCanceled(); }
       } );
@@ -413,7 +413,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     _fullscreenButtonShowing = showing;
   }
 
-  private void ccLanguageDialogDismissed() {
+  private void changeLanguage() {
     if( ! ccLanguageDialogCanceled ) {
       String language = ccLanguageDialogUncommittedSelection.getText().toString();
       if( _player == null ) {
@@ -442,6 +442,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     DebugMode.logD( TAG, "onCCDialogLanguageClicked: " + ", " + button.getText() + ", " + button.isChecked() );
     ccLanguageDialogUncommittedSelection = button;
     checkOnly( button );
+    changeLanguage();
   }
 
   private void checkOnly( RadioButton button ) {
