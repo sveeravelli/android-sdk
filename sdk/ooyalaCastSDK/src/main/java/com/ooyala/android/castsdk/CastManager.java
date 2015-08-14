@@ -648,7 +648,7 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
         
         @Override
         public void onReceive(Context context, Intent intent) {
-         DebugMode.logD("TAG", "Play/Pause button is clicked in notification service");
+         DebugMode.logD(TAG, "Play/Pause button is clicked in notification service");
           if( isActivelyCastingContent() ) {
             String action = intent.getAction();
             if (action.equals(ACTION_STOP)) {
