@@ -658,7 +658,7 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
             } else if (action.equals(ACTION_PLAY)) {
               if (castPlayer.getState() == State.PLAYING) {
                 castPlayer.pause();
-              } else if (castPlayer.getState() == State.PAUSED || castPlayer.getState() == State.READY) {
+              } else if (castPlayer.getState() == State.PAUSED || castPlayer.getState() == State.READY || castPlayer.getState() == State.LOADING || castPlayer.getState() == State.COMPLETED) {
                 castPlayer.play();
               }
             }
