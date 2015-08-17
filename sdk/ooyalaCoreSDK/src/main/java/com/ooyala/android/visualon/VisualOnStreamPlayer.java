@@ -498,7 +498,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
   @Override
   public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-    DebugMode.logV(TAG, "Surface Changed: " + width + ","+ height);
+    DebugMode.logV(TAG, "Surface Changed: " + width + "," + height);
     if (_player != null) {
       _player.setSurfaceChangeFinished();
     }
@@ -521,16 +521,22 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void surfaceDestroyed(SurfaceHolder arg0) {
     DebugMode.logI(TAG, "Surface Destroyed");
     _surfaceExists = false;
-    new Handler().post(new Runnable() {
+    new Handler().postDelayed(new Runnable() {
       public void run() {
-        if (_player != null) {
+        if (_surfaceExists) {
+          DebugMode.logI(TAG, "Surface Destroyed Runnable called after a different surface was created");
+        } else if (_player != null) {
+          DebugMode.logI(TAG, "Player stopped after Surface Destroyed");
           _player.stop();
           _player.setView(null);
         }
+        else {
+          DebugMode.logE(TAG, "Player did not exist after Surface Destroyed");
+        }
       }
-    });
+    }, 0);
   }
-  
+
   private void setVisualOnConfigurations() {
     if (this._visualOnConfiguration != null) {
       _player.setInitialBitrate(this._visualOnConfiguration.getInitialBitrate());
