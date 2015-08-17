@@ -10,6 +10,8 @@ generate-build-tools:
 		cp $(SCRIPT_SUBMODULE_BIN_DIR)/$$me $(SCRIPT_SDK_BIN_DIR)/$$me; \
 		if ! [ -e $(SCRIPT_SDK_BIN_DIR)/$$me ] ; then echo missing $(SCRIPT_SDK_BIN_DIR)/$$me; exit 1; fi; \
 	done
+	@echo "DONE: Build scripts created."
+	@echo "      To compile the SDK, use script/android_build."
 
 update-submodules:
 	git submodule init
