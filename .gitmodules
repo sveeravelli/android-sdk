@@ -6,4 +6,4 @@
 	url = https://github.com/ooyala/android-sample-apps.git
 [submodule "vendor/CastCompanionLibrary"]
 	path = vendor/CastCompanionLibrary
-	url = https://github.com/googlecast/CastCompanionLibrary-android.git
+	url = git@github.com:ooyala/CastCompanionLibrary-android.git
