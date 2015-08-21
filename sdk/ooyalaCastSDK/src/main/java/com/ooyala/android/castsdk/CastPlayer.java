@@ -442,8 +442,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         }
         else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
-          DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
+            DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
             new RunWithWeakCastManager( castManager ) {
               @Override
               public void run( CastManager cm ) {

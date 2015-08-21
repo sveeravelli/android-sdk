@@ -468,6 +468,7 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
 
   private void cleanupAfterReceiverDisconnect() {
     DebugMode.logD(TAG, "Exit Cast Mode");
+    isInCastMode = false;
     hideCastView();
     DebugMode.assertCondition(castPlayer != null, TAG, "castPlayer cannot be null when exit cast mode");
     if (ooyalaPlayer != null) {
@@ -476,7 +477,6 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
     destroyCastPlayer();
     dismissMiniControllers();
     removeAllMiniControllers();
-    isInCastMode = false;
   }
 
   /**
