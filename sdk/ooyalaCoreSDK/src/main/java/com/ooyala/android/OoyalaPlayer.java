@@ -1409,6 +1409,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       sendNotification(AD_COMPLETED_NOTIFICATION);
     } else if (notification.equals(CURRENT_ITEM_CHANGED_NOTIFICATION)) {
       sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+    } else if (notification.equals(ERROR_NOTIFICATION)) {
+      _error = this._castManager.getCastPlayer().getError();
+      onContentError();
     }
   }
 

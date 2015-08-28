@@ -477,6 +477,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           String receiverCode = msg.getJSONObject("1").getString("code");
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
           setState(State.ERROR);
+          setChanged();
+          notifyObservers(OoyalaPlayer.ERROR_NOTIFICATION);
         }
       }
     } catch (JSONException e) {
