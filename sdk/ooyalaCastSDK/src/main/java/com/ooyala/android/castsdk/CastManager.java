@@ -28,6 +28,7 @@ import android.widget.RemoteViews;
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.cast.companionlibrary.cast.DataCastManager;
@@ -103,7 +104,7 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
   }
 
   private static void requireGooglePlayServices( Context context ) {
-    final int gpsAvailableCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable( context );
+    final int gpsAvailableCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
     if( ConnectionResult.SUCCESS != gpsAvailableCode ) {
       String msg = "Couldn't find the appropriate version of Google Play Services (code " + gpsAvailableCode + ")";
       DebugMode.logE( TAG, msg );
