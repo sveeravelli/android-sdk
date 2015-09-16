@@ -27,9 +27,9 @@ import java.util.Set;
  */
 public class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
+  private List<VASTAd> _ads = new ArrayList<VASTAd>();
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
-  private List<String> _impressionURLs = new ArrayList<String>();
   private boolean _impressionSent = false;
   private boolean _startSent = false;
   private boolean _firstQSent = false;
@@ -99,9 +99,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   private boolean initAfterFetch(OoyalaPlayer parent) {
+    _ads.addAll(_ad.getAds());
+
     for (VASTAd vastAd : _ad.getAds()) {
       // Add to the list of impression URLs to be called when player is loaded
-      _impressionURLs.addAll(vastAd.getImpressionURLs());
 
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
@@ -223,8 +224,8 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-        if (_ad._ads.size() == _impressionURLs.size()) {
-          sendImpressionTrackingEvent(_impressionURLs);
+        if (_ad._ads.size() == _ads.size()) {
+          sendImpressionTrackingEvent();
         }
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
         sendTrackingEvent(TrackingEvent.START);
@@ -249,10 +250,9 @@ public class VASTAdPlayer extends AdMoviePlayer {
           sendTrackingEvent(TrackingEvent.COMPLETE);
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
-          if(_impressionURLs.size() > 0) _impressionURLs.remove(0);
           if (!_linearAdQueue.isEmpty()) {
             if(!_impressionSent){
-              sendImpressionTrackingEvent(_impressionURLs);
+              sendImpressionTrackingEvent();
             }
 
             super.destroy();
@@ -357,20 +357,33 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
 
-  private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-    String urlStr = currentAdImpressionUrl(impressionURLs);
-    if(urlStr != null){
-      final URL url = VASTUtils.urlFromAdUrlString(urlStr);
-      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
-      ping(url);
-    }else{
-      _impressionSent = true;
+  private void sendImpressionTrackingEvent() {
+    List<String> currentImpressionUrls = currentAdImpressionUrl();
+    if(currentImpressionUrls != null || currentImpressionUrls.size() != 0){
+      for(String urlStr: currentImpressionUrls) {
+        final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+        DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
+        ping(url);
+      }
     }
 
+    if(_ads == null || _ads.size() == 0){
+      _impressionSent = true;
+    }
   }
 
-  private String currentAdImpressionUrl(List<String> impressionURLs){
-    return impressionURLs.size() > 0 ? impressionURLs.get(0) : null;
+  private List<String> currentAdImpressionUrl(){
+    List<String> currentImpressionUrls = new ArrayList<String>();
+
+    for(VASTAd ad: _ads){
+      currentImpressionUrls.addAll(ad.getImpressionURLs());
+    }
+
+    if(_ads != null || _ads.size() != 0){
+      _ads.remove(0);
+    }
+
+    return currentImpressionUrls;
   }
 
   @Override
