@@ -1,17 +1,10 @@
 package com.ooyala.android.ads.vast;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Set;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -21,6 +14,13 @@ import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
+import com.ooyala.android.util.DebugMode;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Set;
 
 /**
  * A MoviePlayer which helps render VAST advertisements
@@ -223,7 +223,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-        if (!_impressionSent) {
+        if (_ad._ads.size() == _impressionURLs.size()) {
           sendImpressionTrackingEvent(_impressionURLs);
         }
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
@@ -249,7 +249,12 @@ public class VASTAdPlayer extends AdMoviePlayer {
           sendTrackingEvent(TrackingEvent.COMPLETE);
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
+          if(_impressionURLs.size() > 0) _impressionURLs.remove(0);
           if (!_linearAdQueue.isEmpty()) {
+            if(!_impressionSent){
+              sendImpressionTrackingEvent(_impressionURLs);
+            }
+
             super.destroy();
             addQuartileBoundaryObserver();
             super.init(_parent, _linearAdQueue.get(0).getStreams());
@@ -351,13 +356,21 @@ public class VASTAdPlayer extends AdMoviePlayer {
     }
   }
 
+
   private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-    for(String urlStr : impressionURLs) {
+    String urlStr = currentAdImpressionUrl(impressionURLs);
+    if(urlStr != null){
       final URL url = VASTUtils.urlFromAdUrlString(urlStr);
       DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
       ping(url);
+    }else{
+      _impressionSent = true;
     }
-    _impressionSent = true;
+
+  }
+
+  private String currentAdImpressionUrl(List<String> impressionURLs){
+    return impressionURLs.size() > 0 ? impressionURLs.get(0) : null;
   }
 
   @Override
