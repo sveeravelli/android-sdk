@@ -567,6 +567,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     return changeCurrentItemAfterAuth();
   }
 
+  /**
+   * Reauthorize the currentItem, which would refresh the auth_token.
+   * @param callback a callback which is called after Authorization is complete.
+   * @return an AsyncTask which can be used to cancel the request
+   */
   public Object reauthorizeCurrentItemWithCallback(AuthorizeCallback callback){
     PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
     return _playerAPIClient.authorize(_currentItem, playerInfo, callback);

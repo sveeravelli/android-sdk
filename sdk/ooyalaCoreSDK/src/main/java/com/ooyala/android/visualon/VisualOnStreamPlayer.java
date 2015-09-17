@@ -1130,6 +1130,9 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       else {
         DebugMode.logD(TAG, "Acquiring rights");
+
+        // TODO: We only have to reauthorize if the auth_token is invalid, but there is no way to check that as of 09/17/2015
+        //   For now, always refresh auth_token before we acquire rights.
         _parent.reauthorizeCurrentItemWithCallback(new AuthorizeCallback() {
           @Override
           public void callback(boolean result, OoyalaException error) {
