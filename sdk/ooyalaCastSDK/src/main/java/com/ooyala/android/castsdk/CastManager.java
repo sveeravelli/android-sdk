@@ -49,6 +49,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class CastManager implements CastManagerInterface, DataCastConsumer {
+
+  public static final class CastManagerInitializationException extends Exception {
+      public CastManagerInitializationException( String message ) {
+        super( message );
+      }
+    public CastManagerInitializationException( Throwable cause ) {
+      super( cause );
+    }
+  }
+
   private static final String TAG = CastManager.class.getSimpleName();
 
   public static final String ACTION_PLAY = "OOCastPlay";
@@ -87,28 +97,32 @@ public class CastManager implements CastManagerInterface, DataCastConsumer {
    * @param applicationId the unique ID for your application
    * @param namespace     is the single namespace to be set up for this class.
    * @return the CastManager singleton.
-   * @throws java.lang.RuntimeException if Google Play Services are not available or if the underlying
-   * Google DataCastManager couldn't be initialized.
+   * @throws CastManagerInitializationException if initialization fails.
    */
-  public static CastManager initialize(Context context, String applicationId, String namespace) {
+  public static CastManager initialize(Context context, String applicationId, String namespace) throws CastManagerInitializationException {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
       notificationMiniControllerResourceId = R.layout.oo_default_notification;
       notificationImageResourceId = R.drawable.ic_ooyala;
       DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
       requireGooglePlayServices(context);
-      DataCastManager.initialize( context, applicationId, new String[]{namespace} );
-      castManager = new CastManager( DataCastManager.getInstance(), namespace );
+      try {
+        DataCastManager.initialize(context, applicationId, new String[]{namespace});
+        castManager = new CastManager(DataCastManager.getInstance(), namespace);
+      }
+      catch( Exception e ) {
+        throw new CastManagerInitializationException( e );
+      }
     }
     return castManager;
   }
 
-  private static void requireGooglePlayServices( Context context ) {
+  private static void requireGooglePlayServices( Context context ) throws CastManagerInitializationException {
     final int gpsAvailableCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
     if( ConnectionResult.SUCCESS != gpsAvailableCode ) {
       String msg = "Couldn't find the appropriate version of Google Play Services (code " + gpsAvailableCode + ")";
       DebugMode.logE( TAG, msg );
-      throw new RuntimeException( msg );
+      throw new CastManagerInitializationException( msg );
     }
   }
 
