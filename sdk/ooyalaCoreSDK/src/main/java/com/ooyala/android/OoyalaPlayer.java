@@ -2254,6 +2254,14 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
+   * Checks the expiration of the authToken, and compares it to the current time.
+   * @return true if token is expired, false otherwise
+   */
+  public boolean isAuthTokenExpired() {
+    return true; //TODO: there is no way to determine if an auth token is expired at the moment.  when SAS Auth provides this information, we can implement
+  }
+
+  /**
    * Set the AuthToken used to authorize video playback
    *
    * Changing this manually without an existing auth token can cause an inflated number of concurrent
