@@ -541,31 +541,40 @@ public class OoyalaPlayer extends Observable implements Observer,
         } ));
 
     if (_currentItem.getAuthCode() == AuthCode.NOT_REQUESTED) {
-      PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
       // Async authorize;
       final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
-      taskStarted(taskKey, _playerAPIClient.authorize(_currentItem, playerInfo,
-          new AuthorizeCallback() {
-            @Override
-            public void callback(boolean result, OoyalaException error) {
-              taskCompleted(taskKey);
-              if (error != null) {
-                _error = error;
-                DebugMode.logD(TAG, "Exception in changeCurrentVideo!", error);
-                setState(State.ERROR);
-                sendNotification(ERROR_NOTIFICATION);
-                return;
-              }
-              sendNotification(AUTHORIZATION_READY_NOTIFICATION);
-              changeCurrentItemAfterAuth();
-            }
-          }));
+      taskStarted(taskKey, reauthorizeCurrentItemWithCallback(
+              new AuthorizeCallback() {
+                @Override
+                public void callback(boolean result, OoyalaException error) {
+                  taskCompleted(taskKey);
+                  if (error != null) {
+                    _error = error;
+                    DebugMode.logD(TAG, "Exception in changeCurrentVideo!", error);
+                    setState(State.ERROR);
+                    sendNotification(ERROR_NOTIFICATION);
+                    return;
+                  }
+                  sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+                  changeCurrentItemAfterAuth();
+                }
+              }));
       return true;
     }
 
     sendNotification(AUTHORIZATION_READY_NOTIFICATION);
     return changeCurrentItemAfterAuth();
+  }
+
+  /**
+   * Reauthorize the currentItem, which would refresh the auth_token.
+   * @param callback a callback which is called after Authorization is complete.
+   * @return an AsyncTask which can be used to cancel the request
+   */
+  public Object reauthorizeCurrentItemWithCallback(AuthorizeCallback callback){
+    PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
+    return _playerAPIClient.authorize(_currentItem, playerInfo, callback);
   }
 
   /**
@@ -988,11 +997,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (getCurrentItem().isHeartbeatRequired()) {
       if (System.currentTimeMillis() > _suspendTime
           + (_playerAPIClient._heartbeatInterval * 1000)) {
-        PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
         cancelOpenTasks();
         final String taskKey = "changeCurrentItem" + System.currentTimeMillis();
-        taskStarted(taskKey, _playerAPIClient.authorize(_currentItem,
-            playerInfo, new AuthorizeCallback() {
+        taskStarted(taskKey, reauthorizeCurrentItemWithCallback(new AuthorizeCallback() {
               @Override
               public void callback(boolean result, OoyalaException error) {
                 taskCompleted(taskKey);
@@ -2244,6 +2251,14 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public String getAuthToken() {
     return _playerAPIClient.getAuthToken();
+  }
+
+  /**
+   * Checks the expiration of the authToken, and compares it to the current time.
+   * @return true if token is expired, false otherwise
+   */
+  public boolean isAuthTokenExpired() {
+    return true; //TODO: there is no way to determine if an auth token is expired at the moment.  when SAS Auth provides this information, we can implement
   }
 
   /**

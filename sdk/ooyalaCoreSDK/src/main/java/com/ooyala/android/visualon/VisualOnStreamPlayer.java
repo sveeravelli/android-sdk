@@ -19,6 +19,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.StreamPlayer;
@@ -80,7 +81,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private Integer _timeBeforeSuspend = null;
   private State _stateBeforeSuspend = State.INIT;
   protected Timer _playheadUpdateTimer = null;
-  private int _lastPlayhead = -1;
+  private int _lastPlayhead = 0;
   private boolean _isLiveClosedCaptionsAvailable = false;
   private boolean _isLiveClosedCaptionsEnabled = false;
   private int _selectedSubtitleIndex = 0;
@@ -251,10 +252,15 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     resume();
   }
 
+  private boolean isPlayerValid(){
+   return (_player != null && _player.getPlayerStatus() != VO_OSMP_STATUS.VO_OSMP_STATUS_STOPPED);
+  }
+
   @Override
   public int currentTime() {
-    if (_player == null) {
-      return 0;
+    if (!isPlayerValid()) {
+      DebugMode.logW(TAG, "No player when asking for time. using last known playhead time");
+      return _lastPlayhead;
     }
     switch (getState()) {
     case INIT:
@@ -715,7 +721,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     @Override
     public void run() {
       synchronized (_player) {
-        if (_player == null) {
+        if (!isPlayerValid()) {
           return;
         }
         try {
@@ -1123,13 +1129,26 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       }
       else {
         DebugMode.logD(TAG, "Acquiring rights");
-        String authToken = _parent.getAuthToken();
-        String customDRMData = _parent.getCustomDRMData();
-        AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(this, _parent.getLayout().getContext(), _localFilePath,
-            authToken, customDRMData);
-        setChanged();
-        notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
-        acquireRightsTask.execute();
+
+        AuthorizeCallback callback = new AuthorizeCallback() {
+          @Override
+          public void callback(boolean result, OoyalaException error) {
+            String authToken = _parent.getAuthToken();
+            String customDRMData = _parent.getCustomDRMData();
+            AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(VisualOnStreamPlayer.this, _parent.getLayout().getContext(), _localFilePath,
+                    authToken, customDRMData);
+            setChanged();
+            notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
+            acquireRightsTask.execute();
+          }
+        };
+
+        if( _parent.isAuthTokenExpired()) {
+          _parent.reauthorizeCurrentItemWithCallback(callback);
+        } else {
+          callback.callback(true, null);
+        }
+
       }
     }
   }
