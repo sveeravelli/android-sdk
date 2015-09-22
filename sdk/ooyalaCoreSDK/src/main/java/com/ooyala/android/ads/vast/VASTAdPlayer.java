@@ -229,7 +229,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
 
-        if(isCurrentAdIFrstLinearForAdIndx(_adIndex, _ad.getAds())){
+        if(isCurrentAdIFirstLinearForAdIndex(_adIndex, _ad.getAds())){
           sendImpressionTrackingEvent(_adIndex, _ad.getAds());
         }
 
@@ -254,7 +254,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
           if (!_linearAdQueue.isEmpty()) {
-            if(isCurrentAdLastLinearForAdIndx(_adIndex, _ad.getAds())){
+            if(isCurrentAdLastLinearForAdIndex(_adIndex, _ad.getAds())){
               _adIndex++;
             }
 
@@ -389,11 +389,11 @@ public class VASTAdPlayer extends AdMoviePlayer {
     return vastLinearAds;
   }
 
-  private boolean isCurrentAdIFrstLinearForAdIndx(int adIndex, List<VASTAd> ads){
+  private boolean isCurrentAdIFirstLinearForAdIndex(int adIndex, List<VASTAd> ads){
     return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
   }
 
-  private boolean isCurrentAdLastLinearForAdIndx(int _adIndex, List<VASTAd> ads){
+  private boolean isCurrentAdLastLinearForAdIndex(int _adIndex, List<VASTAd> ads){
     return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
   }
 
