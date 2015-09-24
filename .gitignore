@@ -58,3 +58,4 @@ deploy/android_deploy
 **/build
 **/.gradle
 **/workspace.xml
+**/.idea/libraries/
