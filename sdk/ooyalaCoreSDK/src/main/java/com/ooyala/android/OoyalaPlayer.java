@@ -818,15 +818,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
-   * The metadata for current root item
-   *
-   * @return metadata
-   */
-  public JSONObject getMetadata() {
-    return _metadata;
-  }
-
-  /**
    * Get the current error code, if one exists
    *
    * @return error code
