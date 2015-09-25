@@ -392,7 +392,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if(ads != null && ads.size() != 0) {
       return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
     }else{
-      return true;
+      return false;
     }
   }
 
@@ -400,7 +400,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if(ads != null && ads.size() != 0) {
       return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
     }else{
-      return true;
+      return false;
     }
   }
 
