@@ -250,14 +250,13 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
         // If player is completed, send completed tracking event
         if (tempPlayer.getState() == State.COMPLETED) {
+          if(isCurrentAdLastLinearForAdIndex(_adIndex, _ad.getAds())){
+            _adIndex++;
+          }
           sendTrackingEvent(TrackingEvent.COMPLETE);
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
           if (!_linearAdQueue.isEmpty()) {
-            if(isCurrentAdLastLinearForAdIndex(_adIndex, _ad.getAds())){
-              _adIndex++;
-            }
-
             super.destroy();
             addQuartileBoundaryObserver();
             super.init(_parent, _linearAdQueue.get(0).getStreams());
