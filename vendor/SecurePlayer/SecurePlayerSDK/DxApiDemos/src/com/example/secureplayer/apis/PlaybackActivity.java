@@ -229,19 +229,7 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 	protected void onPause() {
 		if(mPlayer != null)
 		{
-			if(mPlayer.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING)
-			{
-				mStartedPlayBack = false;
-			}
-
-			if (mPlayer.canBePaused()) 
-			{
-				mPlayer.pause();
-			}
-			else
-			{
-				mPlayer.stop();
-			}
+            mPlayer.suspend(false);
 		}
 		super.onPause();
 	}
@@ -272,6 +260,8 @@ public class PlaybackActivity extends Activity implements VOCommonPlayerListener
 			}
 			else
 			{
+                mPlayer.setView(mPlayerSurfaceView);
+
 				mPlayer.resume(mPlayerSurfaceView);
 
 				if(!mStartedPlayBack)
