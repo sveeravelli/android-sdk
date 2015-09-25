@@ -381,7 +381,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     VASTAd vastAd = ads.get(adIndex);
     for (VASTSequenceItem seqItem : vastAd.getSequence()) {
       if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
-        _linearAdQueue.add(seqItem.getLinear());
+        vastLinearAds.add(seqItem.getLinear());
       }
     }
 
@@ -389,11 +389,19 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   private boolean isCurrentAdIFirstLinearForAdIndex(int adIndex, List<VASTAd> ads){
-    return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
+    if(ads != null && ads.size() != 0) {
+      return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
+    }else{
+      return true;
+    }
   }
 
   private boolean isCurrentAdLastLinearForAdIndex(int _adIndex, List<VASTAd> ads){
-    return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
+    if(ads != null && ads.size() != 0) {
+      return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
+    }else{
+      return true;
+    }
   }
 
   @Override
