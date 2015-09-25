@@ -19,7 +19,7 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile 'com.google.android.gms:play-services:7.5.+'
+    compile 'com.google.android.gms:play-services:7.8.+'
     compile files('libs/DxDrmDlc.jar')
     compile files('libs/WidevineDRM-5.0.0.12197.jar')
     compile files('libs/assets.jar')
