@@ -112,6 +112,13 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     return hasDiscredix;
   }
 
+  //NOTE: There are two levels of this: Is Discredix Loaded, vs is Discredix Enabled
+  // Discredix must be loaded AND enabled for VODXPlayer to be used
+  // If Discredix is loaded, you need to check against Discredix Library Versions regardless
+  private boolean shouldLoadPlayreadyPlayer() {
+    return _isDiscredixLoaded && OoyalaPlayer.enableCustomPlayreadyPlayer;
+  }
+
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     DebugMode.logD(TAG, "Using VOPlayer");
@@ -366,7 +373,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         return;
       }
 
-      if (_isDiscredixLoaded &&
+      if (shouldLoadPlayreadyPlayer() &&
           !DiscredixDrmUtils.canFileBePlayed(context, _stream, _localFilePath)) {
         DebugMode.logE(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
@@ -377,10 +384,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player != null) {
         DebugMode.logE(TAG, "DANGER: Creating a Media player when one already exists");
       }
-      else if (_isDiscredixLoaded) {
+      else if (shouldLoadPlayreadyPlayer()) {
+        DebugMode.logD(TAG, "Using VODXPlayer");
         _player = DiscredixDrmUtils.getVODXPlayerImpl();
       }
       else {
+        DebugMode.logD(TAG, "Using VOCommonPlayer");
         _player = new VOCommonPlayerImpl();
       }
 
@@ -455,8 +464,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
-      if (!_isDiscredixLoaded) {
-        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
+      if (shouldLoadPlayreadyPlayer()) {
+        DebugMode.logD(TAG, "Setting DRM Library: voDRM_Discretix_PlayReady");
+        _player.setDRMLibrary("voDRM_Discretix_PlayReady","voGetDXDRMAPI");
+      } else {
+        DebugMode.logD(TAG, "Setting DRM Library:  voDRM_VisualOn_AES128");
+        _player.setDRMLibrary("voDRM_VisualOn_AES128", "voGetDRMAPI");
       }
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
