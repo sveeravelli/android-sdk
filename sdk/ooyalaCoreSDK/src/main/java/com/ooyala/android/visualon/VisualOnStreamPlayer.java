@@ -467,9 +467,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (shouldLoadPlayreadyPlayer()) {
         DebugMode.logD(TAG, "Setting DRM Library: voDRM_Discretix_PlayReady");
         _player.setDRMLibrary("voDRM_Discretix_PlayReady","voGetDXDRMAPI");
-      } else {
+      } else if (_isDiscredixLoaded) {
         DebugMode.logD(TAG, "Setting DRM Library:  voDRM_VisualOn_AES128");
         _player.setDRMLibrary("voDRM_VisualOn_AES128", "voGetDRMAPI");
+      } else {
+        DebugMode.logD(TAG, "VisualOn-Only: assuming old DRM Library - Setting DRM Library:  voDRM");
+        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
@@ -548,8 +551,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
           DebugMode.logI(TAG, "Player stopped after Surface Destroyed");
           _player.stop();
           _player.setView(null);
-        }
-        else {
+        } else {
           DebugMode.logE(TAG, "Player did not exist after Surface Destroyed");
         }
       }
@@ -631,9 +633,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     removeView();
-    _buffer = 0;
-    _playQueued = false;
+    resetPlayerState();
     setState(State.SUSPENDED);
+  }
+
+  private void resetPlayerState() {
+    _buffer = 0;
+    _lastPlayhead = 0;
+    _playQueued = false;
   }
 
   @Override
@@ -645,6 +652,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
     _stateBeforeSuspend = stateToResume;
+    _lastPlayhead = millisToResume;
 
     DebugMode.logV(TAG, "Player Resume");
 
@@ -674,8 +682,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void destroy() {
     destroyBasePlayer();
     removeView();
-    _buffer = 0;
-    _playQueued = false;
+    resetPlayerState();
     _timeBeforeSuspend = -1;
     setState(State.INIT);
   }
