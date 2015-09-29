@@ -465,10 +465,10 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
       if (shouldLoadPlayreadyPlayer()) {
-        DebugMode.logD(TAG, "Setting DRM Library: voDRM_Discretix_PlayReady");
+        DebugMode.logD(TAG, "SecurePlayer: Setting DRM Library: voDRM_Discretix_PlayReady");
         _player.setDRMLibrary("voDRM_Discretix_PlayReady","voGetDXDRMAPI");
       } else if (_isDiscredixLoaded) {
-        DebugMode.logD(TAG, "Setting DRM Library:  voDRM_VisualOn_AES128");
+        DebugMode.logD(TAG, "SecurePlayer: Setting DRM Library:  voDRM_VisualOn_AES128");
         _player.setDRMLibrary("voDRM_VisualOn_AES128", "voGetDRMAPI");
       } else {
         DebugMode.logD(TAG, "VisualOn-Only: assuming old DRM Library - Setting DRM Library:  voDRM");
