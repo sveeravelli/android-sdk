@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.google.android.gms.cast.MediaInfo;
-import com.google.android.libraries.cast.companionlibrary.cast.exceptions.CastException;
+import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastModeOptions;
@@ -81,15 +81,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     DebugMode.logD(TAG, "pause()");
     setState(State.PAUSED);
     try {
-      castManager.getVideoCastManager().pause();
-    } catch (TransientNetworkDisconnectionException e) {
-      DebugMode.logE(TAG, "PAUSE FAILED due to TransientNetworkDisconnectionExceptio");
-      e.printStackTrace();
-    } catch (NoConnectionException e) {
-      DebugMode.logE(TAG, "PAUSE FAILED due to NoConnectionException");
-      e.printStackTrace();
-    } catch (CastException e) {
-      DebugMode.logE(TAG, "PAUSE FAILED due to CastException");
+      VideoCastManager.getInstance().pause();
+    } catch (Exception e) {
+      DebugMode.logE(TAG, "PAUSE FAILED due to Exception");
       e.printStackTrace();
     }
   }
@@ -99,15 +93,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     DebugMode.logD(TAG, "play()");
     setState(State.PLAYING);
     try {
-      castManager.getVideoCastManager().play();
-    } catch (TransientNetworkDisconnectionException e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to TransientNetworkDisconnectionExceptio");
-      e.printStackTrace();
-    } catch (NoConnectionException e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to NoConnectionException");
-      e.printStackTrace();
-    } catch (CastException e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to CastException");
+      VideoCastManager.getInstance().play();
+    } catch (Exception e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to exception");
       e.printStackTrace();
     }
   }
@@ -307,13 +295,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*package private on purpose*/
   void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
-    if (initWithTheCastingContent(options.getEmbedCode())) {
-      getReceiverPlayerState(); // for updating UI controls
-    } else {
+    if (!initWithTheCastingContent(options.getEmbedCode())) {
       resetStateOnVideoChange();
       this.embedCode = options.getEmbedCode();
       this.loadMedia(options, embedToken, additionalInitParams);
-
       setCurrentTime(options.getPlayheadTimeInMillis());
     }
   }
@@ -372,10 +357,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         .setCustomData(playerParams)
         .build();
     try {
-      this.castManager.getVideoCastManager().loadMedia(mediaInfo, autoplay, options.getPlayheadTimeInMillis());
-    } catch (TransientNetworkDisconnectionException e) {
-      e.printStackTrace();
-    } catch (NoConnectionException e) {
+      DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "AutoPlay" + autoplay + "Playhead" + options.getPlayheadTimeInMillis());
+      this.castManager.getVideoCastManager().loadMedia(mediaInfo, false, options.getPlayheadTimeInMillis());
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -411,11 +395,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private void onPlayHeadChanged() {
     setChanged();
     notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
-  }
-
-  private void getReceiverPlayerState() {
-    DebugMode.logD(TAG, "getReceiverPlayerState");
-//    sendMessage(CastUtils.makeActionJSON("getstatus"));
   }
 
   /*package private on purpose*/ void receivedMessage(String message) {
@@ -473,7 +452,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           onPlayHeadChanged();
           syncDeviceVolumeToTV();
           setState(State.READY);
-          getReceiverPlayerState();
         }
         else if (eventType.equalsIgnoreCase("closedCaptionsInfoAvailable")) {
           //TODO: Need to check if the info available is "live"
@@ -488,7 +466,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         } 
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;
-          getReceiverPlayerState();
         } else if (eventType.equalsIgnoreCase("error")) {
           String receiverCode = msg.getJSONObject("1").getString("code");
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);

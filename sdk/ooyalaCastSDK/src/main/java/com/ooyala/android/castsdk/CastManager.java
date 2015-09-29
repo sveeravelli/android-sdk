@@ -18,7 +18,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.MediaRouteActionProvider;
-import android.support.v7.media.MediaRouter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,13 +25,11 @@ import android.view.ViewGroup;
 import android.widget.RemoteViews;
 
 import com.google.android.gms.cast.ApplicationMetadata;
-import com.google.android.gms.cast.CastDevice;
-import com.google.android.gms.cast.MediaQueueItem;
-import com.google.android.gms.cast.TextTrackStyle;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
-import com.google.android.libraries.cast.companionlibrary.cast.callbacks.VideoCastConsumer;
+import com.google.android.libraries.cast.companionlibrary.cast.callbacks.VideoCastConsumerImpl;
+import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaPlayer;
@@ -41,12 +38,11 @@ import com.ooyala.android.util.DebugMode;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class CastManager implements CastManagerInterface, VideoCastConsumer {
+public class CastManager implements CastManagerInterface {
 
   public static final class CastManagerInitializationException extends Exception {
       public CastManagerInitializationException( String message ) {
@@ -54,6 +50,52 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
       }
     public CastManagerInitializationException( Throwable cause ) {
       super( cause );
+    }
+  }
+
+  private class VideoCastListener extends VideoCastConsumerImpl {
+    @Override
+    public void onApplicationConnected(ApplicationMetadata appMetadata,
+                                       String sessionId, boolean wasLaunched) {
+      DebugMode.logD(TAG, "onApplicationConnected sessionId"+ sessionId);
+      castPlayer = createNewCastPlayer();
+      if (ooyalaPlayer != null && ooyalaPlayer.get().getCurrentItem() != null) {
+        ooyalaPlayer.get().switchToCastMode(ooyalaPlayer.get().getEmbedCode());
+      }
+    }
+
+    @Override
+    public void onApplicationDisconnected(int errorCode) {
+      DebugMode.logD( TAG, "onApplicationDisconnected called" );
+      if (isActivelyCastingContent()) {
+        cleanupAfterReceiverDisconnect();
+      }
+    }
+
+    @Override
+    public void onDataMessageReceived(String message) {
+      DebugMode.logD(TAG, "onDataMessageReceived: " + message);
+      if (castPlayer != null) {
+        castPlayer.receivedMessage(message);
+      }
+    }
+
+    @Override
+    public void onDisconnected() {
+      DebugMode.logD(TAG, "onDisconnected called");
+      if (isInCastMode()) {
+        cleanupAfterReceiverDisconnect();
+      }
+    }
+
+    @Override
+    public void onMediaLoadResult(int statusCode) {
+      DebugMode.logD(TAG, "onMediaLoadResults:"+statusCode);
+      try {
+        castManager.getVideoCastManager().play();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -81,12 +123,12 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
   private Map<String, String> additionalInitParams;
   private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
-  private boolean isConnectedToReceiverApp;
   private boolean isPlayerSeekable = true;
   private boolean isInCastMode;
 
   private final VideoCastManager videoCastManager;
   private final String namespace;
+  private VideoCastListener videoCastListener;
 
   /**
    * Set up the CastManager singleton.
@@ -105,13 +147,24 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
       DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
       requireGooglePlayServices(context);
       try {
+        DebugMode.logD(TAG, "Initialize VideoCastManager");
         VideoCastManager.initialize(context, applicationId, null, namespace).enableFeatures(
             VideoCastManager.FEATURE_LOCKSCREEN |
                 VideoCastManager.FEATURE_WIFI_RECONNECT |
+                VideoCastManager.FEATURE_AUTO_RECONNECT |
                 VideoCastManager.FEATURE_CAPTIONS_PREFERENCE |
                 VideoCastManager.FEATURE_DEBUGGING);
+        // this is the default behavior but is mentioned to make it clear that it is configurable.
+        VideoCastManager.getInstance().setNextPreviousVisibilityPolicy(
+            VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED);
 
-        castManager = new CastManager(VideoCastManager.getInstance(), namespace);
+        // this is to set the launch options, the following values are the default values
+        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
+
+        // this is the default behavior but is mentioned to make it clear that it is configurable.
+        VideoCastManager.getInstance().setCastControllerImmersive(true);
+
+        castManager = new CastManager( namespace);
       }
       catch( Exception e ) {
         throw new CastManagerInitializationException( e );
@@ -137,10 +190,11 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
     return castManager;
   }
   
-  private CastManager(VideoCastManager vcm, String namespace ) {
-    this.videoCastManager = vcm;
+  private CastManager( String namespace ) {
+    this.videoCastManager = VideoCastManager.getInstance();
     this.namespace = namespace; // there's no accessor for namespaces on DataCastManager.
-    this.videoCastManager.addVideoCastConsumer(this);
+    this.videoCastListener = new VideoCastListener();
+    this.videoCastManager.addVideoCastConsumer(this.videoCastListener);
   }
 
   /**
@@ -293,7 +347,7 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
    * even if casting has not actually begun.
    */
   public boolean isConnectedToReceiverApp() {
-    return this.videoCastManager.isConnected() && this.isConnectedToReceiverApp;
+    return this.videoCastManager.isConnected();
   }
   
   /**
@@ -353,176 +407,6 @@ public class CastManager implements CastManagerInterface, VideoCastConsumer {
   /*============================================================================================*/
   /*========== Consumer callbacks =================================================================*/
   /*============================================================================================*/
-
-  @Override
-  public void onApplicationConnected(ApplicationMetadata appMetadata,
-                              String sessionId, boolean wasLaunched) {
-    DebugMode.logD(TAG, "onApplicationConnected called");
-    this.isConnectedToReceiverApp = true;
-    this.castPlayer = createNewCastPlayer();
-    if (ooyalaPlayer != null && ooyalaPlayer.get().getCurrentItem() != null) {
-      ooyalaPlayer.get().switchToCastMode(ooyalaPlayer.get().getEmbedCode());
-    }
-  }
-
-  @Override
-  public void onApplicationConnectionFailed(int errorCode) {
-    DebugMode.logD(TAG, "onApplicationConnectionFailed with Error" + errorCode);
-  }
-
-  @Override
-  public void onApplicationStopFailed( int errorCode ) {
-    DebugMode.logD( TAG, "onApplicationStopFailed: " + errorCode );
-  }
-
-  @Override
-  public void onApplicationStatusChanged(String appStatus) {
-    DebugMode.logD( TAG, "onApplicationStatusChanged: " + appStatus );
-  }
-
-  @Override
-  public void onVolumeChanged( double value, boolean isMute ) {
-    DebugMode.logD( TAG, "onVolumeChanged: " + value + ", " + isMute );
-  }
-
-  @Override
-  public void onApplicationDisconnected(int errorCode) {
-    DebugMode.logD( TAG, "onApplicationDisconnected called" );
-    this.isConnectedToReceiverApp = false;
-    if (isActivelyCastingContent()) {
-      cleanupAfterReceiverDisconnect();
-    }
-  }
-
-  @Override
-  public void onRemoteMediaPlayerMetadataUpdated() {
-    DebugMode.logD( TAG, "onRemoteMediaPlayerMetadataUpdated" );
-  }
-
-  @Override
-  public void onRemoteMediaPlayerStatusUpdated() {
-    DebugMode.logD(TAG, "onRemoteMediaPlayerStatusUpdated");
-  }
-
-  @Override
-  public void onNamespaceRemoved() {
-    DebugMode.logD(TAG, "onNamespaceRemoved");
-  }
-
- @Override
- public void onDataMessageSendFailed(int errorCode) {
-   DebugMode.logD(TAG, "onDataMessageSendFailed Error:" + errorCode);
- }
-
-  @Override
-  public void onDataMessageReceived(String message) {
-    DebugMode.logD(TAG, "onDataMessageReceived: " + message);
-  }
-
-  @Override
-  public void onTextTrackStyleChanged(TextTrackStyle style) {
-    DebugMode.logD(TAG, "onTextTrackStyleChanged:" + style.toString());
-  }
-
-  @Override
-  public void onTextTrackEnabledChanged(boolean isEnabled) {
-    DebugMode.logD(TAG, "onTextTrackEnabledChanged:" + isEnabled);
-  }
-
-  @Override
-  public void onTextTrackLocaleChanged(Locale locale) {
-    DebugMode.logD(TAG, "onTextTrackLocaleChanged:" + locale.toString());
-  }
-
-  @Override
-  public void onMediaLoadResult(int statusCode) {
-    DebugMode.logD(TAG, "onMediaLoadResult:" + statusCode);
-  }
-
-  @Override
-  public void onMediaQueueUpdated(List<MediaQueueItem> queueItems, MediaQueueItem item,
-                           int repeatMode, boolean shuffle) {
-
-  }
-
-  @Override
-  public void onRemoteMediaPreloadStatusUpdated(MediaQueueItem item) {
-    DebugMode.logD(TAG, "onRemoteMediaPreloadStatusUpdate:" + item.toString());
-  }
-
-  @Override
-  public void onUpcomingPlayClicked(View v, MediaQueueItem item) {
-    DebugMode.logD(TAG, "onUpcomingPlayClicked:" + item.toString());
-  }
-
-  @Override
-  public void onUpcomingStopClicked(View view, MediaQueueItem upcomingItem) {
-   DebugMode.logD(TAG, "onUpcomingStopClicked" + upcomingItem.toString());
-  }
-
-  @Override
-  public void onMediaQueueOperationResult(int operationId, int statusCode) {
-    DebugMode.logD(TAG, "onUpcomingStopClicked" + operationId + ", statusCode:" + statusCode);
-  }
-
-  @Override
-  public void onConnected() {
-    DebugMode.logD(TAG, "onConnected");
-  }
-
-  @Override
-  public void onConnectionSuspended(int cause) {
-    DebugMode.logD(TAG, "onConnectionSuspended:" + cause);
-  }
-
-  @Override
-  public void onDisconnected() {
-  DebugMode.logD(TAG, "onDisconnected called");
-    this.isConnectedToReceiverApp = false;
-    if (isInCastMode()) {
-      cleanupAfterReceiverDisconnect();
-    }
-  }
-
-  @Override
-  public void onConnectionFailed( ConnectionResult result ) {
-    return; // TODO: what do we want here?
-  }
-
-  @Override
-  public void onCastDeviceDetected( MediaRouter.RouteInfo info ) {
-    DebugMode.logD( TAG, "onCastDeviceDetected: " + info );
-  }
-
-  @Override
-  public void onCastAvailabilityChanged( boolean castPresent ) {
-    DebugMode.logD( TAG, "onCastAvailabilityChanged: " + castPresent );
-  }
-
-  @Override
-  public void onConnectivityRecovered() {
-    DebugMode.logD( TAG, "onConnectivityRecovered" );
-  }
-
-  @Override
-  public void onUiVisibilityChanged( boolean visible ) {
-    DebugMode.logD( TAG, "onUiVisibilityChanged: " + visible );
-  }
-
-  @Override
-  public void onReconnectionStatusChanged(int status) {
-    DebugMode.logD( TAG, "onReconnectionStatusChanged: " + status );
-  }
-
-  @Override
-  public void onDeviceSelected( CastDevice device ) {
-    DebugMode.logD( TAG, "onDeviceSelected: " + device );
-  }
-
-  @Override
-  public void onFailed( int resourceId, int statusCode ) {
-    DebugMode.logD( TAG, "onFailed: " + resourceId + ", " + statusCode );
-  }
 
   public boolean isInCastMode() {
     return isInCastMode;
