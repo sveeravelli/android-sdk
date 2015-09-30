@@ -61,9 +61,6 @@ cp ${libs_dir}/*.jar ${app_libs_dir}
 echo "copying x86 shared objects from ${libs_dir} to ${app_jni_dir}"
 cp -r ${libs_dir}/x86 ${app_jni_dir}
 
-echo "copying armeabi shared objects from ${libs_dir} to ${app_jni_dir}"
-cp -r ${libs_dir}/armeabi ${app_jni_dir}
-
 echo "copying armeabi-v7a shared objects from ${libs_dir} to ${app_jni_dir}"
 cp -r ${libs_dir}/armeabi-v7a ${app_jni_dir}
 
