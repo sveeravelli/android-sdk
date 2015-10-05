@@ -62,7 +62,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   private static final String TAG = "VisualOnStreamPlayer";
   private static final String DISCREDIX_MANAGER_CLASS = "com.discretix.drmdlc.api.DxDrmDlc";
   private static final String EXPECTED_VISUALON_VERSION = "3.13.0-B71738";
-  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.14.15-B77005";
+  private static final String EXPECTED_SECUREPLAYER_VO_VERSION = "3.16.4-B80847";
   private VisualOnConfiguration _visualOnConfiguration = null;
   private static final boolean ENABLE_DEBUGGING = false;
   private static final boolean EXTREME_DEBUGGING = false;
@@ -110,6 +110,13 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       hasDiscredix = false;
     }
     return hasDiscredix;
+  }
+
+  //NOTE: There are two levels of this: Is Discredix Loaded, vs is Discredix Enabled
+  // Discredix must be loaded AND enabled for VODXPlayer to be used
+  // If Discredix is loaded, you need to check against Discredix Library Versions regardless
+  private boolean shouldLoadPlayreadyPlayer() {
+    return _isDiscredixLoaded && OoyalaPlayer.enableCustomPlayreadyPlayer;
   }
 
   @Override
@@ -366,7 +373,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         return;
       }
 
-      if (_isDiscredixLoaded &&
+      if (shouldLoadPlayreadyPlayer() &&
           !DiscredixDrmUtils.canFileBePlayed(context, _stream, _localFilePath)) {
         DebugMode.logE(TAG, "File cannot be played yet, we haven't gotten rights yet");
         return;
@@ -377,10 +384,12 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       if (_player != null) {
         DebugMode.logE(TAG, "DANGER: Creating a Media player when one already exists");
       }
-      else if (_isDiscredixLoaded) {
+      else if (shouldLoadPlayreadyPlayer()) {
+        DebugMode.logD(TAG, "Using VODXPlayer");
         _player = DiscredixDrmUtils.getVODXPlayerImpl();
       }
       else {
+        DebugMode.logD(TAG, "Using VOCommonPlayer");
         _player = new VOCommonPlayerImpl();
       }
 
@@ -455,7 +464,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
 
       // If we are using VisualON OSMP player without Discredix, enable eHLS playback
       // eHLS playback will not work using the SecurePlayer
-      if (!_isDiscredixLoaded) {
+      if (shouldLoadPlayreadyPlayer()) {
+        DebugMode.logD(TAG, "SecurePlayer: Setting DRM Library: voDRM_Discretix_PlayReady");
+        _player.setDRMLibrary("voDRM_Discretix_PlayReady","voGetDXDRMAPI");
+      } else if (_isDiscredixLoaded) {
+        DebugMode.logD(TAG, "SecurePlayer: Setting DRM Library:  voDRM_VisualOn_AES128");
+        _player.setDRMLibrary("voDRM_VisualOn_AES128", "voGetDRMAPI");
+      } else {
+        DebugMode.logD(TAG, "VisualOn-Only: assuming old DRM Library - Setting DRM Library:  voDRM");
         _player.setDRMLibrary("voDRM", "voGetDRMAPI");
       }
       /* Set the license */
@@ -535,8 +551,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
           DebugMode.logI(TAG, "Player stopped after Surface Destroyed");
           _player.stop();
           _player.setView(null);
-        }
-        else {
+        } else {
           DebugMode.logE(TAG, "Player did not exist after Surface Destroyed");
         }
       }
@@ -618,9 +633,14 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     }
 
     removeView();
-    _buffer = 0;
-    _playQueued = false;
+    resetPlayerState();
     setState(State.SUSPENDED);
+  }
+
+  private void resetPlayerState() {
+    _buffer = 0;
+    _lastPlayhead = 0;
+    _playQueued = false;
   }
 
   @Override
@@ -632,6 +652,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void resume(int millisToResume, State stateToResume) {
     _timeBeforeSuspend = millisToResume;
     _stateBeforeSuspend = stateToResume;
+    _lastPlayhead = millisToResume;
 
     DebugMode.logV(TAG, "Player Resume");
 
@@ -661,8 +682,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   public void destroy() {
     destroyBasePlayer();
     removeView();
-    _buffer = 0;
-    _playQueued = false;
+    resetPlayerState();
     _timeBeforeSuspend = -1;
     setState(State.INIT);
   }

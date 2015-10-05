@@ -19,5 +19,5 @@ android {
 
 dependencies {
     compile project(':ooyalaCoreSDK')
-    compile files('libs/ima-android-sdk-beta9.jar')
+    compile files('libs/ima-android-v3-3.b13.3.jar')
 }

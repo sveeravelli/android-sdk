@@ -155,7 +155,6 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
     if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
       Log.d(TAG, "AD - metadata true!");
     } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
-      Log.d(TAG, "Woot, here is the current metadata: " + player.getMetadata());
     }
   }
 

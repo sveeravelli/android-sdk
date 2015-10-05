@@ -1,17 +1,10 @@
 package com.ooyala.android.ads.vast;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Set;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreButton;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -21,6 +14,13 @@ import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.BaseStreamPlayer;
+import com.ooyala.android.util.DebugMode;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Set;
 
 /**
  * A MoviePlayer which helps render VAST advertisements
@@ -29,8 +29,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private VASTAdSpot _ad;
   private List<VASTLinearAd> _linearAdQueue = new ArrayList<VASTLinearAd>();
   private static String TAG = VASTAdPlayer.class.getName();
-  private List<String> _impressionURLs = new ArrayList<String>();
-  private boolean _impressionSent = false;
   private boolean _startSent = false;
   private boolean _firstQSent = false;
   private boolean _midSent = false;
@@ -43,6 +41,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private AdsLearnMoreButton _learnMore;
 
   private Object _fetchTask;
+  private int _adIndex;
 
   private interface TrackingEvent {
     public static final String CREATIVE_VIEW = "creativeView";
@@ -99,9 +98,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   private boolean initAfterFetch(OoyalaPlayer parent) {
+    _adIndex = 0;
+
     for (VASTAd vastAd : _ad.getAds()) {
       // Add to the list of impression URLs to be called when player is loaded
-      _impressionURLs.addAll(vastAd.getImpressionURLs());
 
       for (VASTSequenceItem seqItem : vastAd.getSequence()) {
         if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
@@ -122,7 +122,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     _topMargin = parent.getTopBarOffset();
 
     //Add Learn More button if there is a click through URL
-    if (currentAd() != null && currentAd().getClickThroughURL() != null) {
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
       _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
       _playerLayout.addView(_learnMore);
     }
@@ -208,7 +208,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     super.setState(state);
   }
 
-  private VASTLinearAd currentAd() {
+  private VASTLinearAd currentLinearAd() {
     return _linearAdQueue.isEmpty() ? null : _linearAdQueue.get(0);
   }
 
@@ -223,19 +223,23 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-        if (!_impressionSent) {
-          sendImpressionTrackingEvent(_impressionURLs);
-        }
+
+
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
-      } else if (!_firstQSent && currentTime() > (currentAd().getDuration() * 1000 / 4)) {
+
+        if(isCurrentAdIFirstLinearForAdIndex(_adIndex, _ad.getAds())){
+          sendImpressionTrackingEvent(_adIndex, _ad.getAds());
+        }
+
+      } else if (!_firstQSent && currentTime() > (currentLinearAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
         _firstQSent = true;
-      } else if (!_midSent && currentTime() > (currentAd().getDuration() * 1000 / 2)) {
+      } else if (!_midSent && currentTime() > (currentLinearAd().getDuration() * 1000 / 2)) {
         sendTrackingEvent(TrackingEvent.MIDPOINT);
         _midSent = true;
-      } else if (!_thirdQSent && currentTime() > (3 * currentAd().getDuration() * 1000 / 4)) {
+      } else if (!_thirdQSent && currentTime() > (3 * currentLinearAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         _thirdQSent = true;
       }
@@ -246,6 +250,9 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
         // If player is completed, send completed tracking event
         if (tempPlayer.getState() == State.COMPLETED) {
+          if(isCurrentAdLastLinearForAdIndex(_adIndex, _ad.getAds())){
+            _adIndex++;
+          }
           sendTrackingEvent(TrackingEvent.COMPLETE);
           //If there are more ads to play, play them
           if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
@@ -256,7 +263,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
             super.play();
 
             //If the next linear ad has a clickThrough URL, create the Learn More button only if it doesn't exist
-            if (currentAd() != null && currentAd().getClickThroughURL() != null) {
+            if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
               if (_learnMore == null) {
                 _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
                 _playerLayout.addView(_learnMore);
@@ -315,8 +322,8 @@ public class VASTAdPlayer extends AdMoviePlayer {
    */
   @Override
   public void processClickThrough() {
-    if (currentAd() != null && currentAd().getClickTrackingURLs() != null) {
-      Set<String> urls = currentAd().getClickTrackingURLs();
+    if (currentLinearAd() != null && currentLinearAd().getClickTrackingURLs() != null) {
+      Set<String> urls = currentLinearAd().getClickTrackingURLs();
       if (urls != null) {
         for (String urlStr : urls) {
           final URL url = VASTUtils.urlFromAdUrlString(urlStr);
@@ -327,7 +334,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     }
 
     //Open browser to click through URL
-    String url = currentAd().getClickThroughURL();
+    String url = currentLinearAd().getClickThroughURL();
     try {
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -340,8 +347,8 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   public void sendTrackingEvent(String event) {
-    if (currentAd() == null || currentAd().getTrackingEvents() == null) { return; }
-    Set<String> urls = currentAd().getTrackingEvents().get(event);
+    if (currentLinearAd() == null || currentLinearAd().getTrackingEvents() == null) { return; }
+    Set<String> urls = currentLinearAd().getTrackingEvents().get(event);
     if (urls != null) {
       for (String urlStr : urls) {
         final URL url = VASTUtils.urlFromAdUrlString(urlStr);
@@ -351,13 +358,50 @@ public class VASTAdPlayer extends AdMoviePlayer {
     }
   }
 
-  private void sendImpressionTrackingEvent(List<String> impressionURLs) {
-    for(String urlStr : impressionURLs) {
-      final URL url = VASTUtils.urlFromAdUrlString(urlStr);
-      DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
-      ping(url);
+
+  private void sendImpressionTrackingEvent(int adIndex, List<VASTAd> ads) {
+    List<String> urls = impressionUrlForAdIndex(adIndex, ads);
+    if(urls != null){
+      for(String urlStr: urls) {
+        final URL url = VASTUtils.urlFromAdUrlString(urlStr);
+        DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
+        ping(url);
+      }
     }
-    _impressionSent = true;
+  }
+
+  private List<String> impressionUrlForAdIndex(int adIndex, List<VASTAd> ads){
+    VASTAd vastAd = ads.get(adIndex);
+    return vastAd.getImpressionURLs();
+  }
+
+  private List<VASTLinearAd> vastLinearAdsForAdIndex(int adIndex, List<VASTAd> ads){
+    List<VASTLinearAd> vastLinearAds = new ArrayList<VASTLinearAd>();
+
+    VASTAd vastAd = ads.get(adIndex);
+    for (VASTSequenceItem seqItem : vastAd.getSequence()) {
+      if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
+        vastLinearAds.add(seqItem.getLinear());
+      }
+    }
+
+    return vastLinearAds;
+  }
+
+  private boolean isCurrentAdIFirstLinearForAdIndex(int adIndex, List<VASTAd> ads){
+    if(ads != null && ads.size() != 0) {
+      return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
+    }else{
+      return false;
+    }
+  }
+
+  private boolean isCurrentAdLastLinearForAdIndex(int _adIndex, List<VASTAd> ads){
+    if(ads != null && ads.size() != 0) {
+      return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
+    }else{
+      return false;
+    }
   }
 
   @Override
