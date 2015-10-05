@@ -2,6 +2,7 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import com.google.android.gms.cast.MediaMetadata;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
@@ -351,10 +352,12 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       return;
     }
 
+    MediaMetadata metadata= new MediaMetadata();
     MediaInfo mediaInfo = new MediaInfo.Builder(options.getEmbedCode())
         .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
         .setContentType("video/mp4")
         .setCustomData(playerParams)
+        .setMetadata(metadata)
         .build();
     try {
       DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "AutoPlay" + autoplay + "Playhead" + options.getPlayheadTimeInMillis());

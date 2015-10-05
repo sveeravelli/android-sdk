@@ -38,7 +38,6 @@ import com.ooyala.android.util.DebugMode;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -151,7 +150,8 @@ public class CastManager implements CastManagerInterface {
         VideoCastManager.initialize(context, applicationId, null, namespace).enableFeatures(
             VideoCastManager.FEATURE_LOCKSCREEN |
                 VideoCastManager.FEATURE_WIFI_RECONNECT |
-                VideoCastManager.FEATURE_AUTO_RECONNECT |
+//                new CCL option, comment it out for now
+//                VideoCastManager.FEATURE_AUTO_RECONNECT |
                 VideoCastManager.FEATURE_CAPTIONS_PREFERENCE |
                 VideoCastManager.FEATURE_DEBUGGING);
         // this is the default behavior but is mentioned to make it clear that it is configurable.
@@ -159,7 +159,7 @@ public class CastManager implements CastManagerInterface {
             VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED);
 
         // this is to set the launch options, the following values are the default values
-        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
+//        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
 
         // this is the default behavior but is mentioned to make it clear that it is configurable.
         VideoCastManager.getInstance().setCastControllerImmersive(true);
