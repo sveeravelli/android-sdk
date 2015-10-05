@@ -2,9 +2,9 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import com.google.android.gms.cast.MediaMetadata;
 
 import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
@@ -158,30 +158,17 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
 
   /*package private on purpose*/ void syncDeviceVolumeToTV() {
-    DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
-//    new RunWithWeakCastManager(castManager) {
-//      @Override
-//      protected void run( CastManager cm ) {
-//        JSONObject actionSetVolume = new JSONObject();
-//        try {
-////          sendMessage( actionSetVolume.toString() );
-//        }
-//        catch( Exception e ) {
-//          e.printStackTrace();
-//        }
-//      }
-//    }.safeRun();
+    if (castManager != null) {
+      castManager.syncVolume();
+    }
   }
   
   private void setState(State state) {
     this.state = state;
-//    new RunWithWeakCastManager( castManager ) {
-//      @Override
-//      public void run( CastManager cm ) {
-//        cm.updateMiniControllers();
-//        cm.updateNotificationAndLockScreenPlayPauseButton();
-//      }
-//    }.safeRun();
+    if (castManager != null) {
+      castManager.updateMiniControllers();
+      castManager.updateNotificationAndLockScreenPlayPauseButton();
+    }
 
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);

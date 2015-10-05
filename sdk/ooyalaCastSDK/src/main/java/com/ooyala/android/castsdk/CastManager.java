@@ -751,4 +751,18 @@ public class CastManager implements CastManagerInterface {
       }
     }
   }
+
+  /*package private on purpose*/ void syncVolume() {
+    if (videoCastManager != null && currentContext != null) {
+      AudioManager audio = (AudioManager) currentContext.getSystemService(Context.AUDIO_SERVICE);
+      double volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+      volume /= audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+      DebugMode.logD(TAG, "set device volume to cast, volume:" + volume);
+      try {
+        castManager.getVideoCastManager().setVolume(volume);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }
