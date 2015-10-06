@@ -2,6 +2,12 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -10,11 +16,11 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.lang.ref.WeakReference;
+
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,7 +37,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private String RECEIVER_LIVE_LANGUAGE = "live";
   private String RECEIVER_DISABLE_LANGUAGE = "";
 
-  private WeakReference<CastManager> castManager;
+  private CastManager castManager;
   
   private String embedCode;
   private int duration;
@@ -51,9 +57,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   private Bitmap castImageBitmap;
 
-  /*package private on purpose*/ CastPlayer(CastManager castManager) {
-    this.castManager = new WeakReference<CastManager>(castManager);
+  /*package private on purpose*/ CastPlayer(CastManager cm) {
+    this.castManager = cm;
   }
+
 
   /*package private on purpose*/ void setOoyalaPlayer(OoyalaPlayer ooyalaPlayer) {
     DebugMode.logD(TAG, "Set OoyalaPlayer = " + ooyalaPlayer);
@@ -74,14 +81,24 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   public void pause() {
     DebugMode.logD(TAG, "pause()");
     setState(State.PAUSED);
-    sendMessage(CastUtils.makeActionJSON("pause"));
+    try {
+      VideoCastManager.getInstance().pause();
+    } catch (Exception e) {
+      DebugMode.logE(TAG, "PAUSE FAILED due to Exception");
+      e.printStackTrace();
+    }
   }
 
   @Override
   public void play() {
     DebugMode.logD(TAG, "play()");
     setState(State.PLAYING);
-    sendMessage(CastUtils.makeActionJSON("play"));
+    try {
+      VideoCastManager.getInstance().play();
+    } catch (Exception e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to exception");
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -122,46 +139,37 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     if (!isSeeking) {
       setState(OoyalaPlayer.State.LOADING);
     }
-    isSeeking = true;
+
     JSONObject actionSeek = new JSONObject();
     try {
-      actionSeek.put("action", "seek");
-      actionSeek.put("data", String.valueOf(timeInMillis / 1000));
-    } catch (JSONException e1) {
-      e1.printStackTrace();
+      castManager.getVideoCastManager().seek(timeInMillis);
+    } catch (TransientNetworkDisconnectionException e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to TransientNetworkDisconnectionExceptio");
+      e.printStackTrace();
+      return;
+    } catch (NoConnectionException e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to NoConnectionException");
+      e.printStackTrace();
+      return;
     }
-    sendMessage(actionSeek.toString());
+    isSeeking = true;
     setCurrentTime(timeInMillis);
     onPlayHeadChanged();
   }
 
   /*package private on purpose*/ void syncDeviceVolumeToTV() {
-    DebugMode.logD(TAG, "SyncDeviceVolumeToTV");
-    new RunWithWeakCastManager(castManager) {
-      @Override
-      protected void run( CastManager cm ) {
-        JSONObject actionSetVolume = new JSONObject();
-        try {
-          actionSetVolume.put( "action", "volume" );
-          actionSetVolume.put( "data", cm.getDataCastManager().getDeviceVolume() );
-          sendMessage( actionSetVolume.toString() );
-        }
-        catch( Exception e ) {
-          e.printStackTrace();
-        }
-      }
-    }.safeRun();
+    if (castManager != null) {
+      castManager.syncVolume();
+    }
   }
   
   private void setState(State state) {
     this.state = state;
-    new RunWithWeakCastManager( castManager ) {
-      @Override
-      public void run( CastManager cm ) {
-        cm.updateMiniControllers();
-        cm.updateNotificationAndLockScreenPlayPauseButton();
-      }
-    }.safeRun();
+    if (castManager != null) {
+      castManager.updateMiniControllers();
+      castManager.updateNotificationAndLockScreenPlayPauseButton();
+    }
+
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
@@ -184,8 +192,16 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     try {
       actionSetVolume.put("action", "setCCLanguage");
       actionSetVolume.put("data", convertClosedCaptionsLanguageForReceiver(language));
-      sendMessage(actionSetVolume.toString());
-    } catch (Exception e) {
+    } catch (JSONException e) {
+      e.printStackTrace();
+      return;
+    }
+
+    try {
+      castManager.getVideoCastManager().sendDataMessage(actionSetVolume.toString());
+    } catch (NoConnectionException e) {
+      e.printStackTrace();
+    } catch (TransientNetworkDisconnectionException e) {
       e.printStackTrace();
     }
   }
@@ -264,15 +280,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   /*========== CastPlayer Receiver related =====================================================*/
   /*============================================================================================*/
 
-  /*package private on purpose*/ void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
+  /*package private on purpose*/
+  void enterCastMode(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     DebugMode.logD(TAG, "On Cast Mode Entered with embedCode " + options.getEmbedCode());
-    if (initWithTheCastingContent(options.getEmbedCode())) {
-      getReceiverPlayerState(); // for updating UI controls
-    } else {
+    if (!initWithTheCastingContent(options.getEmbedCode())) {
       resetStateOnVideoChange();
       this.embedCode = options.getEmbedCode();
-      String initialPlayMessage = initializePlayerParams(options, embedToken, additionalInitParams);
-      sendMessage(initialPlayMessage);
+      this.loadMedia(options, embedToken, additionalInitParams);
       setCurrentTime(options.getPlayheadTimeInMillis());
     }
   }
@@ -285,19 +299,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     return this.embedCode != null && this.embedCode.equals(embedCode);
   }
   
-  private String initializePlayerParams(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
-    float playheadTime = options.getPlayheadTimeInMillis() / 1000;
+  private void loadMedia(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     JSONObject playerParams = new JSONObject();
-    JSONObject dataParams = new JSONObject();
-    JSONObject wrap = new JSONObject();
+    boolean autoplay = options.isPlaying() ? true : false;
     try {
-      playerParams.put("initialTime", playheadTime);
-      if (options.isPlaying()) {
-        playerParams.put("autoplay", true);
-      } else {
-        playerParams.put("autoplay", false);
-      }
-
       if (embedToken != null) {
         playerParams.put("embedToken", embedToken);
       }
@@ -310,13 +315,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         playerParams.put("authToken", options.getAuthToken());
       }
 
-      dataParams.put("ec", options.getEmbedCode());
-      dataParams.put("version", null);
-      dataParams.put("params", playerParams.toString());
+      playerParams.put("ec", options.getEmbedCode());
+      playerParams.put("version", null);
+      playerParams.put("params", playerParams.toString());
       if (castItemTitle != null || castItemDescription != null || castItemPromoImg != null) {
-        dataParams.put("title", castItemTitle);
-        dataParams.put("description", castItemDescription);
-        dataParams.put("promo_url", castItemPromoImg);
+        playerParams.put("title", castItemTitle);
+        playerParams.put("description", castItemDescription);
+        playerParams.put("promo_url", castItemPromoImg);
       } else {
         DebugMode.logE(TAG, "Title or description or PromoImage is null!!");
       }
@@ -326,16 +331,27 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         Iterator paramsIterator = additionalInitParams.entrySet().iterator();
         while (paramsIterator.hasNext()) {
           Map.Entry<String, String> entry = (Map.Entry) paramsIterator.next();
-          dataParams.put(entry.getKey(), entry.getValue());
+          playerParams.put(entry.getKey(), entry.getValue());
         }
       }
-
-      wrap.put("action", "init");
-      wrap.put("data", dataParams);
     } catch (JSONException e) {
       e.printStackTrace();
+      return;
     }
-    return wrap.toString();
+
+    MediaMetadata metadata= new MediaMetadata();
+    MediaInfo mediaInfo = new MediaInfo.Builder(options.getEmbedCode())
+        .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+        .setContentType("video/mp4")
+        .setCustomData(playerParams)
+        .setMetadata(metadata)
+        .build();
+    try {
+      DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "AutoPlay" + autoplay + "Playhead" + options.getPlayheadTimeInMillis());
+      this.castManager.getVideoCastManager().loadMedia(mediaInfo, false, options.getPlayheadTimeInMillis());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /*package private on purpose*/ void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
@@ -360,12 +376,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         } catch (Exception e) {
           DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", trying the default one",
               e);
-          new RunWithWeakCastManager( castManager ) {
-            @Override
-            public void run( CastManager cm ) {
-              castImageBitmap = cm.getDefaultMiniControllerImageBitmap();
-            }
-          }.safeRun();
+          castImageBitmap = castManager.getDefaultMiniControllerImageBitmap();
         }
       }
     }).start();
@@ -374,26 +385,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private void onPlayHeadChanged() {
     setChanged();
     notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
-  }
-  
-  private void sendMessage(final String message) {
-    DebugMode.logD( TAG, "Sending Message: " + message );
-    new RunWithWeakCastManager( castManager ) {
-      @Override
-      public void run( CastManager cm ) {
-        try {
-          cm.sendDataMessage( message );
-        }
-        catch( Exception e ) {
-          e.printStackTrace();
-        }
-      }
-    }.safeRun();
-  }
-
-  private void getReceiverPlayerState() {
-    DebugMode.logD(TAG, "getReceiverPlayerState");
-    sendMessage(CastUtils.makeActionJSON("getstatus"));
   }
 
   /*package private on purpose*/ void receivedMessage(String message) {
@@ -444,20 +435,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
-            new RunWithWeakCastManager( castManager ) {
-              @Override
-              public void run( CastManager cm ) {
-                // current content has been override on receiver side. keep play current content on content mode
-                cm.getDataCastManager().disconnectDevice( false, true, true );
-              }
-            }.safeRun();
+            castManager.getVideoCastManager().disconnectDevice( false, true, true );
           }
         }
         else if (eventType.equalsIgnoreCase("playbackReady")) {
           onPlayHeadChanged();
           syncDeviceVolumeToTV();
           setState(State.READY);
-          getReceiverPlayerState();
         }
         else if (eventType.equalsIgnoreCase("closedCaptionsInfoAvailable")) {
           //TODO: Need to check if the info available is "live"
@@ -472,7 +456,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         } 
         else if (eventType.equalsIgnoreCase("seeked")) {
           isSeeking = false;
-          getReceiverPlayerState();
         } else if (eventType.equalsIgnoreCase("error")) {
           String receiverCode = msg.getJSONObject("1").getString("code");
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
@@ -556,22 +539,5 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   private OoyalaErrorCode getOoyalaErrorCodeForReceiverCode(String receiverCode) {
      return errorMap.get(receiverCode) == null ? errorMap.get(receiverCode) : OoyalaErrorCode.ERROR_UNKNOWN;
-  }
-
-  private abstract static class RunWithWeakCastManager {
-    private final WeakReference<CastManager> wcm;
-    protected RunWithWeakCastManager( WeakReference<CastManager> wcm ) {
-      this.wcm = wcm;
-    }
-    public void safeRun() {
-      final CastManager cm = wcm.get();
-      if( cm != null ) {
-        run( cm );
-      }
-      else {
-        DebugMode.logE( TAG, "Weak CastManager was null. Stack = " + Arrays.toString(Thread.currentThread().getStackTrace()) );
-      }
-    }
-    protected abstract void run( CastManager cm );
   }
 }
