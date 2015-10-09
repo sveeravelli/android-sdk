@@ -1,28 +1,10 @@
 package com.ooyala.android.castsdk;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.media.MediaMetadataRetriever;
-import android.media.RemoteControlClient;
-import android.media.RemoteControlClient.MetadataEditor;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.MediaRouteActionProvider;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RemoteViews;
 
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.common.ConnectionResult;
@@ -37,9 +19,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
 
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class CastManager implements CastManagerInterface {
 
@@ -96,6 +76,14 @@ public class CastManager implements CastManagerInterface {
         e.printStackTrace();
       }
     }
+
+    @Override
+    public void onRemoteMediaPlayerStatusUpdated() {
+      int playerStatus = castManager.getVideoCastManager().getPlaybackStatus();
+      if (castPlayer != null) {
+        castPlayer.onPlayerStatusChanged(playerStatus);
+      }
+    }
   }
 
   private static final String TAG = CastManager.class.getSimpleName();
@@ -103,24 +91,17 @@ public class CastManager implements CastManagerInterface {
   public static final String ACTION_PLAY = "OOCastPlay";
   public static final String ACTION_STOP = "OOCastStop";
   private static CastManager castManager;
-  private static Class<?> targetActivity;
-  private static Class<?> currentActivity;
-  private static Context currentContext;
+
   private static int notificationMiniControllerResourceId;
   private static int notificationImageResourceId;
 
-  private NotificationCompat.Builder notificationBuilder;
-  private android.content.BroadcastReceiver receiver;
-  private AudioManager audioManager;
-  private RemoteControlClient remoteControlClient;
-  private int notificationID = 001;
   private Bitmap miniControllerDefaultImageBitmap;
 
+  private  Context context;
   private View castView;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private CastPlayer castPlayer;
   private Map<String, String> additionalInitParams;
-  private Set<CastMiniController> miniControllers;
   private boolean notificationServiceIsActivated;
   private boolean isPlayerSeekable = true;
   private boolean isInCastMode;
@@ -141,8 +122,8 @@ public class CastManager implements CastManagerInterface {
   public static CastManager initialize(Context context, String applicationId, String namespace) throws CastManagerInitializationException {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
-      notificationMiniControllerResourceId = R.layout.oo_default_notification;
-      notificationImageResourceId = R.drawable.ic_ooyala;
+//      notificationMiniControllerResourceId = R.layout.oo_default_notification;
+//      notificationImageResourceId = R.drawable.ic_ooyala;
       DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
       requireGooglePlayServices(context);
       try {
@@ -164,7 +145,7 @@ public class CastManager implements CastManagerInterface {
         // this is the default behavior but is mentioned to make it clear that it is configurable.
         VideoCastManager.getInstance().setCastControllerImmersive(true);
 
-        castManager = new CastManager( namespace);
+        castManager = new CastManager(context, namespace);
       }
       catch( Exception e ) {
         throw new CastManagerInitializationException( e );
@@ -190,7 +171,8 @@ public class CastManager implements CastManagerInterface {
     return castManager;
   }
   
-  private CastManager( String namespace ) {
+  private CastManager(Context c, String namespace ) {
+    this.context = c;
     this.videoCastManager = VideoCastManager.getInstance();
     this.namespace = namespace; // there's no accessor for namespaces on DataCastManager.
     this.videoCastListener = new VideoCastListener();
@@ -208,24 +190,6 @@ public class CastManager implements CastManagerInterface {
   /*============================================================================================*/
   /*========== CastManager App Setting API   ===================================================*/
   /*============================================================================================*/
-
-  /**
-   * Add UI for casting options into a pre-existing menu.
-   *
-   * @param activity third party application's Activity desiring a cast button.
-   * @param menu     into which to add the cast button. A selection of available
-   *                 receivers will pop up after clicking on the cast button.
-   */
-  public void addCastButton(Activity activity, Menu menu) {
-    DebugMode.logD(TAG, "Add Cast Button");
-    this.setCurrentContext(activity);
-    activity.getMenuInflater().inflate(R.menu.main, menu);
-    MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
-    MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider)
-            MenuItemCompat.getActionProvider(mediaRouteMenuItem);
-    mediaRouteActionProvider.setRouteSelector(videoCastManager.getMediaRouteSelector());
-    mediaRouteActionProvider.setDialogFactory(new CastMediaRouteDialogFactory());
-  }
   
   /**
    * * @param view to display in the video area while casting. Possibly null.
@@ -244,16 +208,6 @@ public class CastManager implements CastManagerInterface {
    */
   public View getCastView() {
     return castView;
-  }
-
-  /**
-   * Icon to use for Android Notifications.
-   *
-   * @param resourceId for looking up the notification small icon image.
-   */
-  public void setNotificationImageResourceId(int resourceId) {
-    DebugMode.logD(TAG, "Set notification image resource id = " + resourceId);
-    notificationImageResourceId = resourceId;
   }
 
   /**
@@ -361,10 +315,14 @@ public class CastManager implements CastManagerInterface {
    * The Android Activity making use of Ooyala Casting must call this
    * in its own Application.onResume().
    */
-  public void onResume( Context context ) {
+  public void onResume() {
     DebugMode.logD(TAG, "onResume()");
-    setCurrentContext( context );
-    updateMiniControllers();
+    this.videoCastManager.incrementUiCounter();
+  }
+
+  public void onPause() {
+    DebugMode.logD(TAG, "onPause");
+    this.videoCastManager.decrementUiCounter();
   }
 
   /**
@@ -407,7 +365,6 @@ public class CastManager implements CastManagerInterface {
   /*============================================================================================*/
   /*========== Consumer callbacks =================================================================*/
   /*============================================================================================*/
-
   public boolean isInCastMode() {
     return isInCastMode;
   }
@@ -442,319 +399,11 @@ public class CastManager implements CastManagerInterface {
       ooyalaPlayer.get().exitCastMode(castPlayer.currentTime(), castPlayer.getState() == State.PLAYING, castPlayer.getEmbedCode());
     }
     destroyCastPlayer();
-    dismissMiniControllers();
-    removeAllMiniControllers();
-  }
-  
-  /*============================================================================================*/
-  /*========== MiniController ==================================================================*/
-  /*============================================================================================*/
-
-  /**
-   * @param miniController to associate with this CastManager.
-   */
-  public void addMiniController(CastMiniController miniController) {
-    DebugMode.logD(TAG, "Add mini controller " + miniController);
-    if (miniControllers == null) {
-      miniControllers = new HashSet<CastMiniController>();
-    }
-    if (!miniControllers.contains(miniController)) {
-      miniControllers.add(miniController);
-    }
-  }
-
-  /**
-   * Tell all associated CastMiniControllers to update.
-   */
-  public void updateMiniControllers() {
-    DebugMode.logD(TAG, "Update mini controllers state");
-    if( miniControllers != null && isActivelyCastingContent() ) {
-      if (castPlayer.getState() == State.COMPLETED) {
-        dismissMiniControllers();
-      } else {
-        for (CastMiniController miniController : miniControllers) {
-          miniController.updatePlayPauseButtonImage(castPlayer.getState() == State.PLAYING);
-        }
-      }
-    }
-  }
-  
-  /**
-   * @param miniController to be disassociated from this CastManager.
-   */
-  public void removeMiniController(CastMiniController miniController) {
-    DebugMode.logD(TAG, "Remove mini controller " + miniController);
-    if (miniControllers != null) {
-      miniControllers.remove(miniController);
-    }
-  }
-  
-  /**
-   * Disassociate all previously associated CastMiniControllers.
-   *
-   * @see #removeMiniController(CastMiniController)
-   */
-  private void removeAllMiniControllers() {
-    DebugMode.logD(TAG, "Remove all mini controllers");
-    if (miniControllers != null) {
-      miniControllers.clear();
-    }
-  }
-  
-  /**
-   * Tell all associated CastMiniControllers to dismiss.
-   */
-  private void dismissMiniControllers() {
-    DebugMode.logD(TAG, "dismiss mini controllers");
-    if (miniControllers != null) {
-      for (CastMiniController miniController : miniControllers) {
-        miniController.dismiss();
-      }
-    }
-  }
-  
-  /**
-   * Should be called by the Activity in onCreate().
-   *
-   * @param targetActivity to be resumed (probably the Activity calling this method)
-   *                       when the CastMiniController container is clicked. Should not be null.
-   */
-  public void setTargetActivity(Class<?> targetActivity) {
-    this.targetActivity = targetActivity;
-  }
-  
-  /**
-   * @return previously registered target activity. Possibly null.
-   */
-  public Class<?> getTargetActivity() {
-    return targetActivity;
-  }
-
-  private void setCurrentContext(Context context) {
-    currentActivity = context.getClass();
-    currentContext = context;
-  }
-
-  /*package private on purpose*/ Class<?> getCurrentActivity() {
-    return currentActivity;
-  }
-  
-  
-  /*============================================================================================*/
-  /*==========  Notification Service ============================================================*/
-  /*============================================================================================*/
-  
-  /**
-   * Enables reacting to mini controllers in the Notification area of the Android UI.
-   * The app Activity should call this to add the Notification mini controller support e.g. in onSuspend().
-   * Requires setTargetActivity to have previously been called with a valid target.
-   *
-   * @param context an Android context. Non-null.
-   * @see #setTargetActivity(Class)
-   */
-  public  void createNotificationService(Context context) {
-    DebugMode.logD(TAG, "Create notification service");
-    if( isActivelyCastingContent() ) {
-      notificationServiceIsActivated = true;
-      if (castPlayer.getState() == State.PLAYING) {
-        buildNotificationService(context, false);
-      } else {
-        buildNotificationService(context, true);
-      }
-      registerBroadcastReceiver(context);
-    }
-  }
-  
-  /**
-   * The app Actvity should call this to remove the Notification mini
-   * controller support e.g. in onResume().
-   * @param context an Android context. Non-null.
-   */
-  public void destroyNotificationService(Context context) {
-    DebugMode.logD(TAG, "Destroy notification service");
-    if (notificationServiceIsActivated) {
-      NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-      mNotifyMgr.cancel(notificationID);
-      unregisterBroadcastReceiver(context);
-      notificationServiceIsActivated = false;
-      notificationBuilder = null;
-    }
-  }
-  
-  private void registerBroadcastReceiver(Context context) {
-    DebugMode.logD(TAG, "Register notification broadcast receiver");
-    IntentFilter filter = new IntentFilter();
-    filter.addAction(ACTION_PLAY);
-    filter.addAction(ACTION_STOP);
-    
-    if (receiver == null) {
-      receiver = new android.content.BroadcastReceiver() {
-        
-        @Override
-        public void onReceive(Context context, Intent intent) {
-         DebugMode.logD(TAG, "Play/Pause button is clicked in notification service");
-          if( isActivelyCastingContent() ) {
-            String action = intent.getAction();
-            if (action.equals(ACTION_STOP)) {
-              cleanupAfterReceiverDisconnect();
-              videoCastManager.disconnect();
-              destroyNotificationService(context);
-            } else if (action.equals(ACTION_PLAY)) {
-              if (castPlayer.getState() == State.PLAYING) {
-                castPlayer.pause();
-              } else if (castPlayer.getState() == State.PAUSED || castPlayer.getState() == State.READY || castPlayer.getState() == State.LOADING || castPlayer.getState() == State.COMPLETED) {
-                castPlayer.play();
-              }
-            }
-          }
-        }
-      };
-    }
-    context.registerReceiver(receiver, filter);
-  }
-  
-  private void unregisterBroadcastReceiver(Context context) {
-    DebugMode.logD(TAG, "Unregister broadcast receiver");
-    if (receiver != null) {
-      try {
-        context.unregisterReceiver(receiver);
-      } catch (IllegalArgumentException e) {
-        DebugMode.logD(TAG,"epicReciver is already unregistered");
-      }
-      receiver = null;
-    }
-  }
-  
-  private void buildNotificationService(Context context, boolean shouldDisplayPlayButton) {
-    // Create notification View
-    RemoteViews notificationView = new RemoteViews(context.getPackageName(), CastManager.notificationMiniControllerResourceId);
-    notificationView.setTextViewText(R.id.OOTitleView, getCastPlayer().getCastItemTitle());
-    notificationView.setTextViewText(R.id.OOSubtitleView, videoCastManager.getDeviceName());
-    notificationView.setImageViewBitmap(R.id.OOIconView, getCastPlayer().getCastImageBitmap());
-
-    if (shouldDisplayPlayButton) {
-      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, CastUtils.getLightChromecastPlayButton());
-    } else {
-      notificationView.setImageViewBitmap(R.id.OOPlayPauseView, CastUtils.getLightChromecastPauseButton());
-    }
-
-    // Set the result intent so the user can navigate to the target activity by clicking the notification view
-    Intent resultIntent = new Intent(context, targetActivity);
-    resultIntent.putExtra("embedcode", castPlayer.getEmbedCode());
-
-    // Build the stack for PendingIntent to make sure the user can navigate back to the parent acitvity
-    TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-    stackBuilder.addParentStack(targetActivity);
-    stackBuilder.addNextIntent(resultIntent);
-
-    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-    if (notificationBuilder == null) {
-      notificationBuilder = new NotificationCompat.Builder(context).
-          setSmallIcon(notificationImageResourceId).
-          setOnlyAlertOnce(true).
-          setAutoCancel(false).
-          setOngoing(false);
-    }
-    
-    notificationBuilder.setContentIntent(resultPendingIntent);
-    
-    Notification notification = notificationBuilder.build();
-    notification.contentView = notificationView;
-    
-    Intent switchIntent = new Intent(ACTION_PLAY);
-    PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(context, 100, switchIntent, 0);
-    notificationView.setOnClickPendingIntent(R.id.OOPlayPauseView, pendingSwitchIntent);
-
-    Intent stopIntent = new Intent(ACTION_STOP);
-    PendingIntent stopPendingIntent = PendingIntent.getBroadcast(context, 100, stopIntent, 0);
-    notificationView.setOnClickPendingIntent(R.id.OORemoveView, stopPendingIntent);
-    
-    
-    NotificationManager notifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notifyMgr.notify(notificationID, notification);
-  }
-  
-  
-  /*============================================================================================*/
-  /*========== Lock Screen Controller ==========================================================*/
-  /*============================================================================================*/
-  
-  /**
-   * Set up controls to appear on the lock screen.
-   * The application should call this to add the lock screen mini
-   * controller support e.g. in onResume().
-   *
-   * @param context an Android context. Non-null.
-   */
-  public void registerLockScreenControls(Context context) {
-    if( isActivelyCastingContent() ) {
-      DebugMode.logD(TAG, "Register Lock Screen Mini controller");
-      audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-      audioManager.requestAudioFocus(
-          new OnAudioFocusChangeListener() {
-              public void onAudioFocusChange(int focusChange) {}
-          },
-          // Use the music stream.
-          AudioManager.STREAM_MUSIC,
-          // Request permanent focus.
-          AudioManager.AUDIOFOCUS_GAIN);
-
-      ComponentName myEventReceiver = new ComponentName(context, CastBroadcastReceiver.class);
-      audioManager.registerMediaButtonEventReceiver(myEventReceiver);
-      if (remoteControlClient == null) {
-          Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-          intent.setComponent(myEventReceiver);
-          remoteControlClient = new RemoteControlClient(PendingIntent.getBroadcast(context, 0, intent, 0)); // grant the remoteControlClient the right to perform broadcast
-          audioManager.registerRemoteControlClient(remoteControlClient);
-      }
-      remoteControlClient.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PAUSE);
-      remoteControlClient.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY);
-      if (castPlayer.getState() == State.PLAYING) {
-        remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-      } else {
-        remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
-      }
-      remoteControlClient
-      .editMetadata(true)
-      .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, videoCastManager.getDeviceName())
-      .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, castPlayer.getCastItemTitle())
-      .putBitmap(MetadataEditor.BITMAP_KEY_ARTWORK, castPlayer.getCastImageBitmap())
-      .apply();
-    }
-  }
-  
-  /**
-   * Remove any casting controls from the lock screen.
-   */
-  public void unregisterLockScreenControls() {
-    DebugMode.logD(TAG, "Unregister lock screen controls");
-    if (audioManager != null) {
-      audioManager.unregisterRemoteControlClient(remoteControlClient);
-      audioManager = null;
-    }
-    remoteControlClient = null;
-  }
-  
-  /*package private on purpose*/ void updateNotificationAndLockScreenPlayPauseButton() {
-    DebugMode.logD( TAG, "Update Lock Screen mini controller play/pause button status" );
-    if (isActivelyCastingContent() && notificationServiceIsActivated) {
-      if (castPlayer.getState() == State.PLAYING) {
-        if (remoteControlClient != null) {
-          remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-        }
-        buildNotificationService(currentContext, false);
-      } else {
-        if (remoteControlClient != null) { 
-          remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
-        }
-        buildNotificationService(currentContext, true);
-      }
-    }
   }
 
   /*package private on purpose*/ void syncVolume() {
-    if (videoCastManager != null && currentContext != null) {
-      AudioManager audio = (AudioManager) currentContext.getSystemService(Context.AUDIO_SERVICE);
+    if (videoCastManager != null) {
+      AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
       double volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
       volume /= audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
       DebugMode.logD(TAG, "set device volume to cast, volume:" + volume);
