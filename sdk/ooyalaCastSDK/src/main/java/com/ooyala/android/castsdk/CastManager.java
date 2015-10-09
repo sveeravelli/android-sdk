@@ -119,7 +119,7 @@ public class CastManager implements CastManagerInterface {
    * @return the CastManager singleton.
    * @throws CastManagerInitializationException if initialization fails.
    */
-  public static CastManager initialize(Context context, String applicationId, String namespace) throws CastManagerInitializationException {
+  public static CastManager initialize(Context context, String applicationId, Class<?> targetActivity, String namespace) throws CastManagerInitializationException {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
 //      notificationMiniControllerResourceId = R.layout.oo_default_notification;
@@ -128,11 +128,12 @@ public class CastManager implements CastManagerInterface {
       requireGooglePlayServices(context);
       try {
         DebugMode.logD(TAG, "Initialize VideoCastManager");
-        VideoCastManager.initialize(context, applicationId, null, namespace).enableFeatures(
+        VideoCastManager.initialize(context, applicationId, targetActivity, namespace).enableFeatures(
             VideoCastManager.FEATURE_LOCKSCREEN |
                 VideoCastManager.FEATURE_WIFI_RECONNECT |
 //                new CCL option, comment it out for now
-//                VideoCastManager.FEATURE_AUTO_RECONNECT |
+                VideoCastManager.FEATURE_NOTIFICATION |
+                VideoCastManager.FEATURE_AUTO_RECONNECT |
                 VideoCastManager.FEATURE_CAPTIONS_PREFERENCE |
                 VideoCastManager.FEATURE_DEBUGGING);
         // this is the default behavior but is mentioned to make it clear that it is configurable.
@@ -152,6 +153,10 @@ public class CastManager implements CastManagerInterface {
       }
     }
     return castManager;
+  }
+
+  public static VideoCastManager getVideoCastManager() {
+    return VideoCastManager.getInstance();
   }
 
   private static void requireGooglePlayServices( Context context ) throws CastManagerInitializationException {
@@ -177,14 +182,6 @@ public class CastManager implements CastManagerInterface {
     this.namespace = namespace; // there's no accessor for namespaces on DataCastManager.
     this.videoCastListener = new VideoCastListener();
     this.videoCastManager.addVideoCastConsumer(this.videoCastListener);
-  }
-
-  /**
-   * Get the DataCastManager, only to be used for calling methods that we have not already wrapped in CastManager.
-   * @return the DataCastManager being wrapped.
-   */
-  public VideoCastManager getVideoCastManager() {
-    return this.videoCastManager;
   }
 
   /*============================================================================================*/
