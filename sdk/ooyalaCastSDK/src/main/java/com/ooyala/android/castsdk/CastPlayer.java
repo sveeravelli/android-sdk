@@ -2,9 +2,12 @@ package com.ooyala.android.castsdk;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
+import com.google.android.gms.common.images.WebImage;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
@@ -45,7 +48,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private State state = State.INIT;
   private OoyalaException error;
 
-  private boolean isSeeking;
   private boolean seekable;
 
   private boolean isLiveClosedCaptionsAvailable;
@@ -136,23 +138,17 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void seekToTime(int timeInMillis) {
     DebugMode.logD(TAG, "Seek to time in seconds: " + timeInMillis / 1000);
-    if (!isSeeking) {
-      setState(OoyalaPlayer.State.LOADING);
-    }
 
     JSONObject actionSeek = new JSONObject();
     try {
       castManager.getVideoCastManager().seek(timeInMillis);
-    } catch (TransientNetworkDisconnectionException e) {
+    } catch (Exception e) {
       DebugMode.logE(TAG, "PLAY FAILED due to TransientNetworkDisconnectionExceptio");
       e.printStackTrace();
       return;
-    } catch (NoConnectionException e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to NoConnectionException");
-      e.printStackTrace();
-      return;
     }
-    isSeeking = true;
+
+    setState(State.LOADING);
     setCurrentTime(timeInMillis);
     onPlayHeadChanged();
   }
@@ -165,11 +161,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   
   private void setState(State state) {
     this.state = state;
-    if (castManager != null) {
-      castManager.updateMiniControllers();
-      castManager.updateNotificationAndLockScreenPlayPauseButton();
-    }
-
     setChanged();
     notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
@@ -340,6 +331,16 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     }
 
     MediaMetadata metadata= new MediaMetadata();
+    if (castItemTitle != null) {
+      metadata.putString(MediaMetadata.KEY_TITLE, castItemTitle);
+    }
+    if (castItemPromoImg != null ) {
+      Uri uri = Uri.parse(castItemPromoImg);
+      if (uri != null) {
+        WebImage image = new WebImage(uri);
+        metadata.addImage(image);
+      }
+    }
     MediaInfo mediaInfo = new MediaInfo.Builder(options.getEmbedCode())
         .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
         .setContentType("video/mp4")
@@ -387,29 +388,45 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
   }
 
+  /*package private on purpose*/ void onPlayerStatusChanged(int remotePlayerStatus) {
+    switch (remotePlayerStatus) {
+      case MediaStatus.PLAYER_STATE_IDLE: {
+        int idleReason = castManager.getVideoCastManager().getIdleReason();
+        DebugMode.logD(TAG, "castplayerStateChanged: Idle reason:" + idleReason);
+        switch (idleReason) {
+          case MediaStatus.IDLE_REASON_ERROR:
+            setState(State.ERROR);
+            break;
+          default:
+            setState(State.READY);
+            break;
+        }
+        break;
+      }
+      case MediaStatus.PLAYER_STATE_BUFFERING:
+        DebugMode.logD(TAG, "castplayerStateChanged: Buffering");
+        setState(State.LOADING);
+        break;
+      case MediaStatus.PLAYER_STATE_PAUSED:
+        DebugMode.logD(TAG, "castplayerStateChanged: Paused");
+        setState(State.PAUSED);
+        break;
+      case MediaStatus.PLAYER_STATE_PLAYING:
+        DebugMode.logD(TAG, "castplayerStateChanged: Playing");
+        setState(State.PLAYING);
+        break;
+      default:
+        break;
+    }
+  }
+
   /*package private on purpose*/ void receivedMessage(String message) {
     try {
       JSONObject msg = new JSONObject(message);
       
       // The key for "State Message" is different from other messages
       // So we should check it separately
-      if (msg.has("state")) {
-        String state = msg.getString("state");
-        DebugMode.logD(TAG, "Received State: " + state);
-        if (state.equals("playing")) {
-          setState(State.PLAYING);
-        } else if (state.equals("paused")) {
-          setState(State.PAUSED);
-        } else if (state.equals("loading")) {
-          setState(State.LOADING);
-        } else if (state.equals("buffering")) {
-          setState(State.LOADING);
-        } else if (state.equals("ready")) {
-          setState(State.READY);
-        } else if (state.equals("error")) {
-          setState(State.ERROR);
-        }
-      }
+
       if (msg.has("0")) {
         String eventType = msg.getString("0");
         if (!eventType.equals("downloading") && !eventType.equals("playheadTimeChanged")) {
@@ -421,24 +438,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           onPlayHeadChanged();
           String duration = msg.getString("2");
           this.duration = ((int) Double.parseDouble(duration) * 1000);
-        }
-        else if (eventType.equalsIgnoreCase("buffering")) {
-          setState(State.LOADING);
-        }
-        else if (eventType.equalsIgnoreCase("playing") || eventType.equalsIgnoreCase("streamPlaying")) {
-          setState(State.PLAYING);
-        } 
-        else if (eventType.equalsIgnoreCase("paused")) {
-          setState(State.PAUSED);
-        }
-        else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
+        } else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
             DebugMode.logD(TAG, "Disconnect from chromecast and exit cast mode because a different content is casting");
             castManager.getVideoCastManager().disconnectDevice( false, true, true );
           }
-        }
-        else if (eventType.equalsIgnoreCase("playbackReady")) {
+        } else if (eventType.equalsIgnoreCase("playbackReady")) {
           onPlayHeadChanged();
           syncDeviceVolumeToTV();
           setState(State.READY);
@@ -453,9 +459,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);
-        } 
-        else if (eventType.equalsIgnoreCase("seeked")) {
-          isSeeking = false;
         } else if (eventType.equalsIgnoreCase("error")) {
           String receiverCode = msg.getJSONObject("1").getString("code");
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
