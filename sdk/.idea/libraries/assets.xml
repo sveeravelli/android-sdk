@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="assets">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/ooyalaCoreSDK/libs/assets.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
