@@ -55,7 +55,8 @@ vendor/google_play_services/libproject/google-play-services_lib/local.properties
 script/android_*
 deploy/android_deploy
 
-**/build
-**/.gradle
+build/
+.gradle
 **/workspace.xml
 **/.idea/libraries/
+*.iml
