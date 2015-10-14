@@ -19,6 +19,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 import java.util.Map;
 
 public class CastManager implements CastManagerInterface {
@@ -107,46 +108,39 @@ public class CastManager implements CastManagerInterface {
   private boolean isInCastMode;
 
   private final VideoCastManager videoCastManager;
-  private final String namespace;
   private VideoCastListener videoCastListener;
 
   /**
    * Set up the CastManager singleton.
    *
    * @param context       an Android context. Non-null.
-   * @param applicationId the unique ID for your application
-   * @param namespace     is the single namespace to be set up for this class.
+   * @param options       the cast options
    * @return the CastManager singleton.
    * @throws CastManagerInitializationException if initialization fails.
    */
-  public static CastManager initialize(Context context, String applicationId, Class<?> targetActivity, String namespace) throws CastManagerInitializationException {
+  public static CastManager initialize(Context context, CastOptions options) throws CastManagerInitializationException {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
 //      notificationMiniControllerResourceId = R.layout.oo_default_notification;
 //      notificationImageResourceId = R.drawable.ic_ooyala;
-      DebugMode.logD(TAG, "Init new CastManager with appId = " + applicationId + ", namespace = " + namespace);
+      DebugMode.logD(TAG, "Init new CastManager with options " + options.toString());
       requireGooglePlayServices(context);
       try {
         DebugMode.logD(TAG, "Initialize VideoCastManager");
-        VideoCastManager.initialize(context, applicationId, targetActivity, namespace).enableFeatures(
-            VideoCastManager.FEATURE_LOCKSCREEN |
-                VideoCastManager.FEATURE_WIFI_RECONNECT |
-//                new CCL option, comment it out for now
-                VideoCastManager.FEATURE_NOTIFICATION |
-                VideoCastManager.FEATURE_AUTO_RECONNECT |
-                VideoCastManager.FEATURE_CAPTIONS_PREFERENCE |
-                VideoCastManager.FEATURE_DEBUGGING);
+        VideoCastManager.initialize(
+            context, options.getApplicationId(), options.getTargetActivity(), options.getNameSpace())
+            .enableFeatures(options.enabledFeatures());
         // this is the default behavior but is mentioned to make it clear that it is configurable.
         VideoCastManager.getInstance().setNextPreviousVisibilityPolicy(
             VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED);
 
         // this is to set the launch options, the following values are the default values
-//        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
+        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
 
         // this is the default behavior but is mentioned to make it clear that it is configurable.
         VideoCastManager.getInstance().setCastControllerImmersive(true);
 
-        castManager = new CastManager(context, namespace);
+        castManager = new CastManager(context);
       }
       catch( Exception e ) {
         throw new CastManagerInitializationException( e );
@@ -176,10 +170,9 @@ public class CastManager implements CastManagerInterface {
     return castManager;
   }
   
-  private CastManager(Context c, String namespace ) {
+  private CastManager(Context c) {
     this.context = c;
     this.videoCastManager = VideoCastManager.getInstance();
-    this.namespace = namespace; // there's no accessor for namespaces on DataCastManager.
     this.videoCastListener = new VideoCastListener();
     this.videoCastManager.addVideoCastConsumer(this.videoCastListener);
   }

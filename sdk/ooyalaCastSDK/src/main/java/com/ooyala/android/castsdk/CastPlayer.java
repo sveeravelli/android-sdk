@@ -16,6 +16,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
+import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
@@ -41,9 +42,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private String RECEIVER_DISABLE_LANGUAGE = "";
 
   private CastManager castManager;
-  
   private String embedCode;
-  private int duration;
+  private Video currentItem;
   private int currentTime;
   private State state = State.INIT;
   private OoyalaException error;
@@ -51,11 +51,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private boolean seekable;
 
   private boolean isLiveClosedCaptionsAvailable;
-
-  // Related info for current content
-  private String castItemTitle;
-  private String castItemDescription;
-  private String castItemPromoImg;
 
   private Bitmap castImageBitmap;
 
@@ -119,7 +114,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   @Override
   public int duration() {
-    return duration;
+    return currentItem == null ? 0 : currentItem.getDuration();
   }
 
   /**
@@ -236,35 +231,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
    * @return the current asset embed code. Possibly null.
    */
   public String getEmbedCode() {
-    return embedCode;
-  }
-
-  /**
-   * @return the current asset title. Possibly null.
-   */
-  public String getCastItemTitle() {
-    return castItemTitle;
-  }
-
-  /**
-   * @return the current asset description. Possibly null.
-   */
-  public String getCastItemDescription() {
-    return castItemDescription;
-  }
-
-  /**
-   * @return the current asset promo image url. Possibly null.
-   */
-  public String getCastItemPromoImgUrl() {
-    return castItemPromoImg;
-  }
-
-  /**
-   * @return the current asset casting image. Possibly null.
-   */
-  public Bitmap getCastImageBitmap() {
-    return castImageBitmap;
+    return currentItem == null ? "" : currentItem.getEmbedCode();
   }
 
   /*============================================================================================*/
@@ -293,6 +260,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   private void loadMedia(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     JSONObject playerParams = new JSONObject();
     boolean autoplay = options.isPlaying() ? true : false;
+    String itemTitle = null;
+    String itemPromoImageUrl = null;
     try {
       if (embedToken != null) {
         playerParams.put("embedToken", embedToken);
@@ -306,13 +275,26 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         playerParams.put("authToken", options.getAuthToken());
       }
 
+      if (options.getDomain() != null) {
+        playerParams.put("domain", options.getDomain().toString());
+      }
+
       playerParams.put("ec", options.getEmbedCode());
       playerParams.put("version", null);
       playerParams.put("params", playerParams.toString());
-      if (castItemTitle != null || castItemDescription != null || castItemPromoImg != null) {
-        playerParams.put("title", castItemTitle);
-        playerParams.put("description", castItemDescription);
-        playerParams.put("promo_url", castItemPromoImg);
+      if (currentItem != null) {
+        itemTitle = currentItem.getTitle();
+        if (itemTitle != null) {
+          playerParams.put("title", itemTitle);
+        }
+        String itemDescription = currentItem.getDescription();
+        if (itemDescription != null) {
+          playerParams.put("description", itemDescription);
+        }
+        itemPromoImageUrl = currentItem.getPromoImageURL(2000, 2000);
+        if (itemPromoImageUrl != null) {
+          playerParams.put("promo_url", itemPromoImageUrl);
+        }
       } else {
         DebugMode.logE(TAG, "Title or description or PromoImage is null!!");
       }
@@ -331,11 +313,11 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     }
 
     MediaMetadata metadata= new MediaMetadata();
-    if (castItemTitle != null) {
-      metadata.putString(MediaMetadata.KEY_TITLE, castItemTitle);
+    if (itemTitle != null) {
+      metadata.putString(MediaMetadata.KEY_TITLE, itemTitle);
     }
-    if (castItemPromoImg != null ) {
-      Uri uri = Uri.parse(castItemPromoImg);
+    if (itemPromoImageUrl != null ) {
+      Uri uri = Uri.parse(itemPromoImageUrl);
       if (uri != null) {
         WebImage image = new WebImage(uri);
         metadata.addImage(image);
@@ -357,9 +339,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   /*package private on purpose*/ void updateMetadataFromOoyalaPlayer(OoyalaPlayer player) {
     if (player != null && player.getCurrentItem() != null) {
-      castItemPromoImg = player.getCurrentItem().getPromoImageURL(2000, 2000);
-      castItemTitle = player.getCurrentItem().getTitle();
-      castItemDescription = player.getCurrentItem().getDescription();
+      currentItem = player.getCurrentItem();
       seekable = player.seekable();
       loadIcon();
     } else {
@@ -368,14 +348,15 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
   
   private void loadIcon() {
+    final String imageUrl = (currentItem == null ? "" : currentItem.getPromoImageURL(2000, 2000));
     new Thread(new Runnable() {
       @Override
       public void run() {
         try {
-          URL imgUrl = new URL(castItemPromoImg.toString());
+          URL imgUrl = new URL(imageUrl);
           castImageBitmap = BitmapFactory.decodeStream(imgUrl.openStream());
         } catch (Exception e) {
-          DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + castItemPromoImg + ", trying the default one",
+          DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + imageUrl + ", trying the default one",
               e);
           castImageBitmap = castManager.getDefaultMiniControllerImageBitmap();
         }
@@ -436,8 +417,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           String currentTime = msg.getString("1");
           setCurrentTime((int) (Double.parseDouble(currentTime) * 1000));
           onPlayHeadChanged();
-          String duration = msg.getString("2");
-          this.duration = ((int) Double.parseDouble(duration) * 1000);
         } else if (eventType.equalsIgnoreCase("contentTreeFetched")) {
           String embedCode =  msg.getJSONObject("1").getString("embed_code");
           if (this.embedCode != null && !this.embedCode.equals(embedCode)) {
