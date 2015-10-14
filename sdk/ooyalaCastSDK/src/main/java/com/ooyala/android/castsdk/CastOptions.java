@@ -38,7 +38,7 @@ public class CastOptions {
     /**
      * Set the target activity.
      * @param targetActivity - The target activity to be launched from notification, can be null if mini controller is not required.
-     * The default value is CCL's VideoCastControllerActivity
+     * The default value is null, causing CastCopanionLibraries's default VideoCastControllerActivity to be used.
      */
     public Builder setTargetActivity(Class<?> targetActivity) {
       this.targetActivity = targetActivity;
