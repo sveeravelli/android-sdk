@@ -170,7 +170,7 @@ public class CastManager implements CastManagerInterface {
 
   /**
    * @return the CastManager singleton. Possibly null.
-   * @see #initialize(android.content.Context, String, String)
+   * @see #initialize(android.content.Context, String, Class, String)
    */
   public static CastManager getCastManager() {
     return castManager;
