@@ -37,7 +37,7 @@ public class Options implements ReadonlyOptionsInterface {
     private boolean showLiveControls;
 
     /*
-     * If set to "true", load the content when the rquired information and authorization is available. 
+     * If set to "true", load the content when the required information and authorization is available.
      * If set to "false", load the content after pre-roll (if pre-roll is available).
      *  Default: true
      */
