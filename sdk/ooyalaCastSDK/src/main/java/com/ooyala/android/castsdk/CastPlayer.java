@@ -63,6 +63,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     DebugMode.logD(TAG, "Set OoyalaPlayer = " + ooyalaPlayer);
     this.addObserver(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
+    setChanged();
+    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
   }
 
   /*package private on purpose*/ void disconnectFromCurrentOoyalaPlayer() {

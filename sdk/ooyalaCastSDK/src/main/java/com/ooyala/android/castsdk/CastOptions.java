@@ -37,8 +37,8 @@ public class CastOptions {
 
     /**
      * Set the target activity.
-     * @param targetActivity - The target activity to be launched from notification.
-     * The default value is VideoCast
+     * @param targetActivity - The target activity to be launched from notification, can be null if mini controller is not required.
+     * The default value is CCL's VideoCastControllerActivity
      */
     public Builder setTargetActivity(Class<?> targetActivity) {
       this.targetActivity = targetActivity;
@@ -46,9 +46,10 @@ public class CastOptions {
     }
 
     /**
-     * Set the target activity.
+     * Set enable mini controller on lock screen
+     * this will enable CastCompanionLibrary's VideoCastManager.FEATURE_LOCKSCREEN
      * @param enable - true to enable, false to disable.
-     * The default value is 0 (never times out).
+     * The default value is true.
      */
     public Builder setEnableLockScreen(boolean enable) {
       this.enableLockScreen = enable;
@@ -56,9 +57,10 @@ public class CastOptions {
     }
 
     /**
-     * Set the target activity.
+     * Set enable local notification
+     * this will enable CastCompanionLibrary's VideoCastManager.FEATURE_NOTIFICATION
      * @param enable - true to enable, false to disable.
-     * The default value is 0 (never times out).
+     * The default value is true.
      */
     public Builder setEnableNotification(boolean enable) {
       this.enableNotification = enable;
@@ -66,11 +68,12 @@ public class CastOptions {
     }
 
     /**
-     * set enable debug.
+     * set enable video cast debug.
+     * this will enable VideoCastManager.FEATURE_DEBUGGING if set to true
      * @param enable - true to enable, false to disable.
-     * The default value is 0 (never times out).
+     * The default value is false.
      */
-    public Builder setEnableDebug(boolean enable) {
+    public Builder setEnableCastDebug(boolean enable) {
       this.enableDebug = enable;
       return this;
     }
@@ -128,7 +131,7 @@ public class CastOptions {
     return this.targetActivity;
   }
 
-  public boolean isDebugEnabled() {
+  public boolean isCastDebugEnabled() {
     return (this.enabledFeatures & VideoCastManager.FEATURE_DEBUGGING) != 0;
   }
 

@@ -47,7 +47,7 @@ public class CastManager implements CastManagerInterface {
     @Override
     public void onApplicationDisconnected(int errorCode) {
       DebugMode.logD( TAG, "onApplicationDisconnected called" );
-      if (isActivelyCastingContent()) {
+      if (isInCastMode()) {
         cleanupAfterReceiverDisconnect();
       }
     }
@@ -250,7 +250,7 @@ public class CastManager implements CastManagerInterface {
   public void deregisterFromOoyalaPlayer() {
     DebugMode.logD( TAG, "Disconnect from ooyalaPlayer " + ooyalaPlayer );
     this.ooyalaPlayer = null;
-    if( isActivelyCastingContent() ) {
+    if( isInCastMode ) {
       castPlayer.disconnectFromCurrentOoyalaPlayer();
     }
   }
@@ -279,8 +279,6 @@ public class CastManager implements CastManagerInterface {
    * For interacting with the cast playback, even when there is no OoyalaPlayer.
    *
    * @return the current CastPlayer. Possibly null.
-   * @return the current CastPlayer. Possibly null.
-   * @return the current CastPlayer. Possibly null.
    */
   public CastPlayer getCastPlayer() {
     return this.castPlayer;
@@ -291,14 +289,7 @@ public class CastManager implements CastManagerInterface {
    * even if casting has not actually begun.
    */
   public boolean isConnectedToReceiverApp() {
-    return this.videoCastManager.isConnected();
-  }
-  
-  /**
-   * @return true if the CastManager is casting content to a receiver.
-   */
-  public boolean isActivelyCastingContent() {
-    return isInCastMode;
+    return this.videoCastManager.isConnected() && this.castPlayer != null;
   }
 
   /**
@@ -353,7 +344,7 @@ public class CastManager implements CastManagerInterface {
   }
 
   /*============================================================================================*/
-  /*========== Consumer callbacks =================================================================*/
+  /*========== CastManagerInterface ============================================================*/
   /*============================================================================================*/
   public boolean isInCastMode() {
     return isInCastMode;

@@ -649,7 +649,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
-    if (_castManager != null && _castManager.isConnectedToReceiverApp() && _castManager.getCastPlayer() != null) {
+    if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
       DebugMode.logD(TAG, "switchToCastMode onChangeCurrentItemAfterFetch");
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
@@ -1921,7 +1921,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         new CastModeOptions(embedCode, playheadTime, isPlaying, _embedTokenGenerator, getClosedCaptionsLanguage(), _playerAPIClient.getAuthToken(), _playerAPIClient.getPcode(), _playerAPIClient.getDomain());
     _castManager.enterCastMode(castOptions);
     _layoutController.setFullscreenButtonShowing(false);
-    DebugMode.assertCondition(isInCastMode() == true, TAG, "Should be in cast mode by the end of switchCastMode");
+    DebugMode.assertCondition(isInCastMode(), TAG, "Should be in cast mode by the end of switchCastMode");
   }
 
   private int getCurrentPlayheadForCastMode() {
@@ -2066,7 +2066,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (_player != null) {
       // Connect to chromecast device in another activity and then come back to this ooyalaPlayer
       // In this case we need to check should we switch to cast mode
-      if (_castManager != null && _castManager.isConnectedToReceiverApp() && _castManager.getCastPlayer() != null) {
+      if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
         DebugMode.logD(TAG, "Switch to cast mode when resume current player");
         switchToCastMode(_currentItem.getEmbedCode());
       } else {
