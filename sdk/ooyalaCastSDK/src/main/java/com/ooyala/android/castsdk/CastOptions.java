@@ -39,6 +39,7 @@ public class CastOptions {
      * Set the target activity.
      * @param targetActivity - The target activity to be launched from notification, can be null if mini controller is not required.
      * The default value is null, causing CastCopanionLibraries's default VideoCastControllerActivity to be used.
+     * @return the Builder to continue constructing the CastOptions
      */
     public Builder setTargetActivity(Class<?> targetActivity) {
       this.targetActivity = targetActivity;
@@ -50,6 +51,7 @@ public class CastOptions {
      * this will enable CastCompanionLibrary's VideoCastManager.FEATURE_LOCKSCREEN
      * @param enable - true to enable, false to disable.
      * The default value is true.
+     * @return the Builder to continue constructing the CastOptions
      */
     public Builder setEnableLockScreen(boolean enable) {
       this.enableLockScreen = enable;
@@ -61,6 +63,7 @@ public class CastOptions {
      * this will enable CastCompanionLibrary's VideoCastManager.FEATURE_NOTIFICATION
      * @param enable - true to enable, false to disable.
      * The default value is true.
+     * @return the Builder to continue constructing the CastOptions
      */
     public Builder setEnableNotification(boolean enable) {
       this.enableNotification = enable;
@@ -72,6 +75,7 @@ public class CastOptions {
      * this will enable VideoCastManager.FEATURE_DEBUGGING if set to true
      * @param enable - true to enable, false to disable.
      * The default value is false.
+     * @return the Builder to continue constructing the CastOptions
      */
     public Builder setEnableCastDebug(boolean enable) {
       this.enableDebug = enable;

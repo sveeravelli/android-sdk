@@ -164,7 +164,7 @@ public class CastManager implements CastManagerInterface {
 
   /**
    * @return the CastManager singleton. Possibly null.
-   * @see #initialize(android.content.Context, String, Class, String)
+   * @see #initialize(android.content.Context, CastOptions)
    */
   public static CastManager getCastManager() {
     return castManager;
@@ -182,7 +182,8 @@ public class CastManager implements CastManagerInterface {
   /*============================================================================================*/
   
   /**
-   * * @param view to display in the video area while casting. Possibly null.
+   * Set the view to display while casting
+   * @param view to display in the video area while casting. Possibly null.
    *
    * @see #getCastView()
    */
@@ -194,7 +195,7 @@ public class CastManager implements CastManagerInterface {
 
   /**
    * @return the currently associated View. Possibly null.
-   * @see #setCastView(android.view.View)
+   * @see #setCastView(android.view.View) the view that is displayed during Cast playback
    */
   public View getCastView() {
     return castView;
@@ -258,6 +259,7 @@ public class CastManager implements CastManagerInterface {
   /**
    * Provide key-value pairs that will be passed to the Receiver upon Cast Playback. Anything
    * added to this will overwrite anything set by default in the init.
+   * @param params the set of key/values that will be added to the Receiver on Init
    */
   public void setAdditionalInitParams(Map<String, String> params) {
     additionalInitParams = params;
