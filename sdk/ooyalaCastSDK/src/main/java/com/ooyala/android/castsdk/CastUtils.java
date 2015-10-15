@@ -26,7 +26,7 @@ public class CastUtils {
    * make JSON String to pass in information
    *
    * @param action: Play/Pause/Seek
-   * @return
+   * @return the Cast Message JSON to send to the receiver
    */
   public static String makeActionJSON(String action) {
     JSONObject newAction = new JSONObject();
@@ -42,8 +42,8 @@ public class CastUtils {
   /**
    * Takes in a URL and decode the URL into a Bitmap
    *
-   * @param url
-   * @return
+   * @param url The url of the image to decode
+   * @return the Bitmap of the image
    */
   public static Bitmap decodeImageFromURL(String url) {
     Bitmap bitmap = null;
