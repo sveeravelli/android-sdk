@@ -261,7 +261,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   
   private void loadMedia(CastModeOptions options, String embedToken, Map<String, String> additionalInitParams) {
     JSONObject playerParams = new JSONObject();
-    boolean autoplay = options.isPlaying() ? true : false;
     String itemTitle = null;
     String itemPromoImageUrl = null;
     try {
@@ -332,10 +331,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         .setMetadata(metadata)
         .build();
     try {
-      DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "AutoPlay" + autoplay + "Playhead" + options.getPlayheadTimeInMillis());
-      this.castManager.getVideoCastManager().loadMedia(mediaInfo, false, options.getPlayheadTimeInMillis());
+      setState(State.LOADING);
+      DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "Playhead" + options.getPlayheadTimeInMillis());
+      this.castManager.getVideoCastManager().loadMedia(mediaInfo, true, options.getPlayheadTimeInMillis());
     } catch (Exception e) {
       e.printStackTrace();
+      this.error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Chromecast load media exception.");
+      setState(State.ERROR);
     }
   }
 
@@ -373,19 +375,6 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   /*package private on purpose*/ void onPlayerStatusChanged(int remotePlayerStatus) {
     switch (remotePlayerStatus) {
-      case MediaStatus.PLAYER_STATE_IDLE: {
-        int idleReason = castManager.getVideoCastManager().getIdleReason();
-        DebugMode.logD(TAG, "castplayerStateChanged: Idle reason:" + idleReason);
-        switch (idleReason) {
-          case MediaStatus.IDLE_REASON_ERROR:
-            setState(State.ERROR);
-            break;
-          default:
-            setState(State.READY);
-            break;
-        }
-        break;
-      }
       case MediaStatus.PLAYER_STATE_BUFFERING:
         DebugMode.logD(TAG, "castplayerStateChanged: Buffering");
         setState(State.LOADING);
@@ -412,10 +401,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
       if (msg.has("0")) {
         String eventType = msg.getString("0");
-        if (!eventType.equals("downloading") && !eventType.equals("playheadTimeChanged")) {
-          DebugMode.logD(TAG, "Received event: " + msg);
-        }
-        if (eventType.equalsIgnoreCase("playheadTimeChanged")) {
+        if (eventType.equals("downloading")) {
+          // do nothing.
+        } else if (eventType.equalsIgnoreCase("playheadTimeChanged")) {
           String currentTime = msg.getString("1");
           setCurrentTime((int) (Double.parseDouble(currentTime) * 1000));
           onPlayHeadChanged();
@@ -428,16 +416,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         } else if (eventType.equalsIgnoreCase("playbackReady")) {
           onPlayHeadChanged();
           syncDeviceVolumeToTV();
-          setState(State.READY);
-        }
-        else if (eventType.equalsIgnoreCase("closedCaptionsInfoAvailable")) {
+        } else if (eventType.equalsIgnoreCase("closedCaptionsInfoAvailable")) {
           //TODO: Need to check if the info available is "live"
           String language = msg.getJSONObject("1").getString("lang");
           if (RECEIVER_LIVE_LANGUAGE.equals(language)) {
             isLiveClosedCaptionsAvailable = true;
           }
-        }
-        else if (eventType.equalsIgnoreCase("played")) {
+        } else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
           setState(State.COMPLETED);
         } else if (eventType.equalsIgnoreCase("error")) {
@@ -467,6 +452,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   
   @Override
   public void reset() {
+    embedCode = null;
   }
 
   @Override
