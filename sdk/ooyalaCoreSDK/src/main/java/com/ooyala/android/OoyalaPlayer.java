@@ -650,28 +650,30 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
+
+    boolean needToLoadAnalytics = _analytics == null;
+    needToLoadAnalytics |= accountId != null
+            && !accountId.equals(_lastAccountId);
+    needToLoadAnalytics |= accountId == null && _lastAccountId != null;
+
+    if (needToLoadAnalytics) {
+      _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    }
+
+    // last account ID seen. Could be null
+    _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
+
     if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
       DebugMode.logD(TAG, "switchToCastMode onChangeCurrentItemAfterFetch");
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
-      boolean needToLoadAnalytics = _analytics == null;
-      needToLoadAnalytics |= accountId != null
-              && !accountId.equals(_lastAccountId);
-      needToLoadAnalytics |= accountId == null && _lastAccountId != null;
-
-      if (needToLoadAnalytics) {
-        _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
-      }
-
-      // last account ID seen. Could be null
-      _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
-
       _analytics.initializeVideo(_currentItem.getEmbedCode(),
-              _currentItem.getDuration());
+          _currentItem.getDuration());
       if (!processAdModes(AdMode.ContentChanged, 0)) {
         switchToContent(false);
       }
     }
+
     return true;
   }
 
@@ -1317,7 +1319,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
         // send analytics ping
       if (_analytics != null) {
-        _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+        _analytics.reportPlayheadUpdate((player.currentTime()) / 1000);
       }
       processAdModes(AdMode.Playhead, player.currentTime());
       sendNotification(TIME_CHANGED_NOTIFICATION);
