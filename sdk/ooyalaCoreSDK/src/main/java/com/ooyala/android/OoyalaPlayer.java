@@ -1260,6 +1260,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void onComplete() {
+    // castplayer is disconnected after completion, always destroy it and recreate when replay.
     boolean destroyPlayers = isInCastMode();
 
     switch (_actionAtEnd) {
@@ -1904,6 +1905,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     _castManager.enterCastMode(castOptions);
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode(), TAG, "Should be in cast mode by the end of switchCastMode");
+    if (_analytics != null) {
+      _analytics.disable(true);
+    }
   }
 
   private int getCurrentPlayheadForCastMode() {
@@ -1932,6 +1936,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
     }
     _layoutController.setFullscreenButtonShowing(true);
+    if (_analytics != null) {
+      _analytics.disable(false);
+    }
   }
 
   private boolean prepareContent(boolean forcePlay) {

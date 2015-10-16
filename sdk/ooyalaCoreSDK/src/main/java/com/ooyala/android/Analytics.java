@@ -1,17 +1,5 @@
 package com.ooyala.android;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.webkit.ConsoleMessage;
@@ -23,6 +11,18 @@ import android.webkit.WebViewClient;
 import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.util.TemporaryInternalStorageFile;
 import com.ooyala.android.util.TemporaryInternalStorageFileManager;
+
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Integration of Ooyala client-side player with Ooyala server-side analytics collection.
@@ -42,6 +42,7 @@ public class Analytics {
   private static final String JS_ANALYTICS_GUID = "guid";
   private static final String JS_ANALYTICS_DOCUMENT_URL = "documentUrl";
 
+  private boolean _disabled;
   private boolean _ready;
   private boolean _failed;
   private boolean _initialPlay = true;
@@ -114,7 +115,7 @@ public class Analytics {
   private Analytics(Context context, String embedHTML, String embedDomain) {
 
     tmpBootHtmlFileManager = new TemporaryInternalStorageFileManager();
-
+    _disabled = false;
     _jsAnalytics = new WebView(context);
 
     _defaultUserAgent = String.format(JS_ANALYTICS_USER_AGENT, OoyalaPlayer.getVersion(),
@@ -197,7 +198,7 @@ public class Analytics {
    * Helper function to report a player load
    */
   private void report(String action) {
-    if (_failed) { return; }
+    if (_failed  || _disabled) { return; }
     if (!_ready) {
       queue(action);
     } else {
@@ -286,5 +287,20 @@ public class Analytics {
       _userAgent = _defaultUserAgent;
     }
     _jsAnalytics.getSettings().setUserAgentString(_userAgent);
+  }
+
+  /**
+   * temporary enable/disable
+   * @param disable true to disable, false to enable.
+   */
+  public void disable(boolean disable) {
+    _disabled = disable;
+  }
+
+  /**
+   * @return true if disabled, false otherwise
+   */
+  public boolean isDisabled() {
+    return _disabled;
   }
 }
