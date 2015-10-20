@@ -41,6 +41,7 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
+import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
@@ -649,28 +650,30 @@ public class OoyalaPlayer extends Observable implements Observer,
     // If has account ID that was different than before, OR
     // If no account ID, but last time there _was_ an account id, we need to
     // re-initialize
+
+    boolean needToLoadAnalytics = _analytics == null;
+    needToLoadAnalytics |= accountId != null
+            && !accountId.equals(_lastAccountId);
+    needToLoadAnalytics |= accountId == null && _lastAccountId != null;
+
+    if (needToLoadAnalytics) {
+      _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
+    }
+
+    // last account ID seen. Could be null
+    _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
+
     if (_castManager != null && _castManager.isConnectedToReceiverApp()) {
       DebugMode.logD(TAG, "switchToCastMode onChangeCurrentItemAfterFetch");
       switchToCastMode(_currentItem.getEmbedCode());
     } else {
-      boolean needToLoadAnalytics = _analytics == null;
-      needToLoadAnalytics |= accountId != null
-              && !accountId.equals(_lastAccountId);
-      needToLoadAnalytics |= accountId == null && _lastAccountId != null;
-
-      if (needToLoadAnalytics) {
-        _analytics = new Analytics(getLayout().getContext(), _playerAPIClient);
-      }
-
-      // last account ID seen. Could be null
-      _lastAccountId = _playerAPIClient.getUserInfo().getAccountId();
-
       _analytics.initializeVideo(_currentItem.getEmbedCode(),
-              _currentItem.getDuration());
+          _currentItem.getDuration());
       if (!processAdModes(AdMode.ContentChanged, 0)) {
         switchToContent(false);
       }
     }
+
     return true;
   }
 
@@ -789,6 +792,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayer(_player);
     _player = null;
 
+    PlayerInterface castPlayer = _castManager.getCastPlayer();
+    if (castPlayer != null) {
+      ((LifeCycleInterface)castPlayer).reset();
+    }
     hidePromoImage();
   }
 
@@ -884,23 +891,8 @@ public class OoyalaPlayer extends Observable implements Observer,
   public boolean showingAdWithHiddenControlls() {
     return (isShowingAd() && (options().getShowAdsControls() == false));
   }
-  /**
-   * Play the current video
-   */
-  public void play() {
-    if (isInCastMode()) {
-      PlayerInterface castPlayer = currentPlayer();
-      if (castPlayer != null) {
-        castPlayer.play();
-      } else {
-        queuePlay();
-      }
-    } else {
-      playLocally();
-    }
-  }
 
-  private void playLocally() {
+  public void play() {
     if (_analytics != null) {
       _analytics.reportPlayRequested();
     }
@@ -915,14 +907,25 @@ public class OoyalaPlayer extends Observable implements Observer,
       if (!needPlayAdsOnInitialContentPlay()) {
         currentPlayer().play();
       }
-      currentPlayer().play();
     } else {
       queuePlay();
       if (_player == null && _state == State.READY) {
         if (!needPlayAdsOnInitialContentPlay()) {
           prepareContent(false);
         }
+      } else if (_state == State.COMPLETED) {
+        restart();
       }
+    }
+  }
+
+  private void restart() {
+    if (_currentItem != null) {
+      String embedCode = _currentItem.getEmbedCode();
+      if (embedCode != null) {
+        DebugMode.logD(TAG, "restart with embedcode:" + embedCode);
+      }
+      setEmbedCode(embedCode);
     }
   }
 
@@ -1259,31 +1262,34 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void onComplete() {
+    // castplayer is disconnected after completion, always destroy it and recreate when replay.
+    boolean destroyPlayers = isInCastMode();
+
     switch (_actionAtEnd) {
-    case CONTINUE:
-      if (nextVideo(DO_PLAY)) {
-      } else {
-        reset();
-        sendNotification(PLAY_COMPLETED_NOTIFICATION);
-      }
-      break;
-    case PAUSE:
-      if (nextVideo(DO_PAUSE)) {
-      } else {
-        reset();
-        sendNotification(PLAY_COMPLETED_NOTIFICATION);
-      }
-      break;
-    case STOP:
+      case CONTINUE:
+        if (nextVideo(DO_PLAY)) {
+          return;
+        }
+        break;
+      case PAUSE:
+        if (nextVideo(DO_PAUSE)) {
+          return;
+        }
+        break;
+      case STOP:
+        destroyPlayers = true;
+        break;
+      case RESET:
+        break;
+    }
+
+    if (destroyPlayers) {
       cleanupPlayers();
       setState(State.COMPLETED);
-      sendNotification(PLAY_COMPLETED_NOTIFICATION);
-      break;
-    case RESET:
+    } else {
       reset();
-      sendNotification(PLAY_COMPLETED_NOTIFICATION);
-      break;
     }
+    sendNotification(PLAY_COMPLETED_NOTIFICATION);
   }
 
   @Override
@@ -1292,10 +1298,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void update(Observable arg0, Object arg1) {
     String notification = arg1.toString();
-    if (arg0 instanceof Player) {
-      processContentNotifications((Player) arg0, notification);
-    } else if (arg0.getClass() == this._castManager.getCastPlayer().getClass() ) {
-      processCastNotifications(notification);
+    if (arg0 instanceof PlayerInterface) {
+      processContentNotifications((PlayerInterface) arg0, notification);
     }
   }
 
@@ -1307,20 +1311,17 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param notification
    *          the notification
    */
-  private void processContentNotifications(Player player, String notification) {
-    if (_player == null) {
-      DebugMode.logE(TAG,  "Accepting notifications when there is no player: " + notification);
-    }
-    if (_player != player) {
+  private void processContentNotifications(PlayerInterface player, String notification) {
+    if (currentPlayer() != player) {
       DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
     }
 
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
         // send analytics ping
       if (_analytics != null) {
-        _analytics.reportPlayheadUpdate((_player.currentTime()) / 1000);
+        _analytics.reportPlayheadUpdate((player.currentTime()) / 1000);
       }
-      processAdModes(AdMode.Playhead, _player.currentTime());
+      processAdModes(AdMode.Playhead, player.currentTime());
       sendNotification(TIME_CHANGED_NOTIFICATION);
     } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
       State state = player.getState();
@@ -1395,22 +1396,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
 
     sendNotification(notification);
-  }
-
-  private void processCastNotifications(String notification) {
-
-    if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
-      setState(this._castManager.getCastPlayer().getState());
-    } else if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
-      sendNotification(TIME_CHANGED_NOTIFICATION);
-    } else if (notification.equals(AD_COMPLETED_NOTIFICATION)) {
-      sendNotification(AD_COMPLETED_NOTIFICATION);
-    } else if (notification.equals(CURRENT_ITEM_CHANGED_NOTIFICATION)) {
-      sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
-    } else if (notification.equals(ERROR_NOTIFICATION)) {
-      _error = this._castManager.getCastPlayer().getError();
-      onContentError();
-    }
   }
 
   /**
@@ -1922,6 +1907,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     _castManager.enterCastMode(castOptions);
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode(), TAG, "Should be in cast mode by the end of switchCastMode");
+    if (_analytics != null) {
+      _analytics.disable(true);
+    }
   }
 
   private int getCurrentPlayheadForCastMode() {
@@ -1950,6 +1938,9 @@ public class OoyalaPlayer extends Observable implements Observer,
       _player.resume(exitPlayheadTime, isPlaying ? State.PLAYING : State.PAUSED);
     }
     _layoutController.setFullscreenButtonShowing(true);
+    if (_analytics != null) {
+      _analytics.disable(false);
+    }
   }
 
   private boolean prepareContent(boolean forcePlay) {
@@ -2043,7 +2034,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return true if adManager require ad mode, false otherwise
    */
   private boolean processAdModes(AdMode mode, int parameter) {
-    boolean result = _adManager.onAdMode(mode, parameter);
+    boolean result = false;
+    if (!isInCastMode()) {
+      result = _adManager.onAdMode(mode, parameter);
+    }
     if (result) {
       switchToAdMode();
     } else {
