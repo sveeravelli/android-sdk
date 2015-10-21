@@ -792,11 +792,14 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayer(_player);
     _player = null;
 
+    hidePromoImage();
+  }
+
+  private void cleanupCastPlayer() {
     PlayerInterface castPlayer = _castManager.getCastPlayer();
     if (castPlayer != null) {
       ((LifeCycleInterface)castPlayer).reset();
     }
-    hidePromoImage();
   }
 
   private void cleanupPlayer(Player p) {
@@ -1285,6 +1288,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (destroyPlayers) {
       cleanupPlayers();
+      cleanupCastPlayer();
       setState(State.COMPLETED);
     } else {
       reset();
