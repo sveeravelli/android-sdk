@@ -1902,6 +1902,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     DebugMode.logD(TAG, "Switch to Cast Mode");
     DebugMode.assertCondition(_currentItem != null, TAG, "currentItem should be not null");
     DebugMode.assertCondition(_castManager != null, TAG, "castManager should be not null");
+    // disable analytics for cast mode to avoid double count.
+    if (_analytics != null) {
+      _analytics.disable(true);
+    }
+
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     _queuedSeekTime = 0;  //Clear queued seek time if we start casting
@@ -1911,9 +1916,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     _castManager.enterCastMode(castOptions);
     _layoutController.setFullscreenButtonShowing(false);
     DebugMode.assertCondition(isInCastMode(), TAG, "Should be in cast mode by the end of switchCastMode");
-    if (_analytics != null) {
-      _analytics.disable(true);
-    }
   }
 
   private int getCurrentPlayheadForCastMode() {
