@@ -453,6 +453,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void reset() {
     embedCode = null;
+    seekable = false;
+    setState(State.INIT);
   }
 
   @Override
