@@ -12,6 +12,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.cast.callbacks.VideoCastConsumerImpl;
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
+import com.google.android.libraries.cast.companionlibrary.widgets.IMiniController;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaPlayer;
@@ -88,22 +89,15 @@ public class CastManager implements CastManagerInterface {
   }
 
   private static final String TAG = CastManager.class.getSimpleName();
-
-  public static final String ACTION_PLAY = "OOCastPlay";
-  public static final String ACTION_STOP = "OOCastStop";
   private static CastManager castManager;
 
-  private static int notificationMiniControllerResourceId;
-  private static int notificationImageResourceId;
-
-  private Bitmap miniControllerDefaultImageBitmap;
-
-  private  Context context;
+  private Bitmap defaultIcon;
+  private Context context;
   private View castView;
+  private IMiniController miniController;
   private WeakReference<OoyalaPlayer> ooyalaPlayer;
   private CastPlayer castPlayer;
   private Map<String, String> additionalInitParams;
-  private boolean notificationServiceIsActivated;
   private boolean isPlayerSeekable = true;
   private boolean isInCastMode;
 
@@ -202,29 +196,40 @@ public class CastManager implements CastManagerInterface {
   }
 
   /**
-   * What to show in the mini controller when there's no thumbnail for the video asset.
-   *
-   * @param imageBitmap to show in the mini controller. Should not be null.
-   * @see #getDefaultMiniControllerImageBitmap()
+   * set the default icon image
+   * @param image the bitmap image to be used
    */
-  public void setDefaultMiniControllerImageBitmap(Bitmap imageBitmap) {
-    DebugMode.logD(TAG, "Set mini controller image bitmap = " + imageBitmap);
-    miniControllerDefaultImageBitmap = imageBitmap;
+  public void setDefaultIcon(Bitmap image) {
+    defaultIcon = image;
   }
 
   /**
-   * @param resourceId for looking up the notification mini controller view layout.
+   * @return the default icon
    */
-  public void setNotificationMiniControllerLayout(int resourceId) {
-    DebugMode.logD(TAG, "Set notification mini controller layout = " + resourceId);
-    notificationMiniControllerResourceId = resourceId;
+  public Bitmap getDefaultIcon() {
+    return defaultIcon;
   }
 
   /**
-   * @param isSeekable true allows seek operations, false denies them.
+   * add the mini controller
+   * @param miniController the minicontroller to add
    */
-  public void setCastPlayerSeekable(boolean isSeekable) {
-    isPlayerSeekable = isSeekable;
+  public void addMiniController(IMiniController miniController) {
+    this.miniController = miniController;
+    VideoCastManager.getInstance().addMiniController(miniController);
+  }
+
+  /**
+   * remove the mini controller
+   * @param miniController the minicontroller to be removed
+   */
+  public void removeMiniController(IMiniController miniController) {
+    if (miniController != this.miniController) {
+      DebugMode.logD(TAG, "try to remove a different minicontroller");
+      return;
+    }
+    VideoCastManager.getInstance().removeMiniController(miniController);
+    this.miniController = null;
   }
 
   /**
@@ -268,14 +273,6 @@ public class CastManager implements CastManagerInterface {
   /*============================================================================================*/
   /*========== Access CastManager Status Or Fields =============================================*/
   /*============================================================================================*/
-
-  /**
-   * @return any previously registered bitmap, otherwise null.
-   * @see #setDefaultMiniControllerImageBitmap(android.graphics.Bitmap)
-   */
-  public Bitmap getDefaultMiniControllerImageBitmap() {
-    return miniControllerDefaultImageBitmap;
-  }
 
   /**
    * For interacting with the cast playback, even when there is no OoyalaPlayer.
@@ -395,6 +392,12 @@ public class CastManager implements CastManagerInterface {
       } catch (Exception e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  /*package private on purpose*/ void hideMiniController() {
+    if (miniController != null) {
+      miniController.setVisibility(View.GONE);
     }
   }
 }

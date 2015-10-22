@@ -362,7 +362,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         } catch (Exception e) {
           DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + imageUrl + ", trying the default one",
               e);
-          castImageBitmap = castManager.getDefaultMiniControllerImageBitmap();
+          castImageBitmap = castManager.getDefaultIcon();
         }
       }
     }).start();
@@ -424,7 +424,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           }
         } else if (eventType.equalsIgnoreCase("played")) {
           setCurrentTime(0);
+          embedCode = null;
+          setSeekable(false);
           setState(State.COMPLETED);
+          castManager.hideMiniController();
         } else if (eventType.equalsIgnoreCase("error")) {
           String receiverCode = msg.getJSONObject("1").getString("code");
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
@@ -449,12 +452,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void stop() {
   }
-  
+
   @Override
   public void reset() {
-    embedCode = null;
-    seekable = false;
-    setState(State.INIT);
   }
 
   @Override

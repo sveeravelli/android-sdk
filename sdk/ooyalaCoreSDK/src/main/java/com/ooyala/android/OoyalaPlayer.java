@@ -41,7 +41,6 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
-import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
@@ -795,13 +794,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     hidePromoImage();
   }
 
-  private void cleanupCastPlayer() {
-    PlayerInterface castPlayer = _castManager.getCastPlayer();
-    if (castPlayer != null) {
-      ((LifeCycleInterface)castPlayer).reset();
-    }
-  }
-
   private void cleanupPlayer(Player p) {
     if (p != null) {
       p.deleteObserver(this);
@@ -1288,7 +1280,6 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     if (destroyPlayers) {
       cleanupPlayers();
-      cleanupCastPlayer();
       setState(State.COMPLETED);
     } else {
       reset();
