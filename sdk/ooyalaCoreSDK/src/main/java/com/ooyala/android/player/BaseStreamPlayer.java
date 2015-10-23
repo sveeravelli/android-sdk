@@ -135,7 +135,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public int currentTime() {
-    if (_player == null) { return 0; }
+    if (getState() == State.SUSPENDED) {
+      return _timeBeforeSuspend;
+    } else if (_player == null) {
+      return 0;
+    }
     switch (getState()) {
       case INIT:
       case SUSPENDED:
