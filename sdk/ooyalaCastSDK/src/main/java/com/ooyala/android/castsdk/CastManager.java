@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.cast.ApplicationMetadata;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
@@ -15,6 +16,7 @@ import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastC
 import com.google.android.libraries.cast.companionlibrary.widgets.IMiniController;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -22,8 +24,9 @@ import com.ooyala.android.util.DebugMode;
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Observable;
 
-public class CastManager implements CastManagerInterface {
+public class CastManager extends Observable implements CastManagerInterface {
 
   public static final class CastManagerInitializationException extends Exception {
       public CastManagerInitializationException( String message ) {
@@ -47,10 +50,12 @@ public class CastManager implements CastManagerInterface {
 
     @Override
     public void onApplicationDisconnected(int errorCode) {
-      DebugMode.logD( TAG, "onApplicationDisconnected called" );
+      DebugMode.logD(TAG, "onApplicationDisconnected with errorCode:" + errorCode);
       if (isInCastMode()) {
         cleanupAfterReceiverDisconnect();
       }
+      setChanged();
+      notifyObservers(NOTIFICATION_APPLICATION_DISCONNECTED);
     }
 
     @Override
@@ -67,26 +72,47 @@ public class CastManager implements CastManagerInterface {
       if (isInCastMode()) {
         cleanupAfterReceiverDisconnect();
       }
+      setChanged();
+      notifyObservers(NOTIFICATION_DISCONNECTED);
     }
 
     @Override
     public void onMediaLoadResult(int statusCode) {
       DebugMode.logD(TAG, "onMediaLoadResults:"+statusCode);
-      try {
-        castManager.getVideoCastManager().play();
-      } catch (Exception e) {
-        e.printStackTrace();
+      if (statusCode > 0) {
+        OoyalaException error =
+            new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "cast media load failed with code "+statusCode);
+        if (castPlayer != null) {
+          castPlayer.onCastManagerError(error);
+        }
+      } else {
+        try {
+          CastManager.getVideoCastManager().play();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
 
     @Override
     public void onRemoteMediaPlayerStatusUpdated() {
-      int playerStatus = castManager.getVideoCastManager().getPlaybackStatus();
-      if (castPlayer != null) {
+      int playerStatus = CastManager.getVideoCastManager().getPlaybackStatus();
+
+      if ((playerStatus == MediaStatus.PLAYER_STATE_IDLE) &&
+          (CastManager.getVideoCastManager().getIdleReason() == MediaStatus.IDLE_REASON_ERROR)) {
+        OoyalaException error =
+            new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "media idle error");
+        if (castPlayer != null) {
+          castPlayer.onCastManagerError(error);
+        }
+      } else if (castPlayer != null) {
         castPlayer.onPlayerStatusChanged(playerStatus);
       }
     }
   }
+
+  public static final String NOTIFICATION_APPLICATION_DISCONNECTED = "applicationDisconnected";
+  public static final String NOTIFICATION_DISCONNECTED = "disconnected";
 
   private static final String TAG = CastManager.class.getSimpleName();
   private static CastManager castManager;

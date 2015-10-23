@@ -440,6 +440,13 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       e.printStackTrace();
     }
   }
+
+  /*package private on purpose*/ void onCastManagerError(OoyalaException error) {
+    this.error = error;
+    setState(State.ERROR);
+    setChanged();
+    notifyObservers(OoyalaPlayer.ERROR_NOTIFICATION);
+  }
   
   /*============================================================================================*/
   /*========== CastPlayer Lifecycle Interface =======================================================*/
