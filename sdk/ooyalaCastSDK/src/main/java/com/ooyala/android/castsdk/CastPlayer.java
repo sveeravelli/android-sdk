@@ -116,7 +116,17 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   @Override
   public int duration() {
-    return currentItem == null ? 0 : currentItem.getDuration();
+    int duration = 0;
+    try {
+      duration = (int)CastManager.getVideoCastManager().getMediaDuration();
+    } catch (Exception e) {
+
+    }
+
+    if (duration <= 0 && currentItem != null) {
+      duration = currentItem.getDuration();
+    }
+    return duration;
   }
 
   /**
