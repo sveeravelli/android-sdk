@@ -9,6 +9,7 @@ import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.common.images.WebImage;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.CastException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.ooyala.android.CastModeOptions;
@@ -24,6 +25,7 @@ import com.ooyala.android.util.DebugMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,24 +81,22 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void pause() {
     DebugMode.logD(TAG, "pause()");
-    setState(State.PAUSED);
+
     try {
       VideoCastManager.getInstance().pause();
-    } catch (Exception e) {
-      DebugMode.logE(TAG, "PAUSE FAILED due to Exception");
-      e.printStackTrace();
+    } catch (CastException | NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logE(TAG, "PAUSE FAILED due to Exception", e);
     }
   }
 
   @Override
   public void play() {
     DebugMode.logD(TAG, "play()");
-    setState(State.PLAYING);
+
     try {
       VideoCastManager.getInstance().play();
-    } catch (Exception e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to exception");
-      e.printStackTrace();
+    } catch (CastException | NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to exception", e);
     }
   }
 
@@ -116,7 +116,18 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   @Override
   public int duration() {
-    return currentItem == null ? 0 : currentItem.getDuration();
+    int duration = 0;
+    try {
+      duration = (int)CastManager.getVideoCastManager().getMediaDuration();
+    } catch (NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logD(TAG, "failed to get duration from cast due to exception", e);
+    }
+
+    if (duration <= 0 && currentItem != null) {
+      duration = currentItem.getDuration();
+    }
+
+    return duration;
   }
 
   /**
@@ -135,13 +146,11 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   @Override
   public void seekToTime(int timeInMillis) {
     DebugMode.logD(TAG, "Seek to time in seconds: " + timeInMillis / 1000);
-
     JSONObject actionSeek = new JSONObject();
     try {
       castManager.getVideoCastManager().seek(timeInMillis);
-    } catch (Exception e) {
-      DebugMode.logE(TAG, "PLAY FAILED due to TransientNetworkDisconnectionExceptio");
-      e.printStackTrace();
+    } catch (NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logE(TAG, "PLAY FAILED due to exception", e);
       return;
     }
 
@@ -181,16 +190,14 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       actionSetVolume.put("action", "setCCLanguage");
       actionSetVolume.put("data", convertClosedCaptionsLanguageForReceiver(language));
     } catch (JSONException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "FAILED to set CC due to JSON exception", e);
       return;
     }
 
     try {
       castManager.getVideoCastManager().sendDataMessage(actionSetVolume.toString());
-    } catch (NoConnectionException e) {
-      e.printStackTrace();
-    } catch (TransientNetworkDisconnectionException e) {
-      e.printStackTrace();
+    } catch (NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logD(TAG, "FAILED to set CC to " + language + " due to exception ", e);
     }
   }
 
@@ -309,7 +316,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         }
       }
     } catch (JSONException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "FAILED to compose load media due to json exception", e);
       return;
     }
 
@@ -334,8 +341,8 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
       setState(State.LOADING);
       DebugMode.logD(TAG, "LoadMedia MediaInfo" + mediaInfo.toString() + "Playhead" + options.getPlayheadTimeInMillis());
       this.castManager.getVideoCastManager().loadMedia(mediaInfo, true, options.getPlayheadTimeInMillis());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (NoConnectionException | TransientNetworkDisconnectionException e) {
+      DebugMode.logE(TAG, "FAILED to load media due to cast exception" + e.getMessage());
       this.error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Chromecast load media exception.");
       setState(State.ERROR);
     }
@@ -359,8 +366,9 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         try {
           URL imgUrl = new URL(imageUrl);
           castImageBitmap = BitmapFactory.decodeStream(imgUrl.openStream());
-        } catch (Exception e) {
-          DebugMode.logE(TAG, "setIcon(): Failed to load the image with url: " + imageUrl + ", trying the default one",
+        } catch (IOException e) {
+          DebugMode.logE(
+              TAG, "setIcon(): Failed to load the image with url: " + imageUrl + ", trying the default one",
               e);
           castImageBitmap = castManager.getDefaultIcon();
         }
@@ -437,8 +445,15 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
         }
       }
     } catch (JSONException e) {
-      e.printStackTrace();
+      DebugMode.logE(TAG, "Ill formatted message" + message, e);
     }
+  }
+
+  /*package private on purpose*/ void onCastManagerError(OoyalaException error) {
+    this.error = error;
+    setState(State.ERROR);
+    setChanged();
+    notifyObservers(OoyalaPlayer.ERROR_NOTIFICATION);
   }
   
   /*============================================================================================*/

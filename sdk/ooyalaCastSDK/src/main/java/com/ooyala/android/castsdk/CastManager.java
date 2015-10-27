@@ -7,14 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.cast.ApplicationMetadata;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.cast.callbacks.VideoCastConsumerImpl;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.CastException;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
+import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
 import com.google.android.libraries.cast.companionlibrary.widgets.IMiniController;
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
+import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -22,8 +27,9 @@ import com.ooyala.android.util.DebugMode;
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Observable;
 
-public class CastManager implements CastManagerInterface {
+public class CastManager extends Observable implements CastManagerInterface {
 
   public static final class CastManagerInitializationException extends Exception {
       public CastManagerInitializationException( String message ) {
@@ -47,10 +53,12 @@ public class CastManager implements CastManagerInterface {
 
     @Override
     public void onApplicationDisconnected(int errorCode) {
-      DebugMode.logD( TAG, "onApplicationDisconnected called" );
+      DebugMode.logD(TAG, "onApplicationDisconnected with errorCode:" + errorCode);
       if (isInCastMode()) {
         cleanupAfterReceiverDisconnect();
       }
+      setChanged();
+      notifyObservers(NOTIFICATION_APPLICATION_DISCONNECTED);
     }
 
     @Override
@@ -67,26 +75,49 @@ public class CastManager implements CastManagerInterface {
       if (isInCastMode()) {
         cleanupAfterReceiverDisconnect();
       }
+      setChanged();
+      notifyObservers(NOTIFICATION_DISCONNECTED);
     }
 
     @Override
     public void onMediaLoadResult(int statusCode) {
       DebugMode.logD(TAG, "onMediaLoadResults:"+statusCode);
-      try {
-        castManager.getVideoCastManager().play();
-      } catch (Exception e) {
-        e.printStackTrace();
+      if (statusCode > 0) {
+        OoyalaException error =
+            new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "cast media load failed with code "+statusCode);
+        if (castPlayer != null) {
+          castPlayer.onCastManagerError(error);
+        }
+      } else {
+        try {
+          CastManager.getVideoCastManager().play();
+        } catch (NoConnectionException | CastException | TransientNetworkDisconnectionException e) {
+          DebugMode.logE(TAG, "cast play failed due to exception", e);
+          OoyalaException error =
+              new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to play after media load");
+          if (castPlayer != null) {
+            castPlayer.onCastManagerError(error);
+          }
+        }
       }
     }
 
     @Override
     public void onRemoteMediaPlayerStatusUpdated() {
-      int playerStatus = castManager.getVideoCastManager().getPlaybackStatus();
+      int playerStatus = CastManager.getVideoCastManager().getPlaybackStatus();
+
+      if ((playerStatus == MediaStatus.PLAYER_STATE_IDLE) &&
+          (CastManager.getVideoCastManager().getIdleReason() == MediaStatus.IDLE_REASON_ERROR)) {
+        DebugMode.logD(TAG, "Cast idle reason error");
+      }
       if (castPlayer != null) {
         castPlayer.onPlayerStatusChanged(playerStatus);
       }
     }
   }
+
+  public static final String NOTIFICATION_APPLICATION_DISCONNECTED = "applicationDisconnected";
+  public static final String NOTIFICATION_DISCONNECTED = "disconnected";
 
   private static final String TAG = CastManager.class.getSimpleName();
   private static CastManager castManager;
@@ -115,30 +146,23 @@ public class CastManager implements CastManagerInterface {
   public static CastManager initialize(Context context, CastOptions options) throws CastManagerInitializationException {
     DebugMode.assertCondition( castManager == null, TAG, "Cannot re-initialize" );
     if( castManager == null ) {
-//      notificationMiniControllerResourceId = R.layout.oo_default_notification;
-//      notificationImageResourceId = R.drawable.ic_ooyala;
       DebugMode.logD(TAG, "Init new CastManager with options " + options.toString());
       requireGooglePlayServices(context);
-      try {
-        DebugMode.logD(TAG, "Initialize VideoCastManager");
-        VideoCastManager.initialize(
-            context, options.getApplicationId(), options.getTargetActivity(), options.getNameSpace())
+
+      DebugMode.logD(TAG, "Initialize VideoCastManager");
+      VideoCastManager.initialize(context, options.getApplicationId(), options.getTargetActivity(), options.getNameSpace())
             .enableFeatures(options.enabledFeatures());
-        // this is the default behavior but is mentioned to make it clear that it is configurable.
-        VideoCastManager.getInstance().setNextPreviousVisibilityPolicy(
-            VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED);
+      // this is the default behavior but is mentioned to make it clear that it is configurable.
+      VideoCastManager.getInstance().setNextPreviousVisibilityPolicy(
+          VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED);
 
-        // this is to set the launch options, the following values are the default values
-        VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
+      // this is to set the launch options, the following values are the default values
+      VideoCastManager.getInstance().setLaunchOptions(false, Locale.getDefault());
 
-        // this is the default behavior but is mentioned to make it clear that it is configurable.
-        VideoCastManager.getInstance().setCastControllerImmersive(true);
+      // this is the default behavior but is mentioned to make it clear that it is configurable.
+      VideoCastManager.getInstance().setCastControllerImmersive(true);
 
-        castManager = new CastManager(context);
-      }
-      catch( Exception e ) {
-        throw new CastManagerInitializationException( e );
-      }
+      castManager = new CastManager(context);
     }
     return castManager;
   }
@@ -150,9 +174,9 @@ public class CastManager implements CastManagerInterface {
   private static void requireGooglePlayServices( Context context ) throws CastManagerInitializationException {
     final int gpsAvailableCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
     if( ConnectionResult.SUCCESS != gpsAvailableCode ) {
-      String msg = "Couldn't find the appropriate version of Google Play Services (code " + gpsAvailableCode + ")";
-      DebugMode.logE( TAG, msg );
-      throw new CastManagerInitializationException( msg );
+      String message = "Couldn't find the appropriate version of Google Play Services (code " + gpsAvailableCode + ")";
+      DebugMode.logE( TAG, message );
+      throw new CastManagerInitializationException( message );
     }
   }
 
@@ -389,8 +413,8 @@ public class CastManager implements CastManagerInterface {
       DebugMode.logD(TAG, "set device volume to cast, volume:" + volume);
       try {
         castManager.getVideoCastManager().setVolume(volume);
-      } catch (Exception e) {
-        e.printStackTrace();
+      } catch (NoConnectionException | CastException | TransientNetworkDisconnectionException e) {
+        DebugMode.logD(TAG, "Failed to sync volume due to cast exception", e);
       }
     }
   }
