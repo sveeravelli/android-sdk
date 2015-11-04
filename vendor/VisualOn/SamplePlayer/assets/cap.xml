@@ -115,6 +115,18 @@
 	</item>
 	
 	<item>
+		<Core>2</Core>
+		<Neon>1</Neon>
+		<Frequency>2300000</Frequency>
+		<CodecType>5</CodecType>	
+		<BitRate>3000000</BitRate>
+		<VideoWidth>640</VideoWidth>
+		<VideoHeight>480</VideoHeight>
+		<ProfileLevel>0</ProfileLevel>
+		<FPS>30</FPS>
+	</item>
+	
+	<item>
 		<Core>4</Core>
 		<Neon>1</Neon>
 		<Frequency>1000000</Frequency>
@@ -147,6 +159,29 @@
 		<VideoWidth>640</VideoWidth>
 		<VideoHeight>480</VideoHeight>
 		<ProfileLevel>0</ProfileLevel>
+		<FPS>30</FPS>
+	</item>
+	
+	<item>
+		<Core>4</Core>
+		<Neon>1</Neon>
+		<Frequency>2700000</Frequency>
+		<CodecType>5</CodecType>	
+		<BitRate>3000000</BitRate>
+		<VideoWidth>640</VideoWidth>
+		<VideoHeight>480</VideoHeight>
+		<ProfileLevel>0</ProfileLevel>
+		<FPS>30</FPS>
+	</item>
+	<item>
+		<Core>8</Core>
+		<Neon>1</Neon>
+		<Frequency>2000000</Frequency>
+		<CodecType>5</CodecType>
+		<BitRate>3500000</BitRate>
+		<VideoWidth>640</VideoWidth>
+		<VideoHeight>480</VideoHeight>
+		<ProfileLevel>1</ProfileLevel>
 		<FPS>30</FPS>
 	</item>
 </CapData>

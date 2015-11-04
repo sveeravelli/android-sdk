@@ -17,6 +17,7 @@
         <EditText
             android:id="@+id/edtInputURL"
             android:layout_weight="1"
+	    android:singleLine="true"
             android:layout_width="fill_parent"
             android:layout_height="50dp" >
         </EditText>

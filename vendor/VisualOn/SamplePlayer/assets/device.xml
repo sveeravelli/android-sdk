@@ -23,7 +23,30 @@
 <!--The TextureView element value can be set to No to disable the use of TextureView for a specific device when enableVOAdaptivePlayback(true). Other TextureView element values are ignored.-->
 
 <DeviceData>
+		<item>
+			<Model>Hudl HT7S3</Model>
+			<Release>4.2.2</Release>
+			<Platform>rk30xx</Platform>
+			<CodecSolution>IOMX</CodecSolution>
+			<TextureView>Yes</TextureView>
+		</item>
     
+                <item>
+                                <Model>SOL22</Model>
+                                <Release>4.1</Release>
+                                <Platform>msm8960</Platform>
+                                <CodecSolution>MediaCodec</CodecSolution>
+                                <TextureView>Yes</TextureView>
+                 </item>
+                 
+                 <item>
+		<Model>HUAWEI P6-T00</Model>
+		<Release>4.4</Release>
+		<Platform>k3v2oem1</Platform>
+		<CodecSolution>MediaCodec</CodecSolution>
+		<TextureView>No</TextureView>
+	</item>
+	
                  <item>
 		<Model>LG-D684</Model>
 		<Release>4.1</Release>
@@ -174,5 +197,13 @@
                 <Platform>omap4</Platform>
                 <CodecSolution>IOMX</CodecSolution>
                 <TextureView>No</TextureView>
+        </item>
+        
+         <item>
+                <Model>GT-N7100</Model>
+                <Release>4.4</Release>
+                <Platform>exynos4</Platform>
+                <CodecSolution>IOMX</CodecSolution>
+                <TextureView>Yes</TextureView>
         </item>
 </DeviceData>
