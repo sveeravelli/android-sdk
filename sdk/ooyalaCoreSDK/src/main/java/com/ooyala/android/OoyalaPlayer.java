@@ -120,6 +120,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
   public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
   public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION = "liveCCAvailabilityChanged";
+  public static final String EMBED_CODE_SET_NOTIFICATION = "embedCodeSet";
 
   public enum ContentOrAdType {
     MainContent,
@@ -422,6 +423,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
         }));
 
+    sendNotification(EMBED_CODE_SET_NOTIFICATION);
     return true;
   }
 
