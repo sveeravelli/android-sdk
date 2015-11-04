@@ -14,8 +14,8 @@ OnStream MediaPlayer+.Introduction and Documentation Guide for Android.pdf
 API Reference Manual.zip
 
 // main user manuals
+OSMP+_User_Guide.pdf
 OnStream MediaPlayer+.SDK Project Setup for Android.pdf
-OnStream MediaPlayer+.SamplePlayer Tutorial for Android.pdf
 OnStream MediaPlayer+.Player SDK Integration Guide for Android.pdf
 // source code for manual above
 Labs.zip

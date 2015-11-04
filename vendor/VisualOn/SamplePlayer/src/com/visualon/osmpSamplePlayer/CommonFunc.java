@@ -125,16 +125,16 @@ public class CommonFunc {
     public static String bitrateToString(int nBitr) {
        
         String s;
-        nBitr /= 1024;
-        if (nBitr < 1024) {
+        nBitr /= 1000;
+        if (nBitr < 1000) {
             s = Integer.toString(nBitr) + "k";
         } else {
-            String str = Float.toString(nBitr / 1024.0f);
+            String str = Float.toString(nBitr / 1000.0f);
             int n = str.indexOf('.');
             if(n >= 0 && n <str.length() - 2)
                 str = str.substring(0, n + 2);
             
-            s = (str + "m");
+            s = (str + "M");
         }
         return s;
     }

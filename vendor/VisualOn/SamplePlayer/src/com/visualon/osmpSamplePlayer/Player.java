@@ -2513,7 +2513,11 @@ public class Player extends Activity
                 nIndex = m_nSelectedVideoIndex + 1;
         }
         else if (type == AssetType.Asset_Audio)
-            nIndex = m_AudioIndex[m_nSelectedAudioIndex];
+            if(m_nSelectedAudioIndex >= 0) {
+                nIndex = m_AudioIndex[m_nSelectedAudioIndex];
+            } else {
+                nIndex = -1;
+            }
         else if (type == AssetType.Asset_Subtitle)
             nIndex = m_nSelectedSubtitleIndex;
         initProgramInfoPopupMenu(type, nIndex);
