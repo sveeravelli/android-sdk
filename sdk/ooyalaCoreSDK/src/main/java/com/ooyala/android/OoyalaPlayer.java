@@ -187,7 +187,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   private Video _currentItem = null;
   private InitPlayState _currentItemInitPlayState = InitPlayState.NONE;
   private ContentItem _rootItem = null;
-  private final JSONObject _metadata = null;
   private OoyalaException _error = null;
   private ActionAtEnd _actionAtEnd;
   private PlayerAPIClient _playerAPIClient = null;
@@ -292,6 +291,14 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   public void setHook() {
     _playerAPIClient.setHook();
+  }
+
+  /**
+   * @deprecated returns metadata for current video
+   * Currently does not return anything. Instead, use getCurrentItem().getMetadata();
+   */
+  public JSONObject getMetadata() {
+    return null;
   }
 
   /**
