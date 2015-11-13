@@ -6,19 +6,19 @@ import android.view.SurfaceView;
 
 import com.ooyala.android.util.DebugMode;
 
-class MovieView extends SurfaceView {
+class MovieView extends ControlSharingSurfaceView {
   private float _aspectRatio = -1;
 
-  public MovieView(Context context) {
-    super(context);
+  public MovieView(boolean preventVideoViewSharing, Context context) {
+    super(preventVideoViewSharing, context);
   }
 
-  public MovieView(Context context, AttributeSet attrs) {
-    super(context, attrs);
+  public MovieView(boolean preventVideoViewSharing, Context context, AttributeSet attrs) {
+    super(preventVideoViewSharing, context, attrs);
   }
 
-  public MovieView(Context context, AttributeSet attrs, int defStyle) {
-    super(context, attrs, defStyle);
+  public MovieView(boolean preventVideoViewSharing, Context context, AttributeSet attrs, int defStyle) {
+    super(preventVideoViewSharing, context, attrs, defStyle);
   }
 
   public void setAspectRatio(float aspectRatio) {

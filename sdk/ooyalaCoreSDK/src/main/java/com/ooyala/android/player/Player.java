@@ -22,7 +22,7 @@ public class Player extends Observable implements PlayerInterface,
   protected OoyalaPlayer _parent = null;
   /** The Player's current error if it exists */
   protected OoyalaException _error = null;
-  protected SurfaceView _view = null;
+  protected ControlSharingSurfaceView _view = null;
   protected boolean _resizeQueued = false;
   protected int _buffer = 0;
   protected boolean _fullscreen = false;

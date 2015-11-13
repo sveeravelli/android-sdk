@@ -22,6 +22,7 @@ import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.configuration.VisualOnConfiguration;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.player.ControlSharingSurfaceView;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
@@ -574,7 +575,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       return;
     }
 
-    _view = new SurfaceView(_parent.getLayout().getContext()) {
+    _view = new ControlSharingSurfaceView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext()) {
       @Override
       protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         DebugMode.logV(TAG, "Remeasuring Surface: " + MeasureSpec.toString(widthMeasureSpec) + "," + MeasureSpec.toString(heightMeasureSpec));
