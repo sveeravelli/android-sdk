@@ -6,56 +6,57 @@ public class Options implements ReadonlyOptionsInterface {
    * Supports a fluid syntax for configuration.
    */
   public static class Builder {
-    /*
-    * FCCTVRatingConfiguration;
-    * Default: default FCCTVRatingConfiguration object
+
+    /**
+     * FCCTVRatingConfiguration;
+     * Default: default FCCTVRatingConfiguration object
      */
     private FCCTVRatingConfiguration tvRatingConfiguration;
 
-    /*
-    * VisualOnConfiguration
-    * Default: default VisualOnConfiguration object
+    /**
+     * VisualOnConfiguration
+     * Default: default VisualOnConfiguration object
      */
     private VisualOnConfiguration visualOnConfiguration;
 
-    /*
+    /**
      *If set to "true",  show ad controls during ads playback.
      * Default: true
      */
     private boolean showAdsControls;
 
-    /*
+    /**
      * If set to "true", show cuepoint markers for ads.
      * Default: true
      */
     private boolean showCuePoints;
 
-    /*
+    /**
      * If set to "true", show live controls for live content playback (live stream only).
      * Default: true
      */
     private boolean showLiveControls;
 
-    /*
+    /**
      * If set to "true", load the content when the required information and authorization is available.
      * If set to "false", load the content after pre-roll (if pre-roll is available).
      *  Default: true
      */
     private boolean preloadContent;
 
-    /*
+    /**
      * If set to "true", show a promo image if one is available. 
      *  Default: false
      */
     private boolean showPromoImage;
 
-    /*
+    /**
      * Network connection timeout value used by networking operations.
      *  Default: 0
      */
     private int connectionTimeoutInMillisecond;
 
-    /*
+    /**
      * Read timeout value used by networking operations.
      * Default: 0
      */
