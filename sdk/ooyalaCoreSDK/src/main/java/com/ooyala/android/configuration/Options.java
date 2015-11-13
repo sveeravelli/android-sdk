@@ -63,6 +63,11 @@ public class Options implements ReadonlyOptionsInterface {
     private int readTimeoutInMillisecond;
 
     /**
+     * True to prevent screen sharing, false to allow.
+     */
+    private boolean preventVideoViewSharing;
+
+    /**
      * Defaults to the following values:
      * tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
      * visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
@@ -73,6 +78,7 @@ public class Options implements ReadonlyOptionsInterface {
      * showPromoImage = false;
      * connectionTimeoutInMillisecond = 0;
      * readTimeoutInMillisecond = 0;
+     * preventVideoViewSharing = false;
      */
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
@@ -84,6 +90,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.showPromoImage = false;
       this.connectionTimeoutInMillisecond = 0;
       this.readTimeoutInMillisecond = 0;
+      this.preventVideoViewSharing = false;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -141,10 +148,23 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    public Builder setPreventVideoViewSharing( boolean preventVideoViewSharing ) {
+      this.preventVideoViewSharing = preventVideoViewSharing;
+      return this;
+    }
+
     public Options build() {
-      return new Options(tvRatingConfiguration, visualOnConfiguration,
-        showCuePoints, showAdsControls, preloadContent, showPromoImage, showLiveControls,
-        connectionTimeoutInMillisecond, readTimeoutInMillisecond);
+      return new Options(
+          tvRatingConfiguration,
+          visualOnConfiguration,
+          showCuePoints,
+          showAdsControls,
+          preloadContent,
+          showPromoImage,
+          showLiveControls,
+          connectionTimeoutInMillisecond,
+          readTimeoutInMillisecond,
+          preventVideoViewSharing);
     }
   }
 
@@ -157,6 +177,7 @@ public class Options implements ReadonlyOptionsInterface {
   private final int connectionTimeoutInMillisecond;
   private final int readTimeoutInMillisecond;
   private final boolean showLiveControls;
+  private final boolean preventVideoViewSharing;
 
   /**
    * Initialize an Options object with given parameters:
@@ -169,12 +190,19 @@ public class Options implements ReadonlyOptionsInterface {
    * @param showLiveControls - Configure to show live controls
    * @param connectionTimeoutInMillisecond - Configure to set a connection timeout value.
    * @param readTimeoutInMillisecond - Configure to set a read time out value.
+   * @param preventVideoViewSharing - Configure to prevent/allow video sharing.
    * @return the initialized Options - Return the configured options.
    */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
-                  VisualOnConfiguration visualOnConfiguration, boolean showCuePoints,
-                  boolean showAdsControls, boolean preloadContent, boolean showPromoImage, boolean showLiveControls,
-                  int connectionTimeoutInMillisecond, int readTimeoutInMillisecond) {
+                  VisualOnConfiguration visualOnConfiguration,
+                  boolean showCuePoints,
+                  boolean showAdsControls,
+                  boolean preloadContent,
+                  boolean showPromoImage,
+                  boolean showLiveControls,
+                  int connectionTimeoutInMillisecond,
+                  int readTimeoutInMillisecond,
+                  boolean preventVideoViewSharing) {
 
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
@@ -185,6 +213,7 @@ public class Options implements ReadonlyOptionsInterface {
     this.showLiveControls = showLiveControls;
     this.connectionTimeoutInMillisecond = connectionTimeoutInMillisecond;
     this.readTimeoutInMillisecond = readTimeoutInMillisecond;
+    this.preventVideoViewSharing = preventVideoViewSharing;
   }
 
   @Override
@@ -230,5 +259,10 @@ public class Options implements ReadonlyOptionsInterface {
   @Override
   public int getReadTimeoutInMillisecond() {
     return readTimeoutInMillisecond;
+  }
+
+  @Override
+  public boolean getPreventVideoViewSharing() {
+    return preventVideoViewSharing;
   }
 }

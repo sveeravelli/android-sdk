@@ -48,4 +48,8 @@ public interface ReadonlyOptionsInterface {
    */
   int getReadTimeoutInMillisecond();
 
+  /**
+   * True is prevent video view sharing, false is allow.
+   */
+  boolean getPreventVideoViewSharing();
 }

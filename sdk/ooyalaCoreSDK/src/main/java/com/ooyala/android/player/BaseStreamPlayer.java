@@ -316,7 +316,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @SuppressWarnings("deprecation")
   private void setupView() {
-    createView(_parent.getLayout().getContext());
+    createView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext());
     _parent.addVideoView( _view );
 
     // Try to figure out the video size.  If not, use our default
@@ -331,8 +331,8 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     _holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
-  private void createView(Context c) {
-    _view = new MovieView(c);
+  private void createView(boolean preventVideoViewSharing, Context c) {
+    _view = new MovieView(preventVideoViewSharing, c);
     _view.setBackgroundColor(Color.BLACK);
   }
 
