@@ -10,6 +10,7 @@ import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
 import com.discretix.drmdlc.api.IDxDrmDlcDebug;
+import com.discretix.drmdlc.api.exceptions.DrmAndroidPermissionMissingException;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
@@ -29,7 +30,7 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
  */
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
-  private static final String SECURE_PLAYER_VERSION = "03_04_05_0001";
+  private static final String SECURE_PLAYER_VERSION = "03_05_02_0000";
 
   public static void enableDebugging(Context context, boolean extreme) {
     try {
@@ -51,6 +52,8 @@ class DiscredixDrmUtils {
       final IDxDrmDlc dlc = DxDrmDlc.getDxDrmDlc(context, config);
     } catch( DrmClientInitFailureException e ) {
       e.printStackTrace();
+    } catch (DrmAndroidPermissionMissingException e) {
+      DebugMode.logE(TAG, "Caught!", e);
     }
   }
 
@@ -68,13 +71,16 @@ class DiscredixDrmUtils {
       DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
       DebugMode.logE(TAG, "Caught!", e);
+    } catch (DrmAndroidPermissionMissingException e) {
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return false;
   }
 
   /**
    * Checks the given local file path if file is DRM protected
-   * @param streamUrl
+   * @param context the context used to get dxDrmDlc
+   * @param localFilePath the path of a stream to check for protection
    * @return true if the stream is protected with DRM, false otherwise
    */
   public static boolean isStreamProtected(Context context, String localFilePath) {
@@ -91,6 +97,8 @@ class DiscredixDrmUtils {
     } catch (DrmClientInitFailureException e) {
       DebugMode.logE(TAG, "Caught!", e);
     } catch (DrmGeneralFailureException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } catch (DrmAndroidPermissionMissingException e) {
       DebugMode.logE(TAG, "Caught!", e);
     }
     return isDrmContent;
@@ -121,6 +129,8 @@ class DiscredixDrmUtils {
     } catch (DrmClientInitFailureException e) {
       DebugMode.logE(TAG, "Caught!", e);
       return false;
+    } catch (DrmAndroidPermissionMissingException e) {
+      DebugMode.logE(TAG, "Caught!", e);
     }
     return true;
   }
@@ -150,6 +160,8 @@ class DiscredixDrmUtils {
     } catch (DrmInvalidFormatException e) {
       DebugMode.logE(TAG, "Caught!", e);
     } catch (IllegalArgumentException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } catch (DrmAndroidPermissionMissingException e) {
       DebugMode.logE(TAG, "Caught!", e);
     }
     return areRightsVerified;
@@ -218,6 +230,8 @@ class DiscredixDrmUtils {
         DebugMode.logE(TAG, "Caught!", e);
       }
     } catch (DrmClientInitFailureException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } catch (DrmAndroidPermissionMissingException e) {
       DebugMode.logE(TAG, "Caught!", e);
     }
   }

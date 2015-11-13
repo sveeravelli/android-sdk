@@ -78,7 +78,7 @@ public class OoyalaPlayerLayoutController extends AbstractOoyalaPlayerLayoutCont
       _inlineControls.setVisible(true);
 
     } else if (!isFullscreen() && fullscreen) { // Not Fullscreen -> Fullscreen
-      _fullscreenDialog = new Dialog(_layout.getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+      _fullscreenDialog = new Dialog(_layout.getContext(), android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen) {
         @Override
         public void onBackPressed() {
           if (_player.isFullscreen()) {
