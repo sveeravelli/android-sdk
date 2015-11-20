@@ -1907,6 +1907,10 @@ public class OoyalaPlayer extends Observable implements Observer,
       _analytics.disable(true);
     }
 
+    if (isAdPlaying()) {
+      _adManager.forceExitAdMode();
+    }
+
     boolean isPlaying = isPlaying() || _playQueued;
     int playheadTime = getCurrentPlayheadForCastMode();
     _queuedSeekTime = 0;  //Clear queued seek time if we start casting
