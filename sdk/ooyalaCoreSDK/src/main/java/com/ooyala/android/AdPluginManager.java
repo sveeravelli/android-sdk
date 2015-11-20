@@ -1,15 +1,15 @@
 package com.ooyala.android;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The plugin that manage ad plugins. AdPlugin manager handles content/ad switch
@@ -120,6 +120,16 @@ class AdPluginManager implements LifeCycleInterface, AdPluginManagerInterface {
 
   // boolean Manager.insertPluginView()
   // boolean Manager.removePluginView()
+
+  // this should only be called when switchToCast during ad playing. package private on purpose
+  void forceExitAdMode() {
+    DebugMode.logD(TAG, "forceExitAdMode");
+    _admode = AdMode.None;
+    if (_activePlugin != null && _activePlugin.getPlayerInterface() != null) {
+      _activePlugin.getPlayerInterface().stop();
+    }
+    _activePlugin = null;
+  }
 
   @Override
   public void reset() {
