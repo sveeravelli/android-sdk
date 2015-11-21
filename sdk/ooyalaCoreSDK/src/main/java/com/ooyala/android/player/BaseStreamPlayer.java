@@ -377,18 +377,28 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
 
   @Override
   public void suspend() {
-    suspend(_player != null ? _player.getCurrentPosition() : 0, getState());
+    int millisToResume = -1;
+    if ((_player != null) && (_playerPrepared)) {
+      millisToResume = _player.getCurrentPosition();
+    }
+    suspend(millisToResume, getState());
   }
 
   private void suspend(int millisToResume, State stateToResume) {
+    DebugMode.logD(TAG, "suspend with time " + millisToResume + "state" + stateToResume.toString());
     if (getState() == State.SUSPENDED) {
       DebugMode.logD(TAG, "Suspending an already suspended player");
+      return;
     }
     if (_player == null) {
       DebugMode.logD(TAG, "Suspending with a null player");
+      return;
     }
-    _timeBeforeSuspend = millisToResume;
-    _stateBeforeSuspend = stateToResume;
+
+    if (millisToResume >= 0) {
+      _timeBeforeSuspend = millisToResume;
+      _stateBeforeSuspend = stateToResume;
+    }
 
     if (_player != null) {
       stop();
