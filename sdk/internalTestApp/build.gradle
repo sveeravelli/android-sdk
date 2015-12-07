@@ -2,12 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "19.1.0"
+    buildToolsVersion "23"
 
     defaultConfig {
         applicationId "com.ooyala.test"
         minSdkVersion 11
         targetSdkVersion 21
+        // Enabling multidex support.
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -16,9 +18,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.1'
     compile project(':ooyalaCoreSDK')
     compile project(':ooyalaIMASDK')
     compile project(':ooyalaFreewheelSDK')
