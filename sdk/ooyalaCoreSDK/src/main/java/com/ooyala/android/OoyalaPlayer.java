@@ -843,7 +843,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return embedCode
    */
   public String getEmbedCode() {
-    return _rootItem == null ? null : _rootItem.getEmbedCode();
+    return _currentItem == null ? null : _currentItem.getEmbedCode();
   }
 
   /**
