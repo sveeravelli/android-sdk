@@ -9,9 +9,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +40,7 @@ public class Utils {
 
   static final String SEPARATOR_AMPERSAND = "&";
   static final String SEPARATOR_TIME = ":";
+  static final String CHARSET = "UTF-8";
 
   private static final String TAG = Utils.class.getSimpleName();
 
@@ -212,5 +220,96 @@ public class Utils {
       DebugMode.logD(TAG, "No embed token generator to get an OPT");
       return null;
     }
+  }
+
+  /**
+   * Get string from http get method
+   * @param url the url
+   * @param connectionTimeoutInMillisecond connectionTimeOut
+   * @param readTimeoutInMillisecond readTimeout
+   * @return a string of http response
+   */
+  public static String stringFromUrl (
+      URL url,
+      int connectionTimeoutInMillisecond,
+      int readTimeoutInMillisecond) {
+    DebugMode.logD(TAG, "Sending Http Request: " + url.toString());
+    StringBuffer sb = new StringBuffer();
+    BufferedReader rd = null;
+    try {
+      URLConnection conn = url.openConnection();
+      conn.setConnectTimeout(connectionTimeoutInMillisecond);
+      conn.setReadTimeout(readTimeoutInMillisecond);
+      rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
+      String line;
+      while ((line = rd.readLine()) != null) {
+        sb.append(line);
+      }
+    } catch (SocketTimeoutException e) {
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+    } catch (IOException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } finally {
+      if (rd != null) {
+        try {
+          rd.close();
+        } catch (IOException e) {
+          DebugMode.logE(TAG, "Caught!", e);
+        }
+      }
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * calling http post method
+   * @param url the url
+   * @param body the post body
+   * @param connectionTimeoutInMillisecond connectionTimeOut
+   * @param readTimeoutInMillisecond readTimeout
+   * @return a string of http response
+   */
+  public static void postUrl (
+      URL url,
+      Map<String, String> body,
+      int connectionTimeoutInMillisecond,
+      int readTimeoutInMillisecond) {
+    String bodyString = getParamsString(body, SEPARATOR_AMPERSAND, true);
+    StringBuffer sb = new StringBuffer();
+    BufferedReader rd = null;
+
+    try {
+      HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+      conn.setConnectTimeout(connectionTimeoutInMillisecond);
+      conn.setReadTimeout(readTimeoutInMillisecond);
+      conn.setDoOutput(true);
+      conn.setRequestMethod("POST");
+      conn.setRequestProperty("Accept-Charset", CHARSET);
+      conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+      conn.setRequestProperty("charset", CHARSET);
+      OutputStream outputStream = conn.getOutputStream();
+      outputStream.write(bodyString.getBytes(CHARSET));
+
+      rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
+      String line;
+      while ((line = rd.readLine()) != null) {
+        sb.append(line);
+      }
+    } catch (SocketTimeoutException e) {
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+    } catch (IOException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } finally {
+      if (rd != null) {
+        try {
+          rd.close();
+        } catch (IOException e) {
+          DebugMode.logE(TAG, "Caught!", e);
+        }
+      }
+    }
+
+    DebugMode.logD(TAG, "the http response for post method is" + sb.toString());
   }
 }
