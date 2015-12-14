@@ -5,6 +5,8 @@ import android.test.AndroidTestCase;
 import com.ooyala.android.discovery.DiscoveryManager;
 import com.ooyala.android.discovery.DiscoveryOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.CountDownLatch;
@@ -41,7 +43,15 @@ public class DiscoveryTest  extends AndroidTestCase {
     DiscoveryManager.Callback callback = new DiscoveryManager.Callback() {
       @Override
       public void callback(JSONObject results, OoyalaException error) {
-        assertTrue(results != null);
+        assertNotNull("results should not be empty", results);
+        assertTrue("results should contains results array",results.has("results"));
+        try {
+          JSONArray items = results.getJSONArray("results");
+          assertTrue("results should have 10 items", items.length() == 10);
+        } catch (JSONException e) {
+          assertTrue("JSON exception", false);
+        }
+
         signal.countDown();
       }
     };
@@ -61,7 +71,14 @@ public class DiscoveryTest  extends AndroidTestCase {
     DiscoveryManager.Callback callback = new DiscoveryManager.Callback() {
       @Override
       public void callback(JSONObject results, OoyalaException error) {
-        assertTrue(results != null);
+        assertNotNull("results should not be empty", results);
+        assertTrue("results should contains results array",results.has("results"));
+        try {
+          JSONArray items = results.getJSONArray("results");
+          assertTrue("results should have 10 items", items.length() == 10);
+        } catch (JSONException e) {
+          assertTrue("JSON exception", false);
+        }
         signal.countDown();
       }
     };
@@ -81,7 +98,14 @@ public class DiscoveryTest  extends AndroidTestCase {
     DiscoveryManager.Callback callback = new DiscoveryManager.Callback() {
       @Override
       public void callback(JSONObject results, OoyalaException error) {
-        assertTrue(results != null);
+        assertNotNull("results should not be empty", results);
+        assertTrue("results should contains results array",results.has("results"));
+        try {
+          JSONArray items = results.getJSONArray("results");
+          assertTrue("results should have 10 items", items.length() == 10);
+        } catch (JSONException e) {
+          assertTrue("JSON exception", false);
+        }
         signal.countDown();
       }
     };
@@ -101,16 +125,23 @@ public class DiscoveryTest  extends AndroidTestCase {
     DiscoveryManager.Callback callback = new DiscoveryManager.Callback() {
       @Override
       public void callback(JSONObject results, OoyalaException error) {
-        assertNotNull(results);
+        assertNotNull("results should not be empty", results);
+        assertTrue("results should contains results",results.has("results"));
+        try {
+          String response = results.getString("results");
+          assertTrue("the response should be 200 OK", response.equals("OK"));
+        } catch (JSONException e) {
+          assertTrue(false);
+        }
         signal.countDown();
       }
     };
 
     DiscoveryOptions options =
-        new DiscoveryOptions.Builder().setType(DiscoveryOptions.Type.SimilarAssets).build();
+        new DiscoveryOptions.Builder().build();
     DiscoveryManager.sendImpression(options, bucketInfo, pcode, deviceId, null, callback);
     try {
-      signal.await(20, TimeUnit.SECONDS);
+      signal.await(200, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       assertTrue("timed out", false);
     }
@@ -121,16 +152,23 @@ public class DiscoveryTest  extends AndroidTestCase {
     DiscoveryManager.Callback callback = new DiscoveryManager.Callback() {
       @Override
       public void callback(JSONObject results, OoyalaException error) {
-        assertTrue(results != null);
+        assertNotNull("results should not be empty", results);
+        assertTrue("results should contains results",results.has("results"));
+        try {
+          String response = results.getString("results");
+          assertTrue("the response should be 200 OK", response.equals("OK"));
+        } catch (JSONException e) {
+          assertTrue(false);
+        }
         signal.countDown();
       }
     };
 
     DiscoveryOptions options =
-        new DiscoveryOptions.Builder().setType(DiscoveryOptions.Type.SimilarAssets).build();
+        new DiscoveryOptions.Builder().build();
     DiscoveryManager.sendClick(options, bucketInfo, pcode, deviceId, null, callback);
     try {
-      signal.await(20, TimeUnit.SECONDS);
+      signal.await(300, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       assertTrue("timed out", false);
     }

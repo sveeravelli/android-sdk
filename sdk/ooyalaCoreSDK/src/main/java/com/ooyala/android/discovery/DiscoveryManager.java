@@ -230,11 +230,14 @@ public class DiscoveryManager {
       String httpResponse = null;
 
       if (taskInfo.isPostMethod()) {
-        Utils.postUrl(
+        String jsonString = Utils.mapToJsonString(taskInfo.getBody());
+        httpResponse =
+            Utils.postUrl(
             taskInfo.getUrl(),
-            taskInfo.getBody(),
+            jsonString,
             (int)taskInfo.getConnectionTimeoutInMillisecond(),
             (int)taskInfo.getReadTimeoutInMillisecond());
+        httpResponse = "{\"results\":\"" + httpResponse +"\"}";
 
       } else {
         httpResponse =

@@ -10,9 +10,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -268,48 +269,69 @@ public class Utils {
    * @param body the post body
    * @param connectionTimeoutInMillisecond connectionTimeOut
    * @param readTimeoutInMillisecond readTimeout
-   * @return a string of http response
-   */
-  public static void postUrl (
+   * @return the response message
+   * */
+  public static String postUrl (
       URL url,
-      Map<String, String> body,
+      String body,
       int connectionTimeoutInMillisecond,
       int readTimeoutInMillisecond) {
-    String bodyString = getParamsString(body, SEPARATOR_AMPERSAND, true);
-    StringBuffer sb = new StringBuffer();
-    BufferedReader rd = null;
+    final String charset = "utf-8";
+
+    int responseStatus = 0;
+    String responseMessage = "";
+    InputStream errorStream;
 
     try {
+      byte[] bodyBytes = body.getBytes(charset);
       HttpURLConnection conn = (HttpURLConnection)url.openConnection();
       conn.setConnectTimeout(connectionTimeoutInMillisecond);
       conn.setReadTimeout(readTimeoutInMillisecond);
       conn.setDoOutput(true);
       conn.setRequestMethod("POST");
-      conn.setRequestProperty("Accept-Charset", CHARSET);
       conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-      conn.setRequestProperty("charset", CHARSET);
-      OutputStream outputStream = conn.getOutputStream();
-      outputStream.write(bodyString.getBytes(CHARSET));
+      conn.setRequestProperty("Content-Length", Integer.toString(bodyBytes.length));
+      conn.setUseCaches(false);
+      DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+      wr.write(bodyBytes);
 
-      rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
-      String line;
-      while ((line = rd.readLine()) != null) {
-        sb.append(line);
+      responseStatus = conn.getResponseCode();
+      responseMessage = conn.getResponseMessage();
+      if (responseStatus != 200) {
+        errorStream = conn.getErrorStream();
+        if (errorStream != null) {
+          String errorString = "";
+          String line;
+          BufferedReader br = new BufferedReader(new InputStreamReader(errorStream));
+          while ((line = br.readLine()) != null) {
+            errorString += line;
+          }
+          errorStream.close();
+          DebugMode.logD(TAG,
+              "the http response for post method is" + Integer.toString(responseStatus) +
+                  " error:" + errorString);
+        }
       }
     } catch (SocketTimeoutException e) {
       DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
     } catch (IOException e) {
       DebugMode.logE(TAG, "Caught!", e);
-    } finally {
-      if (rd != null) {
-        try {
-          rd.close();
-        } catch (IOException e) {
-          DebugMode.logE(TAG, "Caught!", e);
-        }
-      }
     }
 
-    DebugMode.logD(TAG, "the http response for post method is" + sb.toString());
+    return responseMessage;
+  }
+
+  /**
+   * convert a map to a json string
+   * @param map the map to be converted
+   * @return the converted string, null if error occurs
+   **/
+  public static String mapToJsonString(Map<String, String> map) {
+    if (map == null) {
+      return "";
+    }
+    JSONObject jsonObject = new JSONObject(map);
+    String jsonString = jsonObject.toString();
+    return jsonString;
   }
 }
