@@ -158,11 +158,19 @@ public class DiscoveryTest  extends AndroidTestCase {
     }
   }
 
+  public void testMapToJsonStringEmpty() {
+    Map<String, String> map = new HashMap<String, String>();
+    final String targetString = "{}";
+    String actualString = Utils.mapToJsonString(map);
+    assertTrue("map2JsonString should equal to targetString", targetString.equals(actualString));
+  }
+
   public void testMapToJsonString() {
     Map<String, String> map = new HashMap<String, String>();
     map.put("key1","value1");
     map.put("key2","value2");
-    final String targetString = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
-    assertTrue("map2JsonString should equal to targetString", targetString.equals(Utils.mapToJsonString(map)));
+    final String targetString = "{\"key2\":\"value2\",\"key1\":\"value1\"}";
+    String actualString = Utils.mapToJsonString(map);
+    assertTrue("map2JsonString should equal to targetString", targetString.equals(actualString));
   }
 }

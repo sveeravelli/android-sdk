@@ -237,7 +237,6 @@ public class DiscoveryManager {
             jsonString,
             (int)taskInfo.getConnectionTimeoutInMillisecond(),
             (int)taskInfo.getReadTimeoutInMillisecond());
-        httpResponse = "{\"results\":\"" + httpResponse +"\"}";
 
       } else {
         httpResponse =
