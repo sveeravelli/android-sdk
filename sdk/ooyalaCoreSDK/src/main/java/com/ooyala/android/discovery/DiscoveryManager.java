@@ -7,6 +7,7 @@ import com.ooyala.android.OoyalaException;
 import com.ooyala.android.Utils;
 import com.ooyala.android.util.DebugMode;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,38 +47,15 @@ public class DiscoveryManager {
   public interface Callback {
     /**
      * This callback is used for asynchronous contentTree calls
-     * @param results the root content item from the contentTree call (null if an error occurred)
+     * @param results an JSONArray for success getResults calls, String message otherwise.
      */
-    public void callback(JSONObject results, OoyalaException error);
+    public void callback(Object results, OoyalaException error);
   }
 
-  private static class DiscoveryResultsCallback implements Callback {
-    private Callback callback;
-
-    DiscoveryResultsCallback(Callback c) {
-      this.callback = c;
-    }
-
-    @Override
-    public void callback(JSONObject results, OoyalaException error) {
-      if (error != null) {
-        callback.callback(results, error);
-      }
-
-      if (results.has(KEY_RESULTS)) {
-        callback.callback(results, null);
-      } else {
-        String errorMessage = "discovery results failure";
-        try {
-          String errorDetail = results.getString(KEY_MESSAGE);
-          errorMessage = errorMessage + ": " + errorDetail;
-        } catch (JSONException e) {
-
-        }
-        callback.callback(null, new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_UNKNOWN, errorMessage));
-      }
-    }
+  private static interface DiscoveryResultsCallback {
+    public void callback(String httpResponse, OoyalaException error);
   }
+
 
 /**
  * get the discovery results
@@ -96,7 +74,7 @@ public class DiscoveryManager {
       String pcode,
       String deviceId,
       Map<String, String>  parameters,
-      Callback callback) {
+      final Callback callback) {
     if (callback == null) {
       DebugMode.logE(TAG, "Discovery callback should not be null");
       return;
@@ -124,11 +102,33 @@ public class DiscoveryManager {
     allParams.put(KEY_LIMIT, Long.toString(options.getLimit()));
     allParams.put(KEY_DEVICE_ID, deviceId);
     URL url =  signedUrlForHost(DISCOVERY_HOST, uri, allParams);
-    DiscoveryResultsCallback dc = new DiscoveryResultsCallback(callback);
     DiscoveryTaskInfo taskInfo =
         new DiscoveryTaskInfo(
             url, false, null, options.getTimoutInMilliSeconds(), options.getTimoutInMilliSeconds());
-    DiscoveryTask task = new DiscoveryTask(dc);
+    DiscoveryTask task = new DiscoveryTask(new DiscoveryResultsCallback() {
+      @Override
+      public void callback(String results, OoyalaException error) {
+        if (error != null) {
+          callback.callback(null, error);
+        }
+        try {
+          JSONObject jsonObject = new JSONObject(results);
+          if (jsonObject.has(KEY_RESULTS)) {
+            JSONArray discoveryItems = jsonObject.getJSONArray(KEY_RESULTS);
+            callback.callback(discoveryItems, null);
+          } else {
+            String errorMessage = "discovery results failure";
+            String errorDetail = jsonObject.getString(KEY_MESSAGE);
+            callback.callback(null, new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_DISCOVERY_GET_FAILURE, errorMessage));
+          }
+        } catch (JSONException e) {
+          callback.callback(
+              null, new OoyalaException(
+                  OoyalaException.OoyalaErrorCode.ERROR_DISCOVERY_GET_FAILURE, "failed to parse json results", e));
+        }
+      }
+
+    });
     task.execute(taskInfo);
   }
 
@@ -214,9 +214,9 @@ public class DiscoveryManager {
 
   private static class DiscoveryTask extends AsyncTask<DiscoveryTaskInfo, Integer, String> {
     protected OoyalaException error = null;
-    protected Callback callback = null;
+    protected DiscoveryResultsCallback callback = null;
 
-    public DiscoveryTask(Callback callback) {
+    public DiscoveryTask(DiscoveryResultsCallback callback) {
       super();
       this.callback = callback;
     }
@@ -241,7 +241,7 @@ public class DiscoveryManager {
 
       } else {
         httpResponse =
-            Utils.stringFromUrl(
+            Utils.getUrlContent(
                 taskInfo.getUrl(),
                 (int) taskInfo.getConnectionTimeoutInMillisecond(),
                 (int) taskInfo.getReadTimeoutInMillisecond());
@@ -253,11 +253,7 @@ public class DiscoveryManager {
     @Override
     protected void onPostExecute(String result) {
       if (callback != null) {
-        JSONObject jsonObject = null;
-        if (result != null) {
-          jsonObject = Utils.objectFromJSON(result);
-        }
-        callback.callback(jsonObject, null);
+        callback.callback(result, null);
       }
     }
   }
@@ -284,9 +280,10 @@ public class DiscoveryManager {
 
     long secondsSince1970 = (new Date()).getTime() / 1000;
     parameters.put(KEY_EXPIRES, Long.toString(secondsSince1970 + RESPONSE_LIFE_SECONDS));
+    // Discovery APIs allows client to use pcode to sign the pins if sign version is set to player.
     parameters.put(KEY_SIGN_VERSION, VALUE_PLAYER);
     String stringToSign = genStringToSignFromDict(parameters);
-    parameters.put(KEY_SIGNATURE, signatureGenerator.sign(stringToSign));    // USE THIS TO BYPASS APIKEY
+    parameters.put(KEY_SIGNATURE, signatureGenerator.sign(stringToSign));
 
     parameters.put(KEY_PCODE, pcode);
     URL url = Utils.makeURL(host, uri, parameters);
@@ -304,7 +301,7 @@ public class DiscoveryManager {
       String pcode,
       String deviceId,
       Map<String, String> parameters,
-      Callback callback,
+      final Callback callback,
       String uri) {
     Map<String, String> body =
         parameters == null ? new HashMap<String, String>() : new HashMap<String, String>(parameters);
@@ -317,7 +314,21 @@ public class DiscoveryManager {
     DiscoveryTaskInfo taskInfo =
         new DiscoveryTaskInfo(
             url, true, body, options.getTimoutInMilliSeconds(), options.getTimoutInMilliSeconds());
-    DiscoveryTask task = new DiscoveryTask(callback);
+    DiscoveryTask task = new DiscoveryTask(new DiscoveryResultsCallback() {
+      @Override
+      public void callback(String httpResponse, OoyalaException error) {
+        String results = null;
+        OoyalaException e = null;
+        if (httpResponse.equals("OK")) {
+          results = httpResponse;
+        } else {
+          e = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_DISCOVERY_POST_FAILURE, httpResponse);
+        }
+        if (callback != null) {
+          callback.callback(results, e);
+        }
+      }
+    });
     task.execute(taskInfo);
   }
 }

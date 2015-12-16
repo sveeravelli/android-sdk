@@ -230,7 +230,7 @@ public class Utils {
    * @param readTimeoutInMillisecond readTimeout
    * @return a string of http response
    */
-  public static String stringFromUrl (
+  public static String getUrlContent (
       URL url,
       int connectionTimeoutInMillisecond,
       int readTimeoutInMillisecond) {
@@ -307,7 +307,7 @@ public class Utils {
             errorString += line;
           }
           errorStream.close();
-          DebugMode.logD(TAG,
+          DebugMode.logE(TAG,
               "the http response for post method is" + Integer.toString(responseStatus) +
                   " error:" + errorString);
         }
