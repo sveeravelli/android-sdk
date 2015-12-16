@@ -9,9 +9,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +41,7 @@ public class Utils {
 
   static final String SEPARATOR_AMPERSAND = "&";
   static final String SEPARATOR_TIME = ":";
+  static final String CHARSET = "UTF-8";
 
   private static final String TAG = Utils.class.getSimpleName();
 
@@ -212,5 +221,117 @@ public class Utils {
       DebugMode.logD(TAG, "No embed token generator to get an OPT");
       return null;
     }
+  }
+
+  /**
+   * Get string from http get method
+   * @param url the url
+   * @param connectionTimeoutInMillisecond connectionTimeOut
+   * @param readTimeoutInMillisecond readTimeout
+   * @return a string of http response
+   */
+  public static String getUrlContent (
+      URL url,
+      int connectionTimeoutInMillisecond,
+      int readTimeoutInMillisecond) {
+    DebugMode.logD(TAG, "Sending Http Request: " + url.toString());
+    StringBuffer sb = new StringBuffer();
+    BufferedReader rd = null;
+    try {
+      URLConnection conn = url.openConnection();
+      conn.setConnectTimeout(connectionTimeoutInMillisecond);
+      conn.setReadTimeout(readTimeoutInMillisecond);
+      rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), 8192);
+      String line;
+      while ((line = rd.readLine()) != null) {
+        sb.append(line);
+      }
+    } catch (SocketTimeoutException e) {
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+    } catch (IOException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    } finally {
+      if (rd != null) {
+        try {
+          rd.close();
+        } catch (IOException e) {
+          DebugMode.logE(TAG, "Caught!", e);
+        }
+      }
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * calling http post method
+   * @param url the url
+   * @param body the post body
+   * @param connectionTimeoutInMillisecond connectionTimeOut
+   * @param readTimeoutInMillisecond readTimeout
+   * @return the response message
+   * */
+  public static String postUrl (
+      URL url,
+      String body,
+      int connectionTimeoutInMillisecond,
+      int readTimeoutInMillisecond) {
+    final String charset = "utf-8";
+
+    int responseStatus = 0;
+    String responseMessage = "";
+    InputStream errorStream;
+
+    try {
+      byte[] bodyBytes = body.getBytes(charset);
+      HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+      conn.setConnectTimeout(connectionTimeoutInMillisecond);
+      conn.setReadTimeout(readTimeoutInMillisecond);
+      conn.setDoOutput(true);
+      conn.setRequestMethod("POST");
+      conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+      conn.setRequestProperty("Content-Length", Integer.toString(bodyBytes.length));
+      conn.setUseCaches(false);
+      DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+      wr.write(bodyBytes);
+
+      responseStatus = conn.getResponseCode();
+      responseMessage = conn.getResponseMessage();
+      if (responseStatus != 200) {
+        errorStream = conn.getErrorStream();
+        if (errorStream != null) {
+          String errorString = "";
+          String line;
+          BufferedReader br = new BufferedReader(new InputStreamReader(errorStream));
+          while ((line = br.readLine()) != null) {
+            errorString += line;
+          }
+          errorStream.close();
+          DebugMode.logE(TAG,
+              "the http response for post method is" + Integer.toString(responseStatus) +
+                  " error:" + errorString);
+        }
+      }
+    } catch (SocketTimeoutException e) {
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+    } catch (IOException e) {
+      DebugMode.logE(TAG, "Caught!", e);
+    }
+
+    return responseMessage;
+  }
+
+  /**
+   * convert a map to a json string
+   * @param map the map to be converted
+   * @return the converted string, null if error occurs
+   **/
+  public static String mapToJsonString(Map<String, String> map) {
+    if (map == null) {
+      return "";
+    }
+    JSONObject jsonObject = new JSONObject(map);
+    String jsonString = jsonObject.toString();
+    return jsonString;
   }
 }

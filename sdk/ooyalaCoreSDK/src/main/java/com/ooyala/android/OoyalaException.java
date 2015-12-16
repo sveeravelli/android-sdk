@@ -47,6 +47,10 @@ public class OoyalaException extends Exception {
     /** Failed to obtain Advertising Id. */
     ERROR_ADVERTISING_ID_FAILURE,
     ERROR_UNKNOWN,
+    /** Failed to get discovery results. */
+    ERROR_DISCOVERY_GET_FAILURE,
+    /** Failed to post discovery pins. */
+    ERROR_DISCOVERY_POST_FAILURE
   };
 
   private OoyalaErrorCode _code;
