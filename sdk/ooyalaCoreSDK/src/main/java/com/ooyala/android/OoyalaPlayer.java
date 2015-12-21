@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -420,10 +421,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           public void callback(ContentItem item, OoyalaException error) {
             taskCompleted(taskKey);
             if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Exception in setEmbedCodes!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
+              onError(error, "Exception in setEmbedCodes!");
               return;
             }
             reinitialize(item, adSetCode);
@@ -466,20 +464,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
     final String taskKey = "setExternalIds" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds,
-        new ContentTreeCallback() {
-          @Override
-          public void callback(ContentItem item, OoyalaException error) {
-            taskCompleted(taskKey);
-            if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Exception in setExternalIds!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
-              return;
-            }
-            reinitialize(item, null);
-          }
-        }));
+            new ContentTreeCallback() {
+              @Override
+              public void callback(ContentItem item, OoyalaException error) {
+                taskCompleted(taskKey);
+                if (error != null) {
+                  onError(error, "Exception in setExternalIds!");
+                  return;
+                }
+                reinitialize(item, null);
+              }
+            }));
     return true;
   }
 
@@ -537,11 +532,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           public void callback(boolean result, OoyalaException error) {
             taskCompleted(metadataTaskKey);
             if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Exception fetching metadata from setEmbedCodes!",
-                  error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
+              onError(error, "Exception fetching metadata from setEmbedCodes!");
             } else {
               sendNotification(METADATA_READY_NOTIFICATION);
               changeCurrentItemAfterAuth();
@@ -559,10 +550,7 @@ public class OoyalaPlayer extends Observable implements Observer,
                 public void callback(boolean result, OoyalaException error) {
                   taskCompleted(taskKey);
                   if (error != null) {
-                    _error = error;
-                    DebugMode.logD(TAG, "Exception in changeCurrentVideo!", error);
-                    setState(State.ERROR);
-                    sendNotification(ERROR_NOTIFICATION);
+                    onError(error, "Exception in changeCurrentVideo!");
                     return;
                   }
                   sendNotification(AUTHORIZATION_READY_NOTIFICATION);
@@ -601,9 +589,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
 
     if (!_currentItem.isAuthorized()) {
-      this._error = getAuthError(_currentItem);
-      setState(State.ERROR);
-      sendNotification(ERROR_NOTIFICATION);
+      onError(getAuthError(_currentItem), null);
       return false;
     }
 
@@ -623,16 +609,10 @@ public class OoyalaPlayer extends Observable implements Observer,
           @Override
           public void callback(boolean result) {
             taskCompleted(taskKey);
-            if (!result) {
-              _error = new OoyalaException(
-                  OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
-              setState(State.ERROR);
+            if (!result || !changeCurrentItemAfterFetch()) {
+              OoyalaException error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
+              onError(error, null);
               return;
-            }
-            if (!changeCurrentItemAfterFetch()) {
-              _error = new OoyalaException(
-                  OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED);
-              setState(State.ERROR);
             }
           }
         }));
@@ -712,10 +692,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           public void callback(boolean result, OoyalaException error) {
             taskCompleted(taskKey);
             if (error != null) {
-              _error = error;
-              DebugMode.logD(TAG, "Exception in reinitialize!", error);
-              setState(State.ERROR);
-              sendNotification(ERROR_NOTIFICATION);
+              onError(error, "Exception in reinitialize!");
               return;
             }
             changeCurrentItem(_rootItem.firstVideo(), adSetCode);
@@ -725,7 +702,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
-    final MoviePlayer moviePlayer = _getCorrectMoviePlayer( currentItem );
+    final MoviePlayer moviePlayer = _getCorrectMoviePlayer(currentItem);
     return moviePlayer;
   }
 
@@ -744,11 +721,9 @@ public class OoyalaPlayer extends Observable implements Observer,
         return (MoviePlayer) getClass().getClassLoader()
             .loadClass(WIDEVINE_LIB_PLAYER).newInstance();
       } catch (Exception e) {
-        _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
-            "Could not initialize Widevine Player");
-        DebugMode.logD(TAG, "Please include the Widevine Library in your project",
-            _error);
-        setState(State.ERROR);
+        OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
+                "Could not initialize Widevine Player");
+        onError(error, "Please include the Widevine Library in your project");
       }
     }
 
@@ -1002,16 +977,14 @@ public class OoyalaPlayer extends Observable implements Observer,
               public void callback(boolean result, OoyalaException error) {
                 taskCompleted(taskKey);
                 if (error != null) {
-                  _error = error;
-                  DebugMode.logD(TAG, "Error Reauthorizing Video", error);
-                  setState(State.ERROR);
-                  sendNotification(ERROR_NOTIFICATION);
+                  onError(error, "Error Reauthorizing Video");
                   return;
                 }
                 sendNotification(AUTHORIZATION_READY_NOTIFICATION);
                 if (!_currentItem.isAuthorized()) {
-                  _error = new OoyalaException(
-                      OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+                  OoyalaException authFailedError = new OoyalaException(
+                          OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
+                  onError(authFailedError, null);
                   return;
                 }
                 _suspendTime = System.currentTimeMillis();
@@ -1032,10 +1005,9 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (getCurrentItem().isAuthorized()) {
       prepareContent(false);
     } else {
-      _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
-          "Resuming video from an invalid state");
-      DebugMode.logD(TAG, "Resuming video from an improper state", _error);
-      setState(State.ERROR);
+      OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
+              "Resuming video from an invalid state");
+      onError(error, null);
       return;
     }
 
@@ -1337,9 +1309,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         break;
 
       case ERROR:
-        DebugMode.logE(TAG,
-            "Error recieved from content.  Cleaning up everything");
-        _error = player.getError();
+        onError(player.getError(), "Error recieved from content.  Cleaning up everything");
         int errorCode = _error == null ? 0 : _error.getCode().ordinal();
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
@@ -1712,11 +1682,9 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   @Override
-  public void onAuthHeartbeatError(OoyalaException e) {
+  public void onAuthHeartbeatError(OoyalaException error) {
     cleanupPlayers();
-    _error = e;
-    setState(State.ERROR);
-    sendNotification(ERROR_NOTIFICATION);
+    onError(error, null);
   }
 
   /**
@@ -1770,7 +1738,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param videoView
    */
   public void addVideoView( View videoView ) {
-    _layoutController.addVideoView( videoView );
+    _layoutController.addVideoView(videoView);
   }
 
   /**
@@ -1940,9 +1908,9 @@ public class OoyalaPlayer extends Observable implements Observer,
      if (prepareContent(isPlaying)) {
        _player.seekToTime(exitPlayheadTime);
      } else {
-       DebugMode.logE(TAG, "Player initialization failed");
-       _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Player initialization failed");
-       onContentError();
+       cleanupPlayers();
+       OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Player initialization failed");
+       onError(error, "Player initialization failed");
      }
     } else {
       DebugMode.logE(TAG, "We are swtiching to content, while the player is in state: " + _player.getState());
@@ -2004,7 +1972,8 @@ public class OoyalaPlayer extends Observable implements Observer,
       onComplete();
       break;
     case ContentError:
-      onContentError();
+      cleanupPlayers();
+      onError(null, null);
       break;
     default:
       DebugMode.assertFail(TAG,
@@ -2033,8 +2002,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void onContentError() {
-    cleanupPlayers();
+  private void onError(OoyalaException error, String message) {
+    if (error != null) {
+      this._error = error;
+    }
+    if(this._error != null) {
+      if (TextUtils.isEmpty(message)) {
+        message = _error.getMessage();
+      }
+
+      DebugMode.logD(TAG, message, this._error);
+    }
     setState(State.ERROR);
     sendNotification(ERROR_NOTIFICATION);
   }

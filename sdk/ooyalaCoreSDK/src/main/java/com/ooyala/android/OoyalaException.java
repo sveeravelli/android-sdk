@@ -50,7 +50,7 @@ public class OoyalaException extends Exception {
     /** Failed to get discovery results. */
     ERROR_DISCOVERY_GET_FAILURE,
     /** Failed to post discovery pins. */
-    ERROR_DISCOVERY_POST_FAILURE
+    ERROR_DISCOVERY_POST_FAILURE,
   };
 
   private OoyalaErrorCode _code;
