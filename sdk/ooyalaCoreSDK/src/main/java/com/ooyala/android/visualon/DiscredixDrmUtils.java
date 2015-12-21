@@ -30,7 +30,7 @@ import com.visualon.OSMPPlayer.VOCommonPlayer;
  */
 class DiscredixDrmUtils {
   private static final String TAG = DiscredixDrmUtils.class.getName();
-  private static final String SECURE_PLAYER_VERSION = "03_05_02_0000";
+  private static final String SECURE_PLAYER_VERSION = "03_05_02_0001";
 
   public static void enableDebugging(Context context, boolean extreme) {
     try {
