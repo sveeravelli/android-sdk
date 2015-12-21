@@ -1309,7 +1309,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         break;
 
       case ERROR:
-        onError(getError(), "Error recieved from content.  Cleaning up everything");
+        onError(player.getError(), "Error recieved from content.  Cleaning up everything");
         int errorCode = _error == null ? 0 : _error.getCode().ordinal();
         processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
         break;
@@ -1684,7 +1684,6 @@ public class OoyalaPlayer extends Observable implements Observer,
   @Override
   public void onAuthHeartbeatError(OoyalaException error) {
     cleanupPlayers();
-    cleanupPlayers();
     onError(error, null);
   }
 
@@ -1974,8 +1973,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       break;
     case ContentError:
       cleanupPlayers();
-      OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_EXITING_AD_MODE, "Failed to exit adMode");
-      onError(error, "Player initialization failed");
+      onError(null, null);
       break;
     default:
       DebugMode.assertFail(TAG,
@@ -2004,21 +2002,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void onContentError() {
-    cleanupPlayers();
-    setState(State.ERROR);
-    sendNotification(ERROR_NOTIFICATION);
-  }
-
   private void onError(OoyalaException error, String message) {
-    if (error == null) {
-      return;
+    if (error != null) {
+      this._error = error;
     }
-    if (TextUtils.isEmpty(message)) {
-      message = error.getMessage();
+    if(this._error != null) {
+      if (TextUtils.isEmpty(message)) {
+        message = _error.getMessage();
+      }
+
+      DebugMode.logD(TAG, message, this._error);
     }
-    this._error = error;
-    DebugMode.logD(TAG, message, error);
     setState(State.ERROR);
     sendNotification(ERROR_NOTIFICATION);
   }

@@ -51,8 +51,6 @@ public class OoyalaException extends Exception {
     ERROR_DISCOVERY_GET_FAILURE,
     /** Failed to post discovery pins. */
     ERROR_DISCOVERY_POST_FAILURE,
-    /* Failed exiting ad mode */
-    ERROR_EXITING_AD_MODE
   };
 
   private OoyalaErrorCode _code;
