@@ -322,7 +322,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
    */
   @Override
   public void processClickThrough() {
-    pause();
+    suspend();
     if (currentLinearAd() != null && currentLinearAd().getClickTrackingURLs() != null) {
       Set<String> urls = currentLinearAd().getClickTrackingURLs();
       if (urls != null) {
@@ -340,7 +340,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
       _playerLayout.getContext().startActivity(browserIntent);
-      DebugMode.logD(TAG, "Opening brower to " + url);
+      DebugMode.logD(TAG, "Opening browser to " + url);
     } catch (Exception e) {
       DebugMode.logE(TAG, "There was some exception on clickthrough!");
       DebugMode.logE(TAG, "Caught!", e);
