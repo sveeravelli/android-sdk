@@ -137,4 +137,11 @@ public class ClosedCaptionsTest extends AndroidTestCase {
     c = cclist.get(1);
     assertTrue(c.getEnd() == ItemUtils.secondsFromTimeString("00:00:18:16"));
   }
+
+  public void testCaptionConstructor() {
+    Caption c = new Caption(1.0, 2.5, "sample");
+    assertEquals("begin time stamp", c.getBegin(), 1.0, 0.0001);
+    assertEquals("end time stamp", c.getEnd(), 2.5, 0.0001);
+    assertEquals("text", c.getText(), "sample");
+  }
 }

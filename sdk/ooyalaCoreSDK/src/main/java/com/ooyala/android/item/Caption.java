@@ -9,6 +9,12 @@ public class Caption {
 
   private static final String TAG = Caption.class.getName();
 
+  public Caption(double begin, double end, String text) {
+    _begin = begin;
+    _end = end;
+    _text = text;
+  }
+
   Caption() {}
 
   Caption(Element element) {
