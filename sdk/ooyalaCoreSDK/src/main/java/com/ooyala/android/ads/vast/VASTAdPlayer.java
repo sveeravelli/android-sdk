@@ -322,6 +322,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
    */
   @Override
   public void processClickThrough() {
+    pause();
     if (currentLinearAd() != null && currentLinearAd().getClickTrackingURLs() != null) {
       Set<String> urls = currentLinearAd().getClickTrackingURLs();
       if (urls != null) {
