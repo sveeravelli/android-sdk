@@ -9,6 +9,14 @@ public class Caption {
 
   private static final String TAG = Caption.class.getName();
 
+  /**
+   * Initialize a Caption with the given parameters
+   *
+   * @param begin the begin timestamp
+   * @param end the end timestamp
+   * @param text the subtitle text
+   *
+   */
   public Caption(double begin, double end, String text) {
     _begin = begin;
     _end = end;
@@ -17,6 +25,12 @@ public class Caption {
 
   Caption() {}
 
+  /**
+   * Initialize a Caption with the given parameters
+   *
+   * @param element the dom element that contains caption info.
+   *
+   */
   Caption(Element element) {
     if (!element.getTagName().equals(ClosedCaptions.ELEMENT_P)) { return; }
 
