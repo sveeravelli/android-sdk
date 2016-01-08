@@ -73,8 +73,8 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
    * @param playerLayoutController OoyalaPlayerLayoutController to get the player and playerLayout
    */
   public OoyalaFreewheelManager(Activity parent,
-      AbstractOoyalaPlayerLayoutController playerLayoutController) {
-      this(parent, playerLayoutController.getLayout(), playerLayoutController.getPlayer());
+    AbstractOoyalaPlayerLayoutController playerLayoutController) {
+    this(parent, playerLayoutController.getLayout(), playerLayoutController.getPlayer());
     _controls = playerLayoutController.getControls();
   }
 
