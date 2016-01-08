@@ -1061,6 +1061,10 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return pixels to shift the Learn More button down
    */
   public int getTopBarOffset() {
+    // TODO: Fix the way player position it's children
+    if(!(_layoutController instanceof AbstractOoyalaPlayerLayoutController)) {
+      return 0;
+    }
     return ((AbstractOoyalaPlayerLayoutController) _layoutController)
         .getControls().topBarOffset();
   }
