@@ -1,6 +1,7 @@
 package com.ooyala.android.freewheelsdk;
 
 import android.app.Activity;
+import android.widget.FrameLayout;
 
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -12,6 +13,7 @@ import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.plugin.ManagedAdsPlugin;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
+import com.ooyala.android.ui.OoyalaPlayerControls;
 import com.ooyala.android.util.DebugMode;
 
 import java.util.List;
@@ -42,7 +44,9 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
 
   protected Activity _parent;
   protected OoyalaPlayer _player;
-  protected AbstractOoyalaPlayerLayoutController _layoutController;
+  protected OoyalaPlayerControls _controls;
+  protected FrameLayout _layout;
+
   protected Map<String,String> _fwParameters = null;
   protected List<ISlot> _overlays = null;
   protected boolean haveDataToUpdate;
@@ -69,10 +73,15 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
    * @param playerLayoutController OoyalaPlayerLayoutController to get the player and playerLayout
    */
   public OoyalaFreewheelManager(Activity parent,
-      AbstractOoyalaPlayerLayoutController playerLayoutController) {
+    AbstractOoyalaPlayerLayoutController playerLayoutController) {
+    this(parent, playerLayoutController.getLayout(), playerLayoutController.getPlayer());
+    _controls = playerLayoutController.getControls();
+  }
+
+  public OoyalaFreewheelManager(Activity parent, FrameLayout layout, OoyalaPlayer player) {
     _parent = parent;
-    _layoutController = playerLayoutController;
-    _player = playerLayoutController.getPlayer();
+    _layout = layout;
+    _player = player;
     _player.addObserver(this);
     _player.registerPlugin(this);
     _notifier = _player.createStateNotifier();
@@ -106,8 +115,10 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
    */
   public void adsPlaying() {
     _fwContext.setVideoState(_fwConstants.VIDEO_STATE_PAUSED()); //let the ad manager know content paused to let the ads play
-    _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
-    _layoutController.getControls().setVisible(false); //disable our controllers
+    _fwContext.registerVideoDisplayBase(_layout);
+    if(_controls != null) {
+      _controls.setVisible(false); //disable our controllers
+    }
   }
 
   /**
@@ -146,7 +157,10 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   private boolean currentItemChanged(Video item) {
     //Set overlay ads to null since the ad manager stays alive even though content may change
     _overlays = null;
-    _layoutController.getControls().setVisible(true); //enable our controllers when starting fresh
+    if(_controls != null) {
+      _controls.setVisible(true); //enable our controllers when starting fresh
+    }
+
     _adSpotManager.clear();
     if (Stream.streamSetContainsDeliveryType(_player.getCurrentItem()
         .getStreams(), Stream.DELIVERY_TYPE_HLS)) {
@@ -311,7 +325,10 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
       _adPlayer.destroy();
       _adPlayer = null;
     }
-    _layoutController.getControls().setVisible(true);
+    if(_controls != null) {
+      _controls.setVisible(true);
+    }
+
     _player.exitAdMode(this);
   }
 
@@ -368,7 +385,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   private void checkPlayableAds(int time) {
     double playheadTime = time / 1000.0;
     if (_overlays != null && _overlays.size() > 0 && playheadTime > _overlays.get(0).getTimePosition()) {
-      _fwContext.registerVideoDisplayBase(_layoutController.getLayout());
+      _fwContext.registerVideoDisplayBase(_layout);
       _overlays.remove(0).play();
     }
   }
