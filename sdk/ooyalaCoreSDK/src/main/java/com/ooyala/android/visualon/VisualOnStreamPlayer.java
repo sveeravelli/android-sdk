@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.net.wifi.WifiManager;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -1047,7 +1048,11 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       // todo: emit the tags in a generic way?
       int time = param2;
       byte[] b = (byte[]) obj;
-      DebugMode.logV( TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b) );
+      if (b == null) {
+        DebugMode.logW(TAG, "tag: time=" + time + ", ERROR: bytes was null!");
+      } else {
+        DebugMode.logV(TAG, "tag: time=" + time + ", bytes=" + b + ", string=" + new String(b));
+      }
       ID3TagNotifier.s_getInstance().onTag( b );
       break;
     default:
