@@ -7,3 +7,6 @@
 [submodule "vendor/CastCompanionLibrary"]
 	path = vendor/CastCompanionLibrary
 	url = https://github.com/googlecast/CastCompanionLibrary-android.git
+[submodule "vendor/ExoPlayer"]
+	path = vendor/ExoPlayer
+	url = https://github.com/google/ExoPlayer.git
