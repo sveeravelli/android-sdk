@@ -1,7 +1,5 @@
 package com.ooyala.android.visualon;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -14,6 +12,8 @@ import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmNotProtectedException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.ooyala.android.util.DebugMode;
+
+import java.io.IOException;
 
 /**
  * Perform DRM rights acquisition on a provided local file
@@ -58,6 +58,7 @@ class AcquireRightsAsyncTask extends AsyncTask<Void, Void, Exception> {
       else if (!"".equals(_authToken)) {
         customData = "auth_token=" + _authToken;
       }
+      customData = DiscredixDrmUtils.appendCustomData(customData);
       String customUrl = null;
       if(!dlc.verifyRights(_localFilename)){
         dlc.acquireRights(_localFilename, customData, customUrl);
