@@ -1,26 +1,25 @@
 package com.ooyala.android.visualon;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import android.content.Context;
 
 import com.discretix.drmdlc.api.DxDrmDlc;
 import com.discretix.drmdlc.api.DxLogConfig;
 import com.discretix.drmdlc.api.IDxDrmDlc;
-import com.discretix.drmdlc.api.IDxDrmDlcDebug;
 import com.discretix.drmdlc.api.exceptions.DrmAndroidPermissionMissingException;
 import com.discretix.drmdlc.api.exceptions.DrmClientInitFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmGeneralFailureException;
 import com.discretix.drmdlc.api.exceptions.DrmInvalidFormatException;
 import com.discretix.drmdlc.api.exceptions.DrmServerSoapErrorException;
 import com.discretix.vodx.VODXPlayerImpl;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.util.DebugMode;
 import com.visualon.OSMPPlayer.VOCommonPlayer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Static methods that are used to perform DRM related activities in the VisualOn Stream Player.
@@ -244,4 +243,18 @@ class DiscredixDrmUtils {
   public static VOCommonPlayer getVODXPlayerImpl() {
     return new VODXPlayerImpl();
   }
+
+  /*
+   * append custom data with secureplayer flag required by Ooyala Server
+   * PBA-2930
+   */
+  public static String appendCustomData(String customData) {
+    final String SECURE_PLAYER_FLAG = "SecurePlayer=1";
+    if (customData == null || customData.length() <= 0) {
+      return SECURE_PLAYER_FLAG;
+    } else {
+      return customData + "&" + SECURE_PLAYER_FLAG;
+    }
+  }
+
 }
