@@ -127,7 +127,7 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
    * @param tag
    */
   public void onTag( byte[] tag ) {
-    if( onTag_shouldReportTag() ) {
+    if( onTag_shouldReportTag() && tag != null ) {
       final String tagStr = new String(tag);
       DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
       if( tagStr.contains("www.nielsen.com") ) {
