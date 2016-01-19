@@ -473,8 +473,8 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
         DebugMode.logD(TAG, "SecurePlayer: Setting DRM Library:  voDRM_VisualOn_AES128");
         _player.setDRMLibrary("voDRM_VisualOn_AES128", "voGetDRMAPI");
       } else {
-        DebugMode.logD(TAG, "VisualOn-Only: assuming old DRM Library - Setting DRM Library:  voDRM");
-        _player.setDRMLibrary("voDRM", "voGetDRMAPI");
+        DebugMode.logD(TAG, "VisualOn-Only: Setting DRM setDRMAdapter:  libvoDRMCommonAES128.so");
+        _player.setDRMAdapter("libvoDRMCommonAES128.so", true);
       }
       /* Set the license */
       String licenseText = "VOTRUST_OOYALA_754321974";        // Magic string from VisualOn, must match voVidDec.dat to work
