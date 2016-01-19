@@ -23,6 +23,13 @@
 <!--The TextureView element value can be set to No to disable the use of TextureView for a specific device when enableVOAdaptivePlayback(true). Other TextureView element values are ignored.-->
 
 <DeviceData>
+    <item>
+            <Model>BRAVIA 4K 2015</Model>
+            <Release></Release>
+            <Platform>mt5890</Platform>
+            <CodecSolution>IOMX</CodecSolution>
+            <TextureView>No</TextureView>
+        </item>
 		<item>
 			<Model>Hudl HT7S3</Model>
 			<Release>4.2.2</Release>

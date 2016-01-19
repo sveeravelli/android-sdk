@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/O_1" android:title="ZoomIn 160*120" />
-    <item android:id="@+id/O_2" android:title="Normal" />
-    <item android:id="@+id/O_3" android:title="Version" />
-</menu>

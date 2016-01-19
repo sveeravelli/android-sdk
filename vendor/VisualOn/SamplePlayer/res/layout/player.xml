@@ -1,478 +1,380 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/black" >
+    android:layout_height="fill_parent">
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_centerInParent="true" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
 
-        <SurfaceView
+        <com.visualon.OSMPUtils.voSurfaceView
             android:id="@+id/svMain"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="@drawable/transparent_background"
-            android:layout_centerInParent="true" >
-        </SurfaceView>
+            android:layout_centerInParent="true" />
 
-    </RelativeLayout>
-
-  <RelativeLayout
-        android:id="@+id/tlTop"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/transparent_background"
-        android:orientation="horizontal"
-        
-        android:stretchColumns="1"
-        android:visibility="invisible" >
-        
-        <TextView
-            android:id="@+id/tvCurrentTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:text="0:11:10"
-            android:layout_marginTop="10dp"
-            android:textStyle="bold" />
-          
-            <TextView
-                android:id="@+id/tvBps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
-                android:gravity="right"
-                android:text="750"
-                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/tvCurrentTime"
-                style="@style/style_player_textview_general" />
-            
-         
-              
-            <TextView
-                android:id="@+id/tvResolutionW"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:gravity="right"
-                android:text="0"
-                  android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/tvBps"
-                style="@style/style_player_textview_general" />
-            
-            <TextView
-                android:id="@+id/tvResolutionX"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                  android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/tvResolutionW"
-                android:text=" x "
-                style="@style/style_player_textview_general" />
-             
-            <TextView
-                android:id="@+id/tvResolutionH"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                  android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/tvResolutionX"
-                android:text="0"
-                style="@style/style_player_textview_general" />
-        <TextView
-            android:id="@+id/tvTotalTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:text="1:49:00"
-              android:layout_marginTop="10dp"
-            android:textStyle="bold" />
-
-        <SeekBar
-            android:id="@+id/sbMain"
+        <SurfaceView
+            android:id="@+id/svMain2"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvCurrentTime"
-           
-            android:max="100"
-            android:paddingBottom="2dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:paddingTop="2dp"
-            android:progress="0"
-            android:thumb="@drawable/seek" />
-     
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true" />
+
     </RelativeLayout>
-    <RelativeLayout
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/rlTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true">
+
+        <Button
+            android:id="@+id/btSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="FirstPlayer" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/rlBottom"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@android:color/transparent"
-        android:layout_below="@id/tlTop">
-        
-        <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btPre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prev" />
+
+                <Button
+                    android:id="@+id/btNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Next" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btSpecial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SpecialFeatures" />
+
+            <Button
+                android:id="@+id/btAnalytics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnSkipAd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_skipAD"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnShowAdUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_showAD_URL"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnEnterNTS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enter NTS"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ccffffff"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/timingInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="5dp">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvMinTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00/"
+                        android:textColor="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/tvCurrentTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#848484" />
+
+                <TextView
+                    android:id="@+id/tvHDMI"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="HDMI"
+                    android:textColor="@android:color/black"
+                    android:visibility="gone" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#848484" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvBps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@android:color/black" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvResolutionW"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="."
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvResolutionH"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="."
+                            android:textColor="@android:color/black" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#848484" />
+
+                <TextView
+                    android:id="@+id/tvUTCPosition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@android:color/black" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#848484" />
+
+                <TextView
+                    android:id="@+id/tvMaxTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+
+            <SeekBar
+                android:id="@+id/sbMain"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/timingInfo"
+                android:max="100"
+                android:paddingBottom="2dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="2dp"
+                android:progress="0" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CCFFFFFF"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/llLeftBottem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btPause"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:contentDescription="Pause"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_pause" />
+
+                <ImageButton
+                    android:id="@+id/btStop"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:contentDescription="Stop"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_stop" />
+
+                <Button
+                    android:id="@+id/btAsset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Asset" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llRightBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btSpeedHigh"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:contentDescription="SpeedUp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_plus"
+                    android:text="+" />
+
+                <TextView
+                    android:id="@+id/tvSpeedValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="1.0"
+                    android:textColor="@android:color/black" />
+
+                <ImageButton
+                    android:id="@+id/btSpeedLow"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:contentDescription="SpeedDown"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_minus"
+                    android:text="-" />
+
+                <CheckBox
+                    android:id="@+id/chbEnableST"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="Subtitle"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_cc" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlDownloader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/rlTop">
+
+        <TextView
             android:id="@+id/tvDownloaderPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            />
-        
-        <TextView 
+            android:layout_alignParentRight="true" />
+
+        <TextView
             android:id="@+id/tvDownloaderTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvDownloaderPercentage"
             android:layout_alignParentRight="true"
-            />
-        <RelativeLayout
-            android:id="@+id/rlAudioSpeed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="2dp" >
+            android:layout_below="@id/tvDownloaderPercentage" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true" >
-
-	        <ImageButton
-	            android:id="@+id/ibLowSpeed"
-	            android:layout_width="40dp"
-	            android:layout_height="40dp"
-	            android:background="@drawable/transparent_background"
-	            android:src="@drawable/btn_bf" >
-	        </ImageButton>
-
-                <TextView
-                    android:id="@+id/tvAudioSpeed"
-                    android:layout_width="30dp"
-                    android:layout_height="40dp"
- 			        android:layout_marginLeft="10dp"
-			        android:layout_marginRight="10dp"
-			        android:layout_marginTop="7dp"
-			        android:layout_marginBottom="7dp"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:text="      "
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-	        <ImageButton
-	            android:id="@+id/ibHighSpeed"
-	            android:layout_width="40dp"
-	            android:layout_height="40dp"
-	            android:background="@drawable/transparent_background"
-	            android:src="@drawable/btn_ff" >
-	        </ImageButton>
-                
-        </LinearLayout>
-        </RelativeLayout>
-        
-        <RelativeLayout
-             android:id="@+id/rlDolby"
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content"
-             android:layout_marginBottom="28dp"
-             android:layout_below="@id/rlAudioSpeed"
-             android:background="@android:color/transparent" >
-             <ImageButton
-			                android:id="@+id/ibDolby"
-			                android:layout_width="48dp"
-			                android:layout_height="32dp"
-			                android:layout_alignParentLeft="true"
-			                android:src="@drawable/selector_btn_dolby"
-			                android:background="@android:color/transparent"
-			                android:contentDescription="@string/str_option"
-			                android:scaleType="fitCenter" 
-			                android:layout_gravity="right">
-			 </ImageButton>   
-        </RelativeLayout> 
-        
-        <ImageButton
-            android:id="@+id/ibPlayPause"
-            android:layout_width="116dp"
-            android:layout_height="116dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/transparent_background"
-            android:scaleType="fitCenter"
-            android:src="@drawable/selector_btn_pause" >
-
-        </ImageButton>
-        
-        <RelativeLayout
-            android:id="@+id/rlLeft"
-            android:layout_width="280dp"
-            android:layout_height="217dp"
-            android:layout_marginBottom="40dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:background="@android:color/transparent" >
-                        <RelativeLayout
-                android:id="@+id/rlChannel"
-                android:layout_width="25dp"
-                android:layout_height="80dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/bg_player_left_channel_off" >
-
-            </RelativeLayout>
-                        <ListView
-                android:id="@+id/lvChannel"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_toRightOf="@id/rlChannel"
-                android:background="#55000000"
-                android:cacheColorHint="#00000000"
-                android:divider="@drawable/bg_horizontal_divider"
-                android:visibility="invisible" >
-
-            </ListView>
-            
-        </RelativeLayout>
-          
-        
-        <RelativeLayout
-            android:id="@+id/rlRight"
-            android:layout_width="250dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent" >
-          
-            <RelativeLayout
-                android:id="@+id/rlProgramInfoWrap"
-                android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="0dp"
-                android:background="@android:color/transparent" >
-                
-                <RelativeLayout
-                    android:id="@+id/rlProgramInfoArrow"
-                    android:layout_width="25dp"
-                    android:layout_height="80dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/bg_player_right_programinfo_off" >
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/rlProgramInfo"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_marginTop="0dp"
-                    android:layout_toLeftOf="@id/rlProgramInfoArrow"
-                    android:background="@android:color/transparent"
-                    android:paddingRight="2dp" >
-
-                    <LinearLayout
-                        android:id="@+id/llProgramInfo"
-                        android:layout_width="fill_parent"
-                        android:layout_height="170dp"
-                        android:background="@android:color/transparent"
-                        android:orientation="vertical" >
-
-                        <RelativeLayout
-                            android:id="@+id/rlVideo"
-                            android:layout_width="fill_parent"
-                            android:layout_height="48dp"
-                            
-                            android:layout_weight="1"
-                            android:background="@android:color/transparent" >
-
-                            <TextView
-                                android:id="@+id/tvVideo"
-                                style="@style/style_player_textview_label"
-                                android:layout_width="40dp"
-                                android:layout_height="fill_parent"
-                                android:layout_alignParentRight="true"
-                                android:background="@drawable/bg_player_popupmenu_normal"
-                                android:contentDescription="@string/str_option"
-                                android:text="Video" >
-                            </TextView>
-
-                            <HorizontalScrollView
-                                android:id="@+id/hsvVideoPopupMenu"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:layout_toLeftOf="@id/tvVideo"
-                                android:scrollbars="none"
-                                android:visibility="visible" >
-
-                                <LinearLayout
-                                    android:id="@+id/llVideoPopupMenu"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="fill_parent"
-                                    android:layout_gravity="left"
-                                    android:background="@android:color/transparent"
-                                    android:gravity="right"
-                                    android:layoutAnimation="@anim/la_fadein_reverse"
-                                    android:orientation="horizontal" >
-                                </LinearLayout>
-                            </HorizontalScrollView>
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rlAudio"
-                            android:layout_width="fill_parent"
-                            android:layout_height="48dp"
-                            
-                            android:layout_marginTop="8dp"
-                            android:layout_weight="1"
-                            android:background="@android:color/transparent" >
-
-                            <TextView
-                                android:id="@+id/tvAudio"
-                                style="@style/style_player_textview_label"
-                                android:layout_width="40dp"
-                                android:layout_height="fill_parent"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerInParent="true"
-                                android:background="@drawable/bg_player_popupmenu_normal"
-                                android:contentDescription="@string/str_option"
-                                android:text="Audio" >
-                            </TextView>
-
-                            <HorizontalScrollView
-                                android:id="@+id/hsvAudioPopupMenu"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:layout_toLeftOf="@id/tvAudio"
-                                android:scrollbars="none"
-                                android:visibility="visible" >
-
-                                <LinearLayout
-                                    android:id="@+id/llAudioPopupMenu"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="fill_parent"
-                                    android:layout_gravity="left"
-                                    android:background="@android:color/transparent"
-                                    android:gravity="right"
-                                    android:layoutAnimation="@anim/la_fadein_reverse"
-                                    android:orientation="horizontal" >
-                                </LinearLayout>
-                            </HorizontalScrollView>
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rlSubtitle"
-                            android:layout_width="fill_parent"
-                            android:layout_height="48dp"
-                            
-                            android:layout_marginTop="8dp"
-                            android:layout_weight="1"
-                            android:background="@android:color/transparent" >
-
-                            <TextView
-                                android:id="@+id/tvSubtitle"
-                                style="@style/style_player_textview_label"
-                                android:layout_width="40dp"
-                                android:layout_height="fill_parent"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerInParent="true"
-                                android:background="@drawable/bg_player_popupmenu_normal"
-                                android:contentDescription="@string/str_option"
-                                android:text="Subt" >
-                            </TextView>
-
-                            <HorizontalScrollView
-                                android:id="@+id/hsvSubtitlePopupMenu"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:layout_toLeftOf="@id/tvSubtitle"
-                                android:scrollbars="none"
-                                android:visibility="visible" >
-
-                                <LinearLayout
-                                    android:id="@+id/llSubtitlePopupMenu"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="fill_parent"
-                                    android:layout_gravity="left"
-                                    android:background="@android:color/transparent"
-                                    android:gravity="right"
-                                    android:layoutAnimation="@anim/la_fadein_reverse"
-                                    android:orientation="horizontal" >
-                                </LinearLayout>
-                            </HorizontalScrollView>
-                        </RelativeLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/llConfirmRevert"
-                        android:layout_width="fill_parent"
-                        android:layout_height="50dp"
-                        android:layout_below="@id/llProgramInfo"
-                        android:background="@android:color/transparent"
-                        android:orientation="horizontal" >
-
-                        <TextView
-                            android:id="@+id/tvCommit"
-                            style="@style/style_player_textview_general_selector"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_player_popupmenu_normal"
-                            android:text="Commit" />
-
-                        <TextView
-                            android:id="@+id/tvRevert"
-                            style="@style/style_player_textview_general_selector"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_player_popupmenu_normal"
-                            android:text="Revert" />
-                    </LinearLayout>
-               
-                    </RelativeLayout>
-               </RelativeLayout>
-            
-               <HorizontalScrollView
-                    android:id="@+id/hsvRight"
-                    android:layout_width="fill_parent"
-                    android:layout_height="40dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginRight="5dp"
-                    android:scrollbars="none" >
-
-                    <LinearLayout
-                        android:id="@+id/llRight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="right"
-                        android:background="@android:color/transparent"
-                        android:gravity="right"
-                        android:layoutAnimation="@anim/la_fadein_reverse"
-                        android:orientation="horizontal" >
-                    
-                    </LinearLayout>
-                    
-                </HorizontalScrollView>
-            
-            </RelativeLayout>
-    
     </RelativeLayout>
-    
+
+
     <ProgressBar
         android:id="@+id/pbBuffer"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
-   <TextView android:id="@+id/tvBufferValue"
+
+    <TextView
+        android:id="@+id/tvBufferValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
-    
-  
+
+
 </RelativeLayout>

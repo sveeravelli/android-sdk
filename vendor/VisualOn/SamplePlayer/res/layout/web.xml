@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlWebBrowser"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
+        <RelativeLayout
+            android:id="@+id/llTop"
+            android:layoutAnimation="@anim/la_fadein" 
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_home_toplayout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" >
+
+            <ImageButton
+                android:id="@+id/ibHistory"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/selector_webbrowser_btnfavor" 
+                android:background="@android:color/transparent"
+             />
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/ibHistory"
+                android:background="@android:color/transparent"
+                android:text="〈―"
+                android:gravity="center"
+                />
+            <Button
+                android:id="@+id/btnGo"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/btnBack"
+                android:background="@android:color/transparent"
+                android:text="―〉"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                />
+             <ProgressBar
+                android:id="@+id/pbUrl"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/ivPlay"
+                android:layout_toRightOf="@+id/btnGo"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="1dp"
+                android:progress="0"
+                android:max="100"
+                android:progressDrawable="@drawable/layerlist_webbrowser_url_progress"/>
+            
+             <AutoCompleteTextView
+                android:id="@+id/actvUrl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/ivPlay"
+                android:layout_toRightOf="@+id/btnGo"
+                android:textSize="15sp"
+                android:textColor="@drawable/white"
+                android:inputType="textAutoComplete|textUri" 
+                android:imeOptions="actionGo"
+                android:padding="3dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="1dp"
+                android:background="@android:color/transparent">
+            </AutoCompleteTextView>
+            
+            
+            <ImageView
+                android:id="@+id/ivPlay"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/selector_btn_go"
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/llTop"
+            android:background="@drawable/black" />
+    
+    
+</RelativeLayout>
+
+
+
+
