@@ -63,9 +63,16 @@
         <item name="android:shadowColor">#3F3F3F</item>
         <item name="android:shadowRadius">0.2</item>
     </style>
-    <style name="Dialog_Fullscreen"> 
-       <item name="android:windowFullscreen">true</item> 
-       <item name="android:windowNoTitle">true</item>  
+    <style name="Dialog_GrayWhite"> 
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFullscreen">true</item> 
+        <item name="android:windowNoTitle">true</item>  
+        <item name="android:windowBackground">@drawable/graywhite</item>
     </style>
-
+    <style name="Dialog_Translucent"> 
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFullscreen">true</item> 
+        <item name="android:windowNoTitle">true</item>  
+        <item name="android:windowBackground">@drawable/halftransparent_background</item>
+    </style>
 </resources>

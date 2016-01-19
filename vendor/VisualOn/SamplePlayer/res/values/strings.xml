@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello VisualOn</string>
-    <string name="app_name">API3 Sample Player</string>
+    <string name="app_name">Sample Player</string>
     <string name="str_Welcome_Title">Disclaimers</string>
     <string name="str_Welcome_Message"></string>
     <string name="str_Welcome_Agree">Agree</string>
@@ -101,4 +101,6 @@
 	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_DRMLICENSEERROR">Stream DRM error</string>
 	<string name="VO_OSMP_SRC_ADAPTIVE_STREAMING_ERROR_EVENT_STREAMING_VOLIBLICENSEERROR">Stream license error</string>
 	<string name="spinnerURLTitle">Select</string>
+	<string name="str_skipAD">SkipAD</string>
+	<string name="str_showAD_URL">ShowADURL</string>
 </resources>

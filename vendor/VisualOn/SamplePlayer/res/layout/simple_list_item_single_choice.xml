@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:gravity="center_vertical"
-    android:checkMark="?android:attr/listChoiceIndicatorSingle"
+    android:checkMark="?android:attr/listChoiceIndicatorMultiple"
     android:paddingLeft="6dip"
     android:paddingRight="6dip"
 />

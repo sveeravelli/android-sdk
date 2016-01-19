@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnDone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Done"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvBrightness"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:text="Brightness"
+                android:textColor="@drawable/white" />
+
+            <SeekBar
+                android:id="@+id/sbBrightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_toRightOf="@+id/tvBrightness"
+                android:progress="50" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvVolume"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Volume"
+                android:textColor="@drawable/white" />
+
+            <Button
+                android:id="@+id/btnMute"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center" />
+
+            <SeekBar
+                android:id="@+id/sbVolume"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_toLeftOf="@+id/btnMute"
+                android:layout_toRightOf="@+id/tvVolume"
+                android:progress="100" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvStereoChannel"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Stereo Channel"
+                android:textColor="@drawable/white" />
+
+            <Button
+                android:id="@+id/btnSetStereo"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="SetStereo" />
+
+            <EditText
+                android:id="@+id/edtLeftChannel"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/tvStereoChannel"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:text="1.0" />
+
+            <TextView
+                android:id="@+id/tvLeftChannel"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/edtLeftChannel"
+                android:gravity="center"
+                android:text="Left(0.0~1.0)"
+                android:textColor="@drawable/white" />
+
+            <EditText
+                android:id="@+id/edtRightChannel"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignLeft="@id/edtLeftChannel"
+                android:layout_below="@id/edtLeftChannel"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:text="1.0" />
+
+            <TextView
+                android:id="@+id/tvRightChannel"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignTop="@id/edtRightChannel"
+                android:layout_toRightOf="@id/edtRightChannel"
+                android:gravity="center"
+                android:text="Right(0.0~1.0)"
+                android:textColor="@drawable/white" />"
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvUpdateUrl"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="UpdateUrl"
+                android:textColor="@drawable/white" />"
+
+            <Button
+                android:id="@+id/btnUpdateUrl"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Update" />
+
+            <EditText
+                android:id="@+id/edtUpdateUrl"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignBottom="@+id/btnUpdateUrl"
+                android:layout_toLeftOf="@+id/btnUpdateUrl"
+                android:layout_toRightOf="@+id/tvUpdateUrl"
+                android:imeOptions="actionDone">
+
+            </EditText>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Zoom"
+                android:textColor="@drawable/white" />
+
+            <Button
+                android:id="@+id/btnZoomMode"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Original" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="AspectRatio"
+                android:textColor="@drawable/white" />
+
+            <Button
+                android:id="@+id/btnAspectRatio"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Auto" />
+        </RelativeLayout>
+       
+        
+        <RelativeLayout
+            android:id="@+id/rlIFrameOnly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </RelativeLayout>
+
+        <CheckBox
+            android:id="@+id/chDRMOfflineMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DRM Offline Mode" />
+        
+        <CheckBox
+            android:id="@+id/chbSEI"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SEI" />
+
+        <CheckBox
+            android:id="@+id/chbRTSPStatistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RTSP Statistics" />
+
+
+        <CheckBox
+            android:id="@+id/chbDownloadStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Download Status" />
+
+        
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="VideoDecodingBitrate"
+                android:textColor="@drawable/white" />
+
+            <TextView
+                android:id="@+id/tvVideoDecodingBitrate"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:text="0"
+                android:textColor="@drawable/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="AudioDecodingBitrate"
+                android:textColor="@drawable/white" />
+
+            <TextView
+                android:id="@+id/tvAudioDecodingBitrate"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:text="0"
+                android:textColor="@drawable/white" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvMultiInstance"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Multi Instance"
+                android:textColor="@drawable/white" />
+
+            <Button
+                android:id="@+id/btnMultiInstance"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Start" />
+
+            <SurfaceView
+                android:id="@+id/svMultiInstance"
+                android:layout_width="280dp"
+                android:layout_height="210dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tvMultiInstance"
+                android:background="@drawable/halftransparent_background"/>
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

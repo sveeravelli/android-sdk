@@ -1,110 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
+    <LinearLayout
+        android:id="@+id/rlUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1st URL" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtInputURL"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:imeOptions="actionDone" />
+
+            <ImageButton
+                android:id="@+id/bSelectURL"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_drop10"
+                android:text="Select" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:src="@drawable/ic_play"
+            android:id="@+id/bStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:text="Start" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlOption"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-         >
-   <LinearLayout 
-       android:id="@+id/llUrl" 
-       android:layout_height="wrap_content"
-       android:layout_width="fill_parent"
-       android:layout_alignParentLeft="true"
-       android:layout_alignParentTop="true"
-       android:orientation="horizontal">
-     
-
-        <EditText
-            android:id="@+id/edtInputURL"
-            android:layout_weight="1"
-	    android:singleLine="true"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp" >
-        </EditText>
-         <Button
-            android:id="@+id/bSelectURL"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_weight="6"
-            android:text="Select"
-             />
-        
-        
-</LinearLayout>
-        
-           
-     
-         <RelativeLayout
-             android:layout_below="@+id/llUrl"
-             android:layout_alignLeft="@+id/rlUrl"
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content"
-             android:id="@+id/rlOptions3">
-        
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="VCAS server IP"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <EditText
-                android:id="@+id/editTextIP"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/textView1"
-                
-                android:ems="10" >
-
-                <requestFocus />
-            </EditText>
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/editTextPort"
-                android:layout_alignLeft="@+id/editTextPort"
-                android:text="VCAS sever Port"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <EditText
-                android:id="@+id/editTextPort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/editTextIP"
-                
-                android:ems="10"
-                android:inputType="number" >
-            </EditText>
-
-
-      </RelativeLayout>
-        <RelativeLayout
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/rlOption"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">            
-            <Button
-                android:id="@+id/bStart"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentBottom="true"
-                android:text="Start" />
-            <Button 
-                android:id="@+id/bOption"
-                android:text="Options"
-                android:gravity="center"
-                android:layout_alignParentBottom="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"/>
-            </RelativeLayout>
-       
+        android:layout_below="@id/rlUrl">
     </RelativeLayout>
+
+</RelativeLayout>
