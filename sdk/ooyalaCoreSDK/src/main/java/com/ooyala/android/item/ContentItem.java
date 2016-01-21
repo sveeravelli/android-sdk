@@ -26,6 +26,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected static final String KEY_TITLE = "title";
   protected static final String KEY_DESCRIPTION = "description";
   protected static final String KEY_PROMO_IMAGE = "promo_image";
+  protected static final String KEY_HOSTED_AT_URL = "hostedAtURL";
   protected static final String KEY_THUMBNAIL_IMAGE = "thumbnail_image";
   protected static final String KEY_CONTENT_TYPE = "content_type";
   protected static final String KEY_ADS = "ads";
@@ -58,6 +59,7 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
   protected String _description = null;
   protected OoyalaAPIClient _api;
   protected String _promoImageURL = null;
+  protected String _hostedAtURL = null;
   protected boolean _authorized = false;
   protected int _authCode = AuthCode.NOT_REQUESTED;
   protected boolean _heartbeatRequired;
@@ -187,6 +189,9 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
       if (!myData.isNull(KEY_PROMO_IMAGE)) {
         _promoImageURL = myData.getString(KEY_PROMO_IMAGE);
       }
+      if (!myData.isNull(KEY_HOSTED_AT_URL)) {
+        _hostedAtURL = myData.getString(KEY_HOSTED_AT_URL);
+      }
       if (myData.has(KEY_METADATA_BASE)) {
         _metadata = ItemUtils.mapFromJSONObject(myData.getJSONObject(KEY_METADATA_BASE));
       }
@@ -272,6 +277,14 @@ public abstract class ContentItem implements AuthorizableItem, OrderedMapValue<S
    */
   public String getPromoImageURL(int width, int height) {
     return _promoImageURL;
+  }
+
+  /**
+   * Returns a URL that video is hosted at for this content item
+   * @return the url
+   */
+  public String getHostedAtUrl() {
+    return _hostedAtURL;
   }
 
   public static List<String> getEmbedCodes(List<? extends ContentItem> items) {
