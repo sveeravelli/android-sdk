@@ -39,6 +39,7 @@ public class ContentItemTest extends AndroidTestCase {
     assertEquals("dancing", video.getDescription());
     assertEquals("http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/64AGzoRZwH8F99WH5hMDoxOmFkO7UOTK",
         video.getPromoImageURL(100, 100));
+    assertEquals("http://www.ooyala.com", video.getHostedAtUrl());
     assertEquals(Video.class, video.getClass());
   }
 
