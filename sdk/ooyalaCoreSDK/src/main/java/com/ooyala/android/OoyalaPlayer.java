@@ -822,6 +822,15 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   /**
+   * Get the pcode for the current player.
+   *
+   * @return pcode
+   */
+  public String getPcode() {
+    return _playerAPIClient == null ? null : _playerAPIClient.getPcode();
+  }
+
+  /**
    * Get the customDRMData for the current player.
    *
    * @return _customDRMData

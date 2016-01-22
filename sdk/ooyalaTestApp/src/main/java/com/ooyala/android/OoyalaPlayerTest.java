@@ -84,4 +84,9 @@ public class OoyalaPlayerTest extends AndroidTestCase {
     assertFalse(player.changeCurrentItem("invalid"));
   }
 
+  public void testPcode() {
+    OoyalaPlayer player = new OoyalaPlayer(PCODE, new PlayerDomain(DOMAIN));
+    assertEquals(PCODE, player.getPcode());
+  }
+
 }
