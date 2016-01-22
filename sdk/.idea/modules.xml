@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../vendor/CastCompanionLibrary/CastCompanionLibrary.iml" filepath="$PROJECT_DIR$/../vendor/CastCompanionLibrary/CastCompanionLibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../vendor/CastCompanionLibrary/CastCompanionLibrary.iml" filepath="$PROJECT_DIR$/../../vendor/CastCompanionLibrary/CastCompanionLibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" filepath="$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" filepath="$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/internalTestApp/internalTestApp.iml" filepath="$PROJECT_DIR$/internalTestApp/internalTestApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaCastSDK/ooyalaCastSDK.iml" filepath="$PROJECT_DIR$/ooyalaCastSDK/ooyalaCastSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" filepath="$PROJECT_DIR$/ooyalaCoreSDK/ooyalaCoreSDK.iml" />
@@ -13,8 +10,6 @@
       <module fileurl="file://$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" filepath="$PROJECT_DIR$/ooyalaIMASDK/ooyalaIMASDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaNielsenSDK/ooyalaNielsenSDK.iml" filepath="$PROJECT_DIR$/ooyalaNielsenSDK/ooyalaNielsenSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/ooyalaTestApp/ooyalaTestApp.iml" filepath="$PROJECT_DIR$/ooyalaTestApp/ooyalaTestApp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sdk.iml" filepath="$PROJECT_DIR$/sdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sdk.iml" filepath="$PROJECT_DIR$/sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/sdk.iml" filepath="$PROJECT_DIR$/sdk.iml" />
     </modules>
   </component>
