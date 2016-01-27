@@ -36,7 +36,7 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
-  protected StreamPlayer getStreamPlayer() {
+  protected StreamPlayer createStreamPlayer() {
     return new BaseStreamPlayer();
   }
 
@@ -47,7 +47,7 @@ public class MoviePlayer extends Player implements Observer {
     _streams = streams;
     _suspended = false;
     if(_basePlayer == null) {
-      _basePlayer = getStreamPlayer();
+      _basePlayer = createStreamPlayer();
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);

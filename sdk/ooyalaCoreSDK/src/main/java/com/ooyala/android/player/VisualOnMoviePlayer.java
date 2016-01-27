@@ -10,7 +10,7 @@ public class VisualOnMoviePlayer extends MoviePlayer {
   private static final String VISUALON_PLAYER = "com.ooyala.android.visualon.VisualOnStreamPlayer";
 
   @Override
-  protected StreamPlayer getStreamPlayer() {
+  protected StreamPlayer createStreamPlayer() {
     StreamPlayer player = null;
     try {
       player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
