@@ -9,7 +9,7 @@ import java.io.IOException;
  * Created by pbq on 1/24/16.
  */
 public class SDCardLogcatOoyalaEventsLogger {
-    int count;
+    private int count;
 
     public SDCardLogcatOoyalaEventsLogger(){
         count=0;
@@ -23,19 +23,14 @@ public class SDCardLogcatOoyalaEventsLogger {
 
         //Writing events into file on device if the file already exists , do nothing if file does not exist
         File logFile = new File("sdcard/log.file");
-        if (!logFile.exists()) {
-            // do nothing
-
-        }// end of if
-        else if (logFile.exists()) {
+        if (logFile.exists()) {
             try {
                 BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
                 buf.append(text);
                 buf.newLine();
                 buf.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.out.println(e);
             }
         }// end of else if
 
