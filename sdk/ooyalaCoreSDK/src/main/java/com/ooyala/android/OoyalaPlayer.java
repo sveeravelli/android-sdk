@@ -38,9 +38,9 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
+import com.ooyala.android.player.PlayerFactory;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
-import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
@@ -51,13 +51,17 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * The OoyalaPlayer is the heart of the playback system.
@@ -130,7 +134,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     PostRollAd,
   }
 
-  static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
 
   /**
@@ -212,6 +215,14 @@ public class OoyalaPlayer extends Observable implements Observer,
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
   private EmbedTokenGenerator _embedTokenGenerator = null;
+  private SortedSet<PlayerFactory> _playerFactories;
+
+  private class PlayerFactoryComparator implements Comparator<PlayerFactory> {
+    @Override
+    public int compare(PlayerFactory f1, PlayerFactory f2) {
+      return f1.priority() - f2.priority();
+    }
+  }
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -266,6 +277,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager = new AdPluginManager(this);
     _managedAdsPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_managedAdsPlugin);
+
+    // register player factories;
+    _playerFactories = new TreeSet<PlayerFactory>(new PlayerFactoryComparator());
+    _playerFactories.add(new WidevineLibPlayerFactory());
+    _playerFactories.add(new WidevineOsPlayerFactory());
+    _playerFactories.add(new VisualOnPlayerFactory());
 
     DebugMode.logI(this.getClass().getName(),
             "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -464,17 +481,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
     final String taskKey = "setExternalIds" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds,
-            new ContentTreeCallback() {
-              @Override
-              public void callback(ContentItem item, OoyalaException error) {
-                taskCompleted(taskKey);
-                if (error != null) {
-                  onError(error, "Exception in setExternalIds!");
-                  return;
-                }
-                reinitialize(item, null);
-              }
-            }));
+        new ContentTreeCallback() {
+          @Override
+          public void callback(ContentItem item, OoyalaException error) {
+            taskCompleted(taskKey);
+            if (error != null) {
+              onError(error, "Exception in setExternalIds!");
+              return;
+            }
+            reinitialize(item, null);
+          }
+        }));
     return true;
   }
 
@@ -707,23 +724,18 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private MoviePlayer _getCorrectMoviePlayer(Video currentItem) {
-    Set<Stream> streams = currentItem.getStreams();
-
-    // Get correct type of Movie Player
-    if (Stream.streamSetContainsDeliveryType(streams,
-        Stream.DELIVERY_TYPE_WV_WVM)
-        || Stream.streamSetContainsDeliveryType(streams,
-            Stream.DELIVERY_TYPE_WV_HLS)) {
-      return new WidevineOsPlayer();
-    } else if (Stream.streamSetContainsDeliveryType(streams,
-        Stream.DELIVERY_TYPE_WV_MP4)) {
-      try {
-        return (MoviePlayer) getClass().getClassLoader()
-            .loadClass(WIDEVINE_LIB_PLAYER).newInstance();
-      } catch (Exception e) {
-        OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
-                "Could not initialize Widevine Player");
-        onError(error, "Please include the Widevine Library in your project");
+    MoviePlayer player = null;
+    Iterator it = _playerFactories.iterator();
+    while (it.hasNext()) {
+      PlayerFactory pf = (PlayerFactory)it.next();
+      if (pf.canPlayVideo(currentItem)) {
+        try {
+          player = pf.createPlayer();
+        } catch (OoyalaException e) {
+          onError(e, "cannot create movieplayer from:" + pf.getClass().getCanonicalName());
+        } finally {
+          return player;
+        }
       }
     }
 

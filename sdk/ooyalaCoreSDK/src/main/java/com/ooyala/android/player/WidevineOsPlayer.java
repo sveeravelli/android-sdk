@@ -1,10 +1,5 @@
 package com.ooyala.android.player;
 
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Set;
-
 import android.annotation.TargetApi;
 import android.drm.DrmErrorEvent;
 import android.drm.DrmEvent;
@@ -16,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings.Secure;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -24,6 +18,12 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.util.DebugMode;
+
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Set;
 
 //the widevine player using the built in libraries, for honeycomb+
 @TargetApi(11)
