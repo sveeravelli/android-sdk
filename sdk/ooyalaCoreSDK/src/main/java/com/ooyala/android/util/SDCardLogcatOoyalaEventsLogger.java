@@ -19,7 +19,7 @@ public class SDCardLogcatOoyalaEventsLogger {
 
         // Keeps track of incoming notifications and makes sure count is right
         count=count+1;
-        text=text+"count: " +count;
+        text=text+" count:"+count;
 
         //Writing events into file on device if the file already exists , do nothing if file does not exist
         File logFile = new File("sdcard/log.file");
