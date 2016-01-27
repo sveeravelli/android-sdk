@@ -9,31 +9,26 @@ import java.io.IOException;
  * Created by pbq on 1/24/16.
  */
 public class SDCardLogcatOoyalaEventsLogger {
+    int count;
 
-    public void writeToSdcardLog(int count,String text) {
+    public SDCardLogcatOoyalaEventsLogger(){
+        count=0;
+    }
 
-        //Empty Logcat buffer
-        if (count == 1) {
+    public void writeToSdcardLog(String text) {
 
-            try {
-                Process process = new ProcessBuilder().command("logcat", "-c").redirectErrorStream(true).start();
-            } catch (IOException e) {
-            }
-        }
+        // Keeps track of incoming notifications and makes sure count is right
+        count=count+1;
+        text=text+"count: " +count;
 
-        //Writing events into file on device
+        //Writing events into file on device if the file already exists , do nothing if file does not exist
         File logFile = new File("sdcard/log.file");
         if (!logFile.exists()) {
-            //try {
-            //    //logFile.createNewFile();
-            //} catch (IOException e) {
-            //    // TODO Auto-generated catch block
-            //    e.printStackTrace();
-            //}
+            // do nothing
+
         }// end of if
         else if (logFile.exists()) {
             try {
-                //BufferedWriter for performance, true to set append to file flag
                 BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
                 buf.append(text);
                 buf.newLine();
