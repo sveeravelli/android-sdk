@@ -38,7 +38,6 @@ import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
-import com.ooyala.android.player.PlayerFactory;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
@@ -51,17 +50,13 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * The OoyalaPlayer is the heart of the playback system.
@@ -215,14 +210,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
   private EmbedTokenGenerator _embedTokenGenerator = null;
-  private SortedSet<PlayerFactory> _playerFactories;
-
-  private class PlayerFactoryComparator implements Comparator<PlayerFactory> {
-    @Override
-    public int compare(PlayerFactory f1, PlayerFactory f2) {
-      return f1.priority() - f2.priority();
-    }
-  }
+  private MoviePlayerSelector _playerSelector;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -279,10 +267,10 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager.registerPlugin(_managedAdsPlugin);
 
     // register player factories;
-    _playerFactories = new TreeSet<PlayerFactory>(new PlayerFactoryComparator());
-    _playerFactories.add(new WidevineLibPlayerFactory());
-    _playerFactories.add(new WidevineOsPlayerFactory());
-    _playerFactories.add(new VisualOnPlayerFactory());
+    _playerSelector = new MoviePlayerSelector();
+    _playerSelector.registerPlayerFactory(new WidevineLibPlayerFactory());
+    _playerSelector.registerPlayerFactory(new WidevineOsPlayerFactory());
+    _playerSelector.registerPlayerFactory(new VisualOnPlayerFactory());
 
     DebugMode.logI(this.getClass().getName(),
             "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -718,44 +706,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
-    final MoviePlayer moviePlayer = _getCorrectMoviePlayer(currentItem);
-    return moviePlayer;
-  }
-
-  private MoviePlayer _getCorrectMoviePlayer(Video currentItem) {
-    MoviePlayer player = null;
-    Iterator it = _playerFactories.iterator();
-    while (it.hasNext()) {
-      PlayerFactory pf = (PlayerFactory)it.next();
-      if (pf.canPlayVideo(currentItem)) {
-        try {
-          player = pf.createPlayer();
-        } catch (OoyalaException e) {
-          onError(e, "cannot create movieplayer from:" + pf.getClass().getCanonicalName());
-        } finally {
-          return player;
-        }
-      }
-    }
-
-    return new MoviePlayer();
-  }
-
   /**
    * Create and initialize a content player for an item.
    *
    * @return
    */
   private MoviePlayer createAndInitPlayer(Video item) {
-    if (item == null) {
-      DebugMode.assertFail(TAG, "current item is null when initialze player");
-      return null;
-    }
-
-    MoviePlayer p = getCorrectMoviePlayer(item);
-    if (p == null) {
-      DebugMode.assertFail(TAG, "movie player is null when initialze player");
+    MoviePlayer p = null;
+    try {
+      p = _playerSelector.selectMoviePlayer(item);
+    } catch (OoyalaException e) {
+      onError(e, "cannot initialize movie player");
       return null;
     }
 

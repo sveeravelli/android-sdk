@@ -2,7 +2,9 @@ package com.ooyala.android.player;
 
 
 import com.ooyala.android.OoyalaException;
-import com.ooyala.android.item.Video;
+import com.ooyala.android.item.Stream;
+
+import java.util.Set;
 
 /**
  * The interface that must be implemented by a movie player factory.
@@ -13,7 +15,7 @@ import com.ooyala.android.item.Video;
  *
  */
 public interface PlayerFactory {
-  public boolean canPlayVideo(Video video);
+  public boolean canPlayVideo(Set<Stream> streams);
 
   public MoviePlayer createPlayer() throws OoyalaException;
 

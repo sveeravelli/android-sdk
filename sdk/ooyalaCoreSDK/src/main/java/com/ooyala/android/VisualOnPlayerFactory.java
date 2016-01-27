@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.item.Video;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.PlayerFactory;
 import com.ooyala.android.player.VisualOnMoviePlayer;
@@ -17,9 +16,7 @@ public class VisualOnPlayerFactory implements PlayerFactory {
   public VisualOnPlayerFactory() {}
 
   @Override
-  public boolean canPlayVideo(Video video) {
-    Set<Stream> streams = video.getStreams();
-
+  public boolean canPlayVideo(Set<Stream> streams) {
     if (streams == null) {
       return false;
     }
@@ -51,12 +48,19 @@ public class VisualOnPlayerFactory implements PlayerFactory {
 
   @Override
   public MoviePlayer createPlayer() throws OoyalaException {
-    return new VisualOnMoviePlayer();
+    MoviePlayer player = null;
+    try {
+      player = new VisualOnMoviePlayer();
+    } catch (Exception e) {
+      throw new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
+          "Could not initialize visualon Player");
+    }
+
+    return player;
   }
 
   public int priority() {
-    return 98;
+    return 110;
   }
-
 
 }

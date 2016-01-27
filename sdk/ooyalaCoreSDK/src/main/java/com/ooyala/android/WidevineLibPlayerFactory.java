@@ -1,9 +1,9 @@
 package com.ooyala.android;
 
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.item.Video;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.PlayerFactory;
+import com.ooyala.android.player.WidevineLibPlayer;
 
 import java.util.Set;
 
@@ -12,14 +12,10 @@ import java.util.Set;
  * package private
  */
 class WidevineLibPlayerFactory implements PlayerFactory {
-  static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
-
   public WidevineLibPlayerFactory() {}
 
   @Override
-  public boolean canPlayVideo(Video video) {
-    Set<Stream> streams = video.getStreams();
-
+  public boolean canPlayVideo(Set<Stream> streams) {
     if (streams == null) {
       return false;
     }
@@ -34,17 +30,16 @@ class WidevineLibPlayerFactory implements PlayerFactory {
   public MoviePlayer createPlayer() throws OoyalaException {
     MoviePlayer player = null;
     try {
-      player = (MoviePlayer) getClass().getClassLoader()
-          .loadClass(WIDEVINE_LIB_PLAYER).newInstance();
+      player = new WidevineLibPlayer();
     } catch (Exception e) {
       throw new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
           "Could not initialize Widevine Lib Player");
-    } finally {
-      return player;
     }
+
+    return player;
   }
 
   public int priority() {
-    return 99;
+    return 90;
   }
 }

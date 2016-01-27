@@ -1,0 +1,14 @@
+{
+  "video_bitrate": 1200,
+  "height": 720,
+  "delivery_type": "wv_mp4",
+  "framerate": "30.0",
+  "url": {
+    "data": "http://ak.c.ooyala.com/UwN2wxMzpU1Nl_qojlX8iLlKEHfl4HLM/DOcJ-FxaFrRg4gtGEwOjEzYzowODE7Z_",
+    "format": "text"
+  },
+  "video_codec": "h264",
+  "audio_bitrate": 128,
+  "width": 1280,
+  "profile": "baseline"
+}

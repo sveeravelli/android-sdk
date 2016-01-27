@@ -1,7 +1,6 @@
 package com.ooyala.android;
 
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.item.Video;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.PlayerFactory;
 import com.ooyala.android.player.WidevineOsPlayer;
@@ -16,9 +15,7 @@ class WidevineOsPlayerFactory implements PlayerFactory {
   WidevineOsPlayerFactory() {};
 
   @Override
-  public boolean canPlayVideo(Video video) {
-    Set<Stream> streams = video.getStreams();
-
+  public boolean canPlayVideo(Set<Stream> streams) {
     if (streams == null) {
       return false;
     }
@@ -38,9 +35,9 @@ class WidevineOsPlayerFactory implements PlayerFactory {
     } catch (Exception e) {
       throw new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
           "Could not initialize Widevine OS Player");
-    } finally {
-      return player;
     }
+
+    return player;
   }
 
   @Override
