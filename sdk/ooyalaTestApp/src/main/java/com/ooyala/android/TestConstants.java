@@ -43,6 +43,9 @@ public class TestConstants {
   public static final String TEST_DICTIONARY_STREAM_HLS = "test_stream_hls.json";
   public static final String TEST_DICTIONARY_STREAM_MP4 = "test_stream_mp4.json";
   public static final String TEST_DICTIONARY_STREAMS_MP4 = "test_streams_mp4.json";
+  public static final String TEST_DICTIONARY_STREAM_WIDEVINE_MP4 = "test_stream_wv_mp4.json";
+  public static final String TEST_DICTIONARY_STREAM_WIDEVINE_HLS = "test_stream_wv_hls.json";
+  public static final String TEST_DICTIONARY_STREAM_WIDEVINE_WVM = "test_stream_wv_wvm.json";
   public static final String TEST_DICTIONARY_CLOSED_CAPTIONS = "test_closed_captions.json";
   public static final String TEST_XML_CLOSED_CAPTIONS = "test_closed_captions_timeline.xml";
 

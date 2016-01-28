@@ -40,7 +40,6 @@ import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.player.StreamPlayer;
-import com.ooyala.android.player.WidevineOsPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
 import com.ooyala.android.ui.LayoutController;
@@ -130,7 +129,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     PostRollAd,
   }
 
-  static final String WIDEVINE_LIB_PLAYER = "com.ooyala.android.WidevineLibPlayer";
   public static final String LIVE_CLOSED_CAPIONS_LANGUAGE = "Closed Captions";
 
   /**
@@ -212,6 +210,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   private OoyalaManagedAdsPlugin _managedAdsPlugin = null;
   private ImageView _promoImageView = null;
   private EmbedTokenGenerator _embedTokenGenerator = null;
+  private MoviePlayerSelector _playerSelector;
 
   /**
    * Initialize an OoyalaPlayer with the given parameters
@@ -266,6 +265,12 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adManager = new AdPluginManager(this);
     _managedAdsPlugin = new OoyalaManagedAdsPlugin(this);
     _adManager.registerPlugin(_managedAdsPlugin);
+
+    // register player factories;
+    _playerSelector = new MoviePlayerSelector();
+    _playerSelector.registerPlayerFactory(new WidevineLibPlayerFactory());
+    _playerSelector.registerPlayerFactory(new WidevineOsPlayerFactory());
+    _playerSelector.registerPlayerFactory(new VisualOnPlayerFactory());
 
     DebugMode.logI(this.getClass().getName(),
             "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
@@ -464,17 +469,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     cleanupPlayers();
     final String taskKey = "setExternalIds" + System.currentTimeMillis();
     taskStarted(taskKey, _playerAPIClient.contentTreeByExternalIds(externalIds,
-            new ContentTreeCallback() {
-              @Override
-              public void callback(ContentItem item, OoyalaException error) {
-                taskCompleted(taskKey);
-                if (error != null) {
-                  onError(error, "Exception in setExternalIds!");
-                  return;
-                }
-                reinitialize(item, null);
-              }
-            }));
+        new ContentTreeCallback() {
+          @Override
+          public void callback(ContentItem item, OoyalaException error) {
+            taskCompleted(taskKey);
+            if (error != null) {
+              onError(error, "Exception in setExternalIds!");
+              return;
+            }
+            reinitialize(item, null);
+          }
+        }));
     return true;
   }
 
@@ -701,49 +706,17 @@ public class OoyalaPlayer extends Observable implements Observer,
     return true;
   }
 
-  private MoviePlayer getCorrectMoviePlayer(Video currentItem) {
-    final MoviePlayer moviePlayer = _getCorrectMoviePlayer(currentItem);
-    return moviePlayer;
-  }
-
-  private MoviePlayer _getCorrectMoviePlayer(Video currentItem) {
-    Set<Stream> streams = currentItem.getStreams();
-
-    // Get correct type of Movie Player
-    if (Stream.streamSetContainsDeliveryType(streams,
-        Stream.DELIVERY_TYPE_WV_WVM)
-        || Stream.streamSetContainsDeliveryType(streams,
-            Stream.DELIVERY_TYPE_WV_HLS)) {
-      return new WidevineOsPlayer();
-    } else if (Stream.streamSetContainsDeliveryType(streams,
-        Stream.DELIVERY_TYPE_WV_MP4)) {
-      try {
-        return (MoviePlayer) getClass().getClassLoader()
-            .loadClass(WIDEVINE_LIB_PLAYER).newInstance();
-      } catch (Exception e) {
-        OoyalaException error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED,
-                "Could not initialize Widevine Player");
-        onError(error, "Please include the Widevine Library in your project");
-      }
-    }
-
-    return new MoviePlayer();
-  }
-
   /**
    * Create and initialize a content player for an item.
    *
    * @return
    */
   private MoviePlayer createAndInitPlayer(Video item) {
-    if (item == null) {
-      DebugMode.assertFail(TAG, "current item is null when initialze player");
-      return null;
-    }
-
-    MoviePlayer p = getCorrectMoviePlayer(item);
-    if (p == null) {
-      DebugMode.assertFail(TAG, "movie player is null when initialze player");
+    MoviePlayer p = null;
+    try {
+      p = _playerSelector.selectMoviePlayer(item);
+    } catch (OoyalaException e) {
+      onError(e, "cannot initialize movie player");
       return null;
     }
 

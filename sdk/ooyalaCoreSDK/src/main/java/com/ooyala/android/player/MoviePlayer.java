@@ -1,23 +1,22 @@
 package com.ooyala.android.player;
 
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
 import android.view.View;
 
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.util.DebugMode;
+
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 
 public class MoviePlayer extends Player implements Observer {
 
   private static final String TAG = "MoviePlayer";
-  static final String VISUALON_PLAYER = "com.ooyala.android.visualon.VisualOnStreamPlayer";
   protected static final String DRM_TENENT_PATH = "/sas/drm2/%s/%s/%s/%s"; // '/drm2/:pcode/:embed_code/:drm_type/:tenant'
 
   private State _stateToResume = State.INIT;
@@ -28,45 +27,6 @@ public class MoviePlayer extends Player implements Observer {
   protected boolean _seekable = true;
   private boolean _live = false;
 
-  /**
-   * Check which base player would be best suited for this MoviePlayer
-   * @param streams
-   * @return the correct default base player, possibly null.
-   */
-  private StreamPlayer getPlayerForStreams(Set<Stream> streams) {
-    StreamPlayer player = null;
-
-    // If custom HLS Player is enabled, and one of the following:
-    //   1.) Delivery type is HLS
-    //   2.) Delivery type is Remote Asset, and the url contains .m3u8
-    //   3.) Delivery type is Smooth streaming
-    // use VisualOn
-    boolean isHls = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_HLS);
-    boolean isRemoteHls = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET) &&
-        Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains("m3u8");
-    boolean isSmooth = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_SMOOTH);
-    boolean isRemoteSmooth = Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET) &&
-        Stream.getStreamWithDeliveryType(streams, Stream.DELIVERY_TYPE_REMOTE_ASSET).decodedURL().toString().contains(".ism");
-
-    boolean isVisualOnHLSEnabled = OoyalaPlayer.enableCustomHLSPlayer && (isHls || isRemoteHls);
-    boolean isPlayreadyEnabled = OoyalaPlayer.enableCustomPlayreadyPlayer && (isSmooth || isRemoteSmooth || isHls || isRemoteHls);
-
-    if (isVisualOnHLSEnabled || isPlayreadyEnabled) {
-      try {
-        player = (StreamPlayer)getClass().getClassLoader().loadClass(VISUALON_PLAYER).newInstance();
-      } catch(Exception e) {
-        DebugMode.logE(TAG, "Tried to load VisualOn Player but failed");
-        player = new BaseStreamPlayer();
-      }
-    } else {
-      if (isSmooth || isRemoteSmooth) {
-        DebugMode.assertFail(TAG, "A Smooth stream is about to load on the base stream player.  Did you mean to set enableCustomSmoothPlayer?");
-      }
-      player = new BaseStreamPlayer();
-    }
-    return player;
-  }
-
   private void setStreams( Set<Stream> streams ) {
     if( streams == null ) {
       _streams = new HashSet<Stream>();
@@ -76,6 +36,10 @@ public class MoviePlayer extends Player implements Observer {
     }
   }
 
+  protected StreamPlayer createStreamPlayer() {
+    return new BaseStreamPlayer();
+  }
+
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     setStreams( streams );
@@ -83,7 +47,7 @@ public class MoviePlayer extends Player implements Observer {
     _streams = streams;
     _suspended = false;
     if(_basePlayer == null) {
-      _basePlayer = getPlayerForStreams(streams);
+      _basePlayer = createStreamPlayer();
     }
     _basePlayer.addObserver(this);
     _basePlayer.init(parent, streams);
