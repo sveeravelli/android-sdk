@@ -6,6 +6,8 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.widget.FrameLayout;
 
 import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -89,7 +91,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
     setParent(parent);
     streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
 
-
     // initialize exoplayer
     String userAgent = Util.getUserAgent(parent.getLayout().getContext(), "OoyalaSDK");
     rendererBuildingState = RendererBuildingState.Building;
@@ -101,29 +102,32 @@ public class ExoStreamPlayer extends StreamPlayer implements
   }
 
   private void setupSurfaceView() {
-    _view = new MovieView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext());
-    _parent.addVideoView( _view );
-
-    // Try to figure out the video size.  If not, use our default
-    if (stream.getWidth() > 0 && stream.getHeight() > 0) {
-      ((MovieView)_view).setAspectRatio((float)stream.getWidth()/ stream.getHeight());
-    } else {
-      ((MovieView)_view).setAspectRatio((float)16/ 9);
-    }
-
-    holder = _view.getHolder();
+    SurfaceView surfaceView = new SurfaceView(_parent.getLayout().getContext());
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    _parent.getLayout().addView(surfaceView, params);
+    holder = surfaceView.getHolder();
     holder.addCallback(this);
-    holder.setSizeFromLayout();
+
+//    _view = new MovieView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext());
+//    _view.setBackgroundColor(Color.BLACK);
+//    _parent.addVideoView(_view);
+//
+//    holder = _view.getHolder();
+//    holder.addCallback(this);
+//    holder.setFixedSize(200, 200);
 //    holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+  }
+
+  private void setVideoSize(int width, int height) {
+    ((MovieView) _view).setAspectRatio(((float) width) / height);
   }
 
   private void setSurface() {
     if (!surfaceCreated || rendererBuildingState != RendererBuildingState.Built) {
       return;
     }
-
+    DebugMode.logD(TAG, "surface is" + holder.getSurface().toString() + "frame is" + holder.getSurfaceFrame().toString());
     exoplayer.sendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, holder.getSurface());
-    exoplayer.setPlayWhenReady(true);
   }
 
   // surfaceholder callback
@@ -156,7 +160,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   }
 
   public void onRenderersError(Exception e) {
-
+    DebugMode.logE(TAG, "renderer error" + e.getMessage(), e);
   }
 
   public Handler getMainHandler() {
@@ -199,24 +203,26 @@ public class ExoStreamPlayer extends StreamPlayer implements
   // video track listener
   @Override
   public void onDroppedFrames(int count, long elapsed) {
+    DebugMode.logV(TAG, "dropped " + count + " frames " + elapsed + " elapsed");
 
   }
 
   @Override
   public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                           float pixelWidthHeightRatio) {
+    DebugMode.logV(TAG, "video size changed, width " + width + " height " + height + " aspectRatio " + pixelWidthHeightRatio);
 
   }
 
   @Override
   public void onDrawnToSurface(Surface surface) {
-
+    DebugMode.logV(TAG, "onDrawToSurface, surface is" + surface.toString());
   }
 
   // Audio track listener
   @Override
   public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
-
+    DebugMode.logE(TAG, "audio track init error:" + e.getMessage(), e);
   }
 
   @Override
@@ -237,7 +243,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public void onCryptoError(MediaCodec.CryptoException e) {
-
+    DebugMode.logE(TAG, "audio track init error:" + e.getMessage(), e);
   }
 
   @Override
@@ -277,7 +283,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
         setState(OoyalaPlayer.State.LOADING);
         break;
       case ExoPlayer.STATE_READY:
-        setState(OoyalaPlayer.State.READY);
+        setState(playWhenReady ? OoyalaPlayer.State.PLAYING : OoyalaPlayer.State.PAUSED);
         break;
       default:
         break;
@@ -289,8 +295,10 @@ public class ExoStreamPlayer extends StreamPlayer implements
     boolean isPlaying = exoplayer.getPlayWhenReady();
     if (isPlaying) {
       setState(OoyalaPlayer.State.PLAYING);
+      startPlayheadTimer();
     } else {
       setState(OoyalaPlayer.State.PAUSED);
+      stopPlayheadTimer();
     }
   }
 
@@ -300,7 +308,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
     setState(OoyalaPlayer.State.ERROR);
   }
 
-
+  // player interface
   @Override
   public void play() {
     exoplayer.setPlayWhenReady(true);
@@ -311,5 +319,50 @@ public class ExoStreamPlayer extends StreamPlayer implements
     exoplayer.setPlayWhenReady(false);
   }
 
+  @Override
+  public void seekToTime(int timeMillis) {
+    long seekPosition = exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+        : Math.min(Math.max(0, timeMillis), duration());
+    exoplayer.seekTo(seekPosition);
+  }
 
+  @Override
+  public int duration() {
+    return exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+        : (int) exoplayer.getDuration();
+  }
+
+  @Override
+  public int currentTime() {
+    int currentTime =  exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+        : (int) exoplayer.getCurrentPosition();
+    return currentTime;
+  }
+
+  @Override
+  public void stop() {
+    pause();
+    seekToTime(0);
+  }
+
+  @Override
+  public void destroy() {
+    exoplayer.release();
+    exoplayer = null;
+  }
+
+  @Override
+  public int buffer() {
+    return exoplayer.getBufferedPercentage();
+  }
+
+  @Override
+  public boolean seekable() {
+    return exoplayer != null;
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return exoplayer != null && exoplayer.getPlayWhenReady();
+  }
 }

@@ -271,6 +271,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _playerSelector.registerPlayerFactory(new WidevineLibPlayerFactory());
     _playerSelector.registerPlayerFactory(new WidevineOsPlayerFactory());
     _playerSelector.registerPlayerFactory(new VisualOnPlayerFactory());
+    _playerSelector.registerPlayerFactory(new ExoPlayerFactory());
 
     DebugMode.logI(this.getClass().getName(),
             "Ooyala SDK Version: " + OoyalaPlayer.getVersion());
