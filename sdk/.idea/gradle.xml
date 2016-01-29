@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/ooyalaNielsenSDK" />
             <option value="$PROJECT_DIR$/ooyalaTestApp" />
             <option value="$PROJECT_DIR$/../vendor/CastCompanionLibrary" />
+            <option value="$PROJECT_DIR$/../vendor/ExoPlayer/library" />
           </set>
         </option>
       </GradleProjectSettings>

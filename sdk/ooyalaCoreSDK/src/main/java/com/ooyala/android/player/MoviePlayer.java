@@ -7,6 +7,7 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.player.exoplayer.ExoStreamPlayer;
 import com.ooyala.android.util.DebugMode;
 
 import java.util.HashSet;
@@ -37,7 +38,8 @@ public class MoviePlayer extends Player implements Observer {
   }
 
   protected StreamPlayer createStreamPlayer() {
-    return new BaseStreamPlayer();
+//    return new BaseStreamPlayer();
+    return new ExoStreamPlayer();
   }
 
   @Override

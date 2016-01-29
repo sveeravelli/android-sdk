@@ -2,11 +2,10 @@ package com.ooyala.android.player;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.SurfaceView;
 
 import com.ooyala.android.util.DebugMode;
 
-class MovieView extends ControlSharingSurfaceView {
+public class MovieView extends ControlSharingSurfaceView {
   private float _aspectRatio = -1;
 
   public MovieView(boolean preventVideoViewSharing, Context context) {
