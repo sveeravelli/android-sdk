@@ -6,7 +6,6 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import com.google.android.exoplayer.CodecCounters;
@@ -102,20 +101,16 @@ public class ExoStreamPlayer extends StreamPlayer implements
   }
 
   private void setupSurfaceView() {
-    SurfaceView surfaceView = new SurfaceView(_parent.getLayout().getContext());
+    _view = new MovieView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext());
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-    _parent.getLayout().addView(surfaceView, params);
-    holder = surfaceView.getHolder();
+    _parent.addVideoView(_view);
+    if (stream.getWidth() > 0 && stream.getHeight() > 0) {
+      setVideoSize(stream.getWidth(), stream.getHeight());
+    } else {
+      setVideoSize(16,9);
+    }
+    holder = _view.getHolder();
     holder.addCallback(this);
-
-//    _view = new MovieView(_parent.getOptions().getPreventVideoViewSharing(), _parent.getLayout().getContext());
-//    _view.setBackgroundColor(Color.BLACK);
-//    _parent.addVideoView(_view);
-//
-//    holder = _view.getHolder();
-//    holder.addCallback(this);
-//    holder.setFixedSize(200, 200);
-//    holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
   }
 
   private void setVideoSize(int width, int height) {
