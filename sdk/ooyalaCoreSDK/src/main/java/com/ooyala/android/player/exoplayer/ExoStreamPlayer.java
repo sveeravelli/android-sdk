@@ -44,6 +44,8 @@ public class ExoStreamPlayer extends StreamPlayer implements
   private String streamUrl;
   private Handler mainHander;
   private SurfaceHolder holder;
+  private int timeBeforeSuspend;
+  private OoyalaPlayer.State stateBeforeSuspend;
 
   private enum RendererBuildingState {
     Idle,
@@ -53,7 +55,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   private RendererBuildingState rendererBuildingState;
   private boolean surfaceCreated;
-
 
   private RendererBuilder rendererBuilder;
   private TrackRenderer videoRenderer;
@@ -73,6 +74,8 @@ public class ExoStreamPlayer extends StreamPlayer implements
     mainHander = new Handler();
     stream =  Stream.bestStream(streams, isWifiEnabled);
     surfaceCreated = false;
+    timeBeforeSuspend = -1;
+    stateBeforeSuspend = OoyalaPlayer.State.INIT;
 
     if (stream == null) {
       DebugMode.logE(TAG, "ERROR: Invalid Stream (no valid stream available)");
@@ -95,9 +98,11 @@ public class ExoStreamPlayer extends StreamPlayer implements
     rendererBuildingState = RendererBuildingState.Building;
     rendererBuilder = new HlsRendererBuilder(parent.getLayout().getContext(), userAgent, streamUrl);
     exoplayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
-    exoplayer.addListener(this);
-    setupSurfaceView();
-    rendererBuilder.buildRenderers(this);
+    if (exoplayer != null) {
+      exoplayer.addListener(this);
+      setupSurfaceView();
+      rendererBuilder.buildRenderers(this);
+    }
   }
 
   private void setupSurfaceView() {
@@ -113,16 +118,29 @@ public class ExoStreamPlayer extends StreamPlayer implements
     holder.addCallback(this);
   }
 
+  private void removeSurfaceView() {
+    _parent.removeVideoView();
+    if (holder != null) {
+      holder.removeCallback(this);
+    }
+    _view = null;
+    holder = null;
+    surfaceCreated = false;
+  }
+
   private void setVideoSize(int width, int height) {
     ((MovieView) _view).setAspectRatio(((float) width) / height);
   }
 
+  // this is called when both surface and renderers are ready
   private void setSurface() {
     if (!surfaceCreated || rendererBuildingState != RendererBuildingState.Built) {
       return;
     }
     DebugMode.logD(TAG, "surface is" + holder.getSurface().toString() + "frame is" + holder.getSurfaceFrame().toString());
-    exoplayer.sendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, holder.getSurface());
+    if (exoplayer != null) {
+      exoplayer.sendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, holder.getSurface());
+    }
   }
 
   // surfaceholder callback
@@ -137,20 +155,24 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   public void surfaceDestroyed(SurfaceHolder holder) {
     surfaceCreated = false;
-    exoplayer.blockingSendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
+    if (exoplayer != null) {
+      exoplayer.blockingSendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
+    }
   }
 
   // renderer builder interface
   @Override
   public void onRenderers(TrackRenderer[] renderers, BandwidthMeter bandwidthMeter) {
-    this.videoRenderer = renderers[TYPE_VIDEO];
-    this.codecCounters = videoRenderer instanceof MediaCodecTrackRenderer
+    videoRenderer = renderers[TYPE_VIDEO];
+    codecCounters = (videoRenderer instanceof MediaCodecTrackRenderer)
         ? ((MediaCodecTrackRenderer) videoRenderer).codecCounters
         : renderers[TYPE_AUDIO] instanceof MediaCodecTrackRenderer
         ? ((MediaCodecTrackRenderer) renderers[TYPE_AUDIO]).codecCounters : null;
     this.bandwidthMeter = bandwidthMeter;
-    exoplayer.prepare(renderers);
-    rendererBuildingState = RendererBuildingState.Built;
+    if (exoplayer != null) {
+      exoplayer.prepare(renderers);
+      rendererBuildingState = RendererBuildingState.Built;
+    }
     setSurface();
   }
 
@@ -287,6 +309,9 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public void onPlayWhenReadyCommitted() {
+    if (exoplayer == null) {
+      return;
+    }
     boolean isPlaying = exoplayer.getPlayWhenReady();
     if (isPlaying) {
       setState(OoyalaPlayer.State.PLAYING);
@@ -306,16 +331,23 @@ public class ExoStreamPlayer extends StreamPlayer implements
   // player interface
   @Override
   public void play() {
-    exoplayer.setPlayWhenReady(true);
+    if (exoplayer != null) {
+      exoplayer.setPlayWhenReady(true);
+    }
   }
 
   @Override
   public void pause() {
-    exoplayer.setPlayWhenReady(false);
+    if (exoplayer != null) {
+      exoplayer.setPlayWhenReady(false);
+    }
   }
 
   @Override
   public void seekToTime(int timeMillis) {
+    if (exoplayer == null) {
+      return;
+    }
     long seekPosition = exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
         : Math.min(Math.max(0, timeMillis), duration());
     exoplayer.seekTo(seekPosition);
@@ -323,15 +355,14 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public int duration() {
-    return exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+    return (exoplayer == null || exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME) ? 0
         : (int) exoplayer.getDuration();
   }
 
   @Override
   public int currentTime() {
-    int currentTime =  exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
+    return  (exoplayer == null || exoplayer.getDuration() == ExoPlayer.UNKNOWN_TIME ) ? 0
         : (int) exoplayer.getCurrentPosition();
-    return currentTime;
   }
 
   @Override
@@ -342,13 +373,20 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public void destroy() {
-    exoplayer.release();
-    exoplayer = null;
+
+    if (exoplayer != null) {
+      exoplayer.setPlayWhenReady(false);
+      exoplayer.removeListener(this);
+      exoplayer.release();
+      exoplayer = null;
+    }
+    rendererBuildingState = RendererBuildingState.Idle;
+    removeSurfaceView();
   }
 
   @Override
   public int buffer() {
-    return exoplayer.getBufferedPercentage();
+    return exoplayer == null ? 0 : exoplayer.getBufferedPercentage();
   }
 
   @Override
@@ -359,5 +397,56 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public boolean isPlaying() {
     return exoplayer != null && exoplayer.getPlayWhenReady();
+  }
+
+  @Override
+  public void suspend() {
+    int millisToResume = -1;
+    if (exoplayer != null) {
+      millisToResume = (int)exoplayer.getCurrentPosition();
+    }
+    suspend(millisToResume, getState());
+  }
+
+  private void suspend(int millisToResume, OoyalaPlayer.State stateToResume) {
+    DebugMode.logD(TAG, "suspend with time " + millisToResume + "state" + stateToResume.toString());
+    if (getState() == OoyalaPlayer.State.SUSPENDED) {
+      DebugMode.logD(TAG, "Suspending an already suspended player");
+      return;
+    }
+    if (exoplayer == null) {
+      DebugMode.logD(TAG, "Suspending with a null player");
+      return;
+    }
+
+    if (millisToResume >= 0) {
+      timeBeforeSuspend = millisToResume;
+    }
+    stateBeforeSuspend = stateToResume;
+    destroy();
+    setState(OoyalaPlayer.State.SUSPENDED);
+  }
+
+  @Override
+  public void resume() {
+    resume(timeBeforeSuspend, stateBeforeSuspend);
+  }
+
+  @Override
+  public void resume(int millisToResume, OoyalaPlayer.State stateToResume) {
+    DebugMode.logD(TAG, "Resuming. time to resume: " + millisToResume + ", state to resume: " + stateToResume);
+    if (exoplayer == null) {
+      DebugMode.logE(TAG, "exoplayer is null, cannot resume");
+      return;
+    }
+    setupSurfaceView();
+    if (millisToResume  >= 0) {
+      exoplayer.seekTo(millisToResume);
+    }
+    if (stateToResume == OoyalaPlayer.State.PLAYING) {
+      exoplayer.setPlayWhenReady(true);
+    } else {
+      setState(stateToResume);
+    }
   }
 }
