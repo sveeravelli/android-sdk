@@ -293,6 +293,10 @@ public class ExoStreamPlayer extends StreamPlayer implements
         break;
       case ExoPlayer.STATE_ENDED:
         setState(OoyalaPlayer.State.COMPLETED);
+        if (exoplayer != null) {
+          exoplayer.setPlayWhenReady(false);
+          exoplayer.seekTo(0);
+        }
         break;
       case ExoPlayer.STATE_IDLE:
         break;
