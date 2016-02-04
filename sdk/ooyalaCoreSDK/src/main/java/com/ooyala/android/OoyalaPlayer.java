@@ -313,6 +313,9 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @return the current OoyalaPlayerLayout
    */
   public FrameLayout getLayout() {
+    if(_layoutController == null) {
+      return null;
+    }
     return _layoutController.getLayout();
   }
 
