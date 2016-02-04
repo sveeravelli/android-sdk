@@ -4,6 +4,7 @@ package com.ooyala.android.imasdk;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
@@ -69,14 +70,23 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private boolean _browserOpened = false;
   private boolean _allAdsCompleted = false;
   private Thread timeoutThread;
+
+  private ViewGroup layout;
+
   /**
    * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
    * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
    * Module Metadata.
    * @param ooyalaPlayer current OoyalaPlayer
    */
-  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
+  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer, ViewGroup layout) {
+    this.layout = layout;
     _player = ooyalaPlayer;
+
+    if(this.layout == null) {
+      this.layout = ooyalaPlayer.getLayout();
+    }
+
     _adPlayer = new IMAAdPlayer();
     _adPlayer.setIMAManager(this);
     _companionAdSlots = new ArrayList<CompanionAdSlot>();
@@ -87,7 +97,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
     //Initialize IMA classes
     _sdkFactory = ImaSdkFactory.getInstance();
-    _adsLoader = _sdkFactory.createAdsLoader(_player.getLayout().getContext(), _sdkFactory.createImaSdkSettings());
+    _adsLoader = _sdkFactory.createAdsLoader(layout.getContext(), _sdkFactory.createImaSdkSettings());
 
     //Create the listeners for the adsLoader and adsManager
     _adsLoader.addAdErrorListener(new AdErrorListener() {
@@ -127,54 +137,58 @@ public class OoyalaIMAManager implements AdPluginInterface {
           public void onAdEvent(AdEvent event) {
             DebugMode.logD(TAG,"IMA AdsManager Event: " + event.getType());
             switch (event.getType()) {
-            case LOADED:
-              DebugMode.logD(TAG,"IMA Ad Manager: Ads Loaded");
-              break;
-            case CONTENT_PAUSE_REQUESTED:
-              int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
-              _ooyalaPlayerWrapper.pauseContent();
-              Set<Integer> newCuePoints = new HashSet<Integer>();
-              if (_cuePoints != null && _cuePoints.size() > 1) {
-                for (Integer cuePoint : _cuePoints) {
-                  if (cuePoint != 0 && cuePoint >= currentContentPlayheadTime) {
-                    newCuePoints.add(cuePoint);
+              case LOADED:
+                DebugMode.logD(TAG,"IMA Ad Manager: Ads Loaded");
+                break;
+              case CONTENT_PAUSE_REQUESTED:
+                int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
+                _ooyalaPlayerWrapper.pauseContent();
+                Set<Integer> newCuePoints = new HashSet<Integer>();
+                if (_cuePoints != null && _cuePoints.size() > 1) {
+                  for (Integer cuePoint : _cuePoints) {
+                    if (cuePoint != 0 && cuePoint >= currentContentPlayheadTime) {
+                      newCuePoints.add(cuePoint);
+                    }
                   }
                 }
-              }
-              _cuePoints = newCuePoints;
-              break;
-            case CONTENT_RESUME_REQUESTED:
-              _ooyalaPlayerWrapper.playContent();
-              break;
-            case STARTED:
-              break;
-            case ALL_ADS_COMPLETED:
-              _allAdsCompleted = true;
-              break;
-            case COMPLETED:
-              break;
-            case PAUSED:
-              break;
-            case SKIPPED:
-              skipAd();
-              break;
-            case RESUMED:
-              if (_browserOpened) {
-                _adPlayer.play();
-                _browserOpened = false;
-              }
-              break;
-            case CLICKED:
-              _adPlayer.pause();
-              _browserOpened = true;
-              break;
-            default:
-              break;
+                _cuePoints = newCuePoints;
+                break;
+              case CONTENT_RESUME_REQUESTED:
+                _ooyalaPlayerWrapper.playContent();
+                break;
+              case STARTED:
+                break;
+              case ALL_ADS_COMPLETED:
+                _allAdsCompleted = true;
+                break;
+              case COMPLETED:
+                break;
+              case PAUSED:
+                break;
+              case SKIPPED:
+                skipAd();
+                break;
+              case RESUMED:
+                if (_browserOpened) {
+                  _adPlayer.play();
+                  _browserOpened = false;
+                }
+                break;
+              case CLICKED:
+                _adPlayer.pause();
+                _browserOpened = true;
+                break;
+              default:
+                break;
             }
           }
         });
       }
     });
+  }
+
+  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
+    this(ooyalaPlayer, null);
   }
 
   /**
@@ -223,7 +237,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
     }
     _container = _sdkFactory.createAdDisplayContainer();
     _container.setPlayer(_ooyalaPlayerWrapper);
-    _container.setAdContainer(_player.getLayout());
+    _container.setAdContainer(layout);
     DebugMode.logD(TAG, "IMA Managaer: Requesting ads: " + url);
     AdsRequest request = _sdkFactory.createAdsRequest();
     request.setAdTagUrl(url);
