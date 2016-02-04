@@ -71,10 +71,15 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private boolean _allAdsCompleted = false;
   private Thread timeoutThread;
 
-  private FrameLayout layout;
+  private ViewGroup layout;
 
-
-  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer, FrameLayout layout) {
+  /**
+   * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
+   * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
+   * Module Metadata.
+   * @param ooyalaPlayer current OoyalaPlayer
+   */
+  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer, ViewGroup layout) {
     this.layout = layout;
     _player = ooyalaPlayer;
 
@@ -182,12 +187,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
     });
   }
 
-  /**
-   * Initialize the Ooyala IMA Manager, which will play back all IMA ads affiliated with any playing Ooyala
-   * asset. This will automatically be configured, as long as the VAST URL is properly configured in Third
-   * Module Metadata.
-   * @param ooyalaPlayer current OoyalaPlayer
-   */
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
     this(ooyalaPlayer, null);
   }
