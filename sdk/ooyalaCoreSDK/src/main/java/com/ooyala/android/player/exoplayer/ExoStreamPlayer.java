@@ -36,7 +36,7 @@ import java.util.Set;
  */
 public class ExoStreamPlayer extends StreamPlayer implements
     RendererBuilderListener, SurfaceHolder.Callback, ExoPlayer.Listener {
-  private static final String TAG = BaseStreamPlayer.class.getName();
+  private static final String TAG = ExoStreamPlayer.class.getSimpleName();
   private ExoPlayer exoplayer;
   private Stream stream;
   private String streamUrl;
