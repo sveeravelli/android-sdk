@@ -20,7 +20,7 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:+'
     compile 'com.google.android.gms:play-services:8.3.0'
-    compile project(':library')
+    compile project(':exoPlayerLibrary')
     compile files('libs/DxDrmDlc.jar')
     compile files('libs/WidevineDRM-5.0.0.12197.jar')
     compile files('libs/assets.jar')

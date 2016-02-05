@@ -6,5 +6,5 @@ include ':ooyalaNielsenSDK'
 include ':CastCompanionLibrary'
 
 project(':CastCompanionLibrary').projectDir = new File(settingsDir, '../vendor/CastCompanionLibrary')
-include ':library'
-project(':library').projectDir = new File(settingsDir, '../vendor/ExoPlayer/library')
+include ':exoPlayerLibrary'
+project(':exoPlayerLibrary').projectDir = new File(settingsDir, '../vendor/ExoPlayer/library')
