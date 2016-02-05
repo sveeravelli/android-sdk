@@ -17,22 +17,26 @@ package com.ooyala.android.player.exoplayer;
  */
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
 
 import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
+import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecUtil;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.chunk.VideoFormatSelectorUtil;
+import com.google.android.exoplayer.hls.DefaultHlsTrackSelector;
 import com.google.android.exoplayer.hls.HlsChunkSource;
 import com.google.android.exoplayer.hls.HlsMasterPlaylist;
 import com.google.android.exoplayer.hls.HlsPlaylist;
 import com.google.android.exoplayer.hls.HlsPlaylistParser;
 import com.google.android.exoplayer.hls.HlsSampleSource;
+import com.google.android.exoplayer.hls.PtsTimestampAdjusterProvider;
 import com.google.android.exoplayer.metadata.Id3Parser;
 import com.google.android.exoplayer.metadata.MetadataTrackRenderer;
 import com.google.android.exoplayer.text.eia608.Eia608TrackRenderer;
@@ -126,6 +130,7 @@ public class HlsRendererBuilder implements RendererBuilder {
       Handler mainHandler = player.getMainHandler();
       LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
       DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+      PtsTimestampAdjusterProvider timestampAdjusterProvider = new PtsTimestampAdjusterProvider();
 
       int[] variantIndices = null;
       if (manifest instanceof HlsMasterPlaylist) {
@@ -144,18 +149,23 @@ public class HlsRendererBuilder implements RendererBuilder {
       }
 
       DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-      HlsChunkSource chunkSource = new HlsChunkSource(dataSource, url, manifest, bandwidthMeter,
-          variantIndices, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
+      HlsChunkSource chunkSource =
+          new HlsChunkSource(true, dataSource, url, manifest,
+              DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
+              timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
       HlsSampleSource sampleSource =
           new HlsSampleSource(
               chunkSource, loadControl, BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler,
               player, ExoStreamPlayer.TYPE_VIDEO);
       MediaCodecVideoTrackRenderer videoRenderer =
           new MediaCodecVideoTrackRenderer(
-              context, sampleSource, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, mainHandler,
-              player, 50);
-      MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
-          null, true, player.getMainHandler(), player, AudioCapabilities.getCapabilities(context));
+              context,
+              sampleSource, MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
+              5000, mainHandler, player, 50);
+      MediaCodecAudioTrackRenderer audioRenderer =
+          new MediaCodecAudioTrackRenderer(sampleSource,
+              MediaCodecSelector.DEFAULT, null, true, player.getMainHandler(), player,
+              AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
       MetadataTrackRenderer<Map<String, Object>> id3Renderer = new MetadataTrackRenderer<>(
           sampleSource, new Id3Parser(), player, mainHandler.getLooper());
       Eia608TrackRenderer closedCaptionRenderer = new Eia608TrackRenderer(sampleSource, player,
