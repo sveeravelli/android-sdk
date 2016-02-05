@@ -1,10 +1,5 @@
 package com.ooyala.android.player;
 
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.View;
@@ -17,6 +12,11 @@ import com.ooyala.android.FCCTVRating;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 import com.ooyala.android.ui.FCCTVRatingView;
+
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 
 public class FCCTVRatingUI implements Observer {
 
@@ -42,7 +42,6 @@ public class FCCTVRatingUI implements Observer {
     if( this._videoView.getId() == View.NO_ID ) {
       this._videoView.setId( getUnusedId( this._parentLayout ) );
     }
-    this._videoView.setBackgroundColor( android.graphics.Color.BLACK );
     RelativeLayout.LayoutParams paramsForMovieView = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT );
     paramsForMovieView.addRule( RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE );
     this._relativeLayout.addView( this._videoView, paramsForMovieView );
