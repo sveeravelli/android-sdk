@@ -52,4 +52,9 @@ public interface ReadonlyOptionsInterface {
    * True is prevent video view sharing, false is allow.
    */
   boolean getPreventVideoViewSharing();
+
+  /**
+   * True if use exoplayer, false otherwise.
+   */
+  boolean getUseExoPlayer();
 }

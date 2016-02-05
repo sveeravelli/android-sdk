@@ -11,7 +11,11 @@ import java.util.Set;
  * Created by zchen on 1/29/16.
  */
 public class ExoPlayerFactory implements PlayerFactory {
-  public ExoPlayerFactory() {}
+  private int priority;
+
+  public ExoPlayerFactory(int priority) {
+    this.priority = priority;
+  }
 
   @Override
   public boolean canPlayVideo(Set<Stream> streams) {
@@ -31,6 +35,6 @@ public class ExoPlayerFactory implements PlayerFactory {
   }
 
   public int priority() {
-    return 120;
+    return priority;
   }
 }

@@ -68,6 +68,11 @@ public class Options implements ReadonlyOptionsInterface {
     private boolean preventVideoViewSharing;
 
     /**
+     * True to use exoplayer
+     */
+    private boolean useExoPlayer;
+
+    /**
      * Defaults to the following values:
      * tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
      * visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
@@ -91,6 +96,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.connectionTimeoutInMillisecond = 0;
       this.readTimeoutInMillisecond = 0;
       this.preventVideoViewSharing = false;
+      this.useExoPlayer = false;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -153,6 +159,11 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    public Builder setUseExoPlayer(boolean useExoPlayer) {
+      this.useExoPlayer = useExoPlayer;
+      return this;
+    }
+
     public Options build() {
       return new Options(
           tvRatingConfiguration,
@@ -164,7 +175,8 @@ public class Options implements ReadonlyOptionsInterface {
           showLiveControls,
           connectionTimeoutInMillisecond,
           readTimeoutInMillisecond,
-          preventVideoViewSharing);
+          preventVideoViewSharing,
+          useExoPlayer);
     }
   }
 
@@ -178,6 +190,7 @@ public class Options implements ReadonlyOptionsInterface {
   private final int readTimeoutInMillisecond;
   private final boolean showLiveControls;
   private final boolean preventVideoViewSharing;
+  private final boolean useExoPlayer;
 
   /**
    * Initialize an Options object with given parameters:
@@ -202,7 +215,8 @@ public class Options implements ReadonlyOptionsInterface {
                   boolean showLiveControls,
                   int connectionTimeoutInMillisecond,
                   int readTimeoutInMillisecond,
-                  boolean preventVideoViewSharing) {
+                  boolean preventVideoViewSharing,
+                  boolean useExoPlayer) {
 
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
@@ -214,6 +228,7 @@ public class Options implements ReadonlyOptionsInterface {
     this.connectionTimeoutInMillisecond = connectionTimeoutInMillisecond;
     this.readTimeoutInMillisecond = readTimeoutInMillisecond;
     this.preventVideoViewSharing = preventVideoViewSharing;
+    this.useExoPlayer = useExoPlayer;
   }
 
   @Override
@@ -264,5 +279,10 @@ public class Options implements ReadonlyOptionsInterface {
   @Override
   public boolean getPreventVideoViewSharing() {
     return preventVideoViewSharing;
+  }
+
+  @Override
+  public boolean getUseExoPlayer() {
+    return useExoPlayer;
   }
 }
