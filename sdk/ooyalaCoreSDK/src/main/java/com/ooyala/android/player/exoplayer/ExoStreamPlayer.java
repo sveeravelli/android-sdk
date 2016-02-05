@@ -8,10 +8,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.widget.FrameLayout;
 
-import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
@@ -42,7 +40,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   private ExoPlayer exoplayer;
   private Stream stream;
   private String streamUrl;
-  private Handler mainHander;
+  private Handler mainHandler;
   private SurfaceHolder holder;
   private int timeBeforeSuspend;
   private OoyalaPlayer.State stateBeforeSuspend;
@@ -58,8 +56,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   private RendererBuilder rendererBuilder;
   private TrackRenderer videoRenderer;
-  private CodecCounters codecCounters;
-  private BandwidthMeter bandwidthMeter;
 
   public static final int RENDERER_COUNT = 4;
   public static final int TYPE_VIDEO = 0;
@@ -71,7 +67,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     WifiManager wifiManager = (WifiManager)parent.getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
     boolean isWifiEnabled = wifiManager.isWifiEnabled();
-    mainHander = new Handler();
+    mainHandler = new Handler();
     stream =  Stream.bestStream(streams, isWifiEnabled);
     surfaceCreated = false;
     timeBeforeSuspend = -1;
@@ -164,11 +160,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public void onRenderers(TrackRenderer[] renderers, BandwidthMeter bandwidthMeter) {
     videoRenderer = renderers[TYPE_VIDEO];
-    codecCounters = (videoRenderer instanceof MediaCodecTrackRenderer)
-        ? ((MediaCodecTrackRenderer) videoRenderer).codecCounters
-        : renderers[TYPE_AUDIO] instanceof MediaCodecTrackRenderer
-        ? ((MediaCodecTrackRenderer) renderers[TYPE_AUDIO]).codecCounters : null;
-    this.bandwidthMeter = bandwidthMeter;
     if (exoplayer != null) {
       exoplayer.prepare(renderers);
       rendererBuildingState = RendererBuildingState.Built;
@@ -178,42 +169,52 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   public void onRenderersError(Exception e) {
     DebugMode.logE(TAG, "renderer error" + e.getMessage(), e);
+    this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "renderer error");
+    setState(OoyalaPlayer.State.ERROR);
+    rendererBuildingState = RendererBuildingState.Idle;
   }
 
   public Handler getMainHandler() {
-    return mainHander;
+    return mainHandler;
   }
 
   // SampleSourceEvent Listeners
   @Override
   public void onLoadStarted(int sourceId, long length, int type, int trigger, Format format,
                      long mediaStartTimeMs, long mediaEndTimeMs) {
-
+    DebugMode.logD(TAG, "load started sourceId " + sourceId + " length " + length + " type " + type + " trigger " + trigger + " mediaStartTime " + mediaStartTimeMs + " mediaEndTime " + mediaEndTimeMs);
+    setChanged();
+    notifyObservers(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION);
   }
 
   @Override
   public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format,
                        long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
+    DebugMode.logD(TAG, "load started sourceId " + sourceId + " bytesloaded " + bytesLoaded + " type " + type + " trigger " + trigger + " mediaStartTime " + mediaStartTimeMs + " mediaEndTime " + mediaEndTimeMs + " duration " + loadDurationMs);
+
+    setChanged();
+    notifyObservers(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION);
 
   }
 
   @Override
   public void onLoadCanceled(int sourceId, long bytesLoaded) {
-
+    DebugMode.logD(TAG, "load canceled sourceId " + sourceId + " bytesloaded " + bytesLoaded);
   }
 
   @Override
   public void onLoadError(int sourceId, IOException e) {
-
+    DebugMode.logE(TAG, "load error sourceId " + sourceId + " error " + e.getMessage(), e);
   }
 
   @Override
   public void onUpstreamDiscarded(int sourceId, long mediaStartTimeMs, long mediaEndTimeMs) {
-
+    DebugMode.logD(TAG, "upstreamDiscarded sourceId " + sourceId + " mediaStartTime " + mediaStartTimeMs + "mediaEndTime" + mediaEndTimeMs);
   }
 
   @Override
   public void onDownstreamFormatChanged(int sourceId, Format format, int trigger, long mediaTimeMs) {
+    DebugMode.logD(TAG, "upstreamDiscarded sourceId " + sourceId + " trigger" + trigger + " mediaTime " + mediaTimeMs);
 
   }
 
@@ -221,7 +222,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public void onDroppedFrames(int count, long elapsed) {
     DebugMode.logV(TAG, "dropped " + count + " frames " + elapsed + " elapsed");
-
   }
 
   @Override
@@ -244,18 +244,18 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public void onAudioTrackWriteError(AudioTrack.WriteException e) {
-
+    DebugMode.logE(TAG, "audio track write error:" + e.getMessage(), e);
   }
 
   @Override
   public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
-
+    DebugMode.logD(TAG, "audio track underrun buffersize" + bufferSize + "elapsedSinceLastFeeds" + elapsedSinceLastFeedMs);
   }
 
   // codec track listener
   @Override
   public void onDecoderInitializationError(DecoderInitializationException e) {
-
+    DebugMode.logE(TAG, "onDecoderInitializationError:" + e.getMessage(), e);
   }
 
   @Override
@@ -266,10 +266,8 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs,
                             long initializationDurationMs) {
-
+    DebugMode.logD(TAG, "onDecoderInitialized");
   }
-
-
 
   // MetadataRenderer interface
   @Override
@@ -377,7 +375,10 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   @Override
   public void destroy() {
-
+    stopPlayheadTimer();
+    if (rendererBuildingState == RendererBuildingState.Building) {
+      rendererBuilder.cancel();
+    }
     if (exoplayer != null) {
       exoplayer.setPlayWhenReady(false);
       exoplayer.removeListener(this);
