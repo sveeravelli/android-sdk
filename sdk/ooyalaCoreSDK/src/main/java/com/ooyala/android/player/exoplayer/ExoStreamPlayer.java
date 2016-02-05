@@ -15,13 +15,16 @@ import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
+import com.google.android.exoplayer.metadata.GeobMetadata;
+import com.google.android.exoplayer.metadata.PrivMetadata;
+import com.google.android.exoplayer.metadata.TxxxMetadata;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.android.exoplayer.util.Util;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.player.BaseStreamPlayer;
 import com.ooyala.android.player.MovieView;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
@@ -272,7 +275,21 @@ public class ExoStreamPlayer extends StreamPlayer implements
   // MetadataRenderer interface
   @Override
   public void onMetadata(Map<String, Object> metadata) {
-    // handle ID3 metadata here.
+    for (String key : metadata.keySet()) {
+      Object value = metadata.get(key);
+      if (value instanceof PrivMetadata) {
+        PrivMetadata priv = (PrivMetadata)value;
+        ID3TagNotifier.s_getInstance().onPrivateMetadata(priv.owner, priv.privateData);
+      } else if (value instanceof TxxxMetadata) {
+        TxxxMetadata txxx = (TxxxMetadata)value;
+        ID3TagNotifier.s_getInstance().onTxxxMetadata(txxx.description, txxx.value);
+      } else if (value instanceof GeobMetadata) {
+        GeobMetadata geob = (GeobMetadata)value;
+        ID3TagNotifier.s_getInstance().onGeobMetadata(geob.mimeType, geob.filename, geob.description, geob.data);
+      } else {
+        ID3TagNotifier.s_getInstance().onTag((byte[])value);
+      }
+    }
   }
 
   // TextRenderer interface
