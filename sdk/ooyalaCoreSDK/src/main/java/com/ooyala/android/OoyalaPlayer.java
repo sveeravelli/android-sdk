@@ -1391,7 +1391,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void sendNotification(String obj) {
+  private void sendNotification(Object obj) {
     setChanged();
     notifyObservers(obj);
   }
@@ -1576,6 +1576,15 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (isShowingAd()) {
       sendNotification(AD_SKIPPED_NOTIFICATION);
       _adManager.skipAd();
+    }
+  }
+  /**
+   * Skip the currently playing ad. Do nothing if no ad is playing
+   */
+  public void clickAd() {
+    if (isShowingAd()) {
+      sendNotification(AD_SKIPPED_NOTIFICATION);
+//      _adManager.c();
     }
   }
 
@@ -2047,6 +2056,10 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   void notifyPluginEvent(StateNotifier notifier, String event) {
     sendNotification(event);
+  }
+
+  void notifyPluginEvent(StateNotifier notifier, OoyalaNotification notification) {
+    sendNotification(notification);
   }
 
   void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
