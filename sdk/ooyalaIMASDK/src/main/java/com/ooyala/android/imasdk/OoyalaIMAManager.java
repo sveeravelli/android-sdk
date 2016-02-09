@@ -4,7 +4,6 @@ package com.ooyala.android.imasdk;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
@@ -502,5 +501,10 @@ public class OoyalaIMAManager implements AdPluginInterface {
   private void timeout() {
     DebugMode.logD(TAG, "Requesting ads timeout");
     _player.exitAdMode(_adPlayer.getIMAManager());
+  }
+
+  @Override
+  public void processClickThrough() {
+    // do nothing. the click through UI and event is handled by google IMA.
   }
 }

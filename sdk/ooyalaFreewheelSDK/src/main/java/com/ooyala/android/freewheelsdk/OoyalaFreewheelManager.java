@@ -583,4 +583,11 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
       break;
     }
   }
+
+  @Override
+  public void processClickThrough() {
+    if (_adPlayer != null) {
+      _adPlayer.processClickThrough();
+    }
+  }
 }

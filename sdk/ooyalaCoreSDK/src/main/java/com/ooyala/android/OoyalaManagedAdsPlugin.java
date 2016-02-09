@@ -224,4 +224,11 @@ public class OoyalaManagedAdsPlugin extends
   public PlayerInterface getPlayerInterface() {
     return _adPlayer;
   }
+
+  @Override
+  public void processClickThrough() {
+    if (_adPlayer != null) {
+      _adPlayer.processClickThrough();
+    }
+  }
 }
