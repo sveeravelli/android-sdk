@@ -37,7 +37,7 @@ class PingTask extends AsyncTask<URL, Void, Void> {
 
 public abstract class AdMoviePlayer extends MoviePlayer implements
     AdsLearnMoreInterface {
-  private StateNotifier _notifier;
+  protected StateNotifier _notifier;
 
   public void init(OoyalaPlayer parent, AdSpot ad, StateNotifier notifier) {
     _notifier = notifier;

@@ -58,6 +58,13 @@ public class StateNotifier {
     }
   }
 
+  public void notifyAdStartWithAdInfo(AdPodInfo info) {
+    if (_player.get() != null) {
+      _player.get().notifyPluginEvent(this,
+              new OoyalaNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION, info) );
+    }
+  }
+
   public void addListener(StateNotifierListener l) {
     _listeners.add(l);
   }

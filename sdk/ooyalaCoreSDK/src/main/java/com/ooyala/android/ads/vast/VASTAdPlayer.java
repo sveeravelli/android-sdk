@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.AdPodInfo;
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
@@ -229,6 +230,12 @@ public class VASTAdPlayer extends AdMoviePlayer {
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
 
+        String title = _ad.getAds().get(_adIndex).getTitle();
+        String description = _ad.getAds().get(_adIndex).getDescription();
+        String url = currentLinearAd().getClickThroughURL();
+        int adsCount = _ad.getAds().size();
+        int unplayedCount = adsCount - _adIndex;
+        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount,true,true));
         if(isCurrentAdIFirstLinearForAdIndex(_adIndex, _ad.getAds())){
           sendImpressionTrackingEvent(_adIndex, _ad.getAds());
         }

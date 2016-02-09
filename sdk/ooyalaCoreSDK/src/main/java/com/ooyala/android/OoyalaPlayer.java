@@ -112,6 +112,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
   public static final String AD_STARTED_NOTIFICATION = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
+  public static final String AD_POD_COMPLETED_NOTIFICATION = "adPodCompleted";  //TODO: Used in Skin, needs to be used in SDK
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
@@ -1397,7 +1398,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
-  private void sendNotification(String obj) {
+  private void sendNotification(Object obj) {
     setChanged();
     notifyObservers(obj);
   }
@@ -1582,6 +1583,14 @@ public class OoyalaPlayer extends Observable implements Observer,
     if (isShowingAd()) {
       sendNotification(AD_SKIPPED_NOTIFICATION);
       _adManager.skipAd();
+    }
+  }
+  /**
+   * Skip the currently playing ad. Do nothing if no ad is playing
+   */
+  public void clickAd() {
+    if (isShowingAd()) {
+      //need to be implemented
     }
   }
 
@@ -2062,6 +2071,10 @@ public class OoyalaPlayer extends Observable implements Observer,
 
   void notifyPluginEvent(StateNotifier notifier, String event) {
     sendNotification(event);
+  }
+
+  void notifyPluginEvent(StateNotifier notifier, OoyalaNotification notification) {
+    sendNotification(notification);
   }
 
   void notifyPluginStateChange(StateNotifier notifier, State oldState, State newState) {
