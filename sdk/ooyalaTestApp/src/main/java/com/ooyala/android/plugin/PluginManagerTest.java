@@ -71,6 +71,11 @@ class TestAdsPlugin extends ManagedAdsPlugin<TestAdSpot> {
   }
 
   @Override
+  public void processClickThrough() {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
   protected boolean playAd(TestAdSpot ad) {
     _playedAd = ad;
     return true;
