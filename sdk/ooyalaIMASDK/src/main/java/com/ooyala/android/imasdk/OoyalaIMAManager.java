@@ -505,6 +505,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   @Override
   public void processClickThrough() {
-    // do nothing.
+    // do nothing. the click through UI and event is handled by google IMA.
   }
 }

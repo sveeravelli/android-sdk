@@ -1588,7 +1588,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   /**
    * process the click through event from UI.
    */
-  public void clickThrough() {
+  public void onAdclickThrough() {
     if (isShowingAd() && _adManager.getActivePlugin() != null) {
       _adManager.getActivePlugin().processClickThrough();
     }
