@@ -224,9 +224,12 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-          sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
-          sendTrackingEvent(TrackingEvent.START);
-          _startSent = true;
+
+
+        sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
+        sendTrackingEvent(TrackingEvent.START);
+        _startSent = true;
+
         String title=_ad.getAds().get(_adIndex).getTitle();
         String description=_ad.getAds().get(_adIndex).getDescription();
         String url=currentLinearAd().getClickThroughURL();
