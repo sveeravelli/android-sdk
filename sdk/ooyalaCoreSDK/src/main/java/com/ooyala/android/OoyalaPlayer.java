@@ -112,6 +112,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
   public static final String AD_STARTED_NOTIFICATION = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
+  public static final String AD_POD_COMPLETED_NOTIFICATION = "adPodCompleted";  //TODO: Used in Skin, needs to be used in SDK
   public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
   public static final String AD_ERROR_NOTIFICATION = "adError";
   public static final String METADATA_READY_NOTIFICATION = "metadataReady";
@@ -1583,8 +1584,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void clickAd() {
     if (isShowingAd()) {
-      sendNotification(AD_SKIPPED_NOTIFICATION);
-//      _adManager.c();
+      //need to be implemented
     }
   }
 

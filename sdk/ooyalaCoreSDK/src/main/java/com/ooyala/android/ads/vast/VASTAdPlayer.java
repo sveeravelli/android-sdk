@@ -224,18 +224,15 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-          String title=_ad.getAds().get(_adIndex).getTitle();
-          String description=_ad.getAds().get(_adIndex).getDescription();
-          String url=currentLinearAd().getClickThroughURL();
-          int adsCount=_ad.getAds().size();
-          int unplayedCount=adsCount - _adIndex;
-//          DebugMode.logE(TAG, "check title and other "+title+" desc "+description+" url "+url);
-//          DebugMode.logE(TAG,"ads count "+adsCount+" unplayed "+unplayedCount);
-          _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount,true,true));
           sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
           sendTrackingEvent(TrackingEvent.START);
           _startSent = true;
-
+        String title=_ad.getAds().get(_adIndex).getTitle();
+        String description=_ad.getAds().get(_adIndex).getDescription();
+        String url=currentLinearAd().getClickThroughURL();
+        int adsCount=_ad.getAds().size();
+        int unplayedCount=adsCount - _adIndex;
+        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount,true,true));
         if(isCurrentAdIFirstLinearForAdIndex(_adIndex, _ad.getAds())){
           sendImpressionTrackingEvent(_adIndex, _ad.getAds());
         }
