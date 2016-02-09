@@ -1,5 +1,6 @@
 package com.ooyala.android.plugin;
 
+import com.ooyala.android.AdsLearnMoreInterface;
 import com.ooyala.android.player.PlayerInterface;
 
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.Set;
  * 
  * 
  */
-public interface AdPluginInterface extends LifeCycleInterface {
+public interface AdPluginInterface extends LifeCycleInterface, AdsLearnMoreInterface {
   /**
    * This is called when content changed
    * 
