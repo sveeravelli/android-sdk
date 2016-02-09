@@ -7,19 +7,22 @@ import java.net.URL;
  */
 public class AdPodInfo {
 
-    private String title,description,clickUrl;
-    private int adsCount, unplayedCount;
-    private boolean adbar, controls;
-
+    private String title;
+    private String description;
+    private String clickUrl;
+    private int adsCount;
+    private int unplayedCount;
+    private boolean adbar;
+    private boolean controls;
 
     public AdPodInfo(String title,String description, String clickUrl, int adsCount, int unplayedCount, boolean adbar, boolean controls ) {
-        this.title=title;
-        this.description=description;
-        this.clickUrl=clickUrl;
-        this.adsCount=adsCount;
-        this.unplayedCount=unplayedCount;
-        this.adbar=adbar;
-        this.controls=controls;
+        this.title = title;
+        this.description = description;
+        this.clickUrl = clickUrl;
+        this.adsCount = adsCount;
+        this.unplayedCount = unplayedCount;
+        this.adbar = adbar;
+        this.controls = controls;
 
     }
     public boolean isAdbar() {

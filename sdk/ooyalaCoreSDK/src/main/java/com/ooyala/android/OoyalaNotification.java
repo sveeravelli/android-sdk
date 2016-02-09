@@ -8,12 +8,9 @@ public class OoyalaNotification {
     private String notificationName;
     private Object data;
 
-
     public OoyalaNotification(String notificationName, Object data) {
-        this.notificationName=notificationName;
-        this.data=data;
-
-
+        this.notificationName = notificationName;
+        this.data = data;
     }
     public String getNotificationName() {
         return notificationName;
@@ -21,5 +18,4 @@ public class OoyalaNotification {
     public Object getData() {
         return data;
     }
-
 }
