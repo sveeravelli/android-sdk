@@ -95,6 +95,7 @@ public class ClosedCaptionsView extends TextView {
     }
 
 		if (isLive) {
+			// live cc might be in roll-up mode, needs to be handled separately.
 			setText(text);
 		} else {
 			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);

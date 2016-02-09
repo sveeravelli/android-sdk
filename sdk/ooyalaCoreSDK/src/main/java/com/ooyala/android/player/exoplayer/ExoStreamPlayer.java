@@ -287,8 +287,10 @@ public class ExoStreamPlayer extends StreamPlayer implements
       } else if (value instanceof GeobMetadata) {
         GeobMetadata geob = (GeobMetadata)value;
         ID3TagNotifier.s_getInstance().onGeobMetadata(geob.mimeType, geob.filename, geob.description, geob.data);
-      } else {
+      } else if (value instanceof byte[]){
         ID3TagNotifier.s_getInstance().onTag((byte[])value);
+      } else {
+        DebugMode.logE(TAG, "unknown id3 types" + value.toString());
       }
     }
   }
