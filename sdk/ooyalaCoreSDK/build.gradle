@@ -17,10 +17,14 @@ android {
     }
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.5'
     compile 'com.android.support:support-v4:+'
     compile 'com.google.android.gms:play-services:8.3.0'
-    compile project(':exoPlayerLibrary')
     compile files('libs/DxDrmDlc.jar')
     compile files('libs/WidevineDRM-5.0.0.12197.jar')
     compile files('libs/assets.jar')

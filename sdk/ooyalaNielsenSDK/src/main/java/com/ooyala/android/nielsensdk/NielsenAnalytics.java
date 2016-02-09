@@ -126,15 +126,32 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
    * Handle the original tag and send Nielsen ID3 tag data
    * @param tag
    */
-  public void onTag( byte[] tag ) {
-    if( onTag_shouldReportTag() && tag != null ) {
-      final String tagStr = new String(tag);
-      DebugMode.logV( TAG, "onTag(): tagStr=" + tagStr );
-      if( tagStr.contains("www.nielsen.com") ) {
-        final String nielsenStr = tagStr.replaceFirst( ".*www.nielsen.com", "www.nielsen.com" );
-        DebugMode.logV( TAG, "onTag(): nielsenStr=" + nielsenStr );
-        nielsenApp.sendID3( nielsenStr );
-      }
+  public void onTag(final byte[] tag ) {
+    if (onTag_shouldReportTag() && tag != null ) {
+      final String tagString = new String(tag);
+      sendTag(tagString);
+    }
+  }
+
+  public void onPrivateMetadata(final String owner, final byte[] privateMetadata) {
+    if (onTag_shouldReportTag() && owner != null) {
+      sendTag(owner);
+    }
+  }
+
+  public void onTxxxMetadata(final String description, final String value) {
+    // do nothing.
+  }
+
+  public void onGeobMetadata(final String mimeType, final String filename, final String description, final byte[] data) {
+    // do nothing
+  }
+
+  private void sendTag(final String tagString) {
+    if( tagString.contains("www.nielsen.com") ) {
+      final String nielsenString = tagString.replaceFirst( ".*www.nielsen.com", "www.nielsen.com" );
+      DebugMode.logV( TAG, "onTag(): nielsenStr=" + nielsenString );
+      nielsenApp.sendID3( nielsenString );
     }
   }
 

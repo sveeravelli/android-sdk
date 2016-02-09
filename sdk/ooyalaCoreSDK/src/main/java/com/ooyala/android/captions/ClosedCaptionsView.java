@@ -94,9 +94,14 @@ public class ClosedCaptionsView extends TextView {
       this.setTextColor(Color.TRANSPARENT);
     }
 
-    this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-    String splitText = getSplitTextAndUpdateFrame(text);
-    setText(splitText);
+		if (isLive) {
+			// live cc might be in roll-up mode, needs to be handled separately.
+			setText(text);
+		} else {
+			this.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+			String splitText = getSplitTextAndUpdateFrame(text);
+			setText(splitText);
+		}
   }
 
 	// Useful for when captions are coming live, not from pre-defined file

@@ -21,7 +21,13 @@ public class ID3TagNotifier {
      * When you implement this, consider posting a runnable on the main UI thread
      * to do the actual work.
      */
-    void onTag( byte[] tag );
+    void onTag(final byte[] tag );
+
+    void onPrivateMetadata(final String owner, final byte[] privateMetadata);
+
+    void onTxxxMetadata(final String description, final String value);
+
+    void onGeobMetadata(final String mimeType, final String filename, final String description, final byte[] data);
   }
 
   private final Set<WeakReferencePassThroughEquals<ID3TagNotifierListener>> listeners;
@@ -38,16 +44,49 @@ public class ID3TagNotifier {
 
   public void removeWeakListener( ID3TagNotifierListener listener ) {
     synchronized( listeners ) {
-      listeners.remove( new WeakReferencePassThroughEquals<ID3TagNotifierListener>(listener) );
+      listeners.remove(new WeakReferencePassThroughEquals<ID3TagNotifierListener>(listener));
     }
   }
 
-  public void onTag( byte[] tag ) {
+  public void onTag(final byte[] tag ) {
     synchronized( listeners ) {
       for( WeakReferencePassThroughEquals<ID3TagNotifierListener> wl : listeners ) {
         final ID3TagNotifierListener l = wl.get();
         if( l != null ) {
           l.onTag( tag );
+        }
+      }
+    }
+  }
+
+  public void onPrivateMetadata(final String owner, final byte[] privateMetadata) {
+    synchronized( listeners ) {
+      for( WeakReferencePassThroughEquals<ID3TagNotifierListener> wl : listeners ) {
+        final ID3TagNotifierListener l = wl.get();
+        if( l != null ) {
+          l.onPrivateMetadata(owner, privateMetadata);
+        }
+      }
+    }
+  }
+
+  public void onTxxxMetadata(final String description, final String value) {
+    synchronized( listeners ) {
+      for( WeakReferencePassThroughEquals<ID3TagNotifierListener> wl : listeners ) {
+        final ID3TagNotifierListener l = wl.get();
+        if( l != null ) {
+          l.onTxxxMetadata(description, value);
+        }
+      }
+    }
+  }
+
+  public void onGeobMetadata(final String mimeType, final String filename, final String description, final byte[] data) {
+    synchronized( listeners ) {
+      for( WeakReferencePassThroughEquals<ID3TagNotifierListener> wl : listeners ) {
+        final ID3TagNotifierListener l = wl.get();
+        if( l != null ) {
+          l.onGeobMetadata(mimeType, filename, description, data);
         }
       }
     }

@@ -121,7 +121,11 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
   public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
   public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION = "liveCCAvailabilityChanged";
+  public static final String LIVE_CC_CHANGED_NOTIFICATION = "liveCCChanged";
   public static final String EMBED_CODE_SET_NOTIFICATION = "embedCodeSet";
+
+  public static final String NOTIFICATION_NAME = "name";
+  public static final String CLOSED_CAPTION_TEXT = "caption";
 
   public enum ContentOrAdType {
     MainContent,
@@ -1266,9 +1270,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    String notification = arg1.toString();
     if (arg0 instanceof PlayerInterface) {
-      processContentNotifications((PlayerInterface) arg0, notification);
+      processContentNotifications((PlayerInterface) arg0, arg1);
     }
   }
 
@@ -1277,12 +1280,20 @@ public class OoyalaPlayer extends Observable implements Observer,
    *
    * @param player
    *          the notification sender
-   * @param notification
+   * @param object
    *          the notification
    */
-  private void processContentNotifications(PlayerInterface player, String notification) {
+  private void processContentNotifications(PlayerInterface player, Object object) {
     if (currentPlayer() != player) {
-      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
+      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + object);
+    }
+
+    String notification;
+    if (object instanceof String) {
+      notification = (String)object;
+    } else {
+      Map<String, String> map = (Map<String, String>)object;
+      notification = map.get("name");
     }
 
     if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
@@ -1296,56 +1307,40 @@ public class OoyalaPlayer extends Observable implements Observer,
       State state = player.getState();
       DebugMode.logD(TAG, "content player state change to " + state);
       switch (state) {
-      case COMPLETED:
-        DebugMode.logE(TAG, "content finished! should check for post-roll");
-        processAdModes(AdMode.ContentFinished, 0);
-        break;
+        case COMPLETED:
+          DebugMode.logE(TAG, "content finished! should check for post-roll");
+          processAdModes(AdMode.ContentFinished, 0);
+          break;
 
-      case ERROR:
-        onError(player.getError(), "Error recieved from content.  Cleaning up everything");
-        int errorCode = _error == null ? 0 : _error.getCode().ordinal();
-        processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
-        break;
-      case PLAYING:
-        if (_currentItemInitPlayState != InitPlayState.ContentPlayed) {
-          _currentItemInitPlayState = InitPlayState.ContentPlayed;
-          sendNotification(PLAY_STARTED_NOTIFICATION);
-        }
-        hidePromoImage();
-        setState(State.PLAYING);
-        break;
-      case READY:
-        if (_queuedSeekTime > 0) {
-          seek(_queuedSeekTime);
-        }
-        setState(State.READY);
-        dequeuePlay();
-        break;
-      case INIT:
-      case LOADING:
-      case PAUSED:
-      default:
-        setState(player.getState());
-        break;
+        case ERROR:
+          onError(player.getError(), "Error recieved from content.  Cleaning up everything");
+          int errorCode = _error == null ? 0 : _error.getCode().ordinal();
+          processAdModes(AdMode.ContentError, _error == null ? 0 : errorCode);
+          break;
+        case PLAYING:
+          if (_currentItemInitPlayState != InitPlayState.ContentPlayed) {
+            _currentItemInitPlayState = InitPlayState.ContentPlayed;
+            sendNotification(PLAY_STARTED_NOTIFICATION);
+          }
+          hidePromoImage();
+          setState(State.PLAYING);
+          break;
+        case READY:
+          if (_queuedSeekTime > 0) {
+            seek(_queuedSeekTime);
+          }
+          setState(State.READY);
+          dequeuePlay();
+          break;
+        case INIT:
+        case LOADING:
+        case PAUSED:
+        default:
+          setState(player.getState());
+          break;
       }
-    }
-    else if (notification.equals(SEEK_COMPLETED_NOTIFICATION)) {
-      sendNotification(SEEK_COMPLETED_NOTIFICATION);
-    }
-    else if (notification.equals(BUFFERING_COMPLETED_NOTIFICATION)) {
-      sendNotification(BUFFERING_COMPLETED_NOTIFICATION);
-    }
-    else if (notification.equals(BUFFERING_STARTED_NOTIFICATION)) {
-      sendNotification(BUFFERING_STARTED_NOTIFICATION);
-    }
-    else if (notification.equals(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION)) {
-      sendNotification(DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
-    }
-    else if (notification.equals(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION)) {
-      sendNotification(DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
-    }
-    else if( notification.equals( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION ) ) {
-      sendNotification( LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
+    } else {
+      sendNotification(object);
     }
   }
 

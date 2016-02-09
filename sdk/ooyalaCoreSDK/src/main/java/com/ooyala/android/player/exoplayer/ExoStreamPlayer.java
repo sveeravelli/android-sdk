@@ -15,18 +15,22 @@ import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
+import com.google.android.exoplayer.metadata.GeobMetadata;
+import com.google.android.exoplayer.metadata.PrivMetadata;
+import com.google.android.exoplayer.metadata.TxxxMetadata;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.android.exoplayer.util.Util;
+import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.player.BaseStreamPlayer;
 import com.ooyala.android.player.MovieView;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -272,13 +276,37 @@ public class ExoStreamPlayer extends StreamPlayer implements
   // MetadataRenderer interface
   @Override
   public void onMetadata(Map<String, Object> metadata) {
-    // handle ID3 metadata here.
+    for (String key : metadata.keySet()) {
+      Object value = metadata.get(key);
+      if (value instanceof PrivMetadata) {
+        PrivMetadata priv = (PrivMetadata)value;
+        ID3TagNotifier.s_getInstance().onPrivateMetadata(priv.owner, priv.privateData);
+      } else if (value instanceof TxxxMetadata) {
+        TxxxMetadata txxx = (TxxxMetadata)value;
+        ID3TagNotifier.s_getInstance().onTxxxMetadata(txxx.description, txxx.value);
+      } else if (value instanceof GeobMetadata) {
+        GeobMetadata geob = (GeobMetadata)value;
+        ID3TagNotifier.s_getInstance().onGeobMetadata(geob.mimeType, geob.filename, geob.description, geob.data);
+      } else if (value instanceof byte[]){
+        ID3TagNotifier.s_getInstance().onTag((byte[])value);
+      } else {
+        DebugMode.logE(TAG, "unknown id3 types" + value.toString());
+      }
+    }
   }
 
   // TextRenderer interface
   @Override
   public void onCues(List<Cue> cues) {
-    // handle CC here
+    for (Cue c : cues) {
+      if (c.text != null) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(OoyalaPlayer.NOTIFICATION_NAME, OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION);
+        map.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        setChanged();
+        notifyObservers(map);
+      }
+    }
   }
 
   // Exoplayer listener
@@ -452,6 +480,24 @@ public class ExoStreamPlayer extends StreamPlayer implements
       exoplayer.setPlayWhenReady(true);
     } else {
       setState(stateToResume);
+    }
+  }
+
+  @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    if (exoplayer == null) {
+      return false;
+    }
+    int trackCount = exoplayer.getTrackCount(TYPE_TEXT);
+    return trackCount > 0;
+  }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+    int selectedTrack =
+        OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals(language) ? ExoPlayer.TRACK_DEFAULT : ExoPlayer.TRACK_DISABLED;
+    if (exoplayer != null) {
+      exoplayer.setSelectedTrack(TYPE_TEXT, selectedTrack);
     }
   }
 }
