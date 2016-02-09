@@ -30,6 +30,7 @@ import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -295,7 +296,15 @@ public class ExoStreamPlayer extends StreamPlayer implements
   // TextRenderer interface
   @Override
   public void onCues(List<Cue> cues) {
-    // handle CC here
+    for (Cue c : cues) {
+      if (c.text != null) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(OoyalaPlayer.NOTIFICATION_NAME, OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION);
+        map.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        setChanged();
+        notifyObservers(map);
+      }
+    }
   }
 
   // Exoplayer listener
@@ -469,6 +478,24 @@ public class ExoStreamPlayer extends StreamPlayer implements
       exoplayer.setPlayWhenReady(true);
     } else {
       setState(stateToResume);
+    }
+  }
+
+  @Override
+  public boolean isLiveClosedCaptionsAvailable() {
+    if (exoplayer == null) {
+      return false;
+    }
+    int trackCount = exoplayer.getTrackCount(TYPE_TEXT);
+    return trackCount > 0;
+  }
+
+  @Override
+  public void setClosedCaptionsLanguage(String language) {
+    int selectedTrack =
+        OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE.equals(language) ? ExoPlayer.TRACK_DEFAULT : ExoPlayer.TRACK_DISABLED;
+    if (exoplayer != null) {
+      exoplayer.setSelectedTrack(TYPE_TEXT, selectedTrack);
     }
   }
 }

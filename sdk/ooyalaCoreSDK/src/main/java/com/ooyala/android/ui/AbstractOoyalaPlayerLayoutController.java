@@ -33,6 +33,7 @@ import com.ooyala.android.util.DebugMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -543,10 +544,11 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       return;
 
     Video currentItem = _player.getCurrentItem();
+    String ccLanguage = _player.getClosedCaptionsLanguage();
 
     // PB-3090: we currently only support captions for the main content, not
     // also the advertisements.
-    if (_player.getClosedCaptionsLanguage() != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
+    if (ccLanguage != null && currentItem.hasClosedCaptions() && !_player.isShowingAd()) {
       double currT = _player.getPlayheadTime() / 1000d;
       if (_closedCaptionsView.getCaption() == null
           || currT > _closedCaptionsView.getCaption().getEnd()
@@ -561,6 +563,10 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
     } else {
+      if (ccLanguage != null && ccLanguage.equals(OoyalaPlayer.LIVE_CLOSED_CAPIONS_LANGUAGE)) {
+        return;
+      }
+      // In what scenario we need to call this?
       _closedCaptionsView.setCaption(null);
     }
   }
@@ -636,20 +642,30 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
-      refreshClosedCaptionsView();
+
+    String notificationName;
+    Map<String, String> map = null;
+    if (arg1 instanceof String) {
+      notificationName = (String)arg1;
+    } else {
+      map = (Map<String, String>)arg1;
+      notificationName = map.get(OoyalaPlayer.NOTIFICATION_NAME);
     }
 
-    if (arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+    if (notificationName.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+      refreshClosedCaptionsView();
+    } else if (notificationName.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION)) {
       removeClosedCaptionsView();
-    }
-    
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+    } else if (notificationName.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION)) {
       displayCurrentClosedCaption();
-    }
-
-    if (arg1 == OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED) {
+    } else if (notificationName.equals(OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED)) {
       refreshClosedCaptionsView();
+    } else if (notificationName.equals(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION)) {
+      String caption = map.get(OoyalaPlayer.CLOSED_CAPTION_TEXT);
+      if (_closedCaptionsView == null) {
+        addClosedCaptionsView();
+      }
+      _closedCaptionsView.setCaptionText(caption);
     }
   }
 
