@@ -24,6 +24,7 @@ import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.android.exoplayer.util.Util;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.MovieView;
@@ -302,11 +303,11 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public void onCues(List<Cue> cues) {
     for (Cue c : cues) {
       if (c.text != null) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(OoyalaPlayer.NOTIFICATION_NAME, OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION);
-        map.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        OoyalaNotification notification = new OoyalaNotification(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION, data);
         setChanged();
-        notifyObservers(map);
+        notifyObservers(notification);
       }
     }
   }
