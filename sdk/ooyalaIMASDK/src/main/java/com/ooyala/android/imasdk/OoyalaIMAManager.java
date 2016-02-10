@@ -78,8 +78,8 @@ public class OoyalaIMAManager implements AdPluginInterface {
    * Module Metadata.
    * @param ooyalaPlayer current OoyalaPlayer
    */
-  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer, ViewGroup layout) {
-    this.layout = layout;
+  public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer, ViewGroup l) {
+    this.layout = l;
     _player = ooyalaPlayer;
 
     if(this.layout == null) {
@@ -96,7 +96,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
     //Initialize IMA classes
     _sdkFactory = ImaSdkFactory.getInstance();
-    _adsLoader = _sdkFactory.createAdsLoader(layout.getContext(), _sdkFactory.createImaSdkSettings());
+    _adsLoader = _sdkFactory.createAdsLoader(this.layout.getContext(), _sdkFactory.createImaSdkSettings());
 
     //Create the listeners for the adsLoader and adsManager
     _adsLoader.addAdErrorListener(new AdErrorListener() {
