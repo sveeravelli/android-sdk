@@ -1,5 +1,6 @@
 package com.ooyala.android.player.exoplayer;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaCodec;
 import android.net.wifi.WifiManager;
@@ -263,6 +264,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   }
 
   @Override
+  @TargetApi(16)
   public void onCryptoError(MediaCodec.CryptoException e) {
     DebugMode.logE(TAG, "audio track init error:" + e.getMessage(), e);
   }
