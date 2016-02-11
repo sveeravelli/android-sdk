@@ -51,7 +51,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
   private static final String TAG = ExoStreamPlayer.class.getSimpleName();
   private ExoPlayer exoplayer;
   private Stream stream;
-  private String streamUrl;
   private Handler mainHandler;
   private SurfaceHolder holder;
   private int timeBeforeSuspend;
@@ -86,7 +85,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
     WifiManager wifiManager = (WifiManager)parent.getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
     boolean isWifiEnabled = wifiManager.isWifiEnabled();
 
-    stream =  Stream.bestStream(streams, isWifiEnabled);
+    stream = Stream.bestStream(streams, isWifiEnabled);
     surfaceCreated = false;
     timeBeforeSuspend = -1;
     stateBeforeSuspend = OoyalaPlayer.State.INIT;
@@ -105,19 +104,45 @@ public class ExoStreamPlayer extends StreamPlayer implements
     }
     setState(OoyalaPlayer.State.LOADING);
     setParent(parent);
-    streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
 
-    // initialize exoplayer
-    String userAgent = Util.getUserAgent(parent.getLayout().getContext(), "OoyalaSDK");
-    rendererBuildingState = RendererBuildingState.Building;
-    rendererBuilder = new HlsRendererBuilder(parent.getLayout().getContext(), userAgent, streamUrl, this);
-    exoplayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
 
-    if (exoplayer != null) {
-      exoplayer.addListener(this);
-      setupSurfaceView();
-      rendererBuilder.buildRenderers();
+    // initialize renderer builder
+    rendererBuilder = createRendererBuilder(parent.getLayout().getContext());
+    if (rendererBuilder == null) {
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to create renderer builder");
+      setState(OoyalaPlayer.State.ERROR);
+      return;
     }
+
+    // Initialize exoplayer, create surface and start downloading stream manifest
+    exoplayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
+    if (exoplayer == null) {
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to instanciate exoplayer");
+      setState(OoyalaPlayer.State.ERROR);
+      return;
+    }
+    exoplayer.addListener(this);
+    setupSurfaceView();
+    rendererBuildingState = RendererBuildingState.Building;
+    rendererBuilder.buildRenderers();
+  }
+
+  private RendererBuilderInterface createRendererBuilder(Context context) {
+    if (stream == null) {
+      return null;
+    }
+    String userAgent = Util.getUserAgent(context, "OoyalaSDK");
+    String streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
+    switch (stream.getDeliveryType()) {
+      case Stream.DELIVERY_TYPE_DASH:
+        return new DashRendererBuilder(context, userAgent, streamUrl, this);
+      case Stream.DELIVERY_TYPE_HLS:
+        return new HlsRendererBuilder(context, userAgent, streamUrl, this);
+      default:
+        DebugMode.logE(TAG, "failed to create renderer builder for delivery type: " + stream.getDeliveryType());
+        break;
+    }
+    return null;
   }
 
   private void setupSurfaceView() {

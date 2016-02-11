@@ -6,6 +6,7 @@ import android.media.MediaCodec;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.android.exoplayer.DummyTrackRenderer;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
@@ -127,48 +128,47 @@ public class DashRendererBuilder extends RendererBuilderBase<MediaPresentationDe
     // Build the video renderer.
     int bufferSegmentSize = player.getBufferSegmentSize();
     DataSource videoDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-    ChunkSource videoChunkSource =
-        new DashChunkSource(manifestFetcher,
+    ChunkSource videoChunkSource = new DashChunkSource(manifestFetcher,
             DefaultDashTrackSelector.newVideoInstance(context, true, filterHdContent),
             videoDataSource, new FormatEvaluator.AdaptiveEvaluator(bandwidthMeter),
             LIVE_EDGE_LATENCY_MS,
             elapsedRealtimeOffset, mainHandler, player, ExoStreamPlayer.TYPE_VIDEO);
-        ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl,
-            VIDEO_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player,
-            ExoStreamPlayer.TYPE_VIDEO);
+    ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl,
+        VIDEO_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player, ExoStreamPlayer.TYPE_VIDEO);
         TrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context, videoSampleSource,
             MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
             drmSessionManager, true, mainHandler, player, 50);
 
         // Build the audio renderer.
-        DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-        ChunkSource audioChunkSource = new DashChunkSource(manifestFetcher,
-            DefaultDashTrackSelector.newAudioInstance(), audioDataSource, null, LIVE_EDGE_LATENCY_MS,
-            elapsedRealtimeOffset, mainHandler, player, ExoStreamPlayer.TYPE_AUDIO);
-        ChunkSampleSource audioSampleSource = new ChunkSampleSource(audioChunkSource, loadControl,
-            AUDIO_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player,
-            ExoStreamPlayer.TYPE_AUDIO);
-        TrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(audioSampleSource,
-            MediaCodecSelector.DEFAULT, drmSessionManager, true, mainHandler, player,
-            AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
+    DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+    ChunkSource audioChunkSource = new DashChunkSource(manifestFetcher,
+        DefaultDashTrackSelector.newAudioInstance(), audioDataSource, null, LIVE_EDGE_LATENCY_MS,
+        elapsedRealtimeOffset, mainHandler, player, ExoStreamPlayer.TYPE_AUDIO);
+    ChunkSampleSource audioSampleSource = new ChunkSampleSource(audioChunkSource, loadControl,
+        AUDIO_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player,
+        ExoStreamPlayer.TYPE_AUDIO);
+    TrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(audioSampleSource,
+        MediaCodecSelector.DEFAULT, drmSessionManager, true, mainHandler, player,
+        AudioCapabilities.getCapabilities(context), AudioManager.STREAM_MUSIC);
 
-        // Build the text renderer.
-        DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-        ChunkSource textChunkSource = new DashChunkSource(manifestFetcher,
-            DefaultDashTrackSelector.newTextInstance(), textDataSource, null, LIVE_EDGE_LATENCY_MS,
-            elapsedRealtimeOffset, mainHandler, player, ExoStreamPlayer.TYPE_TEXT);
-        ChunkSampleSource textSampleSource = new ChunkSampleSource(textChunkSource, loadControl,
-            TEXT_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player,
-            ExoStreamPlayer.TYPE_TEXT);
-        TrackRenderer textRenderer = new TextTrackRenderer(textSampleSource, player,
-            mainHandler.getLooper());
+    // Build the text renderer.
+    DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+    ChunkSource textChunkSource = new DashChunkSource(manifestFetcher,
+        DefaultDashTrackSelector.newTextInstance(), textDataSource, null, LIVE_EDGE_LATENCY_MS,
+        elapsedRealtimeOffset, mainHandler, player, ExoStreamPlayer.TYPE_TEXT);
+    ChunkSampleSource textSampleSource = new ChunkSampleSource(textChunkSource, loadControl,
+        TEXT_BUFFER_SEGMENTS * bufferSegmentSize, mainHandler, player,
+        ExoStreamPlayer.TYPE_TEXT);
+    TrackRenderer textRenderer = new TextTrackRenderer(textSampleSource, player,
+        mainHandler.getLooper());
 
-        // Invoke the callback.
-        TrackRenderer[] renderers = new TrackRenderer[ExoStreamPlayer.RENDERER_COUNT];
-        renderers[ExoStreamPlayer.TYPE_VIDEO] = videoRenderer;
-        renderers[ExoStreamPlayer.TYPE_AUDIO] = audioRenderer;
-        renderers[ExoStreamPlayer.TYPE_TEXT] = textRenderer;
-        player.onRenderers(renderers, bandwidthMeter);
+    // Invoke the callback.
+    TrackRenderer[] renderers = new TrackRenderer[ExoStreamPlayer.RENDERER_COUNT];
+    renderers[ExoStreamPlayer.TYPE_VIDEO] = videoRenderer;
+    renderers[ExoStreamPlayer.TYPE_AUDIO] = audioRenderer;
+    renderers[ExoStreamPlayer.TYPE_TEXT] = textRenderer;
+    renderers[ExoStreamPlayer.TYPE_METADATA] = new DummyTrackRenderer();
+    player.onRenderers(renderers, bandwidthMeter);
   }
 
   private boolean contentProtected() {

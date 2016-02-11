@@ -23,7 +23,8 @@ public class ExoPlayerFactory implements PlayerFactory {
       return false;
     }
 
-    if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_HLS)) {
+    if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_HLS) ||
+        Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_DASH)) {
       return true;
     }
     return false;
