@@ -61,7 +61,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   private FCCTVRatingUI _tvRatingUI;
   private ClosedCaptionsView _closedCaptionsView;
   private ClosedCaptionsStyle _closedCaptionsStyle = null;
-  private SelectedLanguageId selectedLanguageId;
+  private String selectedLanguageId;
   private final String languageNone;
 
   /**
@@ -156,8 +156,8 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       _player.addObserver(_inlineControls);
     }
     _player.addObserver( this );
-    selectedLanguageId = new SelectedLanguageId( getLayout().getContext() );
     languageNone = LocalizationSupport.localizedStringFor( "None" );
+    selectedLanguageId = languageNone;
   }
 
   @Override
@@ -427,7 +427,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
         }
       }
       DebugMode.logD( TAG, "Closed captions language is now: '" + language + "'" );
-      selectedLanguageId.set( language );
+      selectedLanguageId = language;
     }
   }
 
@@ -627,7 +627,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       final RadioButton radioButton = new RadioButton( this.context );
       final String language = itemList.get( position );
       radioButton.setText( language );
-      if (language.equals( this.controller.selectedLanguageId.get() )) {
+      if (language.equals( this.controller.selectedLanguageId )) {
         radioButton.setChecked( true );
         controller.ccLanguageDialogUncommittedSelection = radioButton;
       }
