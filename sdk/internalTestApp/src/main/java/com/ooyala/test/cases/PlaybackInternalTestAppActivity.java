@@ -27,8 +27,8 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     super.onCreate(savedInstanceState);
 
     //Populate the embed map
-    embedMap.put("google clear dash", "RyNWV1MDE69D8IBcqY6CNaGtTtq73SuW");
-    embedMap.put("BYU live", "UwN2g1YjoQ7hw8udLG-1q2Zu1XGCyfFu");
+    embedMap.put("GOOGLE Clear DASH SD+HD", "RyNWV1MDE69D8IBcqY6CNaGtTtq73SuW");
+    embedMap.put("BYU Live", "UwN2g1YjoQ7hw8udLG-1q2Zu1XGCyfFu");
     embedMap.put("Big Bunny with ID3 tags", "FqdThndTrouX0QnxRdMf9khym79yyb4M");
     embedMap.put("HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("MP4 Video",    "h4aHB1ZDqV7hbmLEv4xSOx3FdUUuephx");
