@@ -109,7 +109,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     }
 
     Intent intent = new Intent(this, selectedClass);
-    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     startActivity(intent);
     return true;
   }

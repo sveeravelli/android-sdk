@@ -31,13 +31,14 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     embedMap.put("Big Bunny with ID3 tags", "FqdThndTrouX0QnxRdMf9khym79yyb4M");
     embedMap.put("HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("MP4 Video",    "h4aHB1ZDqV7hbmLEv4xSOx3FdUUuephx");
-    embedMap.put("VOD with CCs", "92cWp0ZDpDm4Q8rzHfVK6q9m6OtFP-ww");
     embedMap.put("WV-MP4",       "N3ZnF1ZDo2cUf0JIIFMaxv-gKgmF6Dvv");
     embedMap.put("Avatar Widevine", "54NzJ4NTpMvOAm3p-rdp3qttbqkRad9I"); // WVM
     embedMap.put("Channel",      "ozNTJ2ZDqvPWyXTriQF_Ovcd1VuKHGdH");
     embedMap.put("Channel with pre-roll",    "FncDB0YTrvdMGK3Sva1NUmeQMuB33wbV");
     embedMap.put("Multiple Google IMA",      "4wbjhoYTp6oRqD6lslRn0xYVTbm2GBzh");
     embedMap.put("Video with Initial Time",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
+    embedMap.put("a VOD with CCs", "92cWp0ZDpDm4Q8rzHfVK6q9m6OtFP-ww");
+    embedMap.put("channel: VOD+CCs then VOD-CCs", "ZwNThkdTrSfttI2N_-MH3MRIdJQ3Ox8I");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
