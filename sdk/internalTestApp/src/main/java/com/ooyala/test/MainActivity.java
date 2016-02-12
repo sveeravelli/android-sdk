@@ -40,7 +40,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
     Class<? extends Activity> selectedClass = InternalTestApplication.getActivityMap().get(mainListAdapter.getItem(pos));
 
     Intent intent = new Intent(this, selectedClass);
-    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     startActivity(intent);
     return;
   }
@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
     }
 
     Intent intent = new Intent(this, selectedClass);
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     startActivity(intent);
     return true;
   }
