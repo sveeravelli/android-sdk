@@ -1,6 +1,7 @@
 package com.ooyala.android.imasdk;
 
 
+import com.ooyala.android.AdPodInfo;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
@@ -69,6 +70,12 @@ public class IMAAdPlayer extends AdMoviePlayer {
       // We do not update the State to PLAYING until we hear the callback from IMA SDK
       // since there could be a while between message sent and callback received
       DebugMode.logD(TAG, "playIMA(): Playing");
+      String title = _imaManager._adsManager.getCurrentAd().getTitle();
+      String description = _imaManager._adsManager.getCurrentAd().getDescription();
+      String url = "";
+      int adsCount = 1;
+      int unplayedCount = adsCount - 1;
+      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount, true, true));
       super.play();
       if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
         _imaManager._ooyalaPlayerWrapper.fireVideoStartCallback();
