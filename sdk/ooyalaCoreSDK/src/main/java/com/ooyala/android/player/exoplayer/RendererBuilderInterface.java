@@ -3,15 +3,19 @@ package com.ooyala.android.player.exoplayer;
 /**
  * Created by zchen on 1/28/16.
  */
-public interface RendererBuilder {
+public interface RendererBuilderInterface {
   /**
    * Builds renderers for playback.
-   *
-   * @param player The player for which renderers are being built.
    */
-  void buildRenderers(RendererBuilderListener player);
+  void buildRenderers();
+
   /**
    * Cancels the current build operation, if there is one. Else does nothing.
    */
   void cancel();
+
+  /**
+   * @return true if builder is canceled, false otherwise.
+   */
+  boolean isCanceled();
 }
