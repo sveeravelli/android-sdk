@@ -147,7 +147,11 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
       default:
         break;
     }
-    return _player.getCurrentPosition();
+    try {
+      return _player.getCurrentPosition();
+    } catch (IllegalStateException e) {
+      return 0;
+    }
   }
 
   @Override
