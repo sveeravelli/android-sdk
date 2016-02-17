@@ -150,6 +150,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     try {
       return _player.getCurrentPosition();
     } catch (IllegalStateException e) {
+      DebugMode.logE(TAG, "getCurrentPsition called when state is invalid ", e);
       return 0;
     }
   }
