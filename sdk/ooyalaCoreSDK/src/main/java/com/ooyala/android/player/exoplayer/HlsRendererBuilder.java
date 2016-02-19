@@ -88,7 +88,7 @@ public class HlsRendererBuilder extends RendererBuilderBase<HlsPlaylist> {
 
     DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
     HlsTrackSelector trackSelector =
-        new BitrateHlsTrackSelector(context, player.getUpperBitrateThreshold(), player.getLowerBitrateThreshold());
+        new BitrateHlsTrackSelector(player.getUpperBitrateThreshold(), player.getLowerBitrateThreshold());
     HlsChunkSource chunkSource =
         new HlsChunkSource(true, dataSource, url, manifest, trackSelector, bandwidthMeter,
             timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);

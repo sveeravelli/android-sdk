@@ -116,6 +116,11 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    public Builder setExoConfigureration(ExoConfiguration exoConfig) {
+      this.exoConfiguration = exoConfig;
+      return this;
+    }
+
     public Builder setShowCuePoints(boolean showCuePoints) {
       this.showCuePoints = showCuePoints;
       return this;
