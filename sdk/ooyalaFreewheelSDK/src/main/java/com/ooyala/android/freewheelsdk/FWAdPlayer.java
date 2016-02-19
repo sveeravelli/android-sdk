@@ -202,7 +202,7 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
       String url = "";
       int adsCount = 1;
       int unplayedCount = adsCount - 1;
-      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount, false, false));
+      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount, true, true));
       setState(State.PLAYING);
       _currentAd.play();
     }
