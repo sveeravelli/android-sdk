@@ -20,6 +20,12 @@ public class Options implements ReadonlyOptionsInterface {
     private VisualOnConfiguration visualOnConfiguration;
 
     /**
+     * ExoConfiguration
+     * Default: default ExoConfiguration object
+     */
+    private ExoConfiguration exoConfiguration;
+
+    /**
      *If set to "true",  show ad controls during ads playback.
      * Default: true
      */
@@ -88,6 +94,7 @@ public class Options implements ReadonlyOptionsInterface {
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
       this.visualOnConfiguration = VisualOnConfiguration.s_getDefaultVisualOnConfiguration();
+      this.exoConfiguration = ExoConfiguration.getDefaultExoConfiguration();
       this.showCuePoints = true;
       this.showAdsControls = true;
       this.showLiveControls = true;
@@ -168,6 +175,7 @@ public class Options implements ReadonlyOptionsInterface {
       return new Options(
           tvRatingConfiguration,
           visualOnConfiguration,
+          exoConfiguration,
           showCuePoints,
           showAdsControls,
           preloadContent,
@@ -182,6 +190,7 @@ public class Options implements ReadonlyOptionsInterface {
 
   private final FCCTVRatingConfiguration tvRatingConfiguration;
   private final VisualOnConfiguration visualOnConfiguration;
+  private final ExoConfiguration exoConfiguration;
   private final boolean showCuePoints;
   private final boolean showAdsControls;
   private final boolean preloadContent;
@@ -196,6 +205,7 @@ public class Options implements ReadonlyOptionsInterface {
    * Initialize an Options object with given parameters:
    * @param tvRatingConfiguration - Configure to use TV Ratings.
    * @param visualOnConfiguration - Configure to use VisualOn ads.
+   * @param exoConfiguration - Configure to use ExoPlayer.
    * @param showCuePoints - Configure to show cue p oint markers.
    * @param showAdsControls - Configure to show ad controls in the player.
    * @param preloadContent - Configure to preload content before playback is initiated.
@@ -208,6 +218,7 @@ public class Options implements ReadonlyOptionsInterface {
    */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
                   VisualOnConfiguration visualOnConfiguration,
+                  ExoConfiguration exoConfiguration,
                   boolean showCuePoints,
                   boolean showAdsControls,
                   boolean preloadContent,
@@ -220,6 +231,7 @@ public class Options implements ReadonlyOptionsInterface {
 
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
+    this.exoConfiguration = exoConfiguration;
     this.showCuePoints = showCuePoints;
     this.showAdsControls = showAdsControls;
     this.preloadContent = preloadContent;
@@ -239,6 +251,11 @@ public class Options implements ReadonlyOptionsInterface {
   @Override
   public VisualOnConfiguration getVisualOnConfiguration() {
     return visualOnConfiguration;
+  }
+
+  @Override
+  public ExoConfiguration getExoConfiguration() {
+    return exoConfiguration;
   }
 
   @Override
