@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Debug;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.ooyala.android.EmbedTokenGenerator;
 import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
@@ -644,12 +646,15 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
   public void update(Observable arg0, Object arg1) {
 
     String notificationName;
-    Map<String, String> map = null;
+    OoyalaNotification ooNotification = null;
     if (arg1 instanceof String) {
       notificationName = (String)arg1;
+    } else if (arg1 instanceof OoyalaNotification){
+      ooNotification = (OoyalaNotification)arg1;
+      notificationName = ooNotification.getNotificationName();
     } else {
-      map = (Map<String, String>)arg1;
-      notificationName = map.get(OoyalaPlayer.NOTIFICATION_NAME);
+      DebugMode.logW(TAG, "Unidentified notification, ignorning for now");
+      return;
     }
 
     if (notificationName.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
@@ -661,7 +666,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
     } else if (notificationName.equals(OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED)) {
       refreshClosedCaptionsView();
     } else if (notificationName.equals(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION)) {
-      String caption = map.get(OoyalaPlayer.CLOSED_CAPTION_TEXT);
+      String caption = ((Map<String, String>)ooNotification.getData()).get(OoyalaPlayer.CLOSED_CAPTION_TEXT);
       if (_closedCaptionsView == null) {
         addClosedCaptionsView();
       }
