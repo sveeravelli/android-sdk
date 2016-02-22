@@ -1,7 +1,5 @@
 package com.ooyala.android.discovery;
 
-import android.os.AsyncTask;
-
 import com.ooyala.android.EmbeddedSignatureGenerator;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.Utils;
@@ -15,6 +13,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by zchen on 12/9/15.
@@ -43,6 +43,8 @@ public class DiscoveryManager {
   private static final String VALUE_PLAYER = "player";
 
   private static final int RESPONSE_LIFE_SECONDS = 5 * 60;
+
+  private static final ExecutorService executor = Executors.newFixedThreadPool(10);
 
   public interface Callback {
     /**
@@ -105,7 +107,7 @@ public class DiscoveryManager {
     DiscoveryTaskInfo taskInfo =
         new DiscoveryTaskInfo(
             url, false, null, options.getTimoutInMilliSeconds(), options.getTimoutInMilliSeconds());
-    DiscoveryTask task = new DiscoveryTask(new DiscoveryResultsCallback() {
+    DiscoveryTask task = new DiscoveryTask(taskInfo, new DiscoveryResultsCallback() {
       @Override
       public void callback(String results, OoyalaException error) {
         if (error != null) {
@@ -129,7 +131,7 @@ public class DiscoveryManager {
       }
 
     });
-    task.execute(taskInfo);
+    executor.submit(task);
   }
 
 /**
@@ -170,7 +172,6 @@ public class DiscoveryManager {
     sendFeedback(options, bucketInfo, pcode, deviceId, parameters, callback, DISCOVERY_FEEDBACK_CLICK);
   }
 
-  // AsycTask
   private static class DiscoveryTaskInfo {
     private URL url;
     private boolean postMethod; // set true to use HTTP POST, false to use HTTP GET
@@ -212,21 +213,17 @@ public class DiscoveryManager {
     }
   }
 
-  private static class DiscoveryTask extends AsyncTask<DiscoveryTaskInfo, Integer, String> {
-    protected OoyalaException error = null;
-    protected DiscoveryResultsCallback callback = null;
+  private static class DiscoveryTask implements Runnable {
+    private final DiscoveryTaskInfo taskInfo;
+    private final DiscoveryResultsCallback callback;
 
-    public DiscoveryTask(DiscoveryResultsCallback callback) {
-      super();
+    DiscoveryTask(DiscoveryTaskInfo info, DiscoveryResultsCallback callback) {
+      this.taskInfo = info;
       this.callback = callback;
     }
 
     @Override
-    protected String doInBackground(DiscoveryTaskInfo... taskParams) {
-      if (taskParams.length == 0 || taskParams[0] == null || !(taskParams[0] instanceof  DiscoveryTaskInfo)) {
-        return null;
-      }
-      DiscoveryTaskInfo taskInfo = taskParams[0];
+    public void run() {
       String httpResponse = null;
 
       if (taskInfo.isPostMethod()) {
@@ -245,16 +242,11 @@ public class DiscoveryManager {
                 (int) taskInfo.getConnectionTimeoutInMillisecond(),
                 (int) taskInfo.getReadTimeoutInMillisecond());
       }
-
-      return httpResponse;
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
       if (callback != null) {
-        callback.callback(result, null);
+        callback.callback(httpResponse, null);
       }
     }
+
   }
 
   // helper methods
@@ -313,7 +305,7 @@ public class DiscoveryManager {
     DiscoveryTaskInfo taskInfo =
         new DiscoveryTaskInfo(
             url, true, body, options.getTimoutInMilliSeconds(), options.getTimoutInMilliSeconds());
-    DiscoveryTask task = new DiscoveryTask(new DiscoveryResultsCallback() {
+    DiscoveryTask task = new DiscoveryTask(taskInfo, new DiscoveryResultsCallback() {
       @Override
       public void callback(String httpResponse, OoyalaException error) {
         String results = null;
@@ -328,6 +320,6 @@ public class DiscoveryManager {
         }
       }
     });
-    task.execute(taskInfo);
+    executor.submit(task);
   }
 }

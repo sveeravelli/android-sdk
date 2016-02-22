@@ -32,6 +32,7 @@ public class Stream implements JSONUpdatableItem {
 
   public static final String DELIVERY_TYPE_HLS = "hls";
   public static final String DELIVERY_TYPE_MP4 = "mp4";
+  public static final String DELIVERY_TYPE_DASH = "dash";
   public static final String DELIVERY_TYPE_REMOTE_ASSET = "remote_asset";
   public static final String DELIVERY_TYPE_WV_MP4 = "wv_mp4";
   public static final String DELIVERY_TYPE_WV_WVM = "wv_wvm";
@@ -67,7 +68,8 @@ public class Stream implements JSONUpdatableItem {
       for (Stream stream : streams) {
         // for remote assets, just pick the first stream
         if (stream.getDeliveryType().equals(DELIVERY_TYPE_REMOTE_ASSET)
-            || stream.getDeliveryType().equals(DELIVERY_TYPE_HLS)) { return stream; }
+            || stream.getDeliveryType().equals(DELIVERY_TYPE_HLS)
+            || stream.getDeliveryType().equals(DELIVERY_TYPE_DASH)) { return stream; }
         if (Stream.isDeliveryTypePlayable(stream)
             && Stream.isProfilePlayable(stream)
             && (bestBitrateStream == null

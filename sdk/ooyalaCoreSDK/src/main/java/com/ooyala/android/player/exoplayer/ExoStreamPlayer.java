@@ -5,14 +5,18 @@ import android.content.Context;
 import android.media.MediaCodec;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.widget.FrameLayout;
 
+import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
@@ -21,9 +25,12 @@ import com.google.android.exoplayer.metadata.PrivMetadata;
 import com.google.android.exoplayer.metadata.TxxxMetadata;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.util.Util;
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.MovieView;
@@ -40,15 +47,18 @@ import java.util.Set;
  * Created by zchen on 1/28/16.
  */
 public class ExoStreamPlayer extends StreamPlayer implements
-    RendererBuilderListener, SurfaceHolder.Callback, ExoPlayer.Listener {
+    RendererBuilderCallback, SurfaceHolder.Callback, ExoPlayer.Listener,
+    DefaultBandwidthMeter.EventListener {
   private static final String TAG = ExoStreamPlayer.class.getSimpleName();
   private ExoPlayer exoplayer;
   private Stream stream;
-  private String streamUrl;
   private Handler mainHandler;
   private SurfaceHolder holder;
   private int timeBeforeSuspend;
   private OoyalaPlayer.State stateBeforeSuspend;
+
+  private LoadControl loadControl;
+  private BandwidthMeter bandwidthMeter;
 
   private enum RendererBuildingState {
     Idle,
@@ -59,7 +69,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   private RendererBuildingState rendererBuildingState;
   private boolean surfaceCreated;
 
-  private RendererBuilder rendererBuilder;
+  private RendererBuilderInterface rendererBuilder;
   private TrackRenderer videoRenderer;
 
   public static final int RENDERER_COUNT = 4;
@@ -68,12 +78,15 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public static final int TYPE_TEXT = 2;
   public static final int TYPE_METADATA = 3;
 
+  // TODO: these should be configured via options.
+  private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
+
   @Override
   public void init(OoyalaPlayer parent, Set<Stream> streams) {
     WifiManager wifiManager = (WifiManager)parent.getLayout().getContext().getSystemService(Context.WIFI_SERVICE);
     boolean isWifiEnabled = wifiManager.isWifiEnabled();
-    mainHandler = new Handler();
-    stream =  Stream.bestStream(streams, isWifiEnabled);
+
+    stream = Stream.bestStream(streams, isWifiEnabled);
     surfaceCreated = false;
     timeBeforeSuspend = -1;
     stateBeforeSuspend = OoyalaPlayer.State.INIT;
@@ -92,18 +105,45 @@ public class ExoStreamPlayer extends StreamPlayer implements
     }
     setState(OoyalaPlayer.State.LOADING);
     setParent(parent);
-    streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
 
-    // initialize exoplayer
-    String userAgent = Util.getUserAgent(parent.getLayout().getContext(), "OoyalaSDK");
-    rendererBuildingState = RendererBuildingState.Building;
-    rendererBuilder = new HlsRendererBuilder(parent.getLayout().getContext(), userAgent, streamUrl);
-    exoplayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
-    if (exoplayer != null) {
-      exoplayer.addListener(this);
-      setupSurfaceView();
-      rendererBuilder.buildRenderers(this);
+
+    // initialize renderer builder
+    rendererBuilder = createRendererBuilder(parent.getLayout().getContext());
+    if (rendererBuilder == null) {
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to create renderer builder");
+      setState(OoyalaPlayer.State.ERROR);
+      return;
     }
+
+    // Initialize exoplayer, create surface and start downloading stream manifest
+    exoplayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT);
+    if (exoplayer == null) {
+      this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to instanciate exoplayer");
+      setState(OoyalaPlayer.State.ERROR);
+      return;
+    }
+    exoplayer.addListener(this);
+    setupSurfaceView();
+    rendererBuildingState = RendererBuildingState.Building;
+    rendererBuilder.buildRenderers();
+  }
+
+  private RendererBuilderInterface createRendererBuilder(Context context) {
+    if (stream == null) {
+      return null;
+    }
+    String userAgent = Util.getUserAgent(context, "OoyalaSDK");
+    String streamUrl = stream.getUrlFormat().equals(Stream.STREAM_URL_FORMAT_B64) ? stream.decodedURL().toString().trim() : stream.getUrl().trim();
+    switch (stream.getDeliveryType()) {
+      case Stream.DELIVERY_TYPE_DASH:
+        return new DashRendererBuilder(context, userAgent, streamUrl, this);
+      case Stream.DELIVERY_TYPE_HLS:
+        return new HlsRendererBuilder(context, userAgent, streamUrl, this);
+      default:
+        DebugMode.logE(TAG, "failed to create renderer builder for delivery type: " + stream.getDeliveryType());
+        break;
+    }
+    return null;
   }
 
   private void setupSurfaceView() {
@@ -172,6 +212,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
     setSurface();
   }
 
+  @Override
   public void onRenderersError(Exception e) {
     DebugMode.logE(TAG, "renderer error" + e.getMessage(), e);
     this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "renderer error");
@@ -179,8 +220,38 @@ public class ExoStreamPlayer extends StreamPlayer implements
     rendererBuildingState = RendererBuildingState.Idle;
   }
 
+  @Override
   public Handler getMainHandler() {
+    if (mainHandler == null) {
+      mainHandler = new Handler();
+    }
     return mainHandler;
+  }
+
+  @Override
+  public LoadControl getLoadControl() {
+    if (loadControl == null) {
+      loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
+    }
+    return loadControl;
+  }
+
+  @Override
+  public BandwidthMeter getBandwidthMeter() {
+    if (bandwidthMeter == null) {
+      bandwidthMeter = new DefaultBandwidthMeter(getMainHandler(), this);
+    }
+    return bandwidthMeter;
+  }
+
+  @Override
+  public int getBufferSegmentSize() {
+    return BUFFER_SEGMENT_SIZE;
+  }
+
+  @Override
+  public Looper getPlaybackLooper() {
+    return exoplayer == null ? null : exoplayer.getPlaybackLooper();
   }
 
   // SampleSourceEvent Listeners
@@ -302,13 +373,24 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public void onCues(List<Cue> cues) {
     for (Cue c : cues) {
       if (c.text != null) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put(OoyalaPlayer.NOTIFICATION_NAME, OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION);
-        map.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put(OoyalaPlayer.CLOSED_CAPTION_TEXT, c.text.toString());
+        OoyalaNotification notification = new OoyalaNotification(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION, data);
         setChanged();
-        notifyObservers(map);
+        notifyObservers(notification);
       }
     }
+  }
+
+  // Default Bandwidth Meter listener
+  @Override
+  public void onBandwidthSample(int elapsedMs, long bytes, long bitrate) {
+    DebugMode.logD(TAG, "onBandwidthSample elapsedMs" + elapsedMs + " bytes" + bytes + " bitrate" + bitrate);
+  }
+
+  @Override
+  public void onAvailableRangeChanged(int sourceId, TimeRange availableRange) {
+    DebugMode.logD(TAG, "onAvailableRangeChanged sourceId" + sourceId + " timeRange" + availableRange.toString());
   }
 
   // Exoplayer listener
