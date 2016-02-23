@@ -13,6 +13,11 @@ public interface ReadonlyOptionsInterface {
   VisualOnConfiguration getVisualOnConfiguration();
 
   /**
+   * @see ExoConfiguration
+   */
+  ExoConfiguration getExoConfiguration();
+
+  /**
    * If "true",  show ad controls during ads playback.
    */
   boolean getShowAdsControls();

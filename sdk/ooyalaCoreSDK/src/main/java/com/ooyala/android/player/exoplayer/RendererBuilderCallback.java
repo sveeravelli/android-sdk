@@ -38,6 +38,10 @@ interface RendererBuilderCallback extends
 
   BandwidthMeter getBandwidthMeter();
 
+  long getUpperBitrateThreshold();
+
+  long getLowerBitrateThreshold();
+
   int getBufferSegmentSize();
 
   Looper getPlaybackLooper();

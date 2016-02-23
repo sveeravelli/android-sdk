@@ -29,12 +29,12 @@ import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.chunk.VideoFormatSelectorUtil;
-import com.google.android.exoplayer.hls.DefaultHlsTrackSelector;
 import com.google.android.exoplayer.hls.HlsChunkSource;
 import com.google.android.exoplayer.hls.HlsMasterPlaylist;
 import com.google.android.exoplayer.hls.HlsPlaylist;
 import com.google.android.exoplayer.hls.HlsPlaylistParser;
 import com.google.android.exoplayer.hls.HlsSampleSource;
+import com.google.android.exoplayer.hls.HlsTrackSelector;
 import com.google.android.exoplayer.hls.PtsTimestampAdjusterProvider;
 import com.google.android.exoplayer.metadata.Id3Parser;
 import com.google.android.exoplayer.metadata.MetadataTrackRenderer;
@@ -87,9 +87,10 @@ public class HlsRendererBuilder extends RendererBuilderBase<HlsPlaylist> {
     }
 
     DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+    HlsTrackSelector trackSelector =
+        new BitrateHlsTrackSelector(player.getUpperBitrateThreshold(), player.getLowerBitrateThreshold());
     HlsChunkSource chunkSource =
-        new HlsChunkSource(true, dataSource, url, manifest,
-            DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
+        new HlsChunkSource(true, dataSource, url, manifest, trackSelector, bandwidthMeter,
             timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
     HlsSampleSource sampleSource =
         new HlsSampleSource(

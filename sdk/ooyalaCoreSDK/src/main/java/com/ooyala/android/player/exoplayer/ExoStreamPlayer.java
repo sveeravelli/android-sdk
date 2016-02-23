@@ -33,6 +33,7 @@ import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.configuration.ExoConfiguration;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.player.MovieView;
 import com.ooyala.android.player.StreamPlayer;
@@ -106,7 +107,6 @@ public class ExoStreamPlayer extends StreamPlayer implements
     }
     setState(OoyalaPlayer.State.LOADING);
     setParent(parent);
-
 
     // initialize renderer builder
     rendererBuilder = createRendererBuilder(parent.getLayout().getContext());
@@ -234,7 +234,11 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public LoadControl getLoadControl() {
     if (loadControl == null) {
-      loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
+      ExoConfiguration config = _parent.getOptions().getExoConfiguration();
+      loadControl =
+          new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE), null, null,
+              (int)config.getLowWatermarkMs(), (int)config.getHighWatermarkMs(),
+              config.getLowBufferLoad(), config.getHighBufferLoad());
     }
     return loadControl;
   }
@@ -255,6 +259,16 @@ public class ExoStreamPlayer extends StreamPlayer implements
   @Override
   public Looper getPlaybackLooper() {
     return exoplayer == null ? null : exoplayer.getPlaybackLooper();
+  }
+
+  @Override
+  public long getUpperBitrateThreshold() {
+    return _parent.getOptions().getExoConfiguration().getUpperBitrateThreshold();
+  }
+
+  @Override
+  public long getLowerBitrateThreshold() {
+    return _parent.getOptions().getExoConfiguration().getLowerBitrateThreshold();
   }
 
   // SampleSourceEvent Listeners
