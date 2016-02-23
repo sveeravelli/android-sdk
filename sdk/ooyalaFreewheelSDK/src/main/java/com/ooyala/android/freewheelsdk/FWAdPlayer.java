@@ -11,6 +11,7 @@ import com.ooyala.android.StateNotifier;
 import com.ooyala.android.player.PlayerInterface;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
+import com.ooyala.android.AdPodInfo;
 
 import java.util.ArrayList;
 
@@ -196,6 +197,12 @@ public class FWAdPlayer implements PlayerInterface, LifeCycleInterface,
       _adManager.adsPlaying();
 
       DebugMode.logD(TAG, "FW Ad Player: Playing ad slot " + _currentAd.getCustomId());
+      String title ="";
+      String description = "";
+      String url = "";
+      int adsCount = 1;
+      int unplayedCount = adsCount - 1;
+      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount, false, false));
       setState(State.PLAYING);
       _currentAd.play();
     }
