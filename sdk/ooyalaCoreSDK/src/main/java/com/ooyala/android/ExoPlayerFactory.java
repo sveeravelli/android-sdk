@@ -24,7 +24,8 @@ public class ExoPlayerFactory implements PlayerFactory {
     }
 
     if (Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_HLS) ||
-        Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_DASH)) {
+        Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_DASH) ||
+        Stream.streamSetContainsDeliveryType(streams, Stream.DELIVERY_TYPE_MP4)) {
       return true;
     }
     return false;
