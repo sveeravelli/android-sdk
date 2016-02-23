@@ -3,6 +3,7 @@ package com.ooyala.android.player.exoplayer;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaCodec;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -139,6 +140,8 @@ public class ExoStreamPlayer extends StreamPlayer implements
         return new DashRendererBuilder(context, userAgent, streamUrl, this);
       case Stream.DELIVERY_TYPE_HLS:
         return new HlsRendererBuilder(context, userAgent, streamUrl, this);
+      case Stream.DELIVERY_TYPE_MP4:
+        return new ExtractorRendererBuilder(context, userAgent, Uri.parse(streamUrl), this);
       default:
         DebugMode.logE(TAG, "failed to create renderer builder for delivery type: " + stream.getDeliveryType());
         break;
