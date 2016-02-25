@@ -57,9 +57,9 @@ public abstract class AdMoviePlayer extends MoviePlayer implements
       super.update(arg0, arg);
     } else {
       String notification = (String) arg;
-      if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
         _notifier.setState(getState());
-      } else if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+      } else if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
         _notifier.notifyPlayheadChange();
       }
     }

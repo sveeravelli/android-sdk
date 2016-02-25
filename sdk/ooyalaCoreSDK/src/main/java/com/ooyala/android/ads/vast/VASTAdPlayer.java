@@ -222,7 +222,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
   @Override
   public void update(Observable arg0, Object arg) {
-    if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+    if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       if (!_startSent && currentTime() > 0) {
 
 
@@ -251,7 +251,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         _thirdQSent = true;
       }
     }
-    else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+    else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
       try {
         BaseStreamPlayer tempPlayer = (BaseStreamPlayer) arg0;
 

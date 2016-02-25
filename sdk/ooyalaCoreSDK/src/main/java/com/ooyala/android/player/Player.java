@@ -3,7 +3,6 @@ package com.ooyala.android.player;
 import java.util.Observable;
 import java.util.Set;
 
-import android.view.SurfaceView;
 import android.view.View;
 
 import com.ooyala.android.OoyalaException;
@@ -44,7 +43,7 @@ public class Player extends Observable implements PlayerInterface,
   protected void setState(State state) {
     _state = state;
     super.setChanged();
-    super.notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    super.notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME);
   }
 
   public OoyalaException getError() {

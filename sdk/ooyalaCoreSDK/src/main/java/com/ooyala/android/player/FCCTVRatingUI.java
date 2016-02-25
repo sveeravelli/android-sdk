@@ -153,7 +153,7 @@ public class FCCTVRatingUI implements Observer {
   public void update(Observable observable, Object data) {
     // see MoviePlayer for AD_*_NOTIFICATION since they happen at a tricky time.
     if (observable == _player &&
-        OoyalaPlayer.PLAY_STARTED_NOTIFICATION.equals(data) ) {
+        OoyalaPlayer.PLAY_STARTED_NOTIFICATION_NAME.equals(data) ) {
       reshow();
     }
   }
