@@ -29,7 +29,7 @@ public class ClosedCaptionsStyle {
 			this.textFont = Typeface.DEFAULT;
 			this.textColor = Color.WHITE;
 
-			this.backgroundColor = Color.BLACK;
+			this.backgroundColor = Color.TRANSPARENT;
 
 			this.edgeType = 0;
 			this.edgeColor = Color.TRANSPARENT;
