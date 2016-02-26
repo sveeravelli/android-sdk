@@ -28,7 +28,7 @@
             </Creatives>
         </InLine>
     </Ad>
-    <Ad id="preroll-1" sequence="2">
+    <Ad id="preroll-2" sequence="2">
         <InLine>
             <AdSystem>Ooyala</AdSystem>
             <AdTitle>Ooyla test mp4 postroll</AdTitle>
