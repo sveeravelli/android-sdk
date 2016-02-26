@@ -28,6 +28,7 @@ public class VASTIcon {
   private String resourceUrl;
   private String creativeType;
   private ResourceType type;
+  private String apiFramework;
 
   private List<String> clickTrackings = new ArrayList<String>();
   private List<String> viewTrackings = new ArrayList<String>();
@@ -45,10 +46,28 @@ public class VASTIcon {
     program = xml.getAttribute(VASTAd.ATTRIBUTE_PROGRAM);
     width = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_WIDTH, 0);
     height = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_HEIGHT, 0);
-    xPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_XPOSITION, 0);
-    yPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_YPOSITION, 0);
+
+    String xString = xml.getAttribute(VASTAd.ATTRIBUTE_XPOSITION);
+    if ("left".equals(xString)) {
+      xPosition = 0;
+    } else if ("right".equals(xString)) {
+      xPosition = Integer.MAX_VALUE;
+    } else {
+      xPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_XPOSITION, 0);
+    }
+
+    String yString = xml.getAttribute(VASTAd.ATTRIBUTE_YPOSITION);
+    if ("top".equals(yString)) {
+      yPosition = 0;
+    } else if ("bottom".equals(yString)) {
+      yPosition = Integer.MAX_VALUE;
+    } else {
+      yPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_YPOSITION, 0);
+    }
+
     duration = VASTUtils.secondsFromTimeString(xml.getAttribute(VASTAd.ATTRIBUTE_DURATION), 0);
     offset = VASTUtils.secondsFromTimeString(xml.getAttribute(VASTAd.ATTRIBUTE_OFFSET), 0);
+    apiFramework = xml.getAttribute(VASTAd.ATTRIBUTE_API_FRAMEWORK);
 
     Node child = xml.getFirstChild();
     while (child != null) {
@@ -58,15 +77,15 @@ public class VASTIcon {
         if (tag.equals(VASTAd.ELEMENT_STATIC_RESOURCE)) {
           type = ResourceType.Static;
           creativeType = e.getAttribute(VASTAd.ATTRIBUTE_CREATIVE_TYPE);
-          resourceUrl = e.getTextContent();
+          resourceUrl = e.getTextContent().trim();
         } else if (tag.equals(VASTAd.ELEMENT_IFRAME_RESOURCE)) {
           type = ResourceType.IFrame;
-          resourceUrl = e.getTextContent();
+          resourceUrl = e.getTextContent().trim();
         } else if (tag.equals(VASTAd.ELEMENT_HTML_RESOURCE)) {
           type = ResourceType.HTML;
-          resourceUrl = e.getTextContent();
+          resourceUrl = e.getTextContent().trim();
         } else if (tag.equals(VASTAd.ELEMENT_ICON_VIEW_TRACKING)) {
-          String viewTracking = e.getTextContent();
+          String viewTracking = e.getTextContent().trim();
           if (viewTracking != null && viewTracking.length() > 0) {
             viewTrackings.add(viewTracking);
           }
@@ -85,9 +104,9 @@ public class VASTIcon {
         Element e = (Element)child;
         String tag = e.getTagName();
         if (tag.equals(VASTAd.ELEMENT_ICON_CLICK_THROUGH)) {
-          clickThrough = e.getTextContent();
+          clickThrough = e.getTextContent().trim();
         } else if (tag.equals(VASTAd.ELEMENT_ICON_CLICK_TRACKING)) {
-          String tracking = e.getTextContent();
+          String tracking = e.getTextContent().trim();
           if (tracking != null && tracking.length() > 0) {
             clickTrackings.add(tracking);
           }
@@ -97,50 +116,100 @@ public class VASTIcon {
     }
   }
 
+  /**
+   * @return program
+   */
+  public String getProgram() {
+    return program;
+  }
+
+  /**
+   * @return width in pixels
+   */
   public int getWidth() {
     return width;
   }
 
+  /**
+   * @return height in pixels
+   */
   public int getHeight() {
     return height;
   }
 
+  /**
+   * @return xPosition in pixels
+   */
   public int getXPosition() {
     return xPosition;
   }
 
+  /**
+   * @return yPosition in pixels
+   */
   public int getYPosition() {
     return yPosition;
   }
 
+  /**
+   * @return duration in seconds
+   */
   public double getDuration() {
     return duration;
   }
 
+  /**
+   * @return time offset in seconds
+   */
   public double getOffset() {
     return offset;
   }
 
+  /**
+   * @return resource url
+   */
   public String getResourceUrl() {
     return resourceUrl;
   }
 
+  /**
+   * @return resource type
+   */
   public ResourceType getResourceType() {
     return type;
   }
 
+  /**
+   * @return creative type for static resource
+   */
   public String getCreativeType() {
     return creativeType;
   }
 
+  /**
+   * @return api framework
+   */
+  public String getApiFramework() {
+    return apiFramework;
+  }
+
+  /**
+   * @return a list of click tracking urls
+   */
   public List<String> getClickTrackings() {
     return clickTrackings;
   }
 
+  /**
+   * @return a list of viewing urls
+   */
   public List<String> getViewTrackings() {
     return viewTrackings;
   }
 
+  /**
+   * @return click through url
+   */
   public String getClickThrough() {
     return clickThrough;
   }

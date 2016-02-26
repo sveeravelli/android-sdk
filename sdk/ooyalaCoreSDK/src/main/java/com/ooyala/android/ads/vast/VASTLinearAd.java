@@ -216,6 +216,14 @@ class VASTLinearAd implements PlayableItem {
   }
 
   /**
+   * Fetch icons
+   * @return a list of icons
+   */
+  public List<VASTIcon> getIcons() {
+    return _icons;
+  }
+
+  /**
    * Update the HashMap containing the tracking events by adding to it
    * @param trackingEvents new set of tracking events to add
    */
