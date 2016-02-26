@@ -321,6 +321,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                           float pixelWidthHeightRatio) {
     DebugMode.logV(TAG, "video size changed, width " + width + " height " + height + " aspectRatio " + pixelWidthHeightRatio);
+    setVideoSize(width, height);
 
   }
 
@@ -431,7 +432,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
         setState(OoyalaPlayer.State.LOADING);
         break;
       case ExoPlayer.STATE_READY:
-        setState(playWhenReady ? OoyalaPlayer.State.PLAYING : OoyalaPlayer.State.PAUSED);
+        setState(playWhenReady ? OoyalaPlayer.State.PLAYING : OoyalaPlayer.State.READY);
         break;
       default:
         break;
