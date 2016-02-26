@@ -1,11 +1,10 @@
 package com.ooyala.android.ads.vast;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import android.os.AsyncTask;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
+import com.ooyala.android.util.DebugMode;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,11 +12,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import android.os.AsyncTask;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.apis.FetchPlaybackInfoCallback;
-import com.ooyala.android.item.OoyalaManagedAdSpot;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * A model of an VAST Ad spot, which can be played during video playback
@@ -34,7 +35,8 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   /** The url for the vast request */
   protected URL _vastURL;
   /** The actual ads (List of VASTAd) */
-  protected List<VASTAd> _ads = new ArrayList<VASTAd>();
+  protected List<VASTAd> _poddedAds = new ArrayList<VASTAd>();
+  protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
 
   /**
    * Initialize a VASTAdSpot using the specified data
@@ -127,9 +129,18 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
         }
         VASTAd vastAd = new VASTAd((Element) ad);
         if (vastAd != null) {
-          _ads.add(vastAd);
+          if (vastAd.getAdSequence() > 0) {
+            _poddedAds.add(vastAd);
+          } else {
+            _standAloneAds.add(vastAd);
+          }
         }
         ad = ad.getNextSibling();
+      }
+
+      if (_poddedAds.size() > 0) {
+        // sort podded ads
+        Collections.sort(_poddedAds);
       }
     } catch (Exception e) {
       System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
@@ -164,7 +175,10 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   }
 
   public List<VASTAd> getAds() {
-    return _ads;
+    if (_poddedAds.size() > 0) {
+      return _poddedAds;
+    }
+    return _standAloneAds;
   }
 
   public URL getVASTURL() {

@@ -1,18 +1,18 @@
 package com.ooyala.android.ads.vast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.ooyala.android.util.DebugMode;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ooyala.android.util.DebugMode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A representation of VAST advertisement, and the data that can be stored in it
  */
-class VASTAd {
+class VASTAd implements Comparable<VASTAd> {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
   static final String ELEMENT_VAST = "VAST";
   static final String ELEMENT_AD = "Ad";
@@ -41,6 +41,15 @@ class VASTAd {
   static final String ELEMENT_MEDIA_FILES = "MediaFiles";
   static final String ELEMENT_MEDIA_FILE = "MediaFile";
   static final String ELEMENT_VAST_AD_TAG_URI = "VASTAdTagURI";
+  static final String ELEMENT_ICONS = "Icons";
+  static final String ELEMENT_ICON = "Icon";
+  static final String ELEMENT_ICON_CLICKS = "IconClicks";
+  static final String ELEMENT_ICON_CLICK_THROUGH = "IconClickThrough";
+  static final String ELEMENT_ICON_CLICK_TRACKING = "IconClickTracking";
+  static final String ELEMENT_ICON_VIEW_TRACKING = "IconViewTracking";
+  static final String ELEMENT_STATIC_RESOURCE = "StaticResource";
+  static final String ELEMENT_IFRAME_RESOURCE = "IFrameResource";
+  static final String ELEMENT_HTML_RESOURCE = "HTMLResource";
 
   static final String ATTRIBUTE_VERSION = "version";
   static final String ATTRIBUTE_ID = "id";
@@ -54,6 +63,13 @@ class VASTAd {
   static final String ATTRIBUTE_SCALABLE = "scalable";
   static final String ATTRIBUTE_MAINTAIN_ASPECT_RATIO = "maintainAspectRatio";
   static final String ATTRIBUTE_API_FRAMEWORK = "apiFramework";
+  static final String ATTRIBUTE_SKIPOFFSET = "skipoffset";
+  static final String ATTRIBUTE_PROGRAM = "program";
+  static final String ATTRIBUTE_XPOSITION = "xPosition";
+  static final String ATTRIBUTE_YPOSITION = "yPosition";
+  static final String ATTRIBUTE_OFFSET = "offset";
+  static final String ATTRIBUTE_DURATION = "duration";
+  static final String ATTRIBUTE_CREATIVE_TYPE = "creativeType";
 
   static final String MIME_TYPE_MP4 = "video/mp4";
   static final String MIME_TYPE_M3U8 = "application/x-mpegURL";
@@ -64,6 +80,8 @@ class VASTAd {
 
   /** the ID of the Ad */
   private String _adID;
+
+  private int _adSequence;
   /** the System */
   protected String _system;
   /** the System Version */
@@ -92,6 +110,7 @@ class VASTAd {
   VASTAd(Element data) {
     if (!data.getTagName().equals(ELEMENT_AD)) { return; }
     _adID = data.getAttribute(ATTRIBUTE_ID);
+    _adSequence = VASTUtils.getIntAttribute(data, ATTRIBUTE_SEQUENCE, 0);
     update(data);
   }
 
@@ -300,6 +319,14 @@ class VASTAd {
   }
 
   /**
+   * Fetch the sequence of this VASTAd. VAST 3.0
+   * @return the sequence value, 0 otherwise.
+   */
+  public int getAdSequence() {
+    return _adSequence;
+  }
+
+  /**
    * Fetch the VASTAd's System. This is a String defining which ad provider this VASTAd uses.
    * @return the VASTAd's System.
    */
@@ -371,4 +398,10 @@ class VASTAd {
   public Element getExtensions() {
     return _extensions;
   }
+
+  @Override
+  public int compareTo(VASTAd t) {
+    return this.getAdSequence() - t.getAdSequence();
+  }
+
 }
