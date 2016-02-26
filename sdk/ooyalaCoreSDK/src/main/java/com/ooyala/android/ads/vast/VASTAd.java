@@ -14,6 +14,7 @@ import java.util.List;
  */
 class VASTAd implements Comparable<VASTAd> {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
+  static final double MAXIMUM_SUPPORTED_VAST_VERSION = 3.0;
   static final String ELEMENT_VAST = "VAST";
   static final String ELEMENT_AD = "Ad";
   static final String ELEMENT_IN_LINE = "InLine";

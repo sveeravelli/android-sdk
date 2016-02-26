@@ -24,6 +24,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * A model of an VAST Ad spot, which can be played during video playback
  */
 public class VASTAdSpot extends OoyalaManagedAdSpot {
+  private static final String TAG = VASTAdSpot.class.getSimpleName();
+
   static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
   static final String KEY_SIGNATURE = "signature"; // embedded, VAST
   static final String KEY_URL = "url";  // CC, Stream, VAST
@@ -57,6 +59,14 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
    */
   public VASTAdSpot(JSONObject data) {
     update(data);
+  }
+
+  /**
+   * package private on purpose, for testing only.
+   * @param e the element
+   */
+  VASTAdSpot(Element e) {
+    parse(e);
   }
 
   /**
@@ -118,16 +128,46 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(_vastURL.toString());
       Element vast = doc.getDocumentElement();
-      if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) { return false; }
-      String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
-      if (Double.parseDouble(vastVersion) < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
-      Node ad = vast.getFirstChild();
-      while (ad != null) {
-        if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(VASTAd.ELEMENT_AD)) {
-          ad = ad.getNextSibling();
+      return parse(vast);
+
+    } catch (Exception e) {
+      System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
+      return false;
+    }
+  }
+
+  private boolean parse(Element vast) {
+    if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) {
+      return false;
+    }
+
+    String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
+    if (vastVersion == null) {
+      return false;
+    }
+
+    double version = 0;
+    try {
+      version = Double.parseDouble(vastVersion);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+
+    if (version < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION ||
+        version > VASTAd.MAXIMUM_SUPPORTED_VAST_VERSION) {
+      DebugMode.logE(TAG, "unsupported vast version" + vastVersion);
+      return false;
+    }
+
+    for (Node node = vast.getFirstChild(); node != null; node = node.getNextSibling()) {
+      if (node instanceof Element) {
+        Element ad = (Element) node;
+        String tagName = ad.getTagName();
+        if (!VASTAd.ELEMENT_AD.equals(tagName)) {
           continue;
         }
-        VASTAd vastAd = new VASTAd((Element) ad);
+
+        VASTAd vastAd = new VASTAd(ad);
         if (vastAd != null) {
           if (vastAd.getAdSequence() > 0) {
             _poddedAds.add(vastAd);
@@ -135,16 +175,12 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
             _standAloneAds.add(vastAd);
           }
         }
-        ad = ad.getNextSibling();
       }
+    }
 
-      if (_poddedAds.size() > 0) {
-        // sort podded ads
-        Collections.sort(_poddedAds);
-      }
-    } catch (Exception e) {
-      System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
-      return false;
+    if (_poddedAds.size() > 0) {
+      // sort podded ads
+      Collections.sort(_poddedAds);
     }
     return true;
   }

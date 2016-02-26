@@ -52,6 +52,12 @@ public class TestConstants {
   public static final String TEST_ANALYTICS_HTML = "test_analytics.html";
   public static final String TEST_ANALYTICS_HTML_FAIL = "test_analytics_fail.html";
   public static final String TEST_XML_VAST_AD = "test_vast_ad.xml";
+  // vast3 tests
+  public static final String TEST_VAST3_ICONS = "test_vast3_icons.xml";
+  public static final String TEST_VAST3_PODDED = "test_vast3_podded.xml";
+  public static final String TEST_VAST3_PODDED_STANDALONE = "test_vast3_podded_standalone.xml";
+  public static final String TEST_VAST3_STANDALONE = "test_vast3_standalone.xml";
+  public static final String TEST_VAST3_SKIPPABLE = "test_vast3_skippable.xml";
 
   public static InputStream getTestAssetAsStream(Context c, String name) {
       try {
