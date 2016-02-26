@@ -321,6 +321,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
   public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                           float pixelWidthHeightRatio) {
     DebugMode.logV(TAG, "video size changed, width " + width + " height " + height + " aspectRatio " + pixelWidthHeightRatio);
+    setVideoSize(width, height);
 
   }
 
