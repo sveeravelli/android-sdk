@@ -650,7 +650,7 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       notificationName = (String)arg1;
     } else if (arg1 instanceof OoyalaNotification){
       ooNotification = (OoyalaNotification)arg1;
-      notificationName = ooNotification.getNotificationName();
+      notificationName = ooNotification.getName();
     } else {
       DebugMode.logW(TAG, "Unidentified notification, ignorning for now");
       return;

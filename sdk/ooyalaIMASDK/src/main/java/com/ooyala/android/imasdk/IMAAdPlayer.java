@@ -4,6 +4,7 @@ package com.ooyala.android.imasdk;
 import com.ooyala.android.AdPodInfo;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
@@ -129,17 +130,18 @@ public class IMAAdPlayer extends AdMoviePlayer {
    * @param arg current notification
    */
   @Override
-  public void update(Observable arg0, Object arg) {
-    String notification = arg.toString();
-    if (notification == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
+  public void update(Observable arg0, Object arg1) {
+    final String name = ((OoyalaNotification)arg1).getName();
+    if (name == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       getNotifier().notifyPlayheadChange(); // Notify to update the UI
     }
 
-    super.update(arg0, arg);
+    super.update(arg0, arg1);
+
     // This ad is managed by a third party, not OoyalaPlayer's ad manager! That means that this player
     // does not fire a normal "State Changed: Completed". This is so Ooyala's ad manager does not take over
     // and start playing back content.  Ooyala Player expects the ad manager to resume content.
-    if (notification == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME && getState() == State.COMPLETED) {
+    if (name == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME && getState() == State.COMPLETED) {
       DebugMode.logD(TAG, "update(): Ad complete!");
       if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
         _imaManager._ooyalaPlayerWrapper.fireIMAAdCompleteCallback();

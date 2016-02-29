@@ -8,6 +8,7 @@ import com.ooyala.android.AdPodInfo;
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
@@ -221,8 +222,9 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
   @Override
-  public void update(Observable arg0, Object arg) {
-    if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
+  public void update(Observable arg0, Object arg1) {
+    final String name = ((OoyalaNotification)arg1).getName();
+    if (name == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       if (!_startSent && currentTime() > 0) {
 
 
@@ -251,7 +253,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         _thirdQSent = true;
       }
     }
-    else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
+    else if (name == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
       try {
         BaseStreamPlayer tempPlayer = (BaseStreamPlayer) arg0;
 
@@ -290,7 +292,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         DebugMode.logE(TAG, "arg0 should be a BaseStreamPlayer but is not!");
       }
     }
-    super.update(arg0,  arg);
+    super.update(arg0,  arg1);
   }
 
   /**

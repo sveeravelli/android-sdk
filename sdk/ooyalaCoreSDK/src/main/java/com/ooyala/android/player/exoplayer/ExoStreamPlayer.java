@@ -277,7 +277,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
                      long mediaStartTimeMs, long mediaEndTimeMs) {
     DebugMode.logD(TAG, "load started sourceId " + sourceId + " length " + length + " type " + type + " trigger " + trigger + " mediaStartTime " + mediaStartTimeMs + " mediaEndTime " + mediaEndTimeMs);
     setChanged();
-    notifyObservers(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION_NAME);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION_NAME));
   }
 
   @Override
@@ -286,8 +286,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
     DebugMode.logD(TAG, "load started sourceId " + sourceId + " bytesloaded " + bytesLoaded + " type " + type + " trigger " + trigger + " mediaStartTime " + mediaStartTimeMs + " mediaEndTime " + mediaEndTimeMs + " duration " + loadDurationMs);
 
     setChanged();
-    notifyObservers(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION_NAME);
-
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION_NAME));
   }
 
   @Override

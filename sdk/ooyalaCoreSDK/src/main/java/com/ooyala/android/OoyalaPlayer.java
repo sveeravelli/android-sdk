@@ -39,6 +39,7 @@ import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.player.PlayerInterfaceUtil;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
@@ -1270,8 +1271,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    if (arg0 instanceof PlayerInterface) {
-      processContentNotifications((PlayerInterface) arg0, arg1);
+    if (arg0 instanceof PlayerInterface && arg1 instanceof OoyalaNotification) {
+      processContentNotifications((PlayerInterface) arg0, (OoyalaNotification)arg1);
     }
   }
 
@@ -1280,30 +1281,23 @@ public class OoyalaPlayer extends Observable implements Observer,
    *
    * @param player
    *          the notification sender
-   * @param object
+   * @param notification
    *          the notification
    */
-  private void processContentNotifications(PlayerInterface player, Object object) {
+  private void processContentNotifications(PlayerInterface player, OoyalaNotification notification) {
     if (currentPlayer() != player) {
-      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + object);
+      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
     }
 
-    String notification;
-    if (object instanceof String) {
-      notification = (String)object;
-    } else {
-      Map<String, String> map = (Map<String, String>)object;
-      notification = map.get("name");
-    }
-
-    if (notification.equals(TIME_CHANGED_NOTIFICATION_NAME)) {
+    final String name = notification.getName();
+    if (name.equals(TIME_CHANGED_NOTIFICATION_NAME)) {
         // send analytics ping
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((player.currentTime()) / 1000);
       }
       processAdModes(AdMode.Playhead, player.currentTime());
       sendNotification(TIME_CHANGED_NOTIFICATION_NAME);
-    } else if (notification.equals(STATE_CHANGED_NOTIFICATION_NAME)) {
+    } else if (name.equals(STATE_CHANGED_NOTIFICATION_NAME)) {
       State state = player.getState();
       DebugMode.logD(TAG, "content player state change to " + state);
       switch (state) {
@@ -1340,7 +1334,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           break;
       }
     } else {
-      sendNotification(object);
+      sendNotification(notification);
     }
   }
 
@@ -1386,16 +1380,25 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void setState(State state) {
-    if (state != _state) {
-      DebugMode.logD(TAG, "player set state, old state was " + _state);
+    if (state != this._state) {
+      final State oldState = this._state;
       this._state = state;
-      sendNotification(STATE_CHANGED_NOTIFICATION_NAME);
+      sendNotification( PlayerInterfaceUtil.buildSetStateNotification( oldState, this._state ) );
     }
   }
 
-  private void sendNotification(Object obj) {
+  private void sendNotification(String notificationName) {
+    sendNotification(
+        new OoyalaNotification(
+            notificationName,
+            null
+        )
+    );
+  }
+
+  private void sendNotification(OoyalaNotification notification) {
     setChanged();
-    notifyObservers(obj);
+    notifyObservers(notification);
   }
 
   public boolean isLiveClosedCaptionsAvailable() {

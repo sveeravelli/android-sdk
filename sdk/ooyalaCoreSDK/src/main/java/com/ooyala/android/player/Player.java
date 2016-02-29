@@ -41,9 +41,10 @@ public class Player extends Observable implements PlayerInterface,
   }
 
   protected void setState(State state) {
-    _state = state;
+    final State oldState = this._state;
+    this._state = state;
     super.setChanged();
-    super.notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME);
+    super.notifyObservers( PlayerInterfaceUtil.buildSetStateNotification( oldState, this._state ) );
   }
 
   public OoyalaException getError() {

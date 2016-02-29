@@ -18,6 +18,7 @@ import android.view.SurfaceHolder;
 
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -262,7 +263,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
     this._buffer = percent;
     setChanged();
-    notifyObservers(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION_NAME);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION_NAME));
   }
 
   @Override
@@ -357,7 +358,7 @@ public class BaseStreamPlayer extends StreamPlayer implements OnBufferingUpdateL
     // but seek isn't actaully done, try it again
 
     setChanged();
-    notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION_NAME);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION_NAME));
     // If we're resuming, and we're not near the desired seek position, try again
     if(_timeBeforeSuspend >= 0 && Math.abs(_player.getCurrentPosition() - _timeBeforeSuspend) > 3000) {
       DebugMode.logI(this.getClass().getName(), "Seek failed. currentPos: " + _player.getCurrentPosition() +
