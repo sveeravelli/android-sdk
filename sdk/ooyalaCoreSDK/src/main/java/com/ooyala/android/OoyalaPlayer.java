@@ -420,6 +420,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public boolean setEmbedCodesWithAdSetCode(List<String> embedCodes,
       final String adSetCode) {
+    sendNotification(EMBED_CODE_SET_NOTIFICATION_NAME);
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
@@ -445,7 +446,6 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
         }));
 
-    sendNotification(EMBED_CODE_SET_NOTIFICATION_NAME);
     return true;
   }
 

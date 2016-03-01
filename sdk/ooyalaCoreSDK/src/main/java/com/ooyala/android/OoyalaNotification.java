@@ -39,6 +39,6 @@ public class OoyalaNotification {
   }
 
   public String toString() {
-    return "[" + getClass().getSimpleName() + "@" + hashCode() + ":n=" + name + ";d=" + (data==null?"<null>":data) + "]";
+    return "[" + getClass().getSimpleName() + "@" + hashCode() + ":name=" + name + ";data=" + (data==null?"<null>":data) + "]";
   }
 }

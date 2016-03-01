@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
@@ -129,7 +130,8 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
+    final String notificationName = ((OoyalaNotification)arg1).getName();
+    if (notificationName == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       return;
     }
     Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
