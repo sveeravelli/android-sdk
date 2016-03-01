@@ -70,6 +70,7 @@ public class ExoStreamPlayer extends StreamPlayer implements
 
   private RendererBuildingState rendererBuildingState;
   private boolean surfaceCreated;
+  private boolean initPlayStarted;
 
   private RendererBuilderInterface rendererBuilder;
   private TrackRenderer videoRenderer;
@@ -107,9 +108,13 @@ public class ExoStreamPlayer extends StreamPlayer implements
     }
     setState(OoyalaPlayer.State.LOADING);
     setParent(parent);
+    initExoplayer();
+  }
 
+  private void initExoplayer() {
     // initialize renderer builder
-    rendererBuilder = createRendererBuilder(parent.getLayout().getContext());
+    initPlayStarted = false;
+    rendererBuilder = createRendererBuilder(_parent.getLayout().getContext());
     if (rendererBuilder == null) {
       this._error = new OoyalaException(OoyalaException.OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "failed to create renderer builder");
       setState(OoyalaPlayer.State.ERROR);
@@ -432,7 +437,12 @@ public class ExoStreamPlayer extends StreamPlayer implements
         setState(OoyalaPlayer.State.LOADING);
         break;
       case ExoPlayer.STATE_READY:
-        setState(playWhenReady ? OoyalaPlayer.State.PLAYING : OoyalaPlayer.State.READY);
+        if (playWhenReady) {
+          setState(OoyalaPlayer.State.PLAYING);
+          initPlayStarted = true;
+        } else {
+          setState(initPlayStarted ? OoyalaPlayer.State.PAUSED : OoyalaPlayer.State.READY);
+        }
         break;
       default:
         break;
@@ -504,13 +514,19 @@ public class ExoStreamPlayer extends StreamPlayer implements
   }
 
   @Override
+  public void reset() {
+    destroy();
+    initExoplayer();
+  }
+
+  @Override
   public void destroy() {
     stopPlayheadTimer();
     if (rendererBuildingState == RendererBuildingState.Building) {
       rendererBuilder.cancel();
     }
     if (exoplayer != null) {
-      exoplayer.setPlayWhenReady(false);
+      DebugMode.logD(TAG, "Destroy" + exoplayer.toString());
       exoplayer.removeListener(this);
       exoplayer.release();
       exoplayer = null;
