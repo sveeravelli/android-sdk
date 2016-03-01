@@ -1,0 +1,31 @@
+<VAST version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast3_draft.xsd">
+    <Ad id="standalone">
+        <InLine>
+            <AdSystem>Ooyala</AdSystem>
+            <AdTitle>Ooyala test mp4 standalone</AdTitle>
+            <Error><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&iw=&uxnw=&uxss=&uxct=&et=e&cn=[ERRORCODE]]]></Error>
+            <Impression id="FWi_2447226.0"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=defaultImpression&et=i&_cc=&tpos=15&iw=&uxnw=&uxss=&uxct=&metr=121&init=1&_dic=1&cr=]]></Impression>
+            <Creatives>
+                <Creative sequence="1" AdID="">
+                    <Linear skipoffset="00:00:01">
+                        <Duration>00:00:05</Duration>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=complete&et=i&_cc=&tpos=15&init=1&iw=&uxnw=&uxss=&uxct=&metr=121]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=firstQuartile&et=i&_cc=&tpos=15&init=1&iw=&uxnw=&uxss=&uxct=&metr=121]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=midPoint&et=i&_cc=&tpos=15&init=1&iw=&uxnw=&uxss=&uxct=&metr=121]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=thirdQuartile&et=i&_cc=&tpos=15&init=1&iw=&uxnw=&uxss=&uxct=&metr=121]]></Tracking>
+                        </TrackingEvents>
+                        <AdParameters></AdParameters>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[http://www.ooyala.com/]]></ClickThrough>
+                            <ClickTracking id="FWc_2447226.0"><![CDATA[http://example-ad-server.ooyala.com/ad/l/1?s=a032&n=164515&t=1366755844262714011&adid=2447226&reid=1698599&arid=0&auid=&cn=defaultClick&et=c&_cc=&tpos=15&cr=]]></ClickTracking>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="progressive" type="video/mp4" bitrate="0" width="640" height="360"><![CDATA[http://techslides.com/demos/sample-videos/small.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
