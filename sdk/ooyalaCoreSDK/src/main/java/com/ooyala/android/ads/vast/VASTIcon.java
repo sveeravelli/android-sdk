@@ -35,7 +35,7 @@ public class VASTIcon {
   String clickThrough;
 
   VASTIcon(Element data) {
-    if (data == null || !data.getTagName().equals(VASTAd.ELEMENT_ICON)) {
+    if (data == null || !data.getTagName().equals(Constants.ELEMENT_ICON)) {
       return;
     }
     type = ResourceType.None;
@@ -43,53 +43,53 @@ public class VASTIcon {
   }
 
   private void parseXml(Element xml) {
-    program = xml.getAttribute(VASTAd.ATTRIBUTE_PROGRAM);
-    width = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_WIDTH, 0);
-    height = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_HEIGHT, 0);
+    program = xml.getAttribute(Constants.ATTRIBUTE_PROGRAM);
+    width = VASTUtils.getIntAttribute(xml, Constants.ATTRIBUTE_WIDTH, 0);
+    height = VASTUtils.getIntAttribute(xml, Constants.ATTRIBUTE_HEIGHT, 0);
 
-    String xString = xml.getAttribute(VASTAd.ATTRIBUTE_XPOSITION);
+    String xString = xml.getAttribute(Constants.ATTRIBUTE_XPOSITION);
     if ("left".equals(xString)) {
       xPosition = 0;
     } else if ("right".equals(xString)) {
       xPosition = Integer.MAX_VALUE;
     } else {
-      xPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_XPOSITION, 0);
+      xPosition = VASTUtils.getIntAttribute(xml, Constants.ATTRIBUTE_XPOSITION, 0);
     }
 
-    String yString = xml.getAttribute(VASTAd.ATTRIBUTE_YPOSITION);
+    String yString = xml.getAttribute(Constants.ATTRIBUTE_YPOSITION);
     if ("top".equals(yString)) {
       yPosition = 0;
     } else if ("bottom".equals(yString)) {
       yPosition = Integer.MAX_VALUE;
     } else {
-      yPosition = VASTUtils.getIntAttribute(xml, VASTAd.ATTRIBUTE_YPOSITION, 0);
+      yPosition = VASTUtils.getIntAttribute(xml, Constants.ATTRIBUTE_YPOSITION, 0);
     }
 
-    duration = VASTUtils.secondsFromTimeString(xml.getAttribute(VASTAd.ATTRIBUTE_DURATION), 0);
-    offset = VASTUtils.secondsFromTimeString(xml.getAttribute(VASTAd.ATTRIBUTE_OFFSET), 0);
-    apiFramework = xml.getAttribute(VASTAd.ATTRIBUTE_API_FRAMEWORK);
+    duration = VASTUtils.secondsFromTimeString(xml.getAttribute(Constants.ATTRIBUTE_DURATION), 0);
+    offset = VASTUtils.secondsFromTimeString(xml.getAttribute(Constants.ATTRIBUTE_OFFSET), 0);
+    apiFramework = xml.getAttribute(Constants.ATTRIBUTE_API_FRAMEWORK);
 
     Node child = xml.getFirstChild();
     while (child != null) {
       if (child instanceof Element) {
         Element e = (Element)child;
         String tag = e.getTagName();
-        if (tag.equals(VASTAd.ELEMENT_STATIC_RESOURCE)) {
+        if (tag.equals(Constants.ELEMENT_STATIC_RESOURCE)) {
           type = ResourceType.Static;
-          creativeType = e.getAttribute(VASTAd.ATTRIBUTE_CREATIVE_TYPE);
+          creativeType = e.getAttribute(Constants.ATTRIBUTE_CREATIVE_TYPE);
           resourceUrl = e.getTextContent().trim();
-        } else if (tag.equals(VASTAd.ELEMENT_IFRAME_RESOURCE)) {
+        } else if (tag.equals(Constants.ELEMENT_IFRAME_RESOURCE)) {
           type = ResourceType.IFrame;
           resourceUrl = e.getTextContent().trim();
-        } else if (tag.equals(VASTAd.ELEMENT_HTML_RESOURCE)) {
+        } else if (tag.equals(Constants.ELEMENT_HTML_RESOURCE)) {
           type = ResourceType.HTML;
           resourceUrl = e.getTextContent().trim();
-        } else if (tag.equals(VASTAd.ELEMENT_ICON_VIEW_TRACKING)) {
+        } else if (tag.equals(Constants.ELEMENT_ICON_VIEW_TRACKING)) {
           String viewTracking = e.getTextContent().trim();
           if (viewTracking != null && viewTracking.length() > 0) {
             viewTrackings.add(viewTracking);
           }
-        } else if (tag.equals(VASTAd.ELEMENT_ICON_CLICKS)) {
+        } else if (tag.equals(Constants.ELEMENT_ICON_CLICKS)) {
           parseClicks(e);
         }
       }
@@ -103,9 +103,9 @@ public class VASTIcon {
       if (child instanceof Element) {
         Element e = (Element)child;
         String tag = e.getTagName();
-        if (tag.equals(VASTAd.ELEMENT_ICON_CLICK_THROUGH)) {
+        if (tag.equals(Constants.ELEMENT_ICON_CLICK_THROUGH)) {
           clickThrough = e.getTextContent().trim();
-        } else if (tag.equals(VASTAd.ELEMENT_ICON_CLICK_TRACKING)) {
+        } else if (tag.equals(Constants.ELEMENT_ICON_CLICK_TRACKING)) {
           String tracking = e.getTextContent().trim();
           if (tracking != null && tracking.length() > 0) {
             clickTrackings.add(tracking);

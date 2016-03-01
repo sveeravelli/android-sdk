@@ -73,8 +73,8 @@ class VASTLinearAd implements PlayableItem {
    * @param data the Element containing the xml to use to initialize this VASTLinearAd
    */
   VASTLinearAd(Element data) {
-    if (!data.getTagName().equals(VASTAd.ELEMENT_LINEAR)) { return; }
-    String skipoffset = data.getAttribute(VASTAd.ATTRIBUTE_SKIPOFFSET);
+    if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
+    String skipoffset = data.getAttribute(Constants.ATTRIBUTE_SKIPOFFSET);
     if (skipoffset != null && skipoffset.length() > 0) {
       _skipOffset = parseSkipOffset(skipoffset);
     }
@@ -85,19 +85,19 @@ class VASTLinearAd implements PlayableItem {
         continue;
       }
       if (!VASTUtils.isNullOrEmpty(child.getTextContent())
-          && ((Element) child).getTagName().equals(VASTAd.ELEMENT_DURATION)) {
+          && ((Element) child).getTagName().equals(Constants.ELEMENT_DURATION)) {
         _duration = VASTUtils.secondsFromTimeString(child.getTextContent(), 0);
       } else if (!VASTUtils.isNullOrEmpty(child.getTextContent())
-          && ((Element) child).getTagName().equals(VASTAd.ELEMENT_AD_PARAMETERS)) {
+          && ((Element) child).getTagName().equals(Constants.ELEMENT_AD_PARAMETERS)) {
         _parameters = child.getTextContent();
-      } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_TRACKING_EVENTS)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_TRACKING_EVENTS)) {
         Node trackingChild = child.getFirstChild();
         while (trackingChild != null) {
           if (!(trackingChild instanceof Element) || VASTUtils.isNullOrEmpty(trackingChild.getTextContent())) {
             trackingChild = trackingChild.getNextSibling();
             continue;
           }
-          String event = ((Element) trackingChild).getAttribute(VASTAd.ATTRIBUTE_EVENT);
+          String event = ((Element) trackingChild).getAttribute(Constants.ATTRIBUTE_EVENT);
           Set<String> urls = _trackingEvents.get(event);
           if (urls != null) {
             urls.add(trackingChild.getTextContent());
@@ -108,23 +108,23 @@ class VASTLinearAd implements PlayableItem {
           }
           trackingChild = trackingChild.getNextSibling();
         }
-      } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_VIDEO_CLICKS)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_VIDEO_CLICKS)) {
         Node clickChild = child.getFirstChild();
         while (clickChild != null) {
           if (!(clickChild instanceof Element) || VASTUtils.isNullOrEmpty(clickChild.getTextContent())) {
             clickChild = clickChild.getNextSibling();
             continue;
           }
-          if (((Element) clickChild).getTagName().equals(VASTAd.ELEMENT_CLICK_THROUGH)) {
+          if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CLICK_THROUGH)) {
             _clickThroughURL = clickChild.getTextContent();
-          } else if (((Element) clickChild).getTagName().equals(VASTAd.ELEMENT_CLICK_TRACKING)) {
+          } else if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CLICK_TRACKING)) {
             _clickTrackingURLs.add(clickChild.getTextContent());
-          } else if (((Element) clickChild).getTagName().equals(VASTAd.ELEMENT_CUSTOM_CLICK)) {
+          } else if (((Element) clickChild).getTagName().equals(Constants.ELEMENT_CUSTOM_CLICK)) {
             _customClickURLs.add(clickChild.getTextContent());
           }
           clickChild = clickChild.getNextSibling();
         }
-      } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_MEDIA_FILES)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_MEDIA_FILES)) {
         Node fileChild = child.getFirstChild();
         while (fileChild != null) {
           if (!(fileChild instanceof Element)) {
@@ -135,7 +135,7 @@ class VASTLinearAd implements PlayableItem {
           _streams.add(stream);
           fileChild = fileChild.getNextSibling();
         }
-      } else if (((Element) child).getTagName().equals(VASTAd.ELEMENT_ICONS)) {
+      } else if (((Element) child).getTagName().equals(Constants.ELEMENT_ICONS)) {
         Node fileChild = child.getFirstChild();
         while (fileChild != null) {
           if (fileChild instanceof Element) {

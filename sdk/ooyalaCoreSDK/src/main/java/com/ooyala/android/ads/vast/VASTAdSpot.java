@@ -85,7 +85,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       default:
         break;
     }
-    if (data.isNull(VASTAd.KEY_SIGNATURE)) {
+    if (data.isNull(Constants.KEY_SIGNATURE)) {
       DebugMode.logE(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
@@ -100,9 +100,9 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       return ReturnState.STATE_FAIL;
     }
     try {
-      _signature = data.getString(VASTAd.KEY_SIGNATURE);
+      _signature = data.getString(Constants.KEY_SIGNATURE);
       _expires = data.getInt(KEY_EXPIRES);
-      _vastURL = VASTUtils.urlFromAdUrlString(data.getString(VASTAd.KEY_URL));
+      _vastURL = VASTUtils.urlFromAdUrlString(data.getString(Constants.KEY_URL));
       if (_vastURL == null) {
         return ReturnState.STATE_FAIL;
       }
@@ -137,11 +137,11 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   }
 
   private boolean parse(Element vast) {
-    if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) {
+    if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) {
       return false;
     }
 
-    String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
+    String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
     if (vastVersion == null) {
       return false;
     }
@@ -153,8 +153,8 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       return false;
     }
 
-    if (version < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION ||
-        version > VASTAd.MAXIMUM_SUPPORTED_VAST_VERSION) {
+    if (version < Constants.MINIMUM_SUPPORTED_VAST_VERSION ||
+        version > Constants.MAXIMUM_SUPPORTED_VAST_VERSION) {
       DebugMode.logE(TAG, "unsupported vast version" + vastVersion);
       return false;
     }
@@ -163,7 +163,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       if (node instanceof Element) {
         Element ad = (Element) node;
         String tagName = ad.getTagName();
-        if (!VASTAd.ELEMENT_AD.equals(tagName)) {
+        if (!Constants.ELEMENT_AD.equals(tagName)) {
           continue;
         }
 
