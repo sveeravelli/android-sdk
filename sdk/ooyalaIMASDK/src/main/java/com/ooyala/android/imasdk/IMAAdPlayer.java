@@ -127,7 +127,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
   /**
    * Send notification when playhead changed or ad completed
    * @param arg0 the Observable object
-   * @param arg current notification
+   * @param arg1 current notification
    */
   @Override
   public void update(Observable arg0, Object arg1) {

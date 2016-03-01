@@ -110,7 +110,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   public static final String PLAY_STARTED_NOTIFICATION_NAME = "playStarted";
   public static final String PLAY_COMPLETED_NOTIFICATION_NAME = "playCompleted";
   public static final String SEEK_COMPLETED_NOTIFICATION_NAME = "seekCompleted";
-  public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
+  public static final String CURRENT_ITEM_CHANGED_NOTIFICATION_NAME = "currentItemChanged";
   public static final String AD_STARTED_NOTIFICATION_NAME = "adStarted";
   public static final String AD_COMPLETED_NOTIFICATION_NAME = "adCompleted";
   public static final String AD_POD_COMPLETED_NOTIFICATION_NAME = "adPodCompleted";  //TODO: Used in Skin, needs to be used in SDK
@@ -603,7 +603,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       return false;
     }
 
-    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION_NAME);
 
     if (!_currentItem.isAuthorized()) {
       onError(getAuthError(_currentItem), null);

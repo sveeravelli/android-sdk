@@ -248,7 +248,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
           callback.onEnded();
         }
       }
-      else if(notification.equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
+      else if(notification.equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION_NAME)) {
         for (VideoAdPlayerCallback callback : _adCallbacks) {
           callback.onEnded();
         }

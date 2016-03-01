@@ -382,7 +382,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
       if ( isBacklotIMA || isOverrideIMA ) {
         String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
         if(url != null) {
-          DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
+          DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION_NAME");
           loadAds(url);
         }
       }
