@@ -1,9 +1,5 @@
 package com.ooyala.android.player;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Observable;
-
 import android.os.AsyncTask;
 import android.widget.FrameLayout;
 
@@ -14,6 +10,11 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
 import com.ooyala.android.item.AdSpot;
+import com.ooyala.android.util.DebugMode;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Observable;
 
 class PingTask extends AsyncTask<URL, Void, Void> {
 
@@ -79,4 +80,8 @@ public abstract class AdMoviePlayer extends MoviePlayer implements
     new PingTask().execute(url);
   }
 
+  /*
+   * Called when UI skip ad button is pressed
+   */
+  public abstract void skipAd();
 }

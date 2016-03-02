@@ -1,12 +1,14 @@
 package com.ooyala.android.ads.vast;
 
+import com.ooyala.android.AdvertisingIdUtils;
+import com.ooyala.android.util.DebugMode;
+
+import org.w3c.dom.Element;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-
-import com.ooyala.android.AdvertisingIdUtils;
-import com.ooyala.android.util.DebugMode;
 
 class VASTUtils {
   private static final String TAG = "VASTUtils";
@@ -19,15 +21,50 @@ class VASTUtils {
     return string == null || string.equals("");
   }
 
-  public static double secondsFromTimeString(String time) {
-    String[] hms = time.split(SEPARATOR_TIME);
-    double multiplier = 1.0;
-    double milliseconds = 0.0;
-    for (int i = hms.length - 1; i >= 0; i--) {
-      milliseconds += (Double.parseDouble(hms[i]) * multiplier);
-      multiplier *= 60.0;
+  /*
+   * parse string to time
+   * legal format HH:MM:SS.mmm
+   * @param time the time string
+   * @param defaultValue the default value to be used.
+   * @return time value in seconds, negative if failed;
+   */
+  public static double secondsFromTimeString(String time, double defaultValue) {
+    if (time == null) {
+      return defaultValue;
     }
-    return milliseconds;
+    double seconds = 0;
+    String[] hms = time.split(SEPARATOR_TIME);
+    for (int i = 0; i < hms.length; ++i) {
+      try {
+        double value = Double.parseDouble(hms[i]);
+        seconds = seconds * 60 + value;
+      } catch (NumberFormatException e) {
+        DebugMode.logE(TAG, "invalid time string: " + time);
+        return defaultValue;
+      }
+    }
+    return seconds;
+  }
+
+  /*
+   * parse string to integer
+   * @param e the xml element
+   * @param attributeName the attribute name
+   * @return the integer value, default is used if attribute does not present or is invalid
+   */
+  public static int getIntAttribute(Element e, String attributeName, int defaultValue) {
+    String attributeString = e.getAttribute(attributeName);
+    if (attributeString == null) {
+      DebugMode.logD(TAG, "Attribute " + attributeName + " does not exist");
+      return defaultValue;
+    }
+
+    try {
+      return Integer.parseInt(attributeString);
+    } catch (NumberFormatException ex) {
+      DebugMode.logE(TAG, "Invalid Attribute " + attributeName + " :" + attributeString);
+      return defaultValue;
+    }
   }
 
   public static URL urlFromAdUrlString(String urlStr) {

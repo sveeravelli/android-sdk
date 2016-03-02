@@ -1,11 +1,10 @@
 package com.ooyala.android.ads.vast;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import android.os.AsyncTask;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.ooyala.android.apis.FetchPlaybackInfoCallback;
+import com.ooyala.android.item.OoyalaManagedAdSpot;
+import com.ooyala.android.util.DebugMode;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,16 +12,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import android.os.AsyncTask;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import com.ooyala.android.util.DebugMode;
-import com.ooyala.android.apis.FetchPlaybackInfoCallback;
-import com.ooyala.android.item.OoyalaManagedAdSpot;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * A model of an VAST Ad spot, which can be played during video playback
  */
 public class VASTAdSpot extends OoyalaManagedAdSpot {
+  private static final String TAG = VASTAdSpot.class.getSimpleName();
+
   static final String KEY_EXPIRES = "expires";  //embedded, Vast, PAPI
   static final String KEY_SIGNATURE = "signature"; // embedded, VAST
   static final String KEY_URL = "url";  // CC, Stream, VAST
@@ -34,7 +37,8 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   /** The url for the vast request */
   protected URL _vastURL;
   /** The actual ads (List of VASTAd) */
-  protected List<VASTAd> _ads = new ArrayList<VASTAd>();
+  protected List<VASTAd> _poddedAds = new ArrayList<VASTAd>();
+  protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
 
   /**
    * Initialize a VASTAdSpot using the specified data
@@ -58,6 +62,14 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   }
 
   /**
+   * package private on purpose, for testing only.
+   * @param e the element
+   */
+  VASTAdSpot(Element e) {
+    parse(e);
+  }
+
+  /**
    * Update the VASTAdSpot using the specified data (subclasses should override and call this)
    * @param data the NSDictionary containing the data to use to update this VASTAdSpot
    * @return ReturnState.STATE_FAIL if the parsing failed, ReturnState.STATE_MATCHED if it was successful
@@ -73,7 +85,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       default:
         break;
     }
-    if (data.isNull(VASTAd.KEY_SIGNATURE)) {
+    if (data.isNull(Constants.KEY_SIGNATURE)) {
       DebugMode.logE(this.getClass().getName(),
           "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
@@ -88,9 +100,9 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       return ReturnState.STATE_FAIL;
     }
     try {
-      _signature = data.getString(VASTAd.KEY_SIGNATURE);
+      _signature = data.getString(Constants.KEY_SIGNATURE);
       _expires = data.getInt(KEY_EXPIRES);
-      _vastURL = VASTUtils.urlFromAdUrlString(data.getString(VASTAd.KEY_URL));
+      _vastURL = VASTUtils.urlFromAdUrlString(data.getString(Constants.KEY_URL));
       if (_vastURL == null) {
         return ReturnState.STATE_FAIL;
       }
@@ -116,24 +128,59 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(_vastURL.toString());
       Element vast = doc.getDocumentElement();
-      if (!vast.getTagName().equals(VASTAd.ELEMENT_VAST)) { return false; }
-      String vastVersion = vast.getAttribute(VASTAd.ATTRIBUTE_VERSION);
-      if (Double.parseDouble(vastVersion) < VASTAd.MINIMUM_SUPPORTED_VAST_VERSION) { return false; }
-      Node ad = vast.getFirstChild();
-      while (ad != null) {
-        if (!(ad instanceof Element) || !((Element) ad).getTagName().equals(VASTAd.ELEMENT_AD)) {
-          ad = ad.getNextSibling();
-          continue;
-        }
-        VASTAd vastAd = new VASTAd((Element) ad);
-        if (vastAd != null) {
-          _ads.add(vastAd);
-        }
-        ad = ad.getNextSibling();
-      }
+      return parse(vast);
+
     } catch (Exception e) {
       System.out.println("ERROR: Unable to fetch VAST ad tag info: " + e);
       return false;
+    }
+  }
+
+  private boolean parse(Element vast) {
+    if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) {
+      return false;
+    }
+
+    String vastVersion = vast.getAttribute(Constants.ATTRIBUTE_VERSION);
+    if (vastVersion == null) {
+      return false;
+    }
+
+    double version = 0;
+    try {
+      version = Double.parseDouble(vastVersion);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+
+    if (version < Constants.MINIMUM_SUPPORTED_VAST_VERSION ||
+        version > Constants.MAXIMUM_SUPPORTED_VAST_VERSION) {
+      DebugMode.logE(TAG, "unsupported vast version" + vastVersion);
+      return false;
+    }
+
+    for (Node node = vast.getFirstChild(); node != null; node = node.getNextSibling()) {
+      if (node instanceof Element) {
+        Element ad = (Element) node;
+        String tagName = ad.getTagName();
+        if (!Constants.ELEMENT_AD.equals(tagName)) {
+          continue;
+        }
+
+        VASTAd vastAd = new VASTAd(ad);
+        if (vastAd != null) {
+          if (vastAd.getAdSequence() > 0) {
+            _poddedAds.add(vastAd);
+          } else {
+            _standAloneAds.add(vastAd);
+          }
+        }
+      }
+    }
+
+    if (_poddedAds.size() > 0) {
+      // sort podded ads
+      Collections.sort(_poddedAds);
     }
     return true;
   }
@@ -164,7 +211,10 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   }
 
   public List<VASTAd> getAds() {
-    return _ads;
+    if (_poddedAds.size() > 0) {
+      return _poddedAds;
+    }
+    return _standAloneAds;
   }
 
   public URL getVASTURL() {

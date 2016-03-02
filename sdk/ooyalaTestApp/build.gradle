@@ -11,6 +11,8 @@ android {
 
         testApplicationId "com.ooyala.android.testapp.test"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
+
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -19,9 +21,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.1'
     compile project(':ooyalaCoreSDK')
     compile 'com.google.android.gms:play-services:6.5.87'
 }

@@ -81,6 +81,11 @@ class TestAdsPlugin extends ManagedAdsPlugin<TestAdSpot> {
     return true;
   }
 
+  @Override
+  public void skipAd() {
+    // do nothing.
+  }
+
   public TestAdSpot playedAd() {
     return _playedAd;
   }

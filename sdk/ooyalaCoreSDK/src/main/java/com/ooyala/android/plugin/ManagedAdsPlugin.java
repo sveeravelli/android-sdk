@@ -98,11 +98,6 @@ public abstract class ManagedAdsPlugin<T extends AdSpot> implements
     _adSpotManager.resetAds();
   }
 
-  @Override
-  public void skipAd() {
-    playAdsBeforeTime();
-  }
-
   protected boolean playAdsBeforeTime() {
     T adToPlay = _adSpotManager.adBeforeTime(_lastAdModeTime);
     if (adToPlay == null) {
