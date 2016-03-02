@@ -14,7 +14,7 @@ import com.ooyala.android.StateNotifier;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
-import com.ooyala.android.player.BaseStreamPlayer;
+import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
 
 import java.net.URL;
@@ -34,13 +34,11 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private boolean _firstQSent = false;
   private boolean _midSent = false;
   private boolean _thirdQSent = false;
-
   private boolean _playQueued = false;
 
   private int _topMargin;
   private FrameLayout _playerLayout;
   private AdsLearnMoreButton _learnMore;
-
   private Object _fetchTask;
   private int _adIndex;
 
@@ -224,22 +222,20 @@ public class VASTAdPlayer extends AdMoviePlayer {
   public void update(Observable arg0, Object arg) {
     if (arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
       if (!_startSent && currentTime() > 0) {
-
-
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
         sendTrackingEvent(TrackingEvent.START);
         _startSent = true;
-
+        VASTLinearAd linearAd = currentLinearAd();
         String title = _ad.getAds().get(_adIndex).getTitle();
         String description = _ad.getAds().get(_adIndex).getDescription();
         String url = currentLinearAd().getClickThroughURL();
         int adsCount = _ad.getAds().size();
-        int unplayedCount = adsCount - _adIndex;
-        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount,true,true));
-        if(isCurrentAdIFirstLinearForAdIndex(_adIndex, _ad.getAds())){
-          sendImpressionTrackingEvent(_adIndex, _ad.getAds());
+        int unplayedCount = adsCount - _adIndex - 1;
+        double skipoffset = currentLinearAd().getSkippable() ? currentLinearAd().getSkipOffset() : -1.0;
+        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount, skipoffset, true,true));
+        if (isCurrentAdIFirstLinearForAdIndex()) {
+          sendImpressionTrackingEvent();
         }
-
       } else if (!_firstQSent && currentTime() > (currentLinearAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
         _firstQSent = true;
@@ -252,45 +248,64 @@ public class VASTAdPlayer extends AdMoviePlayer {
       }
     }
     else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+      OoyalaPlayer.State state;
       try {
-        BaseStreamPlayer tempPlayer = (BaseStreamPlayer) arg0;
-
-        // If player is completed, send completed tracking event
-        if (tempPlayer.getState() == State.COMPLETED) {
-          if(isCurrentAdLastLinearForAdIndex(_adIndex, _ad.getAds())){
-            _adIndex++;
-          }
-          sendTrackingEvent(TrackingEvent.COMPLETE);
-          //If there are more ads to play, play them
-          if(_linearAdQueue.size() > 0) _linearAdQueue.remove(0);
-          if (!_linearAdQueue.isEmpty()) {
-            super.destroy();
-            addQuartileBoundaryObserver();
-            super.init(_parent, _linearAdQueue.get(0).getStreams());
-            super.play();
-
-            //If the next linear ad has a clickThrough URL, create the Learn More button only if it doesn't exist
-            if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
-              if (_learnMore == null) {
-                _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
-                _playerLayout.addView(_learnMore);
-              } else {
-                _playerLayout.bringChildToFront(_learnMore);
-              }
-            }
-            //If there is no clickThrough and Learn More button exists from previous ad, remove it
-            else if (_learnMore != null) {
-              _playerLayout.removeView(_learnMore);
-              _learnMore = null;
-            }
-          }
-        }
+        state = ((StreamPlayer) arg0).getState();
       } catch (Exception e) {
-        // ERROR: arg0 is not a BaseStreamPlayer as expected
-        DebugMode.logE(TAG, "arg0 should be a BaseStreamPlayer but is not!");
+        DebugMode.logE(TAG, "arg0 should be a StreamPlayer but is not!" + arg0.toString());
+        return;
+      }
+        // If player is completed, send completed tracking event
+      if (state == State.COMPLETED) {
+        sendTrackingEvent(TrackingEvent.COMPLETE);
+        // more ads to play, DO NOT update state. otherwise ad plugin will exit ad mode.
+        if (proceedToNextAd()) {
+          return;
+        }
       }
     }
     super.update(arg0,  arg);
+  }
+
+  /*
+   * proceed linear ads complete, move to next one if any
+   * returns true if more ads to play, false otherwise
+   */
+  private boolean proceedToNextAd() {
+    if (isCurrentAdLastLinearForAdIndex()) {
+      _adIndex++;
+    }
+
+    //If there are more ads to play, play them
+    if(_linearAdQueue.size() > 0) {
+      _linearAdQueue.remove(0);
+    }
+
+    if (_linearAdQueue.isEmpty()) {
+      return false;
+    }
+
+    super.destroy();
+    addQuartileBoundaryObserver();
+    super.init(_parent, _linearAdQueue.get(0).getStreams());
+    super.play();
+
+    //If the next linear ad has a clickThrough URL, create the Learn More button only if it doesn't exist
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
+      if (_learnMore == null) {
+          _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
+          _playerLayout.addView(_learnMore);
+      } else {
+          _playerLayout.bringChildToFront(_learnMore);
+      }
+    }
+    //If there is no clickThrough and Learn More button exists from previous ad, remove it
+    else if (_learnMore != null) {
+      _playerLayout.removeView(_learnMore);
+      _learnMore = null;
+    }
+
+    return true;
   }
 
   /**
@@ -367,8 +382,11 @@ public class VASTAdPlayer extends AdMoviePlayer {
   }
 
 
-  private void sendImpressionTrackingEvent(int adIndex, List<VASTAd> ads) {
-    List<String> urls = impressionUrlForAdIndex(adIndex, ads);
+  private void sendImpressionTrackingEvent() {
+    if (_adIndex < 0 || _adIndex >= _ad.getAds().size()) {
+      return;
+    }
+    List<String> urls = _ad.getAds().get(_adIndex).getImpressionURLs();
     if(urls != null){
       for(String urlStr: urls) {
         final URL url = VASTUtils.urlFromAdUrlString(urlStr);
@@ -378,15 +396,14 @@ public class VASTAdPlayer extends AdMoviePlayer {
     }
   }
 
-  private List<String> impressionUrlForAdIndex(int adIndex, List<VASTAd> ads){
-    VASTAd vastAd = ads.get(adIndex);
-    return vastAd.getImpressionURLs();
-  }
+  private List<VASTLinearAd> linearAdsForAdIndex(int adIndex){
+    if (adIndex < 0 || adIndex >= _ad.getAds().size()) {
+      return null;
+    }
 
-  private List<VASTLinearAd> vastLinearAdsForAdIndex(int adIndex, List<VASTAd> ads){
     List<VASTLinearAd> vastLinearAds = new ArrayList<VASTLinearAd>();
+    VASTAd vastAd = _ad.getAds().get(adIndex);
 
-    VASTAd vastAd = ads.get(adIndex);
     for (VASTSequenceItem seqItem : vastAd.getSequence()) {
       if (seqItem.hasLinear() && seqItem.getLinear().getStream() != null) {
         vastLinearAds.add(seqItem.getLinear());
@@ -396,18 +413,20 @@ public class VASTAdPlayer extends AdMoviePlayer {
     return vastLinearAds;
   }
 
-  private boolean isCurrentAdIFirstLinearForAdIndex(int adIndex, List<VASTAd> ads){
-    if(ads != null && ads.size() != 0) {
-      return currentLinearAd().equals(vastLinearAdsForAdIndex(adIndex, ads).get(0));
-    }else{
+  private boolean isCurrentAdIFirstLinearForAdIndex() {
+    List<VASTLinearAd> linearAds = linearAdsForAdIndex(_adIndex);
+    if (linearAds != null && linearAds.size() > 0) {
+      return currentLinearAd().equals(linearAds.get(0));
+    } else {
       return false;
     }
   }
 
-  private boolean isCurrentAdLastLinearForAdIndex(int _adIndex, List<VASTAd> ads){
-    if(ads != null && ads.size() != 0) {
-      return currentLinearAd().equals(vastLinearAdsForAdIndex(_adIndex, ads).get(ads.size() - 1));
-    }else{
+  private boolean isCurrentAdLastLinearForAdIndex(){
+    List<VASTLinearAd> linearAds = linearAdsForAdIndex(_adIndex);
+    if (linearAds != null && linearAds.size() > 0) {
+      return currentLinearAd().equals(linearAds.get(linearAds.size() - 1));
+    } else {
       return false;
     }
   }
@@ -424,5 +443,13 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (_fetchTask != null && this._parent != null) this._parent.getOoyalaAPIClient().cancel(_fetchTask);
     deleteObserver(this);
     super.destroy();
+  }
+
+  @Override
+  public void skipAd() {
+    getNotifier().notifyAdSkipped();
+    if (!proceedToNextAd()) {
+      setState(State.COMPLETED);
+    }
   }
 }

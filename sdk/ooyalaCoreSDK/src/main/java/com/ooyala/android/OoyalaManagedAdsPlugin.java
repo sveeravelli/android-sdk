@@ -215,6 +215,13 @@ public class OoyalaManagedAdsPlugin extends
     return true;
   }
 
+  @Override
+  public void skipAd() {
+    if (_adPlayer != null) {
+      _adPlayer.skipAd();
+    }
+  }
+
   /**
    * get the ad player, used to update UI controls
    *

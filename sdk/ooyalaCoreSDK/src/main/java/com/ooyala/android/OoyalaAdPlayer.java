@@ -1,7 +1,5 @@
 package com.ooyala.android;
 
-import java.net.URL;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.FrameLayout;
@@ -14,6 +12,8 @@ import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.util.DebugMode;
+
+import java.net.URL;
 
 class OoyalaAdPlayer extends AdMoviePlayer {
   private static String TAG = OoyalaAdPlayer.class.getName();
@@ -181,5 +181,11 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     if (_fetchTask != null) this._parent.getPlayerAPIClient().cancel(_fetchTask);
     super.destroy();
+  }
+
+  @Override
+  public void skipAd() {
+    getNotifier().notifyAdSkipped();
+    setState(State.COMPLETED);
   }
 }
