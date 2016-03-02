@@ -5,7 +5,6 @@ import android.widget.FrameLayout;
 
 import com.ooyala.android.AdsLearnMoreInterface;
 import com.ooyala.android.OoyalaNotification;
-import com.ooyala.android.util.DebugMode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
