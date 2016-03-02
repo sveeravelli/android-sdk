@@ -230,7 +230,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         String description = _ad.getAds().get(_adIndex).getDescription();
         String url = currentLinearAd().getClickThroughURL();
         int adsCount = _ad.getAds().size();
-        int unplayedCount = adsCount - _adIndex + 1;
+        int unplayedCount = adsCount - _adIndex - 1;
         double skipoffset = currentLinearAd().getSkippable() ? currentLinearAd().getSkipOffset() : -1.0;
         _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount, skipoffset, true,true));
         if (isCurrentAdIFirstLinearForAdIndex()) {
@@ -256,11 +256,13 @@ public class VASTAdPlayer extends AdMoviePlayer {
         return;
       }
         // If player is completed, send completed tracking event
-      if (state == State.COMPLETED && proceedToNextAd()) {
+      if (state == State.COMPLETED) {
+        sendTrackingEvent(TrackingEvent.COMPLETE);
         // more ads to play, DO NOT update state. otherwise ad plugin will exit ad mode.
-        return;
+        if (proceedToNextAd()) {
+          return;
+        }
       }
-
     }
     super.update(arg0,  arg);
   }
@@ -270,7 +272,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
    * returns true if more ads to play, false otherwise
    */
   private boolean proceedToNextAd () {
-    sendTrackingEvent(TrackingEvent.COMPLETE);
+
     if (isCurrentAdLastLinearForAdIndex()) {
       _adIndex++;
     }
@@ -442,5 +444,13 @@ public class VASTAdPlayer extends AdMoviePlayer {
     if (_fetchTask != null && this._parent != null) this._parent.getOoyalaAPIClient().cancel(_fetchTask);
     deleteObserver(this);
     super.destroy();
+  }
+
+  @Override
+  public void skipAd() {
+    getNotifier().notifyAdSkipped();
+    if (!proceedToNextAd()) {
+      setState(State.COMPLETED);
+    }
   }
 }
