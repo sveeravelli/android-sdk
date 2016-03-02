@@ -27,17 +27,23 @@ public class OoyalaNotification {
     this.data = data;
   }
 
+  /**
+   * @return the 'notificationName' originally passed in to the constructor.
+   * @see #OoyalaNotification(String)
+   * @see #OoyalaNotification(String, Object)
+   */
   public String getName() {
     return name;
   }
 
   /**
-   * @return possibly null.
+   * @return possibly null data originally passed in to the constructor.
    */
   public Object getData() {
     return data;
   }
 
+  @Override
   public String toString() {
     return "[" + getClass().getSimpleName() + "@" + hashCode() + ":name=" + name + ";data=" + (data==null?"<null>":data) + "]";
   }
