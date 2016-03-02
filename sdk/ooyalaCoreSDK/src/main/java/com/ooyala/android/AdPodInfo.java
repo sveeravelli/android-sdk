@@ -51,7 +51,7 @@ public class AdPodInfo {
       return controls;
   }
 
-  public double getSkipoffset() {
+  public double getSkipOffset() {
     return skipoffset;
   }
 

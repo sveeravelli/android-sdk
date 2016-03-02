@@ -79,8 +79,7 @@ public abstract class AdMoviePlayer extends MoviePlayer implements
   }
 
   /*
-   * called when UI skip ad button is called
-   * return false if
+   * Called when UI skip ad button is pressed
    */
   public abstract void skipAd();
 }

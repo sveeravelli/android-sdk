@@ -271,8 +271,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
    * proceed linear ads complete, move to next one if any
    * returns true if more ads to play, false otherwise
    */
-  private boolean proceedToNextAd () {
-
+  private boolean proceedToNextAd() {
     if (isCurrentAdLastLinearForAdIndex()) {
       _adIndex++;
     }
