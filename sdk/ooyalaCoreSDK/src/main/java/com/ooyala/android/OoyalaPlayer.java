@@ -1598,6 +1598,27 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+
+  /**
+   * This is called when an icon is clicked.
+   * @param index the index of the icon
+   */
+  public void onAdIconClicked(int index) {
+    if (isShowingAd() && _adManager.getActivePlugin() != null) {
+      _adManager.getActivePlugin().onAdIconClicked(index);
+    }
+  }
+
+  /**
+   * This is called when an icon is rendered/viewed.
+   * @param index the index of the icon
+   */
+  public void onAdIconViewed(int index) {
+    if (isShowingAd() && _adManager.getActivePlugin() != null) {
+      _adManager.getActivePlugin().onAdIconViewed(index);
+    }
+  }
+
   /**
    * @return the kind of content that is on the video display right now.
    */

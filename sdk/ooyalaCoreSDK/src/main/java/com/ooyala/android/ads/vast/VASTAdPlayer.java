@@ -11,6 +11,7 @@ import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.StateNotifier;
+import com.ooyala.android.Utils;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
 import com.ooyala.android.item.AdSpot;
 import com.ooyala.android.player.AdMoviePlayer;
@@ -128,7 +129,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
-        ping(url);
+        Utils.pingUrl(url);
       }
     }
 
@@ -351,7 +352,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
         for (String urlStr : urls) {
           final URL url = VASTUtils.urlFromAdUrlString(urlStr);
           DebugMode.logI(TAG, "Sending Click Tracking Ping: " + url);
-          ping(url);
+          Utils.pingUrl(url);
         }
       }
     }
@@ -376,7 +377,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       for (String urlStr : urls) {
         final URL url = VASTUtils.urlFromAdUrlString(urlStr);
         DebugMode.logI(TAG, "Sending " + event + " Tracking Ping: " + url);
-        ping(url);
+        Utils.pingUrl(url);
       }
     }
   }
@@ -391,7 +392,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
       for(String urlStr: urls) {
         final URL url = VASTUtils.urlFromAdUrlString(urlStr);
         DebugMode.logI(TAG, "Sending Impression Tracking Ping: " + url);
-        ping(url);
+        Utils.pingUrl(url);
       }
     }
   }
