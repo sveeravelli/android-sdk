@@ -759,7 +759,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     cleanupPlayer(_player);
     _player = null;
-
+    _layoutController.getLayout().removeAllViews();
     hidePromoImage();
   }
 
