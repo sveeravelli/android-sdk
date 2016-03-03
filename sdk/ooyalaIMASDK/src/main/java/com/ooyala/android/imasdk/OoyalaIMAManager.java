@@ -304,15 +304,20 @@ public class OoyalaIMAManager implements AdPluginInterface {
   }
 
   /**
-   * Always return true for initializing IMA Ads
-   * @return true
+   * Return true if there is a URL to load
+   * @return true if an adTagURL exists
    */
   @Override
   public boolean onContentChanged() {
     DebugMode.logD(TAG, "IMA Ads Manager: onContentChanged");
     destroy();
     resetFields();
-    return true;  //True if you want to block, false otheriwse
+    if (getAdTagFromCurrentItemOrUrlOverride(_player.getCurrentItem(), _adUrlOverride) != null) {
+      return true;  //True if you want to block, false otherwise
+    }
+
+    DebugMode.logE(TAG, "No Ad URL Available, even though IMA is loaded");
+    return false;
   }
 
   /**
@@ -373,22 +378,32 @@ public class OoyalaIMAManager implements AdPluginInterface {
     // nothing need to be done here for Google IMA since we fire the AdModeEnter request first
     DebugMode.logD(TAG, "IMA Ads Manager: onAdModeEntered");
     if (_adsManager == null) {
-      Video currentItem = _player.getCurrentItem();
 
-      final boolean isBacklotIMA = currentItem.getModuleData() != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager") != null &&
-          currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
-      final boolean isOverrideIMA = _adUrlOverride != null;
-      if ( isBacklotIMA || isOverrideIMA ) {
-        String url = _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
-        if(url != null) {
-          DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
-          loadAds(url);
-        }
+      String url = getAdTagFromCurrentItemOrUrlOverride(_player.getCurrentItem(), _adUrlOverride);
+      if(url != null) {
+        DebugMode.logD(TAG, "Start Loading ads after CURRENT_ITEM_CHANGED_NOTIFICATION");
+        loadAds(url);
+      }
+      else {
+        DebugMode.assertFail(TAG, "Ad Mode Entered, but there is no Ad URL");
+        _player.exitAdMode(this);
       }
     }
   }
 
+  private String getAdTagFromCurrentItemOrUrlOverride(Video currentItem, String adUrlOverride) {
+    final boolean hasBacklotAdMetadata = currentItem.getModuleData() != null &&
+            currentItem.getModuleData().get("google-ima-ads-manager") != null &&
+            currentItem.getModuleData().get("google-ima-ads-manager").getMetadata() != null;
+
+    if (adUrlOverride != null) {
+      return adUrlOverride;
+    } else if (hasBacklotAdMetadata){
+      return _adUrlOverride != null ? _adUrlOverride : currentItem.getModuleData().get("google-ima-ads-manager").getMetadata().get("adTagUrl");
+    } else {
+      return null;
+    }
+  }
   /**
    * Suspend ads playback
    */
@@ -500,7 +515,7 @@ public class OoyalaIMAManager implements AdPluginInterface {
 
   private void timeout() {
     DebugMode.logD(TAG, "Requesting ads timeout");
-    _player.exitAdMode(_adPlayer.getIMAManager());
+    _player.exitAdMode(this);
   }
 
   @Override
