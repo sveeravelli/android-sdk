@@ -43,7 +43,7 @@ import java.util.Set;
  * use this layout controller, you will not see IMA's "Learn More" button when in fullscreen mode.
  *
  */
-public class OoyalaIMAManager implements AdPluginInterface {
+public class OoyalaIMAManager implements AdPluginInterface, AdsLoadedListener, AdErrorListener, AdEventListener {
   private static String TAG = "OoyalaIMAManager";
   private static final int TIMEOUT = 5000;
 
@@ -86,8 +86,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
       this.layout = ooyalaPlayer.getLayout();
     }
 
-    _adPlayer = new IMAAdPlayer();
-    _adPlayer.setIMAManager(this);
     _companionAdSlots = new ArrayList<CompanionAdSlot>();
 
     //Initialize OoyalaPlayer-IMA Bridge
@@ -99,91 +97,81 @@ public class OoyalaIMAManager implements AdPluginInterface {
     _adsLoader = _sdkFactory.createAdsLoader(this.layout.getContext(), _sdkFactory.createImaSdkSettings());
 
     //Create the listeners for the adsLoader and adsManager
-    _adsLoader.addAdErrorListener(new AdErrorListener() {
-      @Override
-      public void onAdError(AdErrorEvent event) {
-        DebugMode.logE(TAG, "IMA AdsLoader Error: " + event.getError().getMessage() + "\n");
-        DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
-        _onAdError = true;
-        _ooyalaPlayerWrapper.onAdError();
-      }
-    });
+    _adsLoader.addAdErrorListener(this);
+    _adsLoader.addAdsLoadedListener(this);
+  }
 
-    _adsLoader.addAdsLoadedListener(new AdsLoadedListener() {
+  @Override
+  public void onAdError(AdErrorEvent event) {
+    DebugMode.logE(TAG, "IMA AdsLoader or AdsManager Error: " + event.getError().getMessage() + "\n");
+    DebugMode.logE(TAG, "IMA AdsLoader or AdsManager Error: doing adPlayerCompleted()" );
+    _onAdError = true;
+    _ooyalaPlayerWrapper.onAdError();
+  }
 
-      @Override
-      public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
-        DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
-        if(timeoutThread != null && timeoutThread.isAlive()) {
-          timeoutThread.interrupt();
-        }
-        _adsManager = event.getAdsManager();
-        _player.exitAdMode(_adPlayer.getIMAManager());
-        _adsManager.addAdErrorListener(new AdErrorListener() {
+  @Override
+  public void onAdsManagerLoaded(AdsManagerLoadedEvent event) {
+    DebugMode.logD(TAG, "IMA AdsManager: Ads loaded");
+    if(timeoutThread != null && timeoutThread.isAlive()) {
+      timeoutThread.interrupt();
+    }
+    _adsManager = event.getAdsManager();
+    _player.exitAdMode(this);
+    _adsManager.addAdErrorListener(this);
+    _adsManager.addAdEventListener(this);
+  }
 
-          @Override
-          public void onAdError(AdErrorEvent event) {
-            DebugMode.logE(TAG, "IMA AdsManager Error: " + event.getError().getMessage() + "\n");
-            DebugMode.logE(TAG, "IMA AdsLoader Error: doing adPlayerCompleted()" );
-            _onAdError = true;
-            _ooyalaPlayerWrapper.onAdError();
-          }
-        });
-
-        _adsManager.addAdEventListener(new AdEventListener() {
-
-          @Override
-          public void onAdEvent(AdEvent event) {
-            DebugMode.logD(TAG,"IMA AdsManager Event: " + event.getType());
-            switch (event.getType()) {
-              case LOADED:
-                DebugMode.logD(TAG,"IMA Ad Manager: Ads Loaded");
-                break;
-              case CONTENT_PAUSE_REQUESTED:
-                int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
-                _ooyalaPlayerWrapper.pauseContent();
-                Set<Integer> newCuePoints = new HashSet<Integer>();
-                if (_cuePoints != null && _cuePoints.size() > 1) {
-                  for (Integer cuePoint : _cuePoints) {
-                    if (cuePoint != 0 && cuePoint >= currentContentPlayheadTime) {
-                      newCuePoints.add(cuePoint);
-                    }
-                  }
-                }
-                _cuePoints = newCuePoints;
-                break;
-              case CONTENT_RESUME_REQUESTED:
-                _ooyalaPlayerWrapper.playContent();
-                break;
-              case STARTED:
-                break;
-              case ALL_ADS_COMPLETED:
-                _allAdsCompleted = true;
-                break;
-              case COMPLETED:
-                break;
-              case PAUSED:
-                break;
-              case SKIPPED:
-                skipAd();
-                break;
-              case RESUMED:
-                if (_browserOpened) {
-                  _adPlayer.play();
-                  _browserOpened = false;
-                }
-                break;
-              case CLICKED:
-                _adPlayer.pause();
-                _browserOpened = true;
-                break;
-              default:
-                break;
+  @Override
+  public void onAdEvent(AdEvent event) {
+    DebugMode.logD(TAG, "IMA AdsManager Event: " + event.getType());
+    switch (event.getType()) {
+      case LOADED:
+        DebugMode.logD(TAG, "IMA Ad Manager: Ads Loaded");
+        break;
+      case CONTENT_PAUSE_REQUESTED:
+        _adPlayer = new IMAAdPlayer();
+        _adPlayer.setIMAManager(this);
+        int currentContentPlayheadTime = _player.getPlayheadTime(); // have to be before _ooyalaPlayerWrapper.pauseContent() since "currentPlayer" will become adPlayer after pause;
+        _ooyalaPlayerWrapper.pauseContent();
+        Set<Integer> newCuePoints = new HashSet<Integer>();
+        if (_cuePoints != null && _cuePoints.size() > 1) {
+          for (Integer cuePoint : _cuePoints) {
+            if (cuePoint != 0 && cuePoint >= currentContentPlayheadTime) {
+              newCuePoints.add(cuePoint);
             }
           }
-        });
-      }
-    });
+        }
+        _cuePoints = newCuePoints;
+        break;
+      case CONTENT_RESUME_REQUESTED:
+        destroyPlayer();
+        _ooyalaPlayerWrapper.playContent();
+        break;
+      case STARTED:
+        break;
+      case ALL_ADS_COMPLETED:
+        _allAdsCompleted = true;
+        break;
+      case COMPLETED:
+        break;
+      case PAUSED:
+        break;
+      case SKIPPED:
+        skipAd();
+        break;
+      case RESUMED:
+        if (_browserOpened) {
+          _adPlayer.play();
+          _browserOpened = false;
+        }
+        break;
+      case CLICKED:
+        _adPlayer.pause();
+        _browserOpened = true;
+        break;
+      default:
+        break;
+    }
   }
 
   public OoyalaIMAManager(OoyalaPlayer ooyalaPlayer) {
@@ -420,7 +408,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
    */
   @Override
   public void resume() {
-    // TODO Auto-generated method stub
     DebugMode.logD(TAG, "IMA Ads Manager: resume");
     if (_adPlayer != null) {
       _adPlayer.resume();
@@ -435,7 +422,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
    */
   @Override
   public void resume(int timeInMilliSecond, State stateToResume) {
-    // TODO Auto-generated method stub
     // Can we resume in this way for Google IMA??
     // Currently we just do the normal resume
     resume();
@@ -453,7 +439,15 @@ public class OoyalaIMAManager implements AdPluginInterface {
       _onAdError = false;
       _cuePoints = null;
     }
+    destroyPlayer();
     _adsManager = null;
+  }
+
+  public void destroyPlayer() {
+    if (_adPlayer != null) {
+      _adPlayer.destroy();
+      _adPlayer = null;
+    }
   }
 
   /**
@@ -461,7 +455,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
    */
   @Override
   public PlayerInterface getPlayerInterface() {
-    // TODO Auto-generated method stub
     return _adPlayer;
   }
 
@@ -471,7 +464,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
   @Override
   public void resetAds() {
     DebugMode.logD(TAG, "IMA Ads Manager: reset");
-    // TODO Auto-generated method stub
     resetFields();
     onInitialPlay();
   }
@@ -482,7 +474,6 @@ public class OoyalaIMAManager implements AdPluginInterface {
   @Override
   public void skipAd() {
     DebugMode.logD(TAG, "IMA Ads Manager: skipAd");
-    // TODO Auto-generated method stub
     _adPlayer.notifyAdSkipped();
     _adsManager.skip();
   }
