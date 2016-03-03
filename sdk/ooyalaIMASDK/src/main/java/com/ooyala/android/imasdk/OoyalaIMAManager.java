@@ -375,7 +375,6 @@ public class OoyalaIMAManager implements AdPluginInterface, AdsLoadedListener, A
       else {
         DebugMode.assertFail(TAG, "Ad Mode Entered, but there is no Ad URL");
         _player.exitAdMode(this);
-
       }
     }
   }
