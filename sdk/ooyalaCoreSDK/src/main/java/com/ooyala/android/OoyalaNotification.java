@@ -5,6 +5,21 @@ package com.ooyala.android;
  */
 public class OoyalaNotification {
 
+  /**
+   * Help parse the Object event types.
+   * @see java.util.Observer#update(Observable, Object)
+   * @param arg the second argument passed to the update method.
+   * @return "UNKNOWN" if arg is not an instance of OoyalaNotification, otherwise the name of the notification.
+   */
+  public static final String getNameOrUnknown( Object arg ) {
+    String name = UNKNOWN_NOTIFICATION_NAME;
+    if( arg instanceof OoyalaNotification ) {
+      name = ((OoyalaNotification)arg).getName();
+    }
+    return name;
+  }
+
+  public static final String UNKNOWN_NOTIFICATION_NAME = "UNKNOWN";
   public static final String OLD_STATE_KEY = "oldState";
   public static final String NEW_STATE_KEY = "newState";
 

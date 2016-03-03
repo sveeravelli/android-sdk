@@ -130,7 +130,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    final String notificationName = ((OoyalaNotification)arg1).getName();
+    final String notificationName = OoyalaNotification.getNameOrUnknown(arg1);
     if (notificationName == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       return;
     }
