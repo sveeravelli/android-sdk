@@ -31,6 +31,12 @@ public class Video extends ContentItem implements PlayableItem {
 
   Video() {}
 
+  /**
+   * Convert an UnbundledVideo into an object our playback stack understands.
+   * This is mostly only for internal use.
+   * @param unbundledVideo non-null.
+   * @see UnbundledVideo
+   */
   public Video( UnbundledVideo unbundledVideo ) {
     _embedCode = UnbundledVideo.UNBUNDLED_EMBED_CODE;
     _authorized = true;
