@@ -553,7 +553,7 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private boolean changeCurrentItemToUnbundledVideo() {
-    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION_NAME);
     cancelOpenTasks();
     if (!processAdModes(AdMode.ContentChanged, 0)) {
       switchToContent(false);

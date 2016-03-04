@@ -19,6 +19,8 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
+import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.UnbundledVideo;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 import java.util.LinkedHashMap;
@@ -117,7 +119,12 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   @Override
   public void onClick(View v) {
-    player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
+//    player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
+//    final String url = "http://techslides.com/demos/sample-videos/small.mp4";
+    final String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
+    final Stream stream = new Stream( url, Stream.DELIVERY_TYPE_HLS );
+    final UnbundledVideo uvideo = new UnbundledVideo( stream );
+    player.setUnbundledVideo(uvideo);
   }
 
   @Override
@@ -129,9 +136,9 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   }
 
   @Override
-  public void update(Observable arg0, Object arg1) {
-    final String notificationName = OoyalaNotification.getNameOrUnknown(arg1);
-    if (notificationName == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
+  public void update(Observable arg0, Object argN) {
+    final String arg1 = OoyalaNotification.getNameOrUnknown(argN);
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       return;
     }
     Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
