@@ -128,7 +128,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
    */
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION && !_player.isShowingAd() && _fwContext != null) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME && !_player.isShowingAd() && _fwContext != null) {
       State state = _player.getState();
       DebugMode.logD(TAG, "update: State changed to: " + state.toString());
       switch (state) {
@@ -147,7 +147,7 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
       default:
         break;
       }
-    } else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION) {
+    } else if (arg1 == OoyalaPlayer.PLAY_COMPLETED_NOTIFICATION_NAME) {
       if (_fwContext != null) {
         _fwContext.setVideoState(_fwConstants.VIDEO_STATE_COMPLETED());
       }

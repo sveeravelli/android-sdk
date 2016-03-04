@@ -15,10 +15,12 @@ import com.google.android.libraries.cast.companionlibrary.cast.exceptions.Transi
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.player.PlayerInterfaceUtil;
 import com.ooyala.android.plugin.LifeCycleInterface;
 import com.ooyala.android.util.DebugMode;
 
@@ -66,7 +68,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     this.addObserver(ooyalaPlayer);
     updateMetadataFromOoyalaPlayer(ooyalaPlayer);
     setChanged();
-    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME));
   }
 
   /*package private on purpose*/ void disconnectFromCurrentOoyalaPlayer() {
@@ -166,9 +168,10 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
   }
   
   private void setState(State state) {
+    final State oldState = this.state;
     this.state = state;
     setChanged();
-    notifyObservers(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    notifyObservers( PlayerInterfaceUtil.buildSetStateNotification( oldState, this.state ) );
   }
 
   @Override
@@ -378,7 +381,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
 
   private void onPlayHeadChanged() {
     setChanged();
-    notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME));
   }
 
   /*package private on purpose*/ void onPlayerStatusChanged(int remotePlayerStatus) {
@@ -441,7 +444,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
           this.error = new OoyalaException(getOoyalaErrorCodeForReceiverCode(receiverCode), "Error from Cast Receiver: " + receiverCode);
           setState(State.ERROR);
           setChanged();
-          notifyObservers(OoyalaPlayer.ERROR_NOTIFICATION);
+          notifyObservers(new OoyalaNotification(OoyalaPlayer.ERROR_NOTIFICATION_NAME));
         }
       }
     } catch (JSONException e) {
@@ -453,7 +456,7 @@ public class CastPlayer extends Observable implements PlayerInterface, LifeCycle
     this.error = error;
     setState(State.ERROR);
     setChanged();
-    notifyObservers(OoyalaPlayer.ERROR_NOTIFICATION);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.ERROR_NOTIFICATION_NAME));
   }
   
   /*============================================================================================*/

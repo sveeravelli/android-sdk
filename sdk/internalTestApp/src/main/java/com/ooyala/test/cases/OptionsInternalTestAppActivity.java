@@ -144,7 +144,7 @@ public class OptionsInternalTestAppActivity extends Activity implements
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       return;
     }
     Log.d(TAG,

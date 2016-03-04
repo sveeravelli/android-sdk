@@ -172,11 +172,11 @@ public class NielsenAnalytics implements ID3TagNotifierListener, Observer {
       DebugMode.logE( TAG, "not our player!" );
     }
     else {
-      if( arg == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION ) {
+      if( arg == OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION_NAME) {
         itemChanged( player.getCurrentItem() );
-      } else if( arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION ) {
+      } else if( arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
         stateUpdate( player.getState() );
-      } else if( arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION ) {
+      } else if( arg == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
         reportPlayheadUpdate( player.getCurrentItem(), player.getPlayheadTime() );
       }
     }

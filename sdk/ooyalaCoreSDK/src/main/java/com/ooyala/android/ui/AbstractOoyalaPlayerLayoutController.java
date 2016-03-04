@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.Debug;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -651,21 +650,21 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
       notificationName = (String)arg1;
     } else if (arg1 instanceof OoyalaNotification){
       ooNotification = (OoyalaNotification)arg1;
-      notificationName = ooNotification.getNotificationName();
+      notificationName = ooNotification.getName();
     } else {
       DebugMode.logW(TAG, "Unidentified notification, ignorning for now");
       return;
     }
 
-    if (notificationName.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+    if (notificationName.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME)) {
       refreshClosedCaptionsView();
-    } else if (notificationName.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION)) {
+    } else if (notificationName.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME)) {
       removeClosedCaptionsView();
-    } else if (notificationName.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION)) {
+    } else if (notificationName.equals(OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME)) {
       displayCurrentClosedCaption();
-    } else if (notificationName.equals(OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED)) {
+    } else if (notificationName.equals(OoyalaPlayer.CLOSED_CAPTIONS_LANGUAGE_CHANGED_NAME)) {
       refreshClosedCaptionsView();
-    } else if (notificationName.equals(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION)) {
+    } else if (notificationName.equals(OoyalaPlayer.LIVE_CC_CHANGED_NOTIFICATION_NAME)) {
       String caption = ((Map<String, String>)ooNotification.getData()).get(OoyalaPlayer.CLOSED_CAPTION_TEXT);
       if (_closedCaptionsView == null) {
         addClosedCaptionsView();
