@@ -245,14 +245,4 @@ public class OoyalaManagedAdsPlugin extends
       _adPlayer.onAdIconClicked(index);
     }
   }
-
-  /**
-   * This is called when an icon is rendered/viewed.
-   * @param index the index of the icon
-   */
-  public void onAdIconViewed(int index) {
-    if (_adPlayer != null) {
-      _adPlayer.onAdIconViewed(index);
-    }
-  }
 }

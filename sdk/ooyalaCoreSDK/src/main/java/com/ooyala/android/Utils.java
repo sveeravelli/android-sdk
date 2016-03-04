@@ -358,6 +358,9 @@ public class Utils {
    * @param url the url to ping
    **/
   public static void pingUrl(URL url) {
+    if (url == null) {
+      return;
+    }
     PingTask task = new PingTask(url);
     executor.submit(task);
   }

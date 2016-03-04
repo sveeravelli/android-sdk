@@ -75,7 +75,7 @@ public class IMAAdPlayer extends AdMoviePlayer {
       String url = "";
       int adsCount = 1;
       int unplayedCount = adsCount - 1;
-      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount,-1.0, false, false));
+      _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title, description, url, adsCount, unplayedCount));
       super.play();
       if (_imaManager != null && _imaManager._ooyalaPlayerWrapper != null) {
         _imaManager._ooyalaPlayerWrapper.fireVideoStartCallback();

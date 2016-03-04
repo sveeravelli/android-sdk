@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.FrameLayout;
 
+import com.ooyala.android.AdIconInfo;
 import com.ooyala.android.AdPodInfo;
 import com.ooyala.android.AdsLearnMoreButton;
 import com.ooyala.android.OoyalaException;
@@ -42,6 +43,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
   private AdsLearnMoreButton _learnMore;
   private Object _fetchTask;
   private int _adIndex;
+  private ArrayList<Boolean> _iconViewTracker;
 
   private interface TrackingEvent {
     public static final String CREATIVE_VIEW = "creativeView";
@@ -217,6 +219,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
     _firstQSent = false;
     _midSent = false;
     _thirdQSent = false;
+    _iconViewTracker = new ArrayList<Boolean>();
+    for (int i = 0; i < currentLinearAd().getIcons().size(); ++i) {
+      _iconViewTracker.add(false);
+    }
   }
 
   @Override
@@ -233,7 +239,17 @@ public class VASTAdPlayer extends AdMoviePlayer {
         int adsCount = _ad.getAds().size();
         int unplayedCount = adsCount - _adIndex - 1;
         double skipoffset = currentLinearAd().getSkippable() ? currentLinearAd().getSkipOffset() : -1.0;
-        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount, skipoffset, true,true));
+        List<AdIconInfo> icons = null;
+        if (currentLinearAd().getIcons().size() > 0) {
+          icons = new ArrayList<AdIconInfo>();
+          for (int i = 0; i < currentLinearAd().getIcons().size(); ++i) {
+            VASTIcon icon = currentLinearAd().getIcons().get(i);
+            AdIconInfo iconInfo =
+              new AdIconInfo(i, icon.getWidth(), icon.getHeight(), icon.getXPosition(), icon.getYPosition(), icon.getOffset(), icon.getDuration(), icon.getResourceUrl());
+            icons.add(iconInfo);
+          }
+        }
+        _notifier.notifyAdStartWithAdInfo(new AdPodInfo(title,description,url,adsCount,unplayedCount, skipoffset, true,true, icons));
         if (isCurrentAdIFirstLinearForAdIndex()) {
           sendImpressionTrackingEvent();
         }
@@ -246,6 +262,17 @@ public class VASTAdPlayer extends AdMoviePlayer {
       } else if (!_thirdQSent && currentTime() > (3 * currentLinearAd().getDuration() * 1000 / 4)) {
         sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         _thirdQSent = true;
+      }
+
+      for (int i = 0; i < currentLinearAd().getIcons().size(); ++i) {
+        if (!_iconViewTracker.get(i) && currentTime() * 1000 > currentLinearAd().getIcons().get(i).getOffset()) {
+          // send view pings
+          _iconViewTracker.set(i, true);
+          for (String viewTracker : currentLinearAd().getIcons().get(i).getViewTrackings()) {
+            final URL url = VASTUtils.urlFromAdUrlString(viewTracker);
+            Utils.pingUrl(url);
+          }
+        }
       }
     }
     else if (arg == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
@@ -358,16 +385,24 @@ public class VASTAdPlayer extends AdMoviePlayer {
     }
 
     //Open browser to click through URL
-    String url = currentLinearAd().getClickThroughURL();
-    try {
-      url = url.trim(); //strip leading and trailing whitespace
-      Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-      _playerLayout.getContext().startActivity(browserIntent);
-      DebugMode.logD(TAG, "Opening browser to " + url);
-    } catch (Exception e) {
-      DebugMode.logE(TAG, "There was some exception on clickthrough!");
-      DebugMode.logE(TAG, "Caught!", e);
+    openUrlInBrowser(currentLinearAd().getClickThroughURL());
+  }
+
+  @Override
+  public void onAdIconClicked(int index) {
+    List<VASTIcon> icons = currentLinearAd().getIcons();
+    if (icons == null || index >= icons.size()) {
+      DebugMode.logE(TAG, "cannot find icon, index is " + index);
+      return;
     }
+    VASTIcon icon = icons.get(index);
+    // send trackings.
+    for (String clickTracking : icon.getClickTrackings()) {
+      final URL url = VASTUtils.urlFromAdUrlString(clickTracking);
+      Utils.pingUrl(url);
+    }
+    // navigate to the click url
+    openUrlInBrowser(icon.getClickThrough());
   }
 
   public void sendTrackingEvent(String event) {
@@ -381,7 +416,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
       }
     }
   }
-
 
   private void sendImpressionTrackingEvent() {
     if (_adIndex < 0 || _adIndex >= _ad.getAds().size()) {
@@ -451,6 +485,21 @@ public class VASTAdPlayer extends AdMoviePlayer {
     getNotifier().notifyAdSkipped();
     if (!proceedToNextAd()) {
       setState(State.COMPLETED);
+    }
+  }
+
+  private void openUrlInBrowser(String url) {
+    if (url == null || url.length() <= 0) {
+      return;
+    }
+
+    try {
+      url = url.trim(); //strip leading and trailing whitespace
+      Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      _playerLayout.getContext().startActivity(browserIntent);
+      DebugMode.logD(TAG, "Opening browser to " + url);
+    } catch (Exception e) {
+      DebugMode.logE(TAG, "There was some exception on clickthrough!", e);
     }
   }
 }

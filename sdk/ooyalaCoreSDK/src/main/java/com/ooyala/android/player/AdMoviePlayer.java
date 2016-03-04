@@ -53,17 +53,7 @@ public abstract class AdMoviePlayer extends MoviePlayer implements
    */
   public abstract void skipAd();
 
-  /**
-   * This is called when an icon is clicked.
-   * @param index the index of the icon
-   */
   public void onAdIconClicked(int index) {
-  }
 
-  /**
-   * This is called when an icon is rendered/viewed.
-   * @param index the index of the icon
-   */
-  public void onAdIconViewed(int index) {
   }
 }
