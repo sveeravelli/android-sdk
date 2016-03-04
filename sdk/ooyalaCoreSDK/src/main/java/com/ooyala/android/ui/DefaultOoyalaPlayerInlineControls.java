@@ -314,7 +314,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     }
 
     // update UI on adStarted/adCompleted
-    if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION) {
+    if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME) {
       _isPlayerReady = true;
       if (_player.options().getShowAdsControls() == false) {
         hide();
@@ -323,15 +323,15 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
       }
     }
 
-    if(arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION ||
-        arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION ||
-        arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION ) {
+    if(arg1 == OoyalaPlayer.AD_COMPLETED_NOTIFICATION_NAME ||
+        arg1 == OoyalaPlayer.AD_SKIPPED_NOTIFICATION_NAME ||
+        arg1 == OoyalaPlayer.AD_ERROR_NOTIFICATION_NAME ) {
       _isPlayerReady = false;
       updateButtonStates();
     }
 
     // update spinner
-    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) {
       State currentState = _player.getState();
 
       updateButtonStates();

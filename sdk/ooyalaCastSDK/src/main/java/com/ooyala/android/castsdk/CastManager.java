@@ -20,6 +20,7 @@ import com.google.android.libraries.cast.companionlibrary.widgets.IMiniControlle
 import com.ooyala.android.CastManagerInterface;
 import com.ooyala.android.CastModeOptions;
 import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.util.DebugMode;
@@ -58,7 +59,7 @@ public class CastManager extends Observable implements CastManagerInterface {
         cleanupAfterReceiverDisconnect();
       }
       setChanged();
-      notifyObservers(NOTIFICATION_APPLICATION_DISCONNECTED);
+      notifyObservers(new OoyalaNotification(NOTIFICATION_APPLICATION_DISCONNECTED_NAME));
     }
 
     @Override
@@ -76,7 +77,7 @@ public class CastManager extends Observable implements CastManagerInterface {
         cleanupAfterReceiverDisconnect();
       }
       setChanged();
-      notifyObservers(NOTIFICATION_DISCONNECTED);
+      notifyObservers(new OoyalaNotification(NOTIFICATION_DISCONNECTED_NAME));
     }
 
     @Override
@@ -116,8 +117,8 @@ public class CastManager extends Observable implements CastManagerInterface {
     }
   }
 
-  public static final String NOTIFICATION_APPLICATION_DISCONNECTED = "applicationDisconnected";
-  public static final String NOTIFICATION_DISCONNECTED = "disconnected";
+  public static final String NOTIFICATION_APPLICATION_DISCONNECTED_NAME = "applicationDisconnected";
+  public static final String NOTIFICATION_DISCONNECTED_NAME = "disconnected";
 
   private static final String TAG = CastManager.class.getSimpleName();
   private static CastManager castManager;

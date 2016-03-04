@@ -40,28 +40,28 @@ public class StateNotifier {
   public void notifyPlayheadChange() {
     if (_player.get() != null) {
       _player.get().notifyPluginEvent(this,
-        OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+        OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME);
     }
   }
 
   public void notifyBufferChange() {
     if (_player.get() != null) {
       _player.get().notifyPluginEvent(this,
-        OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION);
+        OoyalaPlayer.BUFFER_CHANGED_NOTIFICATION_NAME);
     }
   }
 
   public void notifyAdSkipped() {
     if (_player.get() != null) {
       _player.get().notifyPluginEvent(this,
-          OoyalaPlayer.AD_SKIPPED_NOTIFICATION);
+          OoyalaPlayer.AD_SKIPPED_NOTIFICATION_NAME);
     }
   }
 
   public void notifyAdStartWithAdInfo(AdPodInfo info) {
     if (_player.get() != null) {
       _player.get().notifyPluginEvent(this,
-              new OoyalaNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION, info) );
+              new OoyalaNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME, info) );
     }
   }
 

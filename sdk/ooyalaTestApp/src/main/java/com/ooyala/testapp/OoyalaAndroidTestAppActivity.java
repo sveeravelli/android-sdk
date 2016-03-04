@@ -152,9 +152,9 @@ public class OoyalaAndroidTestAppActivity extends Activity implements OnClickLis
   @Override
   public void update(Observable arg0, Object arg1) {
     Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());
-    if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION) {
+    if (arg1 == OoyalaPlayer.CONTENT_TREE_READY_NOTIFICATION_NAME) {
       Log.d(TAG, "AD - metadata true!");
-    } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION) {
+    } else if (arg1 == OoyalaPlayer.METADATA_READY_NOTIFICATION_NAME) {
     }
   }
 
