@@ -354,7 +354,7 @@ public class Utils {
   }
 
   /**
-   * simply send an http get via shared thread pool, usually used to send tracking feedbacks
+   * Simply send an HTTP get via shared thread pool, usually used to send tracking feedbacks
    * @param url the url to ping
    **/
   public static void pingUrl(URL url) {
