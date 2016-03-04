@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represents video that is not tied to the Ooyala CMS e.g. a URL instead of an embed_code.
+ */
 public class UnbundledVideo {
 
   public static final String UNBUNDLED_EMBED_CODE = "UNBUNDLED";
