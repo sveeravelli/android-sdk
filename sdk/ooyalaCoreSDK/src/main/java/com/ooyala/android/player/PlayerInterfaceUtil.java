@@ -21,7 +21,7 @@ public class PlayerInterfaceUtil {
    * Build the OoyalaNotification to send out when state changes.
    * @param oldState the previous state e.g. PLAYING.
    * @param newState the new state e.g. PAUSED.
-   * @return OoyalaNotification named STATE_CHANGED_NOTIFICATION_NAME, and data that is Map<String,State> with keys OLD_STATE_KEY and NEW_STATE_KEY.
+   * @return OoyalaNotification named STATE_CHANGED_NOTIFICATION_NAME, and data that is Map&lt;String,State&gt; with keys OLD_STATE_KEY and NEW_STATE_KEY.
    */
   public static final OoyalaNotification buildSetStateNotification(OoyalaPlayer.State oldState, OoyalaPlayer.State newState) {
     DebugMode.logD(TAG, "player set state " + newState + ", old state was " + oldState);
