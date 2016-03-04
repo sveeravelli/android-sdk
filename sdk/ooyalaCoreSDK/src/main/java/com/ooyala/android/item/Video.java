@@ -31,6 +31,14 @@ public class Video extends ContentItem implements PlayableItem {
 
   Video() {}
 
+  public Video( UnbundledVideo unbundledVideo ) {
+    _embedCode = UnbundledVideo.UNBUNDLED_EMBED_CODE;
+    _authorized = true;
+    _authCode = AuthCode.AUTHORIZED;
+    _streams.addAll( unbundledVideo.getStreams() );
+    _ads.addAll( unbundledVideo.getAds() );
+  }
+
   Video(JSONObject data, String embedCode, OoyalaAPIClient api) {
     this(data, embedCode, null, api);
   }

@@ -34,6 +34,7 @@ import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.UnbundledVideo;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
@@ -519,6 +520,45 @@ public class OoyalaPlayer extends Observable implements Observer,
       return false;
     }
     return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem), null);
+  }
+
+  public boolean setUnbundledVideo( UnbundledVideo unbundledVideo ) {
+    if (unbundledVideo == null) {
+      return false;
+    }
+    cancelOpenTasks();
+    setState(State.LOADING);
+    _playQueued = false;
+    _queuedSeekTime = 0;
+    cleanupPlayers();
+    _adManager.resetManager();
+    return changeCurrentItemToUnbundledVideo( unbundledVideo );
+  }
+
+  private boolean changeCurrentItemToUnbundledVideo( UnbundledVideo unbundledVideo ) {
+    Video video = new Video( unbundledVideo );
+    if (video == null) {
+      cleanupPlayers();
+      return false;
+    }
+    setState(State.LOADING);
+    cleanupPlayers();
+
+    _currentItem = video;
+    _currentItemInitPlayState = InitPlayState.NONE;
+    cancelOpenTasks();
+
+    return changeCurrentItemToUnbundledVideo();
+  }
+
+  private boolean changeCurrentItemToUnbundledVideo() {
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+    cancelOpenTasks();
+    if (!processAdModes(AdMode.ContentChanged, 0)) {
+      switchToContent(false);
+    }
+    _analytics = null;
+    return true;
   }
 
   /**
