@@ -119,12 +119,15 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   @Override
   public void onClick(View v) {
-//    player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
-//    final String url = "http://techslides.com/demos/sample-videos/small.mp4";
-    final String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
-    final Stream stream = new Stream( url, Stream.DELIVERY_TYPE_HLS );
-    final UnbundledVideo uvideo = new UnbundledVideo( stream );
-    player.setUnbundledVideo(uvideo);
+    final String embedCode = embedMap.get(embedSpinner.getSelectedItem());
+    if( ! embedCode.startsWith("http") ) {
+      player.setEmbedCode(embedCode);
+    }
+    else {
+      final Stream stream = new Stream(embedCode, Stream.DELIVERY_TYPE_MP4);
+      final UnbundledVideo uvideo = new UnbundledVideo(stream);
+      player.setUnbundledVideo(uvideo);
+    }
   }
 
   @Override
