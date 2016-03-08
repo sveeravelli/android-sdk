@@ -41,6 +41,7 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     embedMap.put("Video with Initial Time",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
     embedMap.put("a VOD with CCs", "92cWp0ZDpDm4Q8rzHfVK6q9m6OtFP-ww");
     embedMap.put("channel: VOD+CCs then VOD-CCs", "ZwNThkdTrSfttI2N_-MH3MRIdJQ3Ox8I");
+    embedMap.put("Unbundled MP4", "http://techslides.com/demos/sample-videos/small.mp4");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
