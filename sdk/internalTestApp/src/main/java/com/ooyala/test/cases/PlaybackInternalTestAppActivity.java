@@ -31,6 +31,7 @@ public class PlaybackInternalTestAppActivity extends BaseInternalTestAppActivity
     embedMap.put("BYU Live", "UwN2g1YjoQ7hw8udLG-1q2Zu1XGCyfFu");
     embedMap.put("Big Bunny with ID3 tags", "FqdThndTrouX0QnxRdMf9khym79yyb4M");
     embedMap.put("HLS Video",    "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
+    embedMap.put("Apple Sample HLS Video", "9vc3V3bjosKiUJDsJiwmhPyLgQi-lLos");
     embedMap.put("MP4 Video",    "h4aHB1ZDqV7hbmLEv4xSOx3FdUUuephx");
     embedMap.put("WV-MP4",       "N3ZnF1ZDo2cUf0JIIFMaxv-gKgmF6Dvv");
     embedMap.put("Avatar Widevine", "54NzJ4NTpMvOAm3p-rdp3qttbqkRad9I"); // WVM

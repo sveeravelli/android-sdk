@@ -21,6 +21,7 @@ import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
 import com.ooyala.android.item.Stream;
 import com.ooyala.android.item.UnbundledVideo;
+import com.ooyala.android.performance.PerformanceMonitor;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 import java.util.LinkedHashMap;
@@ -40,6 +41,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   protected Spinner embedSpinner;
   protected Button setButton;
   protected ArrayAdapter<String> embedAdapter;
+  protected PerformanceMonitor performanceMonitor;
 
   /**
    * Called when the activity is first created.
@@ -63,6 +65,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player = new OoyalaPlayer(PCODE, domain, options);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
+    performanceMonitor = PerformanceMonitor.getStandardMonitor( player );
 
     //Initialize the bottom controls
     embedMap = new LinkedHashMap<String, String>();
@@ -80,6 +83,18 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     Log.d(TAG, "App Paused");
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().suspend();
+    }
+    if( performanceMonitor != null ) {
+      Log.d( TAG, performanceMonitor.buildStatisticsSnapshot().generateReport() );
+    }
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    if( performanceMonitor != null ) {
+      performanceMonitor.destroy();
+      performanceMonitor = null;
     }
   }
 

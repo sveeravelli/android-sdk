@@ -79,6 +79,12 @@ public interface AdPluginInterface extends LifeCycleInterface, AdsLearnMoreInter
   public void skipAd();
 
   /**
+   * This is called when an icon is clicked.
+   * @param index the icon index
+   */
+  public void onAdIconClicked(int index);
+
+  /**
    * This returns the cue points.
    * 
    */

@@ -595,4 +595,9 @@ public class OoyalaFreewheelManager extends ManagedAdsPlugin<FWAdSpot>
   public void skipAd() {
     // do nothing
   }
+
+  @Override
+  public void onAdIconClicked(int index) {
+
+  }
 }

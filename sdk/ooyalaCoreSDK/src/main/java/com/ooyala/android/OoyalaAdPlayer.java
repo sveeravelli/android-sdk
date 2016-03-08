@@ -87,7 +87,7 @@ class OoyalaAdPlayer extends AdMoviePlayer {
 
     if (_ad.getTrackingURLs() != null) {
       for (URL url : _ad.getTrackingURLs()) {
-        ping(url);
+        Utils.pingUrl(url);
       }
     }
 
