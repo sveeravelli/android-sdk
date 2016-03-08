@@ -513,4 +513,9 @@ public class OoyalaIMAManager implements AdPluginInterface, AdsLoadedListener, A
   public void processClickThrough() {
     // do nothing. the click through UI and event is handled by google IMA.
   }
+
+  @Override
+  public void onAdIconClicked(int index) {
+
+  }
 }

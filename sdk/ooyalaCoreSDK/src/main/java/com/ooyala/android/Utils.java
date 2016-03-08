@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -42,8 +44,24 @@ public class Utils {
   static final String SEPARATOR_AMPERSAND = "&";
   static final String SEPARATOR_TIME = ":";
   static final String CHARSET = "UTF-8";
+  static final int PING_TIMEOUT = 60 * 1000;
 
   private static final String TAG = Utils.class.getSimpleName();
+
+  private static final ExecutorService executor = Executors.newFixedThreadPool(10);
+
+  private static class PingTask implements Runnable {
+    private URL url;
+
+    PingTask(URL url) {
+      this.url = url;
+    }
+
+    public void run() {
+      String httpResponse = getUrlContent(url, PING_TIMEOUT, PING_TIMEOUT);
+      DebugMode.logD(TAG, "ping url:" + url.toString() + " results: " + httpResponse);
+    }
+  }
 
   public static String device() {
     // temporarily disable HLS
@@ -333,5 +351,17 @@ public class Utils {
     JSONObject jsonObject = new JSONObject(map);
     String jsonString = jsonObject.toString();
     return jsonString;
+  }
+
+  /**
+   * Simply send an HTTP get via shared thread pool, usually used to send tracking feedbacks
+   * @param url the url to ping
+   **/
+  public static void pingUrl(URL url) {
+    if (url == null) {
+      return;
+    }
+    PingTask task = new PingTask(url);
+    executor.submit(task);
   }
 }
