@@ -199,7 +199,7 @@ public class Utils {
     try {
       digest = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      DebugMode.logE(TAG, "encryption exception: " + e.getMessage(), e);
+      DebugMode.logE(TAG, "Encryption exception: " + e.getMessage(), e);
       return null;
     }
     digest.reset();
@@ -333,7 +333,7 @@ public class Utils {
     } catch (SocketTimeoutException e) {
       DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out:" + e.getMessage(), e);
     } catch (IOException e) {
-      DebugMode.logE(TAG, "IO exception:" + e.getMessage(), e);
+      DebugMode.logE(TAG, "IOException: " + e.getMessage(), e);
     }
 
     return responseMessage;
