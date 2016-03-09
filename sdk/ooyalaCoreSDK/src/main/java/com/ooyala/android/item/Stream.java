@@ -105,6 +105,17 @@ public class Stream implements JSONUpdatableItem {
     update(data);
   }
 
+  /**
+   * Create an 'unbundled' Stream that doesn't use the Ooyala CMS.
+   * @param url source for the video stream e.g. "http://techslides.com/demos/sample-videos/small.mp4".
+   * @param deliveryType the stream delivery type e.g. DELIVERY_TYPE_MP4.
+   */
+  public Stream( String url, String deliveryType ) {
+    this._url = url;
+    this._deliveryType = deliveryType;
+    this._urlFormat = STREAM_URL_FORMAT_TEXT;
+  }
+
   boolean betterThan(Stream other, boolean isWifiEnabled) {
 
     // if the bitrates are the same, always choose the bitrate with higher resolution

@@ -9,6 +9,8 @@ import com.ooyala.android.util.DebugMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by zchen on 2/18/16.
@@ -25,29 +27,31 @@ public class BitrateHlsTrackSelector implements  HlsTrackSelector {
 
   @Override
   public void selectTracks(HlsMasterPlaylist playlist, HlsTrackSelector.Output output) throws IOException {
-
-    ArrayList<Variant> videoVariants = new ArrayList<>();
-    ArrayList<Variant> audioOnlyVariants = new ArrayList<>();
+    ArrayList<Variant> enabledVariantList = new ArrayList<Variant>(playlist.variants);
+    ArrayList<Variant> videoVariants = new ArrayList<Variant>();
+    ArrayList<Variant> audioOnlyVariants = new ArrayList<Variant>();
     for (int i = 0; i < playlist.variants.size(); i++) {
       Variant variant = playlist.variants.get(i);
       if (variant.format.height > 0 || variantHasExplicitCodecWithPrefix(variant, "avc")) {
-        // video
-        if (variant.format.bitrate >= lowerBitrateThreshold && variant.format.bitrate <= upperBitrateThreshold) {
-          videoVariants.add(variant);
-        }
+        videoVariants.add(variant);
+
       } else if (variantHasExplicitCodecWithPrefix(variant, "mp4a")) {
         audioOnlyVariants.add(variant);
       }
     }
 
-    ArrayList<Variant> enabledVariantList;
     if (!videoVariants.isEmpty()) {
+      // We've identified some variants as definitely containing video. Assume variants within the
+      // master playlist are marked consistently, and hence that we have the full set. Filter out
+      // any other variants, which are likely to be audio only.
       enabledVariantList = videoVariants;
-    } else {
-      // no video, play audio only
-      enabledVariantList = audioOnlyVariants;
+    } else if (audioOnlyVariants.size() < enabledVariantList.size()) {
+      // We've identified some variants, but not all, as being audio only. Filter them out to leave
+      // the remaining variants, which are likely to contain video.
+      enabledVariantList.removeAll(audioOnlyVariants);
     }
 
+    filterTracksWithBitrate(enabledVariantList);
     if (enabledVariantList.size() <= 0) {
       DebugMode.logE(TAG, "no track available between " + lowerBitrateThreshold + " and " + upperBitrateThreshold);
     }
@@ -58,6 +62,16 @@ public class BitrateHlsTrackSelector implements  HlsTrackSelector {
     }
     for (int i = 0; i < enabledVariantList.size(); i++) {
       output.fixedTrack(playlist, enabledVariantList.get(i));
+    }
+  }
+
+  private void filterTracksWithBitrate(List<Variant> tracks) {
+    Iterator<Variant> it = tracks.iterator();
+    while (it.hasNext()) {
+      Variant variant = it.next();
+      if (variant.format.bitrate < lowerBitrateThreshold || variant.format.bitrate > upperBitrateThreshold) {
+        it.remove();
+      }
     }
   }
 

@@ -14,10 +14,14 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.PlayerDomain;
 import com.ooyala.android.configuration.Options;
+import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.UnbundledVideo;
+import com.ooyala.android.performance.PerformanceMonitor;
 import com.ooyala.android.ui.OptimizedOoyalaPlayerLayoutController;
 
 import java.util.LinkedHashMap;
@@ -37,6 +41,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   protected Spinner embedSpinner;
   protected Button setButton;
   protected ArrayAdapter<String> embedAdapter;
+  protected PerformanceMonitor performanceMonitor;
 
   /**
    * Called when the activity is first created.
@@ -60,6 +65,7 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     player = new OoyalaPlayer(PCODE, domain, options);
     playerLayoutController = new OptimizedOoyalaPlayerLayoutController(playerLayout, player);
     player.addObserver(this);
+    performanceMonitor = PerformanceMonitor.getStandardMonitor( player );
 
     //Initialize the bottom controls
     embedMap = new LinkedHashMap<String, String>();
@@ -77,6 +83,18 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
     Log.d(TAG, "App Paused");
     if (playerLayoutController.getPlayer() != null) {
       playerLayoutController.getPlayer().suspend();
+    }
+    if( performanceMonitor != null ) {
+      Log.d( TAG, performanceMonitor.buildStatisticsSnapshot().generateReport() );
+    }
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    if( performanceMonitor != null ) {
+      performanceMonitor.destroy();
+      performanceMonitor = null;
     }
   }
 
@@ -116,7 +134,15 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
 
   @Override
   public void onClick(View v) {
-    player.setEmbedCode(embedMap.get(embedSpinner.getSelectedItem()));
+    final String embedCode = embedMap.get(embedSpinner.getSelectedItem());
+    if( ! embedCode.startsWith("http") ) {
+      player.setEmbedCode(embedCode);
+    }
+    else {
+      final Stream stream = new Stream(embedCode, Stream.DELIVERY_TYPE_MP4);
+      final UnbundledVideo uvideo = new UnbundledVideo(stream);
+      player.setUnbundledVideo(uvideo);
+    }
   }
 
   @Override
@@ -128,8 +154,9 @@ public class BaseInternalTestAppActivity extends Activity implements OnClickList
   }
 
   @Override
-  public void update(Observable arg0, Object arg1) {
-    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION) {
+  public void update(Observable arg0, Object argN) {
+    final String arg1 = OoyalaNotification.getNameOrUnknown(argN);
+    if (arg1 == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       return;
     }
     Log.d(TAG, "Notification Recieved: " + arg1 + " - state: " + player.getState());

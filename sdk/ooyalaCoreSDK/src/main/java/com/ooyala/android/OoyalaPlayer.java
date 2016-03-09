@@ -34,11 +34,13 @@ import com.ooyala.android.item.ChannelSet;
 import com.ooyala.android.item.ContentItem;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.item.Stream;
+import com.ooyala.android.item.UnbundledVideo;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.player.AdMoviePlayer;
 import com.ooyala.android.player.MoviePlayer;
 import com.ooyala.android.player.Player;
 import com.ooyala.android.player.PlayerInterface;
+import com.ooyala.android.player.PlayerInterfaceUtil;
 import com.ooyala.android.player.StreamPlayer;
 import com.ooyala.android.plugin.AdPluginInterface;
 import com.ooyala.android.ui.AbstractOoyalaPlayerLayoutController;
@@ -99,30 +101,30 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public static final int DO_PAUSE = 1;
 
-  public static final String TIME_CHANGED_NOTIFICATION = "timeChanged";
-  public static final String STATE_CHANGED_NOTIFICATION = "stateChanged";
-  public static final String BUFFER_CHANGED_NOTIFICATION = "bufferChanged";
-  public static final String CONTENT_TREE_READY_NOTIFICATION = "contentTreeReady";
-  public static final String CLOSED_CAPTIONS_LANGUAGE_CHANGED = "closedCaptionsLanguageChanged";
-  public static final String AUTHORIZATION_READY_NOTIFICATION = "authorizationReady";
-  public static final String ERROR_NOTIFICATION = "error";
-  public static final String PLAY_STARTED_NOTIFICATION = "playStarted";
-  public static final String PLAY_COMPLETED_NOTIFICATION = "playCompleted";
-  public static final String SEEK_COMPLETED_NOTIFICATION = "seekCompleted";
-  public static final String CURRENT_ITEM_CHANGED_NOTIFICATION = "currentItemChanged";
-  public static final String AD_STARTED_NOTIFICATION = "adStarted";
-  public static final String AD_COMPLETED_NOTIFICATION = "adCompleted";
-  public static final String AD_POD_COMPLETED_NOTIFICATION = "adPodCompleted";  //TODO: Used in Skin, needs to be used in SDK
-  public static final String AD_SKIPPED_NOTIFICATION = "adSkipped";
-  public static final String AD_ERROR_NOTIFICATION = "adError";
-  public static final String METADATA_READY_NOTIFICATION = "metadataReady";
-  public static final String BUFFERING_STARTED_NOTIFICATION = "bufferingStarted";
-  public static final String BUFFERING_COMPLETED_NOTIFICATION = "bufferingCompleted";
-  public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION = "drmRightsAcquireStarted";
-  public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION = "drmRightsAcquireCompleted";
-  public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION = "liveCCAvailabilityChanged";
-  public static final String LIVE_CC_CHANGED_NOTIFICATION = "liveCCChanged";
-  public static final String EMBED_CODE_SET_NOTIFICATION = "embedCodeSet";
+  public static final String TIME_CHANGED_NOTIFICATION_NAME = "timeChanged";
+  public static final String STATE_CHANGED_NOTIFICATION_NAME = "stateChanged";
+  public static final String BUFFER_CHANGED_NOTIFICATION_NAME = "bufferChanged";
+  public static final String CONTENT_TREE_READY_NOTIFICATION_NAME = "contentTreeReady";
+  public static final String CLOSED_CAPTIONS_LANGUAGE_CHANGED_NAME = "closedCaptionsLanguageChanged";
+  public static final String AUTHORIZATION_READY_NOTIFICATION_NAME = "authorizationReady";
+  public static final String ERROR_NOTIFICATION_NAME = "error";
+  public static final String PLAY_STARTED_NOTIFICATION_NAME = "playStarted";
+  public static final String PLAY_COMPLETED_NOTIFICATION_NAME = "playCompleted";
+  public static final String SEEK_COMPLETED_NOTIFICATION_NAME = "seekCompleted";
+  public static final String CURRENT_ITEM_CHANGED_NOTIFICATION_NAME = "currentItemChanged";
+  public static final String AD_STARTED_NOTIFICATION_NAME = "adStarted";
+  public static final String AD_COMPLETED_NOTIFICATION_NAME = "adCompleted";
+  public static final String AD_POD_COMPLETED_NOTIFICATION_NAME = "adPodCompleted";  //TODO: Used in Skin, needs to be used in SDK
+  public static final String AD_SKIPPED_NOTIFICATION_NAME = "adSkipped";
+  public static final String AD_ERROR_NOTIFICATION_NAME = "adError";
+  public static final String METADATA_READY_NOTIFICATION_NAME = "metadataReady";
+  public static final String BUFFERING_STARTED_NOTIFICATION_NAME = "bufferingStarted";
+  public static final String BUFFERING_COMPLETED_NOTIFICATION_NAME = "bufferingCompleted";
+  public static final String DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION_NAME = "drmRightsAcquireStarted";
+  public static final String DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION_NAME = "drmRightsAcquireCompleted";
+  public static final String LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION_NAME = "liveCCAvailabilityChanged";
+  public static final String LIVE_CC_CHANGED_NOTIFICATION_NAME = "liveCCChanged";
+  public static final String EMBED_CODE_SET_NOTIFICATION_NAME = "embedCodeSet";
 
   public static final String NOTIFICATION_NAME = "name";
   public static final String CLOSED_CAPTION_TEXT = "caption";
@@ -419,6 +421,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public boolean setEmbedCodesWithAdSetCode(List<String> embedCodes,
       final String adSetCode) {
+    sendNotification(EMBED_CODE_SET_NOTIFICATION_NAME);
     if (embedCodes == null || embedCodes.isEmpty()) {
       return false;
     }
@@ -444,7 +447,6 @@ public class OoyalaPlayer extends Observable implements Observer,
           }
         }));
 
-    sendNotification(EMBED_CODE_SET_NOTIFICATION);
     return true;
   }
 
@@ -521,6 +523,45 @@ public class OoyalaPlayer extends Observable implements Observer,
     return changeCurrentItem(_rootItem.videoFromEmbedCode(embedCode, _currentItem), null);
   }
 
+  public boolean setUnbundledVideo( UnbundledVideo unbundledVideo ) {
+    if (unbundledVideo == null) {
+      return false;
+    }
+    cancelOpenTasks();
+    setState(State.LOADING);
+    _playQueued = false;
+    _queuedSeekTime = 0;
+    cleanupPlayers();
+    _adManager.resetManager();
+    return changeCurrentItemToUnbundledVideo( unbundledVideo );
+  }
+
+  private boolean changeCurrentItemToUnbundledVideo( UnbundledVideo unbundledVideo ) {
+    Video video = new Video( unbundledVideo );
+    if (video == null) {
+      cleanupPlayers();
+      return false;
+    }
+    setState(State.LOADING);
+    cleanupPlayers();
+
+    _currentItem = video;
+    _currentItemInitPlayState = InitPlayState.NONE;
+    cancelOpenTasks();
+
+    return changeCurrentItemToUnbundledVideo();
+  }
+
+  private boolean changeCurrentItemToUnbundledVideo() {
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION_NAME);
+    cancelOpenTasks();
+    if (!processAdModes(AdMode.ContentChanged, 0)) {
+      switchToContent(false);
+    }
+    _analytics = null;
+    return true;
+  }
+
   /**
    * Set the current video in a channel if the video is present.
    *
@@ -550,7 +591,7 @@ public class OoyalaPlayer extends Observable implements Observer,
             if (error != null) {
               onError(error, "Exception fetching metadata from setEmbedCodes!");
             } else {
-              sendNotification(METADATA_READY_NOTIFICATION);
+              sendNotification(METADATA_READY_NOTIFICATION_NAME);
               changeCurrentItemAfterAuth();
             }
           }
@@ -569,14 +610,14 @@ public class OoyalaPlayer extends Observable implements Observer,
                     onError(error, "Exception in changeCurrentVideo!");
                     return;
                   }
-                  sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+                  sendNotification(AUTHORIZATION_READY_NOTIFICATION_NAME);
                   changeCurrentItemAfterAuth();
                 }
               }));
       return true;
     }
 
-    sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+    sendNotification(AUTHORIZATION_READY_NOTIFICATION_NAME);
     return changeCurrentItemAfterAuth();
   }
 
@@ -602,7 +643,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       return false;
     }
 
-    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION);
+    sendNotification(CURRENT_ITEM_CHANGED_NOTIFICATION_NAME);
 
     if (!_currentItem.isAuthorized()) {
       onError(getAuthError(_currentItem), null);
@@ -695,7 +736,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _rootItem = tree;
     _currentItem = tree.firstVideo();
     _currentItemInitPlayState = InitPlayState.NONE;
-    sendNotification(CONTENT_TREE_READY_NOTIFICATION);
+    sendNotification(CONTENT_TREE_READY_NOTIFICATION_NAME);
 
     PlayerInfo playerInfo = StreamPlayer.defaultPlayerInfo;
 
@@ -758,7 +799,7 @@ public class OoyalaPlayer extends Observable implements Observer,
 
     cleanupPlayer(_player);
     _player = null;
-
+    _layoutController.getLayout().removeAllViews();
     hidePromoImage();
   }
 
@@ -973,7 +1014,7 @@ public class OoyalaPlayer extends Observable implements Observer,
                   onError(error, "Error Reauthorizing Video");
                   return;
                 }
-                sendNotification(AUTHORIZATION_READY_NOTIFICATION);
+                sendNotification(AUTHORIZATION_READY_NOTIFICATION_NAME);
                 if (!_currentItem.isAuthorized()) {
                   OoyalaException authFailedError = new OoyalaException(
                           OoyalaException.OoyalaErrorCode.ERROR_AUTHORIZATION_FAILED);
@@ -1262,7 +1303,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else {
       reset();
     }
-    sendNotification(PLAY_COMPLETED_NOTIFICATION);
+    sendNotification(PLAY_COMPLETED_NOTIFICATION_NAME);
   }
 
   @Override
@@ -1270,8 +1311,8 @@ public class OoyalaPlayer extends Observable implements Observer,
    * For Internal Use Only.
    */
   public void update(Observable arg0, Object arg1) {
-    if (arg0 instanceof PlayerInterface) {
-      processContentNotifications((PlayerInterface) arg0, arg1);
+    if (arg0 instanceof PlayerInterface && arg1 instanceof OoyalaNotification) {
+      processContentNotifications((PlayerInterface) arg0, (OoyalaNotification)arg1);
     }
   }
 
@@ -1280,30 +1321,23 @@ public class OoyalaPlayer extends Observable implements Observer,
    *
    * @param player
    *          the notification sender
-   * @param object
+   * @param notification
    *          the notification
    */
-  private void processContentNotifications(PlayerInterface player, Object object) {
+  private void processContentNotifications(PlayerInterface player, OoyalaNotification notification) {
     if (currentPlayer() != player) {
-      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + object);
+      DebugMode.logE(TAG, "Notification received from a player that is not expected.  Will continue: " + notification);
     }
 
-    String notification;
-    if (object instanceof String) {
-      notification = (String)object;
-    } else {
-      Map<String, String> map = (Map<String, String>)object;
-      notification = map.get("name");
-    }
-
-    if (notification.equals(TIME_CHANGED_NOTIFICATION)) {
+    final String name = notification.getName();
+    if (name.equals(TIME_CHANGED_NOTIFICATION_NAME)) {
         // send analytics ping
       if (_analytics != null) {
         _analytics.reportPlayheadUpdate((player.currentTime()) / 1000);
       }
       processAdModes(AdMode.Playhead, player.currentTime());
-      sendNotification(TIME_CHANGED_NOTIFICATION);
-    } else if (notification.equals(STATE_CHANGED_NOTIFICATION)) {
+      sendNotification(TIME_CHANGED_NOTIFICATION_NAME);
+    } else if (name.equals(STATE_CHANGED_NOTIFICATION_NAME)) {
       State state = player.getState();
       DebugMode.logD(TAG, "content player state change to " + state);
       switch (state) {
@@ -1320,7 +1354,7 @@ public class OoyalaPlayer extends Observable implements Observer,
         case PLAYING:
           if (_currentItemInitPlayState != InitPlayState.ContentPlayed) {
             _currentItemInitPlayState = InitPlayState.ContentPlayed;
-            sendNotification(PLAY_STARTED_NOTIFICATION);
+            sendNotification(PLAY_STARTED_NOTIFICATION_NAME);
           }
           hidePromoImage();
           setState(State.PLAYING);
@@ -1340,7 +1374,7 @@ public class OoyalaPlayer extends Observable implements Observer,
           break;
       }
     } else {
-      sendNotification(object);
+      sendNotification(notification);
     }
   }
 
@@ -1386,16 +1420,25 @@ public class OoyalaPlayer extends Observable implements Observer,
   }
 
   private void setState(State state) {
-    if (state != _state) {
-      DebugMode.logD(TAG, "player set state, old state was " + _state);
+    if (state != this._state) {
+      final State oldState = this._state;
       this._state = state;
-      sendNotification(STATE_CHANGED_NOTIFICATION);
+      sendNotification( PlayerInterfaceUtil.buildSetStateNotification( oldState, this._state ) );
     }
   }
 
-  private void sendNotification(Object obj) {
+  private void sendNotification(String notificationName) {
+    sendNotification(
+        new OoyalaNotification(
+            notificationName,
+            null
+        )
+    );
+  }
+
+  private void sendNotification(OoyalaNotification notification) {
     setChanged();
-    notifyObservers(obj);
+    notifyObservers(notification);
   }
 
   public boolean isLiveClosedCaptionsAvailable() {
@@ -1576,7 +1619,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    */
   public void skipAd() {
     if (isShowingAd()) {
-      sendNotification(AD_SKIPPED_NOTIFICATION);
+      sendNotification(AD_SKIPPED_NOTIFICATION_NAME);
       _adManager.skipAd();
     }
   }
@@ -1595,6 +1638,17 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void onAdclickThrough() {
     if (isShowingAd() && _adManager.getActivePlugin() != null) {
       _adManager.getActivePlugin().processClickThrough();
+    }
+  }
+
+
+  /**
+   * This is called when an icon is clicked.
+   * @param index the index of the icon
+   */
+  public void onAdIconClicked(int index) {
+    if (isShowingAd() && _adManager.getActivePlugin() != null) {
+      _adManager.getActivePlugin().onAdIconClicked(index);
     }
   }
 
@@ -2019,7 +2073,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logD(TAG, message, this._error);
     }
     setState(State.ERROR);
-    sendNotification(ERROR_NOTIFICATION);
+    sendNotification(ERROR_NOTIFICATION_NAME);
   }
 
   /*
@@ -2077,16 +2131,16 @@ public class OoyalaPlayer extends Observable implements Observer,
       DebugMode.logI(TAG, "State change reported, but state has not changed: " + newState);
       return;
     }
-    sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION);
+    sendNotification(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME);
     if (newState == State.COMPLETED) {
-      _tvRatingAdNotification = OoyalaPlayer.AD_COMPLETED_NOTIFICATION;
+      _tvRatingAdNotification = OoyalaPlayer.AD_COMPLETED_NOTIFICATION_NAME;
       sendNotification(_tvRatingAdNotification);
     } else if (newState == State.ERROR) {
-      _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION;
+      _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION_NAME;
       sendNotification(_tvRatingAdNotification);
     } else if (newState == State.PLAYING) {
       if (oldState != State.PAUSED) {
-        sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION);
+        sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME);
       }
     }
   }
@@ -2215,7 +2269,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       currentPlayer().setClosedCaptionsLanguage(_closedCaptionLanguage);
     }
 
-    sendNotification(CLOSED_CAPTIONS_LANGUAGE_CHANGED);
+    sendNotification(CLOSED_CAPTIONS_LANGUAGE_CHANGED_NAME);
   }
 
   /**

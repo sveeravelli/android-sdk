@@ -4,7 +4,6 @@ import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.ooyala.android.OoyalaPlayer;
-import com.ooyala.android.OoyalaPlayer.State;
 import com.ooyala.android.item.OoyalaManagedAdSpot;
 import com.ooyala.android.util.DebugMode;
 
@@ -201,21 +200,21 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
     if(!getVideoProgressState().isPlayingIMAAd() && player.isShowingAd()) {
 
       //If starting a non-IMA Ad, we're pausing the content
-      if (notification.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION)) {
+      if (notification.equals(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME)) {
         DebugMode.logD(TAG, "IMA Ad Update: Non IMA ad playing");
         for (VideoAdPlayerCallback callback : _adCallbacks) {
           callback.onPause();
         }
       }
       //If completing a non-IMA ad
-      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
+      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION_NAME)) {
         DebugMode.logD(TAG, "IMA Ad Update: Non IMA ad completed");
       }
     }
 
     //If an IMA ad is playing while state is being changed
     else if (getVideoProgressState().isPlayingIMAAd()){
-      if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION) && player.isShowingAd()) {
+      if(notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME) && player.isShowingAd()) {
         switch (player.getState()) {
         case PLAYING:
           DebugMode.logD(TAG, "IMA Ad Update: Player Ad start");
@@ -242,14 +241,14 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
       }
 
       //If we get an AD_COMPLETE during an IMA ad, our ad has finished
-      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION)) {
+      else if (notification.equals(OoyalaPlayer.AD_COMPLETED_NOTIFICATION_NAME)) {
         DebugMode.logD(TAG, "IMA Ad Update: Player Ad Complete");
         getVideoProgressState().setPlayingIMAAd( false );
         for (VideoAdPlayerCallback callback : _adCallbacks) {
           callback.onEnded();
         }
       }
-      else if(notification.equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION)) {
+      else if(notification.equals(OoyalaPlayer.CURRENT_ITEM_CHANGED_NOTIFICATION_NAME)) {
         for (VideoAdPlayerCallback callback : _adCallbacks) {
           callback.onEnded();
         }
@@ -258,7 +257,7 @@ class OoyalaPlayerIMAWrapper implements VideoAdPlayer, ContentProgressProvider {
 
     //Notifications from content playback
     else {
-      if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION)) {
+      if (notification.equals(OoyalaPlayer.STATE_CHANGED_NOTIFICATION_NAME)) {
         switch (player.getState()) {
         case PLAYING:
           DebugMode.logD(TAG, "IMA Ad Update: Player Content start");

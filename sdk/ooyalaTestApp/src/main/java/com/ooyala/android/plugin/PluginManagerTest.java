@@ -86,6 +86,11 @@ class TestAdsPlugin extends ManagedAdsPlugin<TestAdSpot> {
     // do nothing.
   }
 
+  @Override
+  public void onAdIconClicked(int index) {
+
+  }
+
   public TestAdSpot playedAd() {
     return _playedAd;
   }

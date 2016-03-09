@@ -14,6 +14,7 @@ import android.provider.Settings.Secure;
 import com.ooyala.android.Environment;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -113,13 +114,13 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
   }
 
   @Override
-  public void update(Observable arg0, Object arg) {
-
-    if(arg == OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION) {
+  public void update(Observable arg0, Object arg1) {
+    final String name = ((OoyalaNotification)arg1).getName();
+    if(name == OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION_NAME) {
       isSeeking = false;
       DebugMode.logD(TAG, "Seek completed. Re-enabling seeking");
     }
-    super.update(arg0, arg);
+    super.update(arg0, arg1);
   }
 
   @Override

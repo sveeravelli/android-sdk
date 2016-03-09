@@ -238,4 +238,11 @@ public class OoyalaManagedAdsPlugin extends
       _adPlayer.processClickThrough();
     }
   }
+
+  @Override
+  public void onAdIconClicked(int index) {
+    if (_adPlayer != null) {
+      _adPlayer.onAdIconClicked(index);
+    }
+  }
 }

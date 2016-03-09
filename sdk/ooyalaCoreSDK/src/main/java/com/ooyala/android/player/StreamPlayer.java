@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.ooyala.android.DefaultPlayerInfo;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.PlayerInfo;
 
@@ -70,6 +71,6 @@ public abstract class StreamPlayer extends Player {
 
   protected void notifyTimeChanged() {
     setChanged();
-    notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME));
   }
 }

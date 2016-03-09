@@ -4,19 +4,18 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.net.wifi.WifiManager;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.ooyala.android.ID3TagNotifier;
 import com.ooyala.android.OoyalaException;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -763,7 +762,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     @Override
     public boolean handleMessage(Message msg) {
       setChanged();
-      notifyObservers(OoyalaPlayer.TIME_CHANGED_NOTIFICATION);
+      notifyObservers(new OoyalaNotification(OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME));
       return false;
     }
   });
@@ -841,7 +840,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     _handleSubtitles();
     if( pre_isLiveClosedCaptionsAvailable != _isLiveClosedCaptionsAvailable ) {
       setChanged();
-      notifyObservers( OoyalaPlayer.LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION );
+      notifyObservers(new OoyalaNotification(OoyalaPlayer.LIVE_CC_AVAILABILITY_CHANGED_NOTIFICATION_NAME));
     }
   }
 
@@ -927,7 +926,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
       // If first param is 0, seek is actaully complete
       if (param1 <= 0) {
         setChanged();
-        notifyObservers(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION);
+        notifyObservers(new OoyalaNotification(OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION_NAME));
         if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
           setState(State.PLAYING);
         } else {
@@ -950,7 +949,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_VIDEO_STOP_BUFFER:
       DebugMode.logD(TAG, "onEvent: Buffering Done! " + param1 + ", " + param2 + " with current playhead = " + _player.getPosition() + " and buffer duration = " + _player.getValidBufferDuration());
       setChanged();
-      notifyObservers(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION);
+      notifyObservers(new OoyalaNotification(OoyalaPlayer.BUFFERING_COMPLETED_NOTIFICATION_NAME));
       if (_player.getPlayerStatus() == VO_OSMP_STATUS.VO_OSMP_STATUS_PLAYING) {
         setState(State.PLAYING);
       } else {
@@ -961,7 +960,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
     case VO_OSMP_CB_VIDEO_START_BUFFER:
       DebugMode.logD(TAG, "onEvent: Buffering Starting " + param1 + ", " + param2);
       setChanged();
-      notifyObservers(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION);
+      notifyObservers(new OoyalaNotification(OoyalaPlayer.BUFFERING_STARTED_NOTIFICATION_NAME));
       setState(State.LOADING);
       break;
 
@@ -1124,7 +1123,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
   @Override
   public void afterAcquireRights(Exception returnedException) {
     setChanged();
-    notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION);
+    notifyObservers(new OoyalaNotification(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_COMPLETED_NOTIFICATION_NAME));
     if (returnedException != null) {
       DebugMode.logE(TAG, "Acquire Rights failed: " + returnedException.getClass());
       _error = DiscredixDrmUtils.handleDRMError(returnedException);
@@ -1164,7 +1163,7 @@ FileDownloadCallback, PersonalizationCallback, AcquireRightsCallback{
             AcquireRightsAsyncTask acquireRightsTask = new AcquireRightsAsyncTask(VisualOnStreamPlayer.this, _parent.getLayout().getContext(), _localFilePath,
                     authToken, customDRMData);
             setChanged();
-            notifyObservers(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION);
+            notifyObservers(new OoyalaNotification(OoyalaPlayer.DRM_RIGHTS_ACQUISITION_STARTED_NOTIFICATION_NAME));
             acquireRightsTask.execute();
           }
         };
