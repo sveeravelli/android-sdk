@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.item.Video;
 import com.ooyala.android.util.DebugMode;
@@ -71,7 +72,7 @@ final class WidevineStuckMonitor implements Observer {
   }
 
   public void update( Observable o, Object arg ) {
-    final String notification = arg.toString();
+    final String notification = OoyalaNotification.getNameOrUnknown(arg);
     if( drmPlayer.isPlaying() && notification.equals( OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) ) {
       checkWhilePlaying();
     }

@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ooyala.android.LocalizationSupport;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.OoyalaPlayer.SeekStyle;
 import com.ooyala.android.OoyalaPlayer.State;
@@ -286,7 +287,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
   }
 
   @Override
-  public void update(Observable arg0, Object arg1) {
+  public void update(Observable arg0, Object argN) {
     if (_seek != null && !_seeking) {
       _seek.setProgress(_player.getPlayheadPercentage());
       _seek.setSecondaryProgress(_player.getBufferPercentage());
@@ -314,6 +315,7 @@ SeekBar.OnSeekBarChangeListener, Button.OnClickListener, Observer {
     }
 
     // update UI on adStarted/adCompleted
+    final String arg1 = OoyalaNotification.getNameOrUnknown(argN);
     if(arg1 == OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME) {
       _isPlayerReady = true;
       if (_player.options().getShowAdsControls() == false) {
