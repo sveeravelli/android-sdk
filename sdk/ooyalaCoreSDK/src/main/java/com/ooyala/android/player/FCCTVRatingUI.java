@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.ooyala.android.FCCTVRating;
+import com.ooyala.android.OoyalaNotification;
 import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.configuration.FCCTVRatingConfiguration;
 import com.ooyala.android.ui.FCCTVRatingView;
@@ -152,8 +153,9 @@ public class FCCTVRatingUI implements Observer {
   @Override
   public void update(Observable observable, Object data) {
     // see MoviePlayer for AD_*_NOTIFICATION since they happen at a tricky time.
+    final String notificationName = OoyalaNotification.getNameOrUnknown(data);
     if (observable == _player &&
-        OoyalaPlayer.PLAY_STARTED_NOTIFICATION_NAME.equals(data) ) {
+        OoyalaPlayer.PLAY_STARTED_NOTIFICATION_NAME.equals(notificationName)) {
       reshow();
     }
   }

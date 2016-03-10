@@ -228,7 +228,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    final String name = ((OoyalaNotification)arg1).getName();
+    final String name = OoyalaNotification.getNameOrUnknown(arg1);
     if (name == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       if (!_startSent && currentTime() > 0) {
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);

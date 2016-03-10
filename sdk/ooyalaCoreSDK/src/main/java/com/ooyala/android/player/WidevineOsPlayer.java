@@ -115,7 +115,7 @@ public class WidevineOsPlayer extends MoviePlayer implements DrmManagerClient.On
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    final String name = ((OoyalaNotification)arg1).getName();
+    final String name = OoyalaNotification.getNameOrUnknown(arg1);
     if(name == OoyalaPlayer.SEEK_COMPLETED_NOTIFICATION_NAME) {
       isSeeking = false;
       DebugMode.logD(TAG, "Seek completed. Re-enabling seeking");
