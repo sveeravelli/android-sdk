@@ -374,20 +374,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
    */
   @Override
   public void processClickThrough() {
-    suspend();
-    if (currentLinearAd() != null && currentLinearAd().getClickTrackingURLs() != null) {
-      Set<String> urls = currentLinearAd().getClickTrackingURLs();
-      if (urls != null) {
-        for (String urlStr : urls) {
-          final URL url = VASTUtils.urlFromAdUrlString(urlStr);
-          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + url);
-          Utils.pingUrl(url);
-        }
-      }
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
+      //Open browser to click through URL
+      processClick(currentLinearAd().getClickThroughURL(), currentLinearAd().getClickTrackingURLs());
     }
-
-    //Open browser to click through URL
-    openUrlInBrowser(currentLinearAd().getClickThroughURL());
   }
 
   @Override
@@ -398,13 +388,21 @@ public class VASTAdPlayer extends AdMoviePlayer {
       return;
     }
     VASTIcon icon = icons.get(index);
-    // send trackings.
-    for (String clickTracking : icon.getClickTrackings()) {
-      final URL url = VASTUtils.urlFromAdUrlString(clickTracking);
-      Utils.pingUrl(url);
+    if (icon.getClickThrough() != null) {
+      processClick(icon.getClickThrough(), icon.getClickTrackings());
     }
-    // navigate to the click url
-    openUrlInBrowser(icon.getClickThrough());
+  }
+
+  private void processClick(String clickUrl, Set<String> trackingUrls) {
+    suspend();
+    if (trackingUrls != null) {
+      //send trackings
+      for (String s : trackingUrls) {
+        final URL url = VASTUtils.urlFromAdUrlString(s);
+        Utils.pingUrl(url);
+      }
+    }
+    openUrlInBrowser(clickUrl);
   }
 
   public void sendTrackingEvent(String event) {
