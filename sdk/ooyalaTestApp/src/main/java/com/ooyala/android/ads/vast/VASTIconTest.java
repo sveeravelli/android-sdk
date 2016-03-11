@@ -47,9 +47,9 @@ public class VASTIconTest extends AndroidTestCase {
       assertEquals("http://player.ooyala.com/static/v4/testAssets/creatives/vast_icon.png", icon.getResourceUrl());
       assertEquals("http://www.ooyala.com/", icon.getClickThrough());
       assertEquals(1, icon.getClickTrackings().size());
-      assertEquals("http://example-ad-server.ooyala.com/trk?uid=fb94f0c8e8c20963db4a9806a1906c0a&action=iconClickThrough&value=532c20fb6c132923bb000005", icon.getClickTrackings().get(0));
+      assertTrue(icon.getClickTrackings().contains("http://example-ad-server.ooyala.com/trk?uid=fb94f0c8e8c20963db4a9806a1906c0a&action=iconClickThrough&value=532c20fb6c132923bb000005"));
       assertEquals(1, icon.getViewTrackings().size());
-      assertEquals("http://example-ad-server.ooyala.com/trk?uid=fb94f0c8e8c20963db4a9806a1906c0a&action=iconClientSideImpression&value=532c20fb6c132923bb000005", icon.getViewTrackings().get(0));
+      assertTrue(icon.getViewTrackings().contains("http://example-ad-server.ooyala.com/trk?uid=fb94f0c8e8c20963db4a9806a1906c0a&action=iconClientSideImpression&value=532c20fb6c132923bb000005"));
 
 
     } catch (Exception e) {
