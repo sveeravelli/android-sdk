@@ -39,6 +39,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   /** The actual ads (List of VASTAd) */
   protected List<VASTAd> _poddedAds = new ArrayList<VASTAd>();
   protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
+  private List<VASTAdSpot> _vmapAdSpots;
 
   /**
    * Initialize a VASTAdSpot using the specified data
@@ -137,7 +138,11 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   }
 
   private boolean parse(Element vast) {
-    if (!vast.getTagName().equals(Constants.ELEMENT_VAST)) {
+    String tag = vast.getTagName();
+    if (Constants.ELEMENT_VMAP.equals(tag)) {
+      _vmapAdSpots = new ArrayList<VASTAdSpot>();
+      return VMAPAdHelper.parse(vast, _vmapAdSpots);
+    } else if (!Constants.ELEMENT_VAST.equals(tag)) {
       return false;
     }
 
@@ -219,6 +224,10 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
 
   public URL getVASTURL() {
     return _vastURL;
+  }
+
+  public List<VASTAdSpot> getVMAPAdSpots() {
+    return _vmapAdSpots;
   }
 
 }

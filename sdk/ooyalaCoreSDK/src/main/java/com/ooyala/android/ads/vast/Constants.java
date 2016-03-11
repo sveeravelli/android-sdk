@@ -43,6 +43,9 @@ public class Constants {
   static final String ELEMENT_IFRAME_RESOURCE = "IFrameResource";
   static final String ELEMENT_HTML_RESOURCE = "HTMLResource";
 
+  static final String ELEMENT_VMAP = "vmap:VMAP";
+
+
   static final String ATTRIBUTE_VERSION = "version";
   static final String ATTRIBUTE_ID = "id";
   static final String ATTRIBUTE_SEQUENCE = "sequence";
