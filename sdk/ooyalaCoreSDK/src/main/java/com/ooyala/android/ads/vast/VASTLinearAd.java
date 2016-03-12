@@ -2,7 +2,6 @@ package com.ooyala.android.ads.vast;
 
 import com.ooyala.android.item.PlayableItem;
 import com.ooyala.android.item.Stream;
-import com.ooyala.android.util.DebugMode;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,34 +18,6 @@ class VASTLinearAd implements PlayableItem {
   /*
    * package private on purpose
    */
-  enum SkipOffsetType{
-    None,
-    Seconds,
-    Percentage
-  };
-
-  static class SkipOffset {
-    private final SkipOffsetType type;
-    private final double value;
-
-    public SkipOffset(SkipOffsetType type, double value) {
-      this.type = type;
-      this.value = value;
-    }
-
-    public SkipOffset() {
-      this.type = SkipOffsetType.None;
-      this.value = -1;
-    }
-
-    public SkipOffsetType getType() {
-      return type;
-    }
-
-    public double getValue() {
-      return value;
-    }
-  }
 
   /** The duration of the ad in seconds */
   private double _duration;
@@ -63,7 +34,7 @@ class VASTLinearAd implements PlayableItem {
   /** The streams in an HashSet of Stream */
   private Set<Stream> _streams = new HashSet<Stream>();
   /** The skipoffset */
-  private SkipOffset _skipOffset;
+  private Offset _skipOffset;
 
   /** icons */
   private List<VASTIcon>  _icons = new ArrayList<VASTIcon>();
@@ -76,7 +47,7 @@ class VASTLinearAd implements PlayableItem {
     if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
     String skipoffset = data.getAttribute(Constants.ATTRIBUTE_SKIPOFFSET);
     if (skipoffset != null && skipoffset.length() > 0) {
-      _skipOffset = parseSkipOffset(skipoffset);
+      _skipOffset = Offset.parseOffset(skipoffset);
     }
     Node child = data.getFirstChild();
     while (child != null) {
@@ -257,7 +228,7 @@ class VASTLinearAd implements PlayableItem {
    * @return true if skippable, false otherwise
    */
   public boolean getSkippable() {
-    return _skipOffset != null && _skipOffset.getType() != SkipOffsetType.None;
+    return _skipOffset != null && _skipOffset.getType() != Offset.Type.Position;
   }
 
   /**
@@ -270,35 +241,11 @@ class VASTLinearAd implements PlayableItem {
     }
     switch (_skipOffset.getType()) {
       case Seconds:
-        return _skipOffset.getValue();
+        return _skipOffset.getSeconds();
       case Percentage:
-        return _skipOffset.getValue() * _duration;
+        return _skipOffset.getPercentage() * _duration;
       default:
         return -1;
-    }
-  }
-
-  static SkipOffset parseSkipOffset(String offsetString) {
-    int percentageIndex = offsetString.indexOf('%');
-    double value = -1;
-    if (percentageIndex > 0) {
-       // Parse percentage string
-       try {
-        value = Double.parseDouble(offsetString.substring(0, percentageIndex)) / 100.0;
-        if (value > 1) {
-          value = 1;
-        } else if (value < 0) {
-          value = 0;
-        }
-        return new SkipOffset(SkipOffsetType.Percentage, value);
-      } catch (NumberFormatException e) {
-        DebugMode.logE(TAG, "Invalid skipoffset:" + offsetString);
-        return new SkipOffset();
-      }
-    } else {
-      value = VASTUtils.secondsFromTimeString(offsetString, -1);
-      SkipOffsetType type = value < 0 ? SkipOffsetType.None : SkipOffsetType.Seconds;
-      return new SkipOffset(type, value);
     }
   }
 }

@@ -89,7 +89,7 @@ public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatabl
    */
   public abstract boolean fetchPlaybackInfo();
 
-  public static OoyalaManagedAdSpot create(JSONObject data, OoyalaAPIClient api) {
+  public static OoyalaManagedAdSpot create(JSONObject data, OoyalaAPIClient api, int contentDuration) {
     if (data == null || data.isNull(KEY_TYPE)) { return null; }
     String type = null;
     try {
@@ -104,7 +104,7 @@ public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatabl
     } else if (type.equals(AD_TYPE_OOYALA)) {
       return new OoyalaAdSpot(data, api);
     } else if (type.equals(AD_TYPE_VAST)) {
-      return new VASTAdSpot(data);
+      return new VASTAdSpot(data, contentDuration);
     } else {
       DebugMode.logD(OoyalaManagedAdSpot.class.getName(), "Unknown ad type: " + type);
       return null;

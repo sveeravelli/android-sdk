@@ -6,6 +6,9 @@ package com.ooyala.android.ads.vast;
 public class Constants {
   static final double MINIMUM_SUPPORTED_VAST_VERSION = 2.0;
   static final double MAXIMUM_SUPPORTED_VAST_VERSION = 3.0;
+  static final double MINIMUM_SUPPORTED_VMAP_VERSION = 1.0;
+  static final double MAXIMUM_SUPPORTED_VMAP_VERSION = 1.0;
+
   static final String ELEMENT_VAST = "VAST";
   static final String ELEMENT_AD = "Ad";
   static final String ELEMENT_IN_LINE = "InLine";
@@ -42,9 +45,13 @@ public class Constants {
   static final String ELEMENT_STATIC_RESOURCE = "StaticResource";
   static final String ELEMENT_IFRAME_RESOURCE = "IFrameResource";
   static final String ELEMENT_HTML_RESOURCE = "HTMLResource";
-
+  // vmap elements
   static final String ELEMENT_VMAP = "vmap:VMAP";
-
+  static final String ELEMENT_ADBREAK = "vmap:AdBreak";
+  static final String ELEMENT_ADSOURCE = "vmap:AdSource";
+  static final String ELEMENT_ADTAGURI = "vmap:AdTagURI";
+  static final String ELEMENT_VASTADDATA = "vmap:VASTAdData";
+  static final String ELEMENT_CUSTOMDATA = "vmap:CustomAdData";
 
   static final String ATTRIBUTE_VERSION = "version";
   static final String ATTRIBUTE_ID = "id";
@@ -65,6 +72,14 @@ public class Constants {
   static final String ATTRIBUTE_OFFSET = "offset";
   static final String ATTRIBUTE_DURATION = "duration";
   static final String ATTRIBUTE_CREATIVE_TYPE = "creativeType";
+  // vmap attributes
+  static final String ATTRIBUTE_TIMEOFFSET = "timeOffset";
+  static final String ATTRIBUTE_BREAKTYPE = "breakType";
+  static final String ATTRIBUTE_BREAKID = "breakId";
+  static final String ATTRIBUTE_REPEAT_AFTER = "repeatAfter";
+  static final String ATTRIBUTE_ALLOW_MULTIPLE_ADS = "allowMultipleAds";
+  static final String ATTRIBUTE_FOLLOW_REDIRECTS = "followRedirects";
+  static final String ATTRIBUTE_TEMPLATE_TYPE = "templateType";
 
   static final String MIME_TYPE_MP4 = "video/mp4";
   static final String MIME_TYPE_M3U8 = "application/x-mpegURL";

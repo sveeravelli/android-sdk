@@ -40,6 +40,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   protected List<VASTAd> _poddedAds = new ArrayList<VASTAd>();
   protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
   private List<VASTAdSpot> _vmapAdSpots;
+  private int contentDuration;
 
   /**
    * Initialize a VASTAdSpot using the specified data
@@ -51,22 +52,22 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   public VASTAdSpot(int time, URL clickURL, List<URL> trackingURLs, URL vastURL) {
     super(time, clickURL, trackingURLs);
     _vastURL = VASTUtils.urlFromAdUrlString(vastURL.toString());
-
   }
 
   /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
+   * @param duration the content duration
    */
-  public VASTAdSpot(JSONObject data) {
+  public VASTAdSpot(JSONObject data, int duration) {
+    contentDuration = duration;
     update(data);
   }
 
   /**
-   * package private on purpose, for testing only.
    * @param e the element
    */
-  VASTAdSpot(Element e) {
+  public VASTAdSpot(int time,  String breakId, Element e) {
     parse(e);
   }
 
@@ -137,11 +138,11 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
     }
   }
 
-  private boolean parse(Element vast) {
+  protected boolean parse(Element vast) {
     String tag = vast.getTagName();
     if (Constants.ELEMENT_VMAP.equals(tag)) {
       _vmapAdSpots = new ArrayList<VASTAdSpot>();
-      return VMAPAdHelper.parse(vast, _vmapAdSpots);
+      return VASTHelper.parse(vast, _vmapAdSpots, contentDuration);
     } else if (!Constants.ELEMENT_VAST.equals(tag)) {
       return false;
     }
