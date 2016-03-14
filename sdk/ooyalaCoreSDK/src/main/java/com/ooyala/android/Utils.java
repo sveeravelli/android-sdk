@@ -80,7 +80,7 @@ public class Utils {
     try {
       return new URL(host + uri + (params == null || params.length() < 1 ? "" : "?" + params));
     } catch (MalformedURLException e) {
-      DebugMode.logE(TAG, "Caught!", e);
+      DebugMode.logE(TAG, "URL format exception:" + e.getMessage(), e);
     }
     return null;
   }
@@ -113,7 +113,7 @@ public class Utils {
         try {
           result.append(URLEncoder.encode(params.get(key), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-          DebugMode.logE(Utils.class.getName(), "ERROR while trying to encode parameter", e);
+          DebugMode.logE(Utils.class.getName(), "ERROR while trying to encode parameter:" + e.getMessage(), e);
           result.append(params.get(key));
         }
       } else {
@@ -199,7 +199,7 @@ public class Utils {
     try {
       digest = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      DebugMode.logE(TAG, "Caught!", e);
+      DebugMode.logE(TAG, "Encryption exception: " + e.getMessage(), e);
       return null;
     }
     digest.reset();
@@ -230,7 +230,7 @@ public class Utils {
       try {
         sem.acquire();
       } catch (InterruptedException e) {
-        DebugMode.logE(TAG, "Embed Token request was interrupted");
+        DebugMode.logE(TAG, "Embed Token request was interrupted:" + e.getMessage(), e);
         return null;
       }
       return tokenReference.get();
@@ -265,15 +265,15 @@ public class Utils {
         sb.append(line);
       }
     } catch (SocketTimeoutException e) {
-      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out:" + e.getMessage(), e);
     } catch (IOException e) {
-      DebugMode.logE(TAG, "Caught!", e);
+      DebugMode.logE(TAG, "IOException: " + e.getMessage(), e);
     } finally {
       if (rd != null) {
         try {
           rd.close();
         } catch (IOException e) {
-          DebugMode.logE(TAG, "Caught!", e);
+          DebugMode.logE(TAG, "IOException: " + e.getMessage(), e);
         }
       }
     }
@@ -331,9 +331,9 @@ public class Utils {
         }
       }
     } catch (SocketTimeoutException e) {
-      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out.");
+      DebugMode.logE(TAG, "Connection to " + url.toString() + " timed out:" + e.getMessage(), e);
     } catch (IOException e) {
-      DebugMode.logE(TAG, "Caught!", e);
+      DebugMode.logE(TAG, "IOException: " + e.getMessage(), e);
     }
 
     return responseMessage;
