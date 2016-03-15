@@ -195,9 +195,8 @@ public class IMAAdPlayer extends AdMoviePlayer {
 
   @Override
   public void skipAd() {
-  }
-
-  public void notifyAdSkipped() {
+    DebugMode.logD(TAG, "Ad is going to be skipped");
+    setState(State.COMPLETED);
     getNotifier().notifyAdSkipped();
   }
 }
