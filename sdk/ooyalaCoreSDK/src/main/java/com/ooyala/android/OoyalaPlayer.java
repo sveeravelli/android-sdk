@@ -2138,10 +2138,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (newState == State.ERROR) {
       _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION_NAME;
       sendNotification(_tvRatingAdNotification);
-    } else if (newState == State.PLAYING) {
-      if (oldState != State.PAUSED) {
-        sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME);
-      }
     }
   }
 
