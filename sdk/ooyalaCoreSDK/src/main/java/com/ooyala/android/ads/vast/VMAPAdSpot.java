@@ -10,28 +10,159 @@ import java.net.URL;
 public class VMAPAdSpot extends VASTAdSpot {
   private static final String TAG = VASTAdSpot.class.getSimpleName();
 
-  String breakType;
-  String breakId;
-  Boolean allowMultipleAds;
-  Boolean followRedirects;
-  double repeatAfter;
+  protected final Offset timeOffset;
+  protected final String breakType;
+  protected final String breakId;
+  protected final String adSourceId;
+  protected final Boolean allowMultipleAds;
+  protected final Boolean followRedirects;
+  protected final double repeatAfter;
 
-  public VMAPAdSpot(double time, double repeat,String breakType, String breakId,  Boolean allowMultipleAds, Boolean followRedirects, Element vast) {
-    super((int)time, null, null, null);
+  protected int repeatCounter;
+
+  /**
+   * create a VMAP Ad Spot with an XML document
+   * @param timeOffset the time offset of the ad spot
+   * @param duration the duration of the content
+   * @param repeatAfter after what time the spot should be repeated. ignored for now
+   * @param breakType the break type. ignored for now
+   * @param breakId the break ID. ignored for now
+   * @param sourceId the source ID.
+   * @param allowMultipleAds if multiple ads are allowed
+   * @param followRedirects if redirects are followed. ignored for now
+   * @param e the root element of the vast xml
+   *
+   */
+  public VMAPAdSpot(final Offset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, Element e) {
+    super(0, duration, e);
+    this.timeOffset = timeOffset;
+    this.repeatAfter = repeatAfter;
     this.breakType = breakType;
     this.breakId = breakId;
-    this.repeatAfter = repeat;
+    this.adSourceId = sourceId;
     this.allowMultipleAds = allowMultipleAds;
     this.followRedirects = followRedirects;
-    parse(vast);
+    this.repeatCounter = 0;
   }
 
-  public VMAPAdSpot(double time, double repeat, String breakType, String breakId, Boolean allowMultipleAds, Boolean followRedirects, URL vastUrl) {
-    super((int)time, null, null, vastUrl);
+  /**
+   * create a VMAP Ad Spot with an url to the vast xml
+   * @param timeOffset the time offset of the ad spot
+   * @param duration the duration of the content
+   * @param repeatAfter after what time the spot should be repeated. ignored for now
+   * @param breakType the break type. ignored for now
+   * @param breakId the break ID. ignored for now
+   * @param sourceId the ad source ID.
+   * @param allowMultipleAds if multiple ads are allowed
+   * @param followRedirects if redirects are followed. ignored for now
+   * @param vastUrl the url to the vast xml
+   *
+   */
+  public VMAPAdSpot(final Offset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, URL vastUrl) {
+    super(0, duration, null, null, vastUrl);
+    this.timeOffset = timeOffset;
+    this.repeatAfter = repeatAfter;
     this.breakType = breakType;
     this.breakId = breakId;
-    this.repeatAfter = repeat;
+    this.adSourceId = sourceId;
     this.allowMultipleAds = allowMultipleAds;
     this.followRedirects = followRedirects;
+    this.repeatCounter = 0;
+  }
+
+  /**
+   * @return the time offset in seconds of when the ad spot should be played
+   */
+  @Override
+  public int getTime() {
+    if (repeatAfter > 0) {
+      return (int)(getOriginalTime() + repeatCounter * repeatAfter);
+    }
+
+    return (int)getOriginalTime();
+  }
+
+  /**
+   * @return the original time offset, in seconds
+   */
+  public double getOriginalTime() {
+    switch (timeOffset.getType()) {
+      case Percentage:
+        return (int)(timeOffset.getPercentage() * _contentDuration);
+      case Seconds:
+        return (int)timeOffset.getSeconds();
+      default:
+        return super.getTime();
+    }
+  }
+
+  /**
+   * @return the time offset
+   */
+  public final Offset getTimeOffset() {
+    return timeOffset;
+  }
+
+  /**
+   * @return repeat after
+   */
+  public double getRepeatAfter() {
+    return repeatAfter;
+  }
+
+  /**
+   * @return break type
+   */
+  public final String getBreakType() {
+    return breakType;
+  }
+
+  /**
+   * @return break id
+   */
+  public final String getBreakId() {
+    return breakId;
+  }
+
+  /**
+   * @return ad source id
+   */
+  public final String getAdSourceId() {
+    return adSourceId;
+  }
+
+  /**
+   * @return allow multiple ads
+   */
+  public boolean getAllowMultipleAds() {
+    return allowMultipleAds;
+  }
+
+  /**
+   * @return follow redirects
+   */
+  public boolean getFollowRedirects() {
+    return followRedirects;
+  }
+
+  /**
+   * @return true if repeatalbe, false otherwise
+   */
+  public boolean isRepeatable() {
+    return (repeatAfter > 0);
+  }
+
+  /**
+   * mark the ad spot as played
+   */
+  public void markAsPlayed() {
+    repeatCounter++;
+  }
+
+  /**
+   * mark the ad spot as unplayed
+   */
+  public void markAsUnplayed() {
+    repeatCounter = 0;
   }
 }

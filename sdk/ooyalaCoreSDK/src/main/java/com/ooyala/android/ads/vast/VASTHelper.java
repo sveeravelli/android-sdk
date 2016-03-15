@@ -81,8 +81,7 @@ public class VASTHelper {
       DebugMode.logE(TAG, "invalid timeOffset:" + timeOffsetString);
       return null;
     }
-    double time =
-        timeOffset.getType().equals(Offset.Type.Percentage)  ? timeOffset.getPercentage() * duration : timeOffset.getSeconds();
+
     double repeatAfter = -1;
     if (repeatAfterString != null) {
       repeatAfter = VASTUtils.secondsFromTimeString(repeatAfterString, -1);
@@ -119,12 +118,12 @@ public class VASTHelper {
       Element vast = (Element)n;
       String tag = vast.getTagName();
       if (Constants.ELEMENT_VASTADDATA.equals(tag)) {
-        return new VMAPAdSpot(time, repeatAfter, breakType, breakId, allowMultiAds, followRedirects, (Element)vast.getFirstChild());
+        return new VMAPAdSpot(timeOffset, duration, repeatAfter, breakType, breakId, adSourceId, allowMultiAds, followRedirects, (Element)vast.getFirstChild());
       } else if (Constants.ELEMENT_ADTAGURI.equals(tag)) {
         String uri = vast.getTextContent().trim();
         try {
           URL url = new URL(uri);
-          return new VMAPAdSpot(time, repeatAfter, breakType, breakId, allowMultiAds, followRedirects, url);
+          return new VMAPAdSpot(timeOffset, duration, repeatAfter, breakType, breakId, adSourceId, allowMultiAds, followRedirects, url);
         } catch (MalformedURLException ex) {
           DebugMode.logE(TAG, "invalid uri:" + ex.getMessage(), ex);
           return null;

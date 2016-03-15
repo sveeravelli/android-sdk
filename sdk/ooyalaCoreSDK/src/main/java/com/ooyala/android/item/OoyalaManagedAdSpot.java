@@ -2,6 +2,7 @@ package com.ooyala.android.item;
 
 import com.ooyala.android.OoyalaAPIClient;
 import com.ooyala.android.OoyalaAdSpot;
+import com.ooyala.android.ads.vast.Constants;
 import com.ooyala.android.ads.vast.VASTAdSpot;
 import com.ooyala.android.util.DebugMode;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatableItem {
+  private static final String TAG = OoyalaManagedAdSpot.class.getSimpleName();
   protected static final String KEY_TYPE = "type";  //AdSpot
   protected static final String KEY_TIME = "time";  //AdSpot
   protected static final String KEY_CLICK_URL = "click_url";
@@ -104,7 +106,12 @@ public abstract class OoyalaManagedAdSpot extends AdSpot implements JSONUpdatabl
     } else if (type.equals(AD_TYPE_OOYALA)) {
       return new OoyalaAdSpot(data, api);
     } else if (type.equals(AD_TYPE_VAST)) {
-      return new VASTAdSpot(data, contentDuration);
+      try {
+        data.put(Constants.KEY_DURATION, contentDuration);
+      } catch (JSONException e) {
+        DebugMode.logE(TAG, "unable to add duration to json", e);
+      }
+      return new VASTAdSpot(data);
     } else {
       DebugMode.logD(OoyalaManagedAdSpot.class.getName(), "Unknown ad type: " + type);
       return null;

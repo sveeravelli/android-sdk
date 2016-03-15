@@ -39,35 +39,48 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   /** The actual ads (List of VASTAd) */
   protected List<VASTAd> _poddedAds = new ArrayList<VASTAd>();
   protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
-  private List<VASTAdSpot> _vmapAdSpots;
-  private int contentDuration;
+  protected List<VASTAdSpot> _vmapAdSpots;
+  protected int _contentDuration;
+
+  /**
+   * for testing purpose only
+   * package private on purpose
+   * @param e the xml
+   */
+  VASTAdSpot(Element e) {
+    this(0, 0, e);
+  }
 
   /**
    * Initialize a VASTAdSpot using the specified data
-   * @param time the time at which the VASTAdSpot should play
+   * @param timeOffset the time offset at which the VASTAdSpot should play
    * @param clickURL the clickthrough URL
    * @param trackingURLs the tracking URLs that should be pinged when this ad plays
    * @param vastURL the VAST URL containing the VAST compliant XML for this ad spot
    */
-  public VASTAdSpot(int time, URL clickURL, List<URL> trackingURLs, URL vastURL) {
-    super(time, clickURL, trackingURLs);
+  public VASTAdSpot(int timeOffset, int duration, URL clickURL, List<URL> trackingURLs, URL vastURL) {
+    super(timeOffset, clickURL, trackingURLs);
+    _contentDuration = duration;
     _vastURL = VASTUtils.urlFromAdUrlString(vastURL.toString());
   }
 
   /**
    * Initialize a VASTAdSpot using the specified data (subclasses should override this)
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
-   * @param duration the content duration
    */
-  public VASTAdSpot(JSONObject data, int duration) {
-    contentDuration = duration;
+  public VASTAdSpot(JSONObject data) {
     update(data);
   }
 
   /**
-   * @param e the element
+   * initialize a VASTAdSpot via XML document
+   * @param timeOffset the time offset of the ad spot
+   * @param duration the content duration
+   * @param e the VAST document element
    */
-  public VASTAdSpot(int time,  String breakId, Element e) {
+  public VASTAdSpot(int timeOffset, int duration, Element e) {
+    super(timeOffset, null, null);
+    _contentDuration = duration;
     parse(e);
   }
 
@@ -87,18 +100,23 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
       default:
         break;
     }
+    if (!data.isNull(Constants.KEY_DURATION)) {
+      try {
+        _contentDuration = data.getInt(Constants.KEY_DURATION);
+      } catch (JSONException e) {
+        DebugMode.logE(TAG, "unable to get content duration", e);
+      }
+    }
     if (data.isNull(Constants.KEY_SIGNATURE)) {
-      DebugMode.logE(this.getClass().getName(),
-          "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
+      DebugMode.logE(TAG, "ERROR: Fail to update VASTAd with dictionary because no signature exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(KEY_EXPIRES)) {
-      DebugMode.logE(this.getClass().getName(),
-          "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
+      DebugMode.logE(TAG, "ERROR: Fail to update VASTAd with dictionary because no expires exists!");
       return ReturnState.STATE_FAIL;
     }
     if (data.isNull(KEY_URL)) {
-      DebugMode.logE(this.getClass().getName(), "ERROR: Fail to update VASTAd with dictionary because no url exists!");
+      DebugMode.logE(TAG, "ERROR: Fail to update VASTAd with dictionary because no url exists!");
       return ReturnState.STATE_FAIL;
     }
     try {
@@ -142,7 +160,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
     String tag = vast.getTagName();
     if (Constants.ELEMENT_VMAP.equals(tag)) {
       _vmapAdSpots = new ArrayList<VASTAdSpot>();
-      return VASTHelper.parse(vast, _vmapAdSpots, contentDuration);
+      return VASTHelper.parse(vast, _vmapAdSpots, _contentDuration);
     } else if (!Constants.ELEMENT_VAST.equals(tag)) {
       return false;
     }
