@@ -10,13 +10,13 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Created by zchen on 3/10/16.
+ * This is a static helper class to deserialize a VMAP XML document into VMAP ad spots.
  */
 public class VASTHelper {
   private static final String TAG = VASTHelper.class.getSimpleName();
   /**
-   * parse the vmap xml according to the spec and generates a list of VASTAdSpots
-   * @param e the root element of the vmap xml
+   * Parse a VMAP XML element according to the spec and generates a list of VASTAdSpots
+   * @param e the root element of the VMAP XML
    * @param spots a list of vast ad spots as output
    * @param duration the content duration, used to compute percentage time offset
    * @return true if pass succeeds, false if failed
@@ -66,6 +66,12 @@ public class VASTHelper {
     return true;
   }
 
+  /**
+   * Parse a VMAP AdBreak element according to the spec and generates a list of VASTAdSpots
+   * @param e the root element of the AdBreak
+   * @param duration the content duration, used to compute percentage time offset
+   * @return a VMAPAdSpot, null if parse failed.
+   */
   private static VMAPAdSpot parseAdBreak(Element e, int duration) {
     String timeOffsetString = e.getAttribute(Constants.ATTRIBUTE_TIMEOFFSET);
     String repeatAfterString = e.getAttribute(Constants.ATTRIBUTE_REPEAT_AFTER);
@@ -76,7 +82,7 @@ public class VASTHelper {
       return null;
     }
 
-    Offset timeOffset = Offset.parseOffset(timeOffsetString);
+    VASTTimeOffset timeOffset = VASTTimeOffset.parseOffset(timeOffsetString);
     if (timeOffset == null) {
       DebugMode.logE(TAG, "invalid timeOffset:" + timeOffsetString);
       return null;

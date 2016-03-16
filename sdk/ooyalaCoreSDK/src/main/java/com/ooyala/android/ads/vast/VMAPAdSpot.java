@@ -10,7 +10,7 @@ import java.net.URL;
 public class VMAPAdSpot extends VASTAdSpot {
   private static final String TAG = VASTAdSpot.class.getSimpleName();
 
-  protected final Offset timeOffset;
+  protected final VASTTimeOffset timeOffset;
   protected final String breakType;
   protected final String breakId;
   protected final String adSourceId;
@@ -33,7 +33,7 @@ public class VMAPAdSpot extends VASTAdSpot {
    * @param e the root element of the vast xml
    *
    */
-  public VMAPAdSpot(final Offset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, Element e) {
+  public VMAPAdSpot(final VASTTimeOffset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, Element e) {
     super(0, duration, e);
     this.timeOffset = timeOffset;
     this.repeatAfter = repeatAfter;
@@ -58,7 +58,7 @@ public class VMAPAdSpot extends VASTAdSpot {
    * @param vastUrl the url to the vast xml
    *
    */
-  public VMAPAdSpot(final Offset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, URL vastUrl) {
+  public VMAPAdSpot(final VASTTimeOffset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, URL vastUrl) {
     super(0, duration, null, null, vastUrl);
     this.timeOffset = timeOffset;
     this.repeatAfter = repeatAfter;
@@ -99,7 +99,7 @@ public class VMAPAdSpot extends VASTAdSpot {
   /**
    * @return the time offset
    */
-  public final Offset getTimeOffset() {
+  public final VASTTimeOffset getTimeOffset() {
     return timeOffset;
   }
 

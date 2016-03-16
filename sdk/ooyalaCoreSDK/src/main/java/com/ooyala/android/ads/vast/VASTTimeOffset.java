@@ -3,11 +3,15 @@ package com.ooyala.android.ads.vast;
 import com.ooyala.android.util.DebugMode;
 
 /**
- * Created by zchen on 3/11/16.
+ * This class is used to hold a VAST 3.0 time offset value.
+ * Supported format:
+ * 1. Seconds in HH:MM:SS.MMM, e.g. 01:30:20.250
+ * 2. Percentage end up with a %, e.g. 20%
+ * 3. Predefined position starting with #, e.g. #1
  */
-public class Offset {
+public class VASTTimeOffset {
   private static int MAX_OFFSET = Integer.MAX_VALUE / 1024;
-  private static final String TAG = Offset.class.getName();
+  private static final String TAG = VASTTimeOffset.class.getName();
   public enum Type{
     Seconds,
     Percentage,
@@ -17,39 +21,55 @@ public class Offset {
   private final Type type;
   private final double value;
 
-  private Offset(Type type, double value) {
+  private VASTTimeOffset(Type type, double value) {
     this.type = type;
     this.value = value;
   }
 
+  /**
+   * @return the time offset type
+   */
   public Type getType() {
       return type;
     }
 
+  /**
+   * @return the percentage time offset, negative if this is not a percentage time offset.
+   */
   public double getPercentage() {
     return type == Type.Percentage ? value : -1.0;
   }
 
+  /**
+   * @return the second time offset, negative if this is not a second time offset.
+   */
   public double getSeconds() {
     return type == Type.Seconds ? value : -1.0;
   }
 
+  /**
+   * @return the position time offset, negative if this is not a position time offset.
+   */
   public int getPosition() {
     return type == Type.Position ? (int)value : -1;
   }
 
-
-  public static Offset parseOffset(String offsetString) {
+  /**
+   * Parse a time offset string to a time offset object.
+   * @param offsetString the offset string.
+   * @return the time offset object, null if the string is not formatted properly.
+   */
+  public static VASTTimeOffset parseOffset(String offsetString) {
     if (offsetString == null) {
       return null;
     }
 
     if (offsetString.equals("start")) {
-      return new Offset(Type.Seconds, 0);
+      return new VASTTimeOffset(Type.Seconds, 0);
     }
 
     if (offsetString.equals("end")) {
-      return new Offset(Type.Seconds, MAX_OFFSET);
+      return new VASTTimeOffset(Type.Seconds, MAX_OFFSET);
     }
 
     int percentageIndex = offsetString.indexOf('%');
@@ -63,7 +83,7 @@ public class Offset {
         } else if (value < 0) {
           value = 0;
         }
-        return new Offset(Type.Percentage, value);
+        return new VASTTimeOffset(Type.Percentage, value);
       } catch (NumberFormatException e) {
         DebugMode.logE(TAG, "Invalid time offset:" + offsetString);
         return null;
@@ -71,11 +91,11 @@ public class Offset {
     } else {
       value = VASTUtils.secondsFromTimeString(offsetString, -1);
       if (value >= 0) {
-        return new Offset(Type.Seconds, value);
+        return new VASTTimeOffset(Type.Seconds, value);
       } else if (offsetString.charAt(0) == '#') {
         try {
           int position = Integer.parseInt(offsetString.substring(1));
-          return new Offset(Type.Position, position);
+          return new VASTTimeOffset(Type.Position, position);
         } catch (NumberFormatException ex) {
           return null;
         }

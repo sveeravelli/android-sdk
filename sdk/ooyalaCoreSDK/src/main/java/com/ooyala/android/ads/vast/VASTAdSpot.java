@@ -63,7 +63,6 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
     super(timeOffset, clickURL, trackingURLs);
     _contentDuration = duration;
     _vastURL = VASTUtils.urlFromAdUrlString(vastURL.toString());
-    _infoFetched = false;
   }
 
   /**
@@ -71,7 +70,6 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
    */
   public VASTAdSpot(JSONObject data) {
-    _infoFetched = false;
     update(data);
   }
 

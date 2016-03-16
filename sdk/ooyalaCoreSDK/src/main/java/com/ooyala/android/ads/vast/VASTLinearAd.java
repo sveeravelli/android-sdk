@@ -34,7 +34,7 @@ class VASTLinearAd implements PlayableItem {
   /** The streams in an HashSet of Stream */
   private Set<Stream> _streams = new HashSet<Stream>();
   /** The skipoffset */
-  private Offset _skipOffset;
+  private VASTTimeOffset _skipOffset;
 
   /** icons */
   private List<VASTIcon>  _icons = new ArrayList<VASTIcon>();
@@ -47,7 +47,7 @@ class VASTLinearAd implements PlayableItem {
     if (!data.getTagName().equals(Constants.ELEMENT_LINEAR)) { return; }
     String skipoffset = data.getAttribute(Constants.ATTRIBUTE_SKIPOFFSET);
     if (skipoffset != null && skipoffset.length() > 0) {
-      _skipOffset = Offset.parseOffset(skipoffset);
+      _skipOffset = VASTTimeOffset.parseOffset(skipoffset);
     }
     Node child = data.getFirstChild();
     while (child != null) {
@@ -228,7 +228,7 @@ class VASTLinearAd implements PlayableItem {
    * @return true if skippable, false otherwise
    */
   public boolean getSkippable() {
-    return _skipOffset != null && _skipOffset.getType() != Offset.Type.Position;
+    return _skipOffset != null && _skipOffset.getType() != VASTTimeOffset.Type.Position;
   }
 
   /**

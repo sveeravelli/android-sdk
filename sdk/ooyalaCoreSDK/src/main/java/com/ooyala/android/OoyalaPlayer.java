@@ -2316,6 +2316,11 @@ public class OoyalaPlayer extends Observable implements Observer,
     }
   }
 
+  /**
+   * Insert VAST ads to the managed ad plugin.
+   *
+   * @param ads the ads to be inserted.
+   */
   public void insertAds(List<VASTAdSpot> ads) {
     if (_managedAdsPlugin != null) {
       for (VASTAdSpot vast : ads) {
