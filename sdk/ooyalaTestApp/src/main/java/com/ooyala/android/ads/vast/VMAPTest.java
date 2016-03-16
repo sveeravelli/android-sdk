@@ -23,7 +23,7 @@ public class VMAPTest extends AndroidTestCase {
   static final String url3 =
       "https://pubads.g.doubleclick.net/gampad/ads?slotname=/124319096/external/ad_rule_samples&sz=640x480&ciu_szs=300x250&unviewed_position_start=1&output=xml_vast3&impl=s&env=vp&gdfp_req=1&ad_rule=0&vad_type=linear&vpos=postroll&pod=3&ppos=1&lip=true&min_ad_duration=0&max_ad_duration=30000&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&url=&video_doc_id=short_onecue&cmsid=496";
   public void testPreMidPost() {
-    int duration = 1200;
+    int duration = 365*24*3600*1000;
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
@@ -49,7 +49,7 @@ public class VMAPTest extends AndroidTestCase {
       vast = adSpot.getVMAPAdSpots().get(1);
       assertTrue(vast instanceof VMAPAdSpot);
       vmap = (VMAPAdSpot)vast;
-      assertEquals(15, vast.getTime());
+      assertEquals(15000, vast.getTime());
       assertEquals("midroll-1", vmap.getBreakId());
       assertEquals("linear", vmap.getBreakType());
       assertEquals("midroll-1-ad-1", vmap.getAdSourceId());
@@ -71,7 +71,7 @@ public class VMAPTest extends AndroidTestCase {
       vast = adSpot.getVMAPAdSpots().get(3);
       assertTrue(vast instanceof VMAPAdSpot);
       vmap = (VMAPAdSpot)vast;
-      assertEquals(Integer.MAX_VALUE, vast.getTime());
+      assertTrue(vast.getTime() > duration);
       assertEquals("postroll", vmap.getBreakId());
       assertEquals("linear", vmap.getBreakType());
       assertEquals("postroll-ad-1", vmap.getAdSourceId());

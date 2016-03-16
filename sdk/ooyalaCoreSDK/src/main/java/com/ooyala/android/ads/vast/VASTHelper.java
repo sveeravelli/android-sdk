@@ -83,7 +83,7 @@ public class VASTHelper {
     }
 
     double repeatAfter = -1;
-    if (repeatAfterString != null) {
+    if (repeatAfterString != null && repeatAfterString.length() > 0) {
       repeatAfter = VASTUtils.secondsFromTimeString(repeatAfterString, -1);
     }
 

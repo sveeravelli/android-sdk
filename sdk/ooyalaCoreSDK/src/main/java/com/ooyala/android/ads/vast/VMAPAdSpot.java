@@ -75,22 +75,22 @@ public class VMAPAdSpot extends VASTAdSpot {
    */
   @Override
   public int getTime() {
+    double time = getOriginalTimeInMilliseconds();
     if (repeatAfter > 0) {
-      return (int)(getOriginalTime() + repeatCounter * repeatAfter);
+      time += repeatCounter * repeatAfter;
     }
-
-    return (int)getOriginalTime();
+    return (int)time;
   }
 
   /**
    * @return the original time offset, in seconds
    */
-  public double getOriginalTime() {
+  public double getOriginalTimeInMilliseconds() {
     switch (timeOffset.getType()) {
       case Percentage:
         return (int)(timeOffset.getPercentage() * _contentDuration);
       case Seconds:
-        return (int)timeOffset.getSeconds();
+        return timeOffset.getSeconds() * 1000;
       default:
         return super.getTime();
     }

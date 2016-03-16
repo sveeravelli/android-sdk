@@ -69,7 +69,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
     _seekable = false;
     _ad = (VASTAdSpot) ad;
-    if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
+    if (!_ad.isInfoFetched()) {
       if (_fetchTask != null) {
         this._parent.getOoyalaAPIClient().cancel(_fetchTask);
       }
@@ -81,6 +81,12 @@ public class VASTAdPlayer extends AdMoviePlayer {
           if (!result) {
             _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Could not fetch VAST Ad");
             setState(State.ERROR);
+            return;
+          }
+          if (_ad.getVMAPAdSpots() != null && _ad.getVMAPAdSpots().size() > 0) {
+            // this is a vmap spot, refresh ads with vmap spots
+            parent.insertAds(_ad.getVMAPAdSpots());
+            setState(State.COMPLETED);
             return;
           }
           if(!initAfterFetch(parent)) {

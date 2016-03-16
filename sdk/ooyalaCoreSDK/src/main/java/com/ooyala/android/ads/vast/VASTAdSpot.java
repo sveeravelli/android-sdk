@@ -41,6 +41,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   protected List<VASTAd> _standAloneAds = new ArrayList<VASTAd>();
   protected List<VASTAdSpot> _vmapAdSpots;
   protected int _contentDuration;
+  protected boolean _infoFetched;
 
   /**
    * for testing purpose only
@@ -62,6 +63,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
     super(timeOffset, clickURL, trackingURLs);
     _contentDuration = duration;
     _vastURL = VASTUtils.urlFromAdUrlString(vastURL.toString());
+    _infoFetched = false;
   }
 
   /**
@@ -69,6 +71,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
    * @param data the NSDictionary containing the data to use to initialize this VASTAdSpot
    */
   public VASTAdSpot(JSONObject data) {
+    _infoFetched = false;
     update(data);
   }
 
@@ -81,7 +84,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
   public VASTAdSpot(int timeOffset, int duration, Element e) {
     super(timeOffset, null, null);
     _contentDuration = duration;
-    parse(e);
+    _infoFetched = parse(e);
   }
 
   /**
@@ -249,4 +252,7 @@ public class VASTAdSpot extends OoyalaManagedAdSpot {
     return _vmapAdSpots;
   }
 
+  public boolean isInfoFetched() {
+    return _infoFetched;
+  }
 }

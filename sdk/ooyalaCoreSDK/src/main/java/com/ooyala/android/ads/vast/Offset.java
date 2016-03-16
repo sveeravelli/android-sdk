@@ -6,6 +6,7 @@ import com.ooyala.android.util.DebugMode;
  * Created by zchen on 3/11/16.
  */
 public class Offset {
+  private static int MAX_OFFSET = Integer.MAX_VALUE / 1024;
   private static final String TAG = Offset.class.getName();
   public enum Type{
     Seconds,
@@ -48,7 +49,7 @@ public class Offset {
     }
 
     if (offsetString.equals("end")) {
-      return new Offset(Type.Seconds, Integer.MAX_VALUE);
+      return new Offset(Type.Seconds, MAX_OFFSET);
     }
 
     int percentageIndex = offsetString.indexOf('%');
