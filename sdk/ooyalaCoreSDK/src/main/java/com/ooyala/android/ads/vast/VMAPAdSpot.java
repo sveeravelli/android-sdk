@@ -5,7 +5,7 @@ import org.w3c.dom.Element;
 import java.net.URL;
 
 /**
- * Created by zchen on 3/11/16.
+ * A model of a VMAP Ad spot, which extends VAST Ad spot with additional VMAP attributes
  */
 public class VMAPAdSpot extends VASTAdSpot {
   private static final String TAG = VASTAdSpot.class.getSimpleName();
@@ -21,7 +21,7 @@ public class VMAPAdSpot extends VASTAdSpot {
   protected int repeatCounter;
 
   /**
-   * create a VMAP Ad Spot with an XML document
+   * Create a VMAP Ad Spot with an XML document
    * @param timeOffset the time offset of the ad spot
    * @param duration the duration of the content
    * @param repeatAfter after what time the spot should be repeated. ignored for now
@@ -30,7 +30,7 @@ public class VMAPAdSpot extends VASTAdSpot {
    * @param sourceId the source ID.
    * @param allowMultipleAds if multiple ads are allowed
    * @param followRedirects if redirects are followed. ignored for now
-   * @param e the root element of the vast xml
+   * @param e the root element of the VAST XML
    *
    */
   public VMAPAdSpot(final VASTTimeOffset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, Element e) {
@@ -46,7 +46,7 @@ public class VMAPAdSpot extends VASTAdSpot {
   }
 
   /**
-   * create a VMAP Ad Spot with an url to the vast xml
+   * create a VMAP Ad Spot with an url to the VAST XML
    * @param timeOffset the time offset of the ad spot
    * @param duration the duration of the content
    * @param repeatAfter after what time the spot should be repeated. ignored for now
@@ -55,7 +55,7 @@ public class VMAPAdSpot extends VASTAdSpot {
    * @param sourceId the ad source ID.
    * @param allowMultipleAds if multiple ads are allowed
    * @param followRedirects if redirects are followed. ignored for now
-   * @param vastUrl the url to the vast xml
+   * @param vastUrl the url to the VAST XML
    *
    */
   public VMAPAdSpot(final VASTTimeOffset timeOffset, int duration, double repeatAfter, String breakType, String breakId, String sourceId, Boolean allowMultipleAds, Boolean followRedirects, URL vastUrl) {

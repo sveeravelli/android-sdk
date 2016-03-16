@@ -2322,7 +2322,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * @param ads the ads to be inserted.
    */
   public void insertAds(List<VASTAdSpot> ads) {
-    if (_managedAdsPlugin != null) {
+    if (_managedAdsPlugin != null && ads != null) {
       for (VASTAdSpot vast : ads) {
         _managedAdsPlugin.insertAd(vast);
       }
