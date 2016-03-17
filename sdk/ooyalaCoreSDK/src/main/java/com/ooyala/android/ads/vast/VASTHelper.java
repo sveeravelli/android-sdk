@@ -93,14 +93,7 @@ public class VASTHelper {
       repeatAfter = VASTUtils.secondsFromTimeString(repeatAfterString, -1);
     }
 
-    Element adSource = null;
-    for (Node node = e.getFirstChild(); node != null; node = node.getNextSibling()) {
-      if (node instanceof Element && Constants.ELEMENT_ADSOURCE.equals(((Element) node).getTagName())) {
-        adSource = (Element)node;
-        break;
-      }
-    }
-
+    Element adSource = VASTHelper.getFirstElementByName(e, Constants.ELEMENT_ADSOURCE);
     if (adSource == null) {
       return null;
     }
@@ -124,7 +117,8 @@ public class VASTHelper {
       Element vast = (Element)n;
       String tag = vast.getTagName();
       if (Constants.ELEMENT_VASTADDATA.equals(tag)) {
-        return new VMAPAdSpot(timeOffset, duration, repeatAfter, breakType, breakId, adSourceId, allowMultiAds, followRedirects, (Element)vast.getFirstChild());
+        Element v = VASTHelper.getFirstElementByName(vast, Constants.ELEMENT_VAST);
+        return new VMAPAdSpot(timeOffset, duration, repeatAfter, breakType, breakId, adSourceId, allowMultiAds, followRedirects, v);
       } else if (Constants.ELEMENT_ADTAGURI.equals(tag)) {
         String uri = vast.getTextContent().trim();
         try {
@@ -137,6 +131,19 @@ public class VASTHelper {
       } else if (Constants.ELEMENT_CUSTOMDATA.equals(tag)) {
         // not implemented
         return null;
+      }
+    }
+    return null;
+  }
+
+  public static Element getFirstElementByName(Element e, String name) {
+    if (e == null || name == null) {
+      DebugMode.logE(TAG, "cannot get child from null element or name");
+      return null;
+    }
+    for (Node node = e.getFirstChild(); node != null; node = node.getNextSibling()) {
+      if (node instanceof Element && name.equals(((Element) node).getTagName())) {
+       return (Element)node;
       }
     }
     return null;

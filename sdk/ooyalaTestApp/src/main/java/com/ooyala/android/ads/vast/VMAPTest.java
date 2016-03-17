@@ -83,4 +83,54 @@ public class VMAPTest extends AndroidTestCase {
       fail();
     }
   }
+
+  public void testVASTAdData() {
+    int duration = 3600*1000;
+    try {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      InputStream is = TestConstants.getTestAssetAsStream(getContext(), TestConstants.TEST_VMAP_VASTADDATA);
+      Document doc = db.parse(is);
+      Element adXML = doc.getDocumentElement();
+      VASTAdSpot adSpot = new VASTAdSpot(0, duration, adXML);
+      assertNotNull(adSpot.getVMAPAdSpots());
+      assertEquals(adSpot.getVMAPAdSpots().size(), 2);
+
+      // adspot 1
+      VASTAdSpot vast = adSpot.getVMAPAdSpots().get(0);
+      assertTrue(vast instanceof VMAPAdSpot);
+      VMAPAdSpot vmap = (VMAPAdSpot)vast;
+      assertEquals(0, vast.getTime());
+      assertEquals("mypre", vmap.getBreakId());
+      assertEquals("linear", vmap.getBreakType());
+      assertEquals("1", vmap.getAdSourceId());
+      assertTrue(vmap.getAllowMultipleAds());
+      assertTrue(vmap.getFollowRedirects());
+
+      // check VAST attributes
+      assertEquals(1, vast.getAds().size());
+      VASTAd vastAd = vast.getAds().get(0);
+      assertEquals("2447226.251866656", vastAd.getAdID());
+      assertEquals("Ooyala Skippable Preroll", vastAd.getTitle());
+
+      vast = adSpot.getVMAPAdSpots().get(1);
+      assertTrue(vast instanceof VMAPAdSpot);
+      vmap = (VMAPAdSpot)vast;
+      assertEquals(10 * 60 * 1000 + 23125, vast.getTime());
+      assertEquals("myid", vmap.getBreakId());
+      assertEquals("linear", vmap.getBreakType());
+      assertEquals("2", vmap.getAdSourceId());
+      assertTrue(vmap.getAllowMultipleAds());
+      assertTrue(vmap.getFollowRedirects());
+
+      assertEquals(1, vast.getAds().size());
+      vastAd = vast.getAds().get(0);
+      assertEquals("2447226.251866656", vastAd.getAdID());
+      assertEquals("Ooyala Skippable Midroll", vastAd.getTitle());
+
+    } catch (Exception e) {
+      System.err.println("Exception: " + e.getMessage());
+      fail();
+    }
+  }
 }

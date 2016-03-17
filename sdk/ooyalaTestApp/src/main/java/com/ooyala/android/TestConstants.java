@@ -59,6 +59,7 @@ public class TestConstants {
   public static final String TEST_VAST3_STANDALONE = "test_vast3_standalone.xml";
   public static final String TEST_VAST3_SKIPPABLE = "test_vast3_skippable.xml";
   public static final String TEST_VMAP_PREMIDPOST = "test_vmap_premidpost.xml";
+  public static final String TEST_VMAP_VASTADDATA = "test_vmap_preroll_vastaddata.xml";
 
   public static InputStream getTestAssetAsStream(Context c, String name) {
       try {
