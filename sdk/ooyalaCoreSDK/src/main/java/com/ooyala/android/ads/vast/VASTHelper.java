@@ -131,6 +131,9 @@ public class VASTHelper {
       } else if (Constants.ELEMENT_CUSTOMDATA.equals(tag)) {
         // not implemented
         return null;
+      } else {
+        DebugMode.logE(TAG, "invalid AdSource element:" + tag);
+        return null;
       }
     }
     return null;

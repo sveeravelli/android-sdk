@@ -86,6 +86,10 @@ public class VMAPAdSpot extends VASTAdSpot {
    * @return the original time offset, in seconds
    */
   public double getOriginalTimeInMilliseconds() {
+    if (timeOffset == null) {
+      return super.getTime();
+    }
+
     switch (timeOffset.getType()) {
       case Percentage:
         return (int)(timeOffset.getPercentage() * _contentDuration);
