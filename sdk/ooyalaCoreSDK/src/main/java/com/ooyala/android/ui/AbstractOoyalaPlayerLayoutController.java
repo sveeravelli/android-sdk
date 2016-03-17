@@ -643,14 +643,12 @@ public abstract class AbstractOoyalaPlayerLayoutController implements LayoutCont
 
   @Override
   public void update(Observable arg0, Object arg1) {
+    String notificationName = null;
 
-    String notificationName;
     OoyalaNotification ooNotification = null;
-    if (arg1 instanceof String) {
-      notificationName = (String)arg1;
-    } else if (arg1 instanceof OoyalaNotification){
+    if (arg1 instanceof OoyalaNotification){
       ooNotification = (OoyalaNotification)arg1;
-      notificationName = ooNotification.getName();
+      notificationName = OoyalaNotification.getNameOrUnknown(arg1);
     } else {
       DebugMode.logW(TAG, "Unidentified notification, ignorning for now");
       return;

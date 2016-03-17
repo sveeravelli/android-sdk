@@ -150,6 +150,8 @@ class OoyalaAdPlayer extends AdMoviePlayer {
   public void processClickThrough() {
     String url = _ad.getClickURL().toString();
     try {
+      pause();
+      queuePlay();
       url = url.trim(); //strip leading and trailing whitespace
       Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
       _playerLayout.getContext().startActivity(browserIntent);
@@ -168,6 +170,8 @@ class OoyalaAdPlayer extends AdMoviePlayer {
     if (_learnMore != null) {
       _playerLayout.bringChildToFront(_learnMore);
     }
+
+    dequeuePlay();
   }
 
   @Override
