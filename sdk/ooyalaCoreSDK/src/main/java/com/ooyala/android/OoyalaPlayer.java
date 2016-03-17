@@ -22,6 +22,7 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.ads.vast.VMAPAdSpot;
 import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
@@ -267,6 +268,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+    registerAdPlayer(VMAPAdSpot.class, VASTAdPlayer.class);
 
     // Initialize third party plugin managers
     _adManager = new AdPluginManager(this);
@@ -2307,6 +2309,19 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setAuthToken(String authToken) {
     if (_playerAPIClient != null) {
       _playerAPIClient.setAuthToken(authToken);
+    }
+  }
+
+  /**
+   * Insert VAST ads to the managed ad plugin.
+   *
+   * @param ads the ads to be inserted.
+   */
+  public void insertAds(List<VASTAdSpot> ads) {
+    if (_managedAdsPlugin != null && ads != null) {
+      for (VASTAdSpot vast : ads) {
+        _managedAdsPlugin.insertAd(vast);
+      }
     }
   }
 }

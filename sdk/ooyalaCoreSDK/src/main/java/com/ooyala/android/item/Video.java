@@ -96,7 +96,7 @@ public class Video extends ContentItem implements PlayableItem {
         if (ads.length() > 0) {
           _ads.clear();
           for (int i = 0; i < ads.length(); i++) {
-            OoyalaManagedAdSpot ad = OoyalaManagedAdSpot.create(ads.getJSONObject(i), _api);
+            OoyalaManagedAdSpot ad = OoyalaManagedAdSpot.create(ads.getJSONObject(i), _api, _duration);
             ad.setPriority(i);
             if (ad != null) {
               _ads.add(ad);
