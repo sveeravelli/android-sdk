@@ -1083,7 +1083,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       _layoutController.setFullscreen(fullscreen);
 
       // Create Learn More button when going in and out of fullscreen
-      if (isShowingAd() && currentPlayer() != null) {
+      if (isShowingAd() && currentPlayer() instanceof AdMoviePlayer) {
         ((AdMoviePlayer) currentPlayer()).updateLearnMoreButton(getLayout(),
             getTopBarOffset());
       }
