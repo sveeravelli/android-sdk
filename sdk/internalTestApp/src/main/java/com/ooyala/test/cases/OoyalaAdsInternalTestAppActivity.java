@@ -35,6 +35,7 @@ public class OoyalaAdsInternalTestAppActivity extends BaseInternalTestAppActivit
     embedMap.put("VAST Wrapper",       "5ybGV3ZTrqvbymwBC6ThtupFBptOp1rP");
     embedMap.put("Ooyala And VAST",       "Ftcmp0ZDoz8tALmhPcN2vMzCdg7YU9lc");
     embedMap.put("VMAP PreMidPost Single", "41MzA5MTE65SC6VQAS3H3d9rX-hwHQSK");
+    embedMap.put("VMAP PreMid VASTAdData", "10eGE0MjE6TZG6mdHfJJEAGnxbuEv1Vi");
 
     //Update the spinner with the embed map
     embedAdapter.addAll(embedMap.keySet());
