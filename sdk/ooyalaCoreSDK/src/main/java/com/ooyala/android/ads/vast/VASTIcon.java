@@ -3,8 +3,8 @@ package com.ooyala.android.ads.vast;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by zchen on 2/25/16.
@@ -30,8 +30,8 @@ public class VASTIcon {
   private ResourceType type;
   private String apiFramework;
 
-  private List<String> clickTrackings = new ArrayList<String>();
-  private List<String> viewTrackings = new ArrayList<String>();
+  private Set<String> clickTrackings = new HashSet<String>();
+  private Set<String> viewTrackings = new HashSet<String>();
   String clickThrough;
 
   VASTIcon(Element data) {
@@ -196,14 +196,14 @@ public class VASTIcon {
   /**
    * @return a list of click tracking urls
    */
-  public List<String> getClickTrackings() {
+  public Set<String> getClickTrackings() {
     return clickTrackings;
   }
 
   /**
    * @return a list of viewing urls
    */
-  public List<String> getViewTrackings() {
+  public Set<String> getViewTrackings() {
     return viewTrackings;
   }
 

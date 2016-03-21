@@ -22,6 +22,7 @@ import com.ooyala.android.Environment.EnvironmentType;
 import com.ooyala.android.OoyalaException.OoyalaErrorCode;
 import com.ooyala.android.ads.vast.VASTAdPlayer;
 import com.ooyala.android.ads.vast.VASTAdSpot;
+import com.ooyala.android.ads.vast.VMAPAdSpot;
 import com.ooyala.android.apis.AuthorizeCallback;
 import com.ooyala.android.apis.ContentTreeCallback;
 import com.ooyala.android.apis.FetchPlaybackInfoCallback;
@@ -71,7 +72,7 @@ public class OoyalaPlayer extends Observable implements Observer,
    * NOTE[jigish] do NOT change the name or location of this variable without
    * changing pub_release.sh
    */
-  static final String SDK_VERSION = "v4.11.0_RC7";
+  static final String SDK_VERSION = "v4.12.0_RC9";
   static final String API_VERSION = "1";
   public static final String PREFERENCES_NAME = "com.ooyala.android_preferences";
 
@@ -267,6 +268,7 @@ public class OoyalaPlayer extends Observable implements Observer,
     _adPlayers = new HashMap<Class<? extends OoyalaManagedAdSpot>, Class<? extends AdMoviePlayer>>();
     registerAdPlayer(OoyalaAdSpot.class, OoyalaAdPlayer.class);
     registerAdPlayer(VASTAdSpot.class, VASTAdPlayer.class);
+    registerAdPlayer(VMAPAdSpot.class, VASTAdPlayer.class);
 
     // Initialize third party plugin managers
     _adManager = new AdPluginManager(this);
@@ -1081,7 +1083,7 @@ public class OoyalaPlayer extends Observable implements Observer,
       _layoutController.setFullscreen(fullscreen);
 
       // Create Learn More button when going in and out of fullscreen
-      if (isShowingAd() && currentPlayer() != null) {
+      if (isShowingAd() && currentPlayer() instanceof AdMoviePlayer) {
         ((AdMoviePlayer) currentPlayer()).updateLearnMoreButton(getLayout(),
             getTopBarOffset());
       }
@@ -2138,10 +2140,6 @@ public class OoyalaPlayer extends Observable implements Observer,
     } else if (newState == State.ERROR) {
       _tvRatingAdNotification = OoyalaPlayer.AD_ERROR_NOTIFICATION_NAME;
       sendNotification(_tvRatingAdNotification);
-    } else if (newState == State.PLAYING) {
-      if (oldState != State.PAUSED) {
-        sendNotification(OoyalaPlayer.AD_STARTED_NOTIFICATION_NAME);
-      }
     }
   }
 
@@ -2311,6 +2309,19 @@ public class OoyalaPlayer extends Observable implements Observer,
   public void setAuthToken(String authToken) {
     if (_playerAPIClient != null) {
       _playerAPIClient.setAuthToken(authToken);
+    }
+  }
+
+  /**
+   * Insert VAST ads to the managed ad plugin.
+   *
+   * @param ads the ads to be inserted.
+   */
+  public void insertAds(List<VASTAdSpot> ads) {
+    if (_managedAdsPlugin != null && ads != null) {
+      for (VASTAdSpot vast : ads) {
+        _managedAdsPlugin.insertAd(vast);
+      }
     }
   }
 }

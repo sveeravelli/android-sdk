@@ -474,7 +474,7 @@ public class OoyalaIMAManager implements AdPluginInterface, AdsLoadedListener, A
   @Override
   public void skipAd() {
     DebugMode.logD(TAG, "IMA Ads Manager: skipAd");
-    _adPlayer.notifyAdSkipped();
+    _adPlayer.skipAd();
     _adsManager.skip();
   }
 

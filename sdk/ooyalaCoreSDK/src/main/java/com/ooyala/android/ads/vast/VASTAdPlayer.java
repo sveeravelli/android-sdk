@@ -69,7 +69,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
     _seekable = false;
     _ad = (VASTAdSpot) ad;
-    if (_ad.getAds() == null || _ad.getAds().isEmpty()) {
+    if (!_ad.isInfoFetched()) {
       if (_fetchTask != null) {
         this._parent.getOoyalaAPIClient().cancel(_fetchTask);
       }
@@ -81,6 +81,12 @@ public class VASTAdPlayer extends AdMoviePlayer {
           if (!result) {
             _error = new OoyalaException(OoyalaErrorCode.ERROR_PLAYBACK_FAILED, "Could not fetch VAST Ad");
             setState(State.ERROR);
+            return;
+          }
+          if (_ad.getVMAPAdSpots() != null && _ad.getVMAPAdSpots().size() > 0) {
+            // this is a vmap spot, refresh ads with vmap spots
+            parent.insertAds(_ad.getVMAPAdSpots());
+            setState(State.COMPLETED);
             return;
           }
           if(!initAfterFetch(parent)) {
@@ -228,7 +234,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
   @Override
   public void update(Observable arg0, Object arg1) {
-    final String name = ((OoyalaNotification)arg1).getName();
+    final String name = OoyalaNotification.getNameOrUnknown(arg1);
     if (name == OoyalaPlayer.TIME_CHANGED_NOTIFICATION_NAME) {
       if (!_startSent && currentTime() > 0) {
         sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
@@ -374,20 +380,10 @@ public class VASTAdPlayer extends AdMoviePlayer {
    */
   @Override
   public void processClickThrough() {
-    suspend();
-    if (currentLinearAd() != null && currentLinearAd().getClickTrackingURLs() != null) {
-      Set<String> urls = currentLinearAd().getClickTrackingURLs();
-      if (urls != null) {
-        for (String urlStr : urls) {
-          final URL url = VASTUtils.urlFromAdUrlString(urlStr);
-          DebugMode.logI(TAG, "Sending Click Tracking Ping: " + url);
-          Utils.pingUrl(url);
-        }
-      }
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
+      //Open browser to click through URL
+      processClick(currentLinearAd().getClickThroughURL(), currentLinearAd().getClickTrackingURLs());
     }
-
-    //Open browser to click through URL
-    openUrlInBrowser(currentLinearAd().getClickThroughURL());
   }
 
   @Override
@@ -398,13 +394,21 @@ public class VASTAdPlayer extends AdMoviePlayer {
       return;
     }
     VASTIcon icon = icons.get(index);
-    // send trackings.
-    for (String clickTracking : icon.getClickTrackings()) {
-      final URL url = VASTUtils.urlFromAdUrlString(clickTracking);
-      Utils.pingUrl(url);
+    if (icon.getClickThrough() != null) {
+      processClick(icon.getClickThrough(), icon.getClickTrackings());
     }
-    // navigate to the click url
-    openUrlInBrowser(icon.getClickThrough());
+  }
+
+  private void processClick(String clickUrl, Set<String> trackingUrls) {
+    suspend();
+    if (trackingUrls != null) {
+      //send trackings
+      for (String s : trackingUrls) {
+        final URL url = VASTUtils.urlFromAdUrlString(s);
+        Utils.pingUrl(url);
+      }
+    }
+    openUrlInBrowser(clickUrl);
   }
 
   public void sendTrackingEvent(String event) {
