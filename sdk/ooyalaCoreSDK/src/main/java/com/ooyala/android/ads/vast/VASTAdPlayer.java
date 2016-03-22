@@ -131,7 +131,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     _topMargin = parent.getTopBarOffset();
 
     //Add Learn More button if there is a click through URL
-    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null && _parent.getOptions().getShowNativeLearnMoreButton()) {
       _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
       _playerLayout.addView(_learnMore);
     }
@@ -193,6 +193,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
     //Bring Learn More button to front when play resumes so it does not get hidden beneath the video view.
     if (_learnMore != null) {
+      System.out.println("inside 2nd loop");
       _playerLayout.bringChildToFront(_learnMore);
     }
   }
@@ -327,7 +328,7 @@ public class VASTAdPlayer extends AdMoviePlayer {
     super.play();
 
     //If the next linear ad has a clickThrough URL, create the Learn More button only if it doesn't exist
-    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null) {
+    if (currentLinearAd() != null && currentLinearAd().getClickThroughURL() != null && _parent.getOptions().getShowNativeLearnMoreButton()) {
       if (_learnMore == null) {
           _learnMore = new AdsLearnMoreButton(_playerLayout.getContext(), this, _topMargin);
           _playerLayout.addView(_learnMore);

@@ -78,6 +78,8 @@ public class Options implements ReadonlyOptionsInterface {
      */
     private boolean useExoPlayer;
 
+    private boolean showNativeLearnMoreButton;
+
     /**
      * Defaults to the following values:
      * tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
@@ -90,6 +92,7 @@ public class Options implements ReadonlyOptionsInterface {
      * connectionTimeoutInMillisecond = 0;
      * readTimeoutInMillisecond = 0;
      * preventVideoViewSharing = false;
+     * showNatveLearnMore = true;
      */
     public Builder() {
       this.tvRatingConfiguration = FCCTVRatingConfiguration.s_getDefaultTVRatingConfiguration();
@@ -104,6 +107,7 @@ public class Options implements ReadonlyOptionsInterface {
       this.readTimeoutInMillisecond = 0;
       this.preventVideoViewSharing = false;
       this.useExoPlayer = false;
+      this.showNativeLearnMoreButton = true;
     }
 
     public Builder setTVRatingConfiguration( FCCTVRatingConfiguration tvRatingConfiguration ) {
@@ -176,6 +180,11 @@ public class Options implements ReadonlyOptionsInterface {
       return this;
     }
 
+    public Builder setShowNativeLearnMoreButton( boolean showNativeLearnMoreButton ) {
+      this.showNativeLearnMoreButton = showNativeLearnMoreButton;
+      return this;
+    }
+
     public Options build() {
       return new Options(
           tvRatingConfiguration,
@@ -189,7 +198,8 @@ public class Options implements ReadonlyOptionsInterface {
           connectionTimeoutInMillisecond,
           readTimeoutInMillisecond,
           preventVideoViewSharing,
-          useExoPlayer);
+          useExoPlayer,
+          showNativeLearnMoreButton);
     }
   }
 
@@ -205,6 +215,11 @@ public class Options implements ReadonlyOptionsInterface {
   private final boolean showLiveControls;
   private final boolean preventVideoViewSharing;
   private final boolean useExoPlayer;
+  private final boolean showNativeLearnMoreButton;
+
+  public boolean isShowNativeLearnMoreButton() {
+    return showNativeLearnMoreButton;
+  }
 
   /**
    * Initialize an Options object with given parameters:
@@ -219,6 +234,7 @@ public class Options implements ReadonlyOptionsInterface {
    * @param connectionTimeoutInMillisecond - Configure to set a connection timeout value.
    * @param readTimeoutInMillisecond - Configure to set a read time out value.
    * @param preventVideoViewSharing - Configure to prevent/allow video sharing.
+   * @param showNativeLearnMoreButton - Configure to show learn more button.
    * @return the initialized Options - Return the configured options.
    */
   private Options(FCCTVRatingConfiguration tvRatingConfiguration,
@@ -232,7 +248,8 @@ public class Options implements ReadonlyOptionsInterface {
                   int connectionTimeoutInMillisecond,
                   int readTimeoutInMillisecond,
                   boolean preventVideoViewSharing,
-                  boolean useExoPlayer) {
+                  boolean useExoPlayer,
+                  boolean showNativeLearnMoreButton) {
 
     this.tvRatingConfiguration = tvRatingConfiguration;
     this.visualOnConfiguration = visualOnConfiguration;
@@ -246,6 +263,7 @@ public class Options implements ReadonlyOptionsInterface {
     this.readTimeoutInMillisecond = readTimeoutInMillisecond;
     this.preventVideoViewSharing = preventVideoViewSharing;
     this.useExoPlayer = useExoPlayer;
+    this.showNativeLearnMoreButton = showNativeLearnMoreButton;
   }
 
   @Override
@@ -307,4 +325,10 @@ public class Options implements ReadonlyOptionsInterface {
   public boolean getUseExoPlayer() {
     return useExoPlayer;
   }
+
+  @Override
+  public boolean getShowNativeLearnMoreButton() {
+    return showNativeLearnMoreButton;
+  }
+
 }

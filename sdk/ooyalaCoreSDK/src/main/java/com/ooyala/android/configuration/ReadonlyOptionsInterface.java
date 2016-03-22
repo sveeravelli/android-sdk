@@ -62,4 +62,10 @@ public interface ReadonlyOptionsInterface {
    * True if use exoplayer, false otherwise.
    */
   boolean getUseExoPlayer();
+
+  boolean getShowNativeLearnMoreButton();
+
+  /**
+   * If "true", show a promo image if one is available.
+   */
 }
