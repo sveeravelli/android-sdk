@@ -63,9 +63,9 @@ public interface ReadonlyOptionsInterface {
    */
   boolean getUseExoPlayer();
 
+  /**
+   * Is set True to show Learn More button for Ads.
+   */
   boolean getShowNativeLearnMoreButton();
 
-  /**
-   * If "true", show a promo image if one is available.
-   */
 }
