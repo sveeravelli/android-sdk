@@ -193,7 +193,6 @@ public class VASTAdPlayer extends AdMoviePlayer {
 
     //Bring Learn More button to front when play resumes so it does not get hidden beneath the video view.
     if (_learnMore != null) {
-      System.out.println("inside 2nd loop");
       _playerLayout.bringChildToFront(_learnMore);
     }
   }
